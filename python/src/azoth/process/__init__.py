@@ -24,6 +24,7 @@ from azoth.core.result import (
     AntiSurgeRecycleResult,
     Api537FlareFlameModelResult,
     BleveResult,
+    BowTieResult,
     ComponentSplitterResult,
     CompressorResult,
     ConsequenceAnalysisResult,
@@ -98,6 +99,7 @@ __all__ = [
     "anti_surge_recycle",
     "api537_flare_flame_model",
     "bleve",
+    "bow_tie",
     "catalogue",
     "component_splitter",
     "compressor",
@@ -174,6 +176,7 @@ _DELUGE_NOZZLE_LAYOUT = "process.deluge_nozzle_layout"
 _EJECTOR = "process.ejector"
 _EVENT_TREE = "process.event_tree"
 _FAULT_TREE = "process.fault_tree"
+_BOW_TIE = "process.bow_tie"
 _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
@@ -2215,6 +2218,27 @@ def fault_tree(
     return resolve(_FAULT_TREE)(  # type: ignore[no-any-return]
         nodes=nodes,
         max_cardinality=max_cardinality,
+    )
+
+
+def bow_tie(
+    threats: list[dict[str, object]],
+    consequences: list[dict[str, object]],
+    barriers: list[dict[str, object]],
+) -> BowTieResult:
+    """The bow-tie risk: the threat sum, the prevention barriers and the RRF.
+
+    The unmitigated frequency is the active threats' sum; the mitigated frequency
+    multiplies the functional ``prevention`` and ``both`` barriers' PFDs in list order.
+    **A ``mitigation`` barrier is read by no formula**, and neither is a threat-to-barrier
+    link. ``total_rrf`` is zero at a zero mitigated frequency, the class's own answer.
+
+    See :func:`azoth.process.reference.bow_tie`.
+    """
+    return resolve(_BOW_TIE)(  # type: ignore[no-any-return]
+        threats=threats,
+        consequences=consequences,
+        barriers=barriers,
     )
 
 

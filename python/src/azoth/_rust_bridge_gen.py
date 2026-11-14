@@ -32,6 +32,7 @@ from azoth.core.result import (
     BeggsBrillSegmentResult,
     BleveResult,
     BoilingHeatTransferResult,
+    BowTieResult,
     BrineMixingPointRow,
     BrineMixingScaleEvaluatorResult,
     BubblePressureResult,
@@ -407,6 +408,7 @@ __all__ = [
     "beggs_brill_segment",
     "bleve",
     "boiling_heat_transfer",
+    "bow_tie",
     "brine_mixing_scale_evaluator",
     "bubble_pressure",
     "bubble_temperature",
@@ -5690,6 +5692,23 @@ def bleve(fuel_mass: Q, heat_of_combustion: float, radiative_fraction: float, re
         transmissivity=result.transmissivity,
         incident_heat_flux=None if result.incident_heat_flux is None else from_si(result.incident_heat_flux.magnitude_si, result.incident_heat_flux.unit),
         distance_to_flux=None if result.distance_to_flux is None else from_si(result.distance_to_flux.magnitude_si, result.distance_to_flux.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def bow_tie(threats: list[dict[str, object]], consequences: list[dict[str, object]], barriers: list[dict[str, object]]) -> BowTieResult:
+    """``process.bow_tie``, computed in Rust."""
+    spec = _models_gen.model("process.bow_tie")
+    result = _core.bow_tie(
+        input_records_to_si(spec, "threats", threats),
+        input_records_to_si(spec, "consequences", consequences),
+        input_records_to_si(spec, "barriers", barriers),
+    )
+    return BowTieResult(
+        unmitigated_frequency_per_year=result.unmitigated_frequency_per_year,
+        mitigated_frequency_per_year=result.mitigated_frequency_per_year,
+        total_rrf=result.total_rrf,
+        max_severity=result.max_severity,
         warnings=_warnings(result.warnings),
     )
 

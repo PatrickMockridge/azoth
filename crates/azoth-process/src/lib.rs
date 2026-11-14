@@ -54,7 +54,8 @@ pub use recycle::{Acceleration, RecycleSettings, Residuals};
 // cross-impl test and a NeqSim capture can address it.
 pub use models::{
     AbsorptionColumnResult, ActiveFireProtectionScreeningResult, AntiSurgeRecycleResult,
-    Api537FlareFlameModelResult, BleveResult, ComponentSplitterResult, CompressorResult,
+    Api537FlareFlameModelResult, BleveResult, BowTieResult, ComponentSplitterResult,
+    CompressorResult,
     ConsequenceAnalysisResult, CoolerResult, DelugeNozzleLayoutResult, DistillationColumnResult,
     EjectorResult, EventTreeResult, ExpanderResult, FaultTreeResult, FilterResult,
     FireMonitorCoverageResult,
@@ -67,7 +68,7 @@ pub use models::{
     StirredTankReactorResult, StrippingColumnResult, TankResult, ThreePhaseSeparatorResult,
     ThrottlingValveResult, TurboExpanderResult, VceResult, absorption_column,
     active_fire_protection_screening, anti_surge_recycle, api537_flare_flame_model, bleve,
-    component_splitter, compressor, consequence_analysis, cooler, deluge_nozzle_layout,
+    bow_tie, component_splitter, compressor, consequence_analysis, cooler, deluge_nozzle_layout,
     distillation_column, ejector, event_tree, expander, fault_tree, filter,
     fire_monitor_coverage,
     fire_water_coverage_assessment, fire_water_demand, flare, gas_dispersion, gas_scrubber,

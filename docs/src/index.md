@@ -331,6 +331,7 @@ Five sections, and the difference between them is the point:
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
 - [`process.api537_flare_flame_model`](./process/api537_flare_flame_model.md) — API 537 flare flame model
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation
+- [`process.bow_tie`](./process/bow_tie.md) — Bow-tie risk
 - [`process.component_splitter`](./process/component_splitter.md) — Component splitter
 - [`process.compressor`](./process/compressor.md) — Compressor
 - [`process.consequence_analysis`](./process/consequence_analysis.md) — Consequence analysis

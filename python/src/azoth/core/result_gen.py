@@ -5735,6 +5735,28 @@ class BleveResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class BowTieResult(_HasWarnings):
+    """Result of ``process.bow_tie``."""
+
+    CALC_ID: ClassVar[str] = "process.bow_tie"
+
+    #: the sum of the active threats' frequencies, in 1/year.
+    unmitigated_frequency_per_year: float
+
+    #: the unmitigated frequency times the functional prevention barriers' PFDs, in 1/year.
+    mitigated_frequency_per_year: float
+
+    #: `unmitigated / mitigated`; zero when the mitigated frequency is zero.
+    total_rrf: float
+
+    #: the largest consequence severity, or zero when there are no consequences.
+    max_severity: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ComponentSplitterResult(_HasWarnings):
     """Result of ``process.component_splitter``."""
 

@@ -41,6 +41,33 @@ pub struct AssayCutDerivation {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BowTieBarrier {
+    #[pyo3(item)]
+    pub pfd: f64,
+    #[pyo3(item)]
+    pub barrier_type: String,
+    #[pyo3(item)]
+    pub functional: Option<bool>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BowTieConsequence {
+    #[pyo3(item)]
+    pub severity: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BowTieThreat {
+    #[pyo3(item)]
+    pub frequency: f64,
+    #[pyo3(item)]
+    pub active: Option<bool>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct BrineAnalysis {
     #[pyo3(item)]
     pub calcium: f64,

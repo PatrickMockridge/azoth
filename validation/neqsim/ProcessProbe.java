@@ -13990,6 +13990,9 @@ public class ProcessProbe {
         new double[][] {{0.1, 0.0, 1.0}, {0.2, 0.0, 1.0}}, true);
     // No barriers: mitigated equals unmitigated and the RRF is one.
     bowTieRow("bt_no_barriers", new double[][] {{0.3, 1.0}}, new int[] {5}, new double[][] {}, false);
+    // A non-functional prevention barrier has the same answer as no barrier at all.
+    bowTieRow("bt_nonfunctional", new double[][] {{0.2, 1.0}}, new int[] {4},
+        new double[][] {{0.01, 0.0, 0.0}}, false);
     // Evidence: an empty bow-tie, and the states the class does not validate.
     bowTieRow("bt_empty", new double[][] {}, new int[] {}, new double[][] {}, false);
     bowTieRow("bt_negative_frequency", new double[][] {{-1.0, 1.0}}, new int[] {5},

@@ -409,6 +409,24 @@ class FlareTargetFlux(TypedDict):
 
     flux: float
 
+class BowTieThreat(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    frequency: float
+    active: bool | None
+
+class BowTieConsequence(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    severity: float
+
+class BowTieBarrier(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    pfd: float
+    barrier_type: str
+    functional: bool | None
+
 class DepositMass(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -2935,6 +2953,14 @@ class BleveResult:
     transmissivity: float | None
     incident_heat_flux: Qty | None
     distance_to_flux: Qty | None
+    warnings: list[Warning]
+
+@final
+class BowTieResult:
+    unmitigated_frequency_per_year: float
+    mitigated_frequency_per_year: float
+    total_rrf: float
+    max_severity: float
     warnings: list[Warning]
 
 @final
@@ -6502,6 +6528,11 @@ def bleve(
     distance: float | None = None,
     target_flux: float | None = None,
 ) -> BleveResult: ...
+def bow_tie(
+    threats: list[BowTieThreat],
+    consequences: list[BowTieConsequence],
+    barriers: list[BowTieBarrier],
+) -> BowTieResult: ...
 def component_splitter(
     components: list[str],
     feed_n: float,

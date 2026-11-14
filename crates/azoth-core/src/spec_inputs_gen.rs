@@ -227,6 +227,7 @@
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/bow_tie.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml

@@ -1,0 +1,81 @@
+model = "process.bow_tie"
+[[cases]]
+id = "bt_class_test"
+tolerance = 1.0e-12
+source = "`BowTieTest.testBowTieModelCalculateRisk`: two threats at 0.1 and 0.05, one prevention barrier at 0.01, one severity-5 consequence. From `validation/neqsim/captures/process_bow_tie.tsv` (`bt_class_test`)."
+[cases.inputs]
+threats = [
+  { frequency = 0.1, active = true },
+  { frequency = 0.05, active = true },
+]
+consequences = [{ severity = 5.0 }]
+barriers = [{ pfd = 0.01, barrier_type = "prevention", functional = true }]
+[cases.expected]
+unmitigated_frequency_per_year = 0.15000000000000002
+mitigated_frequency_per_year = 0.0015000000000000002
+total_rrf = 100.0
+max_severity = 5.0
+[[cases]]
+id = "bt_mitigation_ignored"
+tolerance = 1.0e-12
+source = "A mitigation barrier at PFD 0.5 beside a prevention barrier at 0.01: only the prevention barrier moves the frequency. From (`bt_mitigation_ignored`)."
+[cases.inputs]
+threats = [{ frequency = 0.1, active = true }]
+consequences = [{ severity = 4.0 }]
+barriers = [
+  { pfd = 0.01, barrier_type = "prevention", functional = true },
+  { pfd = 0.5, barrier_type = "mitigation", functional = true },
+]
+[cases.expected]
+unmitigated_frequency_per_year = 0.1
+mitigated_frequency_per_year = 0.001
+total_rrf = 100.0
+max_severity = 4.0
+[[cases]]
+id = "bt_both_types"
+tolerance = 1.0e-12
+source = "A `both` barrier at 0.1 takes part, an inactive threat is skipped and a non-functional prevention barrier does not multiply. From (`bt_both_types`)."
+[cases.inputs]
+threats = [
+  { frequency = 0.1, active = true },
+  { frequency = 0.2, active = false },
+]
+consequences = [{ severity = 3.0 }, { severity = 5.0 }]
+barriers = [
+  { pfd = 0.1, barrier_type = "both", functional = true },
+  { pfd = 0.01, barrier_type = "prevention", functional = false },
+]
+[cases.expected]
+unmitigated_frequency_per_year = 0.1
+mitigated_frequency_per_year = 0.010000000000000002
+total_rrf = 9.999999999999998
+max_severity = 5.0
+[[cases]]
+id = "bt_link_ignored"
+tolerance = 1.0e-12
+source = "Two prevention barriers at 0.1 and 0.2, the first linked to the threat: the link drives no arithmetic and both multiply. From (`bt_link_ignored`)."
+[cases.inputs]
+threats = [{ frequency = 0.1, active = true }]
+consequences = [{ severity = 2.0 }]
+barriers = [
+  { pfd = 0.1, barrier_type = "prevention", functional = true },
+  { pfd = 0.2, barrier_type = "prevention", functional = true },
+]
+[cases.expected]
+unmitigated_frequency_per_year = 0.1
+mitigated_frequency_per_year = 0.0020000000000000005
+total_rrf = 49.99999999999999
+max_severity = 2.0
+[[cases]]
+id = "bt_nonfunctional"
+tolerance = 1.0e-12
+source = "A non-functional prevention barrier leaves the mitigated frequency equal to the unmitigated one; the capture's no-barrier state is the same arithmetic and cannot be cased. From (`bt_nonfunctional`)."
+[cases.inputs]
+threats = [{ frequency = 0.2, active = true }]
+consequences = [{ severity = 4.0 }]
+barriers = [{ pfd = 0.01, barrier_type = "prevention", functional = false }]
+[cases.expected]
+unmitigated_frequency_per_year = 0.2
+mitigated_frequency_per_year = 0.2
+total_rrf = 1.0
+max_severity = 4.0

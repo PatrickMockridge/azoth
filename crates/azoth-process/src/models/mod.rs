@@ -35,6 +35,7 @@ pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
 pub mod api537_flare_flame_model;
 pub mod bleve;
+pub mod bow_tie;
 pub mod component_splitter;
 pub mod compressor;
 pub mod consequence_analysis;
@@ -92,6 +93,9 @@ pub use api537_flare_flame_model::{
     Api537FlareFlameModelResult, FlareTargetFlux, SterileRadius, api537_flare_flame_model,
 };
 pub use bleve::{BleveResult, bleve};
+pub use bow_tie::{
+    BowTieBarrier, BowTieConsequence, BowTieResult, BowTieThreat, bow_tie,
+};
 pub use component_splitter::{ComponentSplitterResult, component_splitter};
 pub use compressor::{CompressorResult, compressor};
 pub use consequence_analysis::{

@@ -2126,6 +2126,23 @@ def _fault_tree(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _bow_tie(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.bow_tie`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.bow_tie import bow_tie as evaluate
+
+    result = evaluate(
+        [dict(row) for row in inputs["threats"]],
+        [dict(row) for row in inputs["consequences"]],
+        [dict(row) for row in inputs["barriers"]],
+    )
+    return {
+        "unmitigated_frequency_per_year": result.unmitigated_frequency_per_year,
+        "mitigated_frequency_per_year": result.mitigated_frequency_per_year,
+        "total_rrf": result.total_rrf,
+        "max_severity": result.max_severity,
+    }
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2143,6 +2160,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.fault_tree": _fault_tree,
+    "process.bow_tie": _bow_tie,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3176,6 +3194,44 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fault_tree.tsv",
         block=4,
         identified_by=("#label", "ft_cut_sets"),
+    ),
+    # The bow-tie's five caseable states. The eight blocks after them (an empty bow-tie,
+    # a negative frequency, PFDs outside [0, 1], a NaN, no consequences, all threats
+    # inactive) are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.bow_tie",
+        case="bt_class_test",
+        capture="process_bow_tie.tsv",
+        block=0,
+        identified_by=("#label", "bt_class_test"),
+    ),
+    LayerCase(
+        model="process.bow_tie",
+        case="bt_mitigation_ignored",
+        capture="process_bow_tie.tsv",
+        block=1,
+        identified_by=("#label", "bt_mitigation_ignored"),
+    ),
+    LayerCase(
+        model="process.bow_tie",
+        case="bt_both_types",
+        capture="process_bow_tie.tsv",
+        block=2,
+        identified_by=("#label", "bt_both_types"),
+    ),
+    LayerCase(
+        model="process.bow_tie",
+        case="bt_link_ignored",
+        capture="process_bow_tie.tsv",
+        block=3,
+        identified_by=("#label", "bt_link_ignored"),
+    ),
+    LayerCase(
+        model="process.bow_tie",
+        case="bt_nonfunctional",
+        capture="process_bow_tie.tsv",
+        block=5,
+        identified_by=("#label", "bt_nonfunctional"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4413,6 +4469,9 @@ UNCASED_ROWS: dict[str, int] = {
     # empty gates, duplicate names, a NaN basic, the 31-basic shift overflow, the zero
     # cardinality and the four constructor guards.
     "process_fault_tree.tsv": 14,
+    # The bow-tie's eight: the empty bow-tie, no barriers, no consequences, all threats
+    # inactive, a negative frequency, a PFD above one, a negative PFD and a NaN.
+    "process_bow_tie.tsv": 8,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

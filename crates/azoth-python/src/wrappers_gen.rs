@@ -5606,6 +5606,48 @@ pub fn bleve(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Bow-tie risk.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (threats, consequences, barriers))]
+#[pyo3(text_signature = "(threats, consequences, barriers)")]
+pub fn bow_tie(
+    py: Python<'_>,
+    threats: Vec<crate::records_gen::BowTieThreat>,
+    consequences: Vec<crate::records_gen::BowTieConsequence>,
+    barriers: Vec<crate::records_gen::BowTieBarrier>,
+) -> PyResult<crate::transport_gen::PyBowTieResult> {
+    let threats_records: Vec<azoth_process::models::bow_tie::BowTieThreat> = threats
+        .into_iter()
+        .map(|row| azoth_process::models::bow_tie::BowTieThreat {
+            frequency: row.frequency,
+            active: row.active,
+        })
+        .collect();
+    let consequences_records: Vec<azoth_process::models::bow_tie::BowTieConsequence> = consequences
+        .into_iter()
+        .map(|row| azoth_process::models::bow_tie::BowTieConsequence {
+            severity: row.severity,
+        })
+        .collect();
+    let barriers_records: Vec<azoth_process::models::bow_tie::BowTieBarrier> = barriers
+        .into_iter()
+        .map(|row| azoth_process::models::bow_tie::BowTieBarrier {
+            pfd: row.pfd,
+            barrier_type: row.barrier_type,
+            functional: row.functional,
+        })
+        .collect();
+    azoth_process::models::bow_tie::bow_tie(
+        &threats_records,
+        &consequences_records,
+        &barriers_records,
+    )
+    .map(|r| crate::transport_gen::PyBowTieResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Component splitter.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

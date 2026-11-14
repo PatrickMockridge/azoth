@@ -16,6 +16,7 @@ use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeni
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
 use crate::models::bleve::BleveResult;
+use crate::models::bow_tie::BowTieResult;
 use crate::models::component_splitter::ComponentSplitterResult;
 use crate::models::compressor::CompressorResult;
 use crate::models::consequence_analysis::ConsequenceAnalysisResult;
@@ -179,6 +180,21 @@ impl CalcResult for BleveResult {
         "transmissivity",
         "incident_heat_flux",
         "distance_to_flux",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for BowTieResult {
+    const CALC_ID: &'static str = "process.bow_tie";
+    const FIELDS: &'static [&'static str] = &[
+        "unmitigated_frequency_per_year",
+        "mitigated_frequency_per_year",
+        "total_rrf",
+        "max_severity",
         "warnings",
     ];
 

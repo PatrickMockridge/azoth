@@ -6,6 +6,7 @@
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/bow_tie.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
@@ -5521,6 +5522,420 @@ pub static BLEVE_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&BLEVE_ALGORITHM),
     checks: BLEVE_CHECKS,
     cases: BLEVE_CASES,
+};
+
+static BOW_TIE_CHECKS: &[SpecCheck] = &[];
+
+static BOW_TIE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "bt_class_test",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("unmitigated_frequency_per_year", 0.15000000000000002),
+            ("mitigated_frequency_per_year", 0.0015000000000000002),
+            ("total_rrf", 100.0),
+            ("max_severity", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "threats",
+                &[
+                    &[
+                        RecordField {
+                            name: "frequency",
+                            value: FieldValue::Number(0.1),
+                        },
+                        RecordField {
+                            name: "active",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "frequency",
+                            value: FieldValue::Number(0.05),
+                        },
+                        RecordField {
+                            name: "active",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "consequences",
+                &[&[RecordField {
+                    name: "severity",
+                    value: FieldValue::Number(5.0),
+                }]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                    RecordField {
+                        name: "barrier_type",
+                        value: FieldValue::Name("prevention"),
+                    },
+                    RecordField {
+                        name: "functional",
+                        value: FieldValue::Flag(true),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "bt_mitigation_ignored",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("unmitigated_frequency_per_year", 0.1),
+            ("mitigated_frequency_per_year", 0.001),
+            ("total_rrf", 100.0),
+            ("max_severity", 4.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "threats",
+                &[&[
+                    RecordField {
+                        name: "frequency",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "active",
+                        value: FieldValue::Flag(true),
+                    },
+                ]],
+            ),
+            (
+                "consequences",
+                &[&[RecordField {
+                    name: "severity",
+                    value: FieldValue::Number(4.0),
+                }]],
+            ),
+            (
+                "barriers",
+                &[
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.01),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.5),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("mitigation"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "bt_both_types",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("unmitigated_frequency_per_year", 0.1),
+            ("mitigated_frequency_per_year", 0.010000000000000002),
+            ("total_rrf", 9.999999999999998),
+            ("max_severity", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "threats",
+                &[
+                    &[
+                        RecordField {
+                            name: "frequency",
+                            value: FieldValue::Number(0.1),
+                        },
+                        RecordField {
+                            name: "active",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "frequency",
+                            value: FieldValue::Number(0.2),
+                        },
+                        RecordField {
+                            name: "active",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "consequences",
+                &[
+                    &[RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(3.0),
+                    }],
+                    &[RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(5.0),
+                    }],
+                ],
+            ),
+            (
+                "barriers",
+                &[
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.1),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("both"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.01),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "bt_link_ignored",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("unmitigated_frequency_per_year", 0.1),
+            ("mitigated_frequency_per_year", 0.0020000000000000005),
+            ("total_rrf", 49.99999999999999),
+            ("max_severity", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "threats",
+                &[&[
+                    RecordField {
+                        name: "frequency",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "active",
+                        value: FieldValue::Flag(true),
+                    },
+                ]],
+            ),
+            (
+                "consequences",
+                &[&[RecordField {
+                    name: "severity",
+                    value: FieldValue::Number(2.0),
+                }]],
+            ),
+            (
+                "barriers",
+                &[
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.1),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.2),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "bt_nonfunctional",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("unmitigated_frequency_per_year", 0.2),
+            ("mitigated_frequency_per_year", 0.2),
+            ("total_rrf", 1.0),
+            ("max_severity", 4.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "threats",
+                &[&[
+                    RecordField {
+                        name: "frequency",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "active",
+                        value: FieldValue::Flag(true),
+                    },
+                ]],
+            ),
+            (
+                "consequences",
+                &[&[RecordField {
+                    name: "severity",
+                    value: FieldValue::Number(4.0),
+                }]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                    RecordField {
+                        name: "barrier_type",
+                        value: FieldValue::Name("prevention"),
+                    },
+                    RecordField {
+                        name: "functional",
+                        value: FieldValue::Flag(false),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+];
+
+static BOW_TIE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_bow_tie",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.bow_tie`.
+pub static BOW_TIE_SPEC: ModelSpec = ModelSpec {
+    id: "process.bow_tie",
+    kind: "procedure",
+    algorithm: Some(&BOW_TIE_ALGORITHM),
+    checks: BOW_TIE_CHECKS,
+    cases: BOW_TIE_CASES,
 };
 
 static COMPONENT_SPLITTER_CHECKS: &[SpecCheck] = &[
@@ -59238,6 +59653,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &ANTI_SURGE_RECYCLE_SPEC,
     &API537_FLARE_FLAME_MODEL_SPEC,
     &BLEVE_SPEC,
+    &BOW_TIE_SPEC,
     &COMPONENT_SPLITTER_SPEC,
     &COMPRESSOR_SPEC,
     &CONSEQUENCE_ANALYSIS_SPEC,

@@ -14341,6 +14341,57 @@ impl From<&azoth_process::models::bleve::BleveResult> for PyBleveResult {
         }
     }
 }
+/// Result of `process.bow_tie`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BowTieResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBowTieResult {
+    /// the sum of the active threats' frequencies, in 1/year.
+    #[pyo3(get)]
+    pub unmitigated_frequency_per_year: f64,
+    /// the unmitigated frequency times the functional prevention barriers' PFDs, in 1/year.
+    #[pyo3(get)]
+    pub mitigated_frequency_per_year: f64,
+    /// `unmitigated / mitigated`; zero when the mitigated frequency is zero.
+    #[pyo3(get)]
+    pub total_rrf: f64,
+    /// the largest consequence severity, or zero when there are no consequences.
+    #[pyo3(get)]
+    pub max_severity: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBowTieResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BowTieResult(unmitigated_frequency_per_year={:?}, mitigated_frequency_per_year={:?}, total_rrf={:?}, max_severity={:?}, {} warning(s))",
+            self.unmitigated_frequency_per_year,
+            self.mitigated_frequency_per_year,
+            self.total_rrf,
+            self.max_severity,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::bow_tie::BowTieResult> for PyBowTieResult {
+    fn from(r: &azoth_process::models::bow_tie::BowTieResult) -> Self {
+        Self {
+            unmitigated_frequency_per_year: r.unmitigated_frequency_per_year,
+            mitigated_frequency_per_year: r.mitigated_frequency_per_year,
+            total_rrf: r.total_rrf,
+            max_severity: r.max_severity,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.component_splitter`, transported.
 #[pyclass(
     frozen,

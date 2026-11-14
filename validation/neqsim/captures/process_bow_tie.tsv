@@ -84,6 +84,21 @@ mitigated_frequency_per_year=0.3
 total_rrf=1.0
 max_severity=5
 
+bt_nonfunctional
+threat_count=1
+threat0_frequency_per_year=0.2
+threat0_active=true
+consequence_count=1
+consequence0_severity=4
+barrier_count=1
+barrier0_pfd=0.01
+barrier0_type=0
+barrier0_functional=false
+unmitigated_frequency_per_year=0.2
+mitigated_frequency_per_year=0.2
+total_rrf=1.0
+max_severity=4
+
 bt_empty
 threat_count=0
 consequence_count=0
