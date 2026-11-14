@@ -33,7 +33,13 @@ import { removeCommandFor } from "../wire/nodes";
 import { asEdgeData } from "../wire/decode";
 import type { Catalogue, Envelope, GraphNode } from "../wire/types";
 import { PfdEdge } from "./PfdEdge";
-import { STREAM_NODE, UNIT_NODE, nodeTypes, type NodePayload } from "./UnitOpNode";
+import {
+  INSTRUMENT_NODE,
+  STREAM_NODE,
+  UNIT_NODE,
+  nodeTypes,
+  type NodePayload,
+} from "./UnitOpNode";
 
 /** The connector: a route computed around the node plates, not xyflow's handle-to-handle curve. */
 export const PFD_EDGE = { type: "pfd" as const };
@@ -43,6 +49,7 @@ const edgeTypes = { pfd: PfdEdge };
 /** The plate sizes the router treats as obstacles; they are the layout tokens' fixed values. */
 const UNIT_OBSTACLE = { width: 190, height: 168 };
 const STREAM_OBSTACLE = { width: 160, height: 42 };
+const INSTRUMENT_OBSTACLE = { width: 150, height: 70 };
 
 /**
  * **One line per point.** A handle already carrying an edge is full; a connection needs a free
@@ -202,7 +209,9 @@ export function Flowsheet({
           onCommand(
             data.kind === "recycle"
               ? { command: "remove_recycle", stream: data.path }
-              : { command: "disconnect", from: data.from, to: data.to },
+              : data.kind === "signal"
+                ? { command: "remove_signal", from: data.from, to: data.to }
+                : { command: "disconnect", from: data.from, to: data.to },
           );
         }
       }}
@@ -271,24 +280,38 @@ function derive(
     };
     return {
       id: node.id,
-      type: node.type === "unit_op" ? UNIT_NODE : STREAM_NODE,
+      type:
+        node.type === "unit_op"
+          ? UNIT_NODE
+          : node.type === "instrument"
+            ? INSTRUMENT_NODE
+            : STREAM_NODE,
       position: node.position,
       data: payload,
       selected: node.id === selected,
     };
   });
 
-  const obstacles = nodes.map((node) => ({
-    x: node.position.x,
-    y: node.position.y,
-    width: node.type === UNIT_NODE ? UNIT_OBSTACLE.width : STREAM_OBSTACLE.width,
-    height: node.type === UNIT_NODE ? UNIT_OBSTACLE.height : STREAM_OBSTACLE.height,
-  }));
+  const obstacles = nodes.map((node) => {
+    const size =
+      node.type === UNIT_NODE
+        ? UNIT_OBSTACLE
+        : node.type === INSTRUMENT_NODE
+          ? INSTRUMENT_OBSTACLE
+          : STREAM_OBSTACLE;
+    return {
+      x: node.position.x,
+      y: node.position.y,
+      width: size.width,
+      height: size.height,
+    };
+  });
   let returnLane = 0;
 
   const edges: Edge[] = envelope.flowsheet.graph.edges.map((edge) => {
     const stream = streams[edge.data.path];
     const recycle = edge.data.kind === "recycle";
+    const signal = edge.data.kind === "signal";
     return {
       id: edge.id,
       type: PFD_EDGE.type,
@@ -308,7 +331,11 @@ function derive(
         type: MarkerType.ArrowClosed,
         width: 14,
         height: 14,
-        color: edge.data.kind === "recycle" ? "var(--edge-recycle)" : "var(--edge)",
+        color: signal
+          ? "var(--accent-hi)"
+          : recycle
+            ? "var(--edge-recycle)"
+            : "var(--edge)",
       },
       // A recycle is drawn moving, which is what a loop is: the tear's value is the previous
       // pass's, and the animation is the honest picture of that.
@@ -318,7 +345,7 @@ function derive(
       // `domAttributes` is typed as SVG attributes, which `data-*` is not. A diagnostic on the
       // pair adds the same reading in the error/warning colour.
       className: [
-        edge.data.kind === "recycle" ? "tear" : "",
+        signal ? "signal" : edge.data.kind === "recycle" ? "tear" : "",
         severityByEdge.get(`${edge.data.from}\u0000${edge.data.to}`) === "error"
           ? "bad"
           : severityByEdge.get(`${edge.data.from}\u0000${edge.data.to}`) === "warning"
@@ -377,6 +404,10 @@ function diagnosticNode(target: { kind: string; [key: string]: unknown }): strin
       return `${String(target.role)}:${String(target.node)}`;
     case "parameter":
       return `instance:${String(target.node)}`;
+    // An endpoint is an instrument's tag in the control layer, and the node the projection
+    // makes for it is prefixed like every other role.
+    case "endpoint":
+      return `instrument:${String(target.endpoint)}`;
     default:
       return "";
   }

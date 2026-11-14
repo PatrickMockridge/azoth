@@ -38,7 +38,7 @@ const runnable = catalogue.unit_ops.filter((entry) => entry.runnable).length;
 check("30 with a model", withModel === 30, `${withModel}`);
 check("30 runnable", runnable === 30, `${runnable}`);
 const withTools = JSON.parse(azoth.palette_json(true));
-check("16 tools", withTools.tools.length === 16, `${withTools.tools.length}`);
+check("20 tools", withTools.tools.length === 20, `${withTools.tools.length}`);
 check("98 calculations", catalogue.calcs.length === 98, `${catalogue.calcs.length}`);
 const available = catalogue.calcs.filter((entry) => entry.available).length;
 check("94 a sheet can draw", available === 94, `${available}`);

@@ -186,9 +186,60 @@ pub fn tools(palette: &[UnitOpSpec]) -> Vec<Tool> {
             ],
         ),
         tool(
+            "set_instrument",
+            "Create or replace an instrument by tag. The checker refuses a tag used twice, a \
+             function that is not upper-case ISA letters, an endpoint the document does not \
+             declare, a location outside field/panel/central, a range whose minimum is not below \
+             its maximum, and a safety declaration a drawing could not state.",
+            vec![
+                req("id", string("The tag, e.g. `PSHH-101`.")),
+                req("function", string("The ISA function letters, e.g. `PSHH`.")),
+                opt("service", string("What the instrument serves.")),
+                opt("loop_number", string("The loop the tag belongs to.")),
+                opt("measures", string("The stream or instance it watches.")),
+                opt("actuates", string("The instance it commands.")),
+                opt("location", string("`field`, `panel` or `central`.")),
+                opt(
+                    "range",
+                    json!({ "type": "object", "description":
+                            "`{ min, max, unit }`, a range in a vocabulary unit." }),
+                ),
+                opt(
+                    "safety",
+                    json!({ "type": "object", "description":
+                            "`{ function, sil, voting?, safe_state?, proof_test_hours?, closure_seconds? }`." }),
+                ),
+            ],
+        ),
+        tool(
+            "remove_instrument",
+            "Remove an instrument, and every signal that names it.",
+            vec![req("id", string("The instrument's tag."))],
+        ),
+        tool(
+            "set_signal",
+            "Create or replace the signal between two instruments.",
+            vec![
+                req("from", string("The source instrument's tag.")),
+                req("to", string("The target instrument's tag.")),
+                opt(
+                    "kind",
+                    string("`electric`, `pneumatic`, `hydraulic`, `capillary` or `radiation`."),
+                ),
+            ],
+        ),
+        tool(
+            "remove_signal",
+            "Remove the signal between two instruments.",
+            vec![
+                req("from", string("The source instrument's tag.")),
+                req("to", string("The target instrument's tag.")),
+            ],
+        ),
+        tool(
             "set_position",
             "Place a node on the canvas, by node id: `instance:sep1`, `input:feed_1`, \
-             `product:out`.",
+             `product:out`, `instrument:PSHH-101`.",
             vec![
                 req("node", string("The node's id.")),
                 req("x", number("The column, in pixels.")),

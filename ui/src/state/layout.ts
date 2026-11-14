@@ -13,7 +13,7 @@
 import type { GraphEdge, GraphNode } from "../wire/types";
 
 /** What kind of object the property view is showing. */
-export type Kind = "instance" | "feed" | "product" | "edge";
+export type Kind = "instance" | "feed" | "product" | "instrument" | "edge";
 
 /** One sheet of the property view. */
 export type TabId =
@@ -27,12 +27,23 @@ export type TabId =
   | "profiles"
   | "performance"
   | "results"
-  | "provenance";
+  | "provenance"
+  | "control"
+  | "signal";
 
 /** What a selection is, in the property view's terms, or `null` when nothing is selected. */
 export function kindOf(node: GraphNode | null, edge: GraphEdge | null): Kind | null {
   if (node !== null) {
-    return node.role === "instance" ? "instance" : node.role === "input" ? "feed" : "product";
+    switch (node.role) {
+      case "instance":
+        return "instance";
+      case "input":
+        return "feed";
+      case "product":
+        return "product";
+      case "instrument":
+        return "instrument";
+    }
   }
   return edge === null ? null : "edge";
 }
@@ -65,10 +76,15 @@ export function tabsFor(
     case "feed":
     case "product":
       return ["conditions", "composition", "connections"];
+    case "instrument":
+      return ["control"];
     case "edge":
       // **A convergence is a tear's, and a connection is not torn.** The seven settings live on
       // `[[recycles]]`, so offering the sheet for a plain connection would be a tab that could
       // only ever say "there is nothing here".
+      if (edge?.data.kind === "signal") {
+        return ["signal"];
+      }
       return edge?.data.kind === "recycle"
         ? ["connections", "convergence"]
         : ["connections"];

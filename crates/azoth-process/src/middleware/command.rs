@@ -18,7 +18,10 @@ use std::collections::BTreeMap;
 use azoth_core::{AzothError, Result};
 use serde::{Deserialize, Serialize};
 
-use crate::flowsheet::{Connection, Flowsheet, Input, Instance, Recycle, split_endpoint};
+use crate::flowsheet::{
+    Connection, Flowsheet, Input, Instance, Instrument, InstrumentRange, Recycle, SafetyFunction,
+    Signal, split_endpoint,
+};
 use crate::unit_op::UnitOpSpec;
 
 /// One edit.
@@ -114,6 +117,44 @@ pub enum Command {
     UnsetRecycleField {
         stream: String,
         field: String,
+    },
+    /// Create or replace an instrument by tag.
+    ///
+    /// **A full record, because an instrument is one.** The checker then says whether the tag,
+    /// function, location, range or endpoints are ones a drawing could state; a command that
+    /// refused the same values would be a second rule set.
+    SetInstrument {
+        id: String,
+        function: String,
+        #[serde(default)]
+        service: Option<String>,
+        #[serde(default)]
+        loop_number: Option<String>,
+        #[serde(default)]
+        measures: Option<String>,
+        #[serde(default)]
+        actuates: Option<String>,
+        #[serde(default)]
+        location: Option<String>,
+        #[serde(default)]
+        range: Option<Box<InstrumentRange>>,
+        #[serde(default)]
+        safety: Option<Box<SafetyFunction>>,
+    },
+    /// Remove an instrument, and every signal that names it.
+    RemoveInstrument {
+        id: String,
+    },
+    /// Create or replace the signal between two instruments.
+    SetSignal {
+        from: String,
+        to: String,
+        #[serde(default)]
+        kind: Option<String>,
+    },
+    RemoveSignal {
+        from: String,
+        to: String,
     },
     /// Place a node on the canvas.
     ///
@@ -325,6 +366,55 @@ pub fn apply(flowsheet: &mut Flowsheet, palette: &[UnitOpSpec], command: &Comman
                 _ => recycle.acceleration_method = None,
             }
         }
+        Command::SetInstrument {
+            id,
+            function,
+            service,
+            loop_number,
+            measures,
+            actuates,
+            location,
+            range,
+            safety,
+        } => {
+            flowsheet
+                .instruments
+                .retain(|instrument| instrument.id != *id);
+            flowsheet.instruments.push(Instrument {
+                id: id.clone(),
+                function: function.clone(),
+                service: service.clone(),
+                loop_number: loop_number.clone(),
+                measures: measures.clone(),
+                actuates: actuates.clone(),
+                location: location.clone(),
+                range: range.as_deref().cloned(),
+                safety: safety.as_deref().cloned(),
+            });
+        }
+        Command::RemoveInstrument { id } => {
+            flowsheet
+                .instruments
+                .retain(|instrument| instrument.id != *id);
+            flowsheet
+                .signals
+                .retain(|signal| signal.from != *id && signal.to != *id);
+        }
+        Command::SetSignal { from, to, kind } => {
+            flowsheet
+                .signals
+                .retain(|signal| !(signal.from == *from && signal.to == *to));
+            flowsheet.signals.push(Signal {
+                from: from.clone(),
+                to: to.clone(),
+                kind: kind.clone(),
+            });
+        }
+        Command::RemoveSignal { from, to } => {
+            flowsheet
+                .signals
+                .retain(|signal| !(signal.from == *from && signal.to == *to));
+        }
         Command::SetPosition { node, x, y } => {
             let Some((role, name)) = crate::split_node_id(node) else {
                 return Err(AzothError::invalid_input(
@@ -345,6 +435,7 @@ pub fn apply(flowsheet: &mut Flowsheet, palette: &[UnitOpSpec], command: &Comman
                 crate::NodeRole::Instance => &mut layout.instances,
                 crate::NodeRole::Input => &mut layout.inputs,
                 crate::NodeRole::Product => &mut layout.products,
+                crate::NodeRole::Instrument => &mut layout.instruments,
             };
             placed.insert(name.to_string(), [*x, *y]);
         }
@@ -378,6 +469,7 @@ fn declares(flowsheet: &Flowsheet, role: crate::NodeRole, name: &str) -> bool {
         crate::NodeRole::Instance => flowsheet.instances.iter().any(|i| i.id == name),
         crate::NodeRole::Input => flowsheet.inputs.iter().any(|i| i.name == name),
         crate::NodeRole::Product => flowsheet.products.iter().any(|p| p == name),
+        crate::NodeRole::Instrument => flowsheet.instruments.iter().any(|i| i.id == name),
     }
 }
 

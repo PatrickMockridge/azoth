@@ -38,5 +38,7 @@ export function removeCommandFor(nodeId: string): EditorCommand | null {
       return { command: "remove_input", name };
     case "product":
       return { command: "remove_product", name };
+    case "instrument":
+      return { command: "remove_instrument", id: name };
   }
 }

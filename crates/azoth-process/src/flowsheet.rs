@@ -436,6 +436,9 @@ pub struct Layout {
     pub inputs: BTreeMap<String, [f64; 2]>,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub products: BTreeMap<String, [f64; 2]>,
+    /// Instruments are drawn on the same canvas; their positions live here too.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub instruments: BTreeMap<String, [f64; 2]>,
 }
 
 impl Layout {
@@ -446,6 +449,7 @@ impl Layout {
             crate::check::NodeRole::Instance => &self.instances,
             crate::check::NodeRole::Input => &self.inputs,
             crate::check::NodeRole::Product => &self.products,
+            crate::check::NodeRole::Instrument => &self.instruments,
         };
         placed.get(name).copied()
     }

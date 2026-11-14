@@ -1,10 +1,10 @@
 /**
  * The command model, held to the schema the library publishes.
  *
- * **This is the "16 of 16" claim.** The editor's `COMMAND_NAMES` and the tool list in the
- * catalogue fixture must be the same sixteen, and that fixture is `azoth forms --tools` output —
+ * **This is the "20 of 20" claim.** The editor's `COMMAND_NAMES` and the tool list in the
+ * catalogue fixture must be the same twenty, and that fixture is `azoth forms --tools` output —
  * so the editor's reachable set, the wire's command enum and the agent's tool list meet in the
- * middle. A sixteenth command in Rust would fail here until the editor could send it.
+ * middle. A twentieth command in Rust would fail here until the editor could send it.
  */
 
 import { describe, expect, it } from "vitest";
@@ -18,9 +18,9 @@ import type { Catalogue } from "../src/wire/types";
 const catalogue = catalogueJson as unknown as Catalogue;
 
 describe("the command model", () => {
-  it("is the same sixteen the agent's tool schema publishes", () => {
+  it("is the same twenty the agent's tool schema publishes", () => {
     const tools = (catalogue.tools ?? []).map((tool) => tool.name);
-    expect(tools).toHaveLength(16);
+    expect(tools).toHaveLength(20);
     expect([...COMMAND_NAMES].sort()).toEqual([...tools].sort());
   });
 
@@ -54,9 +54,14 @@ describe("removeCommandFor", () => {
     expect(removeCommandFor("instance:sep1")).toEqual({ command: "remove_instance", id: "sep1" });
     expect(removeCommandFor("input:feed_1")).toEqual({ command: "remove_input", name: "feed_1" });
     expect(removeCommandFor("product:out")).toEqual({ command: "remove_product", name: "out" });
+    // A signal is removed by its pair, not by its node, but an instrument node is a node.
+    expect(removeCommandFor("instrument:PSHH-101")).toEqual({
+      command: "remove_instrument",
+      id: "PSHH-101",
+    });
   });
 
-  it("refuses an id whose role is none of the three rather than guessing one", () => {
+  it("refuses an id whose role is none of the four rather than guessing one", () => {
     // A node the projection did not make is not a node to invent a command for.
     expect(removeCommandFor("widget:sep1")).toBeNull();
     expect(removeCommandFor("sep1")).toBeNull();

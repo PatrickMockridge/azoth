@@ -1,7 +1,7 @@
 /**
  * Every edit the middleware has, as a type.
  *
- * **This is the check that the editor can reach all sixteen, and it is the TypeScript
+ * **This is the check that the editor can reach all twenty, and it is the TypeScript
  * `deny_unknown_fields`.** The Rust command enum refuses a key it does not declare; a union here
  * refuses one at compile time, so a typo'd field name is a type error rather than a command the
  * wasm boundary rejects at run time with a sentence about a key nobody meant to write.
@@ -11,6 +11,8 @@
  * `every_command_has_a_tool_and_no_tool_is_a_second_surface` in the Rust crate — so the two lists
  * meet in the middle rather than being maintained side by side.
  */
+
+import type { InstrumentRange, SafetyFunction } from "./types";
 
 /** One of the seven `[[recycles]]` keys a tear carries. */
 export type RecycleField =
@@ -46,6 +48,21 @@ export type EditorCommand =
   | { command: "remove_recycle"; stream: string }
   | { command: "set_recycle"; stream: string; field: RecycleField; value: number | string }
   | { command: "unset_recycle_field"; stream: string; field: RecycleField }
+  | {
+      command: "set_instrument";
+      id: string;
+      function: string;
+      service?: string;
+      loop_number?: string;
+      measures?: string;
+      actuates?: string;
+      location?: "field" | "panel" | "central";
+      range?: InstrumentRange;
+      safety?: SafetyFunction;
+    }
+  | { command: "remove_instrument"; id: string }
+  | { command: "set_signal"; from: string; to: string; kind?: string }
+  | { command: "remove_signal"; from: string; to: string }
   | { command: "set_position"; node: string; x: number; y: number }
   | { command: "set_name"; name: string };
 
@@ -68,6 +85,10 @@ export const COMMAND_NAMES: readonly CommandName[] = [
   "remove_recycle",
   "set_recycle",
   "unset_recycle_field",
+  "set_instrument",
+  "remove_instrument",
+  "set_signal",
+  "remove_signal",
   "set_position",
   "set_name",
 ];

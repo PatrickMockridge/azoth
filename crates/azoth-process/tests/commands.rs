@@ -86,6 +86,29 @@ fn every_command() -> Vec<Command> {
             stream: "recycle_1".into(),
             field: "max_iterations".into(),
         },
+        Command::SetInstrument {
+            id: "PSHH-101".into(),
+            function: "PSHH".into(),
+            service: None,
+            loop_number: None,
+            measures: None,
+            actuates: None,
+            location: None,
+            range: None,
+            safety: None,
+        },
+        Command::RemoveInstrument {
+            id: "PSHH-101".into(),
+        },
+        Command::SetSignal {
+            from: "PSHH-101".into(),
+            to: "TIC-102".into(),
+            kind: None,
+        },
+        Command::RemoveSignal {
+            from: "PSHH-101".into(),
+            to: "TIC-102".into(),
+        },
         Command::SetPosition {
             node: "instance:sep1".into(),
             x: 1234.0,
@@ -130,7 +153,7 @@ fn a_command_carrying_an_unknown_field_is_refused() {
 #[test]
 fn every_command_round_trips_through_json() {
     let commands = every_command();
-    assert_eq!(commands.len(), 16, "the enum and this list have drifted");
+    assert_eq!(commands.len(), 20, "the enum and this list have drifted");
     for command in commands {
         let text = serde_json::to_string(&command).expect("a command writes");
         let read: Command = serde_json::from_str(&text).expect("and reads back");
@@ -192,7 +215,12 @@ fn each_edit_lands_and_the_document_round_trips() {
         // **`unset_recycle_field` is the one command the shipped document cannot show**: it states
         // none of the tear's seven settings - that is what a silence *is* - so there is nothing for
         // an unset to remove. The test below does it on a document that states one.
-        if matches!(command, Command::UnsetRecycleField { .. }) {
+        if matches!(
+            command,
+            Command::UnsetRecycleField { .. }
+                | Command::RemoveInstrument { .. }
+                | Command::RemoveSignal { .. }
+        ) {
             continue;
         }
         let mut flowsheet = demo();
@@ -208,6 +236,85 @@ fn each_edit_lands_and_the_document_round_trips() {
             "{command:?}: writing is not a fixed point"
         );
     }
+}
+
+#[test]
+fn an_instrument_and_its_signal_are_commands() {
+    let palette = palette();
+    let mut flowsheet = demo();
+    apply(
+        &mut flowsheet,
+        &palette,
+        &Command::SetInstrument {
+            id: "PSHH-101".into(),
+            function: "PSHH".into(),
+            service: Some("separator overhead pressure".into()),
+            loop_number: Some("101".into()),
+            measures: Some("sep1.vapour".into()),
+            actuates: None,
+            location: Some("field".into()),
+            range: None,
+            safety: None,
+        },
+    )
+    .expect("the instrument is set");
+    apply(
+        &mut flowsheet,
+        &palette,
+        &Command::SetInstrument {
+            id: "TIC-102".into(),
+            function: "TIC".into(),
+            service: None,
+            loop_number: Some("102".into()),
+            measures: Some("sep1.vapour".into()),
+            actuates: None,
+            location: Some("panel".into()),
+            range: None,
+            safety: None,
+        },
+    )
+    .expect("the second instrument is set");
+    apply(
+        &mut flowsheet,
+        &palette,
+        &Command::SetSignal {
+            from: "PSHH-101".into(),
+            to: "TIC-102".into(),
+            kind: Some("electric".into()),
+        },
+    )
+    .expect("the signal is set");
+    assert_eq!(flowsheet.instruments.len(), 2);
+    assert_eq!(flowsheet.signals.len(), 1);
+
+    apply(
+        &mut flowsheet,
+        &palette,
+        &Command::SetPosition {
+            node: "instrument:PSHH-101".into(),
+            x: 10.0,
+            y: 20.0,
+        },
+    )
+    .expect("an instrument is placed");
+    assert_eq!(
+        flowsheet
+            .layout
+            .as_ref()
+            .and_then(|layout| layout.instruments.get("PSHH-101")),
+        Some(&[10.0, 20.0])
+    );
+
+    apply(
+        &mut flowsheet,
+        &palette,
+        &Command::RemoveInstrument {
+            id: "PSHH-101".into(),
+        },
+    )
+    .expect("the instrument is removed");
+    assert_eq!(flowsheet.instruments.len(), 1);
+    assert!(flowsheet.signals.is_empty(), "its signal went with it");
 }
 
 /// **`set` and `unset` are each other's inverse**, and the difference between an unstated setting

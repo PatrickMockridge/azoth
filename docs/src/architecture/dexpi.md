@@ -241,6 +241,13 @@ A signal is a `SignalConveyingFunction` under its source instrument, with `Sourc
 `Target` references to the two instruments and a `SignalConveyingType` reference for the
 carrier. Import reads the whole layer back, including the extensions when they are present.
 
+The editor edits the same layer. The projection makes an instrument a node (`instrument:TAG`)
+and a signal an edge, whose `data.signal_kind` carries the carrier so a sheet can show it and
+not only overwrite it. `set_instrument` replaces the whole record and `set_signal` the pair's
+carrier, so clearing a field is an unset rather than a value that could not be cleared. A tag
+is shown but not renamed from the sheet: a rename would move every signal that names it, which
+is a document edit and not a field edit.
+
 **Not ported in this layer**: `ProcessSignalGeneratingFunction` and `ActuatingFunction` (the
 model's sensor and final-element decomposition, which the instrument record does not split),
 `InstrumentationLoopFunction` grouping (a loop is derivable from `loop_number`), alarm and
@@ -325,11 +332,9 @@ development.
 
 ## Not ported
 
-The instrumentation layer exchanges; the pieces named in that section are not ported yet.
+The pieces of instrumentation named in that section are not ported yet.
 Inline fittings other than a valve, and junctions wider than a three-branch tee, are still
 refused on Plant write.
-The middleware's command model has no instrument edit - a document's instruments are written
-by hand or by an exchange, not by a form - and the editor's graph does not draw them.
 
 Graphics exchange as generic primitives, but **the viewer is not a CAD editor**: it does not
 move, create or author a symbol, and it does not route a stream. `DexpiLayoutEngine` (3,572
