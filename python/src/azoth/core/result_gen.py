@@ -43,6 +43,7 @@ from azoth.core.record_outputs_gen import (
     LeakBlowdownDiagnostic,
     LeakBlowdownPoint,
     MineralEquilibriumRow,
+    MinimalCutSet,
     NaceIssueRow,
     RemediationOptionRow,
     ScaleControlRiskRow,
@@ -6472,6 +6473,25 @@ class ExpanderResult(_HasWarnings):
 
     #: `getModuleHeight`.
     design_module_height: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FaultTreeResult(_HasWarnings):
+    """Result of ``process.fault_tree``."""
+
+    CALC_ID: ClassVar[str] = "process.fault_tree"
+
+    #: the recursive gate probability; OR is the exact complement union, AND the product, VOTING the Poisson-binomial sum.
+    top_event_probability: float
+
+    #: the number of minimal cut sets.
+    cut_set_count: float
+
+    #: the minimal cut sets, ordered by cardinality and then by member name.
+    minimal_cut_sets: tuple[MinimalCutSet, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

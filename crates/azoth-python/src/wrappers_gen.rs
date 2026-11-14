@@ -5985,6 +5985,33 @@ pub fn expander(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Fault tree.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (nodes, max_cardinality))]
+#[pyo3(text_signature = "(nodes, max_cardinality)")]
+pub fn fault_tree(
+    py: Python<'_>,
+    nodes: Vec<crate::records_gen::FaultTreeNodeSpec>,
+    max_cardinality: f64,
+) -> PyResult<crate::transport_gen::PyFaultTreeResult> {
+    let nodes_records: Vec<azoth_process::models::fault_tree::FaultTreeNodeSpec> = nodes
+        .into_iter()
+        .map(|row| azoth_process::models::fault_tree::FaultTreeNodeSpec {
+            name: row.name,
+            parent_index: row.parent_index,
+            gate: row.gate,
+            probability: row.probability,
+            k_of_n: row.k_of_n,
+            beta_ccf: row.beta_ccf,
+        })
+        .collect();
+    azoth_process::models::fault_tree::fault_tree(&nodes_records, max_cardinality)
+        .map(|r| crate::transport_gen::PyFaultTreeResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Fire monitor coverage.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

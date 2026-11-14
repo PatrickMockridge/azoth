@@ -91,6 +91,7 @@ from azoth.core.result import (
     EventTreeOutcome,
     EventTreeResult,
     ExpanderResult,
+    FaultTreeResult,
     FeSMorphology,
     FilippovConductivityResult,
     FilterResult,
@@ -178,6 +179,7 @@ from azoth.core.result import (
     MatcopPrumrAlphaResult,
     MatcopPrumrNewAlphaResult,
     MineralEquilibriumRow,
+    MinimalCutSet,
     MixerResult,
     MolarEnthalpyEntropyResult,
     MollerupAlphaResult,
@@ -453,6 +455,7 @@ __all__ = [
     "erosion_prediction",
     "event_tree",
     "expander",
+    "fault_tree",
     "filippov_conductivity",
     "filter",
     "fire_monitor_coverage",
@@ -6154,6 +6157,21 @@ def expander(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q
         design_module_length=None if result.design_module_length is None else from_si(result.design_module_length.magnitude_si, result.design_module_length.unit),
         design_module_width=None if result.design_module_width is None else from_si(result.design_module_width.magnitude_si, result.design_module_width.unit),
         design_module_height=None if result.design_module_height is None else from_si(result.design_module_height.magnitude_si, result.design_module_height.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def fault_tree(nodes: list[dict[str, object]], max_cardinality: float) -> FaultTreeResult:
+    """``process.fault_tree``, computed in Rust."""
+    spec = _models_gen.model("process.fault_tree")
+    result = _core.fault_tree(
+        input_records_to_si(spec, "nodes", nodes),
+        max_cardinality,
+    )
+    return FaultTreeResult(
+        top_event_probability=result.top_event_probability,
+        cut_set_count=result.cut_set_count,
+        minimal_cut_sets=tuple(MinimalCutSet(members=c.members, cardinality=c.cardinality) for c in result.minimal_cut_sets),
         warnings=_warnings(result.warnings),
     )
 

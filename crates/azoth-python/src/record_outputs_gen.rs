@@ -1597,6 +1597,42 @@ impl From<&azoth_eos::results::MineralEquilibriumRow> for PyMineralEquilibriumRo
     }
 }
 
+/// the minimal cut sets, ordered by cardinality and then by member name.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MinimalCutSet"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMinimalCutSet {
+    /// the sorted basic-event names joined by `", "`; a record field cannot carry a vector, so the join is the wire shape.
+    #[pyo3(get)]
+    pub members: String,
+    /// the number of members.
+    #[pyo3(get)]
+    pub cardinality: f64,
+}
+
+#[pymethods]
+impl PyMinimalCutSet {
+    fn __repr__(&self) -> String {
+        format!(
+            "MinimalCutSet(members={}, cardinality={})",
+            self.members, self.cardinality
+        )
+    }
+}
+
+impl From<&azoth_process::models::fault_tree::MinimalCutSet> for PyMinimalCutSet {
+    fn from(row: &azoth_process::models::fault_tree::MinimalCutSet) -> Self {
+        Self {
+            members: row.members.clone(),
+            cardinality: row.cardinality,
+        }
+    }
+}
+
 /// The NACE assessment's issue strings.
 #[pyclass(
     frozen,

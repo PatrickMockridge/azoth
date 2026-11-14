@@ -340,6 +340,7 @@ Five sections, and the difference between them is the point:
 - [`process.ejector`](./process/ejector.md) — Ejector
 - [`process.event_tree`](./process/event_tree.md) — Event tree
 - [`process.expander`](./process/expander.md) — Expander
+- [`process.fault_tree`](./process/fault_tree.md) — Fault tree
 - [`process.filter`](./process/filter.md) — Filter
 - [`process.fire_monitor_coverage`](./process/fire_monitor_coverage.md) — Fire monitor coverage
 - [`process.fire_water_coverage_assessment`](./process/fire_water_coverage_assessment.md) — Fire-water coverage assessment

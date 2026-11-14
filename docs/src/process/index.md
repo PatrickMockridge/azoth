@@ -27,6 +27,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.ejector`](./ejector.md) | `direct composition` | NeqSim process/equipment/ejector/Ejector.java |
 | [`process.event_tree`](./event_tree.md) | `full_binary_enumeration` | NeqSim process/safety/risk/eta/EventTreeAnalyzer.java |
 | [`process.expander`](./expander.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
+| [`process.fault_tree`](./fault_tree.md) | `recursive_gate_evaluation` | NeqSim process/safety/risk/fta/FaultTreeAnalyzer.java |
 | [`process.filter`](./filter.md) | `direct composition` | NeqSim process/equipment/filter/Filter.java |
 | [`process.fire_monitor_coverage`](./fire_monitor_coverage.md) | `closed_form_fire_monitor_coverage` | NeqSim process/safety/firewater/FireMonitorCoverage.java |
 | [`process.fire_water_coverage_assessment`](./fire_water_coverage_assessment.md) | `closed_form_fire_water_coverage_assessment` | NeqSim process/safety/firewater/FireWaterCoverageAssessment.java |

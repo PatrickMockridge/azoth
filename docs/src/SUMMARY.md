@@ -248,6 +248,7 @@
   - [Ejector](./process/ejector.md)
   - [Event tree](./process/event_tree.md)
   - [Expander](./process/expander.md)
+  - [Fault tree](./process/fault_tree.md)
   - [Filter](./process/filter.md)
   - [Fire monitor coverage](./process/fire_monitor_coverage.md)
   - [Fire-water coverage assessment](./process/fire_water_coverage_assessment.md)

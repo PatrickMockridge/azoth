@@ -449,6 +449,16 @@ class EventTreeBranch(TypedDict):
     name: str
     probability_of_yes: float
 
+class FaultTreeNodeSpec(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    parent_index: float
+    gate: str
+    probability: float | None
+    k_of_n: float | None
+    beta_ccf: float | None
+
 class FilterDropPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -780,6 +790,13 @@ class EventTreeOutcome:
     path: str
     probability: float
     frequency_per_year: float
+
+@final
+class MinimalCutSet:
+    """the minimal cut sets, ordered by cardinality and then by member name."""
+
+    members: str
+    cardinality: float
 
 @final
 class HeatExchangerMechanicalType:
@@ -3172,6 +3189,13 @@ class ExpanderResult:
     design_module_length: Qty | None
     design_module_width: Qty | None
     design_module_height: Qty | None
+    warnings: list[Warning]
+
+@final
+class FaultTreeResult:
+    top_event_probability: float
+    cut_set_count: float
+    minimal_cut_sets: list[MinimalCutSet]
     warnings: list[Warning]
 
 @final
@@ -6655,6 +6679,7 @@ def expander(
     outlet_temperature: float | None = None,
     mechanical_design: bool | None = None,
 ) -> ExpanderResult: ...
+def fault_tree(nodes: list[FaultTreeNodeSpec], max_cardinality: float) -> FaultTreeResult: ...
 def filter(
     components: list[str],
     inlet_n: float,

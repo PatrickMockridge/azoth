@@ -25,6 +25,7 @@ use crate::models::distillation_column::DistillationColumnResult;
 use crate::models::ejector::EjectorResult;
 use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
+use crate::models::fault_tree::FaultTreeResult;
 use crate::models::filter::FilterResult;
 use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
@@ -489,6 +490,20 @@ impl CalcResult for ExpanderResult {
         "design_module_length",
         "design_module_width",
         "design_module_height",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FaultTreeResult {
+    const CALC_ID: &'static str = "process.fault_tree";
+    const FIELDS: &'static [&'static str] = &[
+        "top_event_probability",
+        "cut_set_count",
+        "minimal_cut_sets",
         "warnings",
     ];
 

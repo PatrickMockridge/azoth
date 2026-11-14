@@ -15,6 +15,7 @@
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
+//!   - specs/models/process/fault_tree.toml
 //!   - specs/models/process/filter.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
 //!   - specs/models/process/fire_water_coverage_assessment.toml

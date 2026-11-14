@@ -254,6 +254,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyEjectorResult>()?;
     m.add_class::<crate::transport_gen::PyEventTreeResult>()?;
     m.add_class::<crate::transport_gen::PyExpanderResult>()?;
+    m.add_class::<crate::transport_gen::PyFaultTreeResult>()?;
     m.add_class::<crate::transport_gen::PyFilterResult>()?;
     m.add_class::<crate::transport_gen::PyFireMonitorCoverageResult>()?;
     m.add_class::<crate::transport_gen::PyFireWaterCoverageAssessmentResult>()?;
@@ -336,6 +337,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyLeakBlowdownDiagnostic>()?;
     m.add_class::<crate::record_outputs_gen::PyLeakBlowdownPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyMineralEquilibriumRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyMinimalCutSet>()?;
     m.add_class::<crate::record_outputs_gen::PyNaceIssueRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScaleControlRiskRow>()?;
@@ -917,6 +919,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::process::ejector, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::event_tree, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::expander, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::fault_tree, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::filter, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::fire_monitor_coverage,

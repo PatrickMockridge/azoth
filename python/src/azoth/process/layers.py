@@ -2105,6 +2105,27 @@ def _anti_surge_recycle(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _fault_tree(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fault_tree`'s layers, from the reference's own arithmetic.
+
+    The cut-set members are strings and are asserted by the case and the cross-impl test;
+    the cardinalities are numbers and are dumped here.
+    """
+    from azoth.process.reference.fault_tree import fault_tree as evaluate
+
+    result = evaluate(
+        [dict(row) for row in inputs["nodes"]],
+        float(inputs["max_cardinality"]),
+    )
+    layers = {
+        "top_event_probability": result.top_event_probability,
+        "cut_set_count": result.cut_set_count,
+    }
+    for index, row in enumerate(result.minimal_cut_sets):
+        layers[f"cut_set{index}_cardinality"] = row.cardinality
+    return layers
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2121,6 +2142,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.fire_water_coverage_assessment": _fire_water_coverage_assessment,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.api537_flare_flame_model": _api537_flare_flame_model,
+    "process.fault_tree": _fault_tree,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3117,6 +3139,43 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_api537_flare_flame.tsv",
         block=5,
         identified_by=("#label", "api537_transmissivity"),
+    ),
+    # The fault tree's five class states. The eleven blocks after them are the class's
+    # unvalidated gates and inputs, declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.fault_tree",
+        case="ft_and",
+        capture="process_fault_tree.tsv",
+        block=0,
+        identified_by=("#label", "ft_and"),
+    ),
+    LayerCase(
+        model="process.fault_tree",
+        case="ft_or",
+        capture="process_fault_tree.tsv",
+        block=1,
+        identified_by=("#label", "ft_or"),
+    ),
+    LayerCase(
+        model="process.fault_tree",
+        case="ft_voting",
+        capture="process_fault_tree.tsv",
+        block=2,
+        identified_by=("#label", "ft_voting"),
+    ),
+    LayerCase(
+        model="process.fault_tree",
+        case="ft_beta_or",
+        capture="process_fault_tree.tsv",
+        block=3,
+        identified_by=("#label", "ft_beta_or"),
+    ),
+    LayerCase(
+        model="process.fault_tree",
+        case="ft_cut_sets",
+        capture="process_fault_tree.tsv",
+        block=4,
+        identified_by=("#label", "ft_cut_sets"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4350,6 +4409,10 @@ UNCASED_ROWS: dict[str, int] = {
     # The flare flame's nine: the three clamp states, the negative stack the class accepts,
     # and the five constructor and method refusals.
     "process_api537_flare_flame.tsv": 9,
+    # The fault tree's fourteen: beta on VOTING, k of zero, above n and negative, the two
+    # empty gates, duplicate names, a NaN basic, the 31-basic shift overflow, the zero
+    # cardinality and the four constructor guards.
+    "process_fault_tree.tsv": 14,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

@@ -33,6 +33,7 @@ from azoth.core.result import (
     EjectorResult,
     EventTreeResult,
     ExpanderResult,
+    FaultTreeResult,
     FilterResult,
     FireMonitorCoverageResult,
     FireWaterCoverageAssessmentResult,
@@ -107,6 +108,7 @@ __all__ = [
     "ejector",
     "event_tree",
     "expander",
+    "fault_tree",
     "filter",
     "fire_monitor_coverage",
     "fire_water_coverage_assessment",
@@ -171,6 +173,7 @@ _COOLER = "process.cooler"
 _DELUGE_NOZZLE_LAYOUT = "process.deluge_nozzle_layout"
 _EJECTOR = "process.ejector"
 _EVENT_TREE = "process.event_tree"
+_FAULT_TREE = "process.fault_tree"
 _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
@@ -2192,6 +2195,26 @@ def event_tree(
     return resolve(_EVENT_TREE)(  # type: ignore[no-any-return]
         initiating_frequency_per_year=initiating_frequency_per_year,
         branches=branches,
+    )
+
+
+def fault_tree(
+    nodes: list[dict[str, object]],
+    max_cardinality: float,
+) -> FaultTreeResult:
+    """The recursive gate probability and the minimal cut sets.
+
+    The flat node list is the tree: a row's position is its index, ``parent_index`` names
+    its parent and ``-1`` is the single root. AND is the product, OR the exact complement
+    union, VOTING the Poisson-binomial sum, and the beta factor is read on an OR gate only.
+    **The cut sets are sorted by cardinality and then member name**, where the class's
+    ``HashSet`` order is unspecified.
+
+    See :func:`azoth.process.reference.fault_tree`.
+    """
+    return resolve(_FAULT_TREE)(  # type: ignore[no-any-return]
+        nodes=nodes,
+        max_cardinality=max_cardinality,
     )
 
 

@@ -44,6 +44,7 @@ pub mod distillation_column;
 pub mod ejector;
 pub mod event_tree;
 pub mod expander;
+pub mod fault_tree;
 pub mod filter;
 pub mod fire_monitor_coverage;
 pub mod fire_water_coverage_assessment;
@@ -105,6 +106,9 @@ pub use distillation_column::{DistillationColumnResult, distillation_column};
 pub use ejector::{EjectorResult, ejector};
 pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_tree};
 pub use expander::{ExpanderResult, expander};
+pub use fault_tree::{
+    FaultTreeResult, FaultTreeNodeSpec, MinimalCutSet, fault_tree,
+};
 pub use filter::{FilterResult, filter};
 pub use fire_monitor_coverage::{FireMonitorCoverageResult, fire_monitor_coverage};
 pub use fire_water_coverage_assessment::{

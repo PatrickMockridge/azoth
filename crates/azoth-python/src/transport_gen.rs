@@ -20,9 +20,9 @@ use crate::record_outputs_gen::{
     PyFlowlineScaleSegment, PyHeatExchangerMechanicalType, PyHeaterInstrument,
     PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyMineralEquilibriumRow, PyNaceIssueRow, PyRemediationOptionRow, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySterileRadius,
-    PyStreamScaleMineralRow, PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
+    PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow, PyRemediationOptionRow,
+    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
+    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -16164,6 +16164,56 @@ impl From<&azoth_process::models::expander::ExpanderResult> for PyExpanderResult
                 magnitude_si: v.value,
                 unit: "m".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.fault_tree`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FaultTreeResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFaultTreeResult {
+    /// the recursive gate probability; OR is the exact complement union, AND the product, VOTING the Poisson-binomial sum.
+    #[pyo3(get)]
+    pub top_event_probability: f64,
+    /// the number of minimal cut sets.
+    #[pyo3(get)]
+    pub cut_set_count: f64,
+    /// the minimal cut sets, ordered by cardinality and then by member name.
+    #[pyo3(get)]
+    pub minimal_cut_sets: Vec<PyMinimalCutSet>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFaultTreeResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FaultTreeResult(top_event_probability={:?}, cut_set_count={:?}, minimal_cut_sets={:?}, {} warning(s))",
+            self.top_event_probability,
+            self.cut_set_count,
+            self.minimal_cut_sets,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fault_tree::FaultTreeResult> for PyFaultTreeResult {
+    fn from(r: &azoth_process::models::fault_tree::FaultTreeResult) -> Self {
+        Self {
+            top_event_probability: r.top_event_probability,
+            cut_set_count: r.cut_set_count,
+            minimal_cut_sets: r
+                .minimal_cut_sets
+                .iter()
+                .map(PyMinimalCutSet::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }

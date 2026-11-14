@@ -2600,6 +2600,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 20,
         "tests_skipped": 0,
     },
+    'process.fault_tree': {
+        "calc_id": 'process.fault_tree',
+        "name": 'Fault tree',
+        "spec": {'path': 'specs/models/process/fault_tree.toml', 'sha256': 'd047f70efd5befe3dc027164b4d626bef076b1c15e9e80e1fba7b2abbe04174f'},
+        "code": [{'path': 'python/src/azoth/process/reference/fault_tree.py', 'sha256': 'a0de7593d6dd93b0e3d2d4d429f580d986794c8ab3bf28c5c2282e515a2b897f'}, {'path': 'crates/azoth-process/src/models/fault_tree.rs', 'sha256': 'be0fb5a5a438e2f77ff81b1ebd93c854092682c2784b27b1e7da4b39ddffd938'}],
+        "source": 'NeqSim process/safety/risk/fta/FaultTreeAnalyzer.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 5,
+        "tests_skipped": 0,
+    },
     'process.filter': {
         "calc_id": 'process.filter',
         "name": 'Filter',

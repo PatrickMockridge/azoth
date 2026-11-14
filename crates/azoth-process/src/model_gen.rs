@@ -15,6 +15,7 @@
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
+//!   - specs/models/process/fault_tree.toml
 //!   - specs/models/process/filter.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
 //!   - specs/models/process/fire_water_coverage_assessment.toml
@@ -24958,6 +24959,602 @@ pub static EXPANDER_SPEC: ModelSpec = ModelSpec {
     algorithm: None,
     checks: EXPANDER_CHECKS,
     cases: EXPANDER_CASES,
+};
+
+static FAULT_TREE_CHECKS: &[SpecCheck] = &[SpecCheck {
+    on_input: true,
+    check: RangeCheck {
+        quantity: "max_cardinality",
+        min: Some(1.0),
+        min_inclusive: true,
+        max: None,
+        max_inclusive: true,
+        equals: None,
+        band: Band::Outside,
+        severity: Severity::Error,
+        code: WarningCode::OutOfValidRange,
+        rationale: "the class's mask loop starts at one and can never return the empty cut set",
+    },
+}];
+
+static FAULT_TREE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "ft_and",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("max_cardinality", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("top_event_probability", 0.020000000000000004),
+            ("cut_set_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "nodes",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Both fail"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(-1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("and"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "minimal_cut_sets",
+            &[&[
+                RecordField {
+                    name: "members",
+                    value: FieldValue::Name("A, B"),
+                },
+                RecordField {
+                    name: "cardinality",
+                    value: FieldValue::Number(2.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "ft_or",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("max_cardinality", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("top_event_probability", 0.2799999999999999),
+            ("cut_set_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "nodes",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Either fail"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(-1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("or"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "minimal_cut_sets",
+            &[
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "ft_voting",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("max_cardinality", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("top_event_probability", 0.028000000000000004),
+            ("cut_set_count", 3.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "nodes",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(-1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("voting"),
+                    },
+                    RecordField {
+                        name: "k_of_n",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "minimal_cut_sets",
+            &[
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("A, B"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("A, C"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("B, C"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "ft_beta_or",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("max_cardinality", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("top_event_probability", 0.018910000000000027),
+            ("cut_set_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "nodes",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("any"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(-1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("or"),
+                    },
+                    RecordField {
+                        name: "beta_ccf",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "minimal_cut_sets",
+            &[
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "ft_cut_sets",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("max_cardinality", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("top_event_probability", 0.10899999999999999),
+            ("cut_set_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "nodes",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("top"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(-1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("or"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ab"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("and"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "minimal_cut_sets",
+            &[
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("A, B"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+static FAULT_TREE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "recursive_gate_evaluation",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 20,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.fault_tree`.
+pub static FAULT_TREE_SPEC: ModelSpec = ModelSpec {
+    id: "process.fault_tree",
+    kind: "procedure",
+    algorithm: Some(&FAULT_TREE_ALGORITHM),
+    checks: FAULT_TREE_CHECKS,
+    cases: FAULT_TREE_CASES,
 };
 
 static FILTER_CHECKS: &[SpecCheck] = &[
@@ -58650,6 +59247,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &EJECTOR_SPEC,
     &EVENT_TREE_SPEC,
     &EXPANDER_SPEC,
+    &FAULT_TREE_SPEC,
     &FILTER_SPEC,
     &FIRE_MONITOR_COVERAGE_SPEC,
     &FIRE_WATER_COVERAGE_ASSESSMENT_SPEC,

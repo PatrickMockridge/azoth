@@ -1,0 +1,85 @@
+id = "process.fault_tree"
+name = "Fault tree"
+kind = "procedure"
+assumptions = [
+    "**the tree is a flat node list**: a row's position is its node index, and `parent_index` names its parent, `-1` on the single root. Children are evaluated in ascending row order, which is the class's insertion order.",
+    "**a basic event is a leaf with a probability, and every other node is a gate**: `basic`, `and`, `or` or `voting`. A gate's own probability field is not read, and a child under a basic event is refused.",
+    "**AND is the product of its children's probabilities; OR is the exact complement union `1 - prod(1 - p)`**, which the class's javadoc calls a rare-event approximation and its code computes exactly.",
+    "**VOTING is the Poisson-binomial sum over ascending masks**: masks are enumerated from one, a mask whose set bits number fewer than `k` is skipped, and the product is over child order.",
+    "**the beta correction is applied on OR only**: `(1 - beta) p_independent + beta max(p_i)`. The javadoc names OR and VOTING; the code reads the factor only on OR, so the port refuses it on any other gate rather than silently ignoring it.",
+    "**minimal cut sets enumerate the basics' powerset by ascending mask and drop a set that contains one already found**. The class returns a `HashSet` whose iteration order is unspecified; the port sorts by cardinality and then member name, and the capture prints the class's own order beside it.",
+    "**the caps are the procedure's `max_iterations`, 20**: the mask enumeration is `1 << n`, which overflows at 31 basics, and 20 is the largest a caller can be given without a silent wrap.",
+    "**the class validates neither `k` nor duplicities**: `k <= 0` answers 1.0, `k > n` answers 0.0, and two basics with one name are independent in the probability but aliased in the cut sets. The port refuses the first two and states the third.",
+    "**a NaN probability passes the class's `basic` guard** because neither comparison is true; the port refuses it. The class's β guard is the same shape.",
+    "**an empty gate is answered, not refused, by the class**: AND answers 1.0 and OR 0.0. The port refuses a childless gate because no fault tree states one.",
+]
+references = [
+    "NUREG-0492 (1981). Fault Tree Handbook, US Nuclear Regulatory Commission.",
+    "IEC 61508-6:2010, annex F. Common-cause failures, the beta-factor model.",
+    "ISO 31010:2019. Risk management - Risk assessment techniques, annex B.17, fault tree analysis.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/risk/fta/FaultTreeAnalyzer.java` and `FaultTreeNode.java` are the port sources.",
+    "`validation/neqsim/captures/process_fault_tree.tsv` - the class's AND, OR, 2-of-3, beta and cut-set tests, the beta-on-VOTING state, the unvalidated k, duplicate names, a NaN, a 31-basic overflow and the guards.",
+]
+[source]
+standard = "NeqSim process/safety/risk/fta/FaultTreeAnalyzer.java"
+edition = "Its `topEventProbability` and `minimalCutSets`, and the factories and `withCCF` in `FaultTreeNode`."
+[algorithm]
+scheme = "recursive_gate_evaluation"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 20
+[inputs]
+[inputs.nodes]
+type = "record_list"
+row_type = "FaultTreeNodeSpec"
+description = "the nodes in caller order: the row's position is its node index, and `parent_index` names its parent. **Exactly one row has `parent_index = -1`.** A duplicate basic-event name is refused; children are evaluated in row order.\n"
+[inputs.nodes.fields.name]
+type = "string"
+description = "the node label; a basic event's name is its cut-set identity, and gates are labelled too.\n"
+[inputs.nodes.fields.parent_index]
+unit = "dimensionless"
+description = "the zero-based row index of the parent, or `-1` for the root. A whole number.\n"
+[inputs.nodes.fields.gate]
+type = "enum"
+values = ["basic", "and", "or", "voting"]
+description = "`basic` is a leaf; the other three are the class's `GateType`.\n"
+[inputs.nodes.fields.probability]
+unit = "dimensionless"
+optional = true
+description = "a basic event's failure probability in `[0, 1]`; required on `basic` and refused on a gate.\n"
+[inputs.nodes.fields.k_of_n]
+unit = "dimensionless"
+optional = true
+description = "a `voting` gate's k, a whole number in `[1, n]`; required on `voting` and refused on any other gate.\n"
+[inputs.nodes.fields.beta_ccf]
+unit = "dimensionless"
+optional = true
+description = "the beta factor in `[0, 1]`, read only on an `or` gate; refused on any other gate.\n"
+[inputs.max_cardinality]
+unit = "dimensionless"
+description = "the largest cut set enumerated, a whole number of at least one.\n"
+[outputs]
+[outputs.top_event_probability]
+unit = "dimensionless"
+description = "the recursive gate probability; OR is the exact complement union, AND the product, VOTING the Poisson-binomial sum.\n"
+[outputs.cut_set_count]
+unit = "dimensionless"
+description = "the number of minimal cut sets.\n"
+[outputs.minimal_cut_sets]
+type = "record_list"
+description = "the minimal cut sets, ordered by cardinality and then by member name.\n"
+[outputs.minimal_cut_sets.fields.members]
+type = "string"
+description = "the sorted basic-event names joined by `\", \"`; a record field cannot carry a vector, so the join is the wire shape.\n"
+[outputs.minimal_cut_sets.fields.cardinality]
+unit = "dimensionless"
+description = "the number of members.\n"
+[[valid_range]]
+quantity = "max_cardinality"
+min = 1
+min_inclusive = true
+severity = "error"
+rationale = "the class's mask loop starts at one and can never return the empty cut set"
+[implementations]
+python = "azoth.process.fault_tree"
+rust = "azoth_process::fault_tree"

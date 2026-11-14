@@ -236,6 +236,7 @@
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
+//!   - specs/models/process/fault_tree.toml
 //!   - specs/models/process/filter.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
 //!   - specs/models/process/fire_water_coverage_assessment.toml
@@ -3117,6 +3118,7 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "outlet_temperature",
         "thermodynamic_temperature",
     ),
+    ("process.fault_tree", "max_cardinality", "dimensionless"),
     ("process.filter", "inlet_n", "molar_flow"),
     ("process.filter", "inlet_z", "dimensionless"),
     ("process.filter", "inlet_p", "pressure"),

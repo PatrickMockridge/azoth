@@ -255,6 +255,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.ejector" => azoth_process::models::ejector::EjectorResult::FIELDS.to_vec(),
         "process.event_tree" => azoth_process::models::event_tree::EventTreeResult::FIELDS.to_vec(),
         "process.expander" => azoth_process::models::expander::ExpanderResult::FIELDS.to_vec(),
+        "process.fault_tree" => azoth_process::models::fault_tree::FaultTreeResult::FIELDS.to_vec(),
         "process.filter" => azoth_process::models::filter::FilterResult::FIELDS.to_vec(),
         "process.fire_monitor_coverage" => azoth_process::models::fire_monitor_coverage::FireMonitorCoverageResult::FIELDS.to_vec(),
         "process.fire_water_coverage_assessment" => azoth_process::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult::FIELDS.to_vec(),

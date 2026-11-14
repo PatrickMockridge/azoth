@@ -586,6 +586,17 @@ class MineralEquilibriumRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MinimalCutSet:
+    """the minimal cut sets, ordered by cardinality and then by member name."""
+
+    #: the sorted basic-event names joined by `", "`; a record field cannot carry a vector, so the join is the wire shape.
+    members: str
+
+    #: the number of members.
+    cardinality: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class NaceIssueRow:
     """The NACE assessment's issue strings."""
 
