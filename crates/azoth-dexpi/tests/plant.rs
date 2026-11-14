@@ -240,7 +240,7 @@ line = "L-1003"
 }
 
 #[test]
-fn a_mixer_is_refused_because_it_is_a_junction() {
+fn a_mixer_is_a_junction_not_a_tagged_item() {
     let text = r#"
 id = "flowsheets.mix"
 name = "A mixer"
@@ -264,11 +264,22 @@ P = 5.0e5
 T = 300.0
 
 [[instances]]
+id = "P-1"
+unit = "unit_ops.pump"
+[instances.parameters]
+outlet_pressure = 6.0e5
+isentropic_efficiency = 0.75
+
+[[instances]]
 id = "M-1"
 unit = "unit_ops.mixer"
 
 [[connections]]
 from = "A"
+to = "P-1.inlet"
+
+[[connections]]
+from = "P-1.outlet"
 to = "M-1.feed"
 
 [[connections]]
@@ -281,14 +292,16 @@ to = "OUT"
 "#;
     let flowsheet = parse_flowsheet(text).expect("the fixture parses");
     assert!(validate_flowsheet(&flowsheet, &common::palette()).is_empty());
-    let failure = export_plant(
+    let report = export_plant(
         &flowsheet,
         &common::palette(),
         &PlantExportOptions::default(),
     )
-    .expect_err("a mixer refuses");
-    assert_eq!(failure[0].code, "refused_mapping");
-    assert_eq!(failure[0].subject, "M-1");
+    .expect("a mixer exports as a junction");
+    assert_eq!(report.items, 1, "only the pump is a tagged item");
+    assert_eq!(report.segments, 4, "one feed, two inlets and one outlet");
+    assert!(report.xml.contains("Plant/Piping.PipeTee"));
+    assert!(report.xml.contains("<String>M-1</String>"));
 }
 
 #[test]

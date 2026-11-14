@@ -456,6 +456,19 @@ fn coverage_of(object: &Object) -> Option<Coverage> {
         if class == "PipingNetworkSegment" || class.ends_with("PipeOffPageConnector") {
             return Some(topology("piping topology"));
         }
+        if class == "PipeTee" {
+            return Some(Coverage {
+                status: CoverageStatus::Ambiguous,
+                unit: None,
+                alternatives: vec![
+                    "unit_ops.mixer".to_string(),
+                    "unit_ops.splitter".to_string(),
+                ],
+                explanation: "a tee is a junction; its pipe directions decide mixer or splitter"
+                    .to_string(),
+                exportable: true,
+            });
+        }
         if plant::for_class(class).is_some() {
             return Some(plant_item(ty));
         }
