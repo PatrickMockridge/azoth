@@ -166,7 +166,9 @@ def test_a_proteus_plant_model_imports() -> None:
     assert units["T-100"] == "unit_ops.tank"
     assert units["GlobeValve-1"] == "unit_ops.throttling_valve"
     assert report["flowsheet"]["products"] == ["PRODUCT"]
-    instruments = {instrument["id"]: instrument for instrument in report["flowsheet"]["instruments"]}
+    instruments = {
+        instrument["id"]: instrument for instrument in report["flowsheet"]["instruments"]
+    }
     assert instruments["PSHH-101"]["function"] == "PSHH"
     assert instruments["PSHH-101"]["measures"] == "P-100"
     assert instruments["TIC-102"]["location"] == "panel"
