@@ -1,0 +1,127 @@
+n070_hipps_compliant
+sif_type=HIPPS_PIPELINE
+pfd_average=1.0E-4
+catalogue_minimum_sil=3
+minimum_sil=3
+achieved_sil=3
+compliant=true
+message=Compliant: achieved SIL 3 >= NOG 070 minimum SIL 3 for HIPPS_PIPELINE
+
+n070_hipps_noncompliant
+sif_type=HIPPS_PIPELINE
+pfd_average=0.005
+catalogue_minimum_sil=3
+minimum_sil=3
+achieved_sil=2
+compliant=false
+message=NOT compliant: achieved SIL 2 < NOG 070 minimum SIL 3 for HIPPS_PIPELINE. Reduce PFD by factor 10.0 or revise SIF.
+
+n070_custom_minimum
+sif_type=CUSTOM
+pfd_average=0.005
+catalogue_minimum_sil=0
+minimum_sil=3
+achieved_sil=2
+compliant=false
+message=NOT compliant: achieved SIL 2 < NOG 070 minimum SIL 3 for CUSTOM. Reduce PFD by factor 10.0 or revise SIF.
+
+n070_custom_no_minimum
+sif_type=CUSTOM
+pfd_average=0.005
+catalogue_minimum_sil=0
+minimum_sil=0
+achieved_sil=2
+compliant=true
+message=Compliant: achieved SIL 2 >= NOG 070 minimum SIL 0 for CUSTOM
+
+n070_sil_zero_band
+sif_type=PSD_HIGH_VIBRATION
+pfd_average=0.2
+catalogue_minimum_sil=1
+minimum_sil=1
+achieved_sil=0
+compliant=false
+message=NOT compliant: achieved SIL 0 < NOG 070 minimum SIL 1 for PSD_HIGH_VIBRATION. Reduce PFD by factor 10.0 or revise SIF.
+
+n070_pfd_to_sil_boundaries
+pfd_average=0.1
+achieved_sil=0
+pfd_average=0.0999
+achieved_sil=1
+pfd_average=0.01
+achieved_sil=1
+pfd_average=0.009
+achieved_sil=2
+pfd_average=0.001
+achieved_sil=2
+pfd_average=9.0E-4
+achieved_sil=3
+pfd_average=1.0E-4
+achieved_sil=3
+pfd_average=9.9E-5
+achieved_sil=4
+
+n070_catalogue
+sif_type=PSD_PROCESS_SEGMENT
+catalogue_minimum_sil=2
+sif_type=ESD_TOPSIDE_ISOLATION
+catalogue_minimum_sil=2
+sif_type=ESD_SUBSEA_ISOLATION
+catalogue_minimum_sil=3
+sif_type=HIPPS_PIPELINE
+catalogue_minimum_sil=3
+sif_type=BLOWDOWN_HYDROCARBON_SEGMENT
+catalogue_minimum_sil=2
+sif_type=FG_GAS_DETECTION_ESD
+catalogue_minimum_sil=2
+sif_type=FG_FIRE_DETECTION_ESD
+catalogue_minimum_sil=2
+sif_type=FG_HVAC_SHUTDOWN
+catalogue_minimum_sil=2
+sif_type=FG_DELUGE_RELEASE
+catalogue_minimum_sil=2
+sif_type=PSD_COMPRESSOR_ANTI_SURGE
+catalogue_minimum_sil=2
+sif_type=PSD_HIGH_VIBRATION
+catalogue_minimum_sil=1
+sif_type=PSD_HIGH_LEVEL
+catalogue_minimum_sil=2
+sif_type=PSD_LOW_LOW_LEVEL
+catalogue_minimum_sil=2
+sif_type=PSD_BURNER_MANAGEMENT
+catalogue_minimum_sil=2
+sif_type=ESD_RISER
+catalogue_minimum_sil=3
+sif_type=ESD_WELLHEAD
+catalogue_minimum_sil=2
+sif_type=ESD_LOADING_RELEASE
+catalogue_minimum_sil=2
+sif_type=CUSTOM
+catalogue_minimum_sil=0
+
+n070_refuse_pfd_zero
+pfd_average=0.0
+refusal=IllegalArgumentException: pfdAvg must be in (0, 1), was 0.0
+
+n070_refuse_pfd_one
+pfd_average=1.0
+refusal=IllegalArgumentException: pfdAvg must be in (0, 1), was 1.0
+
+n070_refuse_pfd_above_one
+pfd_average=1.5
+refusal=IllegalArgumentException: pfdAvg must be in (0, 1), was 1.5
+
+n070_refuse_pfd_nan
+pfd_average=NaN
+refusal=IllegalArgumentException: pfdAvg must be in (0, 1), was NaN
+
+n070_refuse_minimum_negative
+pfd_average=0.005
+minimum_sil=-1
+refusal=IllegalArgumentException: minimumSil must be in [0, 4], was -1
+
+n070_refuse_minimum_above_four
+pfd_average=0.005
+minimum_sil=5
+refusal=IllegalArgumentException: minimumSil must be in [0, 4], was 5
+

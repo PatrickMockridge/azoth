@@ -172,8 +172,24 @@ import neqsim.process.safety.release.ReleaseFlowRequest;
 import neqsim.process.safety.release.ReleaseFlowResult;
 import neqsim.process.safety.release.ReleaseState;
 import neqsim.process.safety.release.SourceTermResult;
+import neqsim.process.processmodel.ProcessSystem;
+import neqsim.process.safety.risk.RiskMatrix;
+import neqsim.process.safety.risk.bowtie.BowTieModel;
 import neqsim.process.safety.risk.eta.EventTreeAnalyzer;
+import neqsim.process.safety.risk.fta.FaultTreeAnalyzer;
+import neqsim.process.safety.risk.fta.FaultTreeNode;
+import neqsim.process.safety.risk.sis.LOPAResult;
+import neqsim.process.safety.risk.sis.SafetyInstrumentedFunction;
+import neqsim.process.safety.risk.sis.SILVerificationResult;
+import neqsim.process.safety.risk.sis.nog070.Nog070SilCatalogue;
+import neqsim.process.safety.risk.sis.nog070.Nog070SilDetermination;
+import neqsim.process.safety.risk.sis.nog070.Nog070SifType;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ProcessProbe {
   public static void main(String[] args) {
@@ -364,6 +380,27 @@ public class ProcessProbe {
         break;
       case "api537_flare_flame":
         api537FlareRows();
+        break;
+      case "fault_tree":
+        faultTreeRows();
+        break;
+      case "bow_tie":
+        bowTieRows();
+        break;
+      case "safety_instrumented_function":
+        safetyInstrumentedFunctionRows();
+        break;
+      case "lopa":
+        lopaRows();
+        break;
+      case "sil_verification":
+        silVerificationRows();
+        break;
+      case "nog070_sil_determination":
+        nog070SilRows();
+        break;
+      case "risk_matrix":
+        riskMatrixRows();
         break;
       case "expander_steps":
         expanderStepRows();
@@ -13781,6 +13818,621 @@ public class ProcessProbe {
     } catch (RuntimeException ex) {
       System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
     }
+    System.out.println();
+  }
+
+  // === process.fault_tree ====================================================
+
+  static void faultTreeRows() {
+    // The class's own tests (`FaultTreeAnalyzerTest`).
+    faultTreeRow("ft_and",
+        FaultTreeNode.and("Both fail", FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("B", 0.2)),
+        3);
+    faultTreeRow("ft_or",
+        FaultTreeNode.or("Either fail", FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("B", 0.2)),
+        3);
+    faultTreeRow("ft_voting",
+        FaultTreeNode.voting("2oo3", 2, FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("B", 0.1),
+            FaultTreeNode.basic("C", 0.1)),
+        3);
+    faultTreeRow("ft_beta_or",
+        FaultTreeNode.or("any", FaultTreeNode.basic("A", 0.01), FaultTreeNode.basic("B", 0.01))
+            .withCCF(0.10),
+        3);
+    // `minimalCutSets`: top = (A AND B) OR C, so {C} and {A, B}.
+    faultTreeRow("ft_cut_sets",
+        FaultTreeNode.or("top",
+            FaultTreeNode.and("ab", FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("B", 0.1)),
+            FaultTreeNode.basic("C", 0.1)),
+        3);
+    // The β factor is applied only on OR, though the javadoc names OR / VOTING.
+    faultTreeCompact("ft_beta_on_voting",
+        FaultTreeNode.voting("2oo3", 2, FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("B", 0.1),
+            FaultTreeNode.basic("C", 0.1)).withCCF(0.10),
+        3);
+    // `votingGate` reads `k` unvalidated: 0 and a negative answer 1.0, above n answers 0.0.
+    faultTreeCompact("ft_k_zero",
+        FaultTreeNode.voting("k0", 0, FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("B", 0.1)),
+        2);
+    faultTreeCompact("ft_k_above_n",
+        FaultTreeNode.voting("k4", 4, FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("B", 0.1)),
+        2);
+    faultTreeCompact("ft_k_negative",
+        FaultTreeNode.voting("k-1", -1, FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("B", 0.1)),
+        2);
+    // An empty gate: AND answers 1.0, OR answers 0.0.
+    faultTreeCompact("ft_zero_child_and", FaultTreeNode.and("empty"), 1);
+    faultTreeCompact("ft_zero_child_or", FaultTreeNode.or("empty"), 1);
+    // Two basics with one name: the probability treats them independently, the cut sets alias.
+    faultTreeCompact("ft_duplicate_names",
+        FaultTreeNode.or("dup", FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("A", 0.2)), 2);
+    // `basic` accepts a NaN probability: neither comparison in its guard is true.
+    faultTreeCompact("ft_nan_basic", FaultTreeNode.basic("A", Double.NaN), 1);
+    // The mask enumeration is an int shift: 31 basics overflows it and the cut-set loop is empty.
+    FaultTreeNode[] many = new FaultTreeNode[31];
+    for (int i = 0; i < many.length; i++) {
+      many[i] = FaultTreeNode.basic("B" + i, 0.01);
+    }
+    faultTreeCompact("ft_thirty_one_basics", FaultTreeNode.or("many", many), 5);
+    // `maxCardinality = 0` enumerates nothing; the class does not refuse it.
+    faultTreeRow("ft_max_cardinality_zero",
+        FaultTreeNode.or("top",
+            FaultTreeNode.and("ab", FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("B", 0.1)),
+            FaultTreeNode.basic("C", 0.1)),
+        0);
+    // The constructor's guards.
+    faultTreeBasicRefusal("ft_refuse_negative_probability", -0.1);
+    faultTreeBasicRefusal("ft_refuse_probability_above_one", 1.1);
+    faultTreeBetaRefusal("ft_refuse_beta_above_one", 1.5);
+    faultTreeBetaRefusal("ft_refuse_beta_negative", -0.1);
+  }
+
+  static void faultTreeFlatten(FaultTreeNode node, int parent, List<FaultTreeNode> nodes,
+      List<Integer> parents) {
+    int index = nodes.size();
+    nodes.add(node);
+    parents.add(parent);
+    for (FaultTreeNode child : node.children) {
+      faultTreeFlatten(child, index, nodes, parents);
+    }
+  }
+
+  static void faultTreePrintInputs(List<FaultTreeNode> nodes, List<Integer> parents) {
+    System.out.println("node_count=" + nodes.size());
+    for (int i = 0; i < nodes.size(); i++) {
+      FaultTreeNode node = nodes.get(i);
+      System.out.println("node" + i + "_name=" + node.name);
+      System.out.println("node" + i + "_parent_index=" + parents.get(i));
+      System.out.println("node" + i + "_gate="
+          + (node.gate == null ? "basic" : node.gate.name().toLowerCase()));
+      System.out.println("node" + i + "_probability=" + node.basicProbability);
+      System.out.println("node" + i + "_k_of_n=" + node.kOfN);
+      System.out.println("node" + i + "_beta_ccf=" + node.betaCCF);
+    }
+  }
+
+  static List<List<String>> faultTreeOrderedCutSets(Set<List<String>> sets) {
+    List<List<String>> ordered = new ArrayList<>(sets);
+    ordered.sort(Comparator.comparingInt((List<String> set) -> set.size())
+        .thenComparing(set -> String.join(", ", set)));
+    return ordered;
+  }
+
+  static void faultTreeRow(String label, FaultTreeNode root, int maxCardinality) {
+    FaultTreeAnalyzer analyzer = new FaultTreeAnalyzer();
+    List<FaultTreeNode> nodes = new ArrayList<>();
+    List<Integer> parents = new ArrayList<>();
+    faultTreeFlatten(root, -1, nodes, parents);
+    System.out.println(label);
+    faultTreePrintInputs(nodes, parents);
+    System.out.println("max_cardinality=" + maxCardinality);
+    System.out.println("top_event_probability=" + analyzer.topEventProbability(root));
+    Set<List<String>> sets = analyzer.minimalCutSets(root, maxCardinality);
+    List<List<String>> ordered = faultTreeOrderedCutSets(sets);
+    System.out.println("cut_set_count=" + ordered.size());
+    for (int i = 0; i < ordered.size(); i++) {
+      System.out.println("cut_set" + i + "_members=" + String.join(", ", ordered.get(i)));
+      System.out.println("cut_set" + i + "_cardinality=" + ordered.get(i).size());
+    }
+    // The class's `HashSet` order, as evidence for the port's sorted order.
+    System.out.println("class_cut_set_order=" + sets);
+    System.out.println();
+  }
+
+  static void faultTreeCompact(String label, FaultTreeNode root, int maxCardinality) {
+    FaultTreeAnalyzer analyzer = new FaultTreeAnalyzer();
+    System.out.println(label);
+    System.out.println("max_cardinality=" + maxCardinality);
+    System.out.println("top_event_probability=" + analyzer.topEventProbability(root));
+    System.out.println("cut_set_count=" + analyzer.minimalCutSets(root, maxCardinality).size());
+    System.out.println();
+  }
+
+  static void faultTreeBasicRefusal(String label, double probability) {
+    System.out.println(label);
+    System.out.println("probability=" + probability);
+    try {
+      FaultTreeNode.basic("A", probability);
+      System.out.println("refusal=none");
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void faultTreeBetaRefusal(String label, double beta) {
+    System.out.println(label);
+    System.out.println("beta_ccf=" + beta);
+    try {
+      FaultTreeNode.or("any", FaultTreeNode.basic("A", 0.1), FaultTreeNode.basic("B", 0.2))
+          .withCCF(beta);
+      System.out.println("refusal=none");
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  // === process.bow_tie =======================================================
+
+  static void bowTieRows() {
+    // `BowTieTest.testBowTieModelCalculateRisk`.
+    bowTieRow("bt_class_test", new double[][] {{0.1, 1.0}, {0.05, 1.0}}, new int[] {5},
+        new double[][] {{0.01, 0.0, 1.0}}, false);
+    // A mitigation barrier is read by no formula; the frequency is unchanged.
+    bowTieRow("bt_mitigation_ignored", new double[][] {{0.1, 1.0}}, new int[] {4},
+        new double[][] {{0.01, 0.0, 1.0}, {0.5, 1.0, 1.0}}, false);
+    // BOTH is a prevention barrier; an inactive threat and a non-functional barrier are skipped.
+    bowTieRow("bt_both_types", new double[][] {{0.1, 1.0}, {0.2, 0.0}}, new int[] {3, 5},
+        new double[][] {{0.1, 2.0, 1.0}, {0.01, 0.0, 0.0}}, false);
+    // `linkBarrierToThreat` drives no arithmetic: both prevention barriers multiply.
+    bowTieRow("bt_link_ignored", new double[][] {{0.1, 1.0}}, new int[] {2},
+        new double[][] {{0.1, 0.0, 1.0}, {0.2, 0.0, 1.0}}, true);
+    // No barriers: mitigated equals unmitigated and the RRF is one.
+    bowTieRow("bt_no_barriers", new double[][] {{0.3, 1.0}}, new int[] {5}, new double[][] {}, false);
+    // Evidence: an empty bow-tie, and the states the class does not validate.
+    bowTieRow("bt_empty", new double[][] {}, new int[] {}, new double[][] {}, false);
+    bowTieRow("bt_negative_frequency", new double[][] {{-1.0, 1.0}}, new int[] {5},
+        new double[][] {}, false);
+    bowTieRow("bt_pfd_above_one", new double[][] {{0.1, 1.0}}, new int[] {5},
+        new double[][] {{1.5, 0.0, 1.0}}, false);
+    bowTieRow("bt_pfd_negative", new double[][] {{0.1, 1.0}}, new int[] {5},
+        new double[][] {{-0.5, 0.0, 1.0}}, false);
+    bowTieRow("bt_pfd_nan", new double[][] {{0.1, 1.0}}, new int[] {5},
+        new double[][] {{Double.NaN, 0.0, 1.0}}, false);
+    bowTieRow("bt_no_consequences", new double[][] {{0.1, 1.0}}, new int[] {},
+        new double[][] {{0.1, 0.0, 1.0}}, false);
+    bowTieRow("bt_all_inactive", new double[][] {{0.1, 0.0}, {0.2, 0.0}}, new int[] {5},
+        new double[][] {{0.1, 0.0, 1.0}}, false);
+  }
+
+  static void bowTieRow(String label, double[][] threats, int[] severities, double[][] barriers,
+      boolean linkFirstBarrier) {
+    BowTieModel model = new BowTieModel("HAZ-" + label, label);
+    for (int i = 0; i < threats.length; i++) {
+      BowTieModel.Threat threat = new BowTieModel.Threat("T-" + i, "threat " + i, threats[i][0]);
+      threat.setActive(threats[i][1] != 0.0);
+      model.addThreat(threat);
+    }
+    for (int i = 0; i < severities.length; i++) {
+      model.addConsequence(new BowTieModel.Consequence("C-" + i, "consequence " + i, severities[i]));
+    }
+    for (int i = 0; i < barriers.length; i++) {
+      BowTieModel.Barrier barrier =
+          new BowTieModel.Barrier("B-" + i, "barrier " + i, barriers[i][0]);
+      int type = (int) barriers[i][1];
+      barrier.setBarrierType(type == 0 ? BowTieModel.BarrierType.PREVENTION
+          : type == 1 ? BowTieModel.BarrierType.MITIGATION : BowTieModel.BarrierType.BOTH);
+      barrier.setFunctional(barriers[i][2] != 0.0);
+      model.addBarrier(barrier);
+    }
+    if (linkFirstBarrier && barriers.length > 0 && threats.length > 0) {
+      model.linkBarrierToThreat("T-0", "B-0");
+    }
+    System.out.println(label);
+    System.out.println("threat_count=" + threats.length);
+    for (int i = 0; i < threats.length; i++) {
+      System.out.println("threat" + i + "_frequency_per_year=" + threats[i][0]);
+      System.out.println("threat" + i + "_active=" + (threats[i][1] != 0.0));
+    }
+    System.out.println("consequence_count=" + severities.length);
+    for (int i = 0; i < severities.length; i++) {
+      System.out.println("consequence" + i + "_severity=" + severities[i]);
+    }
+    System.out.println("barrier_count=" + barriers.length);
+    for (int i = 0; i < barriers.length; i++) {
+      System.out.println("barrier" + i + "_pfd=" + barriers[i][0]);
+      System.out.println("barrier" + i + "_type=" + (int) barriers[i][1]);
+      System.out.println("barrier" + i + "_functional=" + (barriers[i][2] != 0.0));
+    }
+    model.calculateRisk();
+    System.out.println("unmitigated_frequency_per_year=" + model.getUnmitigatedFrequency());
+    System.out.println("mitigated_frequency_per_year=" + model.getMitigatedFrequency());
+    System.out.println("total_rrf=" + model.getTotalRRF());
+    System.out.println("max_severity=" + model.getMaxSeverity());
+    System.out.println();
+  }
+
+  // === process.safety_instrumented_function ==================================
+
+  static void safetyInstrumentedFunctionRows() {
+    // `SISIntegrationTest`: SIL 2, PFD 0.005, a one-year proof interval.
+    safetyInstrumentedFunctionRow("sif_class_test", 2, 0.005, 8760.0, 1.0e-6, 0.0, 0.0, 0.99,
+        0.1, 1.0e-5);
+    safetyInstrumentedFunctionRow("sif_required_pfd_at_zero", 2, 0.005, 8760.0, 1.0e-6, 0.0, 0.0,
+        0.99, 0.0, 1.0e-5);
+    safetyInstrumentedFunctionRow("sif_pfd_zero", 2, 0.0, 8760.0, 1.0e-6, 0.0, 0.0, 0.99, 0.1,
+        1.0e-5);
+    safetyInstrumentedFunctionRow("sif_spurious_trips", 2, 0.005, 8760.0, 1.0e-6, 2.0, 48.0, 0.99,
+        0.1, 1.0e-5);
+    // The class prints only a warning for an out-of-band PFD; it does not refuse.
+    safetyInstrumentedFunctionRow("sif_out_of_band", 1, 0.5, 8760.0, 1.0e-6, 0.0, 0.0, 0.99, 0.1,
+        1.0e-5);
+    // Evidence: a negative PFD and a NaN are accepted; SIL 0 is refused by the constructor.
+    safetyInstrumentedFunctionRow("sif_negative_pfd", 2, -0.1, 8760.0, 1.0e-6, 0.0, 0.0, 0.99, 0.1,
+        1.0e-5);
+    safetyInstrumentedFunctionRow("sif_nan_pfd", 2, Double.NaN, 8760.0, 1.0e-6, 0.0, 0.0, 0.99,
+        0.1, 1.0e-5);
+    safetyInstrumentedFunctionRefusal("sif_refuse_sil_zero", 0, 0.005);
+    safetyInstrumentedFunctionRefusal("sif_refuse_sil_five", 5, 0.005);
+    // The static max-PFD table answers 1.0 for a SIL it does not know.
+    System.out.println("sif_max_pfd_unknown_sil");
+    System.out.println("max_pfd_for_sil_0=" + SafetyInstrumentedFunction.getMaxPfdForSil(0));
+    System.out.println("max_pfd_for_sil_5=" + SafetyInstrumentedFunction.getMaxPfdForSil(5));
+    System.out.println();
+  }
+
+  static void safetyInstrumentedFunctionRow(String label, int sil, double pfd, double testHours,
+      double lambdaDu, double spuriousRate, double mttr, double baseAvailability,
+      double unmitigated, double target) {
+    SafetyInstrumentedFunction sif = new SafetyInstrumentedFunction("SIF", sil, pfd);
+    sif.setTestIntervalHours(testHours);
+    sif.setSpuriousTripRate(spuriousRate);
+    sif.setMttr(mttr);
+    System.out.println(label);
+    System.out.println("pfd_average=" + pfd);
+    System.out.println("claimed_sil=" + sil);
+    System.out.println("unmitigated_frequency_per_year=" + unmitigated);
+    System.out.println("target_frequency_per_year=" + target);
+    System.out.println("test_interval_hours=" + testHours);
+    System.out.println("lambda_du_per_hour=" + lambdaDu);
+    System.out.println("spurious_trip_rate_per_year=" + spuriousRate);
+    System.out.println("mttr_hours=" + mttr);
+    System.out.println("base_availability=" + baseAvailability);
+    System.out.println("risk_reduction_factor=" + sif.getRiskReductionFactor());
+    System.out.println("mitigated_frequency_per_year=" + sif.getMitigatedFrequency(unmitigated));
+    double requiredPfd = SafetyInstrumentedFunction.calculateRequiredPfd(unmitigated, target);
+    System.out.println("required_pfd=" + requiredPfd);
+    System.out.println("required_sil=" + SafetyInstrumentedFunction.getRequiredSil(requiredPfd));
+    System.out.println("max_pfd_for_claimed_sil=" + SafetyInstrumentedFunction.getMaxPfdForSil(sil));
+    System.out.println("proof_test_interval_years=" + sif.getProofTestIntervalYears());
+    double[] minPfd = {0.0, 0.01, 0.001, 0.0001, 0.00001};
+    double[] maxPfd = {1.0, 0.1, 0.01, 0.001, 0.0001};
+    System.out.println("pfd_within_claimed_sil="
+        + (pfd >= minPfd[sil] && pfd <= maxPfd[sil]));
+    System.out.println("pfd_1oo1=" + SafetyInstrumentedFunction.calculatePfd1oo1(lambdaDu, testHours));
+    System.out.println("pfd_1oo2=" + SafetyInstrumentedFunction.calculatePfd1oo2(lambdaDu, testHours));
+    System.out.println("pfd_2oo3=" + SafetyInstrumentedFunction.calculatePfd2oo3(lambdaDu, testHours));
+    System.out.println("availability_with_spurious_trips="
+        + sif.getAvailabilityWithSpuriousTrips(baseAvailability, mttr));
+    System.out.println();
+  }
+
+  static void safetyInstrumentedFunctionRefusal(String label, int sil, double pfd) {
+    System.out.println(label);
+    System.out.println("pfd_average=" + pfd);
+    System.out.println("claimed_sil=" + sil);
+    try {
+      new SafetyInstrumentedFunction("SIF", sil, pfd);
+      System.out.println("refusal=none");
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  // === process.lopa ==========================================================
+
+  static void lopaRows() {
+    // `LOPARunnerTest`: the canonical target-met and gap states.
+    lopaRow("lopa_target_met", 0.1, 1.1e-4, new double[] {0.1, 0.01});
+    lopaRow("lopa_gap", 0.5, 1.0e-5, new double[] {0.1});
+    // The comparison is inclusive: mitigated == target is met, and the gap is zero.
+    lopaRow("lopa_boundary_equal", 0.5, 0.05, new double[] {0.1});
+    // One binary step away: `0.1 * 0.1` is above `0.01` by 1.7e-18, so the same target fails.
+    lopaRow("lopa_fp_boundary_unmet", 0.1, 0.01, new double[] {0.1});
+    // Zero mitigated: the RRF is 0 and 0 <= target is met.
+    lopaRow("lopa_zero_mitigated", 0.1, 1.0e-4, new double[] {0.0});
+    // Target zero and not met: the required additional RRF is infinite and its SIL is 4.
+    lopaRow("lopa_zero_target_unmet", 0.1, 0.0, new double[] {0.1});
+    // The STS0131 bands and their exact boundaries.
+    lopaStsRow("lopa_sts_below_design", 5.0, 10.0, 15.0);
+    lopaStsRow("lopa_sts_above_design", 12.0, 10.0, 15.0);
+    lopaStsRow("lopa_sts_above_test", 18.0, 10.0, 15.0);
+    lopaStsRow("lopa_sts_above_two_times", 21.0, 10.0, 15.0);
+    lopaStsRow("lopa_sts_event_at_test", 15.0, 10.0, 15.0);
+    lopaStsRow("lopa_sts_event_at_two_times", 20.0, 10.0, 15.0);
+    // Evidence: a zero-PFD layer, negative frequencies, and the STS0131 guards.
+    lopaRow("lopa_zero_pfd_layer", 0.1, 1.0e-4, new double[] {0.0});
+    lopaRow("lopa_negative_initiating", -0.1, 1.0e-4, new double[] {0.1});
+    lopaStsRefusal("lopa_refuse_zero_event", 0.0, 10.0, 15.0);
+    lopaStsRefusal("lopa_refuse_zero_design", 5.0, 0.0, 15.0);
+    lopaStsRefusal("lopa_refuse_zero_test", 5.0, 10.0, 0.0);
+    lopaStsRefusal("lopa_refuse_test_below_design", 5.0, 10.0, 9.0);
+  }
+
+  static void lopaRow(String label, double initiating, double target, double[] pfds) {
+    LOPAResult lopa = new LOPAResult(label);
+    lopa.setInitiatingEventFrequency(initiating);
+    lopa.setTargetFrequency(target);
+    double current = initiating;
+    for (int i = 0; i < pfds.length; i++) {
+      double before = current;
+      double after = before * pfds[i];
+      lopa.addLayer("L" + i, pfds[i], before, after);
+      current = after;
+    }
+    lopa.setMitigatedFrequency(current);
+    System.out.println(label);
+    System.out.println("initiating_event_frequency_per_year=" + initiating);
+    System.out.println("target_frequency_per_year=" + target);
+    System.out.println("layer_count=" + pfds.length);
+    for (int i = 0; i < pfds.length; i++) {
+      double before = lopa.getLayers().get(i).getFrequencyBefore();
+      double after = lopa.getLayers().get(i).getFrequencyAfter();
+      System.out.println("layer" + i + "_name=L" + i);
+      System.out.println("layer" + i + "_pfd=" + pfds[i]);
+      System.out.println("layer" + i + "_frequency_before_per_year=" + before);
+      System.out.println("layer" + i + "_frequency_after_per_year=" + after);
+      System.out.println("layer" + i + "_contribution_per_year=" + (before - after));
+      System.out.println("layer" + i + "_rrf=" + lopa.getLayers().get(i).getRRF());
+    }
+    System.out.println("target_met=" + lopa.isTargetMet());
+    System.out.println("gap_to_target=" + lopa.getGapToTarget());
+    System.out.println("total_rrf=" + lopa.getTotalRRF());
+    System.out.println("required_additional_rrf=" + lopa.getRequiredAdditionalRRF());
+    System.out.println("required_additional_sil=" + lopa.getRequiredAdditionalSIL());
+    System.out.println();
+  }
+
+  static void lopaStsRow(String label, double event, double design, double test) {
+    System.out.println(label);
+    System.out.println("event_pressure_bar=" + event);
+    System.out.println("design_pressure_bar=" + design);
+    System.out.println("test_pressure_bar=" + test);
+    System.out.println("sts0131_pressure_category="
+        + LOPAResult.getSTS0131PressureCategory(event, design, test).name().toLowerCase());
+    System.out.println("sts0131_target_frequency_per_year="
+        + LOPAResult.getSTS0131OverpressureTargetFrequency(event, design, test));
+    System.out.println();
+  }
+
+  static void lopaStsRefusal(String label, double event, double design, double test) {
+    System.out.println(label);
+    System.out.println("event_pressure_bar=" + event);
+    System.out.println("design_pressure_bar=" + design);
+    System.out.println("test_pressure_bar=" + test);
+    try {
+      LOPAResult.getSTS0131PressureCategory(event, design, test);
+      System.out.println("refusal=none");
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  // === process.sil_verification ==============================================
+
+  static void silVerificationRows() {
+    // `SILRunnerTest.calculatesCanonicalScreeningCase`: claimed 2 at PFD 0.005.
+    silVerificationRow("sv_canonical", 2, 0.005, "1oo1", 8760.0);
+    silVerificationRow("sv_pfd_exceeded", 2, 0.05, "1oo1", 8760.0);
+    // SIL 4 on 1oo2: hardware fault tolerance 1 is below the 2 the class asks for.
+    silVerificationRow("sv_sil4_1oo2", 4, 5.0e-5, "1oo2", 8760.0);
+    // SIL 3 on 1oo1: the architecture and diagnostic-coverage warnings.
+    silVerificationRow("sv_sil3_1oo1", 3, 5.0e-4, "1oo1", 8760.0);
+    // An architecture the class does not know: fault tolerance 0, coverage 0.5.
+    silVerificationRow("sv_unknown_architecture", 2, 0.005, "2oo4", 8760.0);
+    // Evidence: 1oo3, a coverage-matching substring, and the states the class accepts.
+    silVerificationRow("sv_1oo3", 4, 5.0e-5, "1oo3", 8760.0);
+    silVerificationRow("sv_substring_coverage", 3, 5.0e-4, "4oo2", 8760.0);
+    silVerificationRow("sv_long_proof_interval", 3, 5.0e-4, "2oo3", 87601.0);
+    silVerificationRow("sv_proof_at_five_years", 3, 5.0e-4, "2oo3", 43800.0);
+    silVerificationRow("sv_nan_pfd", 2, Double.NaN, "1oo1", 8760.0);
+    silVerificationRow("sv_negative_pfd", 2, -0.1, "1oo1", 8760.0);
+  }
+
+  static void silVerificationRow(String label, int claimed, double pfd, String architecture,
+      double testHours) {
+    SafetyInstrumentedFunction sif = SafetyInstrumentedFunction.builder().name(label).sil(claimed)
+        .pfd(pfd).architecture(architecture).testIntervalHours(testHours).build();
+    SILVerificationResult result = new SILVerificationResult(sif);
+    System.out.println(label);
+    System.out.println("pfd_average=" + pfd);
+    System.out.println("claimed_sil=" + claimed);
+    System.out.println("architecture=" + architecture);
+    System.out.println("test_interval_hours=" + testHours);
+    System.out.println("achieved_sil=" + result.getAchievedSIL());
+    System.out.println("sil_achieved=" + result.isSilAchieved());
+    System.out.println("pfd_upper=" + result.getPfdUpper());
+    System.out.println("hardware_fault_tolerance=" + result.getHardwareFaultTolerance());
+    System.out.println("systematic_capability=" + result.getSystematicCapability());
+    System.out.println("diagnostic_coverage=" + result.getDiagnosticCoverage());
+    System.out.println("issue_count=" + result.getIssues().size());
+    System.out.println("error_count=" + result.getErrors().size());
+    System.out.println("warning_count=" + result.getWarnings().size());
+    System.out.println("verification_passed=" + !result.hasErrors());
+    for (int i = 0; i < result.getIssues().size(); i++) {
+      SILVerificationResult.VerificationIssue issue = result.getIssues().get(i);
+      System.out.println("issue" + i + "_severity=" + issue.getSeverity().name().toLowerCase());
+      System.out.println("issue" + i + "_category=" + issue.getCategory().name().toLowerCase());
+    }
+    System.out.println();
+  }
+
+  // === process.nog070_sil_determination ======================================
+
+  static void nog070SilRows() {
+    // `Nog070SilCatalogueTest`: a compliant HIPPS, a non-compliant one, and CUSTOM.
+    nog070SilRow("n070_hipps_compliant", Nog070SifType.HIPPS_PIPELINE, 1.0e-4);
+    nog070SilRow("n070_hipps_noncompliant", Nog070SifType.HIPPS_PIPELINE, 5.0e-3);
+    nog070SilCustomRow("n070_custom_minimum", 5.0e-3, 3);
+    nog070SilCustomRow("n070_custom_no_minimum", 5.0e-3, 0);
+    // The SIL-0 band, beside the SIF id's `getRequiredSil(0.2) = 1`.
+    nog070SilRow("n070_sil_zero_band", Nog070SifType.PSD_HIGH_VIBRATION, 0.2);
+    // The mapping boundaries.
+    double[] boundaryPfd = {0.1, 0.0999, 0.01, 0.009, 0.001, 0.0009, 1.0e-4, 9.9e-5};
+    System.out.println("n070_pfd_to_sil_boundaries");
+    for (double pfd : boundaryPfd) {
+      System.out.println("pfd_average=" + pfd);
+      System.out.println("achieved_sil=" + Nog070SilDetermination.pfdToSil(pfd));
+    }
+    System.out.println();
+    // The whole catalogue, as one evidence block.
+    System.out.println("n070_catalogue");
+    for (Nog070SifType type : Nog070SifType.values()) {
+      System.out.println("sif_type=" + type.name());
+      System.out.println("catalogue_minimum_sil=" + Nog070SilCatalogue.getMinimumSil(type));
+    }
+    System.out.println();
+    // The class's guards.
+    nog070SilRefusal("n070_refuse_pfd_zero", Nog070SifType.HIPPS_PIPELINE, 0.0, null);
+    nog070SilRefusal("n070_refuse_pfd_one", Nog070SifType.HIPPS_PIPELINE, 1.0, null);
+    nog070SilRefusal("n070_refuse_pfd_above_one", Nog070SifType.HIPPS_PIPELINE, 1.5, null);
+    nog070SilRefusal("n070_refuse_pfd_nan", Nog070SifType.HIPPS_PIPELINE, Double.NaN, null);
+    nog070SilRefusal("n070_refuse_minimum_negative", Nog070SifType.CUSTOM, 5.0e-3, -1);
+    nog070SilRefusal("n070_refuse_minimum_above_four", Nog070SifType.CUSTOM, 5.0e-3, 5);
+  }
+
+  static void nog070SilRow(String label, Nog070SifType type, double pfd) {
+    Nog070SilDetermination determination = Nog070SilDetermination.evaluate(type, pfd);
+    System.out.println(label);
+    System.out.println("sif_type=" + type.name());
+    System.out.println("pfd_average=" + pfd);
+    System.out.println("catalogue_minimum_sil=" + Nog070SilCatalogue.getMinimumSil(type));
+    System.out.println("minimum_sil=" + determination.getMinimumSil());
+    System.out.println("achieved_sil=" + determination.getAchievedSil());
+    System.out.println("compliant=" + determination.isCompliant());
+    System.out.println("message=" + determination.getMessage());
+    System.out.println();
+  }
+
+  static void nog070SilCustomRow(String label, double pfd, int minimumSil) {
+    Nog070SilDetermination determination = Nog070SilDetermination.evaluate(Nog070SifType.CUSTOM,
+        pfd, minimumSil);
+    System.out.println(label);
+    System.out.println("sif_type=CUSTOM");
+    System.out.println("pfd_average=" + pfd);
+    System.out.println("catalogue_minimum_sil=" + Nog070SilCatalogue.getMinimumSil(Nog070SifType.CUSTOM));
+    System.out.println("minimum_sil=" + determination.getMinimumSil());
+    System.out.println("achieved_sil=" + determination.getAchievedSil());
+    System.out.println("compliant=" + determination.isCompliant());
+    System.out.println("message=" + determination.getMessage());
+    System.out.println();
+  }
+
+  static void nog070SilRefusal(String label, Nog070SifType type, double pfd, Integer minimumSil) {
+    System.out.println(label);
+    System.out.println("pfd_average=" + pfd);
+    if (minimumSil != null) {
+      System.out.println("minimum_sil=" + minimumSil);
+    }
+    try {
+      if (minimumSil == null) {
+        Nog070SilDetermination.evaluate(type, pfd);
+      } else {
+        Nog070SilDetermination.evaluate(type, pfd, minimumSil.intValue());
+      }
+      System.out.println("refusal=none");
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  // === process.risk_matrix ===================================================
+
+  static void riskMatrixRows() {
+    // The class's band tests: five frequencies and five production losses.
+    riskMatrixMulti("rm_bands", new double[][] {{0.05, 48.0, 3.0, 1000.0},
+        {0.3, 48.0, 15.0, 1000.0}, {0.7, 48.0, 35.0, 1000.0}, {1.5, 48.0, 65.0, 1000.0},
+        {3.0, 48.0, 90.0, 1000.0}}, 0.5, 5000.0);
+    // The band boundaries, from each side.
+    riskMatrixMulti("rm_boundaries", new double[][] {{0.0, 48.0, 0.0, 1000.0},
+        {0.1, 48.0, 5.0, 1000.0}, {0.5, 48.0, 20.0, 1000.0}, {1.0, 48.0, 50.0, 1000.0},
+        {2.0, 48.0, 80.0, 1000.0}, {2.5, 48.0, 100.0, 1000.0}}, 0.5, 5000.0);
+    // `addEquipmentRisk(2.0, 72)` with the class's default price and downtime cost.
+    riskMatrixMulti("rm_costs", new double[][] {{0.5, 48.0, 50.0, 1000.0}}, 0.5, 5000.0);
+    // Zero failures: MTBF is the class's 1e6 h sentinel.
+    riskMatrixMulti("rm_zero_failures", new double[][] {{0.0, 24.0, 10.0, 500.0}}, 0.5, 5000.0);
+    // Evidence: the values the class silently maps to its top category.
+    riskMatrixMulti("rm_negative_frequency", new double[][] {{-0.5, 48.0, 15.0, 1000.0}}, 0.5,
+        5000.0);
+    riskMatrixMulti("rm_nan_frequency", new double[][] {{Double.NaN, 48.0, 15.0, 1000.0}}, 0.5,
+        5000.0);
+    riskMatrixMulti("rm_loss_above_band", new double[][] {{0.5, 48.0, 101.0, 1000.0}}, 0.5, 5000.0);
+    riskMatrixMulti("rm_negative_loss", new double[][] {{0.5, 48.0, -1.0, 1000.0}}, 0.5, 5000.0);
+    riskMatrixMulti("rm_negative_mttr", new double[][] {{0.5, -48.0, 15.0, 1000.0}}, 0.5, 5000.0);
+    riskMatrixMulti("rm_negative_loss_mass", new double[][] {{0.5, 48.0, 15.0, -1000.0}}, 0.5,
+        5000.0);
+  }
+
+  static void riskMatrixMulti(String label, double[][] rows, double price, double downtimeCost) {
+    ProcessSystem system = new ProcessSystem();
+    RiskMatrix matrix = new RiskMatrix(system);
+    matrix.setProductPrice(price, "USD/kg");
+    matrix.setDowntimeCostPerHour(downtimeCost);
+    for (int i = 0; i < rows.length; i++) {
+      matrix.addEquipmentRisk("EQ" + i, rows[i][0], rows[i][1]);
+    }
+    System.out.println(label);
+    System.out.println("equipment_count=" + rows.length);
+    System.out.println("product_price_per_kg=" + price);
+    System.out.println("downtime_cost_per_hour=" + downtimeCost);
+    try {
+      Method setConsequence = RiskMatrix.RiskAssessment.class.getDeclaredMethod("setConsequenceData",
+          double.class, double.class);
+      setConsequence.setAccessible(true);
+      Method calculateRisk = RiskMatrix.RiskAssessment.class.getDeclaredMethod("calculateRisk");
+      calculateRisk.setAccessible(true);
+      Method calculateCost =
+          RiskMatrix.class.getDeclaredMethod("calculateCost", RiskMatrix.RiskAssessment.class);
+      calculateCost.setAccessible(true);
+      for (int i = 0; i < rows.length; i++) {
+        RiskMatrix.RiskAssessment assessment = matrix.getRiskAssessment("EQ" + i);
+        setConsequence.invoke(assessment, rows[i][2], rows[i][3]);
+        calculateRisk.invoke(assessment);
+        calculateCost.invoke(matrix, assessment);
+      }
+    } catch (ReflectiveOperationException ex) {
+      System.out.println("reflection_error=" + ex.getClass().getSimpleName() + ": "
+          + ex.getMessage());
+    }
+    for (int i = 0; i < rows.length; i++) {
+      RiskMatrix.RiskAssessment assessment = matrix.getRiskAssessment("EQ" + i);
+      System.out.println("assessment" + i + "_name=EQ" + i);
+      System.out.println("assessment" + i + "_failures_per_year=" + rows[i][0]);
+      System.out.println("assessment" + i + "_mtbf_hours=" + assessment.getMtbf());
+      System.out.println("assessment" + i + "_mttr_hours=" + rows[i][1]);
+      System.out.println("assessment" + i + "_expected_downtime_hours_per_year="
+          + assessment.getExpectedDowntimeHoursYear());
+      System.out.println("assessment" + i + "_probability_category="
+          + assessment.getProbabilityCategory().getName().toLowerCase().replace(' ', '_'));
+      System.out.println("assessment" + i + "_probability_level="
+          + assessment.getProbabilityCategory().getLevel());
+      System.out.println("assessment" + i + "_production_loss_percent=" + rows[i][2]);
+      System.out.println("assessment" + i + "_production_loss_kg_hr=" + rows[i][3]);
+      System.out.println("assessment" + i + "_consequence_category="
+          + assessment.getConsequenceCategory().getName().toLowerCase().replace(' ', '_'));
+      System.out.println("assessment" + i + "_consequence_level="
+          + assessment.getConsequenceCategory().getLevel());
+      System.out.println("assessment" + i + "_risk_score=" + assessment.getRiskScore());
+      System.out.println("assessment" + i + "_risk_level="
+          + assessment.getRiskLevel().getName().toLowerCase());
+      System.out.println("assessment" + i + "_cost_per_failure=" + assessment.getCostPerFailure());
+      System.out.println("assessment" + i + "_annual_risk_cost=" + assessment.getAnnualRiskCost());
+    }
+    System.out.println("total_annual_risk_cost=" + matrix.getTotalAnnualRiskCost());
     System.out.println();
   }
 }
