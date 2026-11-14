@@ -6,7 +6,7 @@ assumptions = [
     "**blowdown is the governing control when it is faster than the steel**: `blowdown_faster_than_failure` is `blowdown < bare`, and the margin is `bare - blowdown`, positive when blowdown wins.",
     "**selective protection's saving is `1 - dedicated_object_demand / general_area_demand`**, the fraction of the area requirement that protecting one object does not discharge.",
     "**the class's literals are stated, not published**: `isWaterCreditableForEscalationControl` is always `true` and `isPassiveSubstitutionPermitted` always `false`, so they carry no state.",
-    "**the incident flux, the inventory and the four presentation flags are not carried**: they are read only by `verdict()`, `rankedMeasures()` or `toJson()`, and the prose surfaces are presentation.",
+    "**the incident flux, the inventory and the four presentation flags have no surface here**: only `verdict()`, `rankedMeasures()` or `toJson()` read them, and the prose is presentation.",
     "**an unknown time or demand is not a screening state**: the class's NaN defaults are replaced by required inputs, and the unguarded demand setters become range checks.",
 ]
 references = [

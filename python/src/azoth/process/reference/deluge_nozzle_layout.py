@@ -34,7 +34,7 @@ class _Solution(NamedTuple):
     coverage_per_nozzle: float
     count_from_flow: float
     count_from_coverage: float
-    count: float
+    nozzle_count: float
     governing: GoverningCriterion
     grid: float
     delivered_flow: float
@@ -113,9 +113,7 @@ def _evaluate(
     _require_finite("available_clearance", available)
     pressure = _DEFAULT_OPERATING_PRESSURE_PA if stated_pressure is None else stated_pressure
     _require_finite("operating_pressure", pressure)
-    efficiency = (
-        _DEFAULT_COVERAGE_EFFICIENCY if stated_efficiency is None else stated_efficiency
-    )
+    efficiency = _DEFAULT_COVERAGE_EFFICIENCY if stated_efficiency is None else stated_efficiency
     _require_finite("coverage_efficiency", efficiency)
 
     # **The orifice law is in bar**: `input_to_si` gives pascals, and the K factor is
@@ -143,7 +141,7 @@ def _evaluate(
             coverage_per_nozzle=coverage_per_nozzle,
             count_from_flow=float(count_from_flow),
             count_from_coverage=float(count_from_coverage),
-            count=float(count),
+            nozzle_count=float(count),
             governing=governing,
             grid=grid,
             delivered_flow=delivered_flow / 60000.0,
@@ -205,7 +203,7 @@ def deluge_nozzle_layout(
         coverage_per_nozzle=from_si(solution.coverage_per_nozzle, "m**2"),
         nozzle_count_from_flow=solution.count_from_flow,
         nozzle_count_from_coverage=solution.count_from_coverage,
-        nozzle_count=solution.count,
+        nozzle_count=solution.nozzle_count,
         governing_criterion=solution.governing,
         grid_spacing=from_si(solution.grid, "m"),
         delivered_flow=from_si(solution.delivered_flow, "L/min"),

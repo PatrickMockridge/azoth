@@ -8,8 +8,8 @@ assumptions = [
     "**the class's defaults are carried**: application rate 10 L/(min m2) (NORSOK process area), duration 30 min, foam concentrate 0 % and simultaneous area factor 1.",
     "**a zero area demand has no ratio**: the class's `objectToAreaDemandRatio` answers NaN, and the port publishes the output as absent.",
     "**the object rows validate nothing in the class**: `addObject` and `ProtectedObject` accept a negative area or rate and publish a negative demand; the port refuses both.",
-    "**the horizontal-vessel convenience is not carried**: `addHorizontalVessel` is the caller's wetted area `pi D L + 2 pi D^2 / 4`, and the row takes the surface directly.",
-    "**the object tag is JSON-only**: it is not read by any arithmetic and is not carried.",
+    "**the row takes the wetted surface directly**: `addHorizontalVessel`'s `pi D L + 2 pi D^2 / 4` is the caller's computation, and the row carries the surface it produces.",
+    "**the object tag is JSON-only**: no formula reads it, and the port's row is the surface and the rate alone.",
     "**the foam volume is the concentrate, not the water**: `foam = water concentrate_percent / 100` with the percent in `[0, 10]`.",
 ]
 references = [

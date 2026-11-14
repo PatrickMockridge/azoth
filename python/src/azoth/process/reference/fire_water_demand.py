@@ -74,10 +74,10 @@ def _evaluate(
     stated_rate = None if application_rate is None else float(application_rate)
     stated_duration = None if duration is None else input_to_si(spec, "duration", duration)
     stated_foam = None if foam_concentrate_percent is None else float(foam_concentrate_percent)
-    stated_factor = (
-        None if simultaneous_area_factor is None else float(simultaneous_area_factor)
+    stated_factor = None if simultaneous_area_factor is None else float(simultaneous_area_factor)
+    rows: list[dict[str, Any]] = input_records_to_si(
+        spec, "protected_objects", protected_objects or []
     )
-    rows = input_records_to_si(spec, "protected_objects", protected_objects or [])
     apply_checks(
         checks.on_input,
         {

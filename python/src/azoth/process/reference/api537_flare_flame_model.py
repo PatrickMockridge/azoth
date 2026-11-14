@@ -68,7 +68,7 @@ def _evaluate(
     exit_velocity: Q,
     ground_distance: Q,
     sound_distance: Q,
-    target_fluxes: list[dict[str, object]],
+    target_fluxes: list[dict[str, Any]],
     stack_height: Q | None = None,
     wind_speed: Q | None = None,
     transmissivity: float | None = None,
@@ -85,13 +85,11 @@ def _evaluate(
     exit_v = input_to_si(spec, "exit_velocity", exit_velocity)
     ground = input_to_si(spec, "ground_distance", ground_distance)
     sound = input_to_si(spec, "sound_distance", sound_distance)
-    stated_stack = (
-        None if stack_height is None else input_to_si(spec, "stack_height", stack_height)
-    )
+    stated_stack = None if stack_height is None else input_to_si(spec, "stack_height", stack_height)
     stated_wind = None if wind_speed is None else input_to_si(spec, "wind_speed", wind_speed)
     stated_tau = None if transmissivity is None else float(transmissivity)
     stated_eta = None if acoustic_efficiency is None else float(acoustic_efficiency)
-    targets = input_records_to_si(spec, "target_fluxes", target_fluxes)
+    targets: list[dict[str, Any]] = input_records_to_si(spec, "target_fluxes", target_fluxes)
     apply_checks(
         checks.on_input,
         {

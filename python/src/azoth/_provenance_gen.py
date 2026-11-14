@@ -2460,7 +2460,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.active_fire_protection_screening': {
         "calc_id": 'process.active_fire_protection_screening',
         "name": 'Active fire protection screening',
-        "spec": {'path': 'specs/models/process/active_fire_protection_screening.toml', 'sha256': '7d0dd6de9e55c8dca57cf828b17dcfcce6a2c9d7605b26fbf23d9e1a6707b343'},
+        "spec": {'path': 'specs/models/process/active_fire_protection_screening.toml', 'sha256': '99e276d08fcacef613e97cec09e56d34be3d25dbd2ae463e2d08b84c69c57d47'},
         "code": [{'path': 'python/src/azoth/process/reference/active_fire_protection_screening.py', 'sha256': 'd8c331baf147067e859f8e7adcd90a54f9b75f9d0d6e91a5858b5b57c38b0d74'}, {'path': 'crates/azoth-process/src/models/active_fire_protection_screening.rs', 'sha256': '2f4f9859b25b87806873b5a369cb5d65a277a10b2d9019ad1c38762927c59dab'}],
         "source": 'NeqSim process/safety/firewater/ActiveFireProtectionScreening.java',
         "verification": 'partially_verified',
@@ -2548,7 +2548,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.deluge_nozzle_layout': {
         "calc_id": 'process.deluge_nozzle_layout',
         "name": 'Deluge nozzle layout',
-        "spec": {'path': 'specs/models/process/deluge_nozzle_layout.toml', 'sha256': 'a7bfab2b1e7b8551efb0ae3f8a91da370bd8421bd7098436613ddbd89ff2a95e'},
+        "spec": {'path': 'specs/models/process/deluge_nozzle_layout.toml', 'sha256': '2443b3ba1a1ab5422411a2d67e22cb6387f5f5fbd901c6e5a02f952d75a31427'},
         "code": [{'path': 'python/src/azoth/process/reference/deluge_nozzle_layout.py', 'sha256': 'afb5ce712ea62a69a233bfcf89ee1ffc64470ab35915eeeb64f57919d36b1268'}, {'path': 'crates/azoth-process/src/models/deluge_nozzle_layout.rs', 'sha256': '933966931d5e98be63f053e45b0986d628f65eb854a86e1c5321ca67ef5d7bd5'}],
         "source": 'NeqSim process/safety/firewater/DelugeNozzleLayout.java',
         "verification": 'partially_verified',
@@ -2625,7 +2625,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.fire_water_coverage_assessment': {
         "calc_id": 'process.fire_water_coverage_assessment',
         "name": 'Fire-water coverage assessment',
-        "spec": {'path': 'specs/models/process/fire_water_coverage_assessment.toml', 'sha256': 'e03fc64878d4d533de3c05583844f5cb8e1653ef3556e3ca67d6096b51b03b73'},
+        "spec": {'path': 'specs/models/process/fire_water_coverage_assessment.toml', 'sha256': 'fb2f1efec77c5ed10739c8ee6bd0949b5ddec73a9644ce390ef52888efc1adf9'},
         "code": [{'path': 'python/src/azoth/process/reference/fire_water_coverage_assessment.py', 'sha256': 'af57ce6772b87cdae396d47939f790b2b8cde651af126d252889c7eaab5fb0f3'}, {'path': 'crates/azoth-process/src/models/fire_water_coverage_assessment.rs', 'sha256': '84428b166cfb3f5fb0f6996db89c0b394f569812fc394c9a796b35a3a9ba7cf8'}],
         "source": 'NeqSim process/safety/firewater/FireWaterCoverageAssessment.java',
         "verification": 'partially_verified',
@@ -2636,7 +2636,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.fire_water_demand': {
         "calc_id": 'process.fire_water_demand',
         "name": 'Fire-water demand',
-        "spec": {'path': 'specs/models/process/fire_water_demand.toml', 'sha256': 'fc2127744cda04a9af45ee96bc796b6b0ecb61235e0f2954a8c4f83c9def0b9c'},
+        "spec": {'path': 'specs/models/process/fire_water_demand.toml', 'sha256': '9d00fd230bdf157b691fee927042466e16b8c938a9cd4204b39b0f09813e0078'},
         "code": [{'path': 'python/src/azoth/process/reference/fire_water_demand.py', 'sha256': '7d0d13680432f8149e3fc441a3dfb2572fcabbae21cd45bafb0473c3d0d1174b'}, {'path': 'crates/azoth-process/src/models/fire_water_demand.rs', 'sha256': '331f7e08b529cb2f8ddf0277450f6c78f2b4373a25c61d194eb2fceecfaf15e2'}],
         "source": 'NeqSim process/safety/firewater/FireWaterDemandCalculator.java',
         "verification": 'partially_verified',

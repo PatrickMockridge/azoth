@@ -3027,7 +3027,7 @@ class DelugeNozzleLayoutResult:
     nozzle_count_from_flow: float
     nozzle_count_from_coverage: float
     nozzle_count: float
-    governing_criterion: GoverningCriterion
+    governing_criterion: str
     grid_spacing: Qty
     delivered_flow: Qty
     delivered_density: float
@@ -3236,7 +3236,7 @@ class FireWaterCoverageAssessmentResult:
     flow_deficit: Qty
     flow_feasible: bool
     pressure_feasible: bool
-    verdict: SupplyVerdict
+    verdict: str
     warnings: list[Warning]
 
 @final

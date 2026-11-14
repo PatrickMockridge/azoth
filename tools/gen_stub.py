@@ -463,6 +463,8 @@ ENUMS = {
     "FlowRegime",
     "HenryStatus",
     "CooldownVerdict",
+    "GoverningCriterion",
+    "SupplyVerdict",
     "HydrateRiskLevel",
     "HydrateStructure",
 }

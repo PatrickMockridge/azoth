@@ -7,7 +7,7 @@ assumptions = [
     "**the coverage of one nozzle is `spacing^2 efficiency`**, the class's `maxSpacingM * maxSpacingM * coverageEfficiency`.",
     "**the grid spacing is `sqrt(area / count)`**, and the delivered density is `delivered_flow / area`.",
     "**the clearance check compares the caller's available depth with the nozzle's own requirement**; the nozzle's requirement is validated by nothing in the class.",
-    "**the class's nozzle factories are inputs, not carried names**: medium velocity is `(28, 1.4, 3.0, 0.6)`, high velocity `(42.9, 3.5, 3.0, 1.0)` and high capacity `(79.0, 3.5, 3.7, 1.0)` in `(k, min pressure, spacing, clearance)`. The nozzle's name is JSON-only.",
+    "**the class's nozzle factories are input values**: medium velocity is `(28, 1.4, 3.0, 0.6)`, high velocity `(42.9, 3.5, 3.0, 1.0)` and high capacity `(79.0, 3.5, 3.7, 1.0)` in `(k, min pressure, spacing, clearance)`; the nozzle's name is JSON-only.",
     "**the counts are dimensionless whole numbers**: the class's `int` getters, published as dimensionless values.",
     "**the operation order is the class's**: `required = area density`, `per_nozzle = k sqrt(p)`, `coverage = spacing^2 efficiency`, the two ceilings, the larger count, then `grid`, `delivered` and the density.",
 ]

@@ -153,8 +153,11 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # incremental zone analysis; 280: the detailed TEMA design; 281: the gas dispersion
     # analyzer; 282: the Gaussian plume; 283: the probit; 284: the jet fire; 285: the pool
     # fire; 286: the vapour-cloud explosion; 287: the BLEVE; 288: the event tree; 289: the
-    # consequence analysis; 290: the passive fire protection demand.
-    assert len(registered) == 290
+    # consequence analysis; 290: the passive fire protection demand; 291: the
+    # fire-water demand; 292: the deluge nozzle layout; 293: the fire-monitor
+    # coverage; 294: the fire-water coverage assessment; 295: the active fire
+    # protection screening; 296: the API 537 flare flame.
+    assert len(registered) == 296
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

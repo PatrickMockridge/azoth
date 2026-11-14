@@ -327,17 +327,22 @@ Five sections, and the difference between them is the point:
 *Models* — whose specs fix a procedure rather than an equation:
 
 - [`process.absorption_column`](./process/absorption_column.md) — Absorption column
+- [`process.active_fire_protection_screening`](./process/active_fire_protection_screening.md) — Active fire protection screening
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
+- [`process.api537_flare_flame_model`](./process/api537_flare_flame_model.md) — API 537 flare flame model
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation
 - [`process.component_splitter`](./process/component_splitter.md) — Component splitter
 - [`process.compressor`](./process/compressor.md) — Compressor
 - [`process.consequence_analysis`](./process/consequence_analysis.md) — Consequence analysis
 - [`process.cooler`](./process/cooler.md) — Cooler
+- [`process.deluge_nozzle_layout`](./process/deluge_nozzle_layout.md) — Deluge nozzle layout
 - [`process.distillation_column`](./process/distillation_column.md) — Distillation column
 - [`process.ejector`](./process/ejector.md) — Ejector
 - [`process.event_tree`](./process/event_tree.md) — Event tree
 - [`process.expander`](./process/expander.md) — Expander
 - [`process.filter`](./process/filter.md) — Filter
+- [`process.fire_monitor_coverage`](./process/fire_monitor_coverage.md) — Fire monitor coverage
+- [`process.fire_water_coverage_assessment`](./process/fire_water_coverage_assessment.md) — Fire-water coverage assessment
 - [`process.fire_water_demand`](./process/fire_water_demand.md) — Fire-water demand
 - [`process.flare`](./process/flare.md) — Flare
 - [`process.gas_dispersion`](./process/gas_dispersion.md) — Gas dispersion screening

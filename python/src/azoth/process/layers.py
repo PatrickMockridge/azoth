@@ -1495,7 +1495,7 @@ def _deluge_nozzle_layout(inputs: Mapping[str, Any]) -> dict[str, float]:
         "coverage_per_nozzle_m2": solution.coverage_per_nozzle,
         "nozzle_count_from_flow": solution.count_from_flow,
         "nozzle_count_from_coverage": solution.count_from_coverage,
-        "nozzle_count": solution.count,
+        "nozzle_count": solution.nozzle_count,
         "grid_spacing_m": solution.grid,
         "delivered_flow_lpm": solution.delivered_flow * 60000.0,
         "delivered_density_lpm_m2": solution.delivered_density,
@@ -1608,10 +1608,7 @@ def _api537_flare_flame_model(inputs: Mapping[str, Any]) -> dict[str, float]:
         value = inputs.get(name)
         return None if value is None else quantity(float(value), unit)
 
-    targets = [
-        {"flux": quantity(float(row["flux"]), "W/m**2")}
-        for row in inputs["target_fluxes"]
-    ]
+    targets = [{"flux": quantity(float(row["flux"]), "W/m**2")} for row in inputs["target_fluxes"]]
     tau = inputs.get("transmissivity")
     eta = inputs.get("acoustic_efficiency")
     solution, _ = _evaluate(

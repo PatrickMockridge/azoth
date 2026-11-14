@@ -7,7 +7,7 @@ assumptions = [
     "**flow is feasible when `spare_supply_flow >= flow_deficit` and pressure when `worst_case_pressure_margin >= required_pressure_margin`**; both are comparisons, not arithmetic.",
     "**the verdict is the class's priority**: no gap is `compliant`; both infeasible is `dedicated_supply_required`; a pressure deficit alone is `supply_pressure_deficit`; a flow deficit alone is `supply_flow_deficit`; otherwise `coverage_gap_supply_adequate`.",
     "**an unknown supply is not a verdict**: the class's NaN spare flow or pressure margin reads as feasible, and the port requires both so that an unset supply cannot pass.",
-    "**the recommendation prose is not carried**: `recommendation()` is presentation and the only reader of the serving section's name.",
+    "**the recommendation is presentation**: `recommendation()` is the only reader of the serving section's name, and the verdict carries the classification.",
     "**the flows are dimensionless `L/min`** because the vocabulary has no such rate unit; the pressure margins are in bar and the areas in `m2`.",
 ]
 references = [

@@ -36,9 +36,7 @@ _VERDICT_STILL_AIR = "NOT SUITABLE - required density not achieved even in still
 _VERDICT_MARGINAL = (
     "MARGINAL - density achieved in still air only; wind drift takes it below the requirement"
 )
-_VERDICT_FEASIBLE = (
-    "FEASIBLE ON DENSITY - carry forward to a trajectory and shadowing study"
-)
+_VERDICT_FEASIBLE = "FEASIBLE ON DENSITY - carry forward to a trajectory and shadowing study"
 
 
 class _Solution(NamedTuple):
@@ -92,21 +90,13 @@ def _evaluate(
     area = input_to_si(spec, "target_area", target_area)
     density = float(required_density)
     stated_count = None if monitor_count is None else float(monitor_count)
-    stated_flow = (
-        None if monitor_flow is None else input_to_si(spec, "monitor_flow", monitor_flow)
-    )
+    stated_flow = None if monitor_flow is None else input_to_si(spec, "monitor_flow", monitor_flow)
     stated_throw = (
-        None
-        if effective_throw is None
-        else input_to_si(spec, "effective_throw", effective_throw)
+        None if effective_throw is None else input_to_si(spec, "effective_throw", effective_throw)
     )
     stated_sweep = None if sweep_angle is None else float(sweep_angle)
-    stated_wind = (
-        None if wind_speed is None else input_to_si(spec, "wind_speed", wind_speed)
-    )
-    stated_fall = (
-        None if fall_height is None else input_to_si(spec, "fall_height", fall_height)
-    )
+    stated_wind = None if wind_speed is None else input_to_si(spec, "wind_speed", wind_speed)
+    stated_fall = None if fall_height is None else input_to_si(spec, "fall_height", fall_height)
     stated_terminal = (
         None
         if droplet_terminal_velocity is None
@@ -154,9 +144,7 @@ def _evaluate(
     _require_finite("wind_speed", wind)
     fall = _DEFAULT_FALL_HEIGHT_M if stated_fall is None else stated_fall
     _require_finite("fall_height", fall)
-    terminal = (
-        _DEFAULT_TERMINAL_VELOCITY_M_S if stated_terminal is None else stated_terminal
-    )
+    terminal = _DEFAULT_TERMINAL_VELOCITY_M_S if stated_terminal is None else stated_terminal
     _require_finite("droplet_terminal_velocity", terminal)
     if stated_dimension is not None:
         _require_finite("characteristic_dimension", stated_dimension)
@@ -258,9 +246,7 @@ def fire_monitor_coverage(
         meets_density_still_air=solution.still_air,
         meets_density_in_wind=solution.in_wind,
         flow_needed_for_compliance=(
-            None
-            if solution.needed is None
-            else from_si(solution.needed, "L/min")
+            None if solution.needed is None else from_si(solution.needed, "L/min")
         ),
         verdict=solution.verdict,
         warnings=tuple(warnings),

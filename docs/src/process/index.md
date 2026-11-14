@@ -14,17 +14,22 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | Model | Scheme | Source |
 |---|---|---|
 | [`process.absorption_column`](./absorption_column.md) | `direct composition` | NeqSim process/equipment/absorber/AbsorptionColumn.java |
+| [`process.active_fire_protection_screening`](./active_fire_protection_screening.md) | `closed_form_active_fire_protection_screening` | NeqSim process/safety/firewater/ActiveFireProtectionScreening.java |
 | [`process.anti_surge_recycle`](./anti_surge_recycle.md) | `damped_fixed_point_recycle` | NeqSim process/equipment/compressor/AntiSurgeRecycleCalculator.java |
+| [`process.api537_flare_flame_model`](./api537_flare_flame_model.md) | `closed_form_flare_flame_and_radiation` | NeqSim process/safety/fire/Api537FlareFlameModel.java |
 | [`process.bleve`](./bleve.md) | `ccps_fireball_point_source` | NeqSim process/safety/fire/BLEVECalculator.java |
 | [`process.component_splitter`](./component_splitter.md) | `direct composition` | NeqSim process/equipment/splitter/ComponentSplitter.java |
 | [`process.compressor`](./compressor.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
 | [`process.consequence_analysis`](./consequence_analysis.md) | `outcome_frequency_composition` | NeqSim process/safety/qra/ConsequenceAnalysisEngine.java |
 | [`process.cooler`](./cooler.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Cooler.java |
+| [`process.deluge_nozzle_layout`](./deluge_nozzle_layout.md) | `closed_form_deluge_nozzle_layout` | NeqSim process/safety/firewater/DelugeNozzleLayout.java |
 | [`process.distillation_column`](./distillation_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/DistillationColumn.java |
 | [`process.ejector`](./ejector.md) | `direct composition` | NeqSim process/equipment/ejector/Ejector.java |
 | [`process.event_tree`](./event_tree.md) | `full_binary_enumeration` | NeqSim process/safety/risk/eta/EventTreeAnalyzer.java |
 | [`process.expander`](./expander.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
 | [`process.filter`](./filter.md) | `direct composition` | NeqSim process/equipment/filter/Filter.java |
+| [`process.fire_monitor_coverage`](./fire_monitor_coverage.md) | `closed_form_fire_monitor_coverage` | NeqSim process/safety/firewater/FireMonitorCoverage.java |
+| [`process.fire_water_coverage_assessment`](./fire_water_coverage_assessment.md) | `closed_form_fire_water_coverage_assessment` | NeqSim process/safety/firewater/FireWaterCoverageAssessment.java |
 | [`process.fire_water_demand`](./fire_water_demand.md) | `closed_form_fire_water_demand` | NeqSim process/safety/firewater/FireWaterDemandCalculator.java |
 | [`process.flare`](./flare.md) | `direct composition` | NeqSim process/equipment/flare/Flare.java |
 | [`process.gas_dispersion`](./gas_dispersion.md) | `pasquill_gifford_or_britter_mcquaid_screening` | NeqSim process/safety/dispersion/GasDispersionAnalyzer.java |
