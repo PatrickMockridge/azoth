@@ -229,6 +229,7 @@
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
 //!   - specs/models/process/cooler.toml
+//!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/distillation_column.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/event_tree.toml
@@ -2804,6 +2805,39 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.cooler",
         "dynamic_outlet_temperature",
         "thermodynamic_temperature",
+    ),
+    ("process.deluge_nozzle_layout", "protected_area", "area"),
+    (
+        "process.deluge_nozzle_layout",
+        "required_density",
+        "dimensionless",
+    ),
+    ("process.deluge_nozzle_layout", "nozzle_k", "dimensionless"),
+    (
+        "process.deluge_nozzle_layout",
+        "nozzle_min_pressure",
+        "pressure",
+    ),
+    (
+        "process.deluge_nozzle_layout",
+        "nozzle_max_spacing",
+        "length",
+    ),
+    ("process.deluge_nozzle_layout", "nozzle_clearance", "length"),
+    (
+        "process.deluge_nozzle_layout",
+        "available_clearance",
+        "length",
+    ),
+    (
+        "process.deluge_nozzle_layout",
+        "operating_pressure",
+        "pressure",
+    ),
+    (
+        "process.deluge_nozzle_layout",
+        "coverage_efficiency",
+        "dimensionless",
     ),
     ("process.distillation_column", "feed_n", "molar_flow"),
     ("process.distillation_column", "feed_z", "dimensionless"),

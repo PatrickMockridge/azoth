@@ -8,6 +8,7 @@
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
 //!   - specs/models/process/cooler.toml
+//!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/distillation_column.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/event_tree.toml

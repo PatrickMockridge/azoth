@@ -37,6 +37,7 @@ pub mod component_splitter;
 pub mod compressor;
 pub mod consequence_analysis;
 pub mod cooler;
+pub mod deluge_nozzle_layout;
 pub mod distillation_column;
 pub mod ejector;
 pub mod event_tree;
@@ -87,6 +88,9 @@ pub use consequence_analysis::{
     consequence_analysis,
 };
 pub use cooler::{CoolerResult, cooler};
+pub use deluge_nozzle_layout::{
+    DelugeNozzleLayoutResult, GoverningCriterion, deluge_nozzle_layout,
+};
 pub use distillation_column::{DistillationColumnResult, distillation_column};
 pub use ejector::{EjectorResult, ejector};
 pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_tree};

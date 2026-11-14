@@ -66,6 +66,7 @@ from azoth.core.result import (
     CostaldMolarVolumeResult,
     CriticalPointResult,
     DarcyWeisbachResult,
+    DelugeNozzleLayoutResult,
     DelumpingResult,
     DepositionSegmentRow,
     DesmukhMatherPhaseResult,
@@ -116,6 +117,7 @@ from azoth.core.result import (
     GeVanLaarAcidPhaseResult,
     GeWilsonPhaseResult,
     GibbsReactorResult,
+    GoverningCriterion,
     GtSurfaceTensionResult,
     GtSurfaceTensionSimpleResult,
     HaalandResult,
@@ -426,6 +428,7 @@ __all__ = [
     "critical_point",
     "darcy_weisbach",
     "de_waard_milliams_corrosion",
+    "deluge_nozzle_layout",
     "delumping",
     "desmukh_mather_phase",
     "dew_pressure",
@@ -5804,6 +5807,38 @@ def cooler(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
         outlet_duty=from_si(result.outlet_duty.magnitude_si, result.outlet_duty.unit),
         cooling_valve_opening=result.cooling_valve_opening,
         equilibrium_outlet_temperature=None if result.equilibrium_outlet_temperature is None else from_si(result.equilibrium_outlet_temperature.magnitude_si, result.equilibrium_outlet_temperature.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def deluge_nozzle_layout(protected_area: Q, required_density: float, nozzle_k: float, nozzle_min_pressure: Q, nozzle_max_spacing: Q, nozzle_clearance: Q, available_clearance: Q, operating_pressure: Q | None=None, coverage_efficiency: float | None=None) -> DelugeNozzleLayoutResult:
+    """``process.deluge_nozzle_layout``, computed in Rust."""
+    spec = _models_gen.model("process.deluge_nozzle_layout")
+    result = _core.deluge_nozzle_layout(
+        input_to_si(spec, "protected_area", protected_area),
+        required_density,
+        nozzle_k,
+        input_to_si(spec, "nozzle_min_pressure", nozzle_min_pressure),
+        input_to_si(spec, "nozzle_max_spacing", nozzle_max_spacing),
+        input_to_si(spec, "nozzle_clearance", nozzle_clearance),
+        input_to_si(spec, "available_clearance", available_clearance),
+        None if operating_pressure is None else input_to_si(spec, "operating_pressure", operating_pressure),
+        None if coverage_efficiency is None else coverage_efficiency,
+    )
+    return DelugeNozzleLayoutResult(
+        required_flow=from_si(result.required_flow.magnitude_si, result.required_flow.unit),
+        flow_per_nozzle=from_si(result.flow_per_nozzle.magnitude_si, result.flow_per_nozzle.unit),
+        coverage_per_nozzle=from_si(result.coverage_per_nozzle.magnitude_si, result.coverage_per_nozzle.unit),
+        nozzle_count_from_flow=result.nozzle_count_from_flow,
+        nozzle_count_from_coverage=result.nozzle_count_from_coverage,
+        nozzle_count=result.nozzle_count,
+        governing_criterion=GoverningCriterion(result.governing_criterion),
+        grid_spacing=from_si(result.grid_spacing.magnitude_si, result.grid_spacing.unit),
+        delivered_flow=from_si(result.delivered_flow.magnitude_si, result.delivered_flow.unit),
+        delivered_density=result.delivered_density,
+        pressure_adequate=result.pressure_adequate,
+        density_met=result.density_met,
+        clearance_adequate=result.clearance_adequate,
         warnings=_warnings(result.warnings),
     )
 

@@ -1,0 +1,159 @@
+id = "process.deluge_nozzle_layout"
+name = "Deluge nozzle layout"
+kind = "procedure"
+assumptions = [
+    "**two criteria, the larger governs**: the flow criterion is `ceil(required_flow / flow_per_nozzle)`, the coverage criterion `ceil(area / coverage_per_nozzle)`, and `nozzle_count` is the larger. A tie is the flow criterion, as the class's `>` test reads.",
+    "**the nozzle discharge is the orifice law**: `flow_per_nozzle = k sqrt(p)` with `k` in `(L/min)/sqrt(bar)` and `p` in bar; a pressure below zero answers zero flow.",
+    "**the coverage of one nozzle is `spacing^2 efficiency`**, the class's `maxSpacingM * maxSpacingM * coverageEfficiency`.",
+    "**the grid spacing is `sqrt(area / count)`**, and the delivered density is `delivered_flow / area`.",
+    "**the clearance check compares the caller's available depth with the nozzle's own requirement**; the nozzle's requirement is validated by nothing in the class.",
+    "**the class's nozzle factories are inputs, not carried names**: medium velocity is `(28, 1.4, 3.0, 0.6)`, high velocity `(42.9, 3.5, 3.0, 1.0)` and high capacity `(79.0, 3.5, 3.7, 1.0)` in `(k, min pressure, spacing, clearance)`. The nozzle's name is JSON-only.",
+    "**the counts are dimensionless whole numbers**: the class's `int` getters, published as dimensionless values.",
+    "**the operation order is the class's**: `required = area density`, `per_nozzle = k sqrt(p)`, `coverage = spacing^2 efficiency`, the two ceilings, the larger count, then `grid`, `delivered` and the density.",
+]
+references = [
+    "NFPA 15 (2022). Standard for Water Spray Fixed Systems for Fire Protection.",
+    "NFPA 16 (2019). Standard for the Installation of Foam-Water Sprinkler and Foam-Water Spray Systems.",
+    "NORSOK S-001 (2018). Technical safety, fire-water systems.",
+    "ISO 13702 (2015). Petroleum and natural gas industries - Control and mitigation of fires and explosions on offshore production installations.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/firewater/DelugeNozzleLayout.java` is the port source.",
+    "`validation/neqsim/captures/process_deluge_nozzle_layout.tsv` - the class's three nozzle factories, a low pressure, a reduced efficiency, a failed clearance and the constructor and nozzle refusals.",
+]
+[source]
+standard = "NeqSim process/safety/firewater/DelugeNozzleLayout.java"
+edition = "Its `requiredFlowLpm`, `flowPerNozzleLpm`, `coveragePerNozzleM2`, the two counts, `gridSpacingM`, `deliveredFlowLpm`, `deliveredDensityLpmPerM2` and `isClearanceAdequate`."
+[algorithm]
+scheme = "closed_form_deluge_nozzle_layout"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.protected_area]
+unit = "m**2"
+description = "the protected area, above zero.\n"
+[inputs.required_density]
+unit = "dimensionless"
+description = "the required application density in `L/(min m2)`, above zero; dimensionless because the vocabulary has no per-area volume rate.\n"
+[inputs.nozzle_k]
+unit = "dimensionless"
+description = "the nozzle's discharge coefficient in `(L/min)/sqrt(bar)`, above zero.\n"
+[inputs.nozzle_min_pressure]
+unit = "bar"
+description = "the nozzle's minimum operating pressure, above zero.\n"
+[inputs.nozzle_max_spacing]
+unit = "m"
+description = "the nozzle's maximum spacing, above zero, which sets its coverage square.\n"
+[inputs.nozzle_clearance]
+unit = "m"
+description = "the clear depth the nozzle needs above the equipment, at least zero.\n"
+[inputs.available_clearance]
+unit = "m"
+description = "the clear depth available above the equipment, at least zero; below the nozzle's requirement the placement fails.\n"
+[inputs.operating_pressure]
+unit = "bar"
+optional = true
+description = "the header pressure at the nozzle, above zero. **Absent is 5 bar.**\n"
+[inputs.coverage_efficiency]
+unit = "dimensionless"
+optional = true
+description = "the fraction of the nozzle's coverage square that is effectively wetted, in `(0, 1]`. **Absent is 1.**\n"
+[outputs]
+[outputs.required_flow]
+unit = "L/min"
+description = "`protected_area required_density`.\n"
+[outputs.flow_per_nozzle]
+unit = "L/min"
+description = "`k sqrt(operating_pressure)`.\n"
+[outputs.coverage_per_nozzle]
+unit = "m**2"
+description = "`nozzle_max_spacing^2 coverage_efficiency`.\n"
+[outputs.nozzle_count_from_flow]
+unit = "dimensionless"
+description = "`ceil(required_flow / flow_per_nozzle)`.\n"
+[outputs.nozzle_count_from_coverage]
+unit = "dimensionless"
+description = "`ceil(protected_area / coverage_per_nozzle)`.\n"
+[outputs.nozzle_count]
+unit = "dimensionless"
+description = "the larger of the two criteria's counts.\n"
+[outputs.governing_criterion]
+type = "enum"
+values = ["flow", "coverage"]
+description = "which criterion set the count; a tie is `flow`.\n"
+[outputs.grid_spacing]
+unit = "m"
+description = "`sqrt(protected_area / nozzle_count)`.\n"
+[outputs.delivered_flow]
+unit = "L/min"
+description = "`nozzle_count flow_per_nozzle`.\n"
+[outputs.delivered_density]
+unit = "dimensionless"
+description = "`delivered_flow / protected_area` in `L/(min m2)`.\n"
+[outputs.pressure_adequate]
+type = "boolean"
+description = "whether the operating pressure meets the nozzle's minimum.\n"
+[outputs.density_met]
+type = "boolean"
+description = "whether the delivered density meets the required one.\n"
+[outputs.clearance_adequate]
+type = "boolean"
+description = "whether the available clear depth meets the nozzle's requirement.\n"
+[[valid_range]]
+quantity = "protected_area"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive protected area"
+[[valid_range]]
+quantity = "required_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive density"
+[[valid_range]]
+quantity = "nozzle_k"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the nozzle constructor refuses a non-positive discharge coefficient"
+[[valid_range]]
+quantity = "nozzle_min_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the nozzle constructor refuses a non-positive minimum pressure"
+[[valid_range]]
+quantity = "nozzle_max_spacing"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the nozzle constructor refuses a non-positive spacing"
+[[valid_range]]
+quantity = "nozzle_clearance"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative clear depth is not a placement requirement"
+[[valid_range]]
+quantity = "available_clearance"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative available clearance is not a placement"
+[[valid_range]]
+quantity = "operating_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive operating pressure"
+[[valid_range]]
+quantity = "coverage_efficiency"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class's setter refuses an efficiency outside (0, 1]"
+[implementations]
+python = "azoth.process.deluge_nozzle_layout"
+rust = "azoth_process::deluge_nozzle_layout"

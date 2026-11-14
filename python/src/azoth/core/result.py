@@ -28,6 +28,7 @@ from azoth.core.result_base import EmulsionType as EmulsionType
 from azoth.core.result_base import ErosionRiskLevel as ErosionRiskLevel
 from azoth.core.result_base import FeSMorphology as FeSMorphology
 from azoth.core.result_base import FlowRegime as FlowRegime
+from azoth.core.result_base import GoverningCriterion as GoverningCriterion
 from azoth.core.result_base import HenryStatus as HenryStatus
 from azoth.core.result_base import HydrateRiskLevel as HydrateRiskLevel
 from azoth.core.result_base import HydrateStructure as HydrateStructure

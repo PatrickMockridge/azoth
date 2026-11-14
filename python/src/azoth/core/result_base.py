@@ -91,6 +91,13 @@ class CorrosionSeverity(StrEnum):
     VERY_HIGH = "very_high"
 
 
+class GoverningCriterion(StrEnum):
+    """Which criterion set a deluge nozzle count."""
+
+    FLOW = "flow"
+    COVERAGE = "coverage"
+
+
 class CooldownVerdict(StrEnum):
     """The screening verdict a surface-cooldown analysis reports."""
 

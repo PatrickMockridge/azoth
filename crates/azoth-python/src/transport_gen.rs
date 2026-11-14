@@ -14869,6 +14869,119 @@ impl From<&azoth_process::models::cooler::CoolerResult> for PyCoolerResult {
         }
     }
 }
+/// Result of `process.deluge_nozzle_layout`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DelugeNozzleLayoutResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDelugeNozzleLayoutResult {
+    /// `protected_area required_density`.
+    #[pyo3(get)]
+    pub required_flow: PyQty,
+    /// `k sqrt(operating_pressure)`.
+    #[pyo3(get)]
+    pub flow_per_nozzle: PyQty,
+    /// `nozzle_max_spacing^2 coverage_efficiency`.
+    #[pyo3(get)]
+    pub coverage_per_nozzle: PyQty,
+    /// `ceil(required_flow / flow_per_nozzle)`.
+    #[pyo3(get)]
+    pub nozzle_count_from_flow: f64,
+    /// `ceil(protected_area / coverage_per_nozzle)`.
+    #[pyo3(get)]
+    pub nozzle_count_from_coverage: f64,
+    /// the larger of the two criteria's counts.
+    #[pyo3(get)]
+    pub nozzle_count: f64,
+    /// which criterion set the count; a tie is `flow`.
+    #[pyo3(get)]
+    pub governing_criterion: String,
+    /// `sqrt(protected_area / nozzle_count)`.
+    #[pyo3(get)]
+    pub grid_spacing: PyQty,
+    /// `nozzle_count flow_per_nozzle`.
+    #[pyo3(get)]
+    pub delivered_flow: PyQty,
+    /// `delivered_flow / protected_area` in `L/(min m2)`.
+    #[pyo3(get)]
+    pub delivered_density: f64,
+    /// whether the operating pressure meets the nozzle's minimum.
+    #[pyo3(get)]
+    pub pressure_adequate: bool,
+    /// whether the delivered density meets the required one.
+    #[pyo3(get)]
+    pub density_met: bool,
+    /// whether the available clear depth meets the nozzle's requirement.
+    #[pyo3(get)]
+    pub clearance_adequate: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDelugeNozzleLayoutResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DelugeNozzleLayoutResult(required_flow={:?}, flow_per_nozzle={:?}, coverage_per_nozzle={:?}, nozzle_count_from_flow={:?}, nozzle_count_from_coverage={:?}, nozzle_count={:?}, governing_criterion={:?}, grid_spacing={:?}, delivered_flow={:?}, delivered_density={:?}, pressure_adequate={:?}, density_met={:?}, clearance_adequate={:?}, {} warning(s))",
+            self.required_flow,
+            self.flow_per_nozzle,
+            self.coverage_per_nozzle,
+            self.nozzle_count_from_flow,
+            self.nozzle_count_from_coverage,
+            self.nozzle_count,
+            self.governing_criterion,
+            self.grid_spacing,
+            self.delivered_flow,
+            self.delivered_density,
+            self.pressure_adequate,
+            self.density_met,
+            self.clearance_adequate,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::deluge_nozzle_layout::DelugeNozzleLayoutResult>
+    for PyDelugeNozzleLayoutResult
+{
+    fn from(r: &azoth_process::models::deluge_nozzle_layout::DelugeNozzleLayoutResult) -> Self {
+        Self {
+            required_flow: PyQty {
+                magnitude_si: r.required_flow.value,
+                unit: "L/min".to_string(),
+            },
+            flow_per_nozzle: PyQty {
+                magnitude_si: r.flow_per_nozzle.value,
+                unit: "L/min".to_string(),
+            },
+            coverage_per_nozzle: PyQty {
+                magnitude_si: r.coverage_per_nozzle.value,
+                unit: "m**2".to_string(),
+            },
+            nozzle_count_from_flow: r.nozzle_count_from_flow,
+            nozzle_count_from_coverage: r.nozzle_count_from_coverage,
+            nozzle_count: r.nozzle_count,
+            governing_criterion: r.governing_criterion.as_str().to_string(),
+            grid_spacing: PyQty {
+                magnitude_si: r.grid_spacing.value,
+                unit: "m".to_string(),
+            },
+            delivered_flow: PyQty {
+                magnitude_si: r.delivered_flow.value,
+                unit: "L/min".to_string(),
+            },
+            delivered_density: r.delivered_density,
+            pressure_adequate: r.pressure_adequate,
+            density_met: r.density_met,
+            clearance_adequate: r.clearance_adequate,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.distillation_column`, transported.
 #[pyclass(
     frozen,

@@ -1,0 +1,167 @@
+model = "process.deluge_nozzle_layout"
+[[cases]]
+id = "high_velocity_nozzles_are_coverage_governed"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.nozzleCountIsGovernedByTheLargerOfFlowAndCoverage`: 510 m2 at 10 L/(min m2) on high-velocity nozzles at 5 bar. From `validation/neqsim/captures/process_deluge_nozzle_layout.tsv` (`dnl_high_velocity`)."
+[cases.inputs]
+protected_area = 510.0
+required_density = 10.0
+nozzle_k = 42.9
+nozzle_min_pressure = 3.5
+nozzle_max_spacing = 3.0
+nozzle_clearance = 1.0
+available_clearance = 1.2
+operating_pressure = 5.0
+coverage_efficiency = 1.0
+[cases.expected]
+required_flow = 5100.0
+flow_per_nozzle = 95.92731623474099
+coverage_per_nozzle = 9.0
+nozzle_count_from_flow = 54.0
+nozzle_count_from_coverage = 57.0
+nozzle_count = 57.0
+governing_criterion = "coverage"
+grid_spacing = 2.991215208080594
+delivered_flow = 5467.857025380236
+delivered_density = 10.721288285059288
+pressure_adequate = true
+density_met = true
+clearance_adequate = true
+[[cases]]
+id = "high_capacity_nozzles_are_coverage_governed"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.coverageGovernsWhenNozzlesAreHighCapacity`. From (`dnl_high_capacity`)."
+[cases.inputs]
+protected_area = 510.0
+required_density = 10.0
+nozzle_k = 79.0
+nozzle_min_pressure = 3.5
+nozzle_max_spacing = 3.7
+nozzle_clearance = 1.0
+available_clearance = 1.2
+operating_pressure = 5.0
+coverage_efficiency = 1.0
+[cases.expected]
+required_flow = 5100.0
+flow_per_nozzle = 176.64937022248338
+coverage_per_nozzle = 13.690000000000001
+nozzle_count_from_flow = 29.0
+nozzle_count_from_coverage = 38.0
+nozzle_count = 38.0
+governing_criterion = "coverage"
+grid_spacing = 3.6634754853252325
+delivered_flow = 6712.676068454369
+delivered_density = 13.162109938145822
+pressure_adequate = true
+density_met = true
+clearance_adequate = true
+[[cases]]
+id = "medium_velocity_nozzles_are_flow_governed"
+tolerance = 1.0e-12
+source = "The third factory: medium-velocity nozzles, where the flow criterion sets the count. From (`dnl_medium_velocity`)."
+[cases.inputs]
+protected_area = 510.0
+required_density = 10.0
+nozzle_k = 28.0
+nozzle_min_pressure = 1.4
+nozzle_max_spacing = 3.0
+nozzle_clearance = 0.6
+available_clearance = 1.2
+operating_pressure = 5.0
+coverage_efficiency = 1.0
+[cases.expected]
+required_flow = 5100.0
+flow_per_nozzle = 62.609903369994115
+coverage_per_nozzle = 9.0
+nozzle_count_from_flow = 82.0
+nozzle_count_from_coverage = 57.0
+nozzle_count = 82.0
+governing_criterion = "flow"
+grid_spacing = 2.4938949847822283
+delivered_flow = 5134.012076339517
+delivered_density = 10.066690345763758
+pressure_adequate = true
+density_met = true
+clearance_adequate = true
+[[cases]]
+id = "a_pressure_below_the_nozzle_minimum_is_flagged"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.pressureBelowNozzleMinimumIsFlagged`: 2 bar on a nozzle whose minimum is 3.5 bar. From (`dnl_low_pressure`)."
+[cases.inputs]
+protected_area = 100.0
+required_density = 10.0
+nozzle_k = 42.9
+nozzle_min_pressure = 3.5
+nozzle_max_spacing = 3.0
+nozzle_clearance = 1.0
+available_clearance = 1.2
+operating_pressure = 2.0
+[cases.expected]
+required_flow = 1000.0
+flow_per_nozzle = 60.66976182580578
+coverage_per_nozzle = 9.0
+nozzle_count_from_flow = 17.0
+nozzle_count_from_coverage = 12.0
+nozzle_count = 17.0
+governing_criterion = "flow"
+grid_spacing = 2.42535625036333
+delivered_flow = 1031.3859510386983
+delivered_density = 10.313859510386983
+pressure_adequate = false
+density_met = true
+clearance_adequate = true
+[[cases]]
+id = "a_reduced_coverage_efficiency_adds_nozzles"
+tolerance = 1.0e-12
+source = "The coverage square falls to 7.2 m2 at an efficiency of 0.8. From (`dnl_efficiency`)."
+[cases.inputs]
+protected_area = 510.0
+required_density = 10.0
+nozzle_k = 42.9
+nozzle_min_pressure = 3.5
+nozzle_max_spacing = 3.0
+nozzle_clearance = 1.0
+available_clearance = 1.2
+operating_pressure = 5.0
+coverage_efficiency = 0.8
+[cases.expected]
+required_flow = 5100.0
+flow_per_nozzle = 95.92731623474099
+coverage_per_nozzle = 7.2
+nozzle_count_from_flow = 54.0
+nozzle_count_from_coverage = 71.0
+nozzle_count = 71.0
+governing_criterion = "coverage"
+grid_spacing = 2.6801303310752065
+delivered_flow = 6810.83945266661
+delivered_density = 13.354587162091391
+pressure_adequate = true
+density_met = true
+clearance_adequate = true
+[[cases]]
+id = "the_clearance_check_uses_the_nozzle_requirement"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.clearanceCheckUsesTheNozzleRequirement`: 0.5 m available against the high-velocity nozzle's 1.0 m. From (`dnl_clearance_fails`)."
+[cases.inputs]
+protected_area = 100.0
+required_density = 10.0
+nozzle_k = 42.9
+nozzle_min_pressure = 3.5
+nozzle_max_spacing = 3.0
+nozzle_clearance = 1.0
+available_clearance = 0.5
+operating_pressure = 5.0
+[cases.expected]
+required_flow = 1000.0
+flow_per_nozzle = 95.92731623474099
+coverage_per_nozzle = 9.0
+nozzle_count_from_flow = 11.0
+nozzle_count_from_coverage = 12.0
+nozzle_count = 12.0
+governing_criterion = "coverage"
+grid_spacing = 2.886751345948129
+delivered_flow = 1151.1277948168918
+delivered_density = 11.511277948168917
+pressure_adequate = true
+density_met = true
+clearance_adequate = false

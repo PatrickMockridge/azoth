@@ -62,6 +62,7 @@ from azoth.core.result_base import (
     ErosionRiskLevel,
     FeSMorphology,
     FlowRegime,
+    GoverningCriterion,
     HenryStatus,
     HydrateRiskLevel,
     HydrateStructure,
@@ -5943,6 +5944,55 @@ class CoolerResult(_HasWarnings):
 
     #: the equilibrium the thermal lag moved toward. Present only on the dynamic branch, as evidence.
     equilibrium_outlet_temperature: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class DelugeNozzleLayoutResult(_HasWarnings):
+    """Result of ``process.deluge_nozzle_layout``."""
+
+    CALC_ID: ClassVar[str] = "process.deluge_nozzle_layout"
+
+    #: `protected_area required_density`.
+    required_flow: Q
+
+    #: `k sqrt(operating_pressure)`.
+    flow_per_nozzle: Q
+
+    #: `nozzle_max_spacing^2 coverage_efficiency`.
+    coverage_per_nozzle: Q
+
+    #: `ceil(required_flow / flow_per_nozzle)`.
+    nozzle_count_from_flow: float
+
+    #: `ceil(protected_area / coverage_per_nozzle)`.
+    nozzle_count_from_coverage: float
+
+    #: the larger of the two criteria's counts.
+    nozzle_count: float
+
+    #: which criterion set the count; a tie is `flow`.
+    governing_criterion: GoverningCriterion
+
+    #: `sqrt(protected_area / nozzle_count)`.
+    grid_spacing: Q
+
+    #: `nozzle_count flow_per_nozzle`.
+    delivered_flow: Q
+
+    #: `delivered_flow / protected_area` in `L/(min m2)`.
+    delivered_density: float
+
+    #: whether the operating pressure meets the nozzle's minimum.
+    pressure_adequate: bool
+
+    #: whether the delivered density meets the required one.
+    density_met: bool
+
+    #: whether the available clear depth meets the nozzle's requirement.
+    clearance_adequate: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]

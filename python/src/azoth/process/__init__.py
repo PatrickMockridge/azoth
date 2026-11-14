@@ -26,6 +26,7 @@ from azoth.core.result import (
     CompressorResult,
     ConsequenceAnalysisResult,
     CoolerResult,
+    DelugeNozzleLayoutResult,
     DistillationColumnResult,
     EjectorResult,
     EventTreeResult,
@@ -95,6 +96,7 @@ __all__ = [
     "compressor",
     "consequence_analysis",
     "cooler",
+    "deluge_nozzle_layout",
     "distillation_column",
     "ejector",
     "event_tree",
@@ -155,6 +157,7 @@ _ABSORPTION_COLUMN = "process.absorption_column"
 _STRIPPING_COLUMN = "process.stripping_column"
 _DISTILLATION_COLUMN = "process.distillation_column"
 _COOLER = "process.cooler"
+_DELUGE_NOZZLE_LAYOUT = "process.deluge_nozzle_layout"
 _EJECTOR = "process.ejector"
 _EVENT_TREE = "process.event_tree"
 _EXPANDER = "process.expander"
@@ -2133,6 +2136,43 @@ def fire_water_demand(
         foam_concentrate_percent=foam_concentrate_percent,
         simultaneous_area_factor=simultaneous_area_factor,
         protected_objects=protected_objects,
+    )
+
+
+def deluge_nozzle_layout(
+    protected_area: Q,
+    required_density: float,
+    nozzle_k: float,
+    nozzle_min_pressure: Q,
+    nozzle_max_spacing: Q,
+    nozzle_clearance: Q,
+    available_clearance: Q,
+    operating_pressure: Q | None = None,
+    coverage_efficiency: float | None = None,
+) -> DelugeNozzleLayoutResult:
+    """The deluge nozzle net: the flow and coverage criteria and the larger count.
+
+    The NFPA 15 screen: ``flow_per_nozzle = k sqrt(p)``, ``coverage_per_nozzle =
+    spacing^2 efficiency``, both counts ceilinged and the larger governing, with **a tie set
+    by the flow criterion**. The grid spacing and delivered density follow the count.
+
+    Raises:
+        InvalidInputError: for a non-positive area, density, coefficient, minimum pressure,
+            spacing or operating pressure, an efficiency outside ``(0, 1]``, or a negative
+            clearance.
+
+    See :func:`azoth.process.reference.deluge_nozzle_layout`.
+    """
+    return resolve(_DELUGE_NOZZLE_LAYOUT)(  # type: ignore[no-any-return]
+        protected_area=protected_area,
+        required_density=required_density,
+        nozzle_k=nozzle_k,
+        nozzle_min_pressure=nozzle_min_pressure,
+        nozzle_max_spacing=nozzle_max_spacing,
+        nozzle_clearance=nozzle_clearance,
+        available_clearance=available_clearance,
+        operating_pressure=operating_pressure,
+        coverage_efficiency=coverage_efficiency,
     )
 
 

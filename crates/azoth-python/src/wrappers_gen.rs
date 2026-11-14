@@ -5667,6 +5667,42 @@ pub fn cooler(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Deluge nozzle layout.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (protected_area, required_density, nozzle_k, nozzle_min_pressure, nozzle_max_spacing, nozzle_clearance, available_clearance, operating_pressure, coverage_efficiency))]
+#[pyo3(
+    text_signature = "(protected_area, required_density, nozzle_k, nozzle_min_pressure, nozzle_max_spacing, nozzle_clearance, available_clearance, operating_pressure, coverage_efficiency)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn deluge_nozzle_layout(
+    py: Python<'_>,
+    protected_area: f64,
+    required_density: f64,
+    nozzle_k: f64,
+    nozzle_min_pressure: f64,
+    nozzle_max_spacing: f64,
+    nozzle_clearance: f64,
+    available_clearance: f64,
+    operating_pressure: Option<f64>,
+    coverage_efficiency: Option<f64>,
+) -> PyResult<crate::transport_gen::PyDelugeNozzleLayoutResult> {
+    azoth_process::models::deluge_nozzle_layout::deluge_nozzle_layout(
+        square_meters(protected_area),
+        required_density,
+        nozzle_k,
+        pascals(nozzle_min_pressure),
+        meters(nozzle_max_spacing),
+        meters(nozzle_clearance),
+        meters(available_clearance),
+        operating_pressure.map(pascals),
+        coverage_efficiency,
+    )
+    .map(|r| crate::transport_gen::PyDelugeNozzleLayoutResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Distillation column.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

@@ -1464,6 +1464,44 @@ def _fire_water_demand(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _deluge_nozzle_layout(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.deluge_nozzle_layout`'s layers, from the reference's own arithmetic.
+
+    The criterion and the three flags are the model's own words, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.deluge_nozzle_layout import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    efficiency = inputs.get("coverage_efficiency")
+    solution, _ = _evaluate(
+        quantity(float(inputs["protected_area"]), "m**2"),
+        float(inputs["required_density"]),
+        float(inputs["nozzle_k"]),
+        quantity(float(inputs["nozzle_min_pressure"]), "bar"),
+        quantity(float(inputs["nozzle_max_spacing"]), "m"),
+        quantity(float(inputs["nozzle_clearance"]), "m"),
+        quantity(float(inputs["available_clearance"]), "m"),
+        operating_pressure=optional("operating_pressure", "bar"),
+        coverage_efficiency=None if efficiency is None else float(efficiency),
+    )
+    return {
+        "required_flow_lpm": solution.required_flow * 60000.0,
+        "flow_per_nozzle_lpm": solution.flow_per_nozzle * 60000.0,
+        "coverage_per_nozzle_m2": solution.coverage_per_nozzle,
+        "nozzle_count_from_flow": solution.count_from_flow,
+        "nozzle_count_from_coverage": solution.count_from_coverage,
+        "nozzle_count": solution.count,
+        "grid_spacing_m": solution.grid,
+        "delivered_flow_lpm": solution.delivered_flow * 60000.0,
+        "delivered_density_lpm_m2": solution.delivered_density,
+    }
+
+
 def _vce(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.vce`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -1937,6 +1975,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.jet_fire": _jet_fire,
     "process.pfp_demand": _pfp_demand,
     "process.fire_water_demand": _fire_water_demand,
+    "process.deluge_nozzle_layout": _deluge_nozzle_layout,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -2704,6 +2743,50 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_water_demand.tsv",
         block=6,
         identified_by=("#label", "fwd_zero_area_ratio"),
+    ),
+    # The deluge layout's six: the three nozzle factories, the low pressure, the reduced
+    # efficiency and the failed clearance. The eight refusals are uncased.
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="high_velocity_nozzles_are_coverage_governed",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=0,
+        identified_by=("#label", "dnl_high_velocity"),
+    ),
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="high_capacity_nozzles_are_coverage_governed",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=1,
+        identified_by=("#label", "dnl_high_capacity"),
+    ),
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="medium_velocity_nozzles_are_flow_governed",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=2,
+        identified_by=("#label", "dnl_medium_velocity"),
+    ),
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="a_pressure_below_the_nozzle_minimum_is_flagged",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=3,
+        identified_by=("#label", "dnl_low_pressure"),
+    ),
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="a_reduced_coverage_efficiency_adds_nozzles",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=4,
+        identified_by=("#label", "dnl_efficiency"),
+    ),
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="the_clearance_check_uses_the_nozzle_requirement",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=5,
+        identified_by=("#label", "dnl_clearance_fails"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -3923,6 +4006,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The fire-water demand's seven: the accepted negative object, and the class's
     # constructor, setter and vessel refusals.
     "process_fire_water_demand.tsv": 7,
+    # The deluge layout's eight: the class's constructor, pressure, efficiency and nozzle
+    # refusals.
+    "process_deluge_nozzle_layout.tsv": 8,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

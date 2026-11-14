@@ -2983,6 +2983,23 @@ class CoolerResult:
     warnings: list[Warning]
 
 @final
+class DelugeNozzleLayoutResult:
+    required_flow: Qty
+    flow_per_nozzle: Qty
+    coverage_per_nozzle: Qty
+    nozzle_count_from_flow: float
+    nozzle_count_from_coverage: float
+    nozzle_count: float
+    governing_criterion: GoverningCriterion
+    grid_spacing: Qty
+    delivered_flow: Qty
+    delivered_density: float
+    pressure_adequate: bool
+    density_met: bool
+    clearance_adequate: bool
+    warnings: list[Warning]
+
+@final
 class DistillationColumnResult:
     tray_temperature: list[Qty]
     tray_pressure: list[Qty]
@@ -6448,6 +6465,17 @@ def cooler(
     requested_valve_opening: float | None = None,
     dynamic_outlet_temperature: float | None = None,
 ) -> CoolerResult: ...
+def deluge_nozzle_layout(
+    protected_area: float,
+    required_density: float,
+    nozzle_k: float,
+    nozzle_min_pressure: float,
+    nozzle_max_spacing: float,
+    nozzle_clearance: float,
+    available_clearance: float,
+    operating_pressure: float | None = None,
+    coverage_efficiency: float | None = None,
+) -> DelugeNozzleLayoutResult: ...
 def distillation_column(
     components: list[str],
     feed_n: float,

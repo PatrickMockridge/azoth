@@ -18,6 +18,7 @@ use crate::models::component_splitter::ComponentSplitterResult;
 use crate::models::compressor::CompressorResult;
 use crate::models::consequence_analysis::ConsequenceAnalysisResult;
 use crate::models::cooler::CoolerResult;
+use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::distillation_column::DistillationColumnResult;
 use crate::models::ejector::EjectorResult;
 use crate::models::event_tree::EventTreeResult;
@@ -258,6 +259,30 @@ impl CalcResult for CoolerResult {
         "outlet_duty",
         "cooling_valve_opening",
         "equilibrium_outlet_temperature",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for DelugeNozzleLayoutResult {
+    const CALC_ID: &'static str = "process.deluge_nozzle_layout";
+    const FIELDS: &'static [&'static str] = &[
+        "required_flow",
+        "flow_per_nozzle",
+        "coverage_per_nozzle",
+        "nozzle_count_from_flow",
+        "nozzle_count_from_coverage",
+        "nozzle_count",
+        "governing_criterion",
+        "grid_spacing",
+        "delivered_flow",
+        "delivered_density",
+        "pressure_adequate",
+        "density_met",
+        "clearance_adequate",
         "warnings",
     ];
 

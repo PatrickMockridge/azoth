@@ -214,6 +214,12 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `crates/azoth-process/tests/pfp_demand.rs` asserts it against the capture, and
         # `test_cross_impl` compares it on both results.
         "pfp_required",
+        # `deluge_nozzle_layout`'s three flags, booleans with no slot in `TestCase`.
+        # `crates/azoth-process/tests/deluge_nozzle_layout.rs` asserts them against the
+        # capture, and `test_cross_impl` compares them on both results.
+        "pressure_adequate",
+        "density_met",
+        "clearance_adequate",
         # `thermal.shell_and_tube_vibration`'s four flags, booleans with no slot in
         # `TestCase`. `crates/azoth-thermal/tests/shell_and_tube_vibration.rs` asserts
         # them against the capture, and `test_cross_impl` compares them on both results.
