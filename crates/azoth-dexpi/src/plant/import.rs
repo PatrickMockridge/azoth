@@ -14,8 +14,9 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use azoth_process::flowsheet::{
     Connection, Flowsheet, Instance, Instrument, InstrumentRange, Recycle, SafetyFunction, Signal,
+    split_endpoint,
 };
-use azoth_process::{Direction, UnitOpSpec};
+use azoth_process::{Direction, Multiplicity, UnitOpSpec};
 
 use crate::diagnostic::{DexpiDiagnostic, Severity};
 use crate::extensions;
@@ -109,6 +110,7 @@ pub fn import_plant_document(
         .collect();
     let (feeds, products) = collect_boundaries(&document, &mut owners, &mut bindings);
     let segments = read_segments(plant_model);
+    resolve_junctions(&mut steps, &segments, &mut diagnostics);
 
     let mut connections = Vec::new();
     let mut marked_recycles: Vec<(String, String, String)> = Vec::new();
@@ -164,6 +166,7 @@ pub fn import_plant_document(
         .map(|(name, from, to)| Recycle::new(&name, &from, &to))
         .collect();
     infer_recycles(&mut connections, &mut recycles, &mut diagnostics);
+    index_many_outlets(&mut connections, palette, &steps);
 
     for feed in &feeds {
         diagnostics.push(DexpiDiagnostic::warning(
@@ -376,11 +379,20 @@ fn read_inline_steps(
                 if PASS_THROUGH_CLASSES.contains(&class) {
                     continue;
                 }
-                let Some(unit) =
-                    plant::for_class(class).filter(|unit| plant::is_segment_unit(unit))
-                else {
-                    continue;
+                // **A tee is a junction whose unit the pipe directions decide.** It is kept
+                // without one until the segments are read; every other segment item is a
+                // component of a known unit.
+                let tee = class == "PipeTee";
+                let unit = if tee {
+                    None
+                } else {
+                    plant::for_class(class)
+                        .filter(|unit| plant::is_segment_unit(unit))
+                        .map(str::to_string)
                 };
+                if !tee && unit.is_none() {
+                    continue;
+                }
                 let identifier = item
                     .data_string("TagName")
                     .or(item.id.as_deref())
@@ -414,7 +426,7 @@ fn read_inline_steps(
                 steps.push(Step {
                     object_id: item.id.clone(),
                     identifier,
-                    unit: Some(unit.to_string()),
+                    unit,
                     instance_id: Some(instance_id),
                     nozzles,
                 });
@@ -563,6 +575,90 @@ fn read_segments(plant_model: &Object) -> Vec<Segment> {
         }
     }
     segments
+}
+
+/// Decide whether a `PipeTee` is a mixer or a splitter from the pipes that reach it.
+fn resolve_junctions(
+    steps: &mut [Step],
+    segments: &[Segment],
+    diagnostics: &mut Vec<DexpiDiagnostic>,
+) {
+    for step in steps.iter_mut().filter(|step| step.unit.is_none()) {
+        let nodes: BTreeSet<&str> = step
+            .nozzles
+            .iter()
+            .flat_map(|nozzle| nozzle.nodes.iter().map(String::as_str))
+            .collect();
+        let mut incoming = 0_usize;
+        let mut outgoing = 0_usize;
+        for segment in segments {
+            let source_in = nodes.contains(segment.source_node.as_str());
+            let target_in = nodes.contains(segment.target_node.as_str());
+            match (source_in, target_in) {
+                (false, true) => incoming += 1,
+                (true, false) => outgoing += 1,
+                _ => {}
+            }
+        }
+        step.unit = match (incoming, outgoing) {
+            (2, 1) => Some("unit_ops.mixer".to_string()),
+            (1, 2) => Some("unit_ops.splitter".to_string()),
+            _ => {
+                diagnostics.push(DexpiDiagnostic::warning(
+                    "junction_direction_unknown",
+                    step.identifier.clone(),
+                    format!(
+                        "a `PipeTee` with {incoming} inlet(s) and {outgoing} outlet(s) is not \
+                         a two-way mixer or splitter; it is not modelled"
+                    ),
+                ));
+                None
+            }
+        };
+    }
+}
+
+/// Give a `many` outlet's streams their positions, which the connection grammar requires.
+///
+/// **A mixer's `many` inlet is one port with several connections; a splitter's `many` outlet is
+/// several streams under one port name.** The drawing names the port and not the position, so
+/// document order is the only evidence there is; the checker refuses an outlet that states no
+/// index.
+fn index_many_outlets(connections: &mut [Connection], palette: &[UnitOpSpec], steps: &[Step]) {
+    let units: BTreeMap<&str, &str> = steps
+        .iter()
+        .filter_map(|step| Some((step.instance_id.as_deref()?, step.unit.as_deref()?)))
+        .collect();
+    let mut counters: BTreeMap<(String, String), usize> = BTreeMap::new();
+    for connection in connections {
+        let Some((instance, port, index)) = split_endpoint(&connection.from) else {
+            continue;
+        };
+        if index.is_some() {
+            continue;
+        }
+        let Some(unit) = units.get(instance) else {
+            continue;
+        };
+        let Some(spec) = palette.iter().find(|spec| spec.id == *unit) else {
+            continue;
+        };
+        let Some(declared) = spec
+            .ports
+            .iter()
+            .find(|declared| declared.name.as_str() == port)
+        else {
+            continue;
+        };
+        if declared.direction != Direction::Out || declared.multiplicity != Multiplicity::Many {
+            continue;
+        }
+        let next = counters
+            .entry((instance.to_string(), port.to_string()))
+            .or_insert(0);
+        connection.from = format!("{instance}.{port}[{}]", *next);
+        *next += 1;
+    }
 }
 
 fn first_reference(object: &Object, property: &str) -> Option<String> {

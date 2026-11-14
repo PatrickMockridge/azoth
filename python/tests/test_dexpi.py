@@ -240,3 +240,13 @@ def test_a_valve_exports_inside_a_segment_and_imports_again() -> None:
     _, imported = dexpi.import_plant(xml, PALETTE)
     units = {instance["id"]: instance["unit"] for instance in imported["flowsheet"]["instances"]}
     assert units["V-101"] == "unit_ops.throttling_valve"
+
+
+def test_a_mixer_and_splitter_export_as_tee_junctions() -> None:
+    fixture = (ROOT / "crates/azoth-dexpi/tests/fixtures/mix_split.toml").read_text()
+    xml, _ = dexpi.export_plant(fixture, PALETTE, allow_lossy_mappings=True, drawing=True)
+    assert "Plant/Piping.PipeTee" in xml
+    _, imported = dexpi.import_plant(xml, PALETTE)
+    units = {instance["id"]: instance["unit"] for instance in imported["flowsheet"]["instances"]}
+    assert units["M-101"] == "unit_ops.mixer"
+    assert units["S-101"] == "unit_ops.splitter"

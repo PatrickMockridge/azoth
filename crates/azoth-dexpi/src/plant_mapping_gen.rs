@@ -136,10 +136,10 @@ pub static PLANT_UNITS: &[PlantMapping] = &[
     },
     PlantMapping {
         azoth_id: "unit_ops.mixer",
-        write: Disposition::Refused,
-        plant_types: &[],
+        write: Disposition::Faithful,
+        plant_types: &["Plant/Piping.PipeTee"],
         reader_types: &["Agitator", "StaticMixer", "Mixer"],
-        note: "A mixer is a junction in the piping network, not a tagged plant item; exporting one as an item would invent an equipment that the drawing does not have.",
+        note: "A mixer is a junction of pipes. A `PipeTee` represents the two-inlet/one-outlet case; a junction with more branches is refused rather than drawn as a manifold.",
     },
     PlantMapping {
         azoth_id: "unit_ops.packed_column",
@@ -212,10 +212,10 @@ pub static PLANT_UNITS: &[PlantMapping] = &[
     },
     PlantMapping {
         azoth_id: "unit_ops.splitter",
-        write: Disposition::Refused,
-        plant_types: &[],
+        write: Disposition::Faithful,
+        plant_types: &["Plant/Piping.PipeTee"],
         reader_types: &["PipeTee", "Splitter"],
-        note: "A splitter is a piping junction, not a tagged plant item.",
+        note: "A splitter is a junction of pipes. A `PipeTee` represents the one-inlet/two-outlet case; at read time the pipe directions decide mixer or splitter.",
     },
     PlantMapping {
         azoth_id: "unit_ops.stirred_tank_reactor",
@@ -282,7 +282,11 @@ pub static PLANT_UNITS: &[PlantMapping] = &[
 ];
 
 /// The units placed inside a segment's `Items`, not among the tagged items.
-pub static PLANT_SEGMENT_UNITS: &[&str] = &["unit_ops.throttling_valve"];
+pub static PLANT_SEGMENT_UNITS: &[&str] = &[
+    "unit_ops.mixer",
+    "unit_ops.splitter",
+    "unit_ops.throttling_valve",
+];
 
 /// The reverse index a reader uses: a class name and the azoth unit it stands for.
 /// One name, one unit - a class that could mean two is mapped to the general one.
@@ -383,6 +387,7 @@ pub static PLANT_CLASS_TYPES: &[&str] = &[
     "Plant/Piping.PilotOperatedSafetyValve",
     "Plant/Piping.PinchValve",
     "Plant/Piping.Pipe",
+    "Plant/Piping.PipeTee",
     "Plant/Piping.PlugValve",
     "Plant/Piping.PressureReducingValve",
     "Plant/Piping.PressureReliefValve",
@@ -424,7 +429,6 @@ pub static PLANT_CLASS_TYPES: &[&str] = &[
     "Plant/ProcessEquipment.KnockoutDrum",
     "Plant/ProcessEquipment.Mixer",
     "Plant/ProcessEquipment.PackedColumn",
-    "Plant/ProcessEquipment.PipeTee",
     "Plant/ProcessEquipment.PlateHeatExchanger",
     "Plant/ProcessEquipment.PlugFlowReactor",
     "Plant/ProcessEquipment.PressureVessel",
@@ -453,14 +457,14 @@ pub static PLANT_CLASS_TYPES: &[&str] = &[
     "Plant/ProcessEquipment.WasteGasEmitter",
 ];
 
-/// Faithful writes: 5.
-pub const PLANT_FAITHFUL_COUNT: usize = 5;
+/// Faithful writes: 7.
+pub const PLANT_FAITHFUL_COUNT: usize = 7;
 
 /// Lossy writes: 5.
 pub const PLANT_LOSSY_COUNT: usize = 5;
 
-/// Refused writes: 21.
-pub const PLANT_REFUSED_COUNT: usize = 21;
+/// Refused writes: 19.
+pub const PLANT_REFUSED_COUNT: usize = 19;
 
 /// Rows with at least one readable class name: 23.
 pub const PLANT_READABLE_COUNT: usize = 23;

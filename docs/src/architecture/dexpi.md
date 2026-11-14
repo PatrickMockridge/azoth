@@ -201,12 +201,23 @@ takes the segment's pipes as its edges and the segment's `Items` as instances, s
 comes back as `unit_ops.throttling_valve`. pyDEXPI, loading a valve as a tagged item,
 rejects the file - which is how this was found.
 
-The Plant mapping writes **10 of 31 palette entries** and reads 23.
+**A mixer or splitter is the tee its streams meet at.** The writer removes the junction's
+incident connections from the ordinary segment list and gives each one a segment whose inner
+end is one of a `PipeTee`'s three nodes; the tee lives in the first of them. A two-inlet
+mixer and a one-inlet/two-outlet splitter are the two cases a tee states; a wider junction is
+refused (`junction_streams`) rather than drawn as an invented manifold, and two junctions
+joined by one stream are refused (`junction_adjacent`) because that segment would need a tee
+at each end. The reader decides mixer or splitter from the pipes' directions at the tee and
+gives a `many` outlet's streams their positions (`products[0]`, `products[1]`).
+
+The Plant mapping writes **12 of 31 palette entries** and reads 23.
 
 Reading is wider than writing by design: NeqSim's reviewed Plant writer emits a narrow set,
 while a real P&ID carries every valve, column and reactor class. A class this port reads but
 does not write maps to its azoth unit on import, one class to one unit; a class in neither
-list is kept as `dexpi.unmapped`, which the checker refuses.
+list is kept as `dexpi.unmapped`, which the checker refuses. `PipeTee` is the one class whose
+unit is a direction: it reads as a mixer when two pipes enter and one leaves, and as a
+splitter the other way round.
 
 Import is the same scaffold policy as Process: instances, connections and line numbers, with
 every feed undeclared and no parameter invented. A loop with no marker is found by the
@@ -315,8 +326,8 @@ development.
 ## Not ported
 
 The instrumentation layer exchanges; the pieces named in that section are not ported yet.
-A mixer or splitter is a junction of pipes rather than a tagged item and is still refused
-on Plant write; a valve is the one piping component this writer places.
+Inline fittings other than a valve, and junctions wider than a three-branch tee, are still
+refused on Plant write.
 The middleware's command model has no instrument edit - a document's instruments are written
 by hand or by an exchange, not by a form - and the editor's graph does not draw them.
 

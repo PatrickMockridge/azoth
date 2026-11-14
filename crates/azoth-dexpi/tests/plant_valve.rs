@@ -148,7 +148,7 @@ fn the_mapping_counts_the_valve_as_writable() {
         .iter()
         .filter(|row| row.write != azoth_dexpi::Disposition::Refused)
         .count();
-    assert_eq!(writable, 10);
+    assert_eq!(writable, 12);
     assert!(plant::is_segment_unit("unit_ops.throttling_valve"));
     assert!(!plant::is_segment_unit("unit_ops.pump"));
 }

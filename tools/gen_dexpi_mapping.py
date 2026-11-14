@@ -235,6 +235,7 @@ PLANT_SUPPORTED_TYPES = [
     "Plant/Piping.GlobeValve",
     "Plant/Piping.SpringLoadedGlobeSafetyValve",
     "Plant/Piping.SwingCheckValve",
+    "Plant/Piping.PipeTee",
     "Plant/Piping.FlowInPipeOffPageConnector",
     "Plant/Piping.FlowOutPipeOffPageConnector",
     "Plant/Instrumentation.ProcessInstrumentationFunction",
@@ -360,6 +361,7 @@ def render_plant(rows: list[dict]) -> str:
         "RuptureDisk",
         "Valve",
         "Pipe",
+        "PipeTee",
     }
     projected = sorted(
         {

@@ -33,9 +33,10 @@ azoth dexpi export \
 
 The Plant exchange carries tags, nozzles, line numbers and the instrumentation layer. The
 drawing adds items, off-page connectors, one segment per stream, instrument bubbles and
-dashed signals. It is a **simplified** P&ID: one segment per stream, and a throttling valve
-is placed inside the segment's `Items` with the pipes split around it; other inline fittings
-are not written.
+dashed signals. It is a **simplified** P&ID: one segment per stream; a throttling valve is
+placed inside the segment's `Items` with the pipes split around it, and a two-way mixer or
+splitter is a three-branch `PipeTee` junction. Wider junctions and other inline fittings are
+not written.
 
 Both profiles use generic primitives, not ISO 10628 symbols. The file is the handoff: a CAD
 tool replaces the symbols and keeps the topology, tags and values.
