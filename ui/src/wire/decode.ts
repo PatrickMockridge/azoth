@@ -58,6 +58,8 @@ import type {
   GraphNode,
   Handle,
   InputRecord,
+  Instrument,
+  InstrumentRange,
   Kind,
   NodeData,
   Ports,
@@ -67,6 +69,7 @@ import type {
   RecycleSettings,
   Residuals,
   Role,
+  SafetyFunction,
   SessionReport,
   Severity,
   Sheet,
@@ -169,7 +172,7 @@ function mapOf<T>(
   return built;
 }
 
-const ROLES = ["instance", "input", "product"] as const;
+const ROLES = ["instance", "input", "product", "instrument"] as const;
 const SEVERITIES = ["error", "warning"] as const;
 const ORDERS = ["insertion", "topological"] as const;
 const MULTIPLICITIES = ["one", "many"] as const;
@@ -278,6 +281,63 @@ function inputRecord(value: unknown, path: string): InputRecord {
   };
 }
 
+function instrumentRange(value: unknown, path: string): InstrumentRange {
+  const raw = obj(value, path);
+  return {
+    min: num(raw.min, `${path}.min`),
+    max: num(raw.max, `${path}.max`),
+    unit: str(raw.unit, `${path}.unit`),
+  };
+}
+
+function safetyFunction(value: unknown, path: string): SafetyFunction {
+  const raw = obj(value, path);
+  const safety: SafetyFunction = {
+    function: str(raw.function, `${path}.function`),
+    sil: num(raw.sil, `${path}.sil`),
+  };
+  if (raw.voting !== undefined) {
+    safety.voting = str(raw.voting, `${path}.voting`);
+  }
+  if (raw.safe_state !== undefined) {
+    safety.safe_state = str(raw.safe_state, `${path}.safe_state`);
+  }
+  if (raw.proof_test_hours !== undefined) {
+    safety.proof_test_hours = num(raw.proof_test_hours, `${path}.proof_test_hours`);
+  }
+  if (raw.closure_seconds !== undefined) {
+    safety.closure_seconds = num(raw.closure_seconds, `${path}.closure_seconds`);
+  }
+  return safety;
+}
+
+function instrument(value: unknown, path: string): Instrument {
+  const raw = obj(value, path);
+  const record: Instrument = {
+    id: str(raw.id, `${path}.id`),
+    function: str(raw.function, `${path}.function`),
+  };
+  for (const field of ["service", "loop_number", "measures", "actuates"] as const) {
+    if (raw[field] !== undefined) {
+      record[field] = str(raw[field], `${path}.${field}`);
+    }
+  }
+  if (raw.location !== undefined) {
+    record.location = oneOf(raw.location, `${path}.location`, [
+      "field",
+      "panel",
+      "central",
+    ] as const);
+  }
+  if (raw.range !== undefined) {
+    record.range = instrumentRange(raw.range, `${path}.range`);
+  }
+  if (raw.safety !== undefined) {
+    record.safety = safetyFunction(raw.safety, `${path}.safety`);
+  }
+  return record;
+}
+
 function nodeData(value: unknown, path: string): NodeData {
   const raw = obj(value, path);
   const data: NodeData = { name: str(raw.name, `${path}.name`) };
@@ -293,6 +353,9 @@ function nodeData(value: unknown, path: string): NodeData {
   if (raw.input !== undefined) {
     data.input = inputRecord(raw.input, `${path}.input`);
   }
+  if (raw.instrument !== undefined) {
+    data.instrument = instrument(raw.instrument, `${path}.instrument`);
+  }
   // `parameters` is the library's to shape and this layer's to carry: a document states whatever
   // its own spec declares, so the values are objects by check and opaque by declaration.
   if (raw.parameters !== undefined) {
@@ -305,7 +368,7 @@ function graphNode(value: unknown, path: string): GraphNode {
   const raw = obj(value, path);
   return {
     id: str(raw.id, `${path}.id`),
-    type: oneOf(raw.type, `${path}.type`, ["unit_op", "stream"] as const),
+    type: oneOf(raw.type, `${path}.type`, ["unit_op", "stream", "instrument"] as const),
     role: role(raw.role, `${path}.role`),
     position: position(raw.position, `${path}.position`),
     data: nodeData(raw.data, `${path}.data`),
@@ -334,13 +397,16 @@ function recycleSettings(value: unknown, path: string): RecycleSettings {
 function edgeData(value: unknown, path = "an edge's data"): GraphEdge["data"] {
   const raw = obj(value, path);
   const data: GraphEdge["data"] = {
-    kind: oneOf(raw.kind, `${path}.kind`, ["connection", "recycle"] as const),
+    kind: oneOf(raw.kind, `${path}.kind`, ["connection", "recycle", "signal"] as const),
     from: str(raw.from, `${path}.from`),
     to: str(raw.to, `${path}.to`),
     path: str(raw.path, `${path}.path`),
   };
   if (raw.settings !== undefined) {
     data.settings = recycleSettings(raw.settings, `${path}.settings`);
+  }
+  if (raw.signal_kind !== undefined) {
+    data.signal_kind = str(raw.signal_kind, `${path}.signal_kind`);
   }
   return data;
 }

@@ -50,10 +50,14 @@ export type NodePayload = {
  * projection's shape in the component below instead of `Record<string, unknown>`. The alternative
  * was a cast or a re-read per render, and neither is a statement about the type — this is.
  */
-export type AppNode = Node<NodePayload, typeof UNIT_NODE | typeof STREAM_NODE>;
+export type AppNode = Node<
+  NodePayload,
+  typeof UNIT_NODE | typeof STREAM_NODE | typeof INSTRUMENT_NODE
+>;
 
 export const UNIT_NODE = "unit_op";
 export const STREAM_NODE = "stream";
+export const INSTRUMENT_NODE = "instrument";
 
 /** A side, as xyflow names it. */
 const POSITION: Record<Side, Position> = {
@@ -165,6 +169,34 @@ export function UnitOpNode({ data, selected }: NodeProps<AppNode>) {
   // an assertion in the component that reads it.
   const { graph, form, readout, severity, connected } = data;
 
+  if (graph.role === "instrument") {
+    // **A bubble is a view of control, not a unit.** It carries no ports; the two hidden
+    // handles are where a signal leaves and arrives, and the tag is the node's own id's name.
+    const instrument = graph.data.instrument;
+    return (
+      <div
+        className={`instrument-bubble${selected === true ? " selected" : ""}${severity === "error" ? " bad" : severity === "warning" ? " warn" : ""}`}
+        title={instrument?.service ?? graph.data.name}
+      >
+        <Handle
+          type="target"
+          position={Position.Left}
+          id="in"
+          className="instrument-handle"
+        />
+        <Handle
+          type="source"
+          position={Position.Right}
+          id="out"
+          className="instrument-handle"
+        />
+        <span className="instrument-letters">{instrument?.function ?? "?"}</span>
+        <span className="instrument-loop">{instrument?.loop_number ?? ""}</span>
+        <div className="instrument-tag">{graph.data.name}</div>
+      </div>
+    );
+  }
+
   if (graph.role !== "instance") {
     // A boundary stream: one handle on the side the stream leaves or arrives at, named by the
     // stream itself, so a feed's handle id is the feed's own path.
@@ -241,5 +273,9 @@ export function UnitOpNode({ data, selected }: NodeProps<AppNode>) {
   );
 }
 
-/** Both node kinds are one component: a boundary is the same box with no ports to draw. */
-export const nodeTypes = { [UNIT_NODE]: UnitOpNode, [STREAM_NODE]: UnitOpNode };
+/** Every node kind is one component: a boundary is the same box with no ports to draw. */
+export const nodeTypes = {
+  [UNIT_NODE]: UnitOpNode,
+  [STREAM_NODE]: UnitOpNode,
+  [INSTRUMENT_NODE]: UnitOpNode,
+};

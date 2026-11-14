@@ -65,7 +65,7 @@ describe("the catalogue", () => {
     expect(catalogue.unit_ops.filter((entry) => entry.model === null).map((e) => e.id)).toEqual([
       "unit_ops.simple_absorber",
     ]);
-    expect(catalogue.tools).toHaveLength(16);
+    expect(catalogue.tools).toHaveLength(20);
   });
 
   it("carries the standalone calculations, with the table-shaped four refused", () => {

@@ -20,7 +20,7 @@ const node = (role: GraphNode["role"]): GraphNode => ({
   data: { name: "x" },
 });
 
-const edge = (kind: "connection" | "recycle"): GraphEdge => ({
+const edge = (kind: "connection" | "recycle" | "signal"): GraphEdge => ({
   id: "e1",
   source: "instance:a",
   target: "instance:b",
@@ -29,12 +29,21 @@ const edge = (kind: "connection" | "recycle"): GraphEdge => ({
   data: { kind, from: "a.outlet", to: "b.feed", path: kind === "recycle" ? "r1" : "a.outlet" },
 });
 
-it("reads a selection as one of the four kinds", () => {
+it("reads a selection as one of the five kinds", () => {
   expect(kindOf(node("instance"), null)).toBe("instance");
   expect(kindOf(node("input"), null)).toBe("feed");
   expect(kindOf(node("product"), null)).toBe("product");
+  expect(kindOf(node("instrument"), null)).toBe("instrument");
   expect(kindOf(null, edge("connection"))).toBe("edge");
   expect(kindOf(null, null)).toBeNull();
+});
+
+it("gives an instrument a control sheet and a signal a signal sheet", () => {
+  // **A signal is not a connection.** Its edge carries control, not material, so the connection
+  // sheet — which is about the stream path — is not what a reader selects it for.
+  expect(tabsFor("instrument", null)).toEqual(["control"]);
+  expect(tabsFor("edge", edge("signal"))).toEqual(["signal"]);
+  expect(tabsFor("edge", edge("connection"))).not.toContain("signal");
 });
 
 it("offers a tear a convergence sheet and a plain connection none", () => {

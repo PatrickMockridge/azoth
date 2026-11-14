@@ -77,6 +77,9 @@ pub struct NodeData {
     /// A feed's declared record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub input: Option<InputRecord>,
+    /// An instrument's own record, for the panel that edits it.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub instrument: Option<crate::flowsheet::Instrument>,
 }
 
 /// The two sides of an instance's declaration.
@@ -166,7 +169,7 @@ pub struct Edge {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct EdgeData {
-    /// `connection` or `recycle`.
+    /// `connection`, `recycle` or `signal`.
     pub kind: &'static str,
     /// The endpoints as the document wrote them, so an edge whose node is missing still says
     /// what it referred to.
@@ -182,6 +185,13 @@ pub struct EdgeData {
     /// second reader of the format.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub settings: Option<Settings>,
+    /// A signal's carrier, where the document states one; absent on every other edge.
+    ///
+    /// **The carrier is not the edge's `kind`**: `kind` says what the edge is (a signal, not a
+    /// stream), and this says what carries it (electric, pneumatic, …). A sheet that edited the
+    /// carrier without reading it would offer a field that could only overwrite.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub signal_kind: Option<String>,
 }
 
 /// Project a flowsheet onto the graph a canvas draws.
@@ -199,7 +209,10 @@ pub fn graph(flowsheet: &Flowsheet, palette: &[UnitOpSpec]) -> Result<Graph> {
     let positions = positions(flowsheet);
 
     let mut nodes = Vec::with_capacity(
-        flowsheet.instances.len() + flowsheet.inputs.len() + flowsheet.products.len(),
+        flowsheet.instances.len()
+            + flowsheet.inputs.len()
+            + flowsheet.products.len()
+            + flowsheet.instruments.len(),
     );
     for instance in &flowsheet.instances {
         let spec = specs.get(instance.unit.as_str()).copied();
@@ -238,6 +251,7 @@ pub fn graph(flowsheet: &Flowsheet, palette: &[UnitOpSpec]) -> Result<Graph> {
                     p: input.p,
                     t: input.t,
                 }),
+                instrument: None,
             },
         });
     }
@@ -258,11 +272,36 @@ pub fn graph(flowsheet: &Flowsheet, palette: &[UnitOpSpec]) -> Result<Graph> {
                 parameters: None,
                 ports: None,
                 input: None,
+                instrument: None,
+            },
+        });
+    }
+    for instrument in &flowsheet.instruments {
+        let role = NodeRole::Instrument;
+        let id = role.node_id(&instrument.id);
+        nodes.push(Node {
+            id: id.clone(),
+            node_type: "instrument",
+            role: role.name(),
+            position: positions
+                .get(&id)
+                .copied()
+                .unwrap_or(Position { x: 0.0, y: 0.0 }),
+            data: NodeData {
+                name: instrument.id.clone(),
+                unit: None,
+                unit_name: None,
+                parameters: None,
+                ports: None,
+                input: None,
+                instrument: Some(instrument.clone()),
             },
         });
     }
 
-    let mut edges = Vec::with_capacity(flowsheet.connections.len() + flowsheet.recycles.len());
+    let mut edges = Vec::with_capacity(
+        flowsheet.connections.len() + flowsheet.recycles.len() + flowsheet.signals.len(),
+    );
     for (index, connection) in flowsheet.connections.iter().enumerate() {
         edges.push(edge(
             format!("e{index}"),
@@ -282,6 +321,29 @@ pub fn graph(flowsheet: &Flowsheet, palette: &[UnitOpSpec]) -> Result<Graph> {
             &recycle.to,
             &wiring,
         ));
+    }
+    // **A signal is not a stream.** It joins two instrument nodes, so it has no handle on
+    // either end and is not a member of the wiring pass.
+    for (index, signal) in flowsheet.signals.iter().enumerate() {
+        let role = NodeRole::Instrument;
+        edges.push(Edge {
+            id: format!(
+                "e{}",
+                flowsheet.connections.len() + flowsheet.recycles.len() + index
+            ),
+            source: role.node_id(&signal.from),
+            source_handle: "out".to_string(),
+            target: role.node_id(&signal.to),
+            target_handle: "in".to_string(),
+            data: EdgeData {
+                kind: "signal",
+                from: signal.from.clone(),
+                to: signal.to.clone(),
+                path: format!("{}->{}", signal.from, signal.to),
+                settings: None,
+                signal_kind: signal.kind.clone(),
+            },
+        });
     }
 
     Ok(Graph {
@@ -343,6 +405,7 @@ fn edge(
             to: to.to_string(),
             path: tear.map_or(source_handle, |recycle| recycle.stream.clone()),
             settings: tear.map(Settings::from),
+            signal_kind: None,
         },
     }
 }
@@ -371,6 +434,7 @@ fn instance_data(
             parameters: Some(parameters),
             ports: None,
             input: None,
+            instrument: None,
         });
     };
 
@@ -443,6 +507,7 @@ fn instance_data(
                 .collect(),
         }),
         input: None,
+        instrument: None,
     })
 }
 
@@ -660,6 +725,34 @@ pub fn positions(flowsheet: &Flowsheet) -> HashMap<String, Position> {
         );
     }
 
+    // An instrument sits beside what it watches or commands; several on one item stack.
+    let mut slots: HashMap<String, usize> = HashMap::new();
+    for (index, instrument) in flowsheet.instruments.iter().enumerate() {
+        let anchor = instrument
+            .measures
+            .as_deref()
+            .or(instrument.actuates.as_deref())
+            .map(|target| split_endpoint(target).map_or(target, |(instance, _, _)| instance));
+        let base = anchor.and_then(|name| placed.get(name)).copied();
+        let slot = anchor.map_or(index, |name| {
+            let next = slots.entry(name.to_string()).or_insert(0);
+            let this = *next;
+            *next += 1;
+            this
+        });
+        let position = base.map_or(
+            Position {
+                x: 0.0,
+                y: ROW * index as f64,
+            },
+            |anchor| Position {
+                x: anchor.x + COLUMN * 0.75,
+                y: anchor.y + 48.0 * slot as f64,
+            },
+        );
+        placed.insert(NodeRole::Instrument.node_id(&instrument.id), position);
+    }
+
     // The document's own placements win, node by node.
     if let Some(layout) = &flowsheet.layout {
         for (name, [x, y]) in layout
@@ -669,6 +762,12 @@ pub fn positions(flowsheet: &Flowsheet) -> HashMap<String, Position> {
             .chain(layout.products.iter())
         {
             placed.insert(name.clone(), Position { x: *x, y: *y });
+        }
+        for (name, [x, y]) in &layout.instruments {
+            placed.insert(
+                NodeRole::Instrument.node_id(name),
+                Position { x: *x, y: *y },
+            );
         }
     }
     placed

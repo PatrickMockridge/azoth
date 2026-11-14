@@ -22043,7 +22043,142 @@
       "name": "unset_recycle_field"
     },
     {
-      "description": "Place a node on the canvas, by node id: `instance:sep1`, `input:feed_1`, `product:out`.",
+      "description": "Create or replace an instrument by tag. The checker refuses a tag used twice, a function that is not upper-case ISA letters, an endpoint the document does not declare, a location outside field/panel/central, a range whose minimum is not below its maximum, and a safety declaration a drawing could not state.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "actuates": {
+            "description": "The instance it commands.",
+            "type": "string"
+          },
+          "command": {
+            "const": "set_instrument",
+            "description": "The command's name."
+          },
+          "function": {
+            "description": "The ISA function letters, e.g. `PSHH`.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The tag, e.g. `PSHH-101`.",
+            "type": "string"
+          },
+          "location": {
+            "description": "`field`, `panel` or `central`.",
+            "type": "string"
+          },
+          "loop_number": {
+            "description": "The loop the tag belongs to.",
+            "type": "string"
+          },
+          "measures": {
+            "description": "The stream or instance it watches.",
+            "type": "string"
+          },
+          "range": {
+            "description": "`{ min, max, unit }`, a range in a vocabulary unit.",
+            "type": "object"
+          },
+          "safety": {
+            "description": "`{ function, sil, voting?, safe_state?, proof_test_hours?, closure_seconds? }`.",
+            "type": "object"
+          },
+          "service": {
+            "description": "What the instrument serves.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "command",
+          "id",
+          "function"
+        ],
+        "type": "object"
+      },
+      "name": "set_instrument"
+    },
+    {
+      "description": "Remove an instrument, and every signal that names it.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "const": "remove_instrument",
+            "description": "The command's name."
+          },
+          "id": {
+            "description": "The instrument's tag.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "command",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "remove_instrument"
+    },
+    {
+      "description": "Create or replace the signal between two instruments.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "const": "set_signal",
+            "description": "The command's name."
+          },
+          "from": {
+            "description": "The source instrument's tag.",
+            "type": "string"
+          },
+          "kind": {
+            "description": "`electric`, `pneumatic`, `hydraulic`, `capillary` or `radiation`.",
+            "type": "string"
+          },
+          "to": {
+            "description": "The target instrument's tag.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "command",
+          "from",
+          "to"
+        ],
+        "type": "object"
+      },
+      "name": "set_signal"
+    },
+    {
+      "description": "Remove the signal between two instruments.",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "const": "remove_signal",
+            "description": "The command's name."
+          },
+          "from": {
+            "description": "The source instrument's tag.",
+            "type": "string"
+          },
+          "to": {
+            "description": "The target instrument's tag.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "command",
+          "from",
+          "to"
+        ],
+        "type": "object"
+      },
+      "name": "remove_signal"
+    },
+    {
+      "description": "Place a node on the canvas, by node id: `instance:sep1`, `input:feed_1`, `product:out`, `instrument:PSHH-101`.",
       "input_schema": {
         "additionalProperties": false,
         "properties": {

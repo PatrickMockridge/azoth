@@ -229,9 +229,9 @@ A front-end does not read the document; it reads a projection of it, and the pro
 here because two of its rules are what make an editor mechanical rather than a translation.
 
 ```text
-a node    instance:sep1          input:feed_1          product:vapour_product
-a handle  sep1.liquid            s1.products[0]        feed_1
-an edge   e0 … over the connections then the recycles, in document order
+a node    instance:sep1    input:feed_1    product:vapour_product    instrument:PSHH-101
+a handle  sep1.liquid      s1.products[0]  feed_1                     out / in
+an edge   e0 … over the connections, then the recycles, then the signals, in document order
 ```
 
 **A node's id is `{role}:{name}`.** Instance-versus-boundary is disjoint by the name rule above;
@@ -250,6 +250,12 @@ per stream it returns.
 itself — so the projection draws the union of what the document addresses and what the instance's
 vector parameter says, and an entry with two vector parameters would be ambiguous and leave the
 wiring alone to decide.
+
+**An instrument is a node with no process ports.** Its two handles, `out` and `in`, are the
+control layer's: an edge whose `data.kind` is `signal` joins two instruments through them and
+carries its carrier in `data.signal_kind`, and nothing is solved along it. The node's `data`
+holds the instrument record, so a sheet reads the document's own values rather than a second
+copy — which is the same rule every other node follows.
 
 The graph is emitted in **xyflow's** node/edge shape — `id`, `type`, `position`, `data`, `source`,
 `target`, `sourceHandle`, `targetHandle` — so the editor's model is the schema's. A `[[connections]]`

@@ -22,6 +22,8 @@ import { DesignSheet } from "./DesignSheet";
 import { DockTabs } from "./DockTabs";
 import { ProvenanceSheet } from "./ProvenanceSheet";
 import { ResultsSheet } from "./ResultsSheet";
+import { InstrumentSheet } from "./InstrumentSheet";
+import { SignalSheet } from "./SignalSheet";
 import { StagesSheet } from "./StagesSheet";
 import { TearSheet } from "./TearSheet";
 import { WorksheetSheet } from "./WorksheetSheet";
@@ -39,6 +41,8 @@ const LABELS: Record<TabId, string> = {
   performance: "Performance",
   results: "Results",
   provenance: "Provenance",
+  control: "Control",
+  signal: "Signal",
 };
 
 /**
@@ -94,7 +98,9 @@ export function PropertyView({
         ? null
         : edge.data.kind === "recycle"
           ? { command: "remove_recycle", stream: edge.data.path }
-          : { command: "disconnect", from: edge.data.from, to: edge.data.to };
+          : edge.data.kind === "signal"
+            ? { command: "remove_signal", from: edge.data.from, to: edge.data.to }
+            : { command: "disconnect", from: edge.data.from, to: edge.data.to };
   const available = tabsFor(kind, edge, resultTabs(result, outputs));
   const active = tabFor(kind, remembered, available);
 
@@ -147,8 +153,14 @@ function title(kind: Kind, node: GraphNode | null, edge: GraphEdge | null): stri
       return "Feed";
     case "product":
       return "Product";
+    case "instrument":
+      return node?.data.name ?? "Instrument";
     case "edge":
-      return edge?.data.kind === "recycle" ? `Tear ${edge.data.path}` : "Connection";
+      return edge?.data.kind === "recycle"
+        ? `Tear ${edge.data.path}`
+        : edge?.data.kind === "signal"
+          ? "Signal"
+          : "Connection";
   }
 }
 
@@ -161,6 +173,9 @@ function subtitle(
 ): string {
   if (kind === "edge") {
     return `${edge?.data.from ?? ""} → ${edge?.data.to ?? ""}`;
+  }
+  if (kind === "instrument") {
+    return node?.data.instrument?.service ?? "control layer, not process state";
   }
   const name = node?.data.name ?? "";
   if (kind === "instance" && form !== undefined && !form.runnable) {
@@ -246,6 +261,10 @@ function sheet(
           onSelect={onSelect}
         />
       );
+    case "control":
+      return node === null ? null : <InstrumentSheet node={node} onCommand={onCommand} />;
+    case "signal":
+      return edge === null ? null : <SignalSheet edge={edge} onCommand={onCommand} />;
     default:
       // The result sheets arrive with the workbook, which is where the results region is read.
       return <p className="note">there is nothing on this sheet yet</p>;

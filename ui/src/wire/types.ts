@@ -12,8 +12,8 @@
  * about it.
  */
 
-/** Which of the three kinds of node a target or a graph node is. */
-export type Role = "instance" | "input" | "product";
+/** Which kind of node a target or a graph node is. */
+export type Role = "instance" | "input" | "product" | "instrument";
 
 export type Severity = "error" | "warning";
 
@@ -74,6 +74,34 @@ export interface InputRecord {
   T: number;
 }
 
+export interface InstrumentRange {
+  min: number;
+  max: number;
+  unit: string;
+}
+
+export interface SafetyFunction {
+  function: string;
+  sil: number;
+  voting?: string;
+  safe_state?: string;
+  proof_test_hours?: number;
+  closure_seconds?: number;
+}
+
+/** The control layer's own record: a view of control, not physics. */
+export interface Instrument {
+  id: string;
+  function: string;
+  service?: string;
+  loop_number?: string;
+  measures?: string;
+  actuates?: string;
+  location?: "field" | "panel" | "central";
+  range?: InstrumentRange;
+  safety?: SafetyFunction;
+}
+
 export interface NodeData {
   name: string;
   unit?: string;
@@ -81,12 +109,13 @@ export interface NodeData {
   parameters?: Record<string, unknown>;
   ports?: Ports;
   input?: InputRecord;
+  instrument?: Instrument;
 }
 
 /** A node, in xyflow's shape — which is the shape the projection emits. */
 export interface GraphNode {
   id: string;
-  type: "unit_op" | "stream";
+  type: "unit_op" | "stream" | "instrument";
   role: Role;
   position: Position;
   data: NodeData;
@@ -99,13 +128,15 @@ export interface GraphEdge {
   target: string;
   targetHandle: string;
   data: {
-    kind: "connection" | "recycle";
+    kind: "connection" | "recycle" | "signal";
     from: string;
     to: string;
     /** The session path of the stream this edge carries. */
     path: string;
     /** A tear's seven convergence settings; absent on a connection, which has none. */
     settings?: RecycleSettings;
+    /** A signal's carrier — electric, pneumatic, … — where the document states one. */
+    signal_kind?: string;
   };
 }
 

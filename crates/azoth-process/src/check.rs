@@ -350,6 +350,8 @@ pub enum NodeRole {
     Instance,
     Input,
     Product,
+    /// An instrument in the control layer: a node the drawing shows, not a process stream.
+    Instrument,
 }
 
 impl NodeRole {
@@ -360,6 +362,7 @@ impl NodeRole {
             Self::Instance => "instance",
             Self::Input => "input",
             Self::Product => "product",
+            Self::Instrument => "instrument",
         }
     }
 
@@ -384,6 +387,7 @@ pub fn split_node_id(id: &str) -> Option<(NodeRole, &str)> {
         "instance" => NodeRole::Instance,
         "input" => NodeRole::Input,
         "product" => NodeRole::Product,
+        "instrument" => NodeRole::Instrument,
         _ => return None,
     };
     Some((role, name))

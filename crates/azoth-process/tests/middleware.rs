@@ -1299,6 +1299,86 @@ fn the_shipped_flowsheet_projects_to_six_nodes_and_six_edges() {
 
 /// **xyflow's precondition, asserted here rather than discovered in a browser**: a
 /// `sourceHandle` with no matching handle on the source node is an edge that does not render.
+/// **The control layer is on the same canvas.** An instrument is a node with its own record and
+/// a signal is an edge between two of them, so a selected instrument has a place to put a mark.
+#[test]
+fn an_instrument_is_a_node_and_a_signal_an_edge() {
+    let text = r#"
+id = "flowsheets.instrumented"
+name = "Instrumented"
+
+products = ["OUT"]
+
+[[inputs]]
+name = "FEED"
+components = ["methane"]
+n = 1.0
+z = [1.0]
+P = 5.0e5
+T = 300.0
+
+[[instances]]
+id = "p1"
+unit = "unit_ops.pump"
+[instances.parameters]
+outlet_pressure = 6.0e5
+isentropic_efficiency = 0.75
+
+[[connections]]
+from = "FEED"
+to = "p1.inlet"
+
+[[connections]]
+from = "p1.outlet"
+to = "OUT"
+
+[[instruments]]
+id = "PSHH-101"
+function = "PSHH"
+measures = "p1.outlet"
+location = "field"
+
+[[instruments]]
+id = "TIC-102"
+function = "TIC"
+measures = "p1.outlet"
+location = "panel"
+
+[[signals]]
+from = "PSHH-101"
+to = "TIC-102"
+kind = "electric"
+"#;
+    let flowsheet = Flowsheet::from_toml(text).expect("the fixture parses");
+    let document = graph(&flowsheet, &palette()).expect("it projects");
+    let switch = document
+        .nodes
+        .iter()
+        .find(|node| node.id == "instrument:PSHH-101")
+        .expect("the instrument is a node");
+    assert_eq!(switch.node_type, "instrument");
+    assert_eq!(switch.role, "instrument");
+    let instrument = switch
+        .data
+        .instrument
+        .as_ref()
+        .expect("the node carries the record");
+    assert_eq!(instrument.function, "PSHH");
+    assert_eq!(instrument.measures.as_deref(), Some("p1.outlet"));
+
+    let signal = document
+        .edges
+        .iter()
+        .find(|edge| edge.data.kind == "signal")
+        .expect("the signal is an edge");
+    assert_eq!(signal.source, "instrument:PSHH-101");
+    assert_eq!(signal.target, "instrument:TIC-102");
+    assert_eq!(signal.source_handle, "out");
+    assert_eq!(signal.target_handle, "in");
+    // The carrier travels with the edge, so a sheet can show it and not only overwrite it.
+    assert_eq!(signal.data.signal_kind.as_deref(), Some("electric"));
+}
+
 #[test]
 fn every_edge_references_a_handle_that_exists() {
     let text = std::fs::read_to_string(root().join("specs/flowsheets/demo.toml"))

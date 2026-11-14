@@ -161,7 +161,7 @@ fn the_tool_schema_is_the_command_model() {
     assert!(output.status.success(), "it should print");
     let document = json(&output);
     let tools = document["tools"].as_array().expect("an array");
-    assert_eq!(tools.len(), 16);
+    assert_eq!(tools.len(), 20);
 
     let names: Vec<&str> = tools
         .iter()
@@ -184,6 +184,10 @@ fn the_tool_schema_is_the_command_model() {
             "remove_recycle",
             "set_recycle",
             "unset_recycle_field",
+            "set_instrument",
+            "remove_instrument",
+            "set_signal",
+            "remove_signal",
             "set_position",
             "set_name",
         ]
