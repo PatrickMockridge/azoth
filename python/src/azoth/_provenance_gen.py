@@ -2482,7 +2482,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.api537_flare_flame_model': {
         "calc_id": 'process.api537_flare_flame_model',
         "name": 'API 537 flare flame model',
-        "spec": {'path': 'specs/models/process/api537_flare_flame_model.toml', 'sha256': '9766cf735faa33d4a5a5b694aa6a60d6e8495cf4d881ce3a29b387ed37a51e9d'},
+        "spec": {'path': 'specs/models/process/api537_flare_flame_model.toml', 'sha256': '627ea9f4240e4383e9ec43ab09579283d27cc2a778a43b8cccb155fdb58ea4b7'},
         "code": [{'path': 'python/src/azoth/process/reference/api537_flare_flame_model.py', 'sha256': 'd1b84527fe7cfeaecc7d13c1cf87254f685bc4bfb162835ff139a84233498358'}, {'path': 'crates/azoth-process/src/models/api537_flare_flame_model.rs', 'sha256': 'b696d713928de7beaf8edd3bc6bbfc90ebacaa3ecfa0b2e8685a49304eefc6a2'}],
         "source": 'NeqSim process/safety/fire/Api537FlareFlameModel.java',
         "verification": 'partially_verified',
@@ -2625,7 +2625,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.fire_water_coverage_assessment': {
         "calc_id": 'process.fire_water_coverage_assessment',
         "name": 'Fire-water coverage assessment',
-        "spec": {'path': 'specs/models/process/fire_water_coverage_assessment.toml', 'sha256': 'fb2f1efec77c5ed10739c8ee6bd0949b5ddec73a9644ce390ef52888efc1adf9'},
+        "spec": {'path': 'specs/models/process/fire_water_coverage_assessment.toml', 'sha256': '52e22049e194c0d41f9921a2ece3de63be572ce0716681a4a15f65a2e1455235'},
         "code": [{'path': 'python/src/azoth/process/reference/fire_water_coverage_assessment.py', 'sha256': 'af57ce6772b87cdae396d47939f790b2b8cde651af126d252889c7eaab5fb0f3'}, {'path': 'crates/azoth-process/src/models/fire_water_coverage_assessment.rs', 'sha256': '84428b166cfb3f5fb0f6996db89c0b394f569812fc394c9a796b35a3a9ba7cf8'}],
         "source": 'NeqSim process/safety/firewater/FireWaterCoverageAssessment.java',
         "verification": 'partially_verified',

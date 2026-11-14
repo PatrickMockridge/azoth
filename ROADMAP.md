@@ -875,14 +875,14 @@ a claim nothing holds.
   class answers `+Infinity`) and its four-way verdict. **`process.fire_water_coverage_assessment`
   is `FireWaterCoverageAssessment`**: the coverage, flow and pressure questions and the
   five-way verdict, with the spare flow and pressure margin required because the class's
-  NaN defaults read as feasible. **`process.active_fire_protection_screening` is
+  NaN defaults read as feasible (`#5017`). **`process.active_fire_protection_screening` is
   `ActiveFireProtectionScreening`'s arithmetic**: the extinguishing classification, the
   strict blowdown-versus-steel test, the margin and the selective saving; the class's flux,
   inventory, presentation flags and prose are not carried. **`process.api537_flare_flame_model`
   is `Api537FlareFlameModel`**: Kent's flame length, the `atan2` tilt, the point-source
   ground flux, one sterile radius per target flux, the two sound levels and the equivalent
   flame temperature, with the class's clamps mirrored and a negative stack height, which its
-  setter accepts, refused. Held to six captures. **All six have no executable caller**: the
+  setter accepts, refused (`#5018`). Held to six captures. **All six have no executable caller**: the
   cross-references inside `FireWaterDemandCalculator` are javadoc links, and each class's
   only reader is its own test. What remains owed in the safety tree: **`FaultTreeAnalyzer`**,
   the bowtie and the risk simulators (`RiskMatrix`, `OperationalRiskSimulator`, LOPA/SIL) are

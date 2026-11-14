@@ -80,7 +80,7 @@ not an equation, and both implementations read it from here.
 - **the sterile radius is `max(0, xc + sqrt(r_s^2 - dz^2))`** with `r_s^2 = tau qr / (4 pi target)`; a target the sphere never reaches answers zero.
 - **the noise is `10 log10(eta Q / 1e-12)` dB**, and the sound pressure level subtracts `20 log10(max(distance, 1)) + 11`.
 - **the equivalent flame temperature comes from the emissive power over the flame surface** `pi max(0.12 L, 0.1) L`, with `sigma = 5.670374419e-8`.
-- **the class's clamps are mirrored and unreachable through the declared ranges**: negative wind and acoustic efficiencies are clamped, and the transmissivity to `[0, 1]`. A negative stack height, which the class's setter accepts, is refused.
+- **the class's clamps are mirrored and unreachable through the declared ranges**: negative wind and acoustic efficiencies are clamped, and the transmissivity to `[0, 1]`. A negative stack height, which the class's setter accepts, is refused (NeqSim `#5018`).
 - **the target fluxes are the caller's list**: the class's four constants are 1.58, 4.73, 6.3 and 9.46 kW/m2, and `summary()` prints the first two.
 
 ## Cases
