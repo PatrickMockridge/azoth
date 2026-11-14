@@ -864,10 +864,29 @@ a claim nothing holds.
   executable caller**: `ActiveFireProtectionScreening.setBareSteelTimeToCriticalS` is the
   hand-off its javadoc names and `HazopConsequenceAutoPopulator` names the class in a
   recommendation string; the old "(2 callers)" counted the class's two tests.
-  What remains owed in the safety tree: **`Api537FlareFlameModel`** (zero callers) is flame
-  geometry and noise; **`FaultTreeAnalyzer`**,
+- **The firewater family and the API 537 flare flame** — the last self-contained package in
+  NeqSim's `process/safety/`. **`process.fire_water_demand` is `FireWaterDemandCalculator`**:
+  the area and object demand over a record list, the simultaneous factor, the hourly rate
+  and the water and foam volumes, with the ratio absent where the class answers NaN.
+  **`process.deluge_nozzle_layout` is `DelugeNozzleLayout`**: the flow and coverage criteria,
+  the larger count (a tie on flow), the grid spacing and the delivered density.
+  **`process.fire_monitor_coverage` is `FireMonitorCoverage`**: the nominal and effective
+  densities, the wind drift, the coverage fraction, the compliance flow (absent where the
+  class answers `+Infinity`) and its four-way verdict. **`process.fire_water_coverage_assessment`
+  is `FireWaterCoverageAssessment`**: the coverage, flow and pressure questions and the
+  five-way verdict, with the spare flow and pressure margin required because the class's
+  NaN defaults read as feasible (`#5017`). **`process.active_fire_protection_screening` is
+  `ActiveFireProtectionScreening`'s arithmetic**: the extinguishing classification, the
+  strict blowdown-versus-steel test, the margin and the selective saving; the class's flux,
+  inventory, presentation flags and prose are not carried. **`process.api537_flare_flame_model`
+  is `Api537FlareFlameModel`**: Kent's flame length, the `atan2` tilt, the point-source
+  ground flux, one sterile radius per target flux, the two sound levels and the equivalent
+  flame temperature, with the class's clamps mirrored and a negative stack height, which its
+  setter accepts, refused (`#5018`). Held to six captures. **All six have no executable caller**: the
+  cross-references inside `FireWaterDemandCalculator` are javadoc links, and each class's
+  only reader is its own test. What remains owed in the safety tree: **`FaultTreeAnalyzer`**,
   the bowtie and the risk simulators (`RiskMatrix`, `OperationalRiskSimulator`, LOPA/SIL) are
-  outside this chain; and the `firewater/` family is five calculators, named rather than ported.
+  outside this chain and need the simulation seam.
 - **The reactions family's**: the **ionic branch** of `reactions.reactive_tp_flash` and
   `reactions.reactive_ph_flash`, which is why a charged substance is refused at all;
   `reactions.reactive_ph_flash`'s **entropy-specified variant** and its `NR = 0` delegation to

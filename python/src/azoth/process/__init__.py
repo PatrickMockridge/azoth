@@ -20,17 +20,23 @@ from azoth import _core
 from azoth._dispatch import resolve
 from azoth.core.result import (
     AbsorptionColumnResult,
+    ActiveFireProtectionScreeningResult,
     AntiSurgeRecycleResult,
+    Api537FlareFlameModelResult,
     BleveResult,
     ComponentSplitterResult,
     CompressorResult,
     ConsequenceAnalysisResult,
     CoolerResult,
+    DelugeNozzleLayoutResult,
     DistillationColumnResult,
     EjectorResult,
     EventTreeResult,
     ExpanderResult,
     FilterResult,
+    FireMonitorCoverageResult,
+    FireWaterCoverageAssessmentResult,
+    FireWaterDemandResult,
     FlareResult,
     GasDispersionResult,
     GasScrubberResult,
@@ -87,18 +93,24 @@ __all__ = [
     "Stream",
     "TearResult",
     "absorption_column",
+    "active_fire_protection_screening",
     "anti_surge_recycle",
+    "api537_flare_flame_model",
     "bleve",
     "catalogue",
     "component_splitter",
     "compressor",
     "consequence_analysis",
     "cooler",
+    "deluge_nozzle_layout",
     "distillation_column",
     "ejector",
     "event_tree",
     "expander",
     "filter",
+    "fire_monitor_coverage",
+    "fire_water_coverage_assessment",
+    "fire_water_demand",
     "flare",
     "forms",
     "gas_dispersion",
@@ -137,6 +149,9 @@ __all__ = [
     "vce",
 ]
 
+_FIRE_MONITOR_COVERAGE = "process.fire_monitor_coverage"
+_FIRE_WATER_COVERAGE_ASSESSMENT = "process.fire_water_coverage_assessment"
+_FIRE_WATER_DEMAND = "process.fire_water_demand"
 _MANIFOLD = "process.manifold"
 _MIXER = "process.mixer"
 _PACKED_COLUMN = "process.packed_column"
@@ -149,9 +164,11 @@ _COMPONENT_SPLITTER = "process.component_splitter"
 _COMPRESSOR = "process.compressor"
 _CONSEQUENCE_ANALYSIS = "process.consequence_analysis"
 _ABSORPTION_COLUMN = "process.absorption_column"
+_ACTIVE_FIRE_PROTECTION_SCREENING = "process.active_fire_protection_screening"
 _STRIPPING_COLUMN = "process.stripping_column"
 _DISTILLATION_COLUMN = "process.distillation_column"
 _COOLER = "process.cooler"
+_DELUGE_NOZZLE_LAYOUT = "process.deluge_nozzle_layout"
 _EJECTOR = "process.ejector"
 _EVENT_TREE = "process.event_tree"
 _EXPANDER = "process.expander"
@@ -181,6 +198,7 @@ _STIRRED_TANK_REACTOR = "process.stirred_tank_reactor"
 _TANK = "process.tank"
 _THREE_PHASE_SEPARATOR = "process.three_phase_separator"
 _ANTI_SURGE_RECYCLE = "process.anti_surge_recycle"
+_API537_FLARE_FLAME_MODEL = "process.api537_flare_flame_model"
 _BLEVE = "process.bleve"
 
 
@@ -1131,6 +1149,81 @@ def filter(
         corrosion_allowance=corrosion_allowance,
         element_collapse_pressure=element_collapse_pressure,
         element_integrity_verified=element_integrity_verified,
+    )
+
+
+def active_fire_protection_screening(
+    scenario: str,
+    blowdown_time_to_target: Q,
+    bare_steel_time_to_critical: Q,
+    dedicated_object_demand: Q,
+    general_area_demand: Q,
+) -> ActiveFireProtectionScreeningResult:
+    """The active-versus-passive fire protection screen and its machine-readable facts.
+
+    The class's arithmetic only: water extinguishes a pool or an ordinary combustible fire
+    and not a jet; **blowdown is the governing control when it is faster than the steel**,
+    with `bare - blowdown` as the margin; and selective protection's saving is the fraction of
+    the area requirement it does not discharge. The verdict, the ranked measures and the
+    substitution argument are prose and are not carried.
+
+    Raises:
+        InvalidInputError: for a non-positive blowdown or time to critical, a negative
+            dedicated demand, a non-positive general demand, or an unknown scenario.
+
+    See :func:`azoth.process.reference.active_fire_protection_screening`.
+    """
+    return resolve(_ACTIVE_FIRE_PROTECTION_SCREENING)(  # type: ignore[no-any-return]
+        scenario=scenario,
+        blowdown_time_to_target=blowdown_time_to_target,
+        bare_steel_time_to_critical=bare_steel_time_to_critical,
+        dedicated_object_demand=dedicated_object_demand,
+        general_area_demand=general_area_demand,
+    )
+
+
+def api537_flare_flame_model(
+    mass_flow: Q,
+    heat_of_combustion: float,
+    radiative_fraction: float,
+    exit_velocity: Q,
+    ground_distance: Q,
+    sound_distance: Q,
+    target_fluxes: list[dict[str, object]],
+    stack_height: Q | None = None,
+    wind_speed: Q | None = None,
+    transmissivity: float | None = None,
+    acoustic_efficiency: float | None = None,
+) -> Api537FlareFlameModelResult:
+    """The API 537 flare flame: Kent's length, the tilt, the flux, sterile zones and noise.
+
+    The point-source chain the class publishes: ``Q = m hc``, ``L = 0.00326 Q^0.478``, the
+    tilt ``atan2(wind, exit)``, the ground flux ``tau qr / (4 pi r^2)`` from the flame
+    centre and one sterile radius per target flux. The noise is ``10 log10(eta Q / 1e-12)``
+    dB and the pressure level subtracts ``20 log10(max(d, 1)) + 11``. **The class's clamps
+    are mirrored and unreachable**: negative wind and efficiency are refused rather than
+    clamped, and so is a negative stack height the class accepts.
+
+    Raises:
+        InvalidInputError: for a negative mass flow, a non-positive heat of combustion or
+            exit velocity, a radiative fraction outside ``[0, 1]``, a negative distance,
+            stack height or efficiency, a transmissivity outside ``[0, 1]``, or a
+            non-positive target flux.
+
+    See :func:`azoth.process.reference.api537_flare_flame_model`.
+    """
+    return resolve(_API537_FLARE_FLAME_MODEL)(  # type: ignore[no-any-return]
+        mass_flow=mass_flow,
+        heat_of_combustion=heat_of_combustion,
+        radiative_fraction=radiative_fraction,
+        exit_velocity=exit_velocity,
+        ground_distance=ground_distance,
+        sound_distance=sound_distance,
+        target_fluxes=target_fluxes,
+        stack_height=stack_height,
+        wind_speed=wind_speed,
+        transmissivity=transmissivity,
+        acoustic_efficiency=acoustic_efficiency,
     )
 
 
@@ -2099,6 +2192,152 @@ def event_tree(
     return resolve(_EVENT_TREE)(  # type: ignore[no-any-return]
         initiating_frequency_per_year=initiating_frequency_per_year,
         branches=branches,
+    )
+
+
+def fire_monitor_coverage(
+    target_area: Q,
+    required_density: float,
+    monitor_count: float | None = None,
+    monitor_flow: Q | None = None,
+    effective_throw: Q | None = None,
+    sweep_angle: float | None = None,
+    wind_speed: Q | None = None,
+    fall_height: Q | None = None,
+    droplet_terminal_velocity: Q | None = None,
+    characteristic_dimension: Q | None = None,
+    line_of_sight_obstructed: bool | None = None,
+) -> FireMonitorCoverageResult:
+    """The fire-monitor coverage: density, wind drift and the class's verdict.
+
+    The monitor-substitution screen: the nominal density ``count flow / area``, the drift
+    ``fall wind / terminal``, the coverage fraction ``clamp(1 - drift / dimension, 0, 1)``
+    and the effective density. **The verdict is the class's classification** in its priority
+    order, obstructed sight first. **No finite flow suffices when the drift removes all
+    coverage**, so `flow_needed_for_compliance` is absent there, where the class returns
+    `+Infinity`.
+
+    Raises:
+        InvalidInputError: for a non-positive area, density, flow, throw, fall height or
+            terminal velocity, a count below one or not whole, an angle outside
+            ``(0, 360]``, or a negative wind speed or dimension.
+
+    See :func:`azoth.process.reference.fire_monitor_coverage`.
+    """
+    return resolve(_FIRE_MONITOR_COVERAGE)(  # type: ignore[no-any-return]
+        target_area=target_area,
+        required_density=required_density,
+        monitor_count=monitor_count,
+        monitor_flow=monitor_flow,
+        effective_throw=effective_throw,
+        sweep_angle=sweep_angle,
+        wind_speed=wind_speed,
+        fall_height=fall_height,
+        droplet_terminal_velocity=droplet_terminal_velocity,
+        characteristic_dimension=characteristic_dimension,
+        line_of_sight_obstructed=line_of_sight_obstructed,
+    )
+
+
+def fire_water_coverage_assessment(
+    protected_area: Q,
+    required_flow: Q,
+    spare_supply_flow: Q,
+    worst_case_pressure_margin: Q,
+    covered_area: Q | None = None,
+    existing_delivered_flow: Q | None = None,
+    required_pressure_margin: Q | None = None,
+) -> FireWaterCoverageAssessmentResult:
+    """The fire-water coverage, flow and pressure gate and the class's verdict.
+
+    The class asks coverage, then flow, then pressure, because the routes to a fix differ in
+    cost. The verdict distinguishes a coverage gap with supply in hand from a flow deficit
+    and from a pressure deficit, and answers **dedicated supply** when neither margin exists.
+    **An unset supply is not a verdict**: the class's NaN defaults read as feasible, and this
+    port requires the spare flow and the pressure margin.
+
+    Raises:
+        InvalidInputError: for a non-positive area or required flow, a negative covered
+            area, delivered flow or required margin, or a non-finite input.
+
+    See :func:`azoth.process.reference.fire_water_coverage_assessment`.
+    """
+    return resolve(_FIRE_WATER_COVERAGE_ASSESSMENT)(  # type: ignore[no-any-return]
+        protected_area=protected_area,
+        required_flow=required_flow,
+        spare_supply_flow=spare_supply_flow,
+        worst_case_pressure_margin=worst_case_pressure_margin,
+        covered_area=covered_area,
+        existing_delivered_flow=existing_delivered_flow,
+        required_pressure_margin=required_pressure_margin,
+    )
+
+
+def fire_water_demand(
+    protected_area: Q,
+    application_rate: float | None = None,
+    duration: Q | None = None,
+    foam_concentrate_percent: float | None = None,
+    simultaneous_area_factor: float | None = None,
+    protected_objects: list[dict[str, object]] | None = None,
+) -> FireWaterDemandResult:
+    """The fire-water demand: area and object rates, simultaneous factor and volumes.
+
+    The NORSOK S-001 / NFPA 15 application-rate screen: ``area = protected_area rate``, the
+    object demand summed over the wetted surfaces, the simultaneous factor applied to the
+    total, and the water and foam volumes over the duration. **A zero area demand has no
+    ratio**, the class's NaN.
+
+    Raises:
+        InvalidInputError: for a negative area or rate, a non-positive duration, a foam
+            percent outside ``[0, 10]``, a factor below one, or a negative row area or rate.
+
+    See :func:`azoth.process.reference.fire_water_demand`.
+    """
+    return resolve(_FIRE_WATER_DEMAND)(  # type: ignore[no-any-return]
+        protected_area=protected_area,
+        application_rate=application_rate,
+        duration=duration,
+        foam_concentrate_percent=foam_concentrate_percent,
+        simultaneous_area_factor=simultaneous_area_factor,
+        protected_objects=protected_objects,
+    )
+
+
+def deluge_nozzle_layout(
+    protected_area: Q,
+    required_density: float,
+    nozzle_k: float,
+    nozzle_min_pressure: Q,
+    nozzle_max_spacing: Q,
+    nozzle_clearance: Q,
+    available_clearance: Q,
+    operating_pressure: Q | None = None,
+    coverage_efficiency: float | None = None,
+) -> DelugeNozzleLayoutResult:
+    """The deluge nozzle net: the flow and coverage criteria and the larger count.
+
+    The NFPA 15 screen: ``flow_per_nozzle = k sqrt(p)``, ``coverage_per_nozzle =
+    spacing^2 efficiency``, both counts ceilinged and the larger governing, with **a tie set
+    by the flow criterion**. The grid spacing and delivered density follow the count.
+
+    Raises:
+        InvalidInputError: for a non-positive area, density, coefficient, minimum pressure,
+            spacing or operating pressure, an efficiency outside ``(0, 1]``, or a negative
+            clearance.
+
+    See :func:`azoth.process.reference.deluge_nozzle_layout`.
+    """
+    return resolve(_DELUGE_NOZZLE_LAYOUT)(  # type: ignore[no-any-return]
+        protected_area=protected_area,
+        required_density=required_density,
+        nozzle_k=nozzle_k,
+        nozzle_min_pressure=nozzle_min_pressure,
+        nozzle_max_spacing=nozzle_max_spacing,
+        nozzle_clearance=nozzle_clearance,
+        available_clearance=available_clearance,
+        operating_pressure=operating_pressure,
+        coverage_efficiency=coverage_efficiency,
     )
 
 

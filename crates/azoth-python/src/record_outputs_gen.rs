@@ -1853,6 +1853,48 @@ impl From<&azoth_eos::results::ScenarioIndexRow> for PyScenarioIndexRow {
     }
 }
 
+/// one row per target flux, in the caller's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SterileRadius"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySterileRadius {
+    /// the target flux the radius is for.
+    #[pyo3(get)]
+    pub flux: PyQty,
+    /// the sterile radius; zero where the radiative power never reaches the target.
+    #[pyo3(get)]
+    pub radius: PyQty,
+}
+
+#[pymethods]
+impl PySterileRadius {
+    fn __repr__(&self) -> String {
+        format!(
+            "SterileRadius(flux={:?}, radius={:?})",
+            self.flux, self.radius
+        )
+    }
+}
+
+impl From<&azoth_process::models::api537_flare_flame_model::SterileRadius> for PySterileRadius {
+    fn from(row: &azoth_process::models::api537_flare_flame_model::SterileRadius) -> Self {
+        Self {
+            flux: PyQty {
+                magnitude_si: row.flux.value,
+                unit: "W/m**2".to_string(),
+            },
+            radius: PyQty {
+                magnitude_si: row.radius.value,
+                unit: "m".to_string(),
+            },
+        }
+    }
+}
+
 /// One row per registered mineral, in the equilibrium's order.
 #[pyclass(
     frozen,

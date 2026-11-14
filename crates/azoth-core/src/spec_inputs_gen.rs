@@ -223,17 +223,23 @@
 //!   - specs/calcs/hydraulics/reynolds_number.toml
 //!   - specs/calcs/hydraulics/tray_hydraulics.toml
 //!   - specs/models/process/absorption_column.toml
+//!   - specs/models/process/active_fire_protection_screening.toml
 //!   - specs/models/process/anti_surge_recycle.toml
+//!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
 //!   - specs/models/process/cooler.toml
+//!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/distillation_column.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/filter.toml
+//!   - specs/models/process/fire_monitor_coverage.toml
+//!   - specs/models/process/fire_water_coverage_assessment.toml
+//!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
 //!   - specs/models/process/gas_dispersion.toml
 //!   - specs/models/process/gas_scrubber.toml
@@ -2671,6 +2677,26 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "max_operation_pressure",
         "pressure",
     ),
+    (
+        "process.active_fire_protection_screening",
+        "blowdown_time_to_target",
+        "time",
+    ),
+    (
+        "process.active_fire_protection_screening",
+        "bare_steel_time_to_critical",
+        "time",
+    ),
+    (
+        "process.active_fire_protection_screening",
+        "dedicated_object_demand",
+        "volume_rate",
+    ),
+    (
+        "process.active_fire_protection_screening",
+        "general_area_demand",
+        "volume_rate",
+    ),
     ("process.anti_surge_recycle", "feed_n", "molar_flow"),
     ("process.anti_surge_recycle", "feed_z", "dimensionless"),
     ("process.anti_surge_recycle", "feed_p", "pressure"),
@@ -2695,6 +2721,44 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.anti_surge_recycle",
         "max_iterations",
+        "dimensionless",
+    ),
+    ("process.api537_flare_flame_model", "mass_flow", "mass_rate"),
+    (
+        "process.api537_flare_flame_model",
+        "heat_of_combustion",
+        "dimensionless",
+    ),
+    (
+        "process.api537_flare_flame_model",
+        "radiative_fraction",
+        "dimensionless",
+    ),
+    (
+        "process.api537_flare_flame_model",
+        "exit_velocity",
+        "velocity",
+    ),
+    (
+        "process.api537_flare_flame_model",
+        "ground_distance",
+        "length",
+    ),
+    (
+        "process.api537_flare_flame_model",
+        "sound_distance",
+        "length",
+    ),
+    ("process.api537_flare_flame_model", "stack_height", "length"),
+    ("process.api537_flare_flame_model", "wind_speed", "velocity"),
+    (
+        "process.api537_flare_flame_model",
+        "transmissivity",
+        "dimensionless",
+    ),
+    (
+        "process.api537_flare_flame_model",
+        "acoustic_efficiency",
         "dimensionless",
     ),
     ("process.bleve", "fuel_mass", "mass"),
@@ -2803,6 +2867,39 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.cooler",
         "dynamic_outlet_temperature",
         "thermodynamic_temperature",
+    ),
+    ("process.deluge_nozzle_layout", "protected_area", "area"),
+    (
+        "process.deluge_nozzle_layout",
+        "required_density",
+        "dimensionless",
+    ),
+    ("process.deluge_nozzle_layout", "nozzle_k", "dimensionless"),
+    (
+        "process.deluge_nozzle_layout",
+        "nozzle_min_pressure",
+        "pressure",
+    ),
+    (
+        "process.deluge_nozzle_layout",
+        "nozzle_max_spacing",
+        "length",
+    ),
+    ("process.deluge_nozzle_layout", "nozzle_clearance", "length"),
+    (
+        "process.deluge_nozzle_layout",
+        "available_clearance",
+        "length",
+    ),
+    (
+        "process.deluge_nozzle_layout",
+        "operating_pressure",
+        "pressure",
+    ),
+    (
+        "process.deluge_nozzle_layout",
+        "coverage_efficiency",
+        "dimensionless",
     ),
     ("process.distillation_column", "feed_n", "molar_flow"),
     ("process.distillation_column", "feed_z", "dimensionless"),
@@ -3083,6 +3180,92 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.filter", "joint_efficiency", "dimensionless"),
     ("process.filter", "corrosion_allowance", "length"),
     ("process.filter", "element_collapse_pressure", "pressure"),
+    ("process.fire_monitor_coverage", "target_area", "area"),
+    (
+        "process.fire_monitor_coverage",
+        "required_density",
+        "dimensionless",
+    ),
+    (
+        "process.fire_monitor_coverage",
+        "monitor_count",
+        "dimensionless",
+    ),
+    (
+        "process.fire_monitor_coverage",
+        "monitor_flow",
+        "volume_rate",
+    ),
+    ("process.fire_monitor_coverage", "effective_throw", "length"),
+    (
+        "process.fire_monitor_coverage",
+        "sweep_angle",
+        "dimensionless",
+    ),
+    ("process.fire_monitor_coverage", "wind_speed", "velocity"),
+    ("process.fire_monitor_coverage", "fall_height", "length"),
+    (
+        "process.fire_monitor_coverage",
+        "droplet_terminal_velocity",
+        "velocity",
+    ),
+    (
+        "process.fire_monitor_coverage",
+        "characteristic_dimension",
+        "length",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "protected_area",
+        "area",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "required_flow",
+        "volume_rate",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "spare_supply_flow",
+        "volume_rate",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "worst_case_pressure_margin",
+        "pressure",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "covered_area",
+        "area",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "existing_delivered_flow",
+        "volume_rate",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "required_pressure_margin",
+        "pressure",
+    ),
+    ("process.fire_water_demand", "protected_area", "area"),
+    (
+        "process.fire_water_demand",
+        "application_rate",
+        "dimensionless",
+    ),
+    ("process.fire_water_demand", "duration", "time"),
+    (
+        "process.fire_water_demand",
+        "foam_concentrate_percent",
+        "dimensionless",
+    ),
+    (
+        "process.fire_water_demand",
+        "simultaneous_area_factor",
+        "dimensionless",
+    ),
     ("process.flare", "inlet_n", "molar_flow"),
     ("process.flare", "inlet_z", "dimensionless"),
     ("process.flare", "inlet_p", "pressure"),

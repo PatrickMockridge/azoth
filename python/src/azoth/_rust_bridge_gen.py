@@ -17,10 +17,12 @@ from azoth._registry_gen import spec as _spec_for
 from azoth.core.bridge_support import _association_spec, _count, _molar_masses, _si, _warnings
 from azoth.core.result import (
     AbsorptionColumnResult,
+    ActiveFireProtectionScreeningResult,
     ActivityCoefficientRow,
     AmmoniaPhaseResult,
     AntiSurgeRecycleResult,
     AntoineVaporPressureResult,
+    Api537FlareFlameModelResult,
     AppliedStandardRow,
     AqueousViscosityResult,
     ArgonSolidPhaseResult,
@@ -66,6 +68,7 @@ from azoth.core.result import (
     CostaldMolarVolumeResult,
     CriticalPointResult,
     DarcyWeisbachResult,
+    DelugeNozzleLayoutResult,
     DelumpingResult,
     DepositionSegmentRow,
     DesmukhMatherPhaseResult,
@@ -91,6 +94,9 @@ from azoth.core.result import (
     FeSMorphology,
     FilippovConductivityResult,
     FilterResult,
+    FireMonitorCoverageResult,
+    FireWaterCoverageAssessmentResult,
+    FireWaterDemandResult,
     FirozabadiRamleyInterfaceTensionResult,
     FlareResult,
     FlowlineScaleProfileResult,
@@ -115,6 +121,7 @@ from azoth.core.result import (
     GeVanLaarAcidPhaseResult,
     GeWilsonPhaseResult,
     GibbsReactorResult,
+    GoverningCriterion,
     GtSurfaceTensionResult,
     GtSurfaceTensionSimpleResult,
     HaalandResult,
@@ -279,11 +286,13 @@ from azoth.core.result import (
     SrkPenelouxShiftResult,
     SrkZFactorResult,
     StabilityTestResult,
+    SterileRadius,
     StirredTankReactorResult,
     StreamScaleAnalyzerResult,
     StreamScaleMineralRow,
     StrippingColumnResult,
     SubFraction,
+    SupplyVerdict,
     SurfCooldownResult,
     SwameeJainResult,
     TankResult,
@@ -384,9 +393,11 @@ from azoth.eos.reference.molar_enthalpy_entropy import IdealGasModel
 
 __all__ = [
     "absorption_column",
+    "active_fire_protection_screening",
     "ammonia_phase",
     "anti_surge_recycle",
     "antoine_vapor_pressure",
+    "api537_flare_flame_model",
     "aqueous_viscosity",
     "argon_solid_phase",
     "assay_mass_fractions",
@@ -425,6 +436,7 @@ __all__ = [
     "critical_point",
     "darcy_weisbach",
     "de_waard_milliams_corrosion",
+    "deluge_nozzle_layout",
     "delumping",
     "desmukh_mather_phase",
     "dew_pressure",
@@ -443,6 +455,9 @@ __all__ = [
     "expander",
     "filippov_conductivity",
     "filter",
+    "fire_monitor_coverage",
+    "fire_water_coverage_assessment",
+    "fire_water_demand",
     "firozabadi_ramley_interface_tension",
     "flare",
     "flowline_scale_profile",
@@ -5570,6 +5585,25 @@ def absorption_column(gas_components: list[str], gas_n: Q, gas_z: list[float], g
     )
 
 
+def active_fire_protection_screening(scenario: str, blowdown_time_to_target: Q, bare_steel_time_to_critical: Q, dedicated_object_demand: Q, general_area_demand: Q) -> ActiveFireProtectionScreeningResult:
+    """``process.active_fire_protection_screening``, computed in Rust."""
+    spec = _models_gen.model("process.active_fire_protection_screening")
+    result = _core.active_fire_protection_screening(
+        scenario,
+        input_to_si(spec, "blowdown_time_to_target", blowdown_time_to_target),
+        input_to_si(spec, "bare_steel_time_to_critical", bare_steel_time_to_critical),
+        input_to_si(spec, "dedicated_object_demand", dedicated_object_demand),
+        input_to_si(spec, "general_area_demand", general_area_demand),
+    )
+    return ActiveFireProtectionScreeningResult(
+        water_extinguishing=result.water_extinguishing,
+        blowdown_faster_than_failure=result.blowdown_faster_than_failure,
+        blowdown_margin=from_si(result.blowdown_margin.magnitude_si, result.blowdown_margin.unit),
+        selective_protection_saving_fraction=result.selective_protection_saving_fraction,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def anti_surge_recycle(components: list[str], feed_n: Q, feed_z: list[float], feed_p: Q, feed_t: Q, curve: list[dict[str, Q]], surge_curve: list[dict[str, Q]], speed: float | None=None, surge_control_margin: float | None=None, recycle_cooler_temperature: Q | None=None, damping: float | None=None, tolerance: float | None=None, max_iterations: int | None=None) -> AntiSurgeRecycleResult:
     """``process.anti_surge_recycle``, computed in Rust."""
     spec = _models_gen.model("process.anti_surge_recycle")
@@ -5597,6 +5631,40 @@ def anti_surge_recycle(components: list[str], feed_n: Q, feed_z: list[float], fe
         surge_flow=from_si(result.surge_flow.magnitude_si, result.surge_flow.unit),
         control_flow=from_si(result.control_flow.magnitude_si, result.control_flow.unit),
         distance_to_surge=result.distance_to_surge,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def api537_flare_flame_model(mass_flow: Q, heat_of_combustion: float, radiative_fraction: float, exit_velocity: Q, ground_distance: Q, sound_distance: Q, target_fluxes: list[dict[str, object]], stack_height: Q | None=None, wind_speed: Q | None=None, transmissivity: float | None=None, acoustic_efficiency: float | None=None) -> Api537FlareFlameModelResult:
+    """``process.api537_flare_flame_model``, computed in Rust."""
+    spec = _models_gen.model("process.api537_flare_flame_model")
+    result = _core.api537_flare_flame_model(
+        input_to_si(spec, "mass_flow", mass_flow),
+        heat_of_combustion,
+        radiative_fraction,
+        input_to_si(spec, "exit_velocity", exit_velocity),
+        input_to_si(spec, "ground_distance", ground_distance),
+        input_to_si(spec, "sound_distance", sound_distance),
+        input_records_to_si(spec, "target_fluxes", target_fluxes),
+        None if stack_height is None else input_to_si(spec, "stack_height", stack_height),
+        None if wind_speed is None else input_to_si(spec, "wind_speed", wind_speed),
+        None if transmissivity is None else transmissivity,
+        None if acoustic_efficiency is None else acoustic_efficiency,
+    )
+    return Api537FlareFlameModelResult(
+        heat_release=from_si(result.heat_release.magnitude_si, result.heat_release.unit),
+        radiative_power=from_si(result.radiative_power.magnitude_si, result.radiative_power.unit),
+        flame_length=from_si(result.flame_length.magnitude_si, result.flame_length.unit),
+        flame_tilt=result.flame_tilt,
+        flame_center_horizontal=from_si(result.flame_center_horizontal.magnitude_si, result.flame_center_horizontal.unit),
+        flame_center_height=from_si(result.flame_center_height.magnitude_si, result.flame_center_height.unit),
+        flame_tip_horizontal=from_si(result.flame_tip_horizontal.magnitude_si, result.flame_tip_horizontal.unit),
+        flame_tip_height=from_si(result.flame_tip_height.magnitude_si, result.flame_tip_height.unit),
+        heat_flux_at_ground_distance=from_si(result.heat_flux_at_ground_distance.magnitude_si, result.heat_flux_at_ground_distance.unit),
+        sterile_radii=tuple(SterileRadius(flux=from_si(c.flux.magnitude_si, c.flux.unit), radius=from_si(c.radius.magnitude_si, c.radius.unit)) for c in result.sterile_radii),
+        sound_power_level=result.sound_power_level,
+        sound_pressure_level=result.sound_pressure_level,
+        equivalent_flame_temperature=from_si(result.equivalent_flame_temperature.magnitude_si, result.equivalent_flame_temperature.unit),
         warnings=_warnings(result.warnings),
     )
 
@@ -5802,6 +5870,38 @@ def cooler(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
         outlet_duty=from_si(result.outlet_duty.magnitude_si, result.outlet_duty.unit),
         cooling_valve_opening=result.cooling_valve_opening,
         equilibrium_outlet_temperature=None if result.equilibrium_outlet_temperature is None else from_si(result.equilibrium_outlet_temperature.magnitude_si, result.equilibrium_outlet_temperature.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def deluge_nozzle_layout(protected_area: Q, required_density: float, nozzle_k: float, nozzle_min_pressure: Q, nozzle_max_spacing: Q, nozzle_clearance: Q, available_clearance: Q, operating_pressure: Q | None=None, coverage_efficiency: float | None=None) -> DelugeNozzleLayoutResult:
+    """``process.deluge_nozzle_layout``, computed in Rust."""
+    spec = _models_gen.model("process.deluge_nozzle_layout")
+    result = _core.deluge_nozzle_layout(
+        input_to_si(spec, "protected_area", protected_area),
+        required_density,
+        nozzle_k,
+        input_to_si(spec, "nozzle_min_pressure", nozzle_min_pressure),
+        input_to_si(spec, "nozzle_max_spacing", nozzle_max_spacing),
+        input_to_si(spec, "nozzle_clearance", nozzle_clearance),
+        input_to_si(spec, "available_clearance", available_clearance),
+        None if operating_pressure is None else input_to_si(spec, "operating_pressure", operating_pressure),
+        None if coverage_efficiency is None else coverage_efficiency,
+    )
+    return DelugeNozzleLayoutResult(
+        required_flow=from_si(result.required_flow.magnitude_si, result.required_flow.unit),
+        flow_per_nozzle=from_si(result.flow_per_nozzle.magnitude_si, result.flow_per_nozzle.unit),
+        coverage_per_nozzle=from_si(result.coverage_per_nozzle.magnitude_si, result.coverage_per_nozzle.unit),
+        nozzle_count_from_flow=result.nozzle_count_from_flow,
+        nozzle_count_from_coverage=result.nozzle_count_from_coverage,
+        nozzle_count=result.nozzle_count,
+        governing_criterion=GoverningCriterion(result.governing_criterion),
+        grid_spacing=from_si(result.grid_spacing.magnitude_si, result.grid_spacing.unit),
+        delivered_flow=from_si(result.delivered_flow.magnitude_si, result.delivered_flow.unit),
+        delivered_density=result.delivered_density,
+        pressure_adequate=result.pressure_adequate,
+        density_met=result.density_met,
+        clearance_adequate=result.clearance_adequate,
         warnings=_warnings(result.warnings),
     )
 
@@ -6149,6 +6249,83 @@ def filter(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
         collapse_pressure_utilization=result.collapse_pressure_utilization,
         differential_pressure_design_acceptable=result.differential_pressure_design_acceptable,
         design_media_area=None if result.design_media_area is None else from_si(result.design_media_area.magnitude_si, result.design_media_area.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def fire_monitor_coverage(target_area: Q, required_density: float, monitor_count: float | None=None, monitor_flow: Q | None=None, effective_throw: Q | None=None, sweep_angle: float | None=None, wind_speed: Q | None=None, fall_height: Q | None=None, droplet_terminal_velocity: Q | None=None, characteristic_dimension: Q | None=None, line_of_sight_obstructed: bool | None=None) -> FireMonitorCoverageResult:
+    """``process.fire_monitor_coverage``, computed in Rust."""
+    spec = _models_gen.model("process.fire_monitor_coverage")
+    result = _core.fire_monitor_coverage(
+        input_to_si(spec, "target_area", target_area),
+        required_density,
+        None if monitor_count is None else monitor_count,
+        None if monitor_flow is None else input_to_si(spec, "monitor_flow", monitor_flow),
+        None if effective_throw is None else input_to_si(spec, "effective_throw", effective_throw),
+        None if sweep_angle is None else sweep_angle,
+        None if wind_speed is None else input_to_si(spec, "wind_speed", wind_speed),
+        None if fall_height is None else input_to_si(spec, "fall_height", fall_height),
+        None if droplet_terminal_velocity is None else input_to_si(spec, "droplet_terminal_velocity", droplet_terminal_velocity),
+        None if characteristic_dimension is None else input_to_si(spec, "characteristic_dimension", characteristic_dimension),
+        line_of_sight_obstructed,
+    )
+    return FireMonitorCoverageResult(
+        total_flow=from_si(result.total_flow.magnitude_si, result.total_flow.unit),
+        swept_area=from_si(result.swept_area.magnitude_si, result.swept_area.unit),
+        nominal_density=result.nominal_density,
+        drift_displacement=from_si(result.drift_displacement.magnitude_si, result.drift_displacement.unit),
+        wind_coverage_fraction=result.wind_coverage_fraction,
+        effective_density=result.effective_density,
+        meets_density_still_air=result.meets_density_still_air,
+        meets_density_in_wind=result.meets_density_in_wind,
+        flow_needed_for_compliance=None if result.flow_needed_for_compliance is None else from_si(result.flow_needed_for_compliance.magnitude_si, result.flow_needed_for_compliance.unit),
+        verdict=result.verdict,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def fire_water_coverage_assessment(protected_area: Q, required_flow: Q, spare_supply_flow: Q, worst_case_pressure_margin: Q, covered_area: Q | None=None, existing_delivered_flow: Q | None=None, required_pressure_margin: Q | None=None) -> FireWaterCoverageAssessmentResult:
+    """``process.fire_water_coverage_assessment``, computed in Rust."""
+    spec = _models_gen.model("process.fire_water_coverage_assessment")
+    result = _core.fire_water_coverage_assessment(
+        input_to_si(spec, "protected_area", protected_area),
+        input_to_si(spec, "required_flow", required_flow),
+        input_to_si(spec, "spare_supply_flow", spare_supply_flow),
+        input_to_si(spec, "worst_case_pressure_margin", worst_case_pressure_margin),
+        None if covered_area is None else input_to_si(spec, "covered_area", covered_area),
+        None if existing_delivered_flow is None else input_to_si(spec, "existing_delivered_flow", existing_delivered_flow),
+        None if required_pressure_margin is None else input_to_si(spec, "required_pressure_margin", required_pressure_margin),
+    )
+    return FireWaterCoverageAssessmentResult(
+        coverage_gap=from_si(result.coverage_gap.magnitude_si, result.coverage_gap.unit),
+        coverage_fraction=result.coverage_fraction,
+        flow_deficit=from_si(result.flow_deficit.magnitude_si, result.flow_deficit.unit),
+        flow_feasible=result.flow_feasible,
+        pressure_feasible=result.pressure_feasible,
+        verdict=SupplyVerdict(result.verdict),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def fire_water_demand(protected_area: Q, application_rate: float | None=None, duration: Q | None=None, foam_concentrate_percent: float | None=None, simultaneous_area_factor: float | None=None, protected_objects: list[dict[str, object]] | None=None) -> FireWaterDemandResult:
+    """``process.fire_water_demand``, computed in Rust."""
+    spec = _models_gen.model("process.fire_water_demand")
+    result = _core.fire_water_demand(
+        input_to_si(spec, "protected_area", protected_area),
+        None if application_rate is None else application_rate,
+        None if duration is None else input_to_si(spec, "duration", duration),
+        None if foam_concentrate_percent is None else foam_concentrate_percent,
+        None if simultaneous_area_factor is None else simultaneous_area_factor,
+        None if protected_objects is None else input_records_to_si(spec, "protected_objects", protected_objects),
+    )
+    return FireWaterDemandResult(
+        area_demand=from_si(result.area_demand.magnitude_si, result.area_demand.unit),
+        object_demand=from_si(result.object_demand.magnitude_si, result.object_demand.unit),
+        total_demand=from_si(result.total_demand.magnitude_si, result.total_demand.unit),
+        total_demand_m3_per_hour=from_si(result.total_demand_m3_per_hour.magnitude_si, result.total_demand_m3_per_hour.unit),
+        water_volume=from_si(result.water_volume.magnitude_si, result.water_volume.unit),
+        foam_concentrate_volume=from_si(result.foam_concentrate_volume.magnitude_si, result.foam_concentrate_volume.unit),
+        object_to_area_demand_ratio=result.object_to_area_demand_ratio,
         warnings=_warnings(result.warnings),
     )
 

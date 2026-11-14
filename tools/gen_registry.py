@@ -214,6 +214,28 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `crates/azoth-process/tests/pfp_demand.rs` asserts it against the capture, and
         # `test_cross_impl` compares it on both results.
         "pfp_required",
+        # `deluge_nozzle_layout`'s three flags, booleans with no slot in `TestCase`.
+        # `crates/azoth-process/tests/deluge_nozzle_layout.rs` asserts them against the
+        # capture, and `test_cross_impl` compares them on both results.
+        "pressure_adequate",
+        "density_met",
+        "clearance_adequate",
+        # `fire_monitor_coverage`'s two density predicates, booleans with no slot in
+        # `TestCase`. `crates/azoth-process/tests/fire_monitor_coverage.rs` asserts them
+        # against the capture, and `test_cross_impl` compares them on both results.
+        "meets_density_still_air",
+        "meets_density_in_wind",
+        # `fire_water_coverage_assessment`'s two feasibility flags, booleans with no slot in
+        # `TestCase`. `crates/azoth-process/tests/fire_water_coverage_assessment.rs` asserts
+        # them against the capture, and `test_cross_impl` compares them on both results.
+        "flow_feasible",
+        "pressure_feasible",
+        # `active_fire_protection_screening`'s two flags, booleans with no slot in
+        # `TestCase`. `crates/azoth-process/tests/active_fire_protection_screening.rs`
+        # asserts them against the capture, and `test_cross_impl` compares them on both
+        # results.
+        "water_extinguishing",
+        "blowdown_faster_than_failure",
         # `thermal.shell_and_tube_vibration`'s four flags, booleans with no slot in
         # `TestCase`. `crates/azoth-thermal/tests/shell_and_tube_vibration.rs` asserts
         # them against the capture, and `test_cross_impl` compares them on both results.

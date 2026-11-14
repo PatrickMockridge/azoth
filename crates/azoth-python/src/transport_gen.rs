@@ -21,8 +21,8 @@ use crate::record_outputs_gen::{
     PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
     PyMineralEquilibriumRow, PyNaceIssueRow, PyRemediationOptionRow, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PyStreamScaleMineralRow,
-    PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySterileRadius,
+    PyStreamScaleMineralRow, PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -14002,6 +14002,57 @@ impl From<&azoth_process::models::absorption_column::AbsorptionColumnResult>
         }
     }
 }
+/// Result of `process.active_fire_protection_screening`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ActiveFireProtectionScreeningResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyActiveFireProtectionScreeningResult {
+    /// whether water application can extinguish the scenario's fire.
+    #[pyo3(get)]
+    pub water_extinguishing: bool,
+    /// whether `blowdown_time_to_target < bare_steel_time_to_critical`.
+    #[pyo3(get)]
+    pub blowdown_faster_than_failure: bool,
+    /// `bare_steel_time_to_critical - blowdown_time_to_target`; positive when blowdown wins.
+    #[pyo3(get)]
+    pub blowdown_margin: PyQty,
+    /// `1 - dedicated_object_demand / general_area_demand`.
+    #[pyo3(get)]
+    pub selective_protection_saving_fraction: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyActiveFireProtectionScreeningResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "ActiveFireProtectionScreeningResult(water_extinguishing={:?}, blowdown_faster_than_failure={:?}, blowdown_margin={:?}, selective_protection_saving_fraction={:?}, {} warning(s))",
+            self.water_extinguishing,
+            self.blowdown_faster_than_failure,
+            self.blowdown_margin,
+            self.selective_protection_saving_fraction,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult> for PyActiveFireProtectionScreeningResult {
+    fn from(r: &azoth_process::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult) -> Self {
+        Self {
+            water_extinguishing: r.water_extinguishing,
+            blowdown_faster_than_failure: r.blowdown_faster_than_failure,
+            blowdown_margin: PyQty { magnitude_si: r.blowdown_margin.value, unit: "s".to_string() },
+            selective_protection_saving_fraction: r.selective_protection_saving_fraction,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.anti_surge_recycle`, transported.
 #[pyclass(
     frozen,
@@ -14083,6 +14134,133 @@ impl From<&azoth_process::models::anti_surge_recycle::AntiSurgeRecycleResult>
                 unit: "m**3/h".to_string(),
             },
             distance_to_surge: r.distance_to_surge,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.api537_flare_flame_model`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Api537FlareFlameModelResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyApi537FlareFlameModelResult {
+    /// `mass_flow heat_of_combustion`.
+    #[pyo3(get)]
+    pub heat_release: PyQty,
+    /// `radiative_fraction heat_release`.
+    #[pyo3(get)]
+    pub radiative_power: PyQty,
+    /// `0.00326 heat_release^0.478`; zero when the heat release is zero.
+    #[pyo3(get)]
+    pub flame_length: PyQty,
+    /// the tilt from vertical in radians, `atan2(wind_speed, exit_velocity)`.
+    #[pyo3(get)]
+    pub flame_tilt: f64,
+    /// `0.5 flame_length sin(flame_tilt)`.
+    #[pyo3(get)]
+    pub flame_center_horizontal: PyQty,
+    /// `stack_height + 0.5 flame_length cos(flame_tilt)`.
+    #[pyo3(get)]
+    pub flame_center_height: PyQty,
+    /// `flame_length sin(flame_tilt)`.
+    #[pyo3(get)]
+    pub flame_tip_horizontal: PyQty,
+    /// `stack_height + flame_length cos(flame_tilt)`.
+    #[pyo3(get)]
+    pub flame_tip_height: PyQty,
+    /// `transmissivity radiative_power / (4 pi r^2)` from the flame centre, with `r^2` floored at `1e-6`.
+    #[pyo3(get)]
+    pub heat_flux_at_ground_distance: PyQty,
+    /// one row per target flux, in the caller's order.
+    #[pyo3(get)]
+    pub sterile_radii: Vec<PySterileRadius>,
+    /// `10 log10(acoustic_efficiency heat_release / 1e-12)` dB; zero when the acoustic power is zero.
+    #[pyo3(get)]
+    pub sound_power_level: f64,
+    /// `sound_power_level - 20 log10(max(sound_distance, 1)) - 11` dB.
+    #[pyo3(get)]
+    pub sound_pressure_level: f64,
+    /// `(radiative_power / (pi max(0.12 flame_length, 0.1) flame_length) / sigma)^0.25`; zero when the flame surface is zero.
+    #[pyo3(get)]
+    pub equivalent_flame_temperature: PyQty,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyApi537FlareFlameModelResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Api537FlareFlameModelResult(heat_release={:?}, radiative_power={:?}, flame_length={:?}, flame_tilt={:?}, flame_center_horizontal={:?}, flame_center_height={:?}, flame_tip_horizontal={:?}, flame_tip_height={:?}, heat_flux_at_ground_distance={:?}, sterile_radii={:?}, sound_power_level={:?}, sound_pressure_level={:?}, equivalent_flame_temperature={:?}, {} warning(s))",
+            self.heat_release,
+            self.radiative_power,
+            self.flame_length,
+            self.flame_tilt,
+            self.flame_center_horizontal,
+            self.flame_center_height,
+            self.flame_tip_horizontal,
+            self.flame_tip_height,
+            self.heat_flux_at_ground_distance,
+            self.sterile_radii,
+            self.sound_power_level,
+            self.sound_pressure_level,
+            self.equivalent_flame_temperature,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::api537_flare_flame_model::Api537FlareFlameModelResult>
+    for PyApi537FlareFlameModelResult
+{
+    fn from(
+        r: &azoth_process::models::api537_flare_flame_model::Api537FlareFlameModelResult,
+    ) -> Self {
+        Self {
+            heat_release: PyQty {
+                magnitude_si: r.heat_release.value,
+                unit: "W".to_string(),
+            },
+            radiative_power: PyQty {
+                magnitude_si: r.radiative_power.value,
+                unit: "W".to_string(),
+            },
+            flame_length: PyQty {
+                magnitude_si: r.flame_length.value,
+                unit: "m".to_string(),
+            },
+            flame_tilt: r.flame_tilt,
+            flame_center_horizontal: PyQty {
+                magnitude_si: r.flame_center_horizontal.value,
+                unit: "m".to_string(),
+            },
+            flame_center_height: PyQty {
+                magnitude_si: r.flame_center_height.value,
+                unit: "m".to_string(),
+            },
+            flame_tip_horizontal: PyQty {
+                magnitude_si: r.flame_tip_horizontal.value,
+                unit: "m".to_string(),
+            },
+            flame_tip_height: PyQty {
+                magnitude_si: r.flame_tip_height.value,
+                unit: "m".to_string(),
+            },
+            heat_flux_at_ground_distance: PyQty {
+                magnitude_si: r.heat_flux_at_ground_distance.value,
+                unit: "W/m**2".to_string(),
+            },
+            sterile_radii: r.sterile_radii.iter().map(PySterileRadius::from).collect(),
+            sound_power_level: r.sound_power_level,
+            sound_pressure_level: r.sound_pressure_level,
+            equivalent_flame_temperature: PyQty {
+                magnitude_si: r.equivalent_flame_temperature.value,
+                unit: "K".to_string(),
+            },
             warnings: transport(&r.warnings),
         }
     }
@@ -14865,6 +15043,119 @@ impl From<&azoth_process::models::cooler::CoolerResult> for PyCoolerResult {
                 magnitude_si: v.value,
                 unit: "K".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.deluge_nozzle_layout`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DelugeNozzleLayoutResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDelugeNozzleLayoutResult {
+    /// `protected_area required_density`.
+    #[pyo3(get)]
+    pub required_flow: PyQty,
+    /// `k sqrt(operating_pressure)`.
+    #[pyo3(get)]
+    pub flow_per_nozzle: PyQty,
+    /// `nozzle_max_spacing^2 coverage_efficiency`.
+    #[pyo3(get)]
+    pub coverage_per_nozzle: PyQty,
+    /// `ceil(required_flow / flow_per_nozzle)`.
+    #[pyo3(get)]
+    pub nozzle_count_from_flow: f64,
+    /// `ceil(protected_area / coverage_per_nozzle)`.
+    #[pyo3(get)]
+    pub nozzle_count_from_coverage: f64,
+    /// the larger of the two criteria's counts.
+    #[pyo3(get)]
+    pub nozzle_count: f64,
+    /// which criterion set the count; a tie is `flow`.
+    #[pyo3(get)]
+    pub governing_criterion: String,
+    /// `sqrt(protected_area / nozzle_count)`.
+    #[pyo3(get)]
+    pub grid_spacing: PyQty,
+    /// `nozzle_count flow_per_nozzle`.
+    #[pyo3(get)]
+    pub delivered_flow: PyQty,
+    /// `delivered_flow / protected_area` in `L/(min m2)`.
+    #[pyo3(get)]
+    pub delivered_density: f64,
+    /// whether the operating pressure meets the nozzle's minimum.
+    #[pyo3(get)]
+    pub pressure_adequate: bool,
+    /// whether the delivered density meets the required one.
+    #[pyo3(get)]
+    pub density_met: bool,
+    /// whether the available clear depth meets the nozzle's requirement.
+    #[pyo3(get)]
+    pub clearance_adequate: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDelugeNozzleLayoutResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DelugeNozzleLayoutResult(required_flow={:?}, flow_per_nozzle={:?}, coverage_per_nozzle={:?}, nozzle_count_from_flow={:?}, nozzle_count_from_coverage={:?}, nozzle_count={:?}, governing_criterion={:?}, grid_spacing={:?}, delivered_flow={:?}, delivered_density={:?}, pressure_adequate={:?}, density_met={:?}, clearance_adequate={:?}, {} warning(s))",
+            self.required_flow,
+            self.flow_per_nozzle,
+            self.coverage_per_nozzle,
+            self.nozzle_count_from_flow,
+            self.nozzle_count_from_coverage,
+            self.nozzle_count,
+            self.governing_criterion,
+            self.grid_spacing,
+            self.delivered_flow,
+            self.delivered_density,
+            self.pressure_adequate,
+            self.density_met,
+            self.clearance_adequate,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::deluge_nozzle_layout::DelugeNozzleLayoutResult>
+    for PyDelugeNozzleLayoutResult
+{
+    fn from(r: &azoth_process::models::deluge_nozzle_layout::DelugeNozzleLayoutResult) -> Self {
+        Self {
+            required_flow: PyQty {
+                magnitude_si: r.required_flow.value,
+                unit: "L/min".to_string(),
+            },
+            flow_per_nozzle: PyQty {
+                magnitude_si: r.flow_per_nozzle.value,
+                unit: "L/min".to_string(),
+            },
+            coverage_per_nozzle: PyQty {
+                magnitude_si: r.coverage_per_nozzle.value,
+                unit: "m**2".to_string(),
+            },
+            nozzle_count_from_flow: r.nozzle_count_from_flow,
+            nozzle_count_from_coverage: r.nozzle_count_from_coverage,
+            nozzle_count: r.nozzle_count,
+            governing_criterion: r.governing_criterion.as_str().to_string(),
+            grid_spacing: PyQty {
+                magnitude_si: r.grid_spacing.value,
+                unit: "m".to_string(),
+            },
+            delivered_flow: PyQty {
+                magnitude_si: r.delivered_flow.value,
+                unit: "L/min".to_string(),
+            },
+            delivered_density: r.delivered_density,
+            pressure_adequate: r.pressure_adequate,
+            density_met: r.density_met,
+            clearance_adequate: r.clearance_adequate,
             warnings: transport(&r.warnings),
         }
     }
@@ -16164,6 +16455,258 @@ impl From<&azoth_process::models::filter::FilterResult> for PyFilterResult {
                 magnitude_si: v.value,
                 unit: "m**2".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.fire_monitor_coverage`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FireMonitorCoverageResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFireMonitorCoverageResult {
+    /// `monitor_count monitor_flow`.
+    #[pyo3(get)]
+    pub total_flow: PyQty,
+    /// `monitor_count pi effective_throw^2 sweep_angle / 360`.
+    #[pyo3(get)]
+    pub swept_area: PyQty,
+    /// `total_flow / target_area` in `L/(min m2)`.
+    #[pyo3(get)]
+    pub nominal_density: f64,
+    /// `fall_height wind_speed / droplet_terminal_velocity`.
+    #[pyo3(get)]
+    pub drift_displacement: PyQty,
+    /// `clamp(1 - drift_displacement / characteristic_dimension, 0, 1)`.
+    #[pyo3(get)]
+    pub wind_coverage_fraction: f64,
+    /// `nominal_density wind_coverage_fraction`.
+    #[pyo3(get)]
+    pub effective_density: f64,
+    /// whether the nominal density meets the requirement.
+    #[pyo3(get)]
+    pub meets_density_still_air: bool,
+    /// whether the effective density meets the requirement.
+    #[pyo3(get)]
+    pub meets_density_in_wind: bool,
+    /// `required_density target_area / wind_coverage_fraction`; absent where the fraction is zero, where the class answers `+Infinity`.
+    #[pyo3(get)]
+    pub flow_needed_for_compliance: Option<PyQty>,
+    /// the class's classification in its priority order: obstructed line of sight, still-air density, wind density, or feasible on density.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFireMonitorCoverageResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FireMonitorCoverageResult(total_flow={:?}, swept_area={:?}, nominal_density={:?}, drift_displacement={:?}, wind_coverage_fraction={:?}, effective_density={:?}, meets_density_still_air={:?}, meets_density_in_wind={:?}, flow_needed_for_compliance={:?}, verdict={:?}, {} warning(s))",
+            self.total_flow,
+            self.swept_area,
+            self.nominal_density,
+            self.drift_displacement,
+            self.wind_coverage_fraction,
+            self.effective_density,
+            self.meets_density_still_air,
+            self.meets_density_in_wind,
+            self.flow_needed_for_compliance,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fire_monitor_coverage::FireMonitorCoverageResult>
+    for PyFireMonitorCoverageResult
+{
+    fn from(r: &azoth_process::models::fire_monitor_coverage::FireMonitorCoverageResult) -> Self {
+        Self {
+            total_flow: PyQty {
+                magnitude_si: r.total_flow.value,
+                unit: "L/min".to_string(),
+            },
+            swept_area: PyQty {
+                magnitude_si: r.swept_area.value,
+                unit: "m**2".to_string(),
+            },
+            nominal_density: r.nominal_density,
+            drift_displacement: PyQty {
+                magnitude_si: r.drift_displacement.value,
+                unit: "m".to_string(),
+            },
+            wind_coverage_fraction: r.wind_coverage_fraction,
+            effective_density: r.effective_density,
+            meets_density_still_air: r.meets_density_still_air,
+            meets_density_in_wind: r.meets_density_in_wind,
+            flow_needed_for_compliance: r.flow_needed_for_compliance.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "L/min".to_string(),
+            }),
+            verdict: r.verdict.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.fire_water_coverage_assessment`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FireWaterCoverageAssessmentResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFireWaterCoverageAssessmentResult {
+    /// `max(0, protected_area - covered_area)`.
+    #[pyo3(get)]
+    pub coverage_gap: PyQty,
+    /// `min(1, covered_area / protected_area)`.
+    #[pyo3(get)]
+    pub coverage_fraction: f64,
+    /// `max(0, required_flow - existing_delivered_flow)`.
+    #[pyo3(get)]
+    pub flow_deficit: PyQty,
+    /// whether the spare supply meets the flow deficit.
+    #[pyo3(get)]
+    pub flow_feasible: bool,
+    /// whether the worst-case margin meets the required one.
+    #[pyo3(get)]
+    pub pressure_feasible: bool,
+    /// the class's classification, in its own priority order.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFireWaterCoverageAssessmentResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FireWaterCoverageAssessmentResult(coverage_gap={:?}, coverage_fraction={:?}, flow_deficit={:?}, flow_feasible={:?}, pressure_feasible={:?}, verdict={:?}, {} warning(s))",
+            self.coverage_gap,
+            self.coverage_fraction,
+            self.flow_deficit,
+            self.flow_feasible,
+            self.pressure_feasible,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult>
+    for PyFireWaterCoverageAssessmentResult
+{
+    fn from(
+        r: &azoth_process::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult,
+    ) -> Self {
+        Self {
+            coverage_gap: PyQty {
+                magnitude_si: r.coverage_gap.value,
+                unit: "m**2".to_string(),
+            },
+            coverage_fraction: r.coverage_fraction,
+            flow_deficit: PyQty {
+                magnitude_si: r.flow_deficit.value,
+                unit: "L/min".to_string(),
+            },
+            flow_feasible: r.flow_feasible,
+            pressure_feasible: r.pressure_feasible,
+            verdict: r.verdict.as_str().to_string(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.fire_water_demand`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FireWaterDemandResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFireWaterDemandResult {
+    /// `protected_area application_rate`.
+    #[pyo3(get)]
+    pub area_demand: PyQty,
+    /// the sum of the objects' `surface rate`, in list order.
+    #[pyo3(get)]
+    pub object_demand: PyQty,
+    /// `(area_demand + object_demand) simultaneous_area_factor`.
+    #[pyo3(get)]
+    pub total_demand: PyQty,
+    /// `total_demand 60 / 1000`, the class's `totalDemandM3PerHour`.
+    #[pyo3(get)]
+    pub total_demand_m3_per_hour: PyQty,
+    /// `total_demand duration / 60000` with the duration in seconds, the class's `waterVolumeM3`.
+    #[pyo3(get)]
+    pub water_volume: PyQty,
+    /// `water_volume foam_concentrate_percent / 100`.
+    #[pyo3(get)]
+    pub foam_concentrate_volume: PyQty,
+    /// `object_demand / area_demand`; absent where the area demand is zero, where the class answers NaN.
+    #[pyo3(get)]
+    pub object_to_area_demand_ratio: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFireWaterDemandResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FireWaterDemandResult(area_demand={:?}, object_demand={:?}, total_demand={:?}, total_demand_m3_per_hour={:?}, water_volume={:?}, foam_concentrate_volume={:?}, object_to_area_demand_ratio={:?}, {} warning(s))",
+            self.area_demand,
+            self.object_demand,
+            self.total_demand,
+            self.total_demand_m3_per_hour,
+            self.water_volume,
+            self.foam_concentrate_volume,
+            self.object_to_area_demand_ratio,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fire_water_demand::FireWaterDemandResult>
+    for PyFireWaterDemandResult
+{
+    fn from(r: &azoth_process::models::fire_water_demand::FireWaterDemandResult) -> Self {
+        Self {
+            area_demand: PyQty {
+                magnitude_si: r.area_demand.value,
+                unit: "L/min".to_string(),
+            },
+            object_demand: PyQty {
+                magnitude_si: r.object_demand.value,
+                unit: "L/min".to_string(),
+            },
+            total_demand: PyQty {
+                magnitude_si: r.total_demand.value,
+                unit: "L/min".to_string(),
+            },
+            total_demand_m3_per_hour: PyQty {
+                magnitude_si: r.total_demand_m3_per_hour.value,
+                unit: "m**3/h".to_string(),
+            },
+            water_volume: PyQty {
+                magnitude_si: r.water_volume.value,
+                unit: "m**3".to_string(),
+            },
+            foam_concentrate_volume: PyQty {
+                magnitude_si: r.foam_concentrate_volume.value,
+                unit: "m**3".to_string(),
+            },
+            object_to_area_demand_ratio: r.object_to_area_demand_ratio,
             warnings: transport(&r.warnings),
         }
     }

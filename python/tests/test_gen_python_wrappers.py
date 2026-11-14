@@ -96,7 +96,10 @@ BINDING = REPO_ROOT / "crates" / "azoth-python" / "src"
 #: once - the UC curve, the two Q/N curves, the map and the IGV penalty curve.
 #: 64 -> 65 when `process.map_turbo_expander_compressor` brought the same optional `curve`.
 #: 65 -> 66 when `process.separator_performance` brought its two optional curve tables.
-KNOWN_HAND_WRITTEN = 66
+#: 66 -> 67 when `process.fire_water_demand` brought an optional `record_list`: the deriver
+#: handles a required record list (`event_tree.branches`) but leaves an optional one to a
+#: hand wrapper, which is the same reason every entry above is here.
+KNOWN_HAND_WRITTEN = 67
 
 
 def _tools_module(name: str) -> ModuleType:

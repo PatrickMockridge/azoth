@@ -5435,6 +5435,33 @@ pub fn reynolds_number(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Active fire protection screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (scenario, blowdown_time_to_target, bare_steel_time_to_critical, dedicated_object_demand, general_area_demand))]
+#[pyo3(
+    text_signature = "(scenario, blowdown_time_to_target, bare_steel_time_to_critical, dedicated_object_demand, general_area_demand)"
+)]
+pub fn active_fire_protection_screening(
+    py: Python<'_>,
+    scenario: &str,
+    blowdown_time_to_target: f64,
+    bare_steel_time_to_critical: f64,
+    dedicated_object_demand: f64,
+    general_area_demand: f64,
+) -> PyResult<crate::transport_gen::PyActiveFireProtectionScreeningResult> {
+    azoth_process::models::active_fire_protection_screening::active_fire_protection_screening(
+        scenario,
+        seconds(blowdown_time_to_target),
+        seconds(bare_steel_time_to_critical),
+        cubic_meters_per_second(dedicated_object_demand),
+        cubic_meters_per_second(general_area_demand),
+    )
+    .map(|r| crate::transport_gen::PyActiveFireProtectionScreeningResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Anti-surge recycle calculator.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -5497,6 +5524,56 @@ pub fn anti_surge_recycle(
         max_iterations,
     )
     .map(|r| crate::transport_gen::PyAntiSurgeRecycleResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// API 537 flare flame model.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (mass_flow, heat_of_combustion, radiative_fraction, exit_velocity, ground_distance, sound_distance, target_fluxes, stack_height, wind_speed, transmissivity, acoustic_efficiency))]
+#[pyo3(
+    text_signature = "(mass_flow, heat_of_combustion, radiative_fraction, exit_velocity, ground_distance, sound_distance, target_fluxes, stack_height, wind_speed, transmissivity, acoustic_efficiency)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn api537_flare_flame_model(
+    py: Python<'_>,
+    mass_flow: f64,
+    heat_of_combustion: f64,
+    radiative_fraction: f64,
+    exit_velocity: f64,
+    ground_distance: f64,
+    sound_distance: f64,
+    target_fluxes: Vec<crate::records_gen::FlareTargetFlux>,
+    stack_height: Option<f64>,
+    wind_speed: Option<f64>,
+    transmissivity: Option<f64>,
+    acoustic_efficiency: Option<f64>,
+) -> PyResult<crate::transport_gen::PyApi537FlareFlameModelResult> {
+    let target_fluxes_records: Vec<
+        azoth_process::models::api537_flare_flame_model::FlareTargetFlux,
+    > = target_fluxes
+        .into_iter()
+        .map(
+            |row| azoth_process::models::api537_flare_flame_model::FlareTargetFlux {
+                flux: watts_per_square_meter(row.flux),
+            },
+        )
+        .collect();
+    azoth_process::models::api537_flare_flame_model::api537_flare_flame_model(
+        kilograms_per_second(mass_flow),
+        heat_of_combustion,
+        radiative_fraction,
+        meters_per_second(exit_velocity),
+        meters(ground_distance),
+        meters(sound_distance),
+        &target_fluxes_records,
+        stack_height.map(meters),
+        wind_speed.map(meters_per_second),
+        transmissivity,
+        acoustic_efficiency,
+    )
+    .map(|r| crate::transport_gen::PyApi537FlareFlameModelResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -5664,6 +5741,42 @@ pub fn cooler(
         dynamic_outlet_temperature.map(kelvins),
     )
     .map(|r| crate::transport_gen::PyCoolerResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Deluge nozzle layout.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (protected_area, required_density, nozzle_k, nozzle_min_pressure, nozzle_max_spacing, nozzle_clearance, available_clearance, operating_pressure, coverage_efficiency))]
+#[pyo3(
+    text_signature = "(protected_area, required_density, nozzle_k, nozzle_min_pressure, nozzle_max_spacing, nozzle_clearance, available_clearance, operating_pressure, coverage_efficiency)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn deluge_nozzle_layout(
+    py: Python<'_>,
+    protected_area: f64,
+    required_density: f64,
+    nozzle_k: f64,
+    nozzle_min_pressure: f64,
+    nozzle_max_spacing: f64,
+    nozzle_clearance: f64,
+    available_clearance: f64,
+    operating_pressure: Option<f64>,
+    coverage_efficiency: Option<f64>,
+) -> PyResult<crate::transport_gen::PyDelugeNozzleLayoutResult> {
+    azoth_process::models::deluge_nozzle_layout::deluge_nozzle_layout(
+        square_meters(protected_area),
+        required_density,
+        nozzle_k,
+        pascals(nozzle_min_pressure),
+        meters(nozzle_max_spacing),
+        meters(nozzle_clearance),
+        meters(available_clearance),
+        operating_pressure.map(pascals),
+        coverage_efficiency,
+    )
+    .map(|r| crate::transport_gen::PyDelugeNozzleLayoutResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -5869,6 +5982,78 @@ pub fn expander(
         mechanical_design,
     )
     .map(|r| crate::transport_gen::PyExpanderResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Fire monitor coverage.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (target_area, required_density, monitor_count, monitor_flow, effective_throw, sweep_angle, wind_speed, fall_height, droplet_terminal_velocity, characteristic_dimension, line_of_sight_obstructed))]
+#[pyo3(
+    text_signature = "(target_area, required_density, monitor_count, monitor_flow, effective_throw, sweep_angle, wind_speed, fall_height, droplet_terminal_velocity, characteristic_dimension, line_of_sight_obstructed)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn fire_monitor_coverage(
+    py: Python<'_>,
+    target_area: f64,
+    required_density: f64,
+    monitor_count: Option<f64>,
+    monitor_flow: Option<f64>,
+    effective_throw: Option<f64>,
+    sweep_angle: Option<f64>,
+    wind_speed: Option<f64>,
+    fall_height: Option<f64>,
+    droplet_terminal_velocity: Option<f64>,
+    characteristic_dimension: Option<f64>,
+    line_of_sight_obstructed: Option<bool>,
+) -> PyResult<crate::transport_gen::PyFireMonitorCoverageResult> {
+    azoth_process::models::fire_monitor_coverage::fire_monitor_coverage(
+        square_meters(target_area),
+        required_density,
+        monitor_count,
+        monitor_flow.map(cubic_meters_per_second),
+        effective_throw.map(meters),
+        sweep_angle,
+        wind_speed.map(meters_per_second),
+        fall_height.map(meters),
+        droplet_terminal_velocity.map(meters_per_second),
+        characteristic_dimension.map(meters),
+        line_of_sight_obstructed,
+    )
+    .map(|r| crate::transport_gen::PyFireMonitorCoverageResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Fire-water coverage assessment.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (protected_area, required_flow, spare_supply_flow, worst_case_pressure_margin, covered_area, existing_delivered_flow, required_pressure_margin))]
+#[pyo3(
+    text_signature = "(protected_area, required_flow, spare_supply_flow, worst_case_pressure_margin, covered_area, existing_delivered_flow, required_pressure_margin)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn fire_water_coverage_assessment(
+    py: Python<'_>,
+    protected_area: f64,
+    required_flow: f64,
+    spare_supply_flow: f64,
+    worst_case_pressure_margin: f64,
+    covered_area: Option<f64>,
+    existing_delivered_flow: Option<f64>,
+    required_pressure_margin: Option<f64>,
+) -> PyResult<crate::transport_gen::PyFireWaterCoverageAssessmentResult> {
+    azoth_process::models::fire_water_coverage_assessment::fire_water_coverage_assessment(
+        square_meters(protected_area),
+        cubic_meters_per_second(required_flow),
+        cubic_meters_per_second(spare_supply_flow),
+        pascals(worst_case_pressure_margin),
+        covered_area.map(square_meters),
+        existing_delivered_flow.map(cubic_meters_per_second),
+        required_pressure_margin.map(pascals),
+    )
+    .map(|r| crate::transport_gen::PyFireWaterCoverageAssessmentResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

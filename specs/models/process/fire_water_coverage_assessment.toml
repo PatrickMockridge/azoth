@@ -1,0 +1,111 @@
+id = "process.fire_water_coverage_assessment"
+name = "Fire-water coverage assessment"
+kind = "procedure"
+assumptions = [
+    "**the three questions are asked in the class's order**: coverage, then flow, then pressure, because the routes to a fix have different costs.",
+    "**the gap is `max(0, protected_area - covered_area)`, the fraction `min(1, covered_area / protected_area)` and the deficit `max(0, required_flow - existing_delivered_flow)`**.",
+    "**flow is feasible when `spare_supply_flow >= flow_deficit` and pressure when `worst_case_pressure_margin >= required_pressure_margin`**; both are comparisons, not arithmetic.",
+    "**the verdict is the class's priority**: no gap is `compliant`; both infeasible is `dedicated_supply_required`; a pressure deficit alone is `supply_pressure_deficit`; a flow deficit alone is `supply_flow_deficit`; otherwise `coverage_gap_supply_adequate`.",
+    "**an unknown supply is not a verdict**: the class's NaN spare flow or pressure margin reads as feasible (NeqSim `#5017`), and the port requires both so that an unset supply cannot pass.",
+    "**the recommendation is presentation**: `recommendation()` is the only reader of the serving section's name, and the verdict carries the classification.",
+    "**the flows are dimensionless `L/min`** because the vocabulary has no such rate unit; the pressure margins are in bar and the areas in `m2`.",
+]
+references = [
+    "NORSOK S-001 (2018). Technical safety, fire-water systems, simultaneous demand and pressure margin.",
+    "NFPA 15 (2022). Standard for Water Spray Fixed Systems for Fire Protection.",
+    "ISO 13702 (2015). Petroleum and natural gas industries - Control and mitigation of fires and explosions on offshore production installations.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/firewater/FireWaterCoverageAssessment.java` is the port source.",
+    "`validation/neqsim/captures/process_fire_water_coverage_assessment.tsv` - the class's four tests, a coverage gap with supply in hand, the unset-supply state and the setter refusals.",
+]
+[source]
+standard = "NeqSim process/safety/firewater/FireWaterCoverageAssessment.java"
+edition = "Its `coverageGapM2`, `coverageFraction`, `flowDeficitLpm`, `isFlowFeasible`, `isPressureFeasible` and `verdict`."
+[algorithm]
+scheme = "closed_form_fire_water_coverage_assessment"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.protected_area]
+unit = "m**2"
+description = "the protected area, above zero.\n"
+[inputs.required_flow]
+unit = "L/min"
+description = "the area's required fire-water flow, above zero.\n"
+[inputs.spare_supply_flow]
+unit = "L/min"
+description = "the supply flow available to the area, which may be **negative**: a deficit in the governing simultaneous case. Required.\n"
+[inputs.worst_case_pressure_margin]
+unit = "bar"
+description = "the serving section's worst-case pressure margin, which may be **negative**. Required.\n"
+[inputs.covered_area]
+unit = "m**2"
+optional = true
+description = "the area already protected, at least zero. **Absent is 0.**\n"
+[inputs.existing_delivered_flow]
+unit = "L/min"
+optional = true
+description = "the flow the existing system already delivers to the area, at least zero. **Absent is 0.**\n"
+[inputs.required_pressure_margin]
+unit = "bar"
+optional = true
+description = "the pressure margin the new demand needs, at least zero. **Absent is 0.**\n"
+[outputs]
+[outputs.coverage_gap]
+unit = "m**2"
+description = "`max(0, protected_area - covered_area)`.\n"
+[outputs.coverage_fraction]
+unit = "dimensionless"
+description = "`min(1, covered_area / protected_area)`.\n"
+[outputs.flow_deficit]
+unit = "L/min"
+description = "`max(0, required_flow - existing_delivered_flow)`.\n"
+[outputs.flow_feasible]
+type = "boolean"
+description = "whether the spare supply meets the flow deficit.\n"
+[outputs.pressure_feasible]
+type = "boolean"
+description = "whether the worst-case margin meets the required one.\n"
+[outputs.verdict]
+type = "enum"
+values = [
+    "compliant",
+    "coverage_gap_supply_adequate",
+    "supply_flow_deficit",
+    "supply_pressure_deficit",
+    "dedicated_supply_required",
+]
+description = "the class's classification, in its own priority order.\n"
+[[valid_range]]
+quantity = "protected_area"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive protected area"
+[[valid_range]]
+quantity = "required_flow"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive required flow"
+[[valid_range]]
+quantity = "covered_area"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class's setter refuses a negative covered area"
+[[valid_range]]
+quantity = "existing_delivered_flow"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class's setter refuses a negative delivered flow"
+[[valid_range]]
+quantity = "required_pressure_margin"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class's setter refuses a negative required margin"
+[implementations]
+python = "azoth.process.fire_water_coverage_assessment"
+rust = "azoth_process::fire_water_coverage_assessment"

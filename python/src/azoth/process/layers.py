@@ -1417,6 +1417,232 @@ def _pfp_demand(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _fire_water_demand(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fire_water_demand`'s layers, from the reference's own arithmetic.
+
+    The class works in `L/min` and `m3/h`; the solution is SI, and the capture's keys are
+    the class's units. The ratio is omitted where the class answers NaN.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.fire_water_demand import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    rows = [
+        {
+            "surface_area": quantity(float(row["surface_area"]), "m**2"),
+            "application_rate": float(row["application_rate"]),
+        }
+        for row in inputs.get("protected_objects", [])
+    ]
+    solution, _ = _evaluate(
+        quantity(float(inputs["protected_area"]), "m**2"),
+        application_rate=None
+        if inputs.get("application_rate") is None
+        else float(inputs["application_rate"]),
+        duration=optional("duration", "s"),
+        foam_concentrate_percent=None
+        if inputs.get("foam_concentrate_percent") is None
+        else float(inputs["foam_concentrate_percent"]),
+        simultaneous_area_factor=None
+        if inputs.get("simultaneous_area_factor") is None
+        else float(inputs["simultaneous_area_factor"]),
+        protected_objects=rows,
+    )
+    dumped: dict[str, float] = {
+        "area_demand_lpm": solution.area_demand * 60000.0,
+        "object_demand_lpm": solution.object_demand * 60000.0,
+        "total_demand_lpm": solution.total_demand * 60000.0,
+        "total_demand_m3_per_hour": solution.total_demand_m3_per_hour * 3600.0,
+        "water_volume_m3": solution.water_volume,
+        "foam_concentrate_volume_m3": solution.foam_concentrate_volume,
+    }
+    if solution.ratio is not None:
+        dumped["object_to_area_demand_ratio"] = solution.ratio
+    return dumped
+
+
+def _deluge_nozzle_layout(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.deluge_nozzle_layout`'s layers, from the reference's own arithmetic.
+
+    The criterion and the three flags are the model's own words, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.deluge_nozzle_layout import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    efficiency = inputs.get("coverage_efficiency")
+    solution, _ = _evaluate(
+        quantity(float(inputs["protected_area"]), "m**2"),
+        float(inputs["required_density"]),
+        float(inputs["nozzle_k"]),
+        quantity(float(inputs["nozzle_min_pressure"]), "bar"),
+        quantity(float(inputs["nozzle_max_spacing"]), "m"),
+        quantity(float(inputs["nozzle_clearance"]), "m"),
+        quantity(float(inputs["available_clearance"]), "m"),
+        operating_pressure=optional("operating_pressure", "bar"),
+        coverage_efficiency=None if efficiency is None else float(efficiency),
+    )
+    return {
+        "required_flow_lpm": solution.required_flow * 60000.0,
+        "flow_per_nozzle_lpm": solution.flow_per_nozzle * 60000.0,
+        "coverage_per_nozzle_m2": solution.coverage_per_nozzle,
+        "nozzle_count_from_flow": solution.count_from_flow,
+        "nozzle_count_from_coverage": solution.count_from_coverage,
+        "nozzle_count": solution.nozzle_count,
+        "grid_spacing_m": solution.grid,
+        "delivered_flow_lpm": solution.delivered_flow * 60000.0,
+        "delivered_density_lpm_m2": solution.delivered_density,
+    }
+
+
+def _fire_monitor_coverage(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fire_monitor_coverage`'s layers, from the reference's own arithmetic.
+
+    The verdict and the two predicates are the model's own words, asserted by its test and
+    the cross-impl comparison rather than dumped here. The flow needed is omitted where the
+    drift leaves no coverage, the class's `+Infinity`.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.fire_monitor_coverage import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    count = inputs.get("monitor_count")
+    sweep = inputs.get("sweep_angle")
+    solution, _ = _evaluate(
+        quantity(float(inputs["target_area"]), "m**2"),
+        float(inputs["required_density"]),
+        monitor_count=None if count is None else float(count),
+        monitor_flow=optional("monitor_flow", "L/min"),
+        effective_throw=optional("effective_throw", "m"),
+        sweep_angle=None if sweep is None else float(sweep),
+        wind_speed=optional("wind_speed", "m/s"),
+        fall_height=optional("fall_height", "m"),
+        droplet_terminal_velocity=optional("droplet_terminal_velocity", "m/s"),
+        characteristic_dimension=optional("characteristic_dimension", "m"),
+        line_of_sight_obstructed=inputs.get("line_of_sight_obstructed"),
+    )
+    dumped: dict[str, float] = {
+        "total_flow_lpm": solution.total_flow * 60000.0,
+        "swept_area_m2": solution.swept_area,
+        "nominal_density_lpm_m2": solution.nominal_density,
+        "drift_displacement_m": solution.drift,
+        "wind_coverage_fraction": solution.fraction,
+        "effective_density_lpm_m2": solution.effective_density,
+    }
+    if solution.needed is not None:
+        dumped["flow_needed_for_compliance_lpm"] = solution.needed * 60000.0
+    return dumped
+
+
+def _fire_water_coverage_assessment(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fire_water_coverage_assessment`'s layers, from the reference's arithmetic.
+
+    The verdict and the two flags are the model's own words, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.fire_water_coverage_assessment import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["protected_area"]), "m**2"),
+        quantity(float(inputs["required_flow"]), "L/min"),
+        quantity(float(inputs["spare_supply_flow"]), "L/min"),
+        quantity(float(inputs["worst_case_pressure_margin"]), "bar"),
+        covered_area=optional("covered_area", "m**2"),
+        existing_delivered_flow=optional("existing_delivered_flow", "L/min"),
+        required_pressure_margin=optional("required_pressure_margin", "bar"),
+    )
+    return {
+        "coverage_gap_m2": solution.gap,
+        "coverage_fraction": solution.fraction,
+        "flow_deficit_lpm": solution.deficit * 60000.0,
+    }
+
+
+def _active_fire_protection_screening(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.active_fire_protection_screening`'s layers, from the reference's arithmetic.
+
+    The two flags are the model's own words, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.active_fire_protection_screening import _evaluate
+
+    solution, _ = _evaluate(
+        str(inputs["scenario"]),
+        quantity(float(inputs["blowdown_time_to_target"]), "s"),
+        quantity(float(inputs["bare_steel_time_to_critical"]), "s"),
+        quantity(float(inputs["dedicated_object_demand"]), "L/min"),
+        quantity(float(inputs["general_area_demand"]), "L/min"),
+    )
+    return {
+        "blowdown_margin_s": solution.margin,
+        "selective_protection_saving_fraction": solution.saving,
+    }
+
+
+def _api537_flare_flame_model(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.api537_flare_flame_model`'s layers, from the reference's own arithmetic.
+
+    The sterile zones are a record list; the capture prints one radius per target in the
+    caller's order, so the dump flattens the same way.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.api537_flare_flame_model import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    targets = [{"flux": quantity(float(row["flux"]), "W/m**2")} for row in inputs["target_fluxes"]]
+    tau = inputs.get("transmissivity")
+    eta = inputs.get("acoustic_efficiency")
+    solution, _ = _evaluate(
+        quantity(float(inputs["mass_flow"]), "kg/s"),
+        float(inputs["heat_of_combustion"]),
+        float(inputs["radiative_fraction"]),
+        quantity(float(inputs["exit_velocity"]), "m/s"),
+        quantity(float(inputs["ground_distance"]), "m"),
+        quantity(float(inputs["sound_distance"]), "m"),
+        targets,
+        stack_height=optional("stack_height", "m"),
+        wind_speed=optional("wind_speed", "m/s"),
+        transmissivity=None if tau is None else float(tau),
+        acoustic_efficiency=None if eta is None else float(eta),
+    )
+    dumped: dict[str, float] = {
+        "heat_release_w": solution.heat_release,
+        "radiative_power_w": solution.radiative_power,
+        "flame_length_m": solution.length,
+        "flame_tilt_rad": solution.tilt,
+        "flame_center_horizontal_m": solution.center_horizontal,
+        "flame_center_height_m": solution.center_height,
+        "flame_tip_horizontal_m": solution.tip_horizontal,
+        "flame_tip_height_m": solution.tip_height,
+        "heat_flux_at_ground_distance_w_m2": solution.flux,
+        "sound_power_level_db": solution.pwl,
+        "sound_pressure_level_db": solution.spl,
+        "equivalent_flame_temperature_k": solution.temperature,
+    }
+    for index, (_, radius) in enumerate(solution.sterile):
+        dumped[f"sterile_radius_{index}_m"] = radius
+    return dumped
+
+
 def _vce(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.vce`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -1889,6 +2115,12 @@ DUMPERS: dict[str, Dumper] = {
     "process.consequence_analysis": _consequence_analysis,
     "process.jet_fire": _jet_fire,
     "process.pfp_demand": _pfp_demand,
+    "process.fire_water_demand": _fire_water_demand,
+    "process.deluge_nozzle_layout": _deluge_nozzle_layout,
+    "process.fire_monitor_coverage": _fire_monitor_coverage,
+    "process.fire_water_coverage_assessment": _fire_water_coverage_assessment,
+    "process.active_fire_protection_screening": _active_fire_protection_screening,
+    "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -2605,6 +2837,286 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_pfp_demand.tsv",
         block=8,
         identified_by=("#label", "pfp_overrides"),
+    ),
+    # The fire-water demand's seven: the class's tests, the vessel surface, the ratio and the
+    # zero area demand. The accepted negative object and the six refusals are uncased.
+    LayerCase(
+        model="process.fire_water_demand",
+        case="area_demand_follows_application_rate",
+        capture="process_fire_water_demand.tsv",
+        block=0,
+        identified_by=("#label", "fwd_area_demand"),
+    ),
+    LayerCase(
+        model="process.fire_water_demand",
+        case="wellhead_rate_is_double_the_process_area_rate",
+        capture="process_fire_water_demand.tsv",
+        block=1,
+        identified_by=("#label", "fwd_wellhead_rate"),
+    ),
+    LayerCase(
+        model="process.fire_water_demand",
+        case="horizontal_vessel_surface_is_shell_and_ends",
+        capture="process_fire_water_demand.tsv",
+        block=2,
+        identified_by=("#label", "fwd_horizontal_vessel"),
+    ),
+    LayerCase(
+        model="process.fire_water_demand",
+        case="selective_object_protection_ratio",
+        capture="process_fire_water_demand.tsv",
+        block=3,
+        identified_by=("#label", "fwd_selective_object"),
+    ),
+    LayerCase(
+        model="process.fire_water_demand",
+        case="foam_concentrate_scales_with_water_volume",
+        capture="process_fire_water_demand.tsv",
+        block=4,
+        identified_by=("#label", "fwd_foam"),
+    ),
+    LayerCase(
+        model="process.fire_water_demand",
+        case="simultaneous_release_factor_multiplies_the_demand",
+        capture="process_fire_water_demand.tsv",
+        block=5,
+        identified_by=("#label", "fwd_simultaneous"),
+    ),
+    LayerCase(
+        model="process.fire_water_demand",
+        case="zero_area_demand_has_no_ratio",
+        capture="process_fire_water_demand.tsv",
+        block=6,
+        identified_by=("#label", "fwd_zero_area_ratio"),
+    ),
+    # The deluge layout's six: the three nozzle factories, the low pressure, the reduced
+    # efficiency and the failed clearance. The eight refusals are uncased.
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="high_velocity_nozzles_are_coverage_governed",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=0,
+        identified_by=("#label", "dnl_high_velocity"),
+    ),
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="high_capacity_nozzles_are_coverage_governed",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=1,
+        identified_by=("#label", "dnl_high_capacity"),
+    ),
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="medium_velocity_nozzles_are_flow_governed",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=2,
+        identified_by=("#label", "dnl_medium_velocity"),
+    ),
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="a_pressure_below_the_nozzle_minimum_is_flagged",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=3,
+        identified_by=("#label", "dnl_low_pressure"),
+    ),
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="a_reduced_coverage_efficiency_adds_nozzles",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=4,
+        identified_by=("#label", "dnl_efficiency"),
+    ),
+    LayerCase(
+        model="process.deluge_nozzle_layout",
+        case="the_clearance_check_uses_the_nozzle_requirement",
+        capture="process_deluge_nozzle_layout.tsv",
+        block=5,
+        identified_by=("#label", "dnl_clearance_fails"),
+    ),
+    # The monitor coverage's nine: the class's three tests, a marginal and a feasible state,
+    # the compliance flow, the all-drift state and the stated dimension. The eleven setter
+    # refusals are uncased.
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="a_large_deck_monitor_is_not_suitable",
+        capture="process_fire_monitor_coverage.tsv",
+        block=0,
+        identified_by=("#label", "fmc_large_deck"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="still_air_coverage_is_full",
+        capture="process_fire_monitor_coverage.tsv",
+        block=1,
+        identified_by=("#label", "fmc_wind_still"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="wind_drift_removes_the_coverage",
+        capture="process_fire_monitor_coverage.tsv",
+        block=2,
+        identified_by=("#label", "fmc_wind_drift"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="an_obstructed_line_of_sight_disqualifies_a_monitor",
+        capture="process_fire_monitor_coverage.tsv",
+        block=3,
+        identified_by=("#label", "fmc_obstructed"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="a_wind_limited_density_is_marginal",
+        capture="process_fire_monitor_coverage.tsv",
+        block=4,
+        identified_by=("#label", "fmc_marginal"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="a_small_drift_leaves_the_density_feasible",
+        capture="process_fire_monitor_coverage.tsv",
+        block=5,
+        identified_by=("#label", "fmc_feasible"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="the_flow_needed_for_compliance_scales_with_the_fraction",
+        capture="process_fire_monitor_coverage.tsv",
+        block=6,
+        identified_by=("#label", "fmc_flow_needed"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="drift_can_remove_every_bit_of_the_coverage",
+        capture="process_fire_monitor_coverage.tsv",
+        block=7,
+        identified_by=("#label", "fmc_drift_removes_coverage"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="a_stated_dimension_replaces_the_area_root",
+        capture="process_fire_monitor_coverage.tsv",
+        block=8,
+        identified_by=("#label", "fmc_characteristic_dimension"),
+    ),
+    # The coverage assessment's five: the class's four tests and the coverage gap with the
+    # supply in hand. The unset-supply state and the five refusals are uncased.
+    LayerCase(
+        model="process.fire_water_coverage_assessment",
+        case="no_flow_and_no_pressure_margin_routes_to_a_dedicated_supply",
+        capture="process_fire_water_coverage_assessment.tsv",
+        block=0,
+        identified_by=("#label", "fwca_dedicated_supply"),
+    ),
+    LayerCase(
+        model="process.fire_water_coverage_assessment",
+        case="a_pressure_deficit_alone_is_distinguished",
+        capture="process_fire_water_coverage_assessment.tsv",
+        block=1,
+        identified_by=("#label", "fwca_pressure_deficit"),
+    ),
+    LayerCase(
+        model="process.fire_water_coverage_assessment",
+        case="a_flow_deficit_alone_is_distinguished",
+        capture="process_fire_water_coverage_assessment.tsv",
+        block=2,
+        identified_by=("#label", "fwca_flow_deficit"),
+    ),
+    LayerCase(
+        model="process.fire_water_coverage_assessment",
+        case="a_fully_covered_area_is_compliant",
+        capture="process_fire_water_coverage_assessment.tsv",
+        block=3,
+        identified_by=("#label", "fwca_compliant"),
+    ),
+    LayerCase(
+        model="process.fire_water_coverage_assessment",
+        case="a_coverage_gap_with_supply_in_hand",
+        capture="process_fire_water_coverage_assessment.tsv",
+        block=4,
+        identified_by=("#label", "fwca_coverage_gap"),
+    ),
+    # The protection screening's five: the class's scenario pair, the two further scenarios
+    # and the slower blowdown. The NaN-time and negative-demand states are uncased.
+    LayerCase(
+        model="process.active_fire_protection_screening",
+        case="a_gas_jet_fire_is_not_extinguishable_but_blowdown_wins",
+        capture="process_active_fire_protection_screening.tsv",
+        block=0,
+        identified_by=("#label", "afps_gas_jet"),
+    ),
+    LayerCase(
+        model="process.active_fire_protection_screening",
+        case="a_liquid_pool_fire_is_extinguishable",
+        capture="process_active_fire_protection_screening.tsv",
+        block=1,
+        identified_by=("#label", "afps_pool_fire"),
+    ),
+    LayerCase(
+        model="process.active_fire_protection_screening",
+        case="a_two_phase_jet_fire_is_not_extinguishable",
+        capture="process_active_fire_protection_screening.tsv",
+        block=2,
+        identified_by=("#label", "afps_two_phase_jet"),
+    ),
+    LayerCase(
+        model="process.active_fire_protection_screening",
+        case="an_ordinary_combustible_fire_is_extinguishable",
+        capture="process_active_fire_protection_screening.tsv",
+        block=3,
+        identified_by=("#label", "afps_ordinary_combustible"),
+    ),
+    LayerCase(
+        model="process.active_fire_protection_screening",
+        case="a_slower_blowdown_leaves_a_negative_margin",
+        capture="process_active_fire_protection_screening.tsv",
+        block=4,
+        identified_by=("#label", "afps_slower_blowdown"),
+    ),
+    # The flare flame's six: the class's test state, the still-air pair, the windy and the
+    # documentation example, the zero flow and the reduced transmissivity. The three clamps,
+    # the negative stack and the five refusals are uncased.
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="the_flame_length_and_sterile_zones",
+        capture="process_api537_flare_flame.tsv",
+        block=0,
+        identified_by=("#label", "api537_flame_length"),
+    ),
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="no_wind_leaves_the_tip_vertical",
+        capture="process_api537_flare_flame.tsv",
+        block=1,
+        identified_by=("#label", "api537_no_wind"),
+    ),
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="a_wind_tilts_the_flame_and_moves_the_sterile_zones",
+        capture="process_api537_flare_flame.tsv",
+        block=2,
+        identified_by=("#label", "api537_wind"),
+    ),
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="the_documentation_example",
+        capture="process_api537_flare_flame.tsv",
+        block=3,
+        identified_by=("#label", "api537_doc_example"),
+    ),
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="a_zero_mass_flow_publishes_zeroes",
+        capture="process_api537_flare_flame.tsv",
+        block=4,
+        identified_by=("#label", "api537_zero_flow"),
+    ),
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="a_reduced_transmissivity_halves_the_flux",
+        capture="process_api537_flare_flame.tsv",
+        block=5,
+        identified_by=("#label", "api537_transmissivity"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -3821,6 +4333,23 @@ UNCASED_ROWS: dict[str, int] = {
     # The PFP demand's nine: the two non-physical temperature states the port refuses, and
     # the class's seven constructor and setter refusals.
     "process_pfp_demand.tsv": 9,
+    # The fire-water demand's seven: the accepted negative object, and the class's
+    # constructor, setter and vessel refusals.
+    "process_fire_water_demand.tsv": 7,
+    # The deluge layout's eight: the class's constructor, pressure, efficiency and nozzle
+    # refusals.
+    "process_deluge_nozzle_layout.tsv": 8,
+    # The monitor coverage's eleven: the constructor and each setter's refusal.
+    "process_fire_monitor_coverage.tsv": 11,
+    # The coverage assessment's six: the unset-supply state, where the class's NaN defaults
+    # read as feasible, and the constructor and setter refusals.
+    "process_fire_water_coverage_assessment.tsv": 6,
+    # The protection screening's five: the class's NaN times, the negative demand its setter
+    # accepts, and the three constructor refusals.
+    "process_active_fire_protection_screening.tsv": 5,
+    # The flare flame's nine: the three clamp states, the negative stack the class accepts,
+    # and the five constructor and method refusals.
+    "process_api537_flare_flame.tsv": 9,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

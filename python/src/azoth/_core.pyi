@@ -404,6 +404,11 @@ class CompressorSurgePoint(TypedDict):
     flow: float
     head: float
 
+class FlareTargetFlux(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    flux: float
+
 class DepositMass(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -455,6 +460,12 @@ class FilterBetaPoint(TypedDict):
 
     particle_size: float
     beta_ratio: float
+
+class ProtectedObject(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    surface_area: float
+    application_rate: float
 
 class MapCurvePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -744,6 +755,13 @@ class WaterMixingResult:
     si_srso4: float | None
     si_caso4: float | None
     si_feco3: float | None
+
+@final
+class SterileRadius:
+    """one row per target flux, in the caller's order."""
+
+    flux: Qty
+    radius: Qty
 
 @final
 class ConsequenceOutcomeResult:
@@ -2856,6 +2874,14 @@ class AbsorptionColumnResult:
     warnings: list[Warning]
 
 @final
+class ActiveFireProtectionScreeningResult:
+    water_extinguishing: bool
+    blowdown_faster_than_failure: bool
+    blowdown_margin: Qty
+    selective_protection_saving_fraction: float
+    warnings: list[Warning]
+
+@final
 class AntiSurgeRecycleResult:
     recycle_active: bool
     converged: bool
@@ -2865,6 +2891,23 @@ class AntiSurgeRecycleResult:
     surge_flow: Qty
     control_flow: Qty
     distance_to_surge: float
+    warnings: list[Warning]
+
+@final
+class Api537FlareFlameModelResult:
+    heat_release: Qty
+    radiative_power: Qty
+    flame_length: Qty
+    flame_tilt: float
+    flame_center_horizontal: Qty
+    flame_center_height: Qty
+    flame_tip_horizontal: Qty
+    flame_tip_height: Qty
+    heat_flux_at_ground_distance: Qty
+    sterile_radii: list[SterileRadius]
+    sound_power_level: float
+    sound_pressure_level: float
+    equivalent_flame_temperature: Qty
     warnings: list[Warning]
 
 @final
@@ -2974,6 +3017,23 @@ class CoolerResult:
     outlet_duty: Qty
     cooling_valve_opening: float | None
     equilibrium_outlet_temperature: Qty | None
+    warnings: list[Warning]
+
+@final
+class DelugeNozzleLayoutResult:
+    required_flow: Qty
+    flow_per_nozzle: Qty
+    coverage_per_nozzle: Qty
+    nozzle_count_from_flow: float
+    nozzle_count_from_coverage: float
+    nozzle_count: float
+    governing_criterion: str
+    grid_spacing: Qty
+    delivered_flow: Qty
+    delivered_density: float
+    pressure_adequate: bool
+    density_met: bool
+    clearance_adequate: bool
     warnings: list[Warning]
 
 @final
@@ -3153,6 +3213,41 @@ class FilterResult:
     collapse_pressure_utilization: float | None
     differential_pressure_design_acceptable: bool | None
     design_media_area: Qty | None
+    warnings: list[Warning]
+
+@final
+class FireMonitorCoverageResult:
+    total_flow: Qty
+    swept_area: Qty
+    nominal_density: float
+    drift_displacement: Qty
+    wind_coverage_fraction: float
+    effective_density: float
+    meets_density_still_air: bool
+    meets_density_in_wind: bool
+    flow_needed_for_compliance: Qty | None
+    verdict: str
+    warnings: list[Warning]
+
+@final
+class FireWaterCoverageAssessmentResult:
+    coverage_gap: Qty
+    coverage_fraction: float
+    flow_deficit: Qty
+    flow_feasible: bool
+    pressure_feasible: bool
+    verdict: str
+    warnings: list[Warning]
+
+@final
+class FireWaterDemandResult:
+    area_demand: Qty
+    object_demand: Qty
+    total_demand: Qty
+    total_demand_m3_per_hour: Qty
+    water_volume: Qty
+    foam_concentrate_volume: Qty
+    object_to_area_demand_ratio: float | None
     warnings: list[Warning]
 
 @final
@@ -6340,6 +6435,13 @@ def absorption_column(
     material_grade: str | None = None,
     max_operation_pressure: float | None = None,
 ) -> AbsorptionColumnResult: ...
+def active_fire_protection_screening(
+    scenario: str,
+    blowdown_time_to_target: float,
+    bare_steel_time_to_critical: float,
+    dedicated_object_demand: float,
+    general_area_demand: float,
+) -> ActiveFireProtectionScreeningResult: ...
 def anti_surge_recycle(
     components: list[str],
     feed_n: float,
@@ -6355,6 +6457,19 @@ def anti_surge_recycle(
     tolerance: float | None = None,
     max_iterations: float | None = None,
 ) -> AntiSurgeRecycleResult: ...
+def api537_flare_flame_model(
+    mass_flow: float,
+    heat_of_combustion: float,
+    radiative_fraction: float,
+    exit_velocity: float,
+    ground_distance: float,
+    sound_distance: float,
+    target_fluxes: list[FlareTargetFlux],
+    stack_height: float | None = None,
+    wind_speed: float | None = None,
+    transmissivity: float | None = None,
+    acoustic_efficiency: float | None = None,
+) -> Api537FlareFlameModelResult: ...
 def bleve(
     fuel_mass: float,
     heat_of_combustion: float,
@@ -6431,6 +6546,17 @@ def cooler(
     requested_valve_opening: float | None = None,
     dynamic_outlet_temperature: float | None = None,
 ) -> CoolerResult: ...
+def deluge_nozzle_layout(
+    protected_area: float,
+    required_density: float,
+    nozzle_k: float,
+    nozzle_min_pressure: float,
+    nozzle_max_spacing: float,
+    nozzle_clearance: float,
+    available_clearance: float,
+    operating_pressure: float | None = None,
+    coverage_efficiency: float | None = None,
+) -> DelugeNozzleLayoutResult: ...
 def distillation_column(
     components: list[str],
     feed_n: float,
@@ -6579,6 +6705,36 @@ def filter(
     element_collapse_pressure: float | None = None,
     element_integrity_verified: bool | None = None,
 ) -> FilterResult: ...
+def fire_monitor_coverage(
+    target_area: float,
+    required_density: float,
+    monitor_count: float | None = None,
+    monitor_flow: float | None = None,
+    effective_throw: float | None = None,
+    sweep_angle: float | None = None,
+    wind_speed: float | None = None,
+    fall_height: float | None = None,
+    droplet_terminal_velocity: float | None = None,
+    characteristic_dimension: float | None = None,
+    line_of_sight_obstructed: bool | None = None,
+) -> FireMonitorCoverageResult: ...
+def fire_water_coverage_assessment(
+    protected_area: float,
+    required_flow: float,
+    spare_supply_flow: float,
+    worst_case_pressure_margin: float,
+    covered_area: float | None = None,
+    existing_delivered_flow: float | None = None,
+    required_pressure_margin: float | None = None,
+) -> FireWaterCoverageAssessmentResult: ...
+def fire_water_demand(
+    protected_area: float,
+    application_rate: float | None = None,
+    duration: float | None = None,
+    foam_concentrate_percent: float | None = None,
+    simultaneous_area_factor: float | None = None,
+    protected_objects: list[ProtectedObject] | None = None,
+) -> FireWaterDemandResult: ...
 def flare(
     components: list[str],
     inlet_n: float,

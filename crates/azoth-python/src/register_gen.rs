@@ -241,17 +241,23 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyReynoldsNumberResult>()?;
     m.add_class::<crate::transport_gen::PyTrayHydraulicsResult>()?;
     m.add_class::<crate::transport_gen::PyAbsorptionColumnResult>()?;
+    m.add_class::<crate::transport_gen::PyActiveFireProtectionScreeningResult>()?;
     m.add_class::<crate::transport_gen::PyAntiSurgeRecycleResult>()?;
+    m.add_class::<crate::transport_gen::PyApi537FlareFlameModelResult>()?;
     m.add_class::<crate::transport_gen::PyBleveResult>()?;
     m.add_class::<crate::transport_gen::PyComponentSplitterResult>()?;
     m.add_class::<crate::transport_gen::PyCompressorResult>()?;
     m.add_class::<crate::transport_gen::PyConsequenceAnalysisResult>()?;
     m.add_class::<crate::transport_gen::PyCoolerResult>()?;
+    m.add_class::<crate::transport_gen::PyDelugeNozzleLayoutResult>()?;
     m.add_class::<crate::transport_gen::PyDistillationColumnResult>()?;
     m.add_class::<crate::transport_gen::PyEjectorResult>()?;
     m.add_class::<crate::transport_gen::PyEventTreeResult>()?;
     m.add_class::<crate::transport_gen::PyExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyFilterResult>()?;
+    m.add_class::<crate::transport_gen::PyFireMonitorCoverageResult>()?;
+    m.add_class::<crate::transport_gen::PyFireWaterCoverageAssessmentResult>()?;
+    m.add_class::<crate::transport_gen::PyFireWaterDemandResult>()?;
     m.add_class::<crate::transport_gen::PyFlareResult>()?;
     m.add_class::<crate::transport_gen::PyGasDispersionResult>()?;
     m.add_class::<crate::transport_gen::PyGasScrubberResult>()?;
@@ -336,6 +342,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyScaleControlRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioChangeRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioIndexRow>()?;
+    m.add_class::<crate::record_outputs_gen::PySterileRadius>()?;
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
     m.add_class::<crate::record_outputs_gen::PyWaterMixingResult>()?;
@@ -877,7 +884,15 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::hydraulics::tray_hydraulics, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::absorption_column, m)?)?;
     m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::active_fire_protection_screening,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::anti_surge_recycle,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::api537_flare_flame_model,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::bleve, m)?)?;
@@ -892,6 +907,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::cooler, m)?)?;
     m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::deluge_nozzle_layout,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::distillation_column,
         m
     )?)?;
@@ -899,6 +918,15 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::event_tree, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::expander, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::filter, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::fire_monitor_coverage,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::fire_water_coverage_assessment,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(crate::process::fire_water_demand, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::flare, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_dispersion, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_scrubber, m)?)?;

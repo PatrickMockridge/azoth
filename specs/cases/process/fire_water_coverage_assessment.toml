@@ -1,0 +1,96 @@
+model = "process.fire_water_coverage_assessment"
+[[cases]]
+id = "no_flow_and_no_pressure_margin_routes_to_a_dedicated_supply"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.negativePressureMarginRoutesToADedicatedSupply`: 510 m2, 5100 L/min, no coverage, no spare, margin -0.9 bar. From `validation/neqsim/captures/process_fire_water_coverage_assessment.tsv` (`fwca_dedicated_supply`)."
+[cases.inputs]
+protected_area = 510.0
+required_flow = 5100.0
+spare_supply_flow = -1000.0
+worst_case_pressure_margin = -0.9
+covered_area = 0.0
+existing_delivered_flow = 0.0
+required_pressure_margin = 0.5
+[cases.expected]
+coverage_gap = 510.0
+coverage_fraction = 0.0
+flow_deficit = 5100.0
+flow_feasible = false
+pressure_feasible = false
+verdict = "dedicated_supply_required"
+[[cases]]
+id = "a_pressure_deficit_alone_is_distinguished"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.pressureDeficitAloneIsDistinguishedFromFlowDeficit`, the pressure half: spare flow in hand but a -0.9 bar worst-case margin. From (`fwca_pressure_deficit`)."
+[cases.inputs]
+protected_area = 510.0
+required_flow = 5100.0
+spare_supply_flow = 20000.0
+worst_case_pressure_margin = -0.9
+covered_area = 0.0
+existing_delivered_flow = 0.0
+required_pressure_margin = 0.5
+[cases.expected]
+coverage_gap = 510.0
+coverage_fraction = 0.0
+flow_deficit = 5100.0
+flow_feasible = true
+pressure_feasible = false
+verdict = "supply_pressure_deficit"
+[[cases]]
+id = "a_flow_deficit_alone_is_distinguished"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.pressureDeficitAloneIsDistinguishedFromFlowDeficit`, the flow half: 100 L/min of spare against a 5100 L/min deficit, pressure in hand. From (`fwca_flow_deficit`)."
+[cases.inputs]
+protected_area = 510.0
+required_flow = 5100.0
+spare_supply_flow = 100.0
+worst_case_pressure_margin = 2.5
+covered_area = 0.0
+existing_delivered_flow = 0.0
+required_pressure_margin = 0.5
+[cases.expected]
+coverage_gap = 510.0
+coverage_fraction = 0.0
+flow_deficit = 5100.0
+flow_feasible = false
+pressure_feasible = true
+verdict = "supply_flow_deficit"
+[[cases]]
+id = "a_fully_covered_area_is_compliant"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.fullyCoveredAreaIsCompliant`. From (`fwca_compliant`)."
+[cases.inputs]
+protected_area = 510.0
+required_flow = 5100.0
+spare_supply_flow = 1000.0
+worst_case_pressure_margin = 2.0
+covered_area = 510.0
+existing_delivered_flow = 5200.0
+required_pressure_margin = 0.5
+[cases.expected]
+coverage_gap = 0.0
+coverage_fraction = 1.0
+flow_deficit = 0.0
+flow_feasible = true
+pressure_feasible = true
+verdict = "compliant"
+[[cases]]
+id = "a_coverage_gap_with_supply_in_hand"
+tolerance = 1.0e-12
+source = "No coverage today, but the existing delivery already meets the flow and the margin is in hand: the nozzle net only. From (`fwca_coverage_gap`)."
+[cases.inputs]
+protected_area = 510.0
+required_flow = 5100.0
+spare_supply_flow = 1000.0
+worst_case_pressure_margin = 2.0
+covered_area = 0.0
+existing_delivered_flow = 5100.0
+required_pressure_margin = 0.5
+[cases.expected]
+coverage_gap = 510.0
+coverage_fraction = 0.0
+flow_deficit = 0.0
+flow_feasible = true
+pressure_feasible = true
+verdict = "coverage_gap_supply_adequate"

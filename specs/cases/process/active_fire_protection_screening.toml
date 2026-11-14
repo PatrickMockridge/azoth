@@ -1,0 +1,76 @@
+model = "process.active_fire_protection_screening"
+[[cases]]
+id = "a_gas_jet_fire_is_not_extinguishable_but_blowdown_wins"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.waterDoesNotExtinguishAGasJetFireButIsCreditableForEscalationControl`, the gas-jet half, with the class's 600 s blowdown against 900 s steel. From `validation/neqsim/captures/process_active_fire_protection_screening.tsv` (`afps_gas_jet`)."
+[cases.inputs]
+scenario = "gas_jet_fire"
+blowdown_time_to_target = 600.0
+bare_steel_time_to_critical = 900.0
+dedicated_object_demand = 170.0
+general_area_demand = 5100.0
+[cases.expected]
+water_extinguishing = false
+blowdown_faster_than_failure = true
+blowdown_margin = 300.0
+selective_protection_saving_fraction = 0.9666666666666667
+[[cases]]
+id = "a_liquid_pool_fire_is_extinguishable"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.waterDoesNotExtinguishAGasJetFireButIsCreditableForEscalationControl`, the pool half. From (`afps_pool_fire`)."
+[cases.inputs]
+scenario = "liquid_pool_fire"
+blowdown_time_to_target = 600.0
+bare_steel_time_to_critical = 900.0
+dedicated_object_demand = 170.0
+general_area_demand = 5100.0
+[cases.expected]
+water_extinguishing = true
+blowdown_faster_than_failure = true
+blowdown_margin = 300.0
+selective_protection_saving_fraction = 0.9666666666666667
+[[cases]]
+id = "a_two_phase_jet_fire_is_not_extinguishable"
+tolerance = 1.0e-12
+source = "The class's two-phase jet scenario, where the jet-fire branch applies. From (`afps_two_phase_jet`)."
+[cases.inputs]
+scenario = "two_phase_jet_fire"
+blowdown_time_to_target = 600.0
+bare_steel_time_to_critical = 900.0
+dedicated_object_demand = 170.0
+general_area_demand = 5100.0
+[cases.expected]
+water_extinguishing = false
+blowdown_faster_than_failure = true
+blowdown_margin = 300.0
+selective_protection_saving_fraction = 0.9666666666666667
+[[cases]]
+id = "an_ordinary_combustible_fire_is_extinguishable"
+tolerance = 1.0e-12
+source = "The class's ordinary-combustible scenario, the second extinguishing arm. From (`afps_ordinary_combustible`)."
+[cases.inputs]
+scenario = "ordinary_combustible_fire"
+blowdown_time_to_target = 600.0
+bare_steel_time_to_critical = 900.0
+dedicated_object_demand = 170.0
+general_area_demand = 5100.0
+[cases.expected]
+water_extinguishing = true
+blowdown_faster_than_failure = true
+blowdown_margin = 300.0
+selective_protection_saving_fraction = 0.9666666666666667
+[[cases]]
+id = "a_slower_blowdown_leaves_a_negative_margin"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.blowdownMarginDecidesWhetherTheInventoryIsTheGoverningControl`, the slower half: 1200 s of blowdown against 400 s of steel. From (`afps_slower_blowdown`)."
+[cases.inputs]
+scenario = "gas_jet_fire"
+blowdown_time_to_target = 1200.0
+bare_steel_time_to_critical = 400.0
+dedicated_object_demand = 170.0
+general_area_demand = 5100.0
+[cases.expected]
+water_extinguishing = false
+blowdown_faster_than_failure = false
+blowdown_margin = -800.0
+selective_protection_saving_fraction = 0.9666666666666667

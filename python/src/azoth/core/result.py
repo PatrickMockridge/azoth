@@ -28,6 +28,7 @@ from azoth.core.result_base import EmulsionType as EmulsionType
 from azoth.core.result_base import ErosionRiskLevel as ErosionRiskLevel
 from azoth.core.result_base import FeSMorphology as FeSMorphology
 from azoth.core.result_base import FlowRegime as FlowRegime
+from azoth.core.result_base import GoverningCriterion as GoverningCriterion
 from azoth.core.result_base import HenryStatus as HenryStatus
 from azoth.core.result_base import HydrateRiskLevel as HydrateRiskLevel
 from azoth.core.result_base import HydrateStructure as HydrateStructure
@@ -36,6 +37,7 @@ from azoth.core.result_base import Phase as Phase
 from azoth.core.result_base import PlusModel as PlusModel
 from azoth.core.result_base import RootStructure as RootStructure
 from azoth.core.result_base import StabilityVerdict as StabilityVerdict
+from azoth.core.result_base import SupplyVerdict as SupplyVerdict
 from azoth.core.result_base import TpMultiflashSeed as TpMultiflashSeed
 from azoth.core.result_base import _HasWarnings as _HasWarnings
 from azoth.core.result_gen import *  # noqa: F403

@@ -1,0 +1,208 @@
+model = "process.api537_flare_flame_model"
+[[cases]]
+id = "the_flame_length_and_sterile_zones"
+tolerance = 1.0e-12
+source = "`Api537FlareFlameModelTest.testFlameLength` and `testSterileZoneOrdering`: 50 kg/s of 50 MJ/kg gas at a 200 m/s exit, a 40 m stack, targets at the class's four flux constants. From `validation/neqsim/captures/process_api537_flare_flame.tsv` (`api537_flame_length`)."
+[cases.inputs]
+mass_flow = 50.0
+heat_of_combustion = 5.0e7
+radiative_fraction = 0.2
+exit_velocity = 200.0
+ground_distance = 60.0
+sound_distance = 100.0
+stack_height = 40.0
+wind_speed = 0.0
+transmissivity = 1.0
+acoustic_efficiency = 3.0e-6
+target_fluxes = [
+    { flux = 1580.0 },
+    { flux = 4730.0 },
+    { flux = 6300.0 },
+    { flux = 9460.0 },
+]
+[cases.expected]
+heat_release = 2.5e9
+radiative_power = 5.0e8
+flame_length = 101.25883447888855
+flame_tilt = 0.0
+flame_center_horizontal = 0.0
+flame_center_height = 90.62941723944428
+flame_tip_horizontal = 0.0
+flame_tip_height = 141.25883447888856
+heat_flux_at_ground_distance = 3368.0189253666404
+sterile_radii = [
+    { flux = 1580.0, radius = 130.26531729876814 },
+    { flux = 4730.0, radius = 14.082031417585814 },
+    { flux = 6300.0, radius = 0.0 },
+    { flux = 9460.0, radius = 0.0 },
+]
+sound_power_level = 158.750612633917
+sound_pressure_level = 107.750612633917
+equivalent_flame_temperature = 1228.9672934218445
+[[cases]]
+id = "no_wind_leaves_the_tip_vertical"
+tolerance = 1.0e-12
+source = "`Api537FlareFlameModelTest.testWindTilt`, the still-air half: zero tilt and no horizontal tip. From (`api537_no_wind`)."
+[cases.inputs]
+mass_flow = 50.0
+heat_of_combustion = 5.0e7
+radiative_fraction = 0.2
+exit_velocity = 200.0
+ground_distance = 60.0
+sound_distance = 100.0
+stack_height = 40.0
+wind_speed = 0.0
+transmissivity = 1.0
+acoustic_efficiency = 3.0e-6
+target_fluxes = [
+    { flux = 1580.0 },
+    { flux = 4730.0 },
+    { flux = 6300.0 },
+    { flux = 9460.0 },
+]
+[cases.expected]
+flame_tilt = 0.0
+flame_tip_horizontal = 0.0
+flame_tip_height = 141.25883447888856
+heat_flux_at_ground_distance = 3368.0189253666404
+sterile_radii = [
+    { flux = 1580.0, radius = 130.26531729876814 },
+    { flux = 4730.0, radius = 14.082031417585814 },
+    { flux = 6300.0, radius = 0.0 },
+    { flux = 9460.0, radius = 0.0 },
+]
+[[cases]]
+id = "a_wind_tilts_the_flame_and_moves_the_sterile_zones"
+tolerance = 1.0e-12
+source = "`Api537FlareFlameModelTest.testWindTilt`, the windy half: 100 m/s against a 200 m/s exit. From (`api537_wind`)."
+[cases.inputs]
+mass_flow = 50.0
+heat_of_combustion = 5.0e7
+radiative_fraction = 0.2
+exit_velocity = 200.0
+ground_distance = 60.0
+sound_distance = 100.0
+stack_height = 40.0
+wind_speed = 100.0
+transmissivity = 1.0
+acoustic_efficiency = 3.0e-6
+target_fluxes = [
+    { flux = 1580.0 },
+    { flux = 4730.0 },
+    { flux = 6300.0 },
+    { flux = 9460.0 },
+]
+[cases.expected]
+flame_tilt = 0.4636476090008061
+flame_center_horizontal = 22.642163721719427
+flame_center_height = 85.28432744343885
+flame_tip_horizontal = 45.284327443438855
+flame_tip_height = 130.5686548868777
+heat_flux_at_ground_distance = 4589.759326845264
+sterile_radii = [
+    { flux = 1580.0, radius = 156.46789985879553 },
+    { flux = 4730.0, radius = 56.38499067097571 },
+    { flux = 6300.0, radius = 0.0 },
+    { flux = 9460.0, radius = 0.0 },
+]
+[[cases]]
+id = "the_documentation_example"
+tolerance = 1.0e-12
+source = "`DocSafetyComplianceExamplesTest.testApi537FlareFlameExample`: the same flare in a 10 m/s wind. From (`api537_doc_example`)."
+[cases.inputs]
+mass_flow = 50.0
+heat_of_combustion = 5.0e7
+radiative_fraction = 0.2
+exit_velocity = 200.0
+ground_distance = 60.0
+sound_distance = 100.0
+stack_height = 40.0
+wind_speed = 10.0
+transmissivity = 1.0
+acoustic_efficiency = 3.0e-6
+target_fluxes = [
+    { flux = 1580.0 },
+    { flux = 4730.0 },
+    { flux = 6300.0 },
+    { flux = 9460.0 },
+]
+[cases.expected]
+flame_tilt = 0.049958395721942765
+flame_center_horizontal = 2.528312444195862
+flame_center_height = 90.56624888391724
+flame_tip_horizontal = 5.056624888391724
+flame_tip_height = 141.13249776783448
+heat_flux_at_ground_distance = 3458.3141863910755
+sterile_radii = [
+    { flux = 1580.0, radius = 132.83755510643522 },
+    { flux = 4730.0, radius = 17.01104150689372 },
+    { flux = 6300.0, radius = 0.0 },
+    { flux = 9460.0, radius = 0.0 },
+]
+sound_power_level = 158.750612633917
+sound_pressure_level = 107.750612633917
+[[cases]]
+id = "a_zero_mass_flow_publishes_zeroes"
+tolerance = 1.0e-12
+source = "The class's zero-heat-release branches: every geometry, flux and noise output goes to zero. From (`api537_zero_flow`)."
+[cases.inputs]
+mass_flow = 0.0
+heat_of_combustion = 5.0e7
+radiative_fraction = 0.2
+exit_velocity = 200.0
+ground_distance = 60.0
+sound_distance = 100.0
+stack_height = 40.0
+wind_speed = 0.0
+transmissivity = 1.0
+acoustic_efficiency = 3.0e-6
+target_fluxes = [
+    { flux = 1580.0 },
+    { flux = 4730.0 },
+]
+[cases.expected]
+heat_release = 0.0
+radiative_power = 0.0
+flame_length = 0.0
+flame_tilt = 0.0
+flame_center_horizontal = 0.0
+flame_center_height = 40.0
+flame_tip_horizontal = 0.0
+flame_tip_height = 40.0
+heat_flux_at_ground_distance = 0.0
+sterile_radii = [
+    { flux = 1580.0, radius = 0.0 },
+    { flux = 4730.0, radius = 0.0 },
+]
+sound_power_level = 0.0
+sound_pressure_level = -51.0
+equivalent_flame_temperature = 0.0
+[[cases]]
+id = "a_reduced_transmissivity_halves_the_flux"
+tolerance = 1.0e-12
+source = "A transmissivity of 0.5 scales the ground flux and the sterile radii by the same factor. From (`api537_transmissivity`)."
+[cases.inputs]
+mass_flow = 50.0
+heat_of_combustion = 5.0e7
+radiative_fraction = 0.2
+exit_velocity = 200.0
+ground_distance = 60.0
+sound_distance = 100.0
+stack_height = 40.0
+wind_speed = 0.0
+transmissivity = 0.5
+acoustic_efficiency = 3.0e-6
+target_fluxes = [
+    { flux = 1580.0 },
+    { flux = 4730.0 },
+    { flux = 6300.0 },
+    { flux = 9460.0 },
+]
+[cases.expected]
+heat_flux_at_ground_distance = 1684.0094626833202
+sterile_radii = [
+    { flux = 1580.0, radius = 66.16404469871632 },
+    { flux = 4730.0, radius = 0.0 },
+    { flux = 6300.0, radius = 0.0 },
+    { flux = 9460.0, radius = 0.0 },
+]

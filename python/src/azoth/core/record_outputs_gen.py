@@ -673,6 +673,17 @@ class ScenarioIndexRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SterileRadius:
+    """one row per target flux, in the caller's order."""
+
+    #: the target flux the radius is for.
+    flux: Q
+
+    #: the sterile radius; zero where the radiative power never reaches the target.
+    radius: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class StreamScaleMineralRow:
     """One row per registered mineral, in the equilibrium's order."""
 

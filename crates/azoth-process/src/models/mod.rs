@@ -31,17 +31,23 @@
 //! per outlet and `products_z` a matrix with one row per outlet.
 
 pub mod absorption_column;
+pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
+pub mod api537_flare_flame_model;
 pub mod bleve;
 pub mod component_splitter;
 pub mod compressor;
 pub mod consequence_analysis;
 pub mod cooler;
+pub mod deluge_nozzle_layout;
 pub mod distillation_column;
 pub mod ejector;
 pub mod event_tree;
 pub mod expander;
 pub mod filter;
+pub mod fire_monitor_coverage;
+pub mod fire_water_coverage_assessment;
+pub mod fire_water_demand;
 pub mod flare;
 pub mod gas_dispersion;
 pub mod gas_scrubber;
@@ -77,7 +83,13 @@ pub mod turbo_expander_compressor;
 pub mod vce;
 
 pub use absorption_column::{AbsorptionColumnResult, absorption_column};
+pub use active_fire_protection_screening::{
+    ActiveFireProtectionScreeningResult, active_fire_protection_screening,
+};
 pub use anti_surge_recycle::{AntiSurgeRecycleResult, anti_surge_recycle};
+pub use api537_flare_flame_model::{
+    Api537FlareFlameModelResult, FlareTargetFlux, SterileRadius, api537_flare_flame_model,
+};
 pub use bleve::{BleveResult, bleve};
 pub use component_splitter::{ComponentSplitterResult, component_splitter};
 pub use compressor::{CompressorResult, compressor};
@@ -86,11 +98,19 @@ pub use consequence_analysis::{
     consequence_analysis,
 };
 pub use cooler::{CoolerResult, cooler};
+pub use deluge_nozzle_layout::{
+    DelugeNozzleLayoutResult, GoverningCriterion, deluge_nozzle_layout,
+};
 pub use distillation_column::{DistillationColumnResult, distillation_column};
 pub use ejector::{EjectorResult, ejector};
 pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_tree};
 pub use expander::{ExpanderResult, expander};
 pub use filter::{FilterResult, filter};
+pub use fire_monitor_coverage::{FireMonitorCoverageResult, fire_monitor_coverage};
+pub use fire_water_coverage_assessment::{
+    FireWaterCoverageAssessmentResult, SupplyVerdict, fire_water_coverage_assessment,
+};
+pub use fire_water_demand::{FireWaterDemandResult, ProtectedObject, fire_water_demand};
 pub use flare::{FlareResult, flare};
 pub use gas_dispersion::{GasDispersionResult, gas_dispersion};
 pub use gas_scrubber::{GasScrubberResult, gas_scrubber};

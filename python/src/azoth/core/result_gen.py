@@ -49,6 +49,7 @@ from azoth.core.record_outputs_gen import (
     ScaleControlRow,
     ScenarioChangeRow,
     ScenarioIndexRow,
+    SterileRadius,
     StreamScaleMineralRow,
     SubFraction,
     WaterMixingResult,
@@ -62,6 +63,7 @@ from azoth.core.result_base import (
     ErosionRiskLevel,
     FeSMorphology,
     FlowRegime,
+    GoverningCriterion,
     HenryStatus,
     HydrateRiskLevel,
     HydrateStructure,
@@ -70,6 +72,7 @@ from azoth.core.result_base import (
     PlusModel,
     RootStructure,
     StabilityVerdict,
+    SupplyVerdict,
     TpMultiflashSeed,
     _HasWarnings,
 )
@@ -5598,6 +5601,28 @@ class AbsorptionColumnResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class ActiveFireProtectionScreeningResult(_HasWarnings):
+    """Result of ``process.active_fire_protection_screening``."""
+
+    CALC_ID: ClassVar[str] = "process.active_fire_protection_screening"
+
+    #: whether water application can extinguish the scenario's fire.
+    water_extinguishing: bool
+
+    #: whether `blowdown_time_to_target < bare_steel_time_to_critical`.
+    blowdown_faster_than_failure: bool
+
+    #: `bare_steel_time_to_critical - blowdown_time_to_target`; positive when blowdown wins.
+    blowdown_margin: Q
+
+    #: `1 - dedicated_object_demand / general_area_demand`.
+    selective_protection_saving_fraction: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class AntiSurgeRecycleResult(_HasWarnings):
     """Result of ``process.anti_surge_recycle``."""
 
@@ -5626,6 +5651,55 @@ class AntiSurgeRecycleResult(_HasWarnings):
 
     #: `getDistanceToSurge()` at the final machine state: the inlet flow over the surge flow less one.
     distance_to_surge: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class Api537FlareFlameModelResult(_HasWarnings):
+    """Result of ``process.api537_flare_flame_model``."""
+
+    CALC_ID: ClassVar[str] = "process.api537_flare_flame_model"
+
+    #: `mass_flow heat_of_combustion`.
+    heat_release: Q
+
+    #: `radiative_fraction heat_release`.
+    radiative_power: Q
+
+    #: `0.00326 heat_release^0.478`; zero when the heat release is zero.
+    flame_length: Q
+
+    #: the tilt from vertical in radians, `atan2(wind_speed, exit_velocity)`.
+    flame_tilt: float
+
+    #: `0.5 flame_length sin(flame_tilt)`.
+    flame_center_horizontal: Q
+
+    #: `stack_height + 0.5 flame_length cos(flame_tilt)`.
+    flame_center_height: Q
+
+    #: `flame_length sin(flame_tilt)`.
+    flame_tip_horizontal: Q
+
+    #: `stack_height + flame_length cos(flame_tilt)`.
+    flame_tip_height: Q
+
+    #: `transmissivity radiative_power / (4 pi r^2)` from the flame centre, with `r^2` floored at `1e-6`.
+    heat_flux_at_ground_distance: Q
+
+    #: one row per target flux, in the caller's order.
+    sterile_radii: tuple[SterileRadius, ...]
+
+    #: `10 log10(acoustic_efficiency heat_release / 1e-12)` dB; zero when the acoustic power is zero.
+    sound_power_level: float
+
+    #: `sound_power_level - 20 log10(max(sound_distance, 1)) - 11` dB.
+    sound_pressure_level: float
+
+    #: `(radiative_power / (pi max(0.12 flame_length, 0.1) flame_length) / sigma)^0.25`; zero when the flame surface is zero.
+    equivalent_flame_temperature: Q
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -5943,6 +6017,55 @@ class CoolerResult(_HasWarnings):
 
     #: the equilibrium the thermal lag moved toward. Present only on the dynamic branch, as evidence.
     equilibrium_outlet_temperature: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class DelugeNozzleLayoutResult(_HasWarnings):
+    """Result of ``process.deluge_nozzle_layout``."""
+
+    CALC_ID: ClassVar[str] = "process.deluge_nozzle_layout"
+
+    #: `protected_area required_density`.
+    required_flow: Q
+
+    #: `k sqrt(operating_pressure)`.
+    flow_per_nozzle: Q
+
+    #: `nozzle_max_spacing^2 coverage_efficiency`.
+    coverage_per_nozzle: Q
+
+    #: `ceil(required_flow / flow_per_nozzle)`.
+    nozzle_count_from_flow: float
+
+    #: `ceil(protected_area / coverage_per_nozzle)`.
+    nozzle_count_from_coverage: float
+
+    #: the larger of the two criteria's counts.
+    nozzle_count: float
+
+    #: which criterion set the count; a tie is `flow`.
+    governing_criterion: GoverningCriterion
+
+    #: `sqrt(protected_area / nozzle_count)`.
+    grid_spacing: Q
+
+    #: `nozzle_count flow_per_nozzle`.
+    delivered_flow: Q
+
+    #: `delivered_flow / protected_area` in `L/(min m2)`.
+    delivered_density: float
+
+    #: whether the operating pressure meets the nozzle's minimum.
+    pressure_adequate: bool
+
+    #: whether the delivered density meets the required one.
+    density_met: bool
+
+    #: whether the available clear depth meets the nozzle's requirement.
+    clearance_adequate: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -6470,6 +6593,105 @@ class FilterResult(_HasWarnings):
 
     #: the vessel cross-section a granular design writes to the filter's hydraulic area; absent for a cartridge type.
     design_media_area: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FireMonitorCoverageResult(_HasWarnings):
+    """Result of ``process.fire_monitor_coverage``."""
+
+    CALC_ID: ClassVar[str] = "process.fire_monitor_coverage"
+
+    #: `monitor_count monitor_flow`.
+    total_flow: Q
+
+    #: `monitor_count pi effective_throw^2 sweep_angle / 360`.
+    swept_area: Q
+
+    #: `total_flow / target_area` in `L/(min m2)`.
+    nominal_density: float
+
+    #: `fall_height wind_speed / droplet_terminal_velocity`.
+    drift_displacement: Q
+
+    #: `clamp(1 - drift_displacement / characteristic_dimension, 0, 1)`.
+    wind_coverage_fraction: float
+
+    #: `nominal_density wind_coverage_fraction`.
+    effective_density: float
+
+    #: whether the nominal density meets the requirement.
+    meets_density_still_air: bool
+
+    #: whether the effective density meets the requirement.
+    meets_density_in_wind: bool
+
+    #: `required_density target_area / wind_coverage_fraction`; absent where the fraction is zero, where the class answers `+Infinity`.
+    flow_needed_for_compliance: Q | None
+
+    #: the class's classification in its priority order: obstructed line of sight, still-air density, wind density, or feasible on density.
+    verdict: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FireWaterCoverageAssessmentResult(_HasWarnings):
+    """Result of ``process.fire_water_coverage_assessment``."""
+
+    CALC_ID: ClassVar[str] = "process.fire_water_coverage_assessment"
+
+    #: `max(0, protected_area - covered_area)`.
+    coverage_gap: Q
+
+    #: `min(1, covered_area / protected_area)`.
+    coverage_fraction: float
+
+    #: `max(0, required_flow - existing_delivered_flow)`.
+    flow_deficit: Q
+
+    #: whether the spare supply meets the flow deficit.
+    flow_feasible: bool
+
+    #: whether the worst-case margin meets the required one.
+    pressure_feasible: bool
+
+    #: the class's classification, in its own priority order.
+    verdict: SupplyVerdict
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FireWaterDemandResult(_HasWarnings):
+    """Result of ``process.fire_water_demand``."""
+
+    CALC_ID: ClassVar[str] = "process.fire_water_demand"
+
+    #: `protected_area application_rate`.
+    area_demand: Q
+
+    #: the sum of the objects' `surface rate`, in list order.
+    object_demand: Q
+
+    #: `(area_demand + object_demand) simultaneous_area_factor`.
+    total_demand: Q
+
+    #: `total_demand 60 / 1000`, the class's `totalDemandM3PerHour`.
+    total_demand_m3_per_hour: Q
+
+    #: `total_demand duration / 60000` with the duration in seconds, the class's `waterVolumeM3`.
+    water_volume: Q
+
+    #: `water_volume foam_concentrate_percent / 100`.
+    foam_concentrate_volume: Q
+
+    #: `object_demand / area_demand`; absent where the area demand is zero, where the class answers NaN.
+    object_to_area_demand_ratio: float | None
 
     #: Caveats.
     warnings: tuple[Warning, ...]
