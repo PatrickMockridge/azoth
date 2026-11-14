@@ -56,6 +56,18 @@ pub fn plant_valve() -> azoth_process::Flowsheet {
     azoth_process::parse_flowsheet(&text).expect("the valve fixture parses")
 }
 
+/// Two feeds into a mixer, and the mixed stream split in two.
+pub fn mix_split() -> azoth_process::Flowsheet {
+    let text = std::fs::read_to_string(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests")
+            .join("fixtures")
+            .join("mix_split.toml"),
+    )
+    .expect("the junction fixture reads");
+    azoth_process::parse_flowsheet(&text).expect("the junction fixture parses")
+}
+
 pub fn demo() -> azoth_process::Flowsheet {
     let text = std::fs::read_to_string(
         workspace_root()

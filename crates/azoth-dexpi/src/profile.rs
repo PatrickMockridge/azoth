@@ -142,6 +142,7 @@ pub const PLANT_SUPPORTED_TYPES: &[&str] = &[
     "Plant/Piping.GlobeValve",
     "Plant/Piping.SpringLoadedGlobeSafetyValve",
     "Plant/Piping.SwingCheckValve",
+    "Plant/Piping.PipeTee",
     "Plant/Piping.FlowInPipeOffPageConnector",
     "Plant/Piping.FlowOutPipeOffPageConnector",
     "Plant/Instrumentation.ProcessInstrumentationFunction",

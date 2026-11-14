@@ -1,0 +1,62 @@
+# Two feeds meet at a mixer, and the mixed stream splits in two. Both are junctions:
+# a PipeTee in the P&ID, not a tagged item.
+id = "flowsheets.mix_split"
+name = "Mixer and splitter"
+
+products = ["P1", "P2"]
+
+[[inputs]]
+name = "A"
+components = ["methane"]
+n = 1.0
+z = [1.0]
+P = 5.0e5
+T = 300.0
+
+[[inputs]]
+name = "B"
+components = ["methane"]
+n = 1.0
+z = [1.0]
+P = 5.0e5
+T = 300.0
+
+[[instances]]
+id = "M-101"
+unit = "unit_ops.mixer"
+
+[[instances]]
+id = "C-101"
+unit = "unit_ops.cooler"
+[instances.parameters]
+outlet_temperature = 300.0
+
+[[instances]]
+id = "S-101"
+unit = "unit_ops.splitter"
+[instances.parameters]
+split_factors = [0.5, 0.5]
+
+[[connections]]
+from = "A"
+to = "M-101.feed"
+
+[[connections]]
+from = "B"
+to = "M-101.feed"
+
+[[connections]]
+from = "M-101.product"
+to = "C-101.inlet"
+
+[[connections]]
+from = "C-101.outlet"
+to = "S-101.feed"
+
+[[connections]]
+from = "S-101.products[0]"
+to = "P1"
+
+[[connections]]
+from = "S-101.products[1]"
+to = "P2"

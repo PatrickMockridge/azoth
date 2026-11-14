@@ -67,6 +67,15 @@ pub fn is_segment_unit(unit: &str) -> bool {
     crate::plant_mapping_gen::PLANT_SEGMENT_UNITS.contains(&unit)
 }
 
+/// Whether a segment-placed unit is a junction rather than a component on a pipe.
+///
+/// A mixer and a splitter are the two azoth entries that are pure topology: several streams
+/// meet at one `PipeTee`, one per `many` port's opposite side.
+#[must_use]
+pub fn is_junction_unit(unit: &str) -> bool {
+    matches!(unit, "unit_ops.mixer" | "unit_ops.splitter")
+}
+
 /// The Plant mapping's counts: faithful, lossy and refused writes, and readable rows.
 #[must_use]
 pub fn counts() -> (usize, usize, usize, usize) {

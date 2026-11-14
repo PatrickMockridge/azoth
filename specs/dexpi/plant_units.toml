@@ -132,10 +132,11 @@ note = "A four-port rotating machine has no reviewed Plant class."
 
 [[unit]]
 azoth_id = "unit_ops.mixer"
-write = "refused"
-plant_types = []
+write = "faithful"
+plant_types = ["Plant/Piping.PipeTee"]
+placement = "segment"
 reader_types = ["Agitator", "StaticMixer", "Mixer"]
-note = "A mixer is a junction in the piping network, not a tagged plant item; exporting one as an item would invent an equipment that the drawing does not have."
+note = "A mixer is a junction of pipes. A `PipeTee` represents the two-inlet/one-outlet case; a junction with more branches is refused rather than drawn as a manifold."
 
 [[unit]]
 azoth_id = "unit_ops.packed_column"
@@ -195,10 +196,11 @@ note = "This unit is UNRUNNABLE in this port, so it cannot be exported as a plan
 
 [[unit]]
 azoth_id = "unit_ops.splitter"
-write = "refused"
-plant_types = []
+write = "faithful"
+plant_types = ["Plant/Piping.PipeTee"]
+placement = "segment"
 reader_types = ["PipeTee", "Splitter"]
-note = "A splitter is a piping junction, not a tagged plant item."
+note = "A splitter is a junction of pipes. A `PipeTee` represents the one-inlet/two-outlet case; at read time the pipe directions decide mixer or splitter."
 
 [[unit]]
 azoth_id = "unit_ops.stirred_tank_reactor"
