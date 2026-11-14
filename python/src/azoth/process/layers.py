@@ -1573,6 +1573,28 @@ def _fire_water_coverage_assessment(inputs: Mapping[str, Any]) -> dict[str, floa
     }
 
 
+def _active_fire_protection_screening(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.active_fire_protection_screening`'s layers, from the reference's arithmetic.
+
+    The two flags are the model's own words, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.active_fire_protection_screening import _evaluate
+
+    solution, _ = _evaluate(
+        str(inputs["scenario"]),
+        quantity(float(inputs["blowdown_time_to_target"]), "s"),
+        quantity(float(inputs["bare_steel_time_to_critical"]), "s"),
+        quantity(float(inputs["dedicated_object_demand"]), "L/min"),
+        quantity(float(inputs["general_area_demand"]), "L/min"),
+    )
+    return {
+        "blowdown_margin_s": solution.margin,
+        "selective_protection_saving_fraction": solution.saving,
+    }
+
+
 def _vce(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.vce`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -2049,6 +2071,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.deluge_nozzle_layout": _deluge_nozzle_layout,
     "process.fire_monitor_coverage": _fire_monitor_coverage,
     "process.fire_water_coverage_assessment": _fire_water_coverage_assessment,
+    "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -2963,6 +2986,43 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_water_coverage_assessment.tsv",
         block=4,
         identified_by=("#label", "fwca_coverage_gap"),
+    ),
+    # The protection screening's five: the class's scenario pair, the two further scenarios
+    # and the slower blowdown. The NaN-time and negative-demand states are uncased.
+    LayerCase(
+        model="process.active_fire_protection_screening",
+        case="a_gas_jet_fire_is_not_extinguishable_but_blowdown_wins",
+        capture="process_active_fire_protection_screening.tsv",
+        block=0,
+        identified_by=("#label", "afps_gas_jet"),
+    ),
+    LayerCase(
+        model="process.active_fire_protection_screening",
+        case="a_liquid_pool_fire_is_extinguishable",
+        capture="process_active_fire_protection_screening.tsv",
+        block=1,
+        identified_by=("#label", "afps_pool_fire"),
+    ),
+    LayerCase(
+        model="process.active_fire_protection_screening",
+        case="a_two_phase_jet_fire_is_not_extinguishable",
+        capture="process_active_fire_protection_screening.tsv",
+        block=2,
+        identified_by=("#label", "afps_two_phase_jet"),
+    ),
+    LayerCase(
+        model="process.active_fire_protection_screening",
+        case="an_ordinary_combustible_fire_is_extinguishable",
+        capture="process_active_fire_protection_screening.tsv",
+        block=3,
+        identified_by=("#label", "afps_ordinary_combustible"),
+    ),
+    LayerCase(
+        model="process.active_fire_protection_screening",
+        case="a_slower_blowdown_leaves_a_negative_margin",
+        capture="process_active_fire_protection_screening.tsv",
+        block=4,
+        identified_by=("#label", "afps_slower_blowdown"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4190,6 +4250,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The coverage assessment's six: the unset-supply state, where the class's NaN defaults
     # read as feasible, and the constructor and setter refusals.
     "process_fire_water_coverage_assessment.tsv": 6,
+    # The protection screening's five: the class's NaN times, the negative demand its setter
+    # accepts, and the three constructor refusals.
+    "process_active_fire_protection_screening.tsv": 5,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

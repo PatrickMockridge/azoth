@@ -5600,6 +5600,28 @@ class AbsorptionColumnResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class ActiveFireProtectionScreeningResult(_HasWarnings):
+    """Result of ``process.active_fire_protection_screening``."""
+
+    CALC_ID: ClassVar[str] = "process.active_fire_protection_screening"
+
+    #: whether water application can extinguish the scenario's fire.
+    water_extinguishing: bool
+
+    #: whether `blowdown_time_to_target < bare_steel_time_to_critical`.
+    blowdown_faster_than_failure: bool
+
+    #: `bare_steel_time_to_critical - blowdown_time_to_target`; positive when blowdown wins.
+    blowdown_margin: Q
+
+    #: `1 - dedicated_object_demand / general_area_demand`.
+    selective_protection_saving_fraction: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class AntiSurgeRecycleResult(_HasWarnings):
     """Result of ``process.anti_surge_recycle``."""
 

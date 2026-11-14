@@ -438,6 +438,7 @@ NON_UNIT_MODELS = {
     "process.deluge_nozzle_layout": "the deluge nozzle layout screen over scalars, not a unit",
     "process.fire_monitor_coverage": "the fire-monitor coverage screen over scalars, not a unit",
     "process.fire_water_coverage_assessment": "the fire-water coverage gate over scalars, not a unit",
+    "process.active_fire_protection_screening": "the protection hierarchy screen over scalars, not a unit",
     "process.leak_blowdown": "a vessel blowdown is a calculation over a fluid, not a unit",
     "process.separator_capacity_assessment": "a capacity report over a vessel, not a unit",
     "process.anti_surge_recycle": "a recycle converged around a charted machine, not a unit",

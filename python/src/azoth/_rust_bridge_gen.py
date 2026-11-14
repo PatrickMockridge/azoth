@@ -17,6 +17,7 @@ from azoth._registry_gen import spec as _spec_for
 from azoth.core.bridge_support import _association_spec, _count, _molar_masses, _si, _warnings
 from azoth.core.result import (
     AbsorptionColumnResult,
+    ActiveFireProtectionScreeningResult,
     ActivityCoefficientRow,
     AmmoniaPhaseResult,
     AntiSurgeRecycleResult,
@@ -390,6 +391,7 @@ from azoth.eos.reference.molar_enthalpy_entropy import IdealGasModel
 
 __all__ = [
     "absorption_column",
+    "active_fire_protection_screening",
     "ammonia_phase",
     "anti_surge_recycle",
     "antoine_vapor_pressure",
@@ -5576,6 +5578,25 @@ def absorption_column(gas_components: list[str], gas_n: Q, gas_z: list[float], g
         reboiler_duty_kw=from_si(result.reboiler_duty_kw.magnitude_si, result.reboiler_duty_kw.unit),
         condenser_duty_kw=from_si(result.condenser_duty_kw.magnitude_si, result.condenser_duty_kw.unit),
         material_grade=result.material_grade,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def active_fire_protection_screening(scenario: str, blowdown_time_to_target: Q, bare_steel_time_to_critical: Q, dedicated_object_demand: Q, general_area_demand: Q) -> ActiveFireProtectionScreeningResult:
+    """``process.active_fire_protection_screening``, computed in Rust."""
+    spec = _models_gen.model("process.active_fire_protection_screening")
+    result = _core.active_fire_protection_screening(
+        scenario,
+        input_to_si(spec, "blowdown_time_to_target", blowdown_time_to_target),
+        input_to_si(spec, "bare_steel_time_to_critical", bare_steel_time_to_critical),
+        input_to_si(spec, "dedicated_object_demand", dedicated_object_demand),
+        input_to_si(spec, "general_area_demand", general_area_demand),
+    )
+    return ActiveFireProtectionScreeningResult(
+        water_extinguishing=result.water_extinguishing,
+        blowdown_faster_than_failure=result.blowdown_faster_than_failure,
+        blowdown_margin=from_si(result.blowdown_margin.magnitude_si, result.blowdown_margin.unit),
+        selective_protection_saving_fraction=result.selective_protection_saving_fraction,
         warnings=_warnings(result.warnings),
     )
 

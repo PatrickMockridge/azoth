@@ -1,0 +1,88 @@
+id = "process.active_fire_protection_screening"
+name = "Active fire protection screening"
+kind = "procedure"
+assumptions = [
+    "**water extinguishes a pool or an ordinary combustible fire, not a jet**: a `liquid_pool_fire` or `ordinary_combustible_fire` is extinguishing; a `gas_jet_fire` or `two_phase_jet_fire` is not, and water's creditable function there is cooling and escalation control.",
+    "**blowdown is the governing control when it is faster than the steel**: `blowdown_faster_than_failure` is `blowdown < bare`, and the margin is `bare - blowdown`, positive when blowdown wins.",
+    "**selective protection's saving is `1 - dedicated_object_demand / general_area_demand`**, the fraction of the area requirement that protecting one object does not discharge.",
+    "**the class's literals are stated, not published**: `isWaterCreditableForEscalationControl` is always `true` and `isPassiveSubstitutionPermitted` always `false`, so they carry no state.",
+    "**the incident flux, the inventory and the four presentation flags are not carried**: they are read only by `verdict()`, `rankedMeasures()` or `toJson()`, and the prose surfaces are presentation.",
+    "**an unknown time or demand is not a screening state**: the class's NaN defaults are replaced by required inputs, and the unguarded demand setters become range checks.",
+]
+references = [
+    "NORSOK S-001 (2018). Technical safety, active and passive fire protection, and the protection hierarchy.",
+    "ISO 13702 (2015). Petroleum and natural gas industries - Control and mitigation of fires and explosions on offshore production installations.",
+    "API STD 521 (2021). Pressure-relieving and Depressuring Systems, fire exposure and blowdown.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/firewater/ActiveFireProtectionScreening.java` is the port source.",
+    "`validation/neqsim/captures/process_active_fire_protection_screening.tsv` - the class's four scenarios, the blowdown margin both ways, the class's NaN times, a negative demand the setter accepts and the constructor refusals.",
+]
+[source]
+standard = "NeqSim process/safety/firewater/ActiveFireProtectionScreening.java"
+edition = "Its `isWaterExtinguishing`, `isBlowdownFasterThanFailure`, `blowdownMarginS` and `selectiveProtectionSavingFraction`."
+[algorithm]
+scheme = "closed_form_active_fire_protection_screening"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.scenario]
+type = "enum"
+values = [
+    "gas_jet_fire",
+    "two_phase_jet_fire",
+    "liquid_pool_fire",
+    "ordinary_combustible_fire",
+]
+description = "the fire type, the class's `FireScenario`.\n"
+[inputs.blowdown_time_to_target]
+unit = "s"
+description = "the time the blowdown takes to reach its target, above zero.\n"
+[inputs.bare_steel_time_to_critical]
+unit = "s"
+description = "the bare steel's time to its critical temperature, above zero; `process.pfp_demand` publishes it.\n"
+[inputs.dedicated_object_demand]
+unit = "L/min"
+description = "the dedicated object's fire-water demand, at least zero.\n"
+[inputs.general_area_demand]
+unit = "L/min"
+description = "the area's fire-water demand, above zero; the selective saving is measured against it.\n"
+[outputs]
+[outputs.water_extinguishing]
+type = "boolean"
+description = "whether water application can extinguish the scenario's fire.\n"
+[outputs.blowdown_faster_than_failure]
+type = "boolean"
+description = "whether `blowdown_time_to_target < bare_steel_time_to_critical`.\n"
+[outputs.blowdown_margin]
+unit = "s"
+description = "`bare_steel_time_to_critical - blowdown_time_to_target`; positive when blowdown wins.\n"
+[outputs.selective_protection_saving_fraction]
+unit = "dimensionless"
+description = "`1 - dedicated_object_demand / general_area_demand`.\n"
+[[valid_range]]
+quantity = "blowdown_time_to_target"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive blowdown time"
+[[valid_range]]
+quantity = "bare_steel_time_to_critical"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive time to critical"
+[[valid_range]]
+quantity = "dedicated_object_demand"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative dedicated demand is not a protection requirement"
+[[valid_range]]
+quantity = "general_area_demand"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's ratio is NaN against a zero area demand"
+[implementations]
+python = "azoth.process.active_fire_protection_screening"
+rust = "azoth_process::active_fire_protection_screening"

@@ -223,6 +223,7 @@
 //!   - specs/calcs/hydraulics/reynolds_number.toml
 //!   - specs/calcs/hydraulics/tray_hydraulics.toml
 //!   - specs/models/process/absorption_column.toml
+//!   - specs/models/process/active_fire_protection_screening.toml
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/bleve.toml
 //!   - specs/models/process/component_splitter.toml
@@ -2674,6 +2675,26 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.absorption_column",
         "max_operation_pressure",
         "pressure",
+    ),
+    (
+        "process.active_fire_protection_screening",
+        "blowdown_time_to_target",
+        "time",
+    ),
+    (
+        "process.active_fire_protection_screening",
+        "bare_steel_time_to_critical",
+        "time",
+    ),
+    (
+        "process.active_fire_protection_screening",
+        "dedicated_object_demand",
+        "volume_rate",
+    ),
+    (
+        "process.active_fire_protection_screening",
+        "general_area_demand",
+        "volume_rate",
     ),
     ("process.anti_surge_recycle", "feed_n", "molar_flow"),
     ("process.anti_surge_recycle", "feed_z", "dimensionless"),

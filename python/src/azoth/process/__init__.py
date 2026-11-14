@@ -20,6 +20,7 @@ from azoth import _core
 from azoth._dispatch import resolve
 from azoth.core.result import (
     AbsorptionColumnResult,
+    ActiveFireProtectionScreeningResult,
     AntiSurgeRecycleResult,
     BleveResult,
     ComponentSplitterResult,
@@ -91,6 +92,7 @@ __all__ = [
     "Stream",
     "TearResult",
     "absorption_column",
+    "active_fire_protection_screening",
     "anti_surge_recycle",
     "bleve",
     "catalogue",
@@ -160,6 +162,7 @@ _COMPONENT_SPLITTER = "process.component_splitter"
 _COMPRESSOR = "process.compressor"
 _CONSEQUENCE_ANALYSIS = "process.consequence_analysis"
 _ABSORPTION_COLUMN = "process.absorption_column"
+_ACTIVE_FIRE_PROTECTION_SCREENING = "process.active_fire_protection_screening"
 _STRIPPING_COLUMN = "process.stripping_column"
 _DISTILLATION_COLUMN = "process.distillation_column"
 _COOLER = "process.cooler"
@@ -1143,6 +1146,36 @@ def filter(
         corrosion_allowance=corrosion_allowance,
         element_collapse_pressure=element_collapse_pressure,
         element_integrity_verified=element_integrity_verified,
+    )
+
+
+def active_fire_protection_screening(
+    scenario: str,
+    blowdown_time_to_target: Q,
+    bare_steel_time_to_critical: Q,
+    dedicated_object_demand: Q,
+    general_area_demand: Q,
+) -> ActiveFireProtectionScreeningResult:
+    """The active-versus-passive fire protection screen and its machine-readable facts.
+
+    The class's arithmetic only: water extinguishes a pool or an ordinary combustible fire
+    and not a jet; **blowdown is the governing control when it is faster than the steel**,
+    with `bare - blowdown` as the margin; and selective protection's saving is the fraction of
+    the area requirement it does not discharge. The verdict, the ranked measures and the
+    substitution argument are prose and are not carried.
+
+    Raises:
+        InvalidInputError: for a non-positive blowdown or time to critical, a negative
+            dedicated demand, a non-positive general demand, or an unknown scenario.
+
+    See :func:`azoth.process.reference.active_fire_protection_screening`.
+    """
+    return resolve(_ACTIVE_FIRE_PROTECTION_SCREENING)(  # type: ignore[no-any-return]
+        scenario=scenario,
+        blowdown_time_to_target=blowdown_time_to_target,
+        bare_steel_time_to_critical=bare_steel_time_to_critical,
+        dedicated_object_demand=dedicated_object_demand,
+        general_area_demand=general_area_demand,
     )
 
 

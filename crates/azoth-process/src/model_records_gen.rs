@@ -12,6 +12,7 @@
 use azoth_core::{CalcResult, Warning};
 
 use crate::models::absorption_column::AbsorptionColumnResult;
+use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult;
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::bleve::BleveResult;
 use crate::models::component_splitter::ComponentSplitterResult;
@@ -101,6 +102,21 @@ impl CalcResult for AbsorptionColumnResult {
         "reboiler_duty_kw",
         "condenser_duty_kw",
         "material_grade",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ActiveFireProtectionScreeningResult {
+    const CALC_ID: &'static str = "process.active_fire_protection_screening";
+    const FIELDS: &'static [&'static str] = &[
+        "water_extinguishing",
+        "blowdown_faster_than_failure",
+        "blowdown_margin",
+        "selective_protection_saving_fraction",
         "warnings",
     ];
 

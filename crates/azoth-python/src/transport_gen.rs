@@ -14002,6 +14002,57 @@ impl From<&azoth_process::models::absorption_column::AbsorptionColumnResult>
         }
     }
 }
+/// Result of `process.active_fire_protection_screening`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ActiveFireProtectionScreeningResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyActiveFireProtectionScreeningResult {
+    /// whether water application can extinguish the scenario's fire.
+    #[pyo3(get)]
+    pub water_extinguishing: bool,
+    /// whether `blowdown_time_to_target < bare_steel_time_to_critical`.
+    #[pyo3(get)]
+    pub blowdown_faster_than_failure: bool,
+    /// `bare_steel_time_to_critical - blowdown_time_to_target`; positive when blowdown wins.
+    #[pyo3(get)]
+    pub blowdown_margin: PyQty,
+    /// `1 - dedicated_object_demand / general_area_demand`.
+    #[pyo3(get)]
+    pub selective_protection_saving_fraction: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyActiveFireProtectionScreeningResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "ActiveFireProtectionScreeningResult(water_extinguishing={:?}, blowdown_faster_than_failure={:?}, blowdown_margin={:?}, selective_protection_saving_fraction={:?}, {} warning(s))",
+            self.water_extinguishing,
+            self.blowdown_faster_than_failure,
+            self.blowdown_margin,
+            self.selective_protection_saving_fraction,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult> for PyActiveFireProtectionScreeningResult {
+    fn from(r: &azoth_process::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult) -> Self {
+        Self {
+            water_extinguishing: r.water_extinguishing,
+            blowdown_faster_than_failure: r.blowdown_faster_than_failure,
+            blowdown_margin: PyQty { magnitude_si: r.blowdown_margin.value, unit: "s".to_string() },
+            selective_protection_saving_fraction: r.selective_protection_saving_fraction,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.anti_surge_recycle`, transported.
 #[pyclass(
     frozen,

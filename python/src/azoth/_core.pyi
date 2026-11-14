@@ -2862,6 +2862,14 @@ class AbsorptionColumnResult:
     warnings: list[Warning]
 
 @final
+class ActiveFireProtectionScreeningResult:
+    water_extinguishing: bool
+    blowdown_faster_than_failure: bool
+    blowdown_margin: Qty
+    selective_protection_saving_fraction: float
+    warnings: list[Warning]
+
+@final
 class AntiSurgeRecycleResult:
     recycle_active: bool
     converged: bool
@@ -6398,6 +6406,13 @@ def absorption_column(
     material_grade: str | None = None,
     max_operation_pressure: float | None = None,
 ) -> AbsorptionColumnResult: ...
+def active_fire_protection_screening(
+    scenario: str,
+    blowdown_time_to_target: float,
+    bare_steel_time_to_critical: float,
+    dedicated_object_demand: float,
+    general_area_demand: float,
+) -> ActiveFireProtectionScreeningResult: ...
 def anti_surge_recycle(
     components: list[str],
     feed_n: float,

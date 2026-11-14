@@ -5435,6 +5435,33 @@ pub fn reynolds_number(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Active fire protection screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (scenario, blowdown_time_to_target, bare_steel_time_to_critical, dedicated_object_demand, general_area_demand))]
+#[pyo3(
+    text_signature = "(scenario, blowdown_time_to_target, bare_steel_time_to_critical, dedicated_object_demand, general_area_demand)"
+)]
+pub fn active_fire_protection_screening(
+    py: Python<'_>,
+    scenario: &str,
+    blowdown_time_to_target: f64,
+    bare_steel_time_to_critical: f64,
+    dedicated_object_demand: f64,
+    general_area_demand: f64,
+) -> PyResult<crate::transport_gen::PyActiveFireProtectionScreeningResult> {
+    azoth_process::models::active_fire_protection_screening::active_fire_protection_screening(
+        scenario,
+        seconds(blowdown_time_to_target),
+        seconds(bare_steel_time_to_critical),
+        cubic_meters_per_second(dedicated_object_demand),
+        cubic_meters_per_second(general_area_demand),
+    )
+    .map(|r| crate::transport_gen::PyActiveFireProtectionScreeningResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Anti-surge recycle calculator.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

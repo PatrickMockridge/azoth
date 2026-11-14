@@ -230,6 +230,12 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # them against the capture, and `test_cross_impl` compares them on both results.
         "flow_feasible",
         "pressure_feasible",
+        # `active_fire_protection_screening`'s two flags, booleans with no slot in
+        # `TestCase`. `crates/azoth-process/tests/active_fire_protection_screening.rs`
+        # asserts them against the capture, and `test_cross_impl` compares them on both
+        # results.
+        "water_extinguishing",
+        "blowdown_faster_than_failure",
         # `thermal.shell_and_tube_vibration`'s four flags, booleans with no slot in
         # `TestCase`. `crates/azoth-thermal/tests/shell_and_tube_vibration.rs` asserts
         # them against the capture, and `test_cross_impl` compares them on both results.

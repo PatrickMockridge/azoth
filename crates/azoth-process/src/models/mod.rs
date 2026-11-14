@@ -31,6 +31,7 @@
 //! per outlet and `products_z` a matrix with one row per outlet.
 
 pub mod absorption_column;
+pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
 pub mod bleve;
 pub mod component_splitter;
@@ -81,6 +82,9 @@ pub mod turbo_expander_compressor;
 pub mod vce;
 
 pub use absorption_column::{AbsorptionColumnResult, absorption_column};
+pub use active_fire_protection_screening::{
+    ActiveFireProtectionScreeningResult, active_fire_protection_screening,
+};
 pub use anti_surge_recycle::{AntiSurgeRecycleResult, anti_surge_recycle};
 pub use bleve::{BleveResult, bleve};
 pub use component_splitter::{ComponentSplitterResult, component_splitter};
