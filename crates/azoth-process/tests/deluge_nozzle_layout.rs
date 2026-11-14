@@ -65,7 +65,7 @@ fn high_velocity_nozzles_are_coverage_governed() {
     );
     close(
         lpm(result.delivered_flow.value),
-        5467.857_025_380_236,
+        5_467.857_025_380_236,
         "the delivered flow",
     );
     close(

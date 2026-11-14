@@ -88,7 +88,7 @@ fn the_flame_length_and_sterile_zones_reproduce_the_capture() {
     );
     close(
         result.heat_flux_at_ground_distance.value,
-        3368.018_925_366_640_4,
+        3_368.018_925_366_640_4,
         "the ground flux",
     );
     assert_eq!(result.sterile_radii.len(), 4);
@@ -116,7 +116,7 @@ fn the_flame_length_and_sterile_zones_reproduce_the_capture() {
     );
     close(
         result.equivalent_flame_temperature.value,
-        1228.967_293_421_844_5,
+        1_228.967_293_421_844_5,
         "the equivalent flame temperature",
     );
 }
@@ -140,7 +140,7 @@ fn no_wind_leaves_the_tip_vertical() {
     assert_eq!(result.flame_tip_horizontal.value, 0.0);
     close(
         result.heat_flux_at_ground_distance.value,
-        3368.018_925_366_640_4,
+        3_368.018_925_366_640_4,
         "the ground flux",
     );
 }
@@ -173,7 +173,7 @@ fn a_wind_tilts_the_flame_and_moves_the_sterile_zones() {
     );
     close(
         result.heat_flux_at_ground_distance.value,
-        4589.759_326_845_264,
+        4_589.759_326_845_264,
         "the ground flux",
     );
     close(
@@ -201,7 +201,7 @@ fn the_documentation_example() {
     close(result.flame_tilt, 0.049_958_395_721_942_765, "the tilt");
     close(
         result.heat_flux_at_ground_distance.value,
-        3458.314_186_391_075_5,
+        3_458.314_186_391_075_5,
         "the ground flux",
     );
     close(
@@ -258,7 +258,7 @@ fn a_reduced_transmissivity_halves_the_flux() {
     );
     close(
         result.heat_flux_at_ground_distance.value,
-        1684.009_462_683_320_2,
+        1_684.009_462_683_320_2,
         "the ground flux",
     );
     close(

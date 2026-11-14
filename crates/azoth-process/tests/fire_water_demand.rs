@@ -121,7 +121,7 @@ fn the_selective_object_protection_ratio_is_small() {
     );
     close(
         lpm(result.total_demand.value),
-        5257.567_207_859_327,
+        5_257.567_207_859_327,
         "the total demand",
     );
     close(

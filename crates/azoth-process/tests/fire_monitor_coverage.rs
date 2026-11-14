@@ -66,7 +66,7 @@ fn a_large_deck_monitor_is_not_suitable() {
     close(lpm(result.total_flow.value), 4800.0, "the total flow");
     close(
         result.swept_area.value,
-        2513.274_122_871_834_6,
+        2_513.274_122_871_834_6,
         "the swept area",
     );
     close(
@@ -240,7 +240,7 @@ fn the_flow_needed_scales_with_the_coverage_fraction() {
             .flow_needed_for_compliance
             .expect("a finite fraction")
             .value,
-        7051.548_982_939_475 / 60_000.0,
+        7_051.548_982_939_475 / 60_000.0,
         "the compliance flow",
     );
 }
@@ -286,7 +286,7 @@ fn a_stated_dimension_replaces_the_area_root() {
             .flow_needed_for_compliance
             .expect("a finite fraction")
             .value),
-        5828.571_428_571_428,
+        5_828.571_428_571_428,
         "the compliance flow",
     );
 }
@@ -299,7 +299,7 @@ fn the_defaults_are_the_class_ones() {
     close(lpm(result.total_flow.value), 2400.0, "the default flow");
     close(
         result.swept_area.value,
-        1256.637_061_435_917_3,
+        1_256.637_061_435_917_3,
         "the swept area",
     );
     close(result.drift_displacement.value, 0.0, "no wind");

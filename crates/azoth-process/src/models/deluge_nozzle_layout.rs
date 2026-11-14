@@ -5,7 +5,7 @@
 //! criteria, the larger count, the grid and the delivered density.
 
 use azoth_core::units::{
-    Area, Length, Pressure, VolumeRate, bars, liters_per_minute, meters, square_meters,
+    Area, Length, Pressure, VolumeRate, liters_per_minute, meters, square_meters,
 };
 use azoth_core::{AzothError, Result, Warning, apply_checks};
 use serde::Serialize;

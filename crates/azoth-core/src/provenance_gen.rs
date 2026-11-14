@@ -3472,7 +3472,7 @@ pub static ALL_PROVENANCE: &[ProvenanceStatic] = &[
         python_path: "python/src/azoth/process/reference/deluge_nozzle_layout.py",
         python_sha256: "2f6de91182364284a55c5ccd12157f7fd80d9c0e6ca805d3d88af93a387b661e",
         rust_path: "crates/azoth-process/src/models/deluge_nozzle_layout.rs",
-        rust_sha256: "933966931d5e98be63f053e45b0986d628f65eb854a86e1c5321ca67ef5d7bd5",
+        rust_sha256: "e610634478a8669266055d689a34855b3dc2b76ce9094a2b4c8fa42d407ad711",
         source: "NeqSim process/safety/firewater/DelugeNozzleLayout.java",
         verification: VerificationStatus::PartiallyVerified,
         validation_cases: 0,
