@@ -14,6 +14,7 @@ use azoth_core::{CalcResult, Warning};
 use crate::models::absorption_column::AbsorptionColumnResult;
 use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult;
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
+use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
 use crate::models::bleve::BleveResult;
 use crate::models::component_splitter::ComponentSplitterResult;
 use crate::models::compressor::CompressorResult;
@@ -136,6 +137,30 @@ impl CalcResult for AntiSurgeRecycleResult {
         "surge_flow",
         "control_flow",
         "distance_to_surge",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for Api537FlareFlameModelResult {
+    const CALC_ID: &'static str = "process.api537_flare_flame_model";
+    const FIELDS: &'static [&'static str] = &[
+        "heat_release",
+        "radiative_power",
+        "flame_length",
+        "flame_tilt",
+        "flame_center_horizontal",
+        "flame_center_height",
+        "flame_tip_horizontal",
+        "flame_tip_height",
+        "heat_flux_at_ground_distance",
+        "sterile_radii",
+        "sound_power_level",
+        "sound_pressure_level",
+        "equivalent_flame_temperature",
         "warnings",
     ];
 

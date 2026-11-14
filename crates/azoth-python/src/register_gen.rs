@@ -243,6 +243,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyAbsorptionColumnResult>()?;
     m.add_class::<crate::transport_gen::PyActiveFireProtectionScreeningResult>()?;
     m.add_class::<crate::transport_gen::PyAntiSurgeRecycleResult>()?;
+    m.add_class::<crate::transport_gen::PyApi537FlareFlameModelResult>()?;
     m.add_class::<crate::transport_gen::PyBleveResult>()?;
     m.add_class::<crate::transport_gen::PyComponentSplitterResult>()?;
     m.add_class::<crate::transport_gen::PyCompressorResult>()?;
@@ -341,6 +342,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyScaleControlRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioChangeRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioIndexRow>()?;
+    m.add_class::<crate::record_outputs_gen::PySterileRadius>()?;
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
     m.add_class::<crate::record_outputs_gen::PyWaterMixingResult>()?;
@@ -887,6 +889,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::anti_surge_recycle,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::api537_flare_flame_model,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::bleve, m)?)?;

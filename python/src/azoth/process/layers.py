@@ -1595,6 +1595,57 @@ def _active_fire_protection_screening(inputs: Mapping[str, Any]) -> dict[str, fl
     }
 
 
+def _api537_flare_flame_model(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.api537_flare_flame_model`'s layers, from the reference's own arithmetic.
+
+    The sterile zones are a record list; the capture prints one radius per target in the
+    caller's order, so the dump flattens the same way.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.api537_flare_flame_model import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    targets = [
+        {"flux": quantity(float(row["flux"]), "W/m**2")}
+        for row in inputs["target_fluxes"]
+    ]
+    tau = inputs.get("transmissivity")
+    eta = inputs.get("acoustic_efficiency")
+    solution, _ = _evaluate(
+        quantity(float(inputs["mass_flow"]), "kg/s"),
+        float(inputs["heat_of_combustion"]),
+        float(inputs["radiative_fraction"]),
+        quantity(float(inputs["exit_velocity"]), "m/s"),
+        quantity(float(inputs["ground_distance"]), "m"),
+        quantity(float(inputs["sound_distance"]), "m"),
+        targets,
+        stack_height=optional("stack_height", "m"),
+        wind_speed=optional("wind_speed", "m/s"),
+        transmissivity=None if tau is None else float(tau),
+        acoustic_efficiency=None if eta is None else float(eta),
+    )
+    dumped: dict[str, float] = {
+        "heat_release_w": solution.heat_release,
+        "radiative_power_w": solution.radiative_power,
+        "flame_length_m": solution.length,
+        "flame_tilt_rad": solution.tilt,
+        "flame_center_horizontal_m": solution.center_horizontal,
+        "flame_center_height_m": solution.center_height,
+        "flame_tip_horizontal_m": solution.tip_horizontal,
+        "flame_tip_height_m": solution.tip_height,
+        "heat_flux_at_ground_distance_w_m2": solution.flux,
+        "sound_power_level_db": solution.pwl,
+        "sound_pressure_level_db": solution.spl,
+        "equivalent_flame_temperature_k": solution.temperature,
+    }
+    for index, (_, radius) in enumerate(solution.sterile):
+        dumped[f"sterile_radius_{index}_m"] = radius
+    return dumped
+
+
 def _vce(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.vce`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -2072,6 +2123,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.fire_monitor_coverage": _fire_monitor_coverage,
     "process.fire_water_coverage_assessment": _fire_water_coverage_assessment,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
+    "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3023,6 +3075,51 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_active_fire_protection_screening.tsv",
         block=4,
         identified_by=("#label", "afps_slower_blowdown"),
+    ),
+    # The flare flame's six: the class's test state, the still-air pair, the windy and the
+    # documentation example, the zero flow and the reduced transmissivity. The three clamps,
+    # the negative stack and the five refusals are uncased.
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="the_flame_length_and_sterile_zones",
+        capture="process_api537_flare_flame.tsv",
+        block=0,
+        identified_by=("#label", "api537_flame_length"),
+    ),
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="no_wind_leaves_the_tip_vertical",
+        capture="process_api537_flare_flame.tsv",
+        block=1,
+        identified_by=("#label", "api537_no_wind"),
+    ),
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="a_wind_tilts_the_flame_and_moves_the_sterile_zones",
+        capture="process_api537_flare_flame.tsv",
+        block=2,
+        identified_by=("#label", "api537_wind"),
+    ),
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="the_documentation_example",
+        capture="process_api537_flare_flame.tsv",
+        block=3,
+        identified_by=("#label", "api537_doc_example"),
+    ),
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="a_zero_mass_flow_publishes_zeroes",
+        capture="process_api537_flare_flame.tsv",
+        block=4,
+        identified_by=("#label", "api537_zero_flow"),
+    ),
+    LayerCase(
+        model="process.api537_flare_flame_model",
+        case="a_reduced_transmissivity_halves_the_flux",
+        capture="process_api537_flare_flame.tsv",
+        block=5,
+        identified_by=("#label", "api537_transmissivity"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4253,6 +4350,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The protection screening's five: the class's NaN times, the negative demand its setter
     # accepts, and the three constructor refusals.
     "process_active_fire_protection_screening.tsv": 5,
+    # The flare flame's nine: the three clamp states, the negative stack the class accepts,
+    # and the five constructor and method refusals.
+    "process_api537_flare_flame.tsv": 9,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

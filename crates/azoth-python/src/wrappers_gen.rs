@@ -5527,6 +5527,56 @@ pub fn anti_surge_recycle(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// API 537 flare flame model.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (mass_flow, heat_of_combustion, radiative_fraction, exit_velocity, ground_distance, sound_distance, target_fluxes, stack_height, wind_speed, transmissivity, acoustic_efficiency))]
+#[pyo3(
+    text_signature = "(mass_flow, heat_of_combustion, radiative_fraction, exit_velocity, ground_distance, sound_distance, target_fluxes, stack_height, wind_speed, transmissivity, acoustic_efficiency)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn api537_flare_flame_model(
+    py: Python<'_>,
+    mass_flow: f64,
+    heat_of_combustion: f64,
+    radiative_fraction: f64,
+    exit_velocity: f64,
+    ground_distance: f64,
+    sound_distance: f64,
+    target_fluxes: Vec<crate::records_gen::FlareTargetFlux>,
+    stack_height: Option<f64>,
+    wind_speed: Option<f64>,
+    transmissivity: Option<f64>,
+    acoustic_efficiency: Option<f64>,
+) -> PyResult<crate::transport_gen::PyApi537FlareFlameModelResult> {
+    let target_fluxes_records: Vec<
+        azoth_process::models::api537_flare_flame_model::FlareTargetFlux,
+    > = target_fluxes
+        .into_iter()
+        .map(
+            |row| azoth_process::models::api537_flare_flame_model::FlareTargetFlux {
+                flux: watts_per_square_meter(row.flux),
+            },
+        )
+        .collect();
+    azoth_process::models::api537_flare_flame_model::api537_flare_flame_model(
+        kilograms_per_second(mass_flow),
+        heat_of_combustion,
+        radiative_fraction,
+        meters_per_second(exit_velocity),
+        meters(ground_distance),
+        meters(sound_distance),
+        &target_fluxes_records,
+        stack_height.map(meters),
+        wind_speed.map(meters_per_second),
+        transmissivity,
+        acoustic_efficiency,
+    )
+    .map(|r| crate::transport_gen::PyApi537FlareFlameModelResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// BLEVE fireball radiation.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

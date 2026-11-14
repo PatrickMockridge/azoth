@@ -225,6 +225,7 @@
 //!   - specs/models/process/absorption_column.toml
 //!   - specs/models/process/active_fire_protection_screening.toml
 //!   - specs/models/process/anti_surge_recycle.toml
+//!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
@@ -2720,6 +2721,44 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.anti_surge_recycle",
         "max_iterations",
+        "dimensionless",
+    ),
+    ("process.api537_flare_flame_model", "mass_flow", "mass_rate"),
+    (
+        "process.api537_flare_flame_model",
+        "heat_of_combustion",
+        "dimensionless",
+    ),
+    (
+        "process.api537_flare_flame_model",
+        "radiative_fraction",
+        "dimensionless",
+    ),
+    (
+        "process.api537_flare_flame_model",
+        "exit_velocity",
+        "velocity",
+    ),
+    (
+        "process.api537_flare_flame_model",
+        "ground_distance",
+        "length",
+    ),
+    (
+        "process.api537_flare_flame_model",
+        "sound_distance",
+        "length",
+    ),
+    ("process.api537_flare_flame_model", "stack_height", "length"),
+    ("process.api537_flare_flame_model", "wind_speed", "velocity"),
+    (
+        "process.api537_flare_flame_model",
+        "transmissivity",
+        "dimensionless",
+    ),
+    (
+        "process.api537_flare_flame_model",
+        "acoustic_efficiency",
         "dimensionless",
     ),
     ("process.bleve", "fuel_mass", "mass"),

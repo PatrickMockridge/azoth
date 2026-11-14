@@ -195,6 +195,13 @@ pub struct FilterDropPoint {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct FlareTargetFlux {
+    #[pyo3(item)]
+    pub flux: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct FluidComponent {
     #[pyo3(item)]
     pub fluid: f64,

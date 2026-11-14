@@ -22,6 +22,7 @@ from azoth.core.result import (
     AbsorptionColumnResult,
     ActiveFireProtectionScreeningResult,
     AntiSurgeRecycleResult,
+    Api537FlareFlameModelResult,
     BleveResult,
     ComponentSplitterResult,
     CompressorResult,
@@ -94,6 +95,7 @@ __all__ = [
     "absorption_column",
     "active_fire_protection_screening",
     "anti_surge_recycle",
+    "api537_flare_flame_model",
     "bleve",
     "catalogue",
     "component_splitter",
@@ -196,6 +198,7 @@ _STIRRED_TANK_REACTOR = "process.stirred_tank_reactor"
 _TANK = "process.tank"
 _THREE_PHASE_SEPARATOR = "process.three_phase_separator"
 _ANTI_SURGE_RECYCLE = "process.anti_surge_recycle"
+_API537_FLARE_FLAME_MODEL = "process.api537_flare_flame_model"
 _BLEVE = "process.bleve"
 
 
@@ -1176,6 +1179,51 @@ def active_fire_protection_screening(
         bare_steel_time_to_critical=bare_steel_time_to_critical,
         dedicated_object_demand=dedicated_object_demand,
         general_area_demand=general_area_demand,
+    )
+
+
+def api537_flare_flame_model(
+    mass_flow: Q,
+    heat_of_combustion: float,
+    radiative_fraction: float,
+    exit_velocity: Q,
+    ground_distance: Q,
+    sound_distance: Q,
+    target_fluxes: list[dict[str, object]],
+    stack_height: Q | None = None,
+    wind_speed: Q | None = None,
+    transmissivity: float | None = None,
+    acoustic_efficiency: float | None = None,
+) -> Api537FlareFlameModelResult:
+    """The API 537 flare flame: Kent's length, the tilt, the flux, sterile zones and noise.
+
+    The point-source chain the class publishes: ``Q = m hc``, ``L = 0.00326 Q^0.478``, the
+    tilt ``atan2(wind, exit)``, the ground flux ``tau qr / (4 pi r^2)`` from the flame
+    centre and one sterile radius per target flux. The noise is ``10 log10(eta Q / 1e-12)``
+    dB and the pressure level subtracts ``20 log10(max(d, 1)) + 11``. **The class's clamps
+    are mirrored and unreachable**: negative wind and efficiency are refused rather than
+    clamped, and so is a negative stack height the class accepts.
+
+    Raises:
+        InvalidInputError: for a negative mass flow, a non-positive heat of combustion or
+            exit velocity, a radiative fraction outside ``[0, 1]``, a negative distance,
+            stack height or efficiency, a transmissivity outside ``[0, 1]``, or a
+            non-positive target flux.
+
+    See :func:`azoth.process.reference.api537_flare_flame_model`.
+    """
+    return resolve(_API537_FLARE_FLAME_MODEL)(  # type: ignore[no-any-return]
+        mass_flow=mass_flow,
+        heat_of_combustion=heat_of_combustion,
+        radiative_fraction=radiative_fraction,
+        exit_velocity=exit_velocity,
+        ground_distance=ground_distance,
+        sound_distance=sound_distance,
+        target_fluxes=target_fluxes,
+        stack_height=stack_height,
+        wind_speed=wind_speed,
+        transmissivity=transmissivity,
+        acoustic_efficiency=acoustic_efficiency,
     )
 
 

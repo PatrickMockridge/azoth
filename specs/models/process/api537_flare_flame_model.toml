@@ -1,0 +1,184 @@
+id = "process.api537_flare_flame_model"
+name = "API 537 flare flame model"
+kind = "procedure"
+assumptions = [
+    "**the heat release is `mass_flow heat_of_combustion`** and the radiative power `radiative_fraction` times it; everything else follows from those two.",
+    "**the flame length is Kent's fit to the API 521 curves**: `0.00326 Q^0.478`, exactly zero when the heat release is zero.",
+    "**the flame tilts with `atan2(wind, exit_velocity)`**, and the centre and tip sit half and all of the length along that direction from the stack top.",
+    "**the ground flux is a point source at the flame centre**: `tau qr / (4 pi r^2)`, with `r^2` floored at `1e-6` as the class floors it.",
+    "**the sterile radius is `max(0, xc + sqrt(r_s^2 - dz^2))`** with `r_s^2 = tau qr / (4 pi target)`; a target the sphere never reaches answers zero.",
+    "**the noise is `10 log10(eta Q / 1e-12)` dB**, and the sound pressure level subtracts `20 log10(max(distance, 1)) + 11`.",
+    "**the equivalent flame temperature comes from the emissive power over the flame surface** `pi max(0.12 L, 0.1) L`, with `sigma = 5.670374419e-8`.",
+    "**the class's clamps are mirrored and unreachable through the declared ranges**: negative wind and acoustic efficiencies are clamped, and the transmissivity to `[0, 1]`. A negative stack height, which the class's setter accepts, is refused.",
+    "**the target fluxes are the caller's list**: the class's four constants are 1.58, 4.73, 6.3 and 9.46 kW/m2, and `summary()` prints the first two.",
+]
+references = [
+    "API STD 537 (2017). Flare Details for General Refinery and Petrochemical Service, flame length and radiation.",
+    "API STD 521 (2021). Pressure-relieving and Depressuring Systems, flare radiation and sterile zone.",
+    "Kent, G. R. (1968). Find radiation effect of flares. Hydrocarbon Processing 47(6), 119-120.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/fire/Api537FlareFlameModel.java` is the port source.",
+    "`validation/neqsim/captures/process_api537_flare_flame.tsv` - the class's test state, no wind and a tilted wind, the documentation example, a zero flow, a reduced transmissivity, the three clamps and the five refusals.",
+]
+[source]
+standard = "NeqSim process/safety/fire/Api537FlareFlameModel.java"
+edition = "Its `totalHeatReleaseW`, `totalRadiativePowerW`, `flameLengthM`, `flameTiltRad`, the centre and tip positions, `heatFluxAtGroundDistance`, `sterileZoneRadiusM`, `soundPowerLevelDb`, `soundPressureLevelDb` and `equivalentFlameTemperatureK`."
+[algorithm]
+scheme = "closed_form_flare_flame_and_radiation"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.mass_flow]
+unit = "kg/s"
+description = "the flare gas mass flow, at least zero.\n"
+[inputs.heat_of_combustion]
+unit = "dimensionless"
+description = "the gas's heat of combustion in J/kg, above zero; dimensionless because the vocabulary has no specific-energy unit.\n"
+[inputs.radiative_fraction]
+unit = "dimensionless"
+description = "the fraction of the heat release that radiates, in `[0, 1]`.\n"
+[inputs.exit_velocity]
+unit = "m/s"
+description = "the flare tip's exit velocity, above zero.\n"
+[inputs.ground_distance]
+unit = "m"
+description = "the ground distance at which the incident flux is asked, at least zero.\n"
+[inputs.sound_distance]
+unit = "m"
+description = "the distance at which the sound pressure level is asked, at least zero; the class floors it at 1 m.\n"
+[inputs.target_fluxes]
+type = "record_list"
+row_type = "FlareTargetFlux"
+description = "the flux levels whose sterile radius is asked. The class's four constants are 1.58, 4.73, 6.3 and 9.46 kW/m2.\n"
+[inputs.target_fluxes.fields.flux]
+unit = "W/m**2"
+description = "the target flux, above zero.\n"
+[inputs.stack_height]
+unit = "m"
+optional = true
+description = "the stack height above grade, at least zero. **Absent is 30 m.**\n"
+[inputs.wind_speed]
+unit = "m/s"
+optional = true
+description = "the wind speed, at least zero. **Absent is 0**, and a negative value is refused rather than clamped.\n"
+[inputs.transmissivity]
+unit = "dimensionless"
+optional = true
+description = "the atmospheric transmissivity, in `[0, 1]`. **Absent is 1**, and a value outside the range is refused rather than clamped.\n"
+[inputs.acoustic_efficiency]
+unit = "dimensionless"
+optional = true
+description = "the fraction of the heat release radiated as sound, at least zero. **Absent is `3e-6`**, and a negative value is refused rather than clamped.\n"
+[outputs]
+[outputs.heat_release]
+unit = "W"
+description = "`mass_flow heat_of_combustion`.\n"
+[outputs.radiative_power]
+unit = "W"
+description = "`radiative_fraction heat_release`.\n"
+[outputs.flame_length]
+unit = "m"
+description = "`0.00326 heat_release^0.478`; zero when the heat release is zero.\n"
+[outputs.flame_tilt]
+unit = "dimensionless"
+description = "the tilt from vertical in radians, `atan2(wind_speed, exit_velocity)`.\n"
+[outputs.flame_center_horizontal]
+unit = "m"
+description = "`0.5 flame_length sin(flame_tilt)`.\n"
+[outputs.flame_center_height]
+unit = "m"
+description = "`stack_height + 0.5 flame_length cos(flame_tilt)`.\n"
+[outputs.flame_tip_horizontal]
+unit = "m"
+description = "`flame_length sin(flame_tilt)`.\n"
+[outputs.flame_tip_height]
+unit = "m"
+description = "`stack_height + flame_length cos(flame_tilt)`.\n"
+[outputs.heat_flux_at_ground_distance]
+unit = "W/m**2"
+description = "`transmissivity radiative_power / (4 pi r^2)` from the flame centre, with `r^2` floored at `1e-6`.\n"
+[outputs.sterile_radii]
+type = "record_list"
+description = "one row per target flux, in the caller's order.\n"
+[outputs.sterile_radii.fields.flux]
+unit = "W/m**2"
+description = "the target flux the radius is for.\n"
+[outputs.sterile_radii.fields.radius]
+unit = "m"
+description = "the sterile radius; zero where the radiative power never reaches the target.\n"
+[outputs.sound_power_level]
+unit = "dimensionless"
+description = "`10 log10(acoustic_efficiency heat_release / 1e-12)` dB; zero when the acoustic power is zero.\n"
+[outputs.sound_pressure_level]
+unit = "dimensionless"
+description = "`sound_power_level - 20 log10(max(sound_distance, 1)) - 11` dB.\n"
+[outputs.equivalent_flame_temperature]
+unit = "K"
+description = "`(radiative_power / (pi max(0.12 flame_length, 0.1) flame_length) / sigma)^0.25`; zero when the flame surface is zero.\n"
+[[valid_range]]
+quantity = "mass_flow"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class's constructor refuses a negative mass flow"
+[[valid_range]]
+quantity = "heat_of_combustion"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive heat of combustion"
+[[valid_range]]
+quantity = "radiative_fraction"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class's constructor refuses a radiative fraction outside [0, 1]"
+[[valid_range]]
+quantity = "exit_velocity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive exit velocity"
+[[valid_range]]
+quantity = "ground_distance"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative ground distance is not a location"
+[[valid_range]]
+quantity = "sound_distance"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative distance is not a location"
+[[valid_range]]
+quantity = "stack_height"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a stack below grade is not a flare; the class's unguarded setter accepts it"
+[[valid_range]]
+quantity = "wind_speed"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class clamps a negative wind; the port refuses it instead"
+[[valid_range]]
+quantity = "transmissivity"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class clamps the transmissivity; the port refuses a value outside it"
+[[valid_range]]
+quantity = "acoustic_efficiency"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class clamps a negative efficiency; the port refuses it instead"
+[implementations]
+python = "azoth.process.api537_flare_flame_model"
+rust = "azoth_process::api537_flare_flame_model"

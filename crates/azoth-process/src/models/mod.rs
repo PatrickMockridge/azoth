@@ -33,6 +33,7 @@
 pub mod absorption_column;
 pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
+pub mod api537_flare_flame_model;
 pub mod bleve;
 pub mod component_splitter;
 pub mod compressor;
@@ -86,6 +87,9 @@ pub use active_fire_protection_screening::{
     ActiveFireProtectionScreeningResult, active_fire_protection_screening,
 };
 pub use anti_surge_recycle::{AntiSurgeRecycleResult, anti_surge_recycle};
+pub use api537_flare_flame_model::{
+    Api537FlareFlameModelResult, FlareTargetFlux, SterileRadius, api537_flare_flame_model,
+};
 pub use bleve::{BleveResult, bleve};
 pub use component_splitter::{ComponentSplitterResult, component_splitter};
 pub use compressor::{CompressorResult, compressor};

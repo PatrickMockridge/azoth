@@ -404,6 +404,11 @@ class CompressorSurgePoint(TypedDict):
     flow: float
     head: float
 
+class FlareTargetFlux(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    flux: float
+
 class DepositMass(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -750,6 +755,13 @@ class WaterMixingResult:
     si_srso4: float | None
     si_caso4: float | None
     si_feco3: float | None
+
+@final
+class SterileRadius:
+    """one row per target flux, in the caller's order."""
+
+    flux: Qty
+    radius: Qty
 
 @final
 class ConsequenceOutcomeResult:
@@ -2879,6 +2891,23 @@ class AntiSurgeRecycleResult:
     surge_flow: Qty
     control_flow: Qty
     distance_to_surge: float
+    warnings: list[Warning]
+
+@final
+class Api537FlareFlameModelResult:
+    heat_release: Qty
+    radiative_power: Qty
+    flame_length: Qty
+    flame_tilt: float
+    flame_center_horizontal: Qty
+    flame_center_height: Qty
+    flame_tip_horizontal: Qty
+    flame_tip_height: Qty
+    heat_flux_at_ground_distance: Qty
+    sterile_radii: list[SterileRadius]
+    sound_power_level: float
+    sound_pressure_level: float
+    equivalent_flame_temperature: Qty
     warnings: list[Warning]
 
 @final
@@ -6428,6 +6457,19 @@ def anti_surge_recycle(
     tolerance: float | None = None,
     max_iterations: float | None = None,
 ) -> AntiSurgeRecycleResult: ...
+def api537_flare_flame_model(
+    mass_flow: float,
+    heat_of_combustion: float,
+    radiative_fraction: float,
+    exit_velocity: float,
+    ground_distance: float,
+    sound_distance: float,
+    target_fluxes: list[FlareTargetFlux],
+    stack_height: float | None = None,
+    wind_speed: float | None = None,
+    transmissivity: float | None = None,
+    acoustic_efficiency: float | None = None,
+) -> Api537FlareFlameModelResult: ...
 def bleve(
     fuel_mass: float,
     heat_of_combustion: float,

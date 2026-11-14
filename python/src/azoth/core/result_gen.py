@@ -49,6 +49,7 @@ from azoth.core.record_outputs_gen import (
     ScaleControlRow,
     ScenarioChangeRow,
     ScenarioIndexRow,
+    SterileRadius,
     StreamScaleMineralRow,
     SubFraction,
     WaterMixingResult,
@@ -5650,6 +5651,55 @@ class AntiSurgeRecycleResult(_HasWarnings):
 
     #: `getDistanceToSurge()` at the final machine state: the inlet flow over the surge flow less one.
     distance_to_surge: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class Api537FlareFlameModelResult(_HasWarnings):
+    """Result of ``process.api537_flare_flame_model``."""
+
+    CALC_ID: ClassVar[str] = "process.api537_flare_flame_model"
+
+    #: `mass_flow heat_of_combustion`.
+    heat_release: Q
+
+    #: `radiative_fraction heat_release`.
+    radiative_power: Q
+
+    #: `0.00326 heat_release^0.478`; zero when the heat release is zero.
+    flame_length: Q
+
+    #: the tilt from vertical in radians, `atan2(wind_speed, exit_velocity)`.
+    flame_tilt: float
+
+    #: `0.5 flame_length sin(flame_tilt)`.
+    flame_center_horizontal: Q
+
+    #: `stack_height + 0.5 flame_length cos(flame_tilt)`.
+    flame_center_height: Q
+
+    #: `flame_length sin(flame_tilt)`.
+    flame_tip_horizontal: Q
+
+    #: `stack_height + flame_length cos(flame_tilt)`.
+    flame_tip_height: Q
+
+    #: `transmissivity radiative_power / (4 pi r^2)` from the flame centre, with `r^2` floored at `1e-6`.
+    heat_flux_at_ground_distance: Q
+
+    #: one row per target flux, in the caller's order.
+    sterile_radii: tuple[SterileRadius, ...]
+
+    #: `10 log10(acoustic_efficiency heat_release / 1e-12)` dB; zero when the acoustic power is zero.
+    sound_power_level: float
+
+    #: `sound_power_level - 20 log10(max(sound_distance, 1)) - 11` dB.
+    sound_pressure_level: float
+
+    #: `(radiative_power / (pi max(0.12 flame_length, 0.1) flame_length) / sigma)^0.25`; zero when the flame surface is zero.
+    equivalent_flame_temperature: Q
 
     #: Caveats.
     warnings: tuple[Warning, ...]

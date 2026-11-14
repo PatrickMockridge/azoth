@@ -21,8 +21,8 @@ use crate::record_outputs_gen::{
     PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
     PyMineralEquilibriumRow, PyNaceIssueRow, PyRemediationOptionRow, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PyStreamScaleMineralRow,
-    PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySterileRadius,
+    PyStreamScaleMineralRow, PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -14134,6 +14134,133 @@ impl From<&azoth_process::models::anti_surge_recycle::AntiSurgeRecycleResult>
                 unit: "m**3/h".to_string(),
             },
             distance_to_surge: r.distance_to_surge,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.api537_flare_flame_model`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Api537FlareFlameModelResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyApi537FlareFlameModelResult {
+    /// `mass_flow heat_of_combustion`.
+    #[pyo3(get)]
+    pub heat_release: PyQty,
+    /// `radiative_fraction heat_release`.
+    #[pyo3(get)]
+    pub radiative_power: PyQty,
+    /// `0.00326 heat_release^0.478`; zero when the heat release is zero.
+    #[pyo3(get)]
+    pub flame_length: PyQty,
+    /// the tilt from vertical in radians, `atan2(wind_speed, exit_velocity)`.
+    #[pyo3(get)]
+    pub flame_tilt: f64,
+    /// `0.5 flame_length sin(flame_tilt)`.
+    #[pyo3(get)]
+    pub flame_center_horizontal: PyQty,
+    /// `stack_height + 0.5 flame_length cos(flame_tilt)`.
+    #[pyo3(get)]
+    pub flame_center_height: PyQty,
+    /// `flame_length sin(flame_tilt)`.
+    #[pyo3(get)]
+    pub flame_tip_horizontal: PyQty,
+    /// `stack_height + flame_length cos(flame_tilt)`.
+    #[pyo3(get)]
+    pub flame_tip_height: PyQty,
+    /// `transmissivity radiative_power / (4 pi r^2)` from the flame centre, with `r^2` floored at `1e-6`.
+    #[pyo3(get)]
+    pub heat_flux_at_ground_distance: PyQty,
+    /// one row per target flux, in the caller's order.
+    #[pyo3(get)]
+    pub sterile_radii: Vec<PySterileRadius>,
+    /// `10 log10(acoustic_efficiency heat_release / 1e-12)` dB; zero when the acoustic power is zero.
+    #[pyo3(get)]
+    pub sound_power_level: f64,
+    /// `sound_power_level - 20 log10(max(sound_distance, 1)) - 11` dB.
+    #[pyo3(get)]
+    pub sound_pressure_level: f64,
+    /// `(radiative_power / (pi max(0.12 flame_length, 0.1) flame_length) / sigma)^0.25`; zero when the flame surface is zero.
+    #[pyo3(get)]
+    pub equivalent_flame_temperature: PyQty,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyApi537FlareFlameModelResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Api537FlareFlameModelResult(heat_release={:?}, radiative_power={:?}, flame_length={:?}, flame_tilt={:?}, flame_center_horizontal={:?}, flame_center_height={:?}, flame_tip_horizontal={:?}, flame_tip_height={:?}, heat_flux_at_ground_distance={:?}, sterile_radii={:?}, sound_power_level={:?}, sound_pressure_level={:?}, equivalent_flame_temperature={:?}, {} warning(s))",
+            self.heat_release,
+            self.radiative_power,
+            self.flame_length,
+            self.flame_tilt,
+            self.flame_center_horizontal,
+            self.flame_center_height,
+            self.flame_tip_horizontal,
+            self.flame_tip_height,
+            self.heat_flux_at_ground_distance,
+            self.sterile_radii,
+            self.sound_power_level,
+            self.sound_pressure_level,
+            self.equivalent_flame_temperature,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::api537_flare_flame_model::Api537FlareFlameModelResult>
+    for PyApi537FlareFlameModelResult
+{
+    fn from(
+        r: &azoth_process::models::api537_flare_flame_model::Api537FlareFlameModelResult,
+    ) -> Self {
+        Self {
+            heat_release: PyQty {
+                magnitude_si: r.heat_release.value,
+                unit: "W".to_string(),
+            },
+            radiative_power: PyQty {
+                magnitude_si: r.radiative_power.value,
+                unit: "W".to_string(),
+            },
+            flame_length: PyQty {
+                magnitude_si: r.flame_length.value,
+                unit: "m".to_string(),
+            },
+            flame_tilt: r.flame_tilt,
+            flame_center_horizontal: PyQty {
+                magnitude_si: r.flame_center_horizontal.value,
+                unit: "m".to_string(),
+            },
+            flame_center_height: PyQty {
+                magnitude_si: r.flame_center_height.value,
+                unit: "m".to_string(),
+            },
+            flame_tip_horizontal: PyQty {
+                magnitude_si: r.flame_tip_horizontal.value,
+                unit: "m".to_string(),
+            },
+            flame_tip_height: PyQty {
+                magnitude_si: r.flame_tip_height.value,
+                unit: "m".to_string(),
+            },
+            heat_flux_at_ground_distance: PyQty {
+                magnitude_si: r.heat_flux_at_ground_distance.value,
+                unit: "W/m**2".to_string(),
+            },
+            sterile_radii: r.sterile_radii.iter().map(PySterileRadius::from).collect(),
+            sound_power_level: r.sound_power_level,
+            sound_pressure_level: r.sound_pressure_level,
+            equivalent_flame_temperature: PyQty {
+                magnitude_si: r.equivalent_flame_temperature.value,
+                unit: "K".to_string(),
+            },
             warnings: transport(&r.warnings),
         }
     }

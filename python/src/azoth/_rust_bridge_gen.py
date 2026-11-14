@@ -22,6 +22,7 @@ from azoth.core.result import (
     AmmoniaPhaseResult,
     AntiSurgeRecycleResult,
     AntoineVaporPressureResult,
+    Api537FlareFlameModelResult,
     AppliedStandardRow,
     AqueousViscosityResult,
     ArgonSolidPhaseResult,
@@ -285,6 +286,7 @@ from azoth.core.result import (
     SrkPenelouxShiftResult,
     SrkZFactorResult,
     StabilityTestResult,
+    SterileRadius,
     StirredTankReactorResult,
     StreamScaleAnalyzerResult,
     StreamScaleMineralRow,
@@ -395,6 +397,7 @@ __all__ = [
     "ammonia_phase",
     "anti_surge_recycle",
     "antoine_vapor_pressure",
+    "api537_flare_flame_model",
     "aqueous_viscosity",
     "argon_solid_phase",
     "assay_mass_fractions",
@@ -5628,6 +5631,40 @@ def anti_surge_recycle(components: list[str], feed_n: Q, feed_z: list[float], fe
         surge_flow=from_si(result.surge_flow.magnitude_si, result.surge_flow.unit),
         control_flow=from_si(result.control_flow.magnitude_si, result.control_flow.unit),
         distance_to_surge=result.distance_to_surge,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def api537_flare_flame_model(mass_flow: Q, heat_of_combustion: float, radiative_fraction: float, exit_velocity: Q, ground_distance: Q, sound_distance: Q, target_fluxes: list[dict[str, object]], stack_height: Q | None=None, wind_speed: Q | None=None, transmissivity: float | None=None, acoustic_efficiency: float | None=None) -> Api537FlareFlameModelResult:
+    """``process.api537_flare_flame_model``, computed in Rust."""
+    spec = _models_gen.model("process.api537_flare_flame_model")
+    result = _core.api537_flare_flame_model(
+        input_to_si(spec, "mass_flow", mass_flow),
+        heat_of_combustion,
+        radiative_fraction,
+        input_to_si(spec, "exit_velocity", exit_velocity),
+        input_to_si(spec, "ground_distance", ground_distance),
+        input_to_si(spec, "sound_distance", sound_distance),
+        input_records_to_si(spec, "target_fluxes", target_fluxes),
+        None if stack_height is None else input_to_si(spec, "stack_height", stack_height),
+        None if wind_speed is None else input_to_si(spec, "wind_speed", wind_speed),
+        None if transmissivity is None else transmissivity,
+        None if acoustic_efficiency is None else acoustic_efficiency,
+    )
+    return Api537FlareFlameModelResult(
+        heat_release=from_si(result.heat_release.magnitude_si, result.heat_release.unit),
+        radiative_power=from_si(result.radiative_power.magnitude_si, result.radiative_power.unit),
+        flame_length=from_si(result.flame_length.magnitude_si, result.flame_length.unit),
+        flame_tilt=result.flame_tilt,
+        flame_center_horizontal=from_si(result.flame_center_horizontal.magnitude_si, result.flame_center_horizontal.unit),
+        flame_center_height=from_si(result.flame_center_height.magnitude_si, result.flame_center_height.unit),
+        flame_tip_horizontal=from_si(result.flame_tip_horizontal.magnitude_si, result.flame_tip_horizontal.unit),
+        flame_tip_height=from_si(result.flame_tip_height.magnitude_si, result.flame_tip_height.unit),
+        heat_flux_at_ground_distance=from_si(result.heat_flux_at_ground_distance.magnitude_si, result.heat_flux_at_ground_distance.unit),
+        sterile_radii=tuple(SterileRadius(flux=from_si(c.flux.magnitude_si, c.flux.unit), radius=from_si(c.radius.magnitude_si, c.radius.unit)) for c in result.sterile_radii),
+        sound_power_level=result.sound_power_level,
+        sound_pressure_level=result.sound_pressure_level,
+        equivalent_flame_temperature=from_si(result.equivalent_flame_temperature.magnitude_si, result.equivalent_flame_temperature.unit),
         warnings=_warnings(result.warnings),
     )
 

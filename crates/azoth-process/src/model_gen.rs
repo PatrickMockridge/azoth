@@ -4,6 +4,7 @@
 //!   - specs/models/process/absorption_column.toml
 //!   - specs/models/process/active_fire_protection_screening.toml
 //!   - specs/models/process/anti_surge_recycle.toml
+//!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
@@ -4496,6 +4497,766 @@ pub static ANTI_SURGE_RECYCLE_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&ANTI_SURGE_RECYCLE_ALGORITHM),
     checks: ANTI_SURGE_RECYCLE_CHECKS,
     cases: ANTI_SURGE_RECYCLE_CASES,
+};
+
+static API537_FLARE_FLAME_MODEL_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "mass_flow",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a negative mass flow",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "heat_of_combustion",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a non-positive heat of combustion",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "radiative_fraction",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a radiative fraction outside [0, 1]",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "exit_velocity",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a non-positive exit velocity",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "ground_distance",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative ground distance is not a location",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "sound_distance",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative distance is not a location",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "stack_height",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a stack below grade is not a flare; the class's unguarded setter accepts it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "wind_speed",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class clamps a negative wind; the port refuses it instead",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "transmissivity",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class clamps the transmissivity; the port refuses a value outside it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "acoustic_efficiency",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class clamps a negative efficiency; the port refuses it instead",
+        },
+    },
+];
+
+static API537_FLARE_FLAME_MODEL_CASES: &[TestCase] = &[
+    TestCase {
+        id: "the_flame_length_and_sterile_zones",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("mass_flow", 50.0),
+            ("heat_of_combustion", 50000000.0),
+            ("radiative_fraction", 0.2),
+            ("exit_velocity", 200.0),
+            ("ground_distance", 60.0),
+            ("sound_distance", 100.0),
+            ("stack_height", 40.0),
+            ("wind_speed", 0.0),
+            ("transmissivity", 1.0),
+            ("acoustic_efficiency", 3e-06),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("heat_release", 2500000000.0),
+            ("radiative_power", 500000000.0),
+            ("flame_length", 101.25883447888855),
+            ("flame_tilt", 0.0),
+            ("flame_center_horizontal", 0.0),
+            ("flame_center_height", 90.62941723944428),
+            ("flame_tip_horizontal", 0.0),
+            ("flame_tip_height", 141.25883447888856),
+            ("heat_flux_at_ground_distance", 3368.0189253666404),
+            ("sound_power_level", 158.750612633917),
+            ("sound_pressure_level", 107.750612633917),
+            ("equivalent_flame_temperature", 1228.9672934218445),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "target_fluxes",
+            &[
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(1580.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(4730.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(6300.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(9460.0),
+                }],
+            ],
+        )],
+        expected_records: &[(
+            "sterile_radii",
+            &[
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(1580.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(130.26531729876814),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(4730.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(14.082031417585814),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(6300.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(9460.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "no_wind_leaves_the_tip_vertical",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("mass_flow", 50.0),
+            ("heat_of_combustion", 50000000.0),
+            ("radiative_fraction", 0.2),
+            ("exit_velocity", 200.0),
+            ("ground_distance", 60.0),
+            ("sound_distance", 100.0),
+            ("stack_height", 40.0),
+            ("wind_speed", 0.0),
+            ("transmissivity", 1.0),
+            ("acoustic_efficiency", 3e-06),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("flame_tilt", 0.0),
+            ("flame_tip_horizontal", 0.0),
+            ("flame_tip_height", 141.25883447888856),
+            ("heat_flux_at_ground_distance", 3368.0189253666404),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "target_fluxes",
+            &[
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(1580.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(4730.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(6300.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(9460.0),
+                }],
+            ],
+        )],
+        expected_records: &[(
+            "sterile_radii",
+            &[
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(1580.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(130.26531729876814),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(4730.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(14.082031417585814),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(6300.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(9460.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "a_wind_tilts_the_flame_and_moves_the_sterile_zones",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("mass_flow", 50.0),
+            ("heat_of_combustion", 50000000.0),
+            ("radiative_fraction", 0.2),
+            ("exit_velocity", 200.0),
+            ("ground_distance", 60.0),
+            ("sound_distance", 100.0),
+            ("stack_height", 40.0),
+            ("wind_speed", 100.0),
+            ("transmissivity", 1.0),
+            ("acoustic_efficiency", 3e-06),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("flame_tilt", 0.4636476090008061),
+            ("flame_center_horizontal", 22.642163721719427),
+            ("flame_center_height", 85.28432744343885),
+            ("flame_tip_horizontal", 45.284327443438855),
+            ("flame_tip_height", 130.5686548868777),
+            ("heat_flux_at_ground_distance", 4589.759326845264),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "target_fluxes",
+            &[
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(1580.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(4730.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(6300.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(9460.0),
+                }],
+            ],
+        )],
+        expected_records: &[(
+            "sterile_radii",
+            &[
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(1580.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(156.46789985879553),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(4730.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(56.38499067097571),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(6300.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(9460.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "the_documentation_example",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("mass_flow", 50.0),
+            ("heat_of_combustion", 50000000.0),
+            ("radiative_fraction", 0.2),
+            ("exit_velocity", 200.0),
+            ("ground_distance", 60.0),
+            ("sound_distance", 100.0),
+            ("stack_height", 40.0),
+            ("wind_speed", 10.0),
+            ("transmissivity", 1.0),
+            ("acoustic_efficiency", 3e-06),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("flame_tilt", 0.049958395721942765),
+            ("flame_center_horizontal", 2.528312444195862),
+            ("flame_center_height", 90.56624888391724),
+            ("flame_tip_horizontal", 5.056624888391724),
+            ("flame_tip_height", 141.13249776783448),
+            ("heat_flux_at_ground_distance", 3458.3141863910755),
+            ("sound_power_level", 158.750612633917),
+            ("sound_pressure_level", 107.750612633917),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "target_fluxes",
+            &[
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(1580.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(4730.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(6300.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(9460.0),
+                }],
+            ],
+        )],
+        expected_records: &[(
+            "sterile_radii",
+            &[
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(1580.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(132.83755510643522),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(4730.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(17.01104150689372),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(6300.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(9460.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "a_zero_mass_flow_publishes_zeroes",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("mass_flow", 0.0),
+            ("heat_of_combustion", 50000000.0),
+            ("radiative_fraction", 0.2),
+            ("exit_velocity", 200.0),
+            ("ground_distance", 60.0),
+            ("sound_distance", 100.0),
+            ("stack_height", 40.0),
+            ("wind_speed", 0.0),
+            ("transmissivity", 1.0),
+            ("acoustic_efficiency", 3e-06),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("heat_release", 0.0),
+            ("radiative_power", 0.0),
+            ("flame_length", 0.0),
+            ("flame_tilt", 0.0),
+            ("flame_center_horizontal", 0.0),
+            ("flame_center_height", 40.0),
+            ("flame_tip_horizontal", 0.0),
+            ("flame_tip_height", 40.0),
+            ("heat_flux_at_ground_distance", 0.0),
+            ("sound_power_level", 0.0),
+            ("sound_pressure_level", -51.0),
+            ("equivalent_flame_temperature", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "target_fluxes",
+            &[
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(1580.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(4730.0),
+                }],
+            ],
+        )],
+        expected_records: &[(
+            "sterile_radii",
+            &[
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(1580.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(4730.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "a_reduced_transmissivity_halves_the_flux",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("mass_flow", 50.0),
+            ("heat_of_combustion", 50000000.0),
+            ("radiative_fraction", 0.2),
+            ("exit_velocity", 200.0),
+            ("ground_distance", 60.0),
+            ("sound_distance", 100.0),
+            ("stack_height", 40.0),
+            ("wind_speed", 0.0),
+            ("transmissivity", 0.5),
+            ("acoustic_efficiency", 3e-06),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("heat_flux_at_ground_distance", 1684.0094626833202)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "target_fluxes",
+            &[
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(1580.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(4730.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(6300.0),
+                }],
+                &[RecordField {
+                    name: "flux",
+                    value: FieldValue::Number(9460.0),
+                }],
+            ],
+        )],
+        expected_records: &[(
+            "sterile_radii",
+            &[
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(1580.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(66.16404469871632),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(4730.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(6300.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "flux",
+                        value: FieldValue::Number(9460.0),
+                    },
+                    RecordField {
+                        name: "radius",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+static API537_FLARE_FLAME_MODEL_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_flare_flame_and_radiation",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.api537_flare_flame_model`.
+pub static API537_FLARE_FLAME_MODEL_SPEC: ModelSpec = ModelSpec {
+    id: "process.api537_flare_flame_model",
+    kind: "procedure",
+    algorithm: Some(&API537_FLARE_FLAME_MODEL_ALGORITHM),
+    checks: API537_FLARE_FLAME_MODEL_CHECKS,
+    cases: API537_FLARE_FLAME_MODEL_CASES,
 };
 
 static BLEVE_CHECKS: &[SpecCheck] = &[
@@ -57878,6 +58639,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &ABSORPTION_COLUMN_SPEC,
     &ACTIVE_FIRE_PROTECTION_SCREENING_SPEC,
     &ANTI_SURGE_RECYCLE_SPEC,
+    &API537_FLARE_FLAME_MODEL_SPEC,
     &BLEVE_SPEC,
     &COMPONENT_SPLITTER_SPEC,
     &COMPRESSOR_SPEC,
