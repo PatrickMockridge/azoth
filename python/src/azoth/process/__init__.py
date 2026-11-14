@@ -32,6 +32,7 @@ from azoth.core.result import (
     EventTreeResult,
     ExpanderResult,
     FilterResult,
+    FireMonitorCoverageResult,
     FireWaterDemandResult,
     FlareResult,
     GasDispersionResult,
@@ -102,6 +103,7 @@ __all__ = [
     "event_tree",
     "expander",
     "filter",
+    "fire_monitor_coverage",
     "fire_water_demand",
     "flare",
     "forms",
@@ -141,6 +143,7 @@ __all__ = [
     "vce",
 ]
 
+_FIRE_MONITOR_COVERAGE = "process.fire_monitor_coverage"
 _FIRE_WATER_DEMAND = "process.fire_water_demand"
 _MANIFOLD = "process.manifold"
 _MIXER = "process.mixer"
@@ -2105,6 +2108,50 @@ def event_tree(
     return resolve(_EVENT_TREE)(  # type: ignore[no-any-return]
         initiating_frequency_per_year=initiating_frequency_per_year,
         branches=branches,
+    )
+
+
+def fire_monitor_coverage(
+    target_area: Q,
+    required_density: float,
+    monitor_count: float | None = None,
+    monitor_flow: Q | None = None,
+    effective_throw: Q | None = None,
+    sweep_angle: float | None = None,
+    wind_speed: Q | None = None,
+    fall_height: Q | None = None,
+    droplet_terminal_velocity: Q | None = None,
+    characteristic_dimension: Q | None = None,
+    line_of_sight_obstructed: bool | None = None,
+) -> FireMonitorCoverageResult:
+    """The fire-monitor coverage: density, wind drift and the class's verdict.
+
+    The monitor-substitution screen: the nominal density ``count flow / area``, the drift
+    ``fall wind / terminal``, the coverage fraction ``clamp(1 - drift / dimension, 0, 1)``
+    and the effective density. **The verdict is the class's classification** in its priority
+    order, obstructed sight first. **No finite flow suffices when the drift removes all
+    coverage**, so `flow_needed_for_compliance` is absent there, where the class returns
+    `+Infinity`.
+
+    Raises:
+        InvalidInputError: for a non-positive area, density, flow, throw, fall height or
+            terminal velocity, a count below one or not whole, an angle outside
+            ``(0, 360]``, or a negative wind speed or dimension.
+
+    See :func:`azoth.process.reference.fire_monitor_coverage`.
+    """
+    return resolve(_FIRE_MONITOR_COVERAGE)(  # type: ignore[no-any-return]
+        target_area=target_area,
+        required_density=required_density,
+        monitor_count=monitor_count,
+        monitor_flow=monitor_flow,
+        effective_throw=effective_throw,
+        sweep_angle=sweep_angle,
+        wind_speed=wind_speed,
+        fall_height=fall_height,
+        droplet_terminal_velocity=droplet_terminal_velocity,
+        characteristic_dimension=characteristic_dimension,
+        line_of_sight_obstructed=line_of_sight_obstructed,
     )
 
 

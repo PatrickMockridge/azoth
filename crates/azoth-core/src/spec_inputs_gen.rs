@@ -235,6 +235,7 @@
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/filter.toml
+//!   - specs/models/process/fire_monitor_coverage.toml
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
 //!   - specs/models/process/gas_dispersion.toml
@@ -3118,6 +3119,40 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.filter", "joint_efficiency", "dimensionless"),
     ("process.filter", "corrosion_allowance", "length"),
     ("process.filter", "element_collapse_pressure", "pressure"),
+    ("process.fire_monitor_coverage", "target_area", "area"),
+    (
+        "process.fire_monitor_coverage",
+        "required_density",
+        "dimensionless",
+    ),
+    (
+        "process.fire_monitor_coverage",
+        "monitor_count",
+        "dimensionless",
+    ),
+    (
+        "process.fire_monitor_coverage",
+        "monitor_flow",
+        "volume_rate",
+    ),
+    ("process.fire_monitor_coverage", "effective_throw", "length"),
+    (
+        "process.fire_monitor_coverage",
+        "sweep_angle",
+        "dimensionless",
+    ),
+    ("process.fire_monitor_coverage", "wind_speed", "velocity"),
+    ("process.fire_monitor_coverage", "fall_height", "length"),
+    (
+        "process.fire_monitor_coverage",
+        "droplet_terminal_velocity",
+        "velocity",
+    ),
+    (
+        "process.fire_monitor_coverage",
+        "characteristic_dimension",
+        "length",
+    ),
     ("process.fire_water_demand", "protected_area", "area"),
     (
         "process.fire_water_demand",

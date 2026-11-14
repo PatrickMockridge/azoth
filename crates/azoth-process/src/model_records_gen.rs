@@ -24,6 +24,7 @@ use crate::models::ejector::EjectorResult;
 use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
 use crate::models::filter::FilterResult;
+use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_demand::FireWaterDemandResult;
 use crate::models::flare::FlareResult;
 use crate::models::gas_dispersion::GasDispersionResult;
@@ -494,6 +495,27 @@ impl CalcResult for FilterResult {
         "collapse_pressure_utilization",
         "differential_pressure_design_acceptable",
         "design_media_area",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FireMonitorCoverageResult {
+    const CALC_ID: &'static str = "process.fire_monitor_coverage";
+    const FIELDS: &'static [&'static str] = &[
+        "total_flow",
+        "swept_area",
+        "nominal_density",
+        "drift_displacement",
+        "wind_coverage_fraction",
+        "effective_density",
+        "meets_density_still_air",
+        "meets_density_in_wind",
+        "flow_needed_for_compliance",
+        "verdict",
         "warnings",
     ];
 

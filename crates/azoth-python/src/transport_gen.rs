@@ -16281,6 +16281,101 @@ impl From<&azoth_process::models::filter::FilterResult> for PyFilterResult {
         }
     }
 }
+/// Result of `process.fire_monitor_coverage`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FireMonitorCoverageResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFireMonitorCoverageResult {
+    /// `monitor_count monitor_flow`.
+    #[pyo3(get)]
+    pub total_flow: PyQty,
+    /// `monitor_count pi effective_throw^2 sweep_angle / 360`.
+    #[pyo3(get)]
+    pub swept_area: PyQty,
+    /// `total_flow / target_area` in `L/(min m2)`.
+    #[pyo3(get)]
+    pub nominal_density: f64,
+    /// `fall_height wind_speed / droplet_terminal_velocity`.
+    #[pyo3(get)]
+    pub drift_displacement: PyQty,
+    /// `clamp(1 - drift_displacement / characteristic_dimension, 0, 1)`.
+    #[pyo3(get)]
+    pub wind_coverage_fraction: f64,
+    /// `nominal_density wind_coverage_fraction`.
+    #[pyo3(get)]
+    pub effective_density: f64,
+    /// whether the nominal density meets the requirement.
+    #[pyo3(get)]
+    pub meets_density_still_air: bool,
+    /// whether the effective density meets the requirement.
+    #[pyo3(get)]
+    pub meets_density_in_wind: bool,
+    /// `required_density target_area / wind_coverage_fraction`; absent where the fraction is zero, where the class answers `+Infinity`.
+    #[pyo3(get)]
+    pub flow_needed_for_compliance: Option<PyQty>,
+    /// the class's classification in its priority order: obstructed line of sight, still-air density, wind density, or feasible on density.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFireMonitorCoverageResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FireMonitorCoverageResult(total_flow={:?}, swept_area={:?}, nominal_density={:?}, drift_displacement={:?}, wind_coverage_fraction={:?}, effective_density={:?}, meets_density_still_air={:?}, meets_density_in_wind={:?}, flow_needed_for_compliance={:?}, verdict={:?}, {} warning(s))",
+            self.total_flow,
+            self.swept_area,
+            self.nominal_density,
+            self.drift_displacement,
+            self.wind_coverage_fraction,
+            self.effective_density,
+            self.meets_density_still_air,
+            self.meets_density_in_wind,
+            self.flow_needed_for_compliance,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fire_monitor_coverage::FireMonitorCoverageResult>
+    for PyFireMonitorCoverageResult
+{
+    fn from(r: &azoth_process::models::fire_monitor_coverage::FireMonitorCoverageResult) -> Self {
+        Self {
+            total_flow: PyQty {
+                magnitude_si: r.total_flow.value,
+                unit: "L/min".to_string(),
+            },
+            swept_area: PyQty {
+                magnitude_si: r.swept_area.value,
+                unit: "m**2".to_string(),
+            },
+            nominal_density: r.nominal_density,
+            drift_displacement: PyQty {
+                magnitude_si: r.drift_displacement.value,
+                unit: "m".to_string(),
+            },
+            wind_coverage_fraction: r.wind_coverage_fraction,
+            effective_density: r.effective_density,
+            meets_density_still_air: r.meets_density_still_air,
+            meets_density_in_wind: r.meets_density_in_wind,
+            flow_needed_for_compliance: r.flow_needed_for_compliance.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "L/min".to_string(),
+            }),
+            verdict: r.verdict.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.fire_water_demand`, transported.
 #[pyclass(
     frozen,

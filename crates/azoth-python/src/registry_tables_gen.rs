@@ -254,6 +254,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.event_tree" => azoth_process::models::event_tree::EventTreeResult::FIELDS.to_vec(),
         "process.expander" => azoth_process::models::expander::ExpanderResult::FIELDS.to_vec(),
         "process.filter" => azoth_process::models::filter::FilterResult::FIELDS.to_vec(),
+        "process.fire_monitor_coverage" => azoth_process::models::fire_monitor_coverage::FireMonitorCoverageResult::FIELDS.to_vec(),
         "process.fire_water_demand" => azoth_process::models::fire_water_demand::FireWaterDemandResult::FIELDS.to_vec(),
         "process.flare" => azoth_process::models::flare::FlareResult::FIELDS.to_vec(),
         "process.gas_dispersion" => azoth_process::models::gas_dispersion::GasDispersionResult::FIELDS.to_vec(),

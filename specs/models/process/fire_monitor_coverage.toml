@@ -1,0 +1,169 @@
+id = "process.fire_monitor_coverage"
+name = "Fire monitor coverage"
+kind = "procedure"
+assumptions = [
+    "**the nominal density is the total flow over the target area**: `count flow / area`; the sweep geometry does not enter it.",
+    "**the swept area is `count pi throw^2 angle / 360`**, the class's cone fraction, and is published as geometry rather than used by the density.",
+    "**the drift displacement is `fall_height wind / terminal_velocity`**, and the coverage fraction is `clamp(1 - drift / dimension, 0, 1)`.",
+    "**the characteristic dimension absent is `sqrt(target_area)`**, the class's NaN branch; a stated dimension overrides it.",
+    "**the effective density is the nominal times the coverage fraction**, and the two density predicates are separate: still air and in wind.",
+    "**no finite flow is enough when the drift removes all coverage**: the class answers `+Infinity` and the port publishes the output as absent.",
+    "**the verdict is the class's classification**, in its priority order: an obstructed line of sight first, then still-air density, then wind density, then feasible.",
+    "**the monitor count is dimensionless and whole**; the class's `setMonitors` takes an `int`, so a fractional count is refused here.",
+    "**the class's defaults are carried**: one monitor at 2400 L/min, a 40 m throw, a 90 degree sweep, no wind, a 10 m fall and an 8 m/s terminal velocity.",
+]
+references = [
+    "NFPA 15 (2022). Standard for Water Spray Fixed Systems for Fire Protection, monitor substitution.",
+    "NORSOK S-001 (2018). Technical safety, fire-water systems and monitor coverage.",
+    "ISO 13702 (2015). Petroleum and natural gas industries - Control and mitigation of fires and explosions on offshore production installations.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/firewater/FireMonitorCoverage.java` is the port source.",
+    "`validation/neqsim/captures/process_fire_monitor_coverage.tsv` - the class's large-deck, wind-drift and obstructed tests, a marginal and a feasible state, the all-drift state and the setter refusals.",
+]
+[source]
+standard = "NeqSim process/safety/firewater/FireMonitorCoverage.java"
+edition = "Its `totalFlowLpm`, `sweptAreaM2`, `nominalDensityLpmPerM2`, `driftDisplacementM`, `windCoverageFraction`, `effectiveDensityLpmPerM2`, `flowNeededForComplianceLpm` and `verdict`."
+[algorithm]
+scheme = "closed_form_fire_monitor_coverage"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.target_area]
+unit = "m**2"
+description = "the target area, above zero.\n"
+[inputs.required_density]
+unit = "dimensionless"
+description = "the required application density in `L/(min m2)`, above zero; dimensionless because the vocabulary has no per-area volume rate.\n"
+[inputs.monitor_count]
+unit = "dimensionless"
+optional = true
+description = "the monitor count, a whole number at least one. **Absent is 1.**\n"
+[inputs.monitor_flow]
+unit = "L/min"
+optional = true
+description = "one monitor's flow, above zero. **Absent is 2400 L/min.**\n"
+[inputs.effective_throw]
+unit = "m"
+optional = true
+description = "the monitor's effective throw, above zero. **Absent is 40 m.**\n"
+[inputs.sweep_angle]
+unit = "dimensionless"
+optional = true
+description = "the sweep angle in degrees, in `(0, 360]`. **Absent is 90 degrees.**\n"
+[inputs.wind_speed]
+unit = "m/s"
+optional = true
+description = "the wind speed, at least zero. **Absent is 0.**\n"
+[inputs.fall_height]
+unit = "m"
+optional = true
+description = "the fall height from the monitor to the target, above zero. **Absent is 10 m.**\n"
+[inputs.droplet_terminal_velocity]
+unit = "m/s"
+optional = true
+description = "the droplet terminal velocity, above zero. **Absent is 8 m/s.**\n"
+[inputs.characteristic_dimension]
+unit = "m"
+optional = true
+description = "the target's characteristic dimension along the wind, above zero. **Absent is `sqrt(target_area)`**, the class's NaN branch.\n"
+[inputs.line_of_sight_obstructed]
+type = "boolean"
+optional = true
+description = "whether equipment blocks the monitor's line of sight to part of the target. **Absent is false.**\n"
+[outputs]
+[outputs.total_flow]
+unit = "L/min"
+description = "`monitor_count monitor_flow`.\n"
+[outputs.swept_area]
+unit = "m**2"
+description = "`monitor_count pi effective_throw^2 sweep_angle / 360`.\n"
+[outputs.nominal_density]
+unit = "dimensionless"
+description = "`total_flow / target_area` in `L/(min m2)`.\n"
+[outputs.drift_displacement]
+unit = "m"
+description = "`fall_height wind_speed / droplet_terminal_velocity`.\n"
+[outputs.wind_coverage_fraction]
+unit = "dimensionless"
+description = "`clamp(1 - drift_displacement / characteristic_dimension, 0, 1)`.\n"
+[outputs.effective_density]
+unit = "dimensionless"
+description = "`nominal_density wind_coverage_fraction`.\n"
+[outputs.meets_density_still_air]
+type = "boolean"
+description = "whether the nominal density meets the requirement.\n"
+[outputs.meets_density_in_wind]
+type = "boolean"
+description = "whether the effective density meets the requirement.\n"
+[outputs.flow_needed_for_compliance]
+unit = "L/min"
+optional = true
+description = "`required_density target_area / wind_coverage_fraction`; absent where the fraction is zero, where the class answers `+Infinity`.\n"
+[outputs.verdict]
+type = "string"
+description = "the class's classification in its priority order: obstructed line of sight, still-air density, wind density, or feasible on density.\n"
+[[valid_range]]
+quantity = "target_area"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive target area"
+[[valid_range]]
+quantity = "required_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive density"
+[[valid_range]]
+quantity = "monitor_count"
+min = 1
+min_inclusive = true
+severity = "error"
+rationale = "the class's setter refuses a count below one"
+[[valid_range]]
+quantity = "monitor_flow"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive monitor flow"
+[[valid_range]]
+quantity = "effective_throw"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive throw"
+[[valid_range]]
+quantity = "sweep_angle"
+min = 0
+min_inclusive = false
+max = 360
+max_inclusive = true
+severity = "error"
+rationale = "the class's setter refuses an angle outside (0, 360]"
+[[valid_range]]
+quantity = "wind_speed"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class's setter refuses a negative wind speed"
+[[valid_range]]
+quantity = "fall_height"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive fall height"
+[[valid_range]]
+quantity = "droplet_terminal_velocity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive terminal velocity"
+[[valid_range]]
+quantity = "characteristic_dimension"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive dimension"
+[implementations]
+python = "azoth.process.fire_monitor_coverage"
+rust = "azoth_process::fire_monitor_coverage"

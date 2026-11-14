@@ -1502,6 +1502,48 @@ def _deluge_nozzle_layout(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _fire_monitor_coverage(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fire_monitor_coverage`'s layers, from the reference's own arithmetic.
+
+    The verdict and the two predicates are the model's own words, asserted by its test and
+    the cross-impl comparison rather than dumped here. The flow needed is omitted where the
+    drift leaves no coverage, the class's `+Infinity`.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.fire_monitor_coverage import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    count = inputs.get("monitor_count")
+    sweep = inputs.get("sweep_angle")
+    solution, _ = _evaluate(
+        quantity(float(inputs["target_area"]), "m**2"),
+        float(inputs["required_density"]),
+        monitor_count=None if count is None else float(count),
+        monitor_flow=optional("monitor_flow", "L/min"),
+        effective_throw=optional("effective_throw", "m"),
+        sweep_angle=None if sweep is None else float(sweep),
+        wind_speed=optional("wind_speed", "m/s"),
+        fall_height=optional("fall_height", "m"),
+        droplet_terminal_velocity=optional("droplet_terminal_velocity", "m/s"),
+        characteristic_dimension=optional("characteristic_dimension", "m"),
+        line_of_sight_obstructed=inputs.get("line_of_sight_obstructed"),
+    )
+    dumped: dict[str, float] = {
+        "total_flow_lpm": solution.total_flow * 60000.0,
+        "swept_area_m2": solution.swept_area,
+        "nominal_density_lpm_m2": solution.nominal_density,
+        "drift_displacement_m": solution.drift,
+        "wind_coverage_fraction": solution.fraction,
+        "effective_density_lpm_m2": solution.effective_density,
+    }
+    if solution.needed is not None:
+        dumped["flow_needed_for_compliance_lpm"] = solution.needed * 60000.0
+    return dumped
+
+
 def _vce(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.vce`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -1976,6 +2018,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.pfp_demand": _pfp_demand,
     "process.fire_water_demand": _fire_water_demand,
     "process.deluge_nozzle_layout": _deluge_nozzle_layout,
+    "process.fire_monitor_coverage": _fire_monitor_coverage,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -2787,6 +2830,72 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_deluge_nozzle_layout.tsv",
         block=5,
         identified_by=("#label", "dnl_clearance_fails"),
+    ),
+    # The monitor coverage's nine: the class's three tests, a marginal and a feasible state,
+    # the compliance flow, the all-drift state and the stated dimension. The eleven setter
+    # refusals are uncased.
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="a_large_deck_monitor_is_not_suitable",
+        capture="process_fire_monitor_coverage.tsv",
+        block=0,
+        identified_by=("#label", "fmc_large_deck"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="still_air_coverage_is_full",
+        capture="process_fire_monitor_coverage.tsv",
+        block=1,
+        identified_by=("#label", "fmc_wind_still"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="wind_drift_removes_the_coverage",
+        capture="process_fire_monitor_coverage.tsv",
+        block=2,
+        identified_by=("#label", "fmc_wind_drift"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="an_obstructed_line_of_sight_disqualifies_a_monitor",
+        capture="process_fire_monitor_coverage.tsv",
+        block=3,
+        identified_by=("#label", "fmc_obstructed"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="a_wind_limited_density_is_marginal",
+        capture="process_fire_monitor_coverage.tsv",
+        block=4,
+        identified_by=("#label", "fmc_marginal"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="a_small_drift_leaves_the_density_feasible",
+        capture="process_fire_monitor_coverage.tsv",
+        block=5,
+        identified_by=("#label", "fmc_feasible"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="the_flow_needed_for_compliance_scales_with_the_fraction",
+        capture="process_fire_monitor_coverage.tsv",
+        block=6,
+        identified_by=("#label", "fmc_flow_needed"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="drift_can_remove_every_bit_of_the_coverage",
+        capture="process_fire_monitor_coverage.tsv",
+        block=7,
+        identified_by=("#label", "fmc_drift_removes_coverage"),
+    ),
+    LayerCase(
+        model="process.fire_monitor_coverage",
+        case="a_stated_dimension_replaces_the_area_root",
+        capture="process_fire_monitor_coverage.tsv",
+        block=8,
+        identified_by=("#label", "fmc_characteristic_dimension"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4009,6 +4118,8 @@ UNCASED_ROWS: dict[str, int] = {
     # The deluge layout's eight: the class's constructor, pressure, efficiency and nozzle
     # refusals.
     "process_deluge_nozzle_layout.tsv": 8,
+    # The monitor coverage's eleven: the constructor and each setter's refusal.
+    "process_fire_monitor_coverage.tsv": 11,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

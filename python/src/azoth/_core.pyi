@@ -3179,6 +3179,20 @@ class FilterResult:
     warnings: list[Warning]
 
 @final
+class FireMonitorCoverageResult:
+    total_flow: Qty
+    swept_area: Qty
+    nominal_density: float
+    drift_displacement: Qty
+    wind_coverage_fraction: float
+    effective_density: float
+    meets_density_still_air: bool
+    meets_density_in_wind: bool
+    flow_needed_for_compliance: Qty | None
+    verdict: str
+    warnings: list[Warning]
+
+@final
 class FireWaterDemandResult:
     area_demand: Qty
     object_demand: Qty
@@ -6624,6 +6638,19 @@ def filter(
     element_collapse_pressure: float | None = None,
     element_integrity_verified: bool | None = None,
 ) -> FilterResult: ...
+def fire_monitor_coverage(
+    target_area: float,
+    required_density: float,
+    monitor_count: float | None = None,
+    monitor_flow: float | None = None,
+    effective_throw: float | None = None,
+    sweep_angle: float | None = None,
+    wind_speed: float | None = None,
+    fall_height: float | None = None,
+    droplet_terminal_velocity: float | None = None,
+    characteristic_dimension: float | None = None,
+    line_of_sight_obstructed: bool | None = None,
+) -> FireMonitorCoverageResult: ...
 def fire_water_demand(
     protected_area: float,
     application_rate: float | None = None,

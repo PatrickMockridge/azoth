@@ -5908,6 +5908,46 @@ pub fn expander(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Fire monitor coverage.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (target_area, required_density, monitor_count, monitor_flow, effective_throw, sweep_angle, wind_speed, fall_height, droplet_terminal_velocity, characteristic_dimension, line_of_sight_obstructed))]
+#[pyo3(
+    text_signature = "(target_area, required_density, monitor_count, monitor_flow, effective_throw, sweep_angle, wind_speed, fall_height, droplet_terminal_velocity, characteristic_dimension, line_of_sight_obstructed)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn fire_monitor_coverage(
+    py: Python<'_>,
+    target_area: f64,
+    required_density: f64,
+    monitor_count: Option<f64>,
+    monitor_flow: Option<f64>,
+    effective_throw: Option<f64>,
+    sweep_angle: Option<f64>,
+    wind_speed: Option<f64>,
+    fall_height: Option<f64>,
+    droplet_terminal_velocity: Option<f64>,
+    characteristic_dimension: Option<f64>,
+    line_of_sight_obstructed: Option<bool>,
+) -> PyResult<crate::transport_gen::PyFireMonitorCoverageResult> {
+    azoth_process::models::fire_monitor_coverage::fire_monitor_coverage(
+        square_meters(target_area),
+        required_density,
+        monitor_count,
+        monitor_flow.map(cubic_meters_per_second),
+        effective_throw.map(meters),
+        sweep_angle,
+        wind_speed.map(meters_per_second),
+        fall_height.map(meters),
+        droplet_terminal_velocity.map(meters_per_second),
+        characteristic_dimension.map(meters),
+        line_of_sight_obstructed,
+    )
+    .map(|r| crate::transport_gen::PyFireMonitorCoverageResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Flare.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

@@ -220,6 +220,11 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         "pressure_adequate",
         "density_met",
         "clearance_adequate",
+        # `fire_monitor_coverage`'s two density predicates, booleans with no slot in
+        # `TestCase`. `crates/azoth-process/tests/fire_monitor_coverage.rs` asserts them
+        # against the capture, and `test_cross_impl` compares them on both results.
+        "meets_density_still_air",
+        "meets_density_in_wind",
         # `thermal.shell_and_tube_vibration`'s four flags, booleans with no slot in
         # `TestCase`. `crates/azoth-thermal/tests/shell_and_tube_vibration.rs` asserts
         # them against the capture, and `test_cross_impl` compares them on both results.

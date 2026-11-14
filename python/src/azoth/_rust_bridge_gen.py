@@ -92,6 +92,7 @@ from azoth.core.result import (
     FeSMorphology,
     FilippovConductivityResult,
     FilterResult,
+    FireMonitorCoverageResult,
     FireWaterDemandResult,
     FirozabadiRamleyInterfaceTensionResult,
     FlareResult,
@@ -447,6 +448,7 @@ __all__ = [
     "expander",
     "filippov_conductivity",
     "filter",
+    "fire_monitor_coverage",
     "fire_water_demand",
     "firozabadi_ramley_interface_tension",
     "flare",
@@ -6186,6 +6188,37 @@ def filter(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
         collapse_pressure_utilization=result.collapse_pressure_utilization,
         differential_pressure_design_acceptable=result.differential_pressure_design_acceptable,
         design_media_area=None if result.design_media_area is None else from_si(result.design_media_area.magnitude_si, result.design_media_area.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def fire_monitor_coverage(target_area: Q, required_density: float, monitor_count: float | None=None, monitor_flow: Q | None=None, effective_throw: Q | None=None, sweep_angle: float | None=None, wind_speed: Q | None=None, fall_height: Q | None=None, droplet_terminal_velocity: Q | None=None, characteristic_dimension: Q | None=None, line_of_sight_obstructed: bool | None=None) -> FireMonitorCoverageResult:
+    """``process.fire_monitor_coverage``, computed in Rust."""
+    spec = _models_gen.model("process.fire_monitor_coverage")
+    result = _core.fire_monitor_coverage(
+        input_to_si(spec, "target_area", target_area),
+        required_density,
+        None if monitor_count is None else monitor_count,
+        None if monitor_flow is None else input_to_si(spec, "monitor_flow", monitor_flow),
+        None if effective_throw is None else input_to_si(spec, "effective_throw", effective_throw),
+        None if sweep_angle is None else sweep_angle,
+        None if wind_speed is None else input_to_si(spec, "wind_speed", wind_speed),
+        None if fall_height is None else input_to_si(spec, "fall_height", fall_height),
+        None if droplet_terminal_velocity is None else input_to_si(spec, "droplet_terminal_velocity", droplet_terminal_velocity),
+        None if characteristic_dimension is None else input_to_si(spec, "characteristic_dimension", characteristic_dimension),
+        line_of_sight_obstructed,
+    )
+    return FireMonitorCoverageResult(
+        total_flow=from_si(result.total_flow.magnitude_si, result.total_flow.unit),
+        swept_area=from_si(result.swept_area.magnitude_si, result.swept_area.unit),
+        nominal_density=result.nominal_density,
+        drift_displacement=from_si(result.drift_displacement.magnitude_si, result.drift_displacement.unit),
+        wind_coverage_fraction=result.wind_coverage_fraction,
+        effective_density=result.effective_density,
+        meets_density_still_air=result.meets_density_still_air,
+        meets_density_in_wind=result.meets_density_in_wind,
+        flow_needed_for_compliance=None if result.flow_needed_for_compliance is None else from_si(result.flow_needed_for_compliance.magnitude_si, result.flow_needed_for_compliance.unit),
+        verdict=result.verdict,
         warnings=_warnings(result.warnings),
     )
 

@@ -1,0 +1,234 @@
+model = "process.fire_monitor_coverage"
+[[cases]]
+id = "a_large_deck_monitor_is_not_suitable"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.monitorCannotDeliverFixedSystemDensityOverALargeDeck`: 510 m2 with two 2400 L/min monitors. From `validation/neqsim/captures/process_fire_monitor_coverage.tsv` (`fmc_large_deck`)."
+[cases.inputs]
+target_area = 510.0
+required_density = 10.0
+monitor_count = 2.0
+monitor_flow = 2400.0
+effective_throw = 40.0
+sweep_angle = 90.0
+wind_speed = 0.0
+fall_height = 10.0
+droplet_terminal_velocity = 8.0
+line_of_sight_obstructed = false
+[cases.expected]
+total_flow = 4800.0
+swept_area = 2513.2741228718346
+nominal_density = 9.411764705882353
+drift_displacement = 0.0
+wind_coverage_fraction = 1.0
+effective_density = 9.411764705882353
+meets_density_still_air = false
+meets_density_in_wind = false
+flow_needed_for_compliance = 5100.0
+verdict = "NOT SUITABLE - required density not achieved even in still air"
+[[cases]]
+id = "still_air_coverage_is_full"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.windDriftReducesMonitorCoverage`, the still-air half. From (`fmc_wind_still`)."
+[cases.inputs]
+target_area = 3.0
+required_density = 2000.0
+monitor_count = 1.0
+monitor_flow = 2400.0
+effective_throw = 40.0
+sweep_angle = 180.0
+wind_speed = 0.0
+fall_height = 12.0
+droplet_terminal_velocity = 8.0
+line_of_sight_obstructed = false
+[cases.expected]
+total_flow = 2400.0
+swept_area = 2513.2741228718346
+nominal_density = 800.0
+drift_displacement = 0.0
+wind_coverage_fraction = 1.0
+effective_density = 800.0
+meets_density_still_air = false
+meets_density_in_wind = false
+flow_needed_for_compliance = 6000.0
+verdict = "NOT SUITABLE - required density not achieved even in still air"
+[[cases]]
+id = "wind_drift_removes_the_coverage"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.windDriftReducesMonitorCoverage`, the windy half: `12 15 / 8 = 22.5 m` of drift over a `sqrt(3)` m dimension. From (`fmc_wind_drift`). The class's `+Infinity` flow is published as absent."
+[cases.inputs]
+target_area = 3.0
+required_density = 2000.0
+monitor_count = 1.0
+monitor_flow = 2400.0
+effective_throw = 40.0
+sweep_angle = 180.0
+wind_speed = 15.0
+fall_height = 12.0
+droplet_terminal_velocity = 8.0
+line_of_sight_obstructed = false
+[cases.expected]
+total_flow = 2400.0
+swept_area = 2513.2741228718346
+nominal_density = 800.0
+drift_displacement = 22.5
+wind_coverage_fraction = 0.0
+effective_density = 0.0
+meets_density_still_air = false
+meets_density_in_wind = false
+verdict = "NOT SUITABLE - required density not achieved even in still air"
+[[cases]]
+id = "an_obstructed_line_of_sight_disqualifies_a_monitor"
+tolerance = 1.0e-12
+source = "`FireWaterDesignTest.obstructedLineOfSightDisqualifiesAMonitor`: four 4000 L/min monitors over 100 m2 with the sight blocked. From (`fmc_obstructed`)."
+[cases.inputs]
+target_area = 100.0
+required_density = 10.0
+monitor_count = 4.0
+monitor_flow = 4000.0
+effective_throw = 40.0
+sweep_angle = 360.0
+wind_speed = 0.0
+fall_height = 10.0
+droplet_terminal_velocity = 8.0
+line_of_sight_obstructed = true
+[cases.expected]
+total_flow = 16000.0
+swept_area = 20106.192982974677
+nominal_density = 160.0
+drift_displacement = 0.0
+wind_coverage_fraction = 1.0
+effective_density = 160.0
+meets_density_still_air = true
+meets_density_in_wind = true
+flow_needed_for_compliance = 1000.0
+verdict = "NOT SUITABLE - line of sight to part of the target is obstructed; a monitor cannot wet surfaces it cannot see"
+[[cases]]
+id = "a_wind_limited_density_is_marginal"
+tolerance = 1.0e-12
+source = "One 2400 L/min monitor over 100 m2 at 5 m/s: 24 in still air, 9 in wind. From (`fmc_marginal`)."
+[cases.inputs]
+target_area = 100.0
+required_density = 10.0
+monitor_count = 1.0
+monitor_flow = 2400.0
+effective_throw = 40.0
+sweep_angle = 90.0
+wind_speed = 5.0
+fall_height = 10.0
+droplet_terminal_velocity = 8.0
+line_of_sight_obstructed = false
+[cases.expected]
+total_flow = 2400.0
+swept_area = 1256.6370614359173
+nominal_density = 24.0
+drift_displacement = 6.25
+wind_coverage_fraction = 0.375
+effective_density = 9.0
+meets_density_still_air = true
+meets_density_in_wind = false
+flow_needed_for_compliance = 2666.6666666666665
+verdict = "MARGINAL - density achieved in still air only; wind drift takes it below the requirement"
+[[cases]]
+id = "a_small_drift_leaves_the_density_feasible"
+tolerance = 1.0e-12
+source = "Two 2400 L/min monitors over 100 m2 at 1 m/s: 48 nominal, 42 effective. From (`fmc_feasible`)."
+[cases.inputs]
+target_area = 100.0
+required_density = 10.0
+monitor_count = 2.0
+monitor_flow = 2400.0
+effective_throw = 40.0
+sweep_angle = 90.0
+wind_speed = 1.0
+fall_height = 10.0
+droplet_terminal_velocity = 8.0
+line_of_sight_obstructed = false
+[cases.expected]
+total_flow = 4800.0
+swept_area = 2513.2741228718346
+nominal_density = 48.0
+drift_displacement = 1.25
+wind_coverage_fraction = 0.875
+effective_density = 42.0
+meets_density_still_air = true
+meets_density_in_wind = true
+flow_needed_for_compliance = 1142.857142857143
+verdict = "FEASIBLE ON DENSITY - carry forward to a trajectory and shadowing study"
+[[cases]]
+id = "the_flow_needed_for_compliance_scales_with_the_fraction"
+tolerance = 1.0e-12
+source = "One 2400 L/min monitor over 510 m2 at 5 m/s; the class's `required target_area / fraction`. From (`fmc_flow_needed`)."
+[cases.inputs]
+target_area = 510.0
+required_density = 10.0
+monitor_count = 1.0
+monitor_flow = 2400.0
+effective_throw = 40.0
+sweep_angle = 90.0
+wind_speed = 5.0
+fall_height = 10.0
+droplet_terminal_velocity = 8.0
+line_of_sight_obstructed = false
+[cases.expected]
+total_flow = 2400.0
+swept_area = 1256.6370614359173
+nominal_density = 4.705882352941177
+drift_displacement = 6.25
+wind_coverage_fraction = 0.7232453482687202
+effective_density = 3.403507521264566
+meets_density_still_air = false
+meets_density_in_wind = false
+flow_needed_for_compliance = 7051.548982939475
+verdict = "NOT SUITABLE - required density not achieved even in still air"
+[[cases]]
+id = "drift_can_remove_every_bit_of_the_coverage"
+tolerance = 1.0e-12
+source = "100 m/s of wind against an 8 m/s terminal velocity: no finite flow satisfies the density, and the class returns `+Infinity`. From (`fmc_drift_removes_coverage`)."
+[cases.inputs]
+target_area = 510.0
+required_density = 10.0
+monitor_count = 1.0
+monitor_flow = 2400.0
+effective_throw = 40.0
+sweep_angle = 90.0
+wind_speed = 100.0
+fall_height = 10.0
+droplet_terminal_velocity = 8.0
+line_of_sight_obstructed = false
+[cases.expected]
+total_flow = 2400.0
+swept_area = 1256.6370614359173
+nominal_density = 4.705882352941177
+drift_displacement = 125.0
+wind_coverage_fraction = 0.0
+effective_density = 0.0
+meets_density_still_air = false
+meets_density_in_wind = false
+verdict = "NOT SUITABLE - required density not achieved even in still air"
+[[cases]]
+id = "a_stated_dimension_replaces_the_area_root"
+tolerance = 1.0e-12
+source = "The same state with a stated 50 m dimension instead of `sqrt(510)`, which shrinks the drift fraction. From (`fmc_characteristic_dimension`)."
+[cases.inputs]
+target_area = 510.0
+required_density = 10.0
+monitor_count = 1.0
+monitor_flow = 2400.0
+effective_throw = 40.0
+sweep_angle = 90.0
+wind_speed = 5.0
+fall_height = 10.0
+droplet_terminal_velocity = 8.0
+characteristic_dimension = 50.0
+line_of_sight_obstructed = false
+[cases.expected]
+total_flow = 2400.0
+swept_area = 1256.6370614359173
+nominal_density = 4.705882352941177
+drift_displacement = 6.25
+wind_coverage_fraction = 0.875
+effective_density = 4.11764705882353
+meets_density_still_air = false
+meets_density_in_wind = false
+flow_needed_for_compliance = 5828.571428571428
+verdict = "NOT SUITABLE - required density not achieved even in still air"

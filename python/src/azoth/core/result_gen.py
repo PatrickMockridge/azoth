@@ -6526,6 +6526,46 @@ class FilterResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class FireMonitorCoverageResult(_HasWarnings):
+    """Result of ``process.fire_monitor_coverage``."""
+
+    CALC_ID: ClassVar[str] = "process.fire_monitor_coverage"
+
+    #: `monitor_count monitor_flow`.
+    total_flow: Q
+
+    #: `monitor_count pi effective_throw^2 sweep_angle / 360`.
+    swept_area: Q
+
+    #: `total_flow / target_area` in `L/(min m2)`.
+    nominal_density: float
+
+    #: `fall_height wind_speed / droplet_terminal_velocity`.
+    drift_displacement: Q
+
+    #: `clamp(1 - drift_displacement / characteristic_dimension, 0, 1)`.
+    wind_coverage_fraction: float
+
+    #: `nominal_density wind_coverage_fraction`.
+    effective_density: float
+
+    #: whether the nominal density meets the requirement.
+    meets_density_still_air: bool
+
+    #: whether the effective density meets the requirement.
+    meets_density_in_wind: bool
+
+    #: `required_density target_area / wind_coverage_fraction`; absent where the fraction is zero, where the class answers `+Infinity`.
+    flow_needed_for_compliance: Q | None
+
+    #: the class's classification in its priority order: obstructed line of sight, still-air density, wind density, or feasible on density.
+    verdict: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class FireWaterDemandResult(_HasWarnings):
     """Result of ``process.fire_water_demand``."""
 
