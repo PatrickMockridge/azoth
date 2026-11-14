@@ -167,6 +167,8 @@ pub fn fire_monitor_coverage(
     let nominal_density = total_flow_lpm / target_area.value;
     let drift = fall * wind / terminal;
     let dimension = stated_dimension.unwrap_or_else(|| target_area.value.sqrt());
+    // numerics-ok: `windCoverageFraction`'s own `Math.max(0, Math.min(1, f))`; the class
+    // clamps the coverage fraction rather than refusing it.
     let fraction = (1.0 - drift / dimension).clamp(0.0, 1.0);
     let effective_density = nominal_density * fraction;
     let still_air = nominal_density >= required_density;

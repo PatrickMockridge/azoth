@@ -3562,7 +3562,7 @@ pub static ALL_PROVENANCE: &[ProvenanceStatic] = &[
         python_path: "python/src/azoth/process/reference/fire_monitor_coverage.py",
         python_sha256: "9406f1a8e9a05e9900a8d73b97f8163e6369d925d7e604a4504eb7183abc7d8d",
         rust_path: "crates/azoth-process/src/models/fire_monitor_coverage.rs",
-        rust_sha256: "84e8aa75db03714f6140923407c64c9e29327b21d0d8c3d5017399903e99077a",
+        rust_sha256: "929f6e1ef293384eae71abbee777c95370ba1c2f2a7dc2bad701ba3d51af442b",
         source: "NeqSim process/safety/firewater/FireMonitorCoverage.java",
         verification: VerificationStatus::PartiallyVerified,
         validation_cases: 0,

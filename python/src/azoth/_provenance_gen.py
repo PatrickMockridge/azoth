@@ -2615,7 +2615,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "calc_id": 'process.fire_monitor_coverage',
         "name": 'Fire monitor coverage',
         "spec": {'path': 'specs/models/process/fire_monitor_coverage.toml', 'sha256': 'fd762be74fba6df28a9ad2e7c61a5e70d35dfc7c7f52c84d7a360f0e685c7e83'},
-        "code": [{'path': 'python/src/azoth/process/reference/fire_monitor_coverage.py', 'sha256': '9406f1a8e9a05e9900a8d73b97f8163e6369d925d7e604a4504eb7183abc7d8d'}, {'path': 'crates/azoth-process/src/models/fire_monitor_coverage.rs', 'sha256': '84e8aa75db03714f6140923407c64c9e29327b21d0d8c3d5017399903e99077a'}],
+        "code": [{'path': 'python/src/azoth/process/reference/fire_monitor_coverage.py', 'sha256': '9406f1a8e9a05e9900a8d73b97f8163e6369d925d7e604a4504eb7183abc7d8d'}, {'path': 'crates/azoth-process/src/models/fire_monitor_coverage.rs', 'sha256': '929f6e1ef293384eae71abbee777c95370ba1c2f2a7dc2bad701ba3d51af442b'}],
         "source": 'NeqSim process/safety/firewater/FireMonitorCoverage.java',
         "verification": 'partially_verified',
         "validation_cases": 0,
