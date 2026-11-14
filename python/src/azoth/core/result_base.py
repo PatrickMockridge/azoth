@@ -91,6 +91,16 @@ class CorrosionSeverity(StrEnum):
     VERY_HIGH = "very_high"
 
 
+class SupplyVerdict(StrEnum):
+    """Which of the coverage, flow and pressure questions a fire-water gate failed."""
+
+    COMPLIANT = "compliant"
+    COVERAGE_GAP_SUPPLY_ADEQUATE = "coverage_gap_supply_adequate"
+    SUPPLY_FLOW_DEFICIT = "supply_flow_deficit"
+    SUPPLY_PRESSURE_DEFICIT = "supply_pressure_deficit"
+    DEDICATED_SUPPLY_REQUIRED = "dedicated_supply_required"
+
+
 class GoverningCriterion(StrEnum):
     """Which criterion set a deluge nozzle count."""
 

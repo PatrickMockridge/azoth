@@ -71,6 +71,7 @@ from azoth.core.result_base import (
     PlusModel,
     RootStructure,
     StabilityVerdict,
+    SupplyVerdict,
     TpMultiflashSeed,
     _HasWarnings,
 )
@@ -6560,6 +6561,34 @@ class FireMonitorCoverageResult(_HasWarnings):
 
     #: the class's classification in its priority order: obstructed line of sight, still-air density, wind density, or feasible on density.
     verdict: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FireWaterCoverageAssessmentResult(_HasWarnings):
+    """Result of ``process.fire_water_coverage_assessment``."""
+
+    CALC_ID: ClassVar[str] = "process.fire_water_coverage_assessment"
+
+    #: `max(0, protected_area - covered_area)`.
+    coverage_gap: Q
+
+    #: `min(1, covered_area / protected_area)`.
+    coverage_fraction: float
+
+    #: `max(0, required_flow - existing_delivered_flow)`.
+    flow_deficit: Q
+
+    #: whether the spare supply meets the flow deficit.
+    flow_feasible: bool
+
+    #: whether the worst-case margin meets the required one.
+    pressure_feasible: bool
+
+    #: the class's classification, in its own priority order.
+    verdict: SupplyVerdict
 
     #: Caveats.
     warnings: tuple[Warning, ...]

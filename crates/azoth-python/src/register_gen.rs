@@ -254,6 +254,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyFilterResult>()?;
     m.add_class::<crate::transport_gen::PyFireMonitorCoverageResult>()?;
+    m.add_class::<crate::transport_gen::PyFireWaterCoverageAssessmentResult>()?;
     m.add_class::<crate::transport_gen::PyFireWaterDemandResult>()?;
     m.add_class::<crate::transport_gen::PyFlareResult>()?;
     m.add_class::<crate::transport_gen::PyGasDispersionResult>()?;
@@ -908,6 +909,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::process::filter, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::fire_monitor_coverage,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::fire_water_coverage_assessment,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::process::fire_water_demand, m)?)?;

@@ -236,6 +236,7 @@
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/filter.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
+//!   - specs/models/process/fire_water_coverage_assessment.toml
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
 //!   - specs/models/process/gas_dispersion.toml
@@ -3152,6 +3153,41 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.fire_monitor_coverage",
         "characteristic_dimension",
         "length",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "protected_area",
+        "area",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "required_flow",
+        "volume_rate",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "spare_supply_flow",
+        "volume_rate",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "worst_case_pressure_margin",
+        "pressure",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "covered_area",
+        "area",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "existing_delivered_flow",
+        "volume_rate",
+    ),
+    (
+        "process.fire_water_coverage_assessment",
+        "required_pressure_margin",
+        "pressure",
     ),
     ("process.fire_water_demand", "protected_area", "area"),
     (

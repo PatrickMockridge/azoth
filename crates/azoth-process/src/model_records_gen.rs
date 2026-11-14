@@ -25,6 +25,7 @@ use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
 use crate::models::filter::FilterResult;
 use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
+use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
 use crate::models::fire_water_demand::FireWaterDemandResult;
 use crate::models::flare::FlareResult;
 use crate::models::gas_dispersion::GasDispersionResult;
@@ -515,6 +516,23 @@ impl CalcResult for FireMonitorCoverageResult {
         "meets_density_still_air",
         "meets_density_in_wind",
         "flow_needed_for_compliance",
+        "verdict",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FireWaterCoverageAssessmentResult {
+    const CALC_ID: &'static str = "process.fire_water_coverage_assessment";
+    const FIELDS: &'static [&'static str] = &[
+        "coverage_gap",
+        "coverage_fraction",
+        "flow_deficit",
+        "flow_feasible",
+        "pressure_feasible",
         "verdict",
         "warnings",
     ];

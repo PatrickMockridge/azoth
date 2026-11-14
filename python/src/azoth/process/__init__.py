@@ -33,6 +33,7 @@ from azoth.core.result import (
     ExpanderResult,
     FilterResult,
     FireMonitorCoverageResult,
+    FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
     FlareResult,
     GasDispersionResult,
@@ -104,6 +105,7 @@ __all__ = [
     "expander",
     "filter",
     "fire_monitor_coverage",
+    "fire_water_coverage_assessment",
     "fire_water_demand",
     "flare",
     "forms",
@@ -144,6 +146,7 @@ __all__ = [
 ]
 
 _FIRE_MONITOR_COVERAGE = "process.fire_monitor_coverage"
+_FIRE_WATER_COVERAGE_ASSESSMENT = "process.fire_water_coverage_assessment"
 _FIRE_WATER_DEMAND = "process.fire_water_demand"
 _MANIFOLD = "process.manifold"
 _MIXER = "process.mixer"
@@ -2152,6 +2155,40 @@ def fire_monitor_coverage(
         droplet_terminal_velocity=droplet_terminal_velocity,
         characteristic_dimension=characteristic_dimension,
         line_of_sight_obstructed=line_of_sight_obstructed,
+    )
+
+
+def fire_water_coverage_assessment(
+    protected_area: Q,
+    required_flow: Q,
+    spare_supply_flow: Q,
+    worst_case_pressure_margin: Q,
+    covered_area: Q | None = None,
+    existing_delivered_flow: Q | None = None,
+    required_pressure_margin: Q | None = None,
+) -> FireWaterCoverageAssessmentResult:
+    """The fire-water coverage, flow and pressure gate and the class's verdict.
+
+    The class asks coverage, then flow, then pressure, because the routes to a fix differ in
+    cost. The verdict distinguishes a coverage gap with supply in hand from a flow deficit
+    and from a pressure deficit, and answers **dedicated supply** when neither margin exists.
+    **An unset supply is not a verdict**: the class's NaN defaults read as feasible, and this
+    port requires the spare flow and the pressure margin.
+
+    Raises:
+        InvalidInputError: for a non-positive area or required flow, a negative covered
+            area, delivered flow or required margin, or a non-finite input.
+
+    See :func:`azoth.process.reference.fire_water_coverage_assessment`.
+    """
+    return resolve(_FIRE_WATER_COVERAGE_ASSESSMENT)(  # type: ignore[no-any-return]
+        protected_area=protected_area,
+        required_flow=required_flow,
+        spare_supply_flow=spare_supply_flow,
+        worst_case_pressure_margin=worst_case_pressure_margin,
+        covered_area=covered_area,
+        existing_delivered_flow=existing_delivered_flow,
+        required_pressure_margin=required_pressure_margin,
     )
 
 

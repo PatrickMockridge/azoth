@@ -93,6 +93,7 @@ from azoth.core.result import (
     FilippovConductivityResult,
     FilterResult,
     FireMonitorCoverageResult,
+    FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
     FirozabadiRamleyInterfaceTensionResult,
     FlareResult,
@@ -288,6 +289,7 @@ from azoth.core.result import (
     StreamScaleMineralRow,
     StrippingColumnResult,
     SubFraction,
+    SupplyVerdict,
     SurfCooldownResult,
     SwameeJainResult,
     TankResult,
@@ -449,6 +451,7 @@ __all__ = [
     "filippov_conductivity",
     "filter",
     "fire_monitor_coverage",
+    "fire_water_coverage_assessment",
     "fire_water_demand",
     "firozabadi_ramley_interface_tension",
     "flare",
@@ -6219,6 +6222,29 @@ def fire_monitor_coverage(target_area: Q, required_density: float, monitor_count
         meets_density_in_wind=result.meets_density_in_wind,
         flow_needed_for_compliance=None if result.flow_needed_for_compliance is None else from_si(result.flow_needed_for_compliance.magnitude_si, result.flow_needed_for_compliance.unit),
         verdict=result.verdict,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def fire_water_coverage_assessment(protected_area: Q, required_flow: Q, spare_supply_flow: Q, worst_case_pressure_margin: Q, covered_area: Q | None=None, existing_delivered_flow: Q | None=None, required_pressure_margin: Q | None=None) -> FireWaterCoverageAssessmentResult:
+    """``process.fire_water_coverage_assessment``, computed in Rust."""
+    spec = _models_gen.model("process.fire_water_coverage_assessment")
+    result = _core.fire_water_coverage_assessment(
+        input_to_si(spec, "protected_area", protected_area),
+        input_to_si(spec, "required_flow", required_flow),
+        input_to_si(spec, "spare_supply_flow", spare_supply_flow),
+        input_to_si(spec, "worst_case_pressure_margin", worst_case_pressure_margin),
+        None if covered_area is None else input_to_si(spec, "covered_area", covered_area),
+        None if existing_delivered_flow is None else input_to_si(spec, "existing_delivered_flow", existing_delivered_flow),
+        None if required_pressure_margin is None else input_to_si(spec, "required_pressure_margin", required_pressure_margin),
+    )
+    return FireWaterCoverageAssessmentResult(
+        coverage_gap=from_si(result.coverage_gap.magnitude_si, result.coverage_gap.unit),
+        coverage_fraction=result.coverage_fraction,
+        flow_deficit=from_si(result.flow_deficit.magnitude_si, result.flow_deficit.unit),
+        flow_feasible=result.flow_feasible,
+        pressure_feasible=result.pressure_feasible,
+        verdict=SupplyVerdict(result.verdict),
         warnings=_warnings(result.warnings),
     )
 

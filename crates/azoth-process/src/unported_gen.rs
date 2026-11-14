@@ -15,6 +15,7 @@
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/filter.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
+//!   - specs/models/process/fire_water_coverage_assessment.toml
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
 //!   - specs/models/process/gas_dispersion.toml

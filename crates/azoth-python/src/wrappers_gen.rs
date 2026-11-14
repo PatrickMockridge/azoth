@@ -5948,6 +5948,38 @@ pub fn fire_monitor_coverage(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Fire-water coverage assessment.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (protected_area, required_flow, spare_supply_flow, worst_case_pressure_margin, covered_area, existing_delivered_flow, required_pressure_margin))]
+#[pyo3(
+    text_signature = "(protected_area, required_flow, spare_supply_flow, worst_case_pressure_margin, covered_area, existing_delivered_flow, required_pressure_margin)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn fire_water_coverage_assessment(
+    py: Python<'_>,
+    protected_area: f64,
+    required_flow: f64,
+    spare_supply_flow: f64,
+    worst_case_pressure_margin: f64,
+    covered_area: Option<f64>,
+    existing_delivered_flow: Option<f64>,
+    required_pressure_margin: Option<f64>,
+) -> PyResult<crate::transport_gen::PyFireWaterCoverageAssessmentResult> {
+    azoth_process::models::fire_water_coverage_assessment::fire_water_coverage_assessment(
+        square_meters(protected_area),
+        cubic_meters_per_second(required_flow),
+        cubic_meters_per_second(spare_supply_flow),
+        pascals(worst_case_pressure_margin),
+        covered_area.map(square_meters),
+        existing_delivered_flow.map(cubic_meters_per_second),
+        required_pressure_margin.map(pascals),
+    )
+    .map(|r| crate::transport_gen::PyFireWaterCoverageAssessmentResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Flare.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

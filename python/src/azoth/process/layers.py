@@ -1544,6 +1544,35 @@ def _fire_monitor_coverage(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _fire_water_coverage_assessment(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fire_water_coverage_assessment`'s layers, from the reference's arithmetic.
+
+    The verdict and the two flags are the model's own words, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.fire_water_coverage_assessment import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["protected_area"]), "m**2"),
+        quantity(float(inputs["required_flow"]), "L/min"),
+        quantity(float(inputs["spare_supply_flow"]), "L/min"),
+        quantity(float(inputs["worst_case_pressure_margin"]), "bar"),
+        covered_area=optional("covered_area", "m**2"),
+        existing_delivered_flow=optional("existing_delivered_flow", "L/min"),
+        required_pressure_margin=optional("required_pressure_margin", "bar"),
+    )
+    return {
+        "coverage_gap_m2": solution.gap,
+        "coverage_fraction": solution.fraction,
+        "flow_deficit_lpm": solution.deficit * 60000.0,
+    }
+
+
 def _vce(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.vce`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -2019,6 +2048,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.fire_water_demand": _fire_water_demand,
     "process.deluge_nozzle_layout": _deluge_nozzle_layout,
     "process.fire_monitor_coverage": _fire_monitor_coverage,
+    "process.fire_water_coverage_assessment": _fire_water_coverage_assessment,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -2896,6 +2926,43 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_monitor_coverage.tsv",
         block=8,
         identified_by=("#label", "fmc_characteristic_dimension"),
+    ),
+    # The coverage assessment's five: the class's four tests and the coverage gap with the
+    # supply in hand. The unset-supply state and the five refusals are uncased.
+    LayerCase(
+        model="process.fire_water_coverage_assessment",
+        case="no_flow_and_no_pressure_margin_routes_to_a_dedicated_supply",
+        capture="process_fire_water_coverage_assessment.tsv",
+        block=0,
+        identified_by=("#label", "fwca_dedicated_supply"),
+    ),
+    LayerCase(
+        model="process.fire_water_coverage_assessment",
+        case="a_pressure_deficit_alone_is_distinguished",
+        capture="process_fire_water_coverage_assessment.tsv",
+        block=1,
+        identified_by=("#label", "fwca_pressure_deficit"),
+    ),
+    LayerCase(
+        model="process.fire_water_coverage_assessment",
+        case="a_flow_deficit_alone_is_distinguished",
+        capture="process_fire_water_coverage_assessment.tsv",
+        block=2,
+        identified_by=("#label", "fwca_flow_deficit"),
+    ),
+    LayerCase(
+        model="process.fire_water_coverage_assessment",
+        case="a_fully_covered_area_is_compliant",
+        capture="process_fire_water_coverage_assessment.tsv",
+        block=3,
+        identified_by=("#label", "fwca_compliant"),
+    ),
+    LayerCase(
+        model="process.fire_water_coverage_assessment",
+        case="a_coverage_gap_with_supply_in_hand",
+        capture="process_fire_water_coverage_assessment.tsv",
+        block=4,
+        identified_by=("#label", "fwca_coverage_gap"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4120,6 +4187,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_deluge_nozzle_layout.tsv": 8,
     # The monitor coverage's eleven: the constructor and each setter's refusal.
     "process_fire_monitor_coverage.tsv": 11,
+    # The coverage assessment's six: the unset-supply state, where the class's NaN defaults
+    # read as feasible, and the constructor and setter refusals.
+    "process_fire_water_coverage_assessment.tsv": 6,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

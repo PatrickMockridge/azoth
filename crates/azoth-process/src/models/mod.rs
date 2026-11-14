@@ -44,6 +44,7 @@ pub mod event_tree;
 pub mod expander;
 pub mod filter;
 pub mod fire_monitor_coverage;
+pub mod fire_water_coverage_assessment;
 pub mod fire_water_demand;
 pub mod flare;
 pub mod gas_dispersion;
@@ -98,6 +99,9 @@ pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_t
 pub use expander::{ExpanderResult, expander};
 pub use filter::{FilterResult, filter};
 pub use fire_monitor_coverage::{FireMonitorCoverageResult, fire_monitor_coverage};
+pub use fire_water_coverage_assessment::{
+    FireWaterCoverageAssessmentResult, SupplyVerdict, fire_water_coverage_assessment,
+};
 pub use fire_water_demand::{FireWaterDemandResult, ProtectedObject, fire_water_demand};
 pub use flare::{FlareResult, flare};
 pub use gas_dispersion::{GasDispersionResult, gas_dispersion};

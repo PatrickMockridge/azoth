@@ -3193,6 +3193,16 @@ class FireMonitorCoverageResult:
     warnings: list[Warning]
 
 @final
+class FireWaterCoverageAssessmentResult:
+    coverage_gap: Qty
+    coverage_fraction: float
+    flow_deficit: Qty
+    flow_feasible: bool
+    pressure_feasible: bool
+    verdict: SupplyVerdict
+    warnings: list[Warning]
+
+@final
 class FireWaterDemandResult:
     area_demand: Qty
     object_demand: Qty
@@ -6651,6 +6661,15 @@ def fire_monitor_coverage(
     characteristic_dimension: float | None = None,
     line_of_sight_obstructed: bool | None = None,
 ) -> FireMonitorCoverageResult: ...
+def fire_water_coverage_assessment(
+    protected_area: float,
+    required_flow: float,
+    spare_supply_flow: float,
+    worst_case_pressure_margin: float,
+    covered_area: float | None = None,
+    existing_delivered_flow: float | None = None,
+    required_pressure_margin: float | None = None,
+) -> FireWaterCoverageAssessmentResult: ...
 def fire_water_demand(
     protected_area: float,
     application_rate: float | None = None,

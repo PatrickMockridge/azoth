@@ -16376,6 +16376,77 @@ impl From<&azoth_process::models::fire_monitor_coverage::FireMonitorCoverageResu
         }
     }
 }
+/// Result of `process.fire_water_coverage_assessment`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FireWaterCoverageAssessmentResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFireWaterCoverageAssessmentResult {
+    /// `max(0, protected_area - covered_area)`.
+    #[pyo3(get)]
+    pub coverage_gap: PyQty,
+    /// `min(1, covered_area / protected_area)`.
+    #[pyo3(get)]
+    pub coverage_fraction: f64,
+    /// `max(0, required_flow - existing_delivered_flow)`.
+    #[pyo3(get)]
+    pub flow_deficit: PyQty,
+    /// whether the spare supply meets the flow deficit.
+    #[pyo3(get)]
+    pub flow_feasible: bool,
+    /// whether the worst-case margin meets the required one.
+    #[pyo3(get)]
+    pub pressure_feasible: bool,
+    /// the class's classification, in its own priority order.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFireWaterCoverageAssessmentResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FireWaterCoverageAssessmentResult(coverage_gap={:?}, coverage_fraction={:?}, flow_deficit={:?}, flow_feasible={:?}, pressure_feasible={:?}, verdict={:?}, {} warning(s))",
+            self.coverage_gap,
+            self.coverage_fraction,
+            self.flow_deficit,
+            self.flow_feasible,
+            self.pressure_feasible,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult>
+    for PyFireWaterCoverageAssessmentResult
+{
+    fn from(
+        r: &azoth_process::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult,
+    ) -> Self {
+        Self {
+            coverage_gap: PyQty {
+                magnitude_si: r.coverage_gap.value,
+                unit: "m**2".to_string(),
+            },
+            coverage_fraction: r.coverage_fraction,
+            flow_deficit: PyQty {
+                magnitude_si: r.flow_deficit.value,
+                unit: "L/min".to_string(),
+            },
+            flow_feasible: r.flow_feasible,
+            pressure_feasible: r.pressure_feasible,
+            verdict: r.verdict.as_str().to_string(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.fire_water_demand`, transported.
 #[pyclass(
     frozen,
