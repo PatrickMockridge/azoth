@@ -716,8 +716,8 @@ export function App() {
   return (
     <>
     <div
-      className={`app${workspace === "calculations" ? " off" : ""}`}
-      hidden={workspace === "calculations"}
+      className={`app${workspace === "flowsheet" ? "" : " off"}`}
+      hidden={workspace !== "flowsheet"}
       ref={appRoot}
       data-hud-palette={hudState.palette ? "on" : "off"}
       data-hud-inspector={hudState.inspector ? "on" : "off"}

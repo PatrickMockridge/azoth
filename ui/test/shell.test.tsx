@@ -164,6 +164,28 @@ it("gives the Cyberpunk workbook a real resizer", async () => {
   ).toBe(true);
 });
 
+it("shows the Drawing workspace instead of the flowsheet", async () => {
+  stubFetch();
+  const container = await openLayout("xp");
+  const flowsheet = container.querySelector<HTMLElement>(".app");
+  if (flowsheet === null) {
+    throw new Error("the flowsheet should be mounted");
+  }
+  const drawingButton = Array.from(
+    container.querySelectorAll<HTMLButtonElement>(".workspace-switch button"),
+  ).find((button) => button.textContent === "Drawing");
+  if (drawingButton === undefined) {
+    throw new Error("the workspace switch has no Drawing button");
+  }
+  fireEvent.click(drawingButton);
+  await waitFor(() => {
+    expect(container.querySelector(".app.dexpi-workspace")).not.toBeNull();
+  });
+  const drawing = container.querySelector<HTMLElement>(".app.dexpi-workspace");
+  expect(drawing?.hidden).toBe(false);
+  expect(flowsheet.hidden).toBe(true);
+});
+
 it("keeps the workspace switch reachable in the Macintosh and Cyberpunk shells", async () => {
   for (const layout of ["mac", "cyberpunk"] as const) {
     stubFetch();
