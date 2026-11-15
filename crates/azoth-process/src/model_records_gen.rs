@@ -47,6 +47,7 @@ use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mixer::MixerResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
+use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
 use crate::models::packed_column::PackedColumnResult;
 use crate::models::pfp_demand::PfpDemandResult;
 use crate::models::pipe::PipeResult;
@@ -1111,6 +1112,21 @@ impl CalcResult for Nog070SilDeterminationResult {
         "achieved_sil",
         "compliant",
         "required_pfd_reduction_factor",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for OverpressureAcceptanceResult {
+    const CALC_ID: &'static str = "process.overpressure_acceptance";
+    const FIELDS: &'static [&'static str] = &[
+        "accumulation_factor",
+        "allowable_pressure",
+        "margin",
+        "accepted",
         "warnings",
     ];
 

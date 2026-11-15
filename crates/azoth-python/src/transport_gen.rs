@@ -19394,6 +19394,67 @@ impl From<&azoth_process::models::nog070_sil_determination::Nog070SilDeterminati
         }
     }
 }
+/// Result of `process.overpressure_acceptance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OverpressureAcceptanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOverpressureAcceptanceResult {
+    /// 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.
+    #[pyo3(get)]
+    pub accumulation_factor: f64,
+    /// `mawp accumulation_factor`.
+    #[pyo3(get)]
+    pub allowable_pressure: PyQty,
+    /// `allowable_pressure - peak_pressure`.
+    #[pyo3(get)]
+    pub margin: PyQty,
+    /// whether the peak is at or below the allowable pressure.
+    #[pyo3(get)]
+    pub accepted: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyOverpressureAcceptanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "OverpressureAcceptanceResult(accumulation_factor={:?}, allowable_pressure={:?}, margin={:?}, accepted={:?}, {} warning(s))",
+            self.accumulation_factor,
+            self.allowable_pressure,
+            self.margin,
+            self.accepted,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::overpressure_acceptance::OverpressureAcceptanceResult>
+    for PyOverpressureAcceptanceResult
+{
+    fn from(
+        r: &azoth_process::models::overpressure_acceptance::OverpressureAcceptanceResult,
+    ) -> Self {
+        Self {
+            accumulation_factor: r.accumulation_factor,
+            allowable_pressure: PyQty {
+                magnitude_si: r.allowable_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            margin: PyQty {
+                magnitude_si: r.margin.value,
+                unit: "Pa".to_string(),
+            },
+            accepted: r.accepted,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.packed_column`, transported.
 #[pyclass(
     frozen,

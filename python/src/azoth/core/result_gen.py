@@ -7813,6 +7813,28 @@ class Nog070SilDeterminationResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class OverpressureAcceptanceResult(_HasWarnings):
+    """Result of ``process.overpressure_acceptance``."""
+
+    CALC_ID: ClassVar[str] = "process.overpressure_acceptance"
+
+    #: 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.
+    accumulation_factor: float
+
+    #: `mawp accumulation_factor`.
+    allowable_pressure: Q
+
+    #: `allowable_pressure - peak_pressure`.
+    margin: Q
+
+    #: whether the peak is at or below the allowable pressure.
+    accepted: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PackedColumnResult(_HasWarnings):
     """Result of ``process.packed_column``."""
 

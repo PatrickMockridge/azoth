@@ -55,6 +55,7 @@ from azoth.core.result import (
     MapTurboExpanderResult,
     MixerResult,
     Nog070SilDeterminationResult,
+    OverpressureAcceptanceResult,
     PackedColumnResult,
     PfpDemandResult,
     PipeResult,
@@ -141,6 +142,7 @@ __all__ = [
     "map_turbo_expander_compressor",
     "mixer",
     "nog070_sil_determination",
+    "overpressure_acceptance",
     "packed_column",
     "pfp_demand",
     "pipe",
@@ -175,6 +177,7 @@ _FIRE_WATER_DEMAND = "process.fire_water_demand"
 _MANIFOLD = "process.manifold"
 _MIXER = "process.mixer"
 _NOG070_SIL_DETERMINATION = "process.nog070_sil_determination"
+_OVERPRESSURE_ACCEPTANCE = "process.overpressure_acceptance"
 _PACKED_COLUMN = "process.packed_column"
 _PFP_DEMAND = "process.pfp_demand"
 _RATE_BASED_PACKED_COLUMN = "process.rate_based_packed_column"
@@ -2369,6 +2372,24 @@ def nog070_sil_determination(
         sif_type=sif_type,
         pfd_average=pfd_average,
         minimum_sil=minimum_sil,
+    )
+
+
+def overpressure_acceptance(
+    peak_pressure: Q,
+    mawp: Q,
+    cause: str,
+    multiple_devices: bool,
+) -> OverpressureAcceptanceResult:
+    """The accumulation factor, the allowable pressure and the acceptance verdict.
+
+    See :func:`azoth.process.reference.overpressure_acceptance`.
+    """
+    return resolve(_OVERPRESSURE_ACCEPTANCE)(  # type: ignore[no-any-return]
+        peak_pressure=peak_pressure,
+        mawp=mawp,
+        cause=cause,
+        multiple_devices=multiple_devices,
     )
 
 

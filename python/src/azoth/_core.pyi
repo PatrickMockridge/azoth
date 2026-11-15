@@ -3723,6 +3723,14 @@ class Nog070SilDeterminationResult:
     warnings: list[Warning]
 
 @final
+class OverpressureAcceptanceResult:
+    accumulation_factor: float
+    allowable_pressure: Qty
+    margin: Qty
+    accepted: bool
+    warnings: list[Warning]
+
+@final
 class PackedColumnResult:
     tray_temperature: list[Qty]
     tray_pressure: list[Qty]
@@ -7234,6 +7242,12 @@ def nog070_sil_determination(
     pfd_average: float,
     minimum_sil: float | None = None,
 ) -> Nog070SilDeterminationResult: ...
+def overpressure_acceptance(
+    peak_pressure: float,
+    mawp: float,
+    cause: str,
+    multiple_devices: bool,
+) -> OverpressureAcceptanceResult: ...
 def packed_column(
     components: list[str],
     feed_n: float,

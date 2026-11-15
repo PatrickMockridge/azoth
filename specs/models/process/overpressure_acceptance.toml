@@ -1,0 +1,82 @@
+id = "process.overpressure_acceptance"
+name = "Overpressure acceptance"
+kind = "procedure"
+assumptions = [
+    "**the accumulation factor is 1.21 for a fire, 1.16 for several non-fire devices and 1.10 for one**, the class's three constants.",
+    "**fire ignores `multipleDevices`**: a fire always takes 1.21, whatever the device count.",
+    "**the allowable pressure is `MAWP factor`**, the margin is `allowable - peak`, and acceptance is `peak <= allowable`, so the equality is accepted.",
+    "**the class works in bara**; this id carries Pa and converts through bara, so the comparison and the margin match the class's own arithmetic.",
+    "**the basis string is prose** and sits outside this id; the factor, the allowable and the margin carry the decision.",
+    "**the class validates nothing**: the port refuses a non-positive pressure or a non-finite value.",
+]
+references = [
+    "API STD 521 (7th edition, 2020). Pressure-relieving and depressuring systems, accumulation.",
+    "ASME Boiler and Pressure Vessel Code, Section VIII, Division 1, UG-125. Accumulated pressure limits.",
+    "TR3001. Overpressure protection and the accumulated-pressure acceptance limit.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/overpressure/OverpressureAcceptanceChecker.java` is the port source.",
+    "`validation/neqsim/captures/process_overpressure_acceptance.tsv` - the fire, single, multiple, equality and exceeded states.",
+]
+[source]
+standard = "NeqSim process/safety/overpressure/OverpressureAcceptanceChecker.java"
+edition = "Its `accumulationFactor` and `check`."
+[algorithm]
+scheme = "closed_form_overpressure_acceptance"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.peak_pressure]
+unit = "Pa"
+description = "the peak (relieving) pressure, absolute, above zero.\n"
+[inputs.mawp]
+unit = "Pa"
+description = "the protected item's maximum allowable working pressure, absolute, above zero.\n"
+[inputs.cause]
+type = "enum"
+values = [
+    "blocked_outlet",
+    "check_valve_leakage",
+    "gas_blow_by",
+    "liquid_blow_by",
+    "volatile_liquid_ingress",
+    "inadvertent_valve_opening",
+    "control_valve_failure",
+    "fire",
+    "thermal_expansion",
+    "choke_collapse",
+    "tube_rupture",
+    "vacuum",
+    "other",
+]
+description = "the overpressure cause, the class's `ReliefCause`; only `fire` changes the factor.\n"
+[inputs.multiple_devices]
+type = "boolean"
+description = "whether more than one relief device protects the item; ignored for a fire.\n"
+[outputs]
+[outputs.accumulation_factor]
+unit = "dimensionless"
+description = "1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.\n"
+[outputs.allowable_pressure]
+unit = "Pa"
+description = "`mawp accumulation_factor`.\n"
+[outputs.margin]
+unit = "Pa"
+description = "`allowable_pressure - peak_pressure`.\n"
+[outputs.accepted]
+type = "boolean"
+description = "whether the peak is at or below the allowable pressure.\n"
+[[valid_range]]
+quantity = "peak_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class compares any number; a non-positive absolute pressure is not a relieving state"
+[[valid_range]]
+quantity = "mawp"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class compares any number; a non-positive MAWP is not a protected item"
+[implementations]
+python = "azoth.process.overpressure_acceptance"
+rust = "azoth_process::overpressure_acceptance"

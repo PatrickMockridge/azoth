@@ -2842,6 +2842,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'process.overpressure_acceptance': {
+        "calc_id": 'process.overpressure_acceptance',
+        "name": 'Overpressure acceptance',
+        "spec": {'path': 'specs/models/process/overpressure_acceptance.toml', 'sha256': '3bc6fa71be0e04b03854343eceac743ae355cd4503f78db86373d25c57bcedb2'},
+        "code": [{'path': 'python/src/azoth/process/reference/overpressure_acceptance.py', 'sha256': '21316638fea8ec46923800f2922d980a4b1b3d49e92331294d68c204ea6c5195'}, {'path': 'crates/azoth-process/src/models/overpressure_acceptance.rs', 'sha256': '10c70cbb515e1b14d353e13796d26fae988695c476194ac3ed011b084e4af94d'}],
+        "source": 'NeqSim process/safety/overpressure/OverpressureAcceptanceChecker.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'process.packed_column': {
         "calc_id": 'process.packed_column',
         "name": 'Packed column',

@@ -195,6 +195,7 @@ from azoth.core.result import (
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
     OrificeFlowResult,
+    OverpressureAcceptanceResult,
     PackedColumnResult,
     PackingHydraulicsResult,
     PackingSizingResult,
@@ -553,6 +554,7 @@ __all__ = [
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
     "orifice_flow",
+    "overpressure_acceptance",
     "packed_column",
     "packing_hydraulics",
     "packing_sizing",
@@ -7103,6 +7105,24 @@ def nog070_sil_determination(sif_type: str, pfd_average: float, minimum_sil: flo
         achieved_sil=result.achieved_sil,
         compliant=result.compliant,
         required_pfd_reduction_factor=result.required_pfd_reduction_factor,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def overpressure_acceptance(peak_pressure: Q, mawp: Q, cause: str, multiple_devices: bool) -> OverpressureAcceptanceResult:
+    """``process.overpressure_acceptance``, computed in Rust."""
+    spec = _models_gen.model("process.overpressure_acceptance")
+    result = _core.overpressure_acceptance(
+        input_to_si(spec, "peak_pressure", peak_pressure),
+        input_to_si(spec, "mawp", mawp),
+        cause,
+        multiple_devices,
+    )
+    return OverpressureAcceptanceResult(
+        accumulation_factor=result.accumulation_factor,
+        allowable_pressure=from_si(result.allowable_pressure.magnitude_si, result.allowable_pressure.unit),
+        margin=from_si(result.margin.magnitude_si, result.margin.unit),
+        accepted=result.accepted,
         warnings=_warnings(result.warnings),
     )
 

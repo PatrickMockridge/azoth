@@ -37,6 +37,7 @@
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/nog070_sil_determination.toml
+//!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
@@ -46824,6 +46825,201 @@ pub static NOG070_SIL_DETERMINATION_SPEC: ModelSpec = ModelSpec {
     cases: NOG070_SIL_DETERMINATION_CASES,
 };
 
+static OVERPRESSURE_ACCEPTANCE_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "peak_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class compares any number; a non-positive absolute pressure is not a relieving state",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "mawp",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class compares any number; a non-positive MAWP is not a protected item",
+        },
+    },
+];
+
+static OVERPRESSURE_ACCEPTANCE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "oa_fire",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1050000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", false)],
+        lists: &[],
+        strings: &[("cause", "fire")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.21),
+            ("allowable_pressure", 1210000.0),
+            ("margin", 159999.99999999997),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oa_single_at_limit",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1100000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", false)],
+        lists: &[],
+        strings: &[("cause", "blocked_outlet")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.1),
+            ("allowable_pressure", 1100000.0),
+            ("margin", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oa_multiple",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1150000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", true)],
+        lists: &[],
+        strings: &[("cause", "blocked_outlet")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.16),
+            ("allowable_pressure", 1160000.0),
+            ("margin", 9999.999999999964),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oa_fire_multiple_ignored",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1200000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", true)],
+        lists: &[],
+        strings: &[("cause", "fire")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.21),
+            ("allowable_pressure", 1210000.0),
+            ("margin", 9999.999999999964),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oa_exceeded",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1220000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", false)],
+        lists: &[],
+        strings: &[("cause", "fire")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.21),
+            ("allowable_pressure", 1210000.0),
+            ("margin", -9999.999999999964),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oa_single_exceeded",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1110000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", false)],
+        lists: &[],
+        strings: &[("cause", "blocked_outlet")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.1),
+            ("allowable_pressure", 1100000.0),
+            ("margin", -9999.999999999964),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static OVERPRESSURE_ACCEPTANCE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_overpressure_acceptance",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.overpressure_acceptance`.
+pub static OVERPRESSURE_ACCEPTANCE_SPEC: ModelSpec = ModelSpec {
+    id: "process.overpressure_acceptance",
+    kind: "procedure",
+    algorithm: Some(&OVERPRESSURE_ACCEPTANCE_ALGORITHM),
+    checks: OVERPRESSURE_ACCEPTANCE_CHECKS,
+    cases: OVERPRESSURE_ACCEPTANCE_CASES,
+};
+
 static PACKED_COLUMN_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -63772,6 +63968,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &MAP_TURBO_EXPANDER_COMPRESSOR_SPEC,
     &MIXER_SPEC,
     &NOG070_SIL_DETERMINATION_SPEC,
+    &OVERPRESSURE_ACCEPTANCE_SPEC,
     &PACKED_COLUMN_SPEC,
     &PFP_DEMAND_SPEC,
     &PIPE_SPEC,

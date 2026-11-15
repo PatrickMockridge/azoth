@@ -2460,6 +2460,26 @@ def _fire_case_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _overpressure_acceptance(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.overpressure_acceptance`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.overpressure_acceptance import (
+        overpressure_acceptance as evaluate,
+    )
+
+    result = evaluate(
+        quantity(float(inputs["peak_pressure"]), "Pa"),
+        quantity(float(inputs["mawp"]), "Pa"),
+        str(inputs["cause"]),
+        bool(inputs["multiple_devices"]),
+    )
+    return {
+        "accumulation_factor": result.accumulation_factor,
+        "allowable_pressure": result.allowable_pressure.to("Pa").magnitude,
+        "margin": result.margin.to("Pa").magnitude,
+    }
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2471,6 +2491,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.jet_fire": _jet_fire,
     "process.pfp_demand": _pfp_demand,
     "process.fire_case_relief": _fire_case_relief,
+    "process.overpressure_acceptance": _overpressure_acceptance,
     "process.fire_water_demand": _fire_water_demand,
     "process.deluge_nozzle_layout": _deluge_nozzle_layout,
     "process.fire_monitor_coverage": _fire_monitor_coverage,
@@ -3905,6 +3926,50 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_case_relief.tsv",
         block=6,
         identified_by=("#label", "fc_firefighting_unread"),
+    ),
+    # The acceptance's six: the fire, single, multiple, ignored-count, equality and
+    # exceeded states.
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_fire",
+        capture="process_overpressure_acceptance.tsv",
+        block=0,
+        identified_by=("#label", "oa_fire"),
+    ),
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_single_at_limit",
+        capture="process_overpressure_acceptance.tsv",
+        block=1,
+        identified_by=("#label", "oa_single_at_limit"),
+    ),
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_multiple",
+        capture="process_overpressure_acceptance.tsv",
+        block=2,
+        identified_by=("#label", "oa_multiple"),
+    ),
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_fire_multiple_ignored",
+        capture="process_overpressure_acceptance.tsv",
+        block=3,
+        identified_by=("#label", "oa_fire_multiple_ignored"),
+    ),
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_exceeded",
+        capture="process_overpressure_acceptance.tsv",
+        block=4,
+        identified_by=("#label", "oa_exceeded"),
+    ),
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_single_exceeded",
+        capture="process_overpressure_acceptance.tsv",
+        block=5,
+        identified_by=("#label", "oa_single_exceeded"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,

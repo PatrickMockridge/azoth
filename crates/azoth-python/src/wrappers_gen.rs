@@ -6727,6 +6727,29 @@ pub fn nog070_sil_determination(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Overpressure acceptance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (peak_pressure, mawp, cause, multiple_devices))]
+#[pyo3(text_signature = "(peak_pressure, mawp, cause, multiple_devices)")]
+pub fn overpressure_acceptance(
+    py: Python<'_>,
+    peak_pressure: f64,
+    mawp: f64,
+    cause: &str,
+    multiple_devices: bool,
+) -> PyResult<crate::transport_gen::PyOverpressureAcceptanceResult> {
+    azoth_process::models::overpressure_acceptance::overpressure_acceptance(
+        pascals(peak_pressure),
+        pascals(mawp),
+        cause,
+        multiple_devices,
+    )
+    .map(|r| crate::transport_gen::PyOverpressureAcceptanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Packed column.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

@@ -49,6 +49,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.map_turbo_expander_compressor`](./map_turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/MapTurboExpanderCompressor.java |
 | [`process.mixer`](./mixer.md) | `direct composition` | NeqSim process/equipment/mixer/Mixer.java |
 | [`process.nog070_sil_determination`](./nog070_sil_determination.md) | `closed_form_nog070_sil_determination` | NeqSim process/safety/risk/sis/nog070/Nog070SilDetermination.java |
+| [`process.overpressure_acceptance`](./overpressure_acceptance.md) | `closed_form_overpressure_acceptance` | NeqSim process/safety/overpressure/OverpressureAcceptanceChecker.java |
 | [`process.packed_column`](./packed_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/PackedColumn.java |
 | [`process.pfp_demand`](./pfp_demand.md) | `closed_form_steel_time_to_critical` | NeqSim process/safety/fire/PfpDemandCalculator.java |
 | [`process.pipe`](./pipe.md) | `direct composition` | NeqSim process/equipment/pipeline/AdiabaticPipe.java |

@@ -1,0 +1,91 @@
+model = "process.overpressure_acceptance"
+
+[[cases]]
+id = "oa_fire"
+tolerance = 1.0e-12
+source = "A 10.5 bara peak against a 10 bara MAWP on a fire: the 1.21 factor. From `validation/neqsim/captures/process_overpressure_acceptance.tsv` (`oa_fire`)."
+[cases.inputs]
+peak_pressure = 1050000.0
+mawp = 1000000.0
+cause = "fire"
+multiple_devices = false
+[cases.expected]
+accumulation_factor = 1.21
+allowable_pressure = 1210000.0
+margin = 159999.99999999997
+accepted = true
+
+[[cases]]
+id = "oa_single_at_limit"
+tolerance = 1.0e-12
+source = "A single non-fire device at exactly its 1.10 allowable: accepted on the equality. From (`oa_single_at_limit`)."
+[cases.inputs]
+peak_pressure = 1100000.0
+mawp = 1000000.0
+cause = "blocked_outlet"
+multiple_devices = false
+[cases.expected]
+accumulation_factor = 1.1
+allowable_pressure = 1100000.0
+margin = 0.0
+accepted = true
+
+[[cases]]
+id = "oa_multiple"
+tolerance = 1.0e-12
+source = "Several non-fire devices: the 1.16 factor. From (`oa_multiple`)."
+[cases.inputs]
+peak_pressure = 1150000.0
+mawp = 1000000.0
+cause = "blocked_outlet"
+multiple_devices = true
+[cases.expected]
+accumulation_factor = 1.16
+allowable_pressure = 1160000.0
+margin = 9999.999999999964
+accepted = true
+
+[[cases]]
+id = "oa_fire_multiple_ignored"
+tolerance = 1.0e-12
+source = "A fire with several devices: still 1.21. From (`oa_fire_multiple_ignored`)."
+[cases.inputs]
+peak_pressure = 1200000.0
+mawp = 1000000.0
+cause = "fire"
+multiple_devices = true
+[cases.expected]
+accumulation_factor = 1.21
+allowable_pressure = 1210000.0
+margin = 9999.999999999964
+accepted = true
+
+[[cases]]
+id = "oa_exceeded"
+tolerance = 1.0e-12
+source = "A 12.2 bara peak on a fire against the 12.1 allowable: rejected, with a negative margin. From (`oa_exceeded`)."
+[cases.inputs]
+peak_pressure = 1220000.0
+mawp = 1000000.0
+cause = "fire"
+multiple_devices = false
+[cases.expected]
+accumulation_factor = 1.21
+allowable_pressure = 1210000.0
+margin = -9999.999999999964
+accepted = false
+
+[[cases]]
+id = "oa_single_exceeded"
+tolerance = 1.0e-12
+source = "A single non-fire device just above its allowable: rejected. From (`oa_single_exceeded`)."
+[cases.inputs]
+peak_pressure = 1110000.0
+mawp = 1000000.0
+cause = "blocked_outlet"
+multiple_devices = false
+[cases.expected]
+accumulation_factor = 1.1
+allowable_pressure = 1100000.0
+margin = -9999.999999999964
+accepted = false
