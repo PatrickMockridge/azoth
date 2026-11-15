@@ -83,6 +83,7 @@ from azoth.core.result import (
     TankResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
+    ToxicLibraryResult,
     Tr3001ComplianceResult,
     TurboExpanderResult,
     VceResult,
@@ -176,6 +177,7 @@ __all__ = [
     "three_phase_separator",
     "throttling_valve",
     "tools",
+    "toxic_library",
     "tr3001_compliance",
     "validate",
     "vce",
@@ -236,6 +238,7 @@ _SEPARATOR_PERFORMANCE = "process.separator_performance"
 _SHORTCUT_DISTILLATION_COLUMN = "process.shortcut_distillation_column"
 _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
+_TOXIC_LIBRARY = "process.toxic_library"
 _TR3001_COMPLIANCE = "process.tr3001_compliance"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
@@ -2936,6 +2939,34 @@ def hazardous_area(
         ambient_density=ambient_density,
         safety_factor=safety_factor,
         release_grade=release_grade,
+    )
+
+
+def toxic_library(
+    chemical: str | None = None,
+    concentration_ppm: float | None = None,
+    molar_mass: Q | None = None,
+    temperature: Q | None = None,
+    pressure: Q | None = None,
+) -> ToxicLibraryResult:
+    """The toxic-exposure thresholds for a chemical, and the ppm-to-kg/m3 conversion.
+
+    The class's static table of IDLH, ERPG-2 and AEGL-2 values, its exact-then-lowercase
+    lookup, and ``(ppm/1e6) M (P_bara 1e5) / (8.314 T)``. **An unknown or blank chemical is
+    a stated false**, not a refusal; the measured case-sensitivity asymmetry is reproduced.
+
+    Raises:
+        InvalidInputError: when neither a chemical nor the conversion group is stated,
+            when the group is incomplete, or when its values are out of range.
+
+    See :func:`azoth.process.reference.toxic_library`.
+    """
+    return resolve(_TOXIC_LIBRARY)(  # type: ignore[no-any-return]
+        chemical=chemical,
+        concentration_ppm=concentration_ppm,
+        molar_mass=molar_mass,
+        temperature=temperature,
+        pressure=pressure,
     )
 
 

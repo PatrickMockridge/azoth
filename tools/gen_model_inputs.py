@@ -460,6 +460,7 @@ NON_UNIT_MODELS = {
     "process.gaussian_plume": "the plume arithmetic over scalars, not a unit",
     "process.heavy_gas_dispersion": "the Britter-McQuaid distance over scalars, not a unit",
     "process.hazardous_area": "the IEC 60079-10-1 area classification over scalars, not a unit",
+    "process.toxic_library": "the toxic threshold table and ppm conversion, not a unit",
     "process.jet_fire": "the jet-fire radiation over scalars, not a unit",
     "process.pool_fire": "the pool-fire radiation over scalars, not a unit",
     "process.probit": "a dose-response over scalars, not a unit",

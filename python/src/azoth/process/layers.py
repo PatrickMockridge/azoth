@@ -1211,6 +1211,34 @@ def _hem_release(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _toxic_library(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.toxic_library`'s layers, from the reference's own arithmetic.
+
+    A lookup and a conversion are separate arms: the row dumper returns the three
+    thresholds when a known chemical is named, and the converted concentration when the
+    conversion group is stated. An unknown name has no numeric layer.
+    """
+    from azoth.process.reference.toxic_library import _lookup, _ppm_to_kg_per_m3
+
+    dumped: dict[str, float] = {}
+    chemical = inputs.get("chemical")
+    if chemical is not None:
+        record = _lookup(str(chemical))
+        if record is not None:
+            dumped["idlh_ppm"] = record[1]
+            dumped["erpg2_ppm"] = record[2]
+            dumped["aegl2_ppm"] = record[3]
+    ppm = inputs.get("concentration_ppm")
+    if ppm is not None:
+        dumped["mass_concentration_kg_m3"] = _ppm_to_kg_per_m3(
+            float(ppm),
+            float(inputs["molar_mass"]),
+            float(inputs["temperature"]),
+            float(inputs["pressure"]),
+        )
+    return dumped
+
+
 def _hazardous_area(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.hazardous_area`'s layers, from the reference's own arithmetic.
 
@@ -2621,6 +2649,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.hem_release": _hem_release,
     "process.leak_blowdown": _leak_blowdown,
     "process.hazardous_area": _hazardous_area,
+    "process.toxic_library": _toxic_library,
     "process.heavy_gas_dispersion": _heavy_gas_dispersion,
     "process.gaussian_plume": _gaussian_plume,
     "process.gas_dispersion": _gas_dispersion,
@@ -3045,6 +3074,93 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_leak_blowdown.tsv",
         block=0,
         identified_by=("#label", "pr_methane_50bara_10s_1s"),
+    ),
+    # The toxic library's twelve: the ten canonical rows and the two conversions; the
+    # five aliases, the case-failure states, three unknown names and four evidence rows
+    # are uncased.
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_h2s",
+        capture="process_toxic_library.tsv",
+        block=0,
+        identified_by=("#label", "threshold_h2s"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_co",
+        capture="process_toxic_library.tsv",
+        block=2,
+        identified_by=("#label", "threshold_co"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_cl2",
+        capture="process_toxic_library.tsv",
+        block=4,
+        identified_by=("#label", "threshold_cl2"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_nh3",
+        capture="process_toxic_library.tsv",
+        block=6,
+        identified_by=("#label", "threshold_nh3"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_so2",
+        capture="process_toxic_library.tsv",
+        block=8,
+        identified_by=("#label", "threshold_so2"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_hcn",
+        capture="process_toxic_library.tsv",
+        block=10,
+        identified_by=("#label", "threshold_hcn"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_hf",
+        capture="process_toxic_library.tsv",
+        block=11,
+        identified_by=("#label", "threshold_hf"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_hcl",
+        capture="process_toxic_library.tsv",
+        block=12,
+        identified_by=("#label", "threshold_hcl"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_methanol",
+        capture="process_toxic_library.tsv",
+        block=13,
+        identified_by=("#label", "threshold_methanol"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_benzene",
+        capture="process_toxic_library.tsv",
+        block=14,
+        identified_by=("#label", "threshold_benzene"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="h2s_100ppm_288k",
+        capture="process_toxic_library.tsv",
+        block=30,
+        identified_by=("#label", "h2s_100ppm_288k"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="h2s_100ppm_1bar_300k",
+        capture="process_toxic_library.tsv",
+        block=31,
+        identified_by=("#label", "h2s_100ppm_1bar_300k"),
     ),
     # The hazardous area's six: the documentation state, the safety-factor and ambient
     # overrides, a tenfold flow and both other grades; the nine guards are uncased.
@@ -5523,6 +5639,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.
     "process_hazardous_area.tsv": 9,
+    # The toxic library's twenty-four: five aliases, ten case-failure states, two
+    # case-resolved duplicates, three unknown names and four unguarded evidence rows.
+    "process_toxic_library.tsv": 24,
     # The event tree's four: the no-branch tree, the two refusals and the shift count, which
     # cannot be cased (an empty record value is not a case).
     "process_event_tree.tsv": 4,

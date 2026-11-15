@@ -69,7 +69,8 @@ pub use models::{
     ReliefDisposalNetworkResult, RiskMatrixResult, SafetyInstrumentedFunctionResult,
     SeparatorPerformanceResult, SeparatorResult, ShortcutDistillationColumnResult,
     SilVerificationResult, SplitterResult, StirredTankReactorResult, StrippingColumnResult,
-    TankResult, ThreePhaseSeparatorResult, ThrottlingValveResult, Tr3001ComplianceResult,
+    TankResult, ThreePhaseSeparatorResult, ThrottlingValveResult, ToxicLibraryResult,
+    Tr3001ComplianceResult,
     TurboExpanderResult, VceResult, absorption_column, active_fire_protection_screening,
     anti_surge_recycle, api537_flare_flame_model, bleve, bow_tie, component_splitter, compressor,
     consequence_analysis, cooler, deluge_nozzle_layout, distillation_column, ejector, event_tree,
@@ -83,7 +84,8 @@ pub use models::{
     rate_based_packed_column, relief_disposal_network, risk_matrix, safety_instrumented_function,
     separator, separator_capacity_assessment, separator_performance, shortcut_distillation_column,
     sil_verification, splitter, stirred_tank_reactor, stripping_column, tank,
-    three_phase_separator, throttling_valve, tr3001_compliance, turbo_expander_compressor, vce,
+    three_phase_separator, throttling_valve, toxic_library, tr3001_compliance,
+    turbo_expander_compressor, vce,
 };
 pub use stream::Stream;
 pub use unit_op::{Param, Source, UnitOpSpec};

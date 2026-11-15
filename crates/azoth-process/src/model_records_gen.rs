@@ -75,6 +75,7 @@ use crate::models::stripping_column::StrippingColumnResult;
 use crate::models::tank::TankResult;
 use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
+use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vce::VceResult;
@@ -1903,6 +1904,23 @@ impl CalcResult for ThrottlingValveResult {
         "choked",
         "gas_valve",
         "calculated_molar_flow",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ToxicLibraryResult {
+    const CALC_ID: &'static str = "process.toxic_library";
+    const FIELDS: &'static [&'static str] = &[
+        "known",
+        "name",
+        "idlh_ppm",
+        "erpg2_ppm",
+        "aegl2_ppm",
+        "mass_concentration",
         "warnings",
     ];
 

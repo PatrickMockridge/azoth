@@ -1,0 +1,103 @@
+id = "process.toxic_library"
+name = "Toxic-exposure thresholds"
+kind = "procedure"
+assumptions = [
+    "**the table is static data**, carried verbatim: ten chemicals and five spelled-out aliases, with IDLH, ERPG-2 and AEGL-2 (60 min) in ppm by mole.",
+    "**the lookup is the class's**: an exact map hit, then a `toLowerCase()` hit; the javadoc's case-insensitivity is narrower than the code.",
+    "**all eight formula keys and their mixed forms are exact-case only**: `h2s`, `H2s`, `hcn`, `Hcn` and the like answer unknown, while `H2S` and `HCN` answer their row.",
+    "**the five aliases and the two lowercase names are case-insensitive** because their keys are already lowercase.",
+    "**an unknown or blank chemical is not an error**: `known` is false and the name and thresholds are absent.",
+    "**the conversion is the class's**: `(ppm/1e6) M (P_bara 1e5) / (R T)` with `R = 8.314`, not the analyzer's `8.314462618`.",
+    "**ppm is mole basis**, and the pressure input is pascals; the kernel's bara round trip is the class's `pressureBara`.",
+    "**the class guards nothing** in the conversion: a negative ppm or a zero temperature, pressure or molar mass is published; the port refuses them.",
+    "**the values are the class's stated NIOSH, AIHA and EPA figures**, carried as data and not independently verified.",
+    "**at least one arm is required**: a chemical name or the conversion group, and the group is all four of ppm, molar mass, temperature and pressure.",
+]
+references = [
+    "NIOSH Pocket Guide to Chemical Hazards. Centers for Disease Control and Prevention.",
+    "AIHA. Emergency Response Planning Guidelines (ERPG) and Workplace Environmental Exposure Levels (WEEL) Handbook.",
+    "US EPA. Acute Exposure Guideline Levels (AEGL) database.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/dispersion/ToxicLibrary.java` is the port source.",
+    "`validation/neqsim/captures/process_toxic_library.tsv` - the ten rows, the five aliases, the measured case-sensitivity states, three unknown names and the conversions plus the class's unguarded states.",
+]
+[source]
+standard = "NeqSim process/safety/dispersion/ToxicLibrary.java"
+edition = "Its `get` over the static threshold map and `ppmToKgPerM3`."
+[algorithm]
+scheme = "toxic_threshold_lookup_and_ppm_conversion"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.chemical]
+type = "string"
+optional = true
+description = "the chemical name or formula, looked up exactly and then lowercased. Blank or unknown is a stated false, not a refusal.\n"
+[inputs.concentration_ppm]
+unit = "dimensionless"
+optional = true
+description = "the concentration in ppm by mole, at least zero; it is the conversion arm.\n"
+[inputs.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "the component molar mass, above zero; required with `concentration_ppm`.\n"
+[inputs.temperature]
+unit = "K"
+optional = true
+description = "the temperature, above zero; required with `concentration_ppm`.\n"
+[inputs.pressure]
+unit = "Pa"
+optional = true
+description = "the pressure, above zero; required with `concentration_ppm`, and converted through the class's bara.\n"
+[outputs]
+[outputs.known]
+type = "boolean"
+optional = true
+description = "whether the chemical is in the table; present iff a chemical is stated.\n"
+[outputs.name]
+type = "string"
+optional = true
+description = "the table's display name for the chemical; present iff it is known.\n"
+[outputs.idlh_ppm]
+unit = "dimensionless"
+optional = true
+description = "the NIOSH IDLH in ppm; present iff the chemical is known.\n"
+[outputs.erpg2_ppm]
+unit = "dimensionless"
+optional = true
+description = "the AIHA ERPG-2 in ppm; present iff the chemical is known.\n"
+[outputs.aegl2_ppm]
+unit = "dimensionless"
+optional = true
+description = "the EPA AEGL-2 (60 min) in ppm; present iff the chemical is known.\n"
+[outputs.mass_concentration]
+unit = "kg/m**3"
+optional = true
+description = "the converted concentration; present iff the conversion group is stated.\n"
+[[valid_range]]
+quantity = "concentration_ppm"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative concentration is not a state the port publishes"
+[[valid_range]]
+quantity = "molar_mass"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class divides by the molar mass through the ideal-gas relation"
+[[valid_range]]
+quantity = "temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class divides by the temperature, and zero is not a gas state"
+[[valid_range]]
+quantity = "pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class scales by the pressure, and zero is not a gas state"
+[implementations]
+python = "azoth.process.toxic_library"
+rust = "azoth_process::toxic_library"

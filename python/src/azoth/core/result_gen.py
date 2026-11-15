@@ -9580,6 +9580,34 @@ class ThrottlingValveResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class ToxicLibraryResult(_HasWarnings):
+    """Result of ``process.toxic_library``."""
+
+    CALC_ID: ClassVar[str] = "process.toxic_library"
+
+    #: whether the chemical is in the table; present iff a chemical is stated.
+    known: bool | None
+
+    #: the table's display name; present iff the chemical is known.
+    name: str | None
+
+    #: the NIOSH IDLH in ppm; present iff the chemical is known.
+    idlh_ppm: float | None
+
+    #: the AIHA ERPG-2 in ppm; present iff the chemical is known.
+    erpg2_ppm: float | None
+
+    #: the EPA AEGL-2 (60 min) in ppm; present iff the chemical is known.
+    aegl2_ppm: float | None
+
+    #: the converted concentration; present iff the conversion group is stated.
+    mass_concentration: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class Tr3001ComplianceResult(_HasWarnings):
     """Result of ``process.tr3001_compliance``."""
 
