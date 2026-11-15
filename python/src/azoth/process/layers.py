@@ -2726,6 +2726,96 @@ def _pipe_fire_rupture_material(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _pipe_fire_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.pipe_fire_rupture`'s march, through the reference's own evaluator."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.pipe_fire_rupture import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    profile = [
+        {
+            "time": quantity(float(row["time"]), "s"),
+            "pressure": quantity(float(row["pressure"]), "bar"),
+        }
+        for row in inputs["pressure_profile"]
+    ]
+    solution, _ = _evaluate(
+        quantity(float(inputs["outside_diameter"]), "mm"),
+        quantity(float(inputs["nominal_wall_thickness"]), "mm"),
+        str(inputs["material_name"]),
+        str(inputs["fire_scenario"]),
+        profile,
+        optional("corrosion_allowance", "mm"),
+        None
+        if inputs.get("wall_thickness_undertolerance") is None
+        else float(inputs["wall_thickness_undertolerance"]),
+        optional("exposed_length", "m"),
+        optional("weight_stress", "MPa"),
+        optional("fluid_density", "kg/m**3"),
+        optional("fluid_heat_capacity", "J/(kg*K)"),
+        optional("gas_molecular_weight", "kg/mol"),
+        optional("initial_temperature", "K"),
+        optional("fire_temperature", "K"),
+        optional("gas_temperature", "K"),
+        optional("convective_heat_transfer_coefficient", "W/(m**2*K)"),
+        None if inputs.get("fire_emissivity") is None else float(inputs["fire_emissivity"]),
+        None if inputs.get("metal_emissivity") is None else float(inputs["metal_emissivity"]),
+        None
+        if inputs.get("metal_absorptivity") is None
+        else float(inputs["metal_absorptivity"]),
+        None
+        if inputs.get("passive_protection_heat_flux_factor") is None
+        else float(inputs["passive_protection_heat_flux_factor"]),
+        optional("gauge_offset", "bar"),
+        inputs.get("interpolation_mode"),
+        optional("time_step", "s"),
+        optional("max_time", "s"),
+        None
+        if inputs.get("spreadsheet_gas_thermal_mass") is None
+        else bool(inputs["spreadsheet_gas_thermal_mass"]),
+    )
+    dumped: dict[str, float] = {
+        "point_count": float(len(solution.history)),
+    }
+    if solution.rupture_time is not None:
+        dumped.update(
+            {
+                "rupture_time_s": solution.rupture_time,
+                "rupture_pressure_barg": solution.rupture_pressure or 0.0,
+                "rupture_mean_wall_temperature_c": (
+                    solution.rupture_mean_wall_temperature or 0.0
+                )
+                - 273.15,
+                "rupture_outer_surface_temperature_c": (
+                    solution.rupture_outer_surface_temperature or 0.0
+                )
+                - 273.15,
+                "rupture_accumulated_strain": solution.rupture_accumulated_strain or 0.0,
+                "rupture_strain_limit": solution.rupture_strain_limit or 0.0,
+                "long_pipe_gas_two_sides_kg_s": solution.long_pipe_gas_two_sides or 0.0,
+                "long_pipe_gas_one_side_kg_s": solution.long_pipe_gas_one_side or 0.0,
+                "short_pipe_gas_one_side_kg_s": solution.short_pipe_gas_one_side or 0.0,
+                "liquid_one_side_kg_s": solution.liquid_one_side or 0.0,
+                "release_gas_temperature_c": (solution.release_gas_temperature or 0.0)
+                - 273.15,
+            }
+        )
+    for index, row in enumerate(solution.history):
+        dumped[f"history{index}_time_s"] = row[0]
+        dumped[f"history{index}_pressure_barg"] = row[1]
+        dumped[f"history{index}_mean_wall_temperature_c"] = row[2] - 273.15
+        dumped[f"history{index}_outer_surface_temperature_c"] = row[3] - 273.15
+        dumped[f"history{index}_heat_flux_kw_m2"] = row[4] / 1000.0
+        dumped[f"history{index}_von_mises_stress_mpa"] = row[5]
+        dumped[f"history{index}_strain_rate_per_minute"] = row[6]
+        dumped[f"history{index}_accumulated_strain"] = row[7]
+        dumped[f"history{index}_strain_limit"] = row[8]
+    return dumped
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2734,6 +2824,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.toxic_library": _toxic_library,
     "process.blowdown_pressure_profile": _blowdown_pressure_profile,
     "process.pipe_fire_rupture_material": _pipe_fire_rupture_material,
+    "process.pipe_fire_rupture": _pipe_fire_rupture,
     "process.heavy_gas_dispersion": _heavy_gas_dispersion,
     "process.gaussian_plume": _gaussian_plume,
     "process.gas_dispersion": _gas_dispersion,
@@ -5868,6 +5959,77 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=11,
         identified_by=(LABEL_KEY, "material_custom_clamp_high"),
     ),
+    # The pipe march's ten state blocks; the ten refusals are in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.pipe_fire_rupture",
+        case="benchmark",
+        capture="process_pipe_fire_rupture.tsv",
+        block=0,
+        identified_by=(LABEL_KEY, "pipe_rupture_benchmark"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture",
+        case="no_rupture_10s",
+        capture="process_pipe_fire_rupture.tsv",
+        block=1,
+        identified_by=(LABEL_KEY, "pipe_no_rupture_10s"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture",
+        case="small_jet_builtin",
+        capture="process_pipe_fire_rupture.tsv",
+        block=2,
+        identified_by=(LABEL_KEY, "pipe_small_jet_builtin"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture",
+        case="explicit_small_jet",
+        capture="process_pipe_fire_rupture.tsv",
+        block=3,
+        identified_by=(LABEL_KEY, "pipe_explicit_small_jet"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture",
+        case="ss_316",
+        capture="process_pipe_fire_rupture.tsv",
+        block=4,
+        identified_by=(LABEL_KEY, "pipe_ss316"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture",
+        case="liquid",
+        capture="process_pipe_fire_rupture.tsv",
+        block=5,
+        identified_by=(LABEL_KEY, "pipe_liquid"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture",
+        case="gas_thermal_mass_off",
+        capture="process_pipe_fire_rupture.tsv",
+        block=6,
+        identified_by=(LABEL_KEY, "pipe_gas_thermal_mass_off"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture",
+        case="gas_thermal_mass_on",
+        capture="process_pipe_fire_rupture.tsv",
+        block=7,
+        identified_by=(LABEL_KEY, "pipe_gas_thermal_mass_on"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture",
+        case="pool_fire",
+        capture="process_pipe_fire_rupture.tsv",
+        block=8,
+        identified_by=(LABEL_KEY, "pipe_pool_fire"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture",
+        case="pfp_factor",
+        capture="process_pipe_fire_rupture.tsv",
+        block=9,
+        identified_by=(LABEL_KEY, "pipe_pfp_01"),
+    ),
 )
 
 #: Probe rows that are **deliberately not cases**, per capture, by the count they take.
@@ -5896,6 +6058,10 @@ UNCASED_ROWS: dict[str, int] = {
     # The material curve's fourteen: the six resolved-name aliases and the eight
     # constructor refusals.
     "process_pipe_fire_rupture_material.tsv": 14,
+    # The pipe march's ten: the weld-factor pair, the two geometry refusals, the zero
+    # diameter, the unknown material and scenario, the one-point profile, the zero step and
+    # the negative maximum time.
+    "process_pipe_fire_rupture.tsv": 10,
     # The event tree's four: the no-branch tree, the two refusals and the shift count, which
     # cannot be cased (an empty record value is not a case).
     "process_event_tree.tsv": 4,
