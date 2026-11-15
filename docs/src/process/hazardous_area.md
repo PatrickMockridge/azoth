@@ -65,7 +65,7 @@ not an equation, and both implementations read it from here.
 - **the defaults are the class's**: ambient density `1.225` kg/m3, safety factor `0.5` and grade `secondary`.
 - **the grade maps to the class's label**: continuous is `Zone 0`, primary `Zone 1` and secondary `Zone 2`.
 - **the constructor and setters guard** positive flow, density, velocity and molar mass, an LFL in `(0, 1)`, a factor in `(0, 1]` and a known grade; the port also refuses non-finite values.
-- **`summary()` is prose** and is not carried; the class's only `src/main` readers are its own test and a documentation example.
+- **`summary()` is prose** and sits outside this id; the class's only `src/main` readers are its own test and a documentation example.
 - **this is IEC 60079-10-1 area classification**, not plume dispersion; the class's `5.4` decay is carried as the class's model and is not re-derived.
 
 ## Cases
