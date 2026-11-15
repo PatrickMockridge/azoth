@@ -92,9 +92,7 @@ def _gas_area(
     if balanced_bellows and back_pressure_fraction > critical_ratio:
         r = back_pressure_fraction
         value = math.sqrt(
-            (k / (k - 1.0))
-            * (r ** (2.0 / k) - r ** ((k + 1.0) / k))
-            / (1.0 - critical_ratio)
+            (k / (k - 1.0)) * (r ** (2.0 / k) - r ** ((k + 1.0) / k)) / (1.0 - critical_ratio)
         )
         kb = min(value, 1.0)
     elif not balanced_bellows and back_pressure_fraction > 0.5:
@@ -153,16 +151,10 @@ def _liquid_area(
         velocity = volume_flow / area_si
         reynolds = liquid_density * velocity * equivalent_diameter / viscosity
         if 0.0 < reynolds < 100_000.0:
-            kv = 1.0 / (
-                0.9935 + 2.878 / math.sqrt(reynolds) + 342.75 / reynolds**1.5
-            )
+            kv = 1.0 / (0.9935 + 2.878 / math.sqrt(reynolds) + 342.75 / reynolds**1.5)
             kv = min(max(kv, 0.2), 1.0)
     kp = min(0.6 + 4.0 * overpressure_fraction, 1.0) if overpressure_fraction < 0.25 else 1.0
-    area_in2 = (
-        flow_gpm
-        / (38.0 * kd * kw * kv * kp)
-        * math.sqrt(specific_gravity / dp)
-    )
+    area_in2 = flow_gpm / (38.0 * kd * kw * kv * kp) * math.sqrt(specific_gravity / dp)
     letter, selected_area_in2 = _select_orifice(area_in2)
     return {
         "required_area": area_in2 * 6.4516e-4,
@@ -193,21 +185,11 @@ def _two_phase_area(
     v_l = 1.0 / liquid_density
     mix = gas_fraction * v_g + (1.0 - gas_fraction) * v_l
     omega = gas_fraction * v_g / mix + (
-        liquid_heat_capacity
-        * temperature
-        * p0
-        * (v_g - v_l) ** 2
-        / (latent_heat**2 * mix)
+        liquid_heat_capacity * temperature * p0 * (v_g - v_l) ** 2 / (latent_heat**2 * mix)
     )
-    eta_c = (
-        0.55 + 0.217 * math.log(omega)
-        if omega <= 1.0
-        else 0.85 / (1.0 + omega)
-    )
+    eta_c = 0.55 + 0.217 * math.log(omega) if omega <= 1.0 else 0.85 / (1.0 + omega)
     eta_c = max(eta_c, back_pressure / p0)
-    g2 = p0 / mix * (
-        2.0 * (omega * math.log(1.0 / eta_c) + (1.0 - omega) * (1.0 - eta_c))
-    )
+    g2 = p0 / mix * (2.0 * (omega * math.log(1.0 / eta_c) + (1.0 - omega) * (1.0 - eta_c)))
     mass_flux = math.sqrt(max(g2, 0.0))
     if mass_flux <= 0.0:
         return 0.0
@@ -286,24 +268,14 @@ def psv_sizing(
     set_pressure_si = input_to_si(spec, "set_pressure", set_pressure)
     back_pressure_si = input_to_si(spec, "back_pressure", back_pressure)
     mass_flow_si = None if mass_flow is None else input_to_si(spec, "mass_flow", mass_flow)
-    temperature_si = (
-        None if temperature is None else input_to_si(spec, "temperature", temperature)
-    )
-    molar_mass_si = (
-        None if molar_mass is None else input_to_si(spec, "molar_mass", molar_mass)
-    )
-    volume_flow_si = (
-        None if volume_flow is None else input_to_si(spec, "volume_flow", volume_flow)
-    )
+    temperature_si = None if temperature is None else input_to_si(spec, "temperature", temperature)
+    molar_mass_si = None if molar_mass is None else input_to_si(spec, "molar_mass", molar_mass)
+    volume_flow_si = None if volume_flow is None else input_to_si(spec, "volume_flow", volume_flow)
     liquid_density_si = (
-        None
-        if liquid_density is None
-        else input_to_si(spec, "liquid_density", liquid_density)
+        None if liquid_density is None else input_to_si(spec, "liquid_density", liquid_density)
     )
     viscosity_si = None if viscosity is None else input_to_si(spec, "viscosity", viscosity)
-    gas_density_si = (
-        None if gas_density is None else input_to_si(spec, "gas_density", gas_density)
-    )
+    gas_density_si = None if gas_density is None else input_to_si(spec, "gas_density", gas_density)
     liquid_heat_capacity_si = (
         None
         if liquid_heat_capacity is None
@@ -370,9 +342,7 @@ def psv_sizing(
         temperature_value = _present(temperature_si, "temperature", service)
         molar_mass_value = _present(molar_mass_si, "molar_mass", service)
         compressibility_value = _present(compressibility, "compressibility", service)
-        specific_heat_ratio_value = _present(
-            specific_heat_ratio, "specific_heat_ratio", service
-        )
+        specific_heat_ratio_value = _present(specific_heat_ratio, "specific_heat_ratio", service)
         gas = _gas_area(
             mass_flow_value,
             set_pressure_si,
@@ -469,13 +439,9 @@ def psv_sizing(
         )
 
     if balanced_bellows:
-        raise InvalidInputError(
-            "is_balanced_bellows", "is not read by the two_phase service"
-        )
+        raise InvalidInputError("is_balanced_bellows", "is not read by the two_phase service")
     if rupture_disk:
-        raise InvalidInputError(
-            "has_rupture_disk", "is not read by the two_phase service"
-        )
+        raise InvalidInputError("has_rupture_disk", "is not read by the two_phase service")
     _refuse(volume_flow_si, "volume_flow", service)
     _refuse(viscosity_si, "viscosity", service)
     _refuse(molar_mass_si, "molar_mass", service)
@@ -489,9 +455,7 @@ def psv_sizing(
     gas_fraction_value = _present(gas_fraction, "gas_fraction", service)
     gas_density_value = _present(gas_density_si, "gas_density", service)
     latent_heat_value = _present(latent_heat, "latent_heat", service)
-    liquid_heat_capacity_value = _present(
-        liquid_heat_capacity_si, "liquid_heat_capacity", service
-    )
+    liquid_heat_capacity_value = _present(liquid_heat_capacity_si, "liquid_heat_capacity", service)
     area = _two_phase_area(
         mass_flow_value,
         set_pressure_si,

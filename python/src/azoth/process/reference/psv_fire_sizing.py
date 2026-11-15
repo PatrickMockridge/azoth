@@ -54,9 +54,7 @@ def _select_orifice(required_area_in2: float) -> tuple[str, float]:
 
 def _require_positive(name: str, value: float) -> None:
     if not math.isfinite(value) or value <= 0.0:
-        raise InvalidInputError(
-            name, f"a finite positive value is required, and {value} is not"
-        )
+        raise InvalidInputError(name, f"a finite positive value is required, and {value} is not")
 
 
 def _gas_area(
@@ -207,13 +205,9 @@ def psv_fire_sizing(
         specific_heat_ratio,
     )
     if orifice_area_si is not None and cv_discharge_coefficient is None:
-        raise InvalidInputError(
-            "cv_discharge_coefficient", "is required with orifice_area"
-        )
+        raise InvalidInputError("cv_discharge_coefficient", "is required with orifice_area")
     if orifice_area_si is None and cv_discharge_coefficient is not None:
-        raise InvalidInputError(
-            "orifice_area", "is required with cv_discharge_coefficient"
-        )
+        raise InvalidInputError("orifice_area", "is required with cv_discharge_coefficient")
     flow_coefficient = (
         None
         if orifice_area_si is None
