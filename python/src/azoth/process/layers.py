@@ -2816,6 +2816,60 @@ def _pipe_fire_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _vessel_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.vessel_rupture`'s crossover, through the reference's own evaluator."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.vessel_rupture import _evaluate
+
+    history = [
+        {
+            "time": quantity(float(row["time"]), "s"),
+            "internal_pressure": quantity(float(row["internal_pressure"]), "Pa"),
+            "metal_temperature": quantity(float(row["metal_temperature"]), "K"),
+        }
+        for row in inputs["history"]
+    ]
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["inner_radius"]), "m"),
+        quantity(float(inputs["wall_thickness"]), "m"),
+        str(inputs["material"]),
+        history,
+        optional("yield_strength", "MPa"),
+        optional("tensile_strength", "MPa"),
+        None if inputs.get("grade") is None else str(inputs["grade"]),
+        None
+        if inputs.get("tensile_strength_factor") is None
+        else float(inputs["tensile_strength_factor"]),
+    )
+    dumped: dict[str, float] = {
+        "point_count": float(len(solution.history)),
+        "min_margin_pa": solution.min_margin,
+        "min_margin_time_s": solution.min_margin_time,
+        "ambient_yield_strength_mpa": solution.ambient_yield_strength / 1.0e6,
+        "ambient_tensile_strength_mpa": solution.ambient_tensile_strength / 1.0e6,
+    }
+    if solution.ruptured:
+        dumped.update(
+            {
+                "rupture_time_s": solution.rupture_time or 0.0,
+                "rupture_stress_pa": solution.rupture_stress or 0.0,
+                "rupture_allowable_stress_pa": solution.rupture_allowable_stress or 0.0,
+                "rupture_metal_temperature_k": solution.rupture_metal_temperature or 0.0,
+            }
+        )
+    for index, row in enumerate(solution.history):
+        dumped[f"history{index}_time_s"] = row[0]
+        dumped[f"history{index}_von_mises_stress_pa"] = row[1]
+        dumped[f"history{index}_allowable_stress_pa"] = row[2]
+        dumped[f"history{index}_margin_pa"] = row[3]
+    return dumped
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2825,6 +2879,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.blowdown_pressure_profile": _blowdown_pressure_profile,
     "process.pipe_fire_rupture_material": _pipe_fire_rupture_material,
     "process.pipe_fire_rupture": _pipe_fire_rupture,
+    "process.vessel_rupture": _vessel_rupture,
     "process.heavy_gas_dispersion": _heavy_gas_dispersion,
     "process.gaussian_plume": _gaussian_plume,
     "process.gas_dispersion": _gas_dispersion,
@@ -6030,6 +6085,50 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=9,
         identified_by=(LABEL_KEY, "pipe_pfp_01"),
     ),
+    # The vessel's six states; the fourteen-grade sweep and the ten evidence rows are in
+    # `UNCASED_ROWS`.
+    LayerCase(
+        model="process.vessel_rupture",
+        case="severe_x65",
+        capture="process_vessel_rupture.tsv",
+        block=0,
+        identified_by=(LABEL_KEY, "vessel_severe_x65"),
+    ),
+    LayerCase(
+        model="process.vessel_rupture",
+        case="mild_x65",
+        capture="process_vessel_rupture.tsv",
+        block=1,
+        identified_by=(LABEL_KEY, "vessel_mild_x65"),
+    ),
+    LayerCase(
+        model="process.vessel_rupture",
+        case="lpg_bare",
+        capture="process_vessel_rupture.tsv",
+        block=2,
+        identified_by=(LABEL_KEY, "vessel_lpg_bare"),
+    ),
+    LayerCase(
+        model="process.vessel_rupture",
+        case="lpg_insulated",
+        capture="process_vessel_rupture.tsv",
+        block=3,
+        identified_by=(LABEL_KEY, "vessel_lpg_insulated"),
+    ),
+    LayerCase(
+        model="process.vessel_rupture",
+        case="x90_one_row",
+        capture="process_vessel_rupture.tsv",
+        block=18,
+        identified_by=(LABEL_KEY, "vessel_x90_one_row"),
+    ),
+    LayerCase(
+        model="process.vessel_rupture",
+        case="l450_alias",
+        capture="process_vessel_rupture.tsv",
+        block=19,
+        identified_by=(LABEL_KEY, "vessel_l450_alias"),
+    ),
 )
 
 #: Probe rows that are **deliberately not cases**, per capture, by the count they take.
@@ -6062,6 +6161,9 @@ UNCASED_ROWS: dict[str, int] = {
     # diameter, the unknown material and scenario, the one-point profile, the zero step and
     # the negative maximum time.
     "process_pipe_fire_rupture.tsv": 10,
+    # The vessel's twenty-four: the fourteen-grade sweep, the nine refusals and the
+    # non-monotonic evidence block the class accepts and the port refuses.
+    "process_vessel_rupture.tsv": 24,
     # The event tree's four: the no-branch tree, the two refusals and the shift count, which
     # cannot be cased (an empty record value is not a case).
     "process_event_tree.tsv": 4,
