@@ -31,6 +31,7 @@
 //!   - specs/models/process/hem_release.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
+//!   - specs/models/process/lopa.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mixer.toml
@@ -42974,6 +42975,546 @@ pub static LEAK_BLOWDOWN_SPEC: ModelSpec = ModelSpec {
     cases: LEAK_BLOWDOWN_CASES,
 };
 
+static LOPA_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "initiating_event_frequency_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative frequency is not a frequency",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "target_frequency_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative frequency is not a frequency",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "mitigated_frequency_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative frequency is not a frequency",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "event_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "design_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "test_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive pressure",
+        },
+    },
+];
+
+static LOPA_CASES: &[TestCase] = &[
+    TestCase {
+        id: "lopa_target_met",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initiating_event_frequency_per_year", 0.1),
+            ("target_frequency_per_year", 0.00011),
+            ("mitigated_frequency_per_year", 0.00010000000000000002),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("gap_to_target", -9.999999999999986e-06),
+            ("total_rrf", 999.9999999999999),
+            ("required_additional_rrf", 0.0),
+            ("required_additional_sil", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "layers",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("L0"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "frequency_before_per_year",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "frequency_after_per_year",
+                        value: FieldValue::Number(0.010000000000000002),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("L1"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                    RecordField {
+                        name: "frequency_before_per_year",
+                        value: FieldValue::Number(0.010000000000000002),
+                    },
+                    RecordField {
+                        name: "frequency_after_per_year",
+                        value: FieldValue::Number(0.00010000000000000002),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "layer_contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("L0"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "frequency_before_per_year",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "frequency_after_per_year",
+                        value: FieldValue::Number(0.010000000000000002),
+                    },
+                    RecordField {
+                        name: "contribution_per_year",
+                        value: FieldValue::Number(0.09),
+                    },
+                    RecordField {
+                        name: "rrf",
+                        value: FieldValue::Number(10.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("L1"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                    RecordField {
+                        name: "frequency_before_per_year",
+                        value: FieldValue::Number(0.010000000000000002),
+                    },
+                    RecordField {
+                        name: "frequency_after_per_year",
+                        value: FieldValue::Number(0.00010000000000000002),
+                    },
+                    RecordField {
+                        name: "contribution_per_year",
+                        value: FieldValue::Number(0.009900000000000003),
+                    },
+                    RecordField {
+                        name: "rrf",
+                        value: FieldValue::Number(100.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "lopa_gap",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initiating_event_frequency_per_year", 0.5),
+            ("target_frequency_per_year", 1e-05),
+            ("mitigated_frequency_per_year", 0.05),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("gap_to_target", 0.04999),
+            ("total_rrf", 10.0),
+            ("required_additional_rrf", 5000.0),
+            ("required_additional_sil", 3.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "layers",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.05),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "layer_contributions",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.05),
+                },
+                RecordField {
+                    name: "contribution_per_year",
+                    value: FieldValue::Number(0.45),
+                },
+                RecordField {
+                    name: "rrf",
+                    value: FieldValue::Number(10.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "lopa_boundary_equal",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initiating_event_frequency_per_year", 0.5),
+            ("target_frequency_per_year", 0.05),
+            ("mitigated_frequency_per_year", 0.05),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("gap_to_target", 0.0),
+            ("total_rrf", 10.0),
+            ("required_additional_rrf", 0.0),
+            ("required_additional_sil", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "layers",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.05),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "layer_contributions",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.05),
+                },
+                RecordField {
+                    name: "contribution_per_year",
+                    value: FieldValue::Number(0.45),
+                },
+                RecordField {
+                    name: "rrf",
+                    value: FieldValue::Number(10.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "lopa_zero_mitigated",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initiating_event_frequency_per_year", 0.1),
+            ("target_frequency_per_year", 0.0001),
+            ("mitigated_frequency_per_year", 0.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("gap_to_target", -0.0001),
+            ("total_rrf", 0.0),
+            ("required_additional_rrf", 0.0),
+            ("required_additional_sil", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "layers",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "layer_contributions",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "contribution_per_year",
+                    value: FieldValue::Number(0.1),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "lopa_zero_target_unmet",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initiating_event_frequency_per_year", 0.1),
+            ("target_frequency_per_year", 0.0),
+            ("mitigated_frequency_per_year", 0.010000000000000002),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("gap_to_target", 0.010000000000000002),
+            ("total_rrf", 9.999999999999998),
+            ("required_additional_sil", 4.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "layers",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.010000000000000002),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "layer_contributions",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.010000000000000002),
+                },
+                RecordField {
+                    name: "contribution_per_year",
+                    value: FieldValue::Number(0.09),
+                },
+                RecordField {
+                    name: "rrf",
+                    value: FieldValue::Number(10.0),
+                },
+            ]],
+        )],
+    },
+];
+
+static LOPA_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_lopa",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.lopa`.
+pub static LOPA_SPEC: ModelSpec = ModelSpec {
+    id: "process.lopa",
+    kind: "procedure",
+    algorithm: Some(&LOPA_ALGORITHM),
+    checks: LOPA_CHECKS,
+    cases: LOPA_CASES,
+};
+
 static MANIFOLD_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -60040,6 +60581,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &HEM_RELEASE_SPEC,
     &JET_FIRE_SPEC,
     &LEAK_BLOWDOWN_SPEC,
+    &LOPA_SPEC,
     &MANIFOLD_SPEC,
     &MAP_TURBO_EXPANDER_COMPRESSOR_SPEC,
     &MIXER_SPEC,

@@ -42,6 +42,7 @@ from azoth.core.record_outputs_gen import (
     KComponent,
     LeakBlowdownDiagnostic,
     LeakBlowdownPoint,
+    LopaLayerContribution,
     MineralEquilibriumRow,
     MinimalCutSet,
     NaceIssueRow,
@@ -73,6 +74,7 @@ from azoth.core.result_base import (
     PlusModel,
     RootStructure,
     StabilityVerdict,
+    Sts0131PressureCategory,
     SupplyVerdict,
     TpMultiflashSeed,
     _HasWarnings,
@@ -7608,6 +7610,40 @@ class LeakBlowdownResult(_HasWarnings):
 
     #: the codes alone.
     diagnostic_codes: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class LopaResult(_HasWarnings):
+    """Result of ``process.lopa``."""
+
+    CALC_ID: ClassVar[str] = "process.lopa"
+
+    #: whether the mitigated frequency is at or below the target.
+    target_met: bool
+
+    #: `mitigated - target`, in 1/year; positive is a shortfall.
+    gap_to_target: float
+
+    #: `initiating / mitigated`; zero when the mitigated frequency is zero.
+    total_rrf: float
+
+    #: `mitigated / target` when the target is not met and the target is positive; absent when the target is zero, where the class answers `+Infinity`.
+    required_additional_rrf: float | None
+
+    #: the SIL the required RRF asks for, or zero when the target is met.
+    required_additional_sil: float
+
+    #: one row per input layer, in caller order.
+    layer_contributions: tuple[LopaLayerContribution, ...]
+
+    #: the STS0131 pressure band; absent when the pressure triple is absent.
+    sts0131_pressure_category: Sts0131PressureCategory | None
+
+    #: the target frequency the band asks for, in 1/year; absent with the category.
+    sts0131_target_frequency_per_year: float | None
 
     #: Caveats.
     warnings: tuple[Warning, ...]

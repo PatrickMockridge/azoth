@@ -495,6 +495,14 @@ class ProtectedObject(TypedDict):
     surface_area: float
     application_rate: float
 
+class LopaProtectionLayer(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    pfd: float
+    frequency_before_per_year: float
+    frequency_after_per_year: float
+
 class MapCurvePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -915,6 +923,17 @@ class LeakBlowdownDiagnostic:
 
     code: str
     message: str
+
+@final
+class LopaLayerContribution:
+    """one row per input layer, in caller order."""
+
+    name: str
+    pfd: float
+    frequency_before_per_year: float
+    frequency_after_per_year: float
+    contribution_per_year: float
+    rrf: float | None
 
 # --- results --------------------------------------------------------------
 # Generated from the result dataclasses, so the stub and `azoth.core.result`
@@ -3596,6 +3615,18 @@ class LeakBlowdownResult:
     time_to_empty: Qty | None
     diagnostics: list[LeakBlowdownDiagnostic]
     diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
+class LopaResult:
+    target_met: bool
+    gap_to_target: float
+    total_rrf: float
+    required_additional_rrf: float | None
+    required_additional_sil: float
+    layer_contributions: list[LopaLayerContribution]
+    sts0131_pressure_category: str | None
+    sts0131_target_frequency_per_year: float | None
     warnings: list[Warning]
 
 @final
@@ -7031,6 +7062,15 @@ def leak_blowdown(
     time_step: float | None = None,
     scenario_name: str | None = None,
 ) -> LeakBlowdownResult: ...
+def lopa(
+    initiating_event_frequency_per_year: float,
+    target_frequency_per_year: float,
+    mitigated_frequency_per_year: float,
+    layers: list[LopaProtectionLayer],
+    event_pressure: float | None = None,
+    design_pressure: float | None = None,
+    test_pressure: float | None = None,
+) -> LopaResult: ...
 def manifold(
     components: list[str],
     feed_n: list[float],

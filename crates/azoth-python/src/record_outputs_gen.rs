@@ -1516,6 +1516,63 @@ impl From<&azoth_process::models::leak_blowdown::LeakBlowdownPoint> for PyLeakBl
     }
 }
 
+/// one row per input layer, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "LopaLayerContribution"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyLopaLayerContribution {
+    /// the layer's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the layer's PFD.
+    #[pyo3(get)]
+    pub pfd: f64,
+    /// the recorded frequency before the layer.
+    #[pyo3(get)]
+    pub frequency_before_per_year: f64,
+    /// the recorded frequency after the layer.
+    #[pyo3(get)]
+    pub frequency_after_per_year: f64,
+    /// `before - after`, in 1/year.
+    #[pyo3(get)]
+    pub contribution_per_year: f64,
+    /// `1 / PFD`; absent at a zero PFD, where the class answers `+Infinity`.
+    #[pyo3(get)]
+    pub rrf: Option<f64>,
+}
+
+#[pymethods]
+impl PyLopaLayerContribution {
+    fn __repr__(&self) -> String {
+        format!(
+            "LopaLayerContribution(name={}, pfd={}, frequency_before_per_year={}, frequency_after_per_year={}, contribution_per_year={}, rrf={:?})",
+            self.name,
+            self.pfd,
+            self.frequency_before_per_year,
+            self.frequency_after_per_year,
+            self.contribution_per_year,
+            self.rrf
+        )
+    }
+}
+
+impl From<&azoth_process::models::lopa::LopaLayerContribution> for PyLopaLayerContribution {
+    fn from(row: &azoth_process::models::lopa::LopaLayerContribution) -> Self {
+        Self {
+            name: row.name.clone(),
+            pfd: row.pfd,
+            frequency_before_per_year: row.frequency_before_per_year,
+            frequency_after_per_year: row.frequency_after_per_year,
+            contribution_per_year: row.contribution_per_year,
+            rrf: row.rrf,
+        }
+    }
+}
+
 /// The registered minerals, in the class's order; a mineral whose ion is below the registration floor is absent rather than zero.
 #[pyclass(
     frozen,

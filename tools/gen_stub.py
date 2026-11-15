@@ -465,6 +465,7 @@ ENUMS = {
     "HenryStatus",
     "CooldownVerdict",
     "GoverningCriterion",
+    "Sts0131PressureCategory",
     "SupplyVerdict",
     "HydrateRiskLevel",
     "HydrateStructure",

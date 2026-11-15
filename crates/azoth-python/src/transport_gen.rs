@@ -20,9 +20,10 @@ use crate::record_outputs_gen::{
     PyFlowlineScaleSegment, PyHeatExchangerMechanicalType, PyHeaterInstrument,
     PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow, PyRemediationOptionRow,
-    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
-    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
+    PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow,
+    PyRemediationOptionRow, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySterileRadius, PyStreamScaleMineralRow, PySubFraction,
+    PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -18879,6 +18880,81 @@ impl From<&azoth_process::models::leak_blowdown::LeakBlowdownResult> for PyLeakB
                 .map(PyLeakBlowdownDiagnostic::from)
                 .collect(),
             diagnostic_codes: r.diagnostic_codes.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.lopa`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "LopaResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyLopaResult {
+    /// whether the mitigated frequency is at or below the target.
+    #[pyo3(get)]
+    pub target_met: bool,
+    /// `mitigated - target`, in 1/year; positive is a shortfall.
+    #[pyo3(get)]
+    pub gap_to_target: f64,
+    /// `initiating / mitigated`; zero when the mitigated frequency is zero.
+    #[pyo3(get)]
+    pub total_rrf: f64,
+    /// `mitigated / target` when the target is not met and the target is positive; absent when the target is zero, where the class answers `+Infinity`.
+    #[pyo3(get)]
+    pub required_additional_rrf: Option<f64>,
+    /// the SIL the required RRF asks for, or zero when the target is met.
+    #[pyo3(get)]
+    pub required_additional_sil: f64,
+    /// one row per input layer, in caller order.
+    #[pyo3(get)]
+    pub layer_contributions: Vec<PyLopaLayerContribution>,
+    /// the STS0131 pressure band; absent when the pressure triple is absent.
+    #[pyo3(get)]
+    pub sts0131_pressure_category: Option<String>,
+    /// the target frequency the band asks for, in 1/year; absent with the category.
+    #[pyo3(get)]
+    pub sts0131_target_frequency_per_year: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyLopaResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "LopaResult(target_met={:?}, gap_to_target={:?}, total_rrf={:?}, required_additional_rrf={:?}, required_additional_sil={:?}, layer_contributions={:?}, sts0131_pressure_category={:?}, sts0131_target_frequency_per_year={:?}, {} warning(s))",
+            self.target_met,
+            self.gap_to_target,
+            self.total_rrf,
+            self.required_additional_rrf,
+            self.required_additional_sil,
+            self.layer_contributions,
+            self.sts0131_pressure_category,
+            self.sts0131_target_frequency_per_year,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::lopa::LopaResult> for PyLopaResult {
+    fn from(r: &azoth_process::models::lopa::LopaResult) -> Self {
+        Self {
+            target_met: r.target_met,
+            gap_to_target: r.gap_to_target,
+            total_rrf: r.total_rrf,
+            required_additional_rrf: r.required_additional_rrf,
+            required_additional_sil: r.required_additional_sil,
+            layer_contributions: r
+                .layer_contributions
+                .iter()
+                .map(PyLopaLayerContribution::from)
+                .collect(),
+            sts0131_pressure_category: r.sts0131_pressure_category.map(|v| v.as_str().to_string()),
+            sts0131_target_frequency_per_year: r.sts0131_target_frequency_per_year,
             warnings: transport(&r.warnings),
         }
     }

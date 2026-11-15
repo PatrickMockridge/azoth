@@ -252,6 +252,7 @@
 //!   - specs/models/process/hem_release.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
+//!   - specs/models/process/lopa.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mixer.toml
@@ -3654,6 +3655,20 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ),
     ("process.leak_blowdown", "back_pressure", "pressure"),
     ("process.leak_blowdown", "time_step", "time"),
+    (
+        "process.lopa",
+        "initiating_event_frequency_per_year",
+        "dimensionless",
+    ),
+    ("process.lopa", "target_frequency_per_year", "dimensionless"),
+    (
+        "process.lopa",
+        "mitigated_frequency_per_year",
+        "dimensionless",
+    ),
+    ("process.lopa", "event_pressure", "pressure"),
+    ("process.lopa", "design_pressure", "pressure"),
+    ("process.lopa", "test_pressure", "pressure"),
     ("process.manifold", "feed_n", "molar_flow"),
     ("process.manifold", "feed_z", "dimensionless"),
     ("process.manifold", "feed_p", "pressure"),

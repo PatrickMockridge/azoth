@@ -554,6 +554,29 @@ class LeakBlowdownPoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class LopaLayerContribution:
+    """one row per input layer, in caller order."""
+
+    #: the layer's name.
+    name: str
+
+    #: the layer's PFD.
+    pfd: float
+
+    #: the recorded frequency before the layer.
+    frequency_before_per_year: float
+
+    #: the recorded frequency after the layer.
+    frequency_after_per_year: float
+
+    #: `before - after`, in 1/year.
+    contribution_per_year: float
+
+    #: `1 / PFD`; absent at a zero PFD, where the class answers `+Infinity`.
+    rrf: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class MineralEquilibriumRow:
     """The registered minerals, in the class's order; a mineral whose ion is below the registration floor is absent rather than zero."""
 

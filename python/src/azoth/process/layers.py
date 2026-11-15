@@ -2188,6 +2188,45 @@ def _safety_instrumented_function(inputs: Mapping[str, Any]) -> dict[str, float]
     return layers
 
 
+def _lopa(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.lopa`'s layers, from the reference's own arithmetic.
+
+    The layer names and the STS0131 category are not numbers; they are asserted by the
+    case and the cross-impl test. A layer's RRF absent at a zero PFD is absent here too.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.lopa import lopa as evaluate
+
+    def optional(name: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), "bar")
+
+    result = evaluate(
+        float(inputs["initiating_event_frequency_per_year"]),
+        float(inputs["target_frequency_per_year"]),
+        float(inputs["mitigated_frequency_per_year"]),
+        [dict(row) for row in inputs["layers"]],
+        optional("event_pressure"),
+        optional("design_pressure"),
+        optional("test_pressure"),
+    )
+    layers: dict[str, float] = {
+        "gap_to_target": result.gap_to_target,
+        "total_rrf": result.total_rrf,
+        "required_additional_sil": result.required_additional_sil,
+        "layer_count": float(len(result.layer_contributions)),
+    }
+    if result.required_additional_rrf is not None:
+        layers["required_additional_rrf"] = result.required_additional_rrf
+    if result.sts0131_target_frequency_per_year is not None:
+        layers["sts0131_target_frequency_per_year"] = result.sts0131_target_frequency_per_year
+    for index, row in enumerate(result.layer_contributions):
+        layers[f"layer{index}_contribution_per_year"] = row.contribution_per_year
+        if row.rrf is not None:
+            layers[f"layer{index}_rrf"] = row.rrf
+    return layers
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2207,6 +2246,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.fault_tree": _fault_tree,
     "process.bow_tie": _bow_tie,
     "process.safety_instrumented_function": _safety_instrumented_function,
+    "process.lopa": _lopa,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3315,6 +3355,44 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_safety_instrumented_function.tsv",
         block=4,
         identified_by=("#label", "sif_out_of_band"),
+    ),
+    # The LOPA's five caseable states. The thirteen blocks after them (the floating-point
+    # boundary, the six STS0131 bands, a zero-PFD layer, a negative initiating frequency
+    # and the four refusals) are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.lopa",
+        case="lopa_target_met",
+        capture="process_lopa.tsv",
+        block=0,
+        identified_by=("#label", "lopa_target_met"),
+    ),
+    LayerCase(
+        model="process.lopa",
+        case="lopa_gap",
+        capture="process_lopa.tsv",
+        block=1,
+        identified_by=("#label", "lopa_gap"),
+    ),
+    LayerCase(
+        model="process.lopa",
+        case="lopa_boundary_equal",
+        capture="process_lopa.tsv",
+        block=2,
+        identified_by=("#label", "lopa_boundary_equal"),
+    ),
+    LayerCase(
+        model="process.lopa",
+        case="lopa_zero_mitigated",
+        capture="process_lopa.tsv",
+        block=4,
+        identified_by=("#label", "lopa_zero_mitigated"),
+    ),
+    LayerCase(
+        model="process.lopa",
+        case="lopa_zero_target_unmet",
+        capture="process_lopa.tsv",
+        block=5,
+        identified_by=("#label", "lopa_zero_target_unmet"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4558,6 +4636,10 @@ UNCASED_ROWS: dict[str, int] = {
     # The SIF's five: a negative PFD, a NaN, the SIL 0 and SIL 5 refusals, and the static
     # max-PFD table for a SIL it does not know.
     "process_safety_instrumented_function.tsv": 5,
+    # The LOPA's thirteen: the floating-point boundary, the six STS0131 bands and their
+    # boundaries, a zero-PFD layer, a negative initiating frequency, and the four STS0131
+    # refusals (a zero pressure three times and a test below design).
+    "process_lopa.tsv": 13,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

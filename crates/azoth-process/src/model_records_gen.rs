@@ -41,6 +41,7 @@ use crate::models::heater::HeaterResult;
 use crate::models::hem_release::HemReleaseResult;
 use crate::models::jet_fire::JetFireResult;
 use crate::models::leak_blowdown::LeakBlowdownResult;
+use crate::models::lopa::LopaResult;
 use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mixer::MixerResult;
@@ -993,6 +994,25 @@ impl CalcResult for LeakBlowdownResult {
         "time_to_empty",
         "diagnostics",
         "diagnostic_codes",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for LopaResult {
+    const CALC_ID: &'static str = "process.lopa";
+    const FIELDS: &'static [&'static str] = &[
+        "target_met",
+        "gap_to_target",
+        "total_rrf",
+        "required_additional_rrf",
+        "required_additional_sil",
+        "layer_contributions",
+        "sts0131_pressure_category",
+        "sts0131_target_frequency_per_year",
         "warnings",
     ];
 

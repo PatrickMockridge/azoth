@@ -60,6 +60,7 @@ pub mod heater;
 pub mod hem_release;
 pub mod jet_fire;
 pub mod leak_blowdown;
+pub mod lopa;
 pub mod manifold;
 pub mod map_turbo_expander_compressor;
 pub mod mixer;
@@ -130,6 +131,9 @@ pub use heater::{HeaterResult, heater};
 pub use hem_release::{HemReleaseResult, hem_release};
 pub use jet_fire::{JetFireResult, jet_fire};
 pub use leak_blowdown::{LeakBlowdownResult, leak_blowdown};
+pub use lopa::{
+    LopaProtectionLayer, LopaResult, LopaLayerContribution, Sts0131PressureCategory, lopa,
+};
 pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};
 pub use mixer::{MixerResult, mixer};

@@ -57,7 +57,7 @@ fn require_finite(name: &str, value: f64) -> Result<()> {
 }
 
 /// The class's `getRequiredSil`: the minimum SIL a target PFD asks for.
-fn required_sil(target_pfd: f64) -> usize {
+pub(crate) fn required_sil(target_pfd: f64) -> usize {
     if target_pfd >= 0.01 {
         1
     } else if target_pfd >= 0.001 {

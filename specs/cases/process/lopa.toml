@@ -1,0 +1,102 @@
+model = "process.lopa"
+[[cases]]
+id = "lopa_target_met"
+tolerance = 1.0e-12
+source = "`LOPARunnerTest.calculatesCanonicalTargetMetCaseWithScreeningBoundary`: 0.1 /year, two layers at 0.1 and 0.01, a 1.1e-4 target. From `validation/neqsim/captures/process_lopa.tsv` (`lopa_target_met`)."
+[cases.inputs]
+initiating_event_frequency_per_year = 0.1
+target_frequency_per_year = 1.1e-4
+mitigated_frequency_per_year = 1.0000000000000002e-4
+layers = [
+  { name = "L0", pfd = 0.1, frequency_before_per_year = 0.1, frequency_after_per_year = 0.010000000000000002 },
+  { name = "L1", pfd = 0.01, frequency_before_per_year = 0.010000000000000002, frequency_after_per_year = 1.0000000000000002e-4 },
+]
+[cases.expected]
+target_met = true
+gap_to_target = -9.999999999999986e-6
+total_rrf = 999.9999999999999
+required_additional_rrf = 0.0
+required_additional_sil = 0.0
+layer_contributions = [
+  { name = "L0", pfd = 0.1, frequency_before_per_year = 0.1, frequency_after_per_year = 0.010000000000000002, contribution_per_year = 0.09, rrf = 10.0 },
+  { name = "L1", pfd = 0.01, frequency_before_per_year = 0.010000000000000002, frequency_after_per_year = 1.0000000000000002e-4, contribution_per_year = 0.009900000000000003, rrf = 100.0 },
+]
+[[cases]]
+id = "lopa_gap"
+tolerance = 1.0e-12
+source = "`LOPARunnerTest.calculatesCanonicalGapAndLabelsIndicativeSilBand`: 0.5 /year, one layer at 0.1, a 1e-5 target; the required RRF is 5000 and the SIL is 3. From (`lopa_gap`)."
+[cases.inputs]
+initiating_event_frequency_per_year = 0.5
+target_frequency_per_year = 1.0e-5
+mitigated_frequency_per_year = 0.05
+layers = [
+  { name = "L0", pfd = 0.1, frequency_before_per_year = 0.5, frequency_after_per_year = 0.05 },
+]
+[cases.expected]
+target_met = false
+gap_to_target = 0.04999
+total_rrf = 10.0
+required_additional_rrf = 5000.0
+required_additional_sil = 3.0
+layer_contributions = [
+  { name = "L0", pfd = 0.1, frequency_before_per_year = 0.5, frequency_after_per_year = 0.05, contribution_per_year = 0.45, rrf = 10.0 },
+]
+[[cases]]
+id = "lopa_boundary_equal"
+tolerance = 1.0e-12
+source = "`mitigated == target`: the comparison is inclusive, so the target is met and the gap is exactly zero. From (`lopa_boundary_equal`)."
+[cases.inputs]
+initiating_event_frequency_per_year = 0.5
+target_frequency_per_year = 0.05
+mitigated_frequency_per_year = 0.05
+layers = [
+  { name = "L0", pfd = 0.1, frequency_before_per_year = 0.5, frequency_after_per_year = 0.05 },
+]
+[cases.expected]
+target_met = true
+gap_to_target = 0.0
+total_rrf = 10.0
+required_additional_rrf = 0.0
+required_additional_sil = 0.0
+layer_contributions = [
+  { name = "L0", pfd = 0.1, frequency_before_per_year = 0.5, frequency_after_per_year = 0.05, contribution_per_year = 0.45, rrf = 10.0 },
+]
+[[cases]]
+id = "lopa_zero_mitigated"
+tolerance = 1.0e-12
+source = "A zero mitigated frequency: the total RRF is the class's zero, the target is met, and the zero-PFD layer's RRF is `+Infinity`, published as absent. From (`lopa_zero_mitigated`)."
+[cases.inputs]
+initiating_event_frequency_per_year = 0.1
+target_frequency_per_year = 1.0e-4
+mitigated_frequency_per_year = 0.0
+layers = [
+  { name = "L0", pfd = 0.0, frequency_before_per_year = 0.1, frequency_after_per_year = 0.0 },
+]
+[cases.expected]
+target_met = true
+gap_to_target = -1.0e-4
+total_rrf = 0.0
+required_additional_rrf = 0.0
+required_additional_sil = 0.0
+layer_contributions = [
+  { name = "L0", pfd = 0.0, frequency_before_per_year = 0.1, frequency_after_per_year = 0.0, contribution_per_year = 0.1 },
+]
+[[cases]]
+id = "lopa_zero_target_unmet"
+tolerance = 1.0e-12
+source = "A zero target that is not met: the required additional RRF is `+Infinity`, published as absent, and the class's SIL reads 4. From (`lopa_zero_target_unmet`)."
+[cases.inputs]
+initiating_event_frequency_per_year = 0.1
+target_frequency_per_year = 0.0
+mitigated_frequency_per_year = 0.010000000000000002
+layers = [
+  { name = "L0", pfd = 0.1, frequency_before_per_year = 0.1, frequency_after_per_year = 0.010000000000000002 },
+]
+[cases.expected]
+target_met = false
+gap_to_target = 0.010000000000000002
+total_rrf = 9.999999999999998
+required_additional_sil = 4.0
+layer_contributions = [
+  { name = "L0", pfd = 0.1, frequency_before_per_year = 0.1, frequency_after_per_year = 0.010000000000000002, contribution_per_year = 0.09, rrf = 10.0 },
+]

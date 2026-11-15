@@ -170,6 +170,8 @@ from azoth.core.result import (
     LiquidHeatCapacityResult,
     LiquidViscosityPureResult,
     LmtdCorrectionFactorResult,
+    LopaLayerContribution,
+    LopaResult,
     LumpingResult,
     ManifoldResult,
     MapTurboExpanderResult,
@@ -521,6 +523,7 @@ __all__ = [
     "liquid_heat_capacity",
     "liquid_viscosity_pure",
     "lmtd_correction_factor",
+    "lopa",
     "lumping",
     "manifold",
     "map_turbo_expander_compressor",
@@ -6928,6 +6931,31 @@ def leak_blowdown(components: list[str], initial_z: list[float], initial_t: Q, i
         time_to_empty=None if result.time_to_empty is None else from_si(result.time_to_empty.magnitude_si, result.time_to_empty.unit),
         diagnostics=tuple(LeakBlowdownDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
         diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def lopa(initiating_event_frequency_per_year: float, target_frequency_per_year: float, mitigated_frequency_per_year: float, layers: list[dict[str, object]], event_pressure: Q | None=None, design_pressure: Q | None=None, test_pressure: Q | None=None) -> LopaResult:
+    """``process.lopa``, computed in Rust."""
+    spec = _models_gen.model("process.lopa")
+    result = _core.lopa(
+        initiating_event_frequency_per_year,
+        target_frequency_per_year,
+        mitigated_frequency_per_year,
+        input_records_to_si(spec, "layers", layers),
+        None if event_pressure is None else input_to_si(spec, "event_pressure", event_pressure),
+        None if design_pressure is None else input_to_si(spec, "design_pressure", design_pressure),
+        None if test_pressure is None else input_to_si(spec, "test_pressure", test_pressure),
+    )
+    return LopaResult(
+        target_met=result.target_met,
+        gap_to_target=result.gap_to_target,
+        total_rrf=result.total_rrf,
+        required_additional_rrf=result.required_additional_rrf,
+        required_additional_sil=result.required_additional_sil,
+        layer_contributions=tuple(LopaLayerContribution(name=c.name, pfd=c.pfd, frequency_before_per_year=c.frequency_before_per_year, frequency_after_per_year=c.frequency_after_per_year, contribution_per_year=c.contribution_per_year, rrf=c.rrf) for c in result.layer_contributions),
+        sts0131_pressure_category=None if result.sts0131_pressure_category is None else Sts0131PressureCategory(result.sts0131_pressure_category),
+        sts0131_target_frequency_per_year=result.sts0131_target_frequency_per_year,
         warnings=_warnings(result.warnings),
     )
 

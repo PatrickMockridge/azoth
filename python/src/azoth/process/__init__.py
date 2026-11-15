@@ -49,6 +49,7 @@ from azoth.core.result import (
     HemReleaseResult,
     JetFireResult,
     LeakBlowdownResult,
+    LopaResult,
     ManifoldResult,
     MapTurboExpanderResult,
     MixerResult,
@@ -128,6 +129,7 @@ __all__ = [
     "jet_fire",
     "leak_blowdown",
     "load_flowsheet",
+    "lopa",
     "manifold",
     "map_turbo_expander_compressor",
     "mixer",
@@ -190,6 +192,7 @@ _HEATER = "process.heater"
 _HEM_RELEASE = "process.hem_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
+_LOPA = "process.lopa"
 _GAS_DISPERSION = "process.gas_dispersion"
 _GAUSSIAN_PLUME = "process.gaussian_plume"
 _PROBIT = "process.probit"
@@ -2275,6 +2278,35 @@ def safety_instrumented_function(
         spurious_trip_rate_per_year=spurious_trip_rate_per_year,
         mttr_hours=mttr_hours,
         base_availability=base_availability,
+    )
+
+
+def lopa(
+    initiating_event_frequency_per_year: float,
+    target_frequency_per_year: float,
+    mitigated_frequency_per_year: float,
+    layers: list[dict[str, object]],
+    event_pressure: Q | None = None,
+    design_pressure: Q | None = None,
+    test_pressure: Q | None = None,
+) -> LopaResult:
+    """The LOPA result: the target status, the RRFs, the layers and the STS0131 band.
+
+    ``gap_to_target`` is ``mitigated - target``, positive on a shortfall. **The layers
+    are recorded, not multiplied**: the mitigated frequency is an input. The required
+    additional RRF is absent when the target is zero and not met, where the class answers
+    ``+Infinity``, and the required SIL then reads 4.
+
+    See :func:`azoth.process.reference.lopa`.
+    """
+    return resolve(_LOPA)(  # type: ignore[no-any-return]
+        initiating_event_frequency_per_year=initiating_event_frequency_per_year,
+        target_frequency_per_year=target_frequency_per_year,
+        mitigated_frequency_per_year=mitigated_frequency_per_year,
+        layers=layers,
+        event_pressure=event_pressure,
+        design_pressure=design_pressure,
+        test_pressure=test_pressure,
     )
 
 

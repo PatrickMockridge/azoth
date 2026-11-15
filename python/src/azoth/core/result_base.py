@@ -108,6 +108,15 @@ class GoverningCriterion(StrEnum):
     COVERAGE = "coverage"
 
 
+class Sts0131PressureCategory(StrEnum):
+    """The STS0131 overpressure band a LOPA scenario falls in."""
+
+    BELOW_OR_AT_DESIGN_PRESSURE = "below_or_at_design_pressure"
+    ABOVE_DESIGN_TO_TEST_PRESSURE = "above_design_to_test_pressure"
+    ABOVE_TEST_TO_TWO_TIMES_DESIGN_PRESSURE = "above_test_to_two_times_design_pressure"
+    ABOVE_TWO_TIMES_DESIGN_PRESSURE = "above_two_times_design_pressure"
+
+
 class CooldownVerdict(StrEnum):
     """The screening verdict a surface-cooldown analysis reports."""
 

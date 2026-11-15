@@ -6579,6 +6579,47 @@ pub fn leak_blowdown(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Layer of protection analysis.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (initiating_event_frequency_per_year, target_frequency_per_year, mitigated_frequency_per_year, layers, event_pressure, design_pressure, test_pressure))]
+#[pyo3(
+    text_signature = "(initiating_event_frequency_per_year, target_frequency_per_year, mitigated_frequency_per_year, layers, event_pressure, design_pressure, test_pressure)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn lopa(
+    py: Python<'_>,
+    initiating_event_frequency_per_year: f64,
+    target_frequency_per_year: f64,
+    mitigated_frequency_per_year: f64,
+    layers: Vec<crate::records_gen::LopaProtectionLayer>,
+    event_pressure: Option<f64>,
+    design_pressure: Option<f64>,
+    test_pressure: Option<f64>,
+) -> PyResult<crate::transport_gen::PyLopaResult> {
+    let layers_records: Vec<azoth_process::models::lopa::LopaProtectionLayer> = layers
+        .into_iter()
+        .map(|row| azoth_process::models::lopa::LopaProtectionLayer {
+            name: row.name,
+            pfd: row.pfd,
+            frequency_before_per_year: row.frequency_before_per_year,
+            frequency_after_per_year: row.frequency_after_per_year,
+        })
+        .collect();
+    azoth_process::models::lopa::lopa(
+        initiating_event_frequency_per_year,
+        target_frequency_per_year,
+        mitigated_frequency_per_year,
+        &layers_records,
+        event_pressure.map(pascals),
+        design_pressure.map(pascals),
+        test_pressure.map(pascals),
+    )
+    .map(|r| crate::transport_gen::PyLopaResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Manifold.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
