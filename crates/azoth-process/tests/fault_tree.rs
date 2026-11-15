@@ -43,11 +43,19 @@ fn voting(name: &str, parent_index: f64, k: f64) -> FaultTreeNodeSpec {
 #[test]
 fn the_and_gate_is_the_product_of_its_basics() {
     let result = fault_tree(
-        &[gate("Both fail", -1.0, "and"), basic("A", 0.0, 0.1), basic("B", 0.0, 0.2)],
+        &[
+            gate("Both fail", -1.0, "and"),
+            basic("A", 0.0, 0.1),
+            basic("B", 0.0, 0.2),
+        ],
         3.0,
     )
     .expect("the captured state is valid");
-    close(result.top_event_probability, 0.020_000_000_000_000_004, "AND");
+    close(
+        result.top_event_probability,
+        0.020_000_000_000_000_004,
+        "AND",
+    );
     close(result.cut_set_count, 1.0, "one cut set");
     assert_eq!(result.minimal_cut_sets[0].members, "A, B");
     close(result.minimal_cut_sets[0].cardinality, 2.0, "two members");
@@ -82,7 +90,11 @@ fn the_voting_gate_is_the_poisson_binomial_sum() {
         3.0,
     )
     .expect("the captured state is valid");
-    close(result.top_event_probability, 0.028_000_000_000_000_004, "2oo3");
+    close(
+        result.top_event_probability,
+        0.028_000_000_000_000_004,
+        "2oo3",
+    );
     close(result.cut_set_count, 3.0, "three pairs");
     assert_eq!(result.minimal_cut_sets[0].members, "A, B");
     assert_eq!(result.minimal_cut_sets[1].members, "A, C");
@@ -121,7 +133,11 @@ fn the_cut_sets_are_sorted_by_cardinality_and_then_name() {
         3.0,
     )
     .expect("the captured state is valid");
-    close(result.top_event_probability, 0.108_999_999_999_999_99, "the top");
+    close(
+        result.top_event_probability,
+        0.108_999_999_999_999_99,
+        "the top",
+    );
     close(result.cut_set_count, 2.0, "two cut sets");
     assert_eq!(result.minimal_cut_sets[0].members, "C");
     assert_eq!(result.minimal_cut_sets[1].members, "A, B");
@@ -190,7 +206,10 @@ fn a_malformed_structure_is_refused() {
 
     // A basic event with a child.
     let child_of_basic = [basic("A", -1.0, 0.1), basic("B", 0.0, 0.1)];
-    assert!(fault_tree(&child_of_basic, 1.0).is_err(), "a child of a basic");
+    assert!(
+        fault_tree(&child_of_basic, 1.0).is_err(),
+        "a child of a basic"
+    );
 
     // An empty node list has no root.
     assert!(fault_tree(&[], 1.0).is_err(), "an empty node list");

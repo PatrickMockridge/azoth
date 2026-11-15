@@ -1,8 +1,6 @@
 //! `process.bow_tie` against `validation/neqsim/captures/process_bow_tie.tsv`.
 
-use azoth_process::models::bow_tie::{
-    BowTieBarrier, BowTieConsequence, BowTieThreat, bow_tie,
-};
+use azoth_process::models::bow_tie::{BowTieBarrier, BowTieConsequence, BowTieThreat, bow_tie};
 
 fn close(actual: f64, expected: f64, what: &str) {
     let error = (actual - expected).abs() / expected.abs().max(f64::MIN_POSITIVE);
@@ -65,7 +63,11 @@ fn a_mitigation_barrier_does_not_move_the_frequency() {
     )
     .expect("the captured state is valid");
     close(result.unmitigated_frequency_per_year, 0.1, "the sum");
-    close(result.mitigated_frequency_per_year, 0.001, "the prevention only");
+    close(
+        result.mitigated_frequency_per_year,
+        0.001,
+        "the prevention only",
+    );
     close(result.total_rrf, 100.0, "the RRF");
 }
 
@@ -122,7 +124,11 @@ fn a_nonfunctional_barrier_leaves_the_frequency_alone() {
     )
     .expect("the captured state is valid");
     close(result.unmitigated_frequency_per_year, 0.2, "the sum");
-    close(result.mitigated_frequency_per_year, 0.2, "the same frequency");
+    close(
+        result.mitigated_frequency_per_year,
+        0.2,
+        "the same frequency",
+    );
     close(result.total_rrf, 1.0, "no reduction");
 }
 
@@ -134,9 +140,13 @@ fn the_empty_states_are_answered() {
     close(empty.total_rrf, 0.0, "the class's zero at zero mitigated");
     close(empty.max_severity, 0.0, "no consequences");
 
-    let inactive = bow_tie(&[threat(0.1, false)], &[severity(5.0)], &[])
-        .expect("an inactive threat is valid");
-    close(inactive.unmitigated_frequency_per_year, 0.0, "the inactive sum");
+    let inactive =
+        bow_tie(&[threat(0.1, false)], &[severity(5.0)], &[]).expect("an inactive threat is valid");
+    close(
+        inactive.unmitigated_frequency_per_year,
+        0.0,
+        "the inactive sum",
+    );
     close(inactive.max_severity, 5.0, "the severity still reads");
 }
 

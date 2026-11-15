@@ -1,9 +1,7 @@
 //! `process.lopa` against `validation/neqsim/captures/process_lopa.tsv`.
 
 use azoth_core::units::bars;
-use azoth_process::models::lopa::{
-    LopaProtectionLayer, LopaResult, Sts0131PressureCategory, lopa,
-};
+use azoth_process::models::lopa::{LopaProtectionLayer, LopaResult, Sts0131PressureCategory, lopa};
 
 fn close(actual: f64, expected: f64, what: &str) {
     let error = (actual - expected).abs() / expected.abs().max(f64::MIN_POSITIVE);
@@ -48,7 +46,12 @@ fn the_target_met_state_reproduces_the_capture() {
         1.000_000_000_000_000_2e-4,
         &[
             layer("L0", 0.1, 0.1, 0.010_000_000_000_000_002),
-            layer("L1", 0.01, 0.010_000_000_000_000_002, 1.000_000_000_000_000_2e-4),
+            layer(
+                "L1",
+                0.01,
+                0.010_000_000_000_000_002,
+                1.000_000_000_000_000_2e-4,
+            ),
         ],
     );
     assert!(result.target_met, "the target is met");
@@ -75,7 +78,11 @@ fn the_target_met_state_reproduces_the_capture() {
         0.009_900_000_000_000_003,
         "the second contribution",
     );
-    close(result.layer_contributions[1].rrf.unwrap(), 100.0, "L1's RRF");
+    close(
+        result.layer_contributions[1].rrf.unwrap(),
+        100.0,
+        "L1's RRF",
+    );
 }
 
 #[test]

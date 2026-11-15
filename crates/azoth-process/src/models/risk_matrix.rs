@@ -288,8 +288,7 @@ pub fn risk_matrix(
             ));
         }
 
-        let (probability_category, probability_level) =
-            probability_category(row.failures_per_year);
+        let (probability_category, probability_level) = probability_category(row.failures_per_year);
         let (consequence_category, consequence_level) =
             consequence_category(row.production_loss_percent);
         let risk_score = probability_level * consequence_level;
@@ -300,8 +299,7 @@ pub fn risk_matrix(
         };
         let expected_downtime_hours_per_year = row.failures_per_year * row.mttr_hours;
         let loss_kg_hr = row.production_loss_kg_per_hr.value * 3600.0;
-        let cost_per_failure = loss_kg_hr * row.mttr_hours * price
-            + row.mttr_hours * downtime_cost;
+        let cost_per_failure = loss_kg_hr * row.mttr_hours * price + row.mttr_hours * downtime_cost;
         let annual_risk_cost = cost_per_failure * row.failures_per_year;
         total_annual_risk_cost += annual_risk_cost;
 

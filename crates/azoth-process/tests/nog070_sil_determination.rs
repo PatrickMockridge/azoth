@@ -40,8 +40,8 @@ fn a_non_compliant_hipps_needs_a_factor_of_ten() {
 
 #[test]
 fn the_custom_type_takes_the_callers_minimum() {
-    let explicit = nog070_sil_determination("custom", 5.0e-3, Some(3.0))
-        .expect("the captured state is valid");
+    let explicit =
+        nog070_sil_determination("custom", 5.0e-3, Some(3.0)).expect("the captured state is valid");
     close(explicit.catalogue_minimum_sil, 0.0, "the catalogue");
     close(explicit.minimum_sil, 3.0, "the caller's minimum");
     assert!(!explicit.compliant, "2 misses 3");
@@ -51,8 +51,8 @@ fn the_custom_type_takes_the_callers_minimum() {
         "the factor",
     );
 
-    let catalogue = nog070_sil_determination("custom", 5.0e-3, None)
-        .expect("the captured state is valid");
+    let catalogue =
+        nog070_sil_determination("custom", 5.0e-3, None).expect("the captured state is valid");
     close(catalogue.minimum_sil, 0.0, "the catalogue's zero");
     assert!(catalogue.compliant, "everything meets zero");
 }
@@ -62,8 +62,15 @@ fn the_sil_zero_band_is_distinct_from_the_required_sil_map() {
     let result = nog070_sil_determination("psd_high_vibration", 0.2, None)
         .expect("the captured state is valid");
     close(result.achieved_sil, 0.0, "pfdToSil reads 0 at 0.2");
-    assert!(!result.compliant, "0 misses the high-vibration minimum of 1");
-    close(result.required_pfd_reduction_factor.unwrap(), 10.0, "the factor");
+    assert!(
+        !result.compliant,
+        "0 misses the high-vibration minimum of 1"
+    );
+    close(
+        result.required_pfd_reduction_factor.unwrap(),
+        10.0,
+        "the factor",
+    );
 }
 
 #[test]
@@ -108,8 +115,8 @@ fn the_catalogue_is_the_classes_eighteen_rows() {
         ("custom", 0.0),
     ];
     for (sif_type, expected) in catalogue {
-        let result = nog070_sil_determination(sif_type, 1.0e-3, None)
-            .expect("the captured state is valid");
+        let result =
+            nog070_sil_determination(sif_type, 1.0e-3, None).expect("the captured state is valid");
         close(result.catalogue_minimum_sil, expected, sif_type);
     }
 }

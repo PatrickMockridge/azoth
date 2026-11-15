@@ -24,7 +24,15 @@ fn call(
     base: Option<f64>,
 ) -> azoth_process::models::safety_instrumented_function::SafetyInstrumentedFunctionResult {
     safety_instrumented_function(
-        pfd, sil, unmitigated, target, interval, lambda, spurious, mttr, base,
+        pfd,
+        sil,
+        unmitigated,
+        target,
+        interval,
+        lambda,
+        spurious,
+        mttr,
+        base,
     )
     .expect("the captured state is valid")
 }
@@ -74,17 +82,7 @@ fn the_class_state_reproduces_the_capture() {
 
 #[test]
 fn a_zero_unmitigated_frequency_answers_one() {
-    let result = call(
-        0.005,
-        2.0,
-        0.0,
-        1.0e-5,
-        8760.0,
-        None,
-        None,
-        None,
-        None,
-    );
+    let result = call(0.005, 2.0, 0.0, 1.0e-5, 8760.0, None, None, None, None);
     close(result.required_pfd, 1.0, "the class's one");
     close(result.required_sil, 1.0, "the SIL of one");
     close(
@@ -172,17 +170,13 @@ fn an_out_of_band_pfd_is_published_with_a_warning() {
 #[test]
 fn the_class_values_the_port_refuses_are_refused() {
     assert!(
-        safety_instrumented_function(
-            -0.1, 2.0, 0.1, 1.0e-5, 8760.0, None, None, None, None
-        )
-        .is_err(),
+        safety_instrumented_function(-0.1, 2.0, 0.1, 1.0e-5, 8760.0, None, None, None, None)
+            .is_err(),
         "a negative PFD"
     );
     assert!(
-        safety_instrumented_function(
-            f64::NAN, 2.0, 0.1, 1.0e-5, 8760.0, None, None, None, None
-        )
-        .is_err(),
+        safety_instrumented_function(f64::NAN, 2.0, 0.1, 1.0e-5, 8760.0, None, None, None, None)
+            .is_err(),
         "a NaN PFD"
     );
     assert!(

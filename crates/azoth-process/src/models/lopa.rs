@@ -36,9 +36,7 @@ impl Sts0131PressureCategory {
         match self {
             Self::BelowOrAtDesignPressure => "below_or_at_design_pressure",
             Self::AboveDesignToTestPressure => "above_design_to_test_pressure",
-            Self::AboveTestToTwoTimesDesignPressure => {
-                "above_test_to_two_times_design_pressure"
-            }
+            Self::AboveTestToTwoTimesDesignPressure => "above_test_to_two_times_design_pressure",
             Self::AboveTwoTimesDesignPressure => "above_two_times_design_pressure",
         }
     }
@@ -109,11 +107,7 @@ fn require_finite(name: &str, value: f64) -> Result<()> {
     }
 }
 
-fn sts0131_category(
-    event: f64,
-    design: f64,
-    test: f64,
-) -> (Sts0131PressureCategory, f64) {
+fn sts0131_category(event: f64, design: f64, test: f64) -> (Sts0131PressureCategory, f64) {
     if event > 2.0 * design {
         (Sts0131PressureCategory::AboveTwoTimesDesignPressure, 1.0e-5)
     } else if event > test {
@@ -122,10 +116,7 @@ fn sts0131_category(
             1.0e-4,
         )
     } else if event > design {
-        (
-            Sts0131PressureCategory::AboveDesignToTestPressure,
-            1.0e-3,
-        )
+        (Sts0131PressureCategory::AboveDesignToTestPressure, 1.0e-3)
     } else {
         (Sts0131PressureCategory::BelowOrAtDesignPressure, 1.0e-2)
     }
@@ -153,9 +144,7 @@ pub fn lopa(
     apply_checks(
         spec.input_checks(),
         |quantity| match quantity {
-            "initiating_event_frequency_per_year" => {
-                Some(initiating_event_frequency_per_year)
-            }
+            "initiating_event_frequency_per_year" => Some(initiating_event_frequency_per_year),
             "target_frequency_per_year" => Some(target_frequency_per_year),
             "mitigated_frequency_per_year" => Some(mitigated_frequency_per_year),
             "event_pressure" => event_pressure.map(|value| value.value),
@@ -171,10 +160,7 @@ pub fn lopa(
         initiating_event_frequency_per_year,
     )?;
     require_finite("target_frequency_per_year", target_frequency_per_year)?;
-    require_finite(
-        "mitigated_frequency_per_year",
-        mitigated_frequency_per_year,
-    )?;
+    require_finite("mitigated_frequency_per_year", mitigated_frequency_per_year)?;
     for (index, layer) in layers.iter().enumerate() {
         if !layer.pfd.is_finite() || !(0.0..=1.0).contains(&layer.pfd) {
             return Err(AzothError::invalid_input(
@@ -254,8 +240,7 @@ pub fn lopa(
             pfd: layer.pfd,
             frequency_before_per_year: layer.frequency_before_per_year,
             frequency_after_per_year: layer.frequency_after_per_year,
-            contribution_per_year: layer.frequency_before_per_year
-                - layer.frequency_after_per_year,
+            contribution_per_year: layer.frequency_before_per_year - layer.frequency_after_per_year,
             rrf: if layer.pfd > 0.0 {
                 Some(1.0 / layer.pfd)
             } else {

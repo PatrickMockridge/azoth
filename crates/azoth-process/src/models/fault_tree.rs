@@ -276,10 +276,7 @@ fn parse_nodes(spec_nodes: &[FaultTreeNodeSpec], cap: usize) -> Result<(Vec<Node
         if node.gate == Gate::Basic && !names.insert(node.name.as_str()) {
             return Err(AzothError::invalid_input(
                 format!("nodes[{index}].name"),
-                format!(
-                    "a basic-event name is unique, and {:?} repeats",
-                    node.name
-                ),
+                format!("a basic-event name is unique, and {:?} repeats", node.name),
             ));
         }
     }
@@ -326,11 +323,7 @@ fn voting_probability(probabilities: &[f64], k: usize) -> f64 {
         }
         let mut probability = 1.0;
         for (bit, p) in probabilities.iter().enumerate() {
-            probability *= if (mask >> bit) & 1 == 1 {
-                *p
-            } else {
-                1.0 - *p
-            };
+            probability *= if (mask >> bit) & 1 == 1 { *p } else { 1.0 - *p };
         }
         total += probability;
     }

@@ -47,10 +47,7 @@ fn the_five_bands_reproduce_the_capture() {
     let first = &result.assessments[0];
     close(first.mtbf_hours, 175_200.0, "the MTBF");
     close(first.expected_downtime_hours_per_year, 2.4, "the downtime");
-    assert_eq!(
-        first.probability_category,
-        RiskProbabilityCategory::VeryLow
-    );
+    assert_eq!(first.probability_category, RiskProbabilityCategory::VeryLow);
     assert_eq!(
         first.consequence_category,
         RiskConsequenceCategory::Negligible
@@ -63,12 +60,18 @@ fn the_five_bands_reproduce_the_capture() {
     let third = &result.assessments[2];
     close(third.mtbf_hours, 12_514.285_714_285_716, "EQ2's MTBF");
     assert_eq!(third.probability_category, RiskProbabilityCategory::Medium);
-    assert_eq!(third.consequence_category, RiskConsequenceCategory::Moderate);
+    assert_eq!(
+        third.consequence_category,
+        RiskConsequenceCategory::Moderate
+    );
     close(third.risk_score, 9.0, "EQ2's score");
     assert_eq!(third.risk_level, RiskLevel::Medium);
 
     let fifth = &result.assessments[4];
-    assert_eq!(fifth.probability_category, RiskProbabilityCategory::VeryHigh);
+    assert_eq!(
+        fifth.probability_category,
+        RiskProbabilityCategory::VeryHigh
+    );
     assert_eq!(
         fifth.consequence_category,
         RiskConsequenceCategory::Catastrophic
@@ -174,21 +177,11 @@ fn zero_failures_carry_the_sentinel_and_a_real_cost_per_failure() {
 #[test]
 fn the_class_values_the_port_refuses_are_refused() {
     assert!(
-        risk_matrix(
-            &[equipment("EQ", -0.5, 48.0, 15.0, 1000.0)],
-            None,
-            None
-        )
-        .is_err(),
+        risk_matrix(&[equipment("EQ", -0.5, 48.0, 15.0, 1000.0)], None, None).is_err(),
         "a negative frequency"
     );
     assert!(
-        risk_matrix(
-            &[equipment("EQ", f64::NAN, 48.0, 15.0, 1000.0)],
-            None,
-            None
-        )
-        .is_err(),
+        risk_matrix(&[equipment("EQ", f64::NAN, 48.0, 15.0, 1000.0)], None, None).is_err(),
         "a NaN frequency"
     );
     assert!(
@@ -208,11 +201,21 @@ fn the_class_values_the_port_refuses_are_refused() {
         "a negative mass loss"
     );
     assert!(
-        risk_matrix(&[equipment("EQ", 0.5, 48.0, 15.0, 1000.0)], Some(-1.0), None).is_err(),
+        risk_matrix(
+            &[equipment("EQ", 0.5, 48.0, 15.0, 1000.0)],
+            Some(-1.0),
+            None
+        )
+        .is_err(),
         "a negative price"
     );
     assert!(
-        risk_matrix(&[equipment("EQ", 0.5, 48.0, 15.0, 1000.0)], None, Some(-1.0)).is_err(),
+        risk_matrix(
+            &[equipment("EQ", 0.5, 48.0, 15.0, 1000.0)],
+            None,
+            Some(-1.0)
+        )
+        .is_err(),
         "a negative downtime cost"
     );
 }
