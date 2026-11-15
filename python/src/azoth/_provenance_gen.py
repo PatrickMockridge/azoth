@@ -2933,7 +2933,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.psv_fire_sizing': {
         "calc_id": 'process.psv_fire_sizing',
         "name": 'PSV fire sizing',
-        "spec": {'path': 'specs/models/process/psv_fire_sizing.toml', 'sha256': '2d38b1efd9fad75b3b0f0e88d2f36f90221e18f5c774f1504c5675336efd247c'},
+        "spec": {'path': 'specs/models/process/psv_fire_sizing.toml', 'sha256': 'fc6f0b430291cc07255f9fec66818d2d650052c2eea821bbbd74d9e701ac456b'},
         "code": [{'path': 'python/src/azoth/process/reference/psv_fire_sizing.py', 'sha256': '337e19fb2234981c04d1d4b6bbfcb5abab1c2c0d66c52e05a73f77da8a52125e'}, {'path': 'crates/azoth-process/src/models/psv_fire_sizing.rs', 'sha256': '00603eb8121ee720fd836e5dc58b49f2eb5154324756bb0a9612115a64a916f8'}],
         "source": 'NeqSim process/util/fire/ReliefValveSizing.java',
         "verification": 'partially_verified',
@@ -3131,7 +3131,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.tr3001_compliance': {
         "calc_id": 'process.tr3001_compliance',
         "name": 'TR3001 compliance',
-        "spec": {'path': 'specs/models/process/tr3001_compliance.toml', 'sha256': 'cef890366c1dc0281ae9e4d64155a0ecfcb8e52c42e242a40a25aeb2f83617fc'},
+        "spec": {'path': 'specs/models/process/tr3001_compliance.toml', 'sha256': '1905ae21594e4f64c73fa74439502e2244f908eba8442358b0db3177fc04ccfc'},
         "code": [{'path': 'python/src/azoth/process/reference/tr3001_compliance.py', 'sha256': '2e5de88d9247163f8643536403b88343393b8f934ba03d33a7851ee0383e1ad4'}, {'path': 'crates/azoth-process/src/models/tr3001_compliance.rs', 'sha256': '06a59522fad40e001177332b3f7f3cbf119ae96ac5254b89cb1731ec09c2c2f7'}],
         "source": 'NeqSim process/safety/overpressure/TR3001ComplianceChecker.java',
         "verification": 'partially_verified',
