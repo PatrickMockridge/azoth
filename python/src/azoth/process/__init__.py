@@ -36,6 +36,7 @@ from azoth.core.result import (
     ExpanderResult,
     FaultTreeResult,
     FilterResult,
+    FireCaseReliefResult,
     FireMonitorCoverageResult,
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
@@ -54,14 +55,19 @@ from azoth.core.result import (
     MapTurboExpanderResult,
     MixerResult,
     Nog070SilDeterminationResult,
+    OverpressureAcceptanceResult,
     PackedColumnResult,
     PfpDemandResult,
+    PipelinePressureProtectionResult,
     PipeResult,
     PlugFlowReactorResult,
     PoolFireResult,
     ProbitResult,
+    PsvFireSizingResult,
+    PsvSizingResult,
     PumpResult,
     RateBasedPackedColumnResult,
+    ReliefDisposalNetworkResult,
     RiskMatrixResult,
     SafetyInstrumentedFunctionResult,
     SeparatorCapacityAssessmentResult,
@@ -75,6 +81,7 @@ from azoth.core.result import (
     TankResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
+    Tr3001ComplianceResult,
     TurboExpanderResult,
     VceResult,
 )
@@ -117,6 +124,7 @@ __all__ = [
     "expander",
     "fault_tree",
     "filter",
+    "fire_case_relief",
     "fire_monitor_coverage",
     "fire_water_coverage_assessment",
     "fire_water_demand",
@@ -137,14 +145,19 @@ __all__ = [
     "map_turbo_expander_compressor",
     "mixer",
     "nog070_sil_determination",
+    "overpressure_acceptance",
     "packed_column",
     "pfp_demand",
     "pipe",
+    "pipeline_pressure_protection",
     "plug_flow_reactor",
     "pool_fire",
     "probit",
+    "psv_fire_sizing",
+    "psv_sizing",
     "pump",
     "rate_based_packed_column",
+    "relief_disposal_network",
     "risk_matrix",
     "run_flowsheet",
     "safety_instrumented_function",
@@ -159,6 +172,7 @@ __all__ = [
     "three_phase_separator",
     "throttling_valve",
     "tools",
+    "tr3001_compliance",
     "validate",
     "vce",
 ]
@@ -169,9 +183,12 @@ _FIRE_WATER_DEMAND = "process.fire_water_demand"
 _MANIFOLD = "process.manifold"
 _MIXER = "process.mixer"
 _NOG070_SIL_DETERMINATION = "process.nog070_sil_determination"
+_OVERPRESSURE_ACCEPTANCE = "process.overpressure_acceptance"
 _PACKED_COLUMN = "process.packed_column"
 _PFP_DEMAND = "process.pfp_demand"
+_PIPELINE_PRESSURE_PROTECTION = "process.pipeline_pressure_protection"
 _RATE_BASED_PACKED_COLUMN = "process.rate_based_packed_column"
+_RELIEF_DISPOSAL_NETWORK = "process.relief_disposal_network"
 _RISK_MATRIX = "process.risk_matrix"
 _SAFETY_INSTRUMENTED_FUNCTION = "process.safety_instrumented_function"
 _PIPE = "process.pipe"
@@ -195,6 +212,7 @@ _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _VCE = "process.vce"
 _FILTER = "process.filter"
+_FIRE_CASE_RELIEF = "process.fire_case_relief"
 _FLARE = "process.flare"
 _HEATER = "process.heater"
 _HEM_RELEASE = "process.hem_release"
@@ -204,12 +222,15 @@ _LOPA = "process.lopa"
 _GAS_DISPERSION = "process.gas_dispersion"
 _GAUSSIAN_PLUME = "process.gaussian_plume"
 _PROBIT = "process.probit"
+_PSV_FIRE_SIZING = "process.psv_fire_sizing"
+_PSV_SIZING = "process.psv_sizing"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
 _SHORTCUT_DISTILLATION_COLUMN = "process.shortcut_distillation_column"
 _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
+_TR3001_COMPLIANCE = "process.tr3001_compliance"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
 _POOL_FIRE = "process.pool_fire"
@@ -2363,6 +2384,76 @@ def nog070_sil_determination(
     )
 
 
+def overpressure_acceptance(
+    peak_pressure: Q,
+    mawp: Q,
+    cause: str,
+    multiple_devices: bool,
+) -> OverpressureAcceptanceResult:
+    """The accumulation factor, the allowable pressure and the acceptance verdict.
+
+    See :func:`azoth.process.reference.overpressure_acceptance`.
+    """
+    return resolve(_OVERPRESSURE_ACCEPTANCE)(  # type: ignore[no-any-return]
+        peak_pressure=peak_pressure,
+        mawp=mawp,
+        cause=cause,
+        multiple_devices=multiple_devices,
+    )
+
+
+def pipeline_pressure_protection(
+    max_source_pressure: Q,
+    design_pressure: Q,
+    incidental_factor: float,
+    barrier1_setpoint: Q,
+    barrier2_setpoint: Q,
+) -> PipelinePressureProtectionResult:
+    """The maximum incidental pressure, the design margin and the three verdicts.
+
+    See :func:`azoth.process.reference.pipeline_pressure_protection`.
+    """
+    return resolve(_PIPELINE_PRESSURE_PROTECTION)(  # type: ignore[no-any-return]
+        max_source_pressure=max_source_pressure,
+        design_pressure=design_pressure,
+        incidental_factor=incidental_factor,
+        barrier1_setpoint=barrier1_setpoint,
+        barrier2_setpoint=barrier2_setpoint,
+    )
+
+
+def relief_disposal_network(
+    contributions: list[dict[str, object]],
+) -> ReliefDisposalNetworkResult:
+    """The simultaneous total, the peak single load and the echoed rows.
+
+    See :func:`azoth.process.reference.relief_disposal_network`.
+    """
+    return resolve(_RELIEF_DISPOSAL_NETWORK)(  # type: ignore[no-any-return]
+        contributions=contributions,
+    )
+
+
+def tr3001_compliance(
+    scenarios: list[dict[str, object]],
+    capacity_adequate: bool,
+    required_area_in2: float | None = None,
+    acceptance_accepted: bool | None = None,
+    accumulation_fraction: float | None = None,
+) -> Tr3001ComplianceResult:
+    """The six TR3001 checks over a study's scenario rows and sizing verdict.
+
+    See :func:`azoth.process.reference.tr3001_compliance`.
+    """
+    return resolve(_TR3001_COMPLIANCE)(  # type: ignore[no-any-return]
+        scenarios=scenarios,
+        capacity_adequate=capacity_adequate,
+        required_area_in2=required_area_in2,
+        acceptance_accepted=acceptance_accepted,
+        accumulation_fraction=accumulation_fraction,
+    )
+
+
 def risk_matrix(
     equipment: list[dict[str, object]],
     product_price_per_kg: float | None = None,
@@ -2381,6 +2472,30 @@ def risk_matrix(
         equipment=equipment,
         product_price_per_kg=product_price_per_kg,
         downtime_cost_per_hour=downtime_cost_per_hour,
+    )
+
+
+def fire_case_relief(
+    has_drainage: bool,
+    has_fire_fighting: bool,
+    wetted_area: Q | None = None,
+    vessel_diameter: Q | None = None,
+    wetted_height: Q | None = None,
+    latent_heat: float | None = None,
+    relieving_temperature: Q | None = None,
+) -> FireCaseReliefResult:
+    """The API 521 fire-case heat input and the vapour relief rate.
+
+    See :func:`azoth.process.reference.fire_case_relief`.
+    """
+    return resolve(_FIRE_CASE_RELIEF)(  # type: ignore[no-any-return]
+        has_drainage=has_drainage,
+        has_fire_fighting=has_fire_fighting,
+        wetted_area=wetted_area,
+        vessel_diameter=vessel_diameter,
+        wetted_height=wetted_height,
+        latent_heat=latent_heat,
+        relieving_temperature=relieving_temperature,
     )
 
 
@@ -2834,6 +2949,94 @@ def probit(
         n=n,
         dose=dose,
         probit_value=probit_value,
+    )
+
+
+def psv_fire_sizing(
+    initial_mass: Q,
+    initial_pressure: Q,
+    set_pressure: Q,
+    initial_temperature: Q,
+    fire_heat_input: Q,
+    vessel_volume: Q,
+    molar_mass: Q,
+    specific_heat_ratio: float,
+    compressibility: float,
+    heat_capacity: Q,
+    blowdown_time: Q,
+    blowdown_percent: float | None = None,
+    orifice_area: Q | None = None,
+    cv_discharge_coefficient: float | None = None,
+) -> PsvFireSizingResult:
+    """The API 521 dynamic fire-case area, blowdown pressure, Cv and next orifice.
+
+    See :func:`azoth.process.reference.psv_fire_sizing`.
+    """
+    return resolve(_PSV_FIRE_SIZING)(  # type: ignore[no-any-return]
+        initial_mass=initial_mass,
+        initial_pressure=initial_pressure,
+        set_pressure=set_pressure,
+        initial_temperature=initial_temperature,
+        fire_heat_input=fire_heat_input,
+        vessel_volume=vessel_volume,
+        molar_mass=molar_mass,
+        specific_heat_ratio=specific_heat_ratio,
+        compressibility=compressibility,
+        heat_capacity=heat_capacity,
+        blowdown_time=blowdown_time,
+        blowdown_percent=blowdown_percent,
+        orifice_area=orifice_area,
+        cv_discharge_coefficient=cv_discharge_coefficient,
+    )
+
+
+def psv_sizing(
+    service: str,
+    set_pressure: Q,
+    overpressure_fraction: float,
+    back_pressure: Q,
+    is_balanced_bellows: bool | None = None,
+    has_rupture_disk: bool | None = None,
+    mass_flow: Q | None = None,
+    temperature: Q | None = None,
+    molar_mass: Q | None = None,
+    compressibility: float | None = None,
+    specific_heat_ratio: float | None = None,
+    volume_flow: Q | None = None,
+    liquid_density: Q | None = None,
+    viscosity: Q | None = None,
+    gas_fraction: float | None = None,
+    gas_density: Q | None = None,
+    latent_heat: float | None = None,
+    liquid_heat_capacity: Q | None = None,
+    orifice_area: Q | None = None,
+    capacity_discharge_coefficient: float | None = None,
+) -> PsvSizingResult:
+    """The API 520 relief-orifice area, the D to T ladder and the capacity helper.
+
+    See :func:`azoth.process.reference.psv_sizing`.
+    """
+    return resolve(_PSV_SIZING)(  # type: ignore[no-any-return]
+        service=service,
+        set_pressure=set_pressure,
+        overpressure_fraction=overpressure_fraction,
+        back_pressure=back_pressure,
+        is_balanced_bellows=is_balanced_bellows,
+        has_rupture_disk=has_rupture_disk,
+        mass_flow=mass_flow,
+        temperature=temperature,
+        molar_mass=molar_mass,
+        compressibility=compressibility,
+        specific_heat_ratio=specific_heat_ratio,
+        volume_flow=volume_flow,
+        liquid_density=liquid_density,
+        viscosity=viscosity,
+        gas_fraction=gas_fraction,
+        gas_density=gas_density,
+        latent_heat=latent_heat,
+        liquid_heat_capacity=liquid_heat_capacity,
+        orifice_area=orifice_area,
+        capacity_discharge_coefficient=capacity_discharge_coefficient,
     )
 
 

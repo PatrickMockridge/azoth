@@ -628,6 +628,29 @@ class NaceIssueRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class ReliefDisposalRow:
+    """one row per input row, in caller order."""
+
+    #: the protected item's name.
+    item_name: str
+
+    #: the overpressure cause.
+    cause: str
+
+    #: the relieving phase.
+    phase: str
+
+    #: the rate, echoed.
+    mass_flow: Q
+
+    #: the rate times 3600.
+    mass_flow_kg_hr: Q
+
+    #: whether the load is concurrent.
+    simultaneous: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class RemediationOptionRow:
     """The candidate remedies, ordered by descending effectiveness."""
 
@@ -816,6 +839,17 @@ class SubFraction:
 
     #: The sub-fraction's normal boiling point, spread with its molar mass. Absent where its parent states none.
     boiling_point: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class Tr3001Finding:
+    """one row per check the class raised, in its order."""
+
+    #: which check the row is.
+    check: str
+
+    #: the check's status; the checker emits pass, fail and needs-review, never info.
+    status: str
 
 
 @dataclass(frozen=True, slots=True, eq=False)

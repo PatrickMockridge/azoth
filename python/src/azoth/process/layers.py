@@ -2318,6 +2318,244 @@ def _risk_matrix(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _psv_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.psv_sizing`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.psv_sizing import psv_sizing as evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    def number(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    result = evaluate(
+        str(inputs["service"]),
+        quantity(float(inputs["set_pressure"]), "Pa"),
+        float(inputs["overpressure_fraction"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        None if inputs.get("is_balanced_bellows") is None else bool(inputs["is_balanced_bellows"]),
+        None if inputs.get("has_rupture_disk") is None else bool(inputs["has_rupture_disk"]),
+        optional("mass_flow", "kg/s"),
+        optional("temperature", "K"),
+        optional("molar_mass", "kg/mol"),
+        number("compressibility"),
+        number("specific_heat_ratio"),
+        optional("volume_flow", "m**3/s"),
+        optional("liquid_density", "kg/m**3"),
+        optional("viscosity", "Pa*s"),
+        number("gas_fraction"),
+        optional("gas_density", "kg/m**3"),
+        number("latent_heat"),
+        optional("liquid_heat_capacity", "J/(kg*K)"),
+        optional("orifice_area", "m**2"),
+        number("capacity_discharge_coefficient"),
+    )
+    layers: dict[str, float] = {
+        "relieving_pressure": result.relieving_pressure.to("Pa").magnitude,
+        "back_pressure_fraction": result.back_pressure_fraction,
+        "discharge_coefficient": result.discharge_coefficient,
+        "required_area": result.required_area.to("m**2").magnitude,
+    }
+    if result.required_area_in2 is not None:
+        layers["required_area_in2"] = result.required_area_in2
+    if result.selected_area_in2 is not None:
+        layers["selected_area_in2"] = result.selected_area_in2
+    if result.back_pressure_correction is not None:
+        layers["back_pressure_correction"] = result.back_pressure_correction
+    if result.combination_correction is not None:
+        layers["combination_correction"] = result.combination_correction
+    if result.viscosity_correction is not None:
+        layers["viscosity_correction"] = result.viscosity_correction
+    if result.mass_flow_rate is not None:
+        layers["mass_flow_rate"] = result.mass_flow_rate.to("kg/s").magnitude
+    if result.mass_flow_capacity is not None:
+        layers["mass_flow_capacity"] = result.mass_flow_capacity.to("kg/s").magnitude
+    return layers
+
+
+def _psv_fire_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.psv_fire_sizing`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.psv_fire_sizing import psv_fire_sizing as evaluate
+
+    result = evaluate(
+        quantity(float(inputs["initial_mass"]), "kg"),
+        quantity(float(inputs["initial_pressure"]), "Pa"),
+        quantity(float(inputs["set_pressure"]), "Pa"),
+        quantity(float(inputs["initial_temperature"]), "K"),
+        quantity(float(inputs["fire_heat_input"]), "W"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["molar_mass"]), "kg/mol"),
+        float(inputs["specific_heat_ratio"]),
+        float(inputs["compressibility"]),
+        quantity(float(inputs["heat_capacity"]), "J/(kg*K)"),
+        quantity(float(inputs["blowdown_time"]), "s"),
+        None if inputs.get("blowdown_percent") is None else float(inputs["blowdown_percent"]),
+        (
+            None
+            if inputs.get("orifice_area") is None
+            else quantity(float(inputs["orifice_area"]), "m**2")
+        ),
+        (
+            None
+            if inputs.get("cv_discharge_coefficient") is None
+            else float(inputs["cv_discharge_coefficient"])
+        ),
+    )
+    layers: dict[str, float] = {
+        "overpressure_fraction": result.overpressure_fraction,
+        "required_area": result.required_area.to("m**2").magnitude,
+        "required_area_in2": result.required_area_in2,
+        "selected_area_in2": result.selected_area_in2,
+        "back_pressure_fraction": result.back_pressure_fraction,
+        "discharge_coefficient": result.discharge_coefficient,
+        "back_pressure_correction": result.back_pressure_correction,
+        "combination_correction": result.combination_correction,
+    }
+    if result.blowdown_pressure is not None:
+        layers["blowdown_pressure"] = result.blowdown_pressure.to("Pa").magnitude
+    if result.flow_coefficient is not None:
+        layers["flow_coefficient"] = result.flow_coefficient
+    return layers
+
+
+def _fire_case_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fire_case_relief`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.fire_case_relief import fire_case_relief as evaluate
+
+    result = evaluate(
+        bool(inputs["has_drainage"]),
+        bool(inputs["has_fire_fighting"]),
+        None
+        if inputs.get("wetted_area") is None
+        else quantity(float(inputs["wetted_area"]), "m**2"),
+        (
+            None
+            if inputs.get("vessel_diameter") is None
+            else quantity(float(inputs["vessel_diameter"]), "m")
+        ),
+        (
+            None
+            if inputs.get("wetted_height") is None
+            else quantity(float(inputs["wetted_height"]), "m")
+        ),
+        None if inputs.get("latent_heat") is None else float(inputs["latent_heat"]),
+        (
+            None
+            if inputs.get("relieving_temperature") is None
+            else quantity(float(inputs["relieving_temperature"]), "K")
+        ),
+    )
+    layers: dict[str, float] = {
+        "latent_heat": result.latent_heat,
+        "relief_rate": result.relief_rate.to("kg/s").magnitude,
+        "relief_rate_kg_per_hr": result.relief_rate_kg_per_hr.to("kg/h").magnitude,
+    }
+    if result.relieving_temperature is not None:
+        layers["relieving_temperature"] = result.relieving_temperature.to("K").magnitude
+    return layers
+
+
+def _overpressure_acceptance(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.overpressure_acceptance`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.overpressure_acceptance import (
+        overpressure_acceptance as evaluate,
+    )
+
+    result = evaluate(
+        quantity(float(inputs["peak_pressure"]), "Pa"),
+        quantity(float(inputs["mawp"]), "Pa"),
+        str(inputs["cause"]),
+        bool(inputs["multiple_devices"]),
+    )
+    return {
+        "accumulation_factor": result.accumulation_factor,
+        "allowable_pressure": result.allowable_pressure.to("Pa").magnitude,
+        "margin": result.margin.to("Pa").magnitude,
+    }
+
+
+def _pipeline_pressure_protection(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.pipeline_pressure_protection`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.pipeline_pressure_protection import (
+        pipeline_pressure_protection as evaluate,
+    )
+
+    result = evaluate(
+        quantity(float(inputs["max_source_pressure"]), "bar"),
+        quantity(float(inputs["design_pressure"]), "bar"),
+        float(inputs["incidental_factor"]),
+        quantity(float(inputs["barrier1_setpoint"]), "bar"),
+        quantity(float(inputs["barrier2_setpoint"]), "bar"),
+    )
+    return {
+        "max_incidental_pressure": result.max_incidental_pressure.to("bar").magnitude,
+        "design_margin": result.design_margin.to("bar").magnitude,
+    }
+
+
+def _relief_disposal_network(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.relief_disposal_network`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.relief_disposal_network import (
+        relief_disposal_network as evaluate,
+    )
+
+    rows = []
+    for row in inputs["contributions"]:
+        converted = dict(row)
+        converted["mass_flow"] = quantity(float(row["mass_flow"]), "kg/s")
+        rows.append(converted)
+    result = evaluate(rows)
+    layers: dict[str, float] = {
+        "total_simultaneous": result.total_simultaneous.to("kg/s").magnitude,
+        "total_simultaneous_kg_hr": result.total_simultaneous_kg_hr.to("kg/h").magnitude,
+        "peak_single": result.peak_single.to("kg/s").magnitude,
+    }
+    for index, row in enumerate(result.contributions):
+        layers[f"contribution{index}_mass_flow"] = row.mass_flow.to("kg/s").magnitude
+        layers[f"contribution{index}_mass_flow_kg_hr"] = row.mass_flow_kg_hr.to("kg/h").magnitude
+    return layers
+
+
+def _tr3001_compliance(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.tr3001_compliance`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.tr3001_compliance import tr3001_compliance as evaluate
+
+    rows = []
+    for row in inputs["scenarios"]:
+        converted = dict(row)
+        converted["relief_rate"] = quantity(float(row["relief_rate"]), "kg/s")
+        rows.append(converted)
+    result = evaluate(
+        rows,
+        bool(inputs["capacity_adequate"]),
+        None if inputs.get("required_area_in2") is None else float(inputs["required_area_in2"]),
+        (
+            None
+            if inputs.get("acceptance_accepted") is None
+            else bool(inputs["acceptance_accepted"])
+        ),
+        (
+            None
+            if inputs.get("accumulation_fraction") is None
+            else float(inputs["accumulation_fraction"])
+        ),
+    )
+    return {
+        "pass_count": result.pass_count,
+        "review_count": result.review_count,
+        "fail_count": result.fail_count,
+    }
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2328,6 +2566,11 @@ DUMPERS: dict[str, Dumper] = {
     "process.consequence_analysis": _consequence_analysis,
     "process.jet_fire": _jet_fire,
     "process.pfp_demand": _pfp_demand,
+    "process.fire_case_relief": _fire_case_relief,
+    "process.overpressure_acceptance": _overpressure_acceptance,
+    "process.pipeline_pressure_protection": _pipeline_pressure_protection,
+    "process.relief_disposal_network": _relief_disposal_network,
+    "process.tr3001_compliance": _tr3001_compliance,
     "process.fire_water_demand": _fire_water_demand,
     "process.deluge_nozzle_layout": _deluge_nozzle_layout,
     "process.fire_monitor_coverage": _fire_monitor_coverage,
@@ -2341,6 +2584,8 @@ DUMPERS: dict[str, Dumper] = {
     "process.sil_verification": _sil_verification,
     "process.nog070_sil_determination": _nog070_sil_determination,
     "process.risk_matrix": _risk_matrix,
+    "process.psv_fire_sizing": _psv_fire_sizing,
+    "process.psv_sizing": _psv_sizing,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3592,6 +3837,344 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_risk_matrix.tsv",
         block=3,
         identified_by=("#label", "rm_zero_failures"),
+    ),
+    # The PSV's fourteen cased blocks: seven gas, five liquid and two two-phase. The
+    # refused and accepted-by-the-class states sit outside the cases.
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_choked",
+        capture="process_psv_sizing.tsv",
+        block=0,
+        identified_by=("#label", "ps_gas_choked"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_balanced_subcritical",
+        capture="process_psv_sizing.tsv",
+        block=1,
+        identified_by=("#label", "ps_gas_balanced_subcritical"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_conventional_high_back_pressure",
+        capture="process_psv_sizing.tsv",
+        block=2,
+        identified_by=("#label", "ps_gas_conventional_high_back_pressure"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_conventional_severe_back_pressure",
+        capture="process_psv_sizing.tsv",
+        block=3,
+        identified_by=("#label", "ps_gas_conventional_severe_back_pressure"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_rupture_disk",
+        capture="process_psv_sizing.tsv",
+        block=4,
+        identified_by=("#label", "ps_gas_rupture_disk"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_orifice_exhausted",
+        capture="process_psv_sizing.tsv",
+        block=5,
+        identified_by=("#label", "ps_gas_orifice_exhausted"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_capacity_roundtrip",
+        capture="process_psv_sizing.tsv",
+        block=6,
+        identified_by=("#label", "ps_gas_capacity_roundtrip"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_liquid_low_viscosity",
+        capture="process_psv_sizing.tsv",
+        block=7,
+        identified_by=("#label", "ps_liquid_low_viscosity"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_liquid_high_viscosity",
+        capture="process_psv_sizing.tsv",
+        block=8,
+        identified_by=("#label", "ps_liquid_high_viscosity"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_liquid_low_overpressure",
+        capture="process_psv_sizing.tsv",
+        block=9,
+        identified_by=("#label", "ps_liquid_low_overpressure"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_liquid_balanced_high_back_pressure",
+        capture="process_psv_sizing.tsv",
+        block=10,
+        identified_by=("#label", "ps_liquid_balanced_high_back_pressure"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_liquid_conventional_high_back_pressure",
+        capture="process_psv_sizing.tsv",
+        block=11,
+        identified_by=("#label", "ps_liquid_conventional_high_back_pressure"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_two_phase_omega_high",
+        capture="process_psv_sizing.tsv",
+        block=13,
+        identified_by=("#label", "ps_two_phase_omega_high"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_two_phase_omega_low",
+        capture="process_psv_sizing.tsv",
+        block=14,
+        identified_by=("#label", "ps_two_phase_omega_low"),
+    ),
+    # The fire sizing's three cased blocks; the two dead-input rows and the zero-blowdown
+    # state the class accepts sit outside the cases.
+    LayerCase(
+        model="process.psv_fire_sizing",
+        case="pf_peak_dominated",
+        capture="process_psv_fire_sizing.tsv",
+        block=0,
+        identified_by=("#label", "pf_peak_dominated"),
+    ),
+    LayerCase(
+        model="process.psv_fire_sizing",
+        case="pf_average_dominated",
+        capture="process_psv_fire_sizing.tsv",
+        block=1,
+        identified_by=("#label", "pf_average_dominated"),
+    ),
+    LayerCase(
+        model="process.psv_fire_sizing",
+        case="pf_helpers",
+        capture="process_psv_fire_sizing.tsv",
+        block=2,
+        identified_by=("#label", "pf_helpers"),
+    ),
+    # The fire relief's six cased blocks: both drainage branches, the geometry, the
+    # no-area state, the latent default and the unread firefighting flag. The negative
+    # latent heat the class silently defaults sits outside them.
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_area_drainage",
+        capture="process_fire_case_relief.tsv",
+        block=0,
+        identified_by=("#label", "fc_area_drainage"),
+    ),
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_area_no_drainage",
+        capture="process_fire_case_relief.tsv",
+        block=1,
+        identified_by=("#label", "fc_area_no_drainage"),
+    ),
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_geometry",
+        capture="process_fire_case_relief.tsv",
+        block=2,
+        identified_by=("#label", "fc_geometry"),
+    ),
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_no_area",
+        capture="process_fire_case_relief.tsv",
+        block=3,
+        identified_by=("#label", "fc_no_area"),
+    ),
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_latent_default",
+        capture="process_fire_case_relief.tsv",
+        block=4,
+        identified_by=("#label", "fc_latent_default"),
+    ),
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_firefighting_unread",
+        capture="process_fire_case_relief.tsv",
+        block=6,
+        identified_by=("#label", "fc_firefighting_unread"),
+    ),
+    # The acceptance's six: the fire, single, multiple, ignored-count, equality and
+    # exceeded states.
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_fire",
+        capture="process_overpressure_acceptance.tsv",
+        block=0,
+        identified_by=("#label", "oa_fire"),
+    ),
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_single_at_limit",
+        capture="process_overpressure_acceptance.tsv",
+        block=1,
+        identified_by=("#label", "oa_single_at_limit"),
+    ),
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_multiple",
+        capture="process_overpressure_acceptance.tsv",
+        block=2,
+        identified_by=("#label", "oa_multiple"),
+    ),
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_fire_multiple_ignored",
+        capture="process_overpressure_acceptance.tsv",
+        block=3,
+        identified_by=("#label", "oa_fire_multiple_ignored"),
+    ),
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_exceeded",
+        capture="process_overpressure_acceptance.tsv",
+        block=4,
+        identified_by=("#label", "oa_exceeded"),
+    ),
+    LayerCase(
+        model="process.overpressure_acceptance",
+        case="oa_single_exceeded",
+        capture="process_overpressure_acceptance.tsv",
+        block=5,
+        identified_by=("#label", "oa_single_exceeded"),
+    ),
+    LayerCase(
+        model="process.pipeline_pressure_protection",
+        case="pp_fully_rated",
+        capture="process_pipeline_pressure_protection.tsv",
+        block=0,
+        identified_by=("#label", "pp_fully_rated"),
+    ),
+    LayerCase(
+        model="process.pipeline_pressure_protection",
+        case="pp_two_barriers",
+        capture="process_pipeline_pressure_protection.tsv",
+        block=1,
+        identified_by=("#label", "pp_two_barriers"),
+    ),
+    LayerCase(
+        model="process.pipeline_pressure_protection",
+        case="pp_insufficient",
+        capture="process_pipeline_pressure_protection.tsv",
+        block=2,
+        identified_by=("#label", "pp_insufficient"),
+    ),
+    LayerCase(
+        model="process.pipeline_pressure_protection",
+        case="pp_source_at_design",
+        capture="process_pipeline_pressure_protection.tsv",
+        block=3,
+        identified_by=("#label", "pp_source_at_design"),
+    ),
+    LayerCase(
+        model="process.pipeline_pressure_protection",
+        case="pp_barrier2_at_mip",
+        capture="process_pipeline_pressure_protection.tsv",
+        block=4,
+        identified_by=("#label", "pp_barrier2_at_mip"),
+    ),
+    LayerCase(
+        model="process.pipeline_pressure_protection",
+        case="pp_barrier1_above_design",
+        capture="process_pipeline_pressure_protection.tsv",
+        block=5,
+        identified_by=("#label", "pp_barrier1_above_design"),
+    ),
+    LayerCase(
+        model="process.relief_disposal_network",
+        case="dn_all_simultaneous",
+        capture="process_relief_disposal_network.tsv",
+        block=0,
+        identified_by=("#label", "dn_all_simultaneous"),
+    ),
+    LayerCase(
+        model="process.relief_disposal_network",
+        case="dn_mixed",
+        capture="process_relief_disposal_network.tsv",
+        block=1,
+        identified_by=("#label", "dn_mixed"),
+    ),
+    LayerCase(
+        model="process.relief_disposal_network",
+        case="dn_tie_first_wins",
+        capture="process_relief_disposal_network.tsv",
+        block=2,
+        identified_by=("#label", "dn_tie_first_wins"),
+    ),
+    LayerCase(
+        model="process.relief_disposal_network",
+        case="dn_all_zero",
+        capture="process_relief_disposal_network.tsv",
+        block=3,
+        identified_by=("#label", "dn_all_zero"),
+    ),
+    LayerCase(
+        model="process.tr3001_compliance",
+        case="tr_all_pass",
+        capture="process_tr3001_compliance.tsv",
+        block=0,
+        identified_by=("#label", "tr_all_pass"),
+    ),
+    LayerCase(
+        model="process.tr3001_compliance",
+        case="tr_no_credible",
+        capture="process_tr3001_compliance.tsv",
+        block=1,
+        identified_by=("#label", "tr_no_credible"),
+    ),
+    LayerCase(
+        model="process.tr3001_compliance",
+        case="tr_unsized",
+        capture="process_tr3001_compliance.tsv",
+        block=2,
+        identified_by=("#label", "tr_unsized"),
+    ),
+    LayerCase(
+        model="process.tr3001_compliance",
+        case="tr_capacity_fail",
+        capture="process_tr3001_compliance.tsv",
+        block=3,
+        identified_by=("#label", "tr_capacity_fail"),
+    ),
+    LayerCase(
+        model="process.tr3001_compliance",
+        case="tr_acceptance_fail",
+        capture="process_tr3001_compliance.tsv",
+        block=4,
+        identified_by=("#label", "tr_acceptance_fail"),
+    ),
+    LayerCase(
+        model="process.tr3001_compliance",
+        case="tr_fire_basis_review",
+        capture="process_tr3001_compliance.tsv",
+        block=5,
+        identified_by=("#label", "tr_fire_basis_review"),
+    ),
+    LayerCase(
+        model="process.tr3001_compliance",
+        case="tr_other_cause",
+        capture="process_tr3001_compliance.tsv",
+        block=6,
+        identified_by=("#label", "tr_other_cause"),
+    ),
+    LayerCase(
+        model="process.tr3001_compliance",
+        case="tr_null_acceptance",
+        capture="process_tr3001_compliance.tsv",
+        block=7,
+        identified_by=("#label", "tr_null_acceptance"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4848,6 +5431,21 @@ UNCASED_ROWS: dict[str, int] = {
     # The risk matrix's six: a negative frequency, a NaN frequency, a loss above 100 %,
     # a negative loss, a negative repair time and a negative mass loss.
     "process_risk_matrix.tsv": 6,
+    # The PSV's six: a back pressure above the relieving pressure in both the liquid and
+    # two-phase branches, a zero mass flow and a zero liquid volume the class refuses, and
+    # the exponent of one and zero liquid density it accepts.
+    "process_psv_sizing.tsv": 6,
+    # The fire sizing's three: two rows differing only in the dead initial pressure and
+    # volume, and the zero blowdown time the class accepts as an infinite average flow.
+    "process_psv_fire_sizing.tsv": 3,
+    # The fire relief's one: the negative latent heat the class silently replaces with
+    # 350000 J/kg.
+    "process_fire_case_relief.tsv": 1,
+    # The disposal network's two: the empty network, which the schema cannot carry as a
+    # case, and the negative rate the class subtracts.
+    "process_relief_disposal_network.tsv": 2,
+    # The TR3001 map's one: the empty scenario list, whose two checks fail.
+    "process_tr3001_compliance.tsv": 1,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

@@ -6054,6 +6054,38 @@ pub fn fault_tree(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Fire case relief.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (has_drainage, has_fire_fighting, wetted_area, vessel_diameter, wetted_height, latent_heat, relieving_temperature))]
+#[pyo3(
+    text_signature = "(has_drainage, has_fire_fighting, wetted_area, vessel_diameter, wetted_height, latent_heat, relieving_temperature)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn fire_case_relief(
+    py: Python<'_>,
+    has_drainage: bool,
+    has_fire_fighting: bool,
+    wetted_area: Option<f64>,
+    vessel_diameter: Option<f64>,
+    wetted_height: Option<f64>,
+    latent_heat: Option<f64>,
+    relieving_temperature: Option<f64>,
+) -> PyResult<crate::transport_gen::PyFireCaseReliefResult> {
+    azoth_process::models::fire_case_relief::fire_case_relief(
+        wetted_area.map(square_meters),
+        vessel_diameter.map(meters),
+        wetted_height.map(meters),
+        has_drainage,
+        has_fire_fighting,
+        latent_heat,
+        relieving_temperature.map(kelvins),
+    )
+    .map(|r| crate::transport_gen::PyFireCaseReliefResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Fire monitor coverage.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6695,6 +6727,29 @@ pub fn nog070_sil_determination(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Overpressure acceptance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (peak_pressure, mawp, cause, multiple_devices))]
+#[pyo3(text_signature = "(peak_pressure, mawp, cause, multiple_devices)")]
+pub fn overpressure_acceptance(
+    py: Python<'_>,
+    peak_pressure: f64,
+    mawp: f64,
+    cause: &str,
+    multiple_devices: bool,
+) -> PyResult<crate::transport_gen::PyOverpressureAcceptanceResult> {
+    azoth_process::models::overpressure_acceptance::overpressure_acceptance(
+        pascals(peak_pressure),
+        pascals(mawp),
+        cause,
+        multiple_devices,
+    )
+    .map(|r| crate::transport_gen::PyOverpressureAcceptanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Packed column.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6843,6 +6898,33 @@ pub fn pfp_demand(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Pipeline pressure protection.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (max_source_pressure, design_pressure, incidental_factor, barrier1_setpoint, barrier2_setpoint))]
+#[pyo3(
+    text_signature = "(max_source_pressure, design_pressure, incidental_factor, barrier1_setpoint, barrier2_setpoint)"
+)]
+pub fn pipeline_pressure_protection(
+    py: Python<'_>,
+    max_source_pressure: f64,
+    design_pressure: f64,
+    incidental_factor: f64,
+    barrier1_setpoint: f64,
+    barrier2_setpoint: f64,
+) -> PyResult<crate::transport_gen::PyPipelinePressureProtectionResult> {
+    azoth_process::models::pipeline_pressure_protection::pipeline_pressure_protection(
+        pascals(max_source_pressure),
+        pascals(design_pressure),
+        incidental_factor,
+        pascals(barrier1_setpoint),
+        pascals(barrier2_setpoint),
+    )
+    .map(|r| crate::transport_gen::PyPipelinePressureProtectionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Pool fire radiation.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6884,6 +6966,139 @@ pub fn probit(
 ) -> PyResult<crate::transport_gen::PyProbitResult> {
     azoth_process::models::probit::probit(a, b, n, dose, probit_value)
         .map(|r| crate::transport_gen::PyProbitResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
+/// PSV fire sizing.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (initial_mass, initial_pressure, set_pressure, initial_temperature, fire_heat_input, vessel_volume, molar_mass, specific_heat_ratio, compressibility, heat_capacity, blowdown_time, blowdown_percent, orifice_area, cv_discharge_coefficient))]
+#[pyo3(
+    text_signature = "(initial_mass, initial_pressure, set_pressure, initial_temperature, fire_heat_input, vessel_volume, molar_mass, specific_heat_ratio, compressibility, heat_capacity, blowdown_time, blowdown_percent, orifice_area, cv_discharge_coefficient)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn psv_fire_sizing(
+    py: Python<'_>,
+    initial_mass: f64,
+    initial_pressure: f64,
+    set_pressure: f64,
+    initial_temperature: f64,
+    fire_heat_input: f64,
+    vessel_volume: f64,
+    molar_mass: f64,
+    specific_heat_ratio: f64,
+    compressibility: f64,
+    heat_capacity: f64,
+    blowdown_time: f64,
+    blowdown_percent: Option<f64>,
+    orifice_area: Option<f64>,
+    cv_discharge_coefficient: Option<f64>,
+) -> PyResult<crate::transport_gen::PyPsvFireSizingResult> {
+    azoth_process::models::psv_fire_sizing::psv_fire_sizing(
+        kilograms(initial_mass),
+        pascals(initial_pressure),
+        pascals(set_pressure),
+        kelvins(initial_temperature),
+        watts(fire_heat_input),
+        cubic_meters(vessel_volume),
+        kilograms_per_mole(molar_mass),
+        specific_heat_ratio,
+        compressibility,
+        joules_per_kilogram_kelvin(heat_capacity),
+        seconds(blowdown_time),
+        blowdown_percent,
+        orifice_area.map(square_meters),
+        cv_discharge_coefficient,
+    )
+    .map(|r| crate::transport_gen::PyPsvFireSizingResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// PSV sizing.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (service, set_pressure, overpressure_fraction, back_pressure, mass_flow, temperature, molar_mass, compressibility, specific_heat_ratio, is_balanced_bellows, has_rupture_disk, volume_flow, liquid_density, viscosity, gas_fraction, gas_density, latent_heat, liquid_heat_capacity, orifice_area, capacity_discharge_coefficient))]
+#[pyo3(
+    text_signature = "(service, set_pressure, overpressure_fraction, back_pressure, mass_flow, temperature, molar_mass, compressibility, specific_heat_ratio, is_balanced_bellows, has_rupture_disk, volume_flow, liquid_density, viscosity, gas_fraction, gas_density, latent_heat, liquid_heat_capacity, orifice_area, capacity_discharge_coefficient)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn psv_sizing(
+    py: Python<'_>,
+    service: &str,
+    set_pressure: f64,
+    overpressure_fraction: f64,
+    back_pressure: f64,
+    mass_flow: Option<f64>,
+    temperature: Option<f64>,
+    molar_mass: Option<f64>,
+    compressibility: Option<f64>,
+    specific_heat_ratio: Option<f64>,
+    is_balanced_bellows: Option<bool>,
+    has_rupture_disk: Option<bool>,
+    volume_flow: Option<f64>,
+    liquid_density: Option<f64>,
+    viscosity: Option<f64>,
+    gas_fraction: Option<f64>,
+    gas_density: Option<f64>,
+    latent_heat: Option<f64>,
+    liquid_heat_capacity: Option<f64>,
+    orifice_area: Option<f64>,
+    capacity_discharge_coefficient: Option<f64>,
+) -> PyResult<crate::transport_gen::PyPsvSizingResult> {
+    azoth_process::models::psv_sizing::psv_sizing(
+        service,
+        pascals(set_pressure),
+        overpressure_fraction,
+        pascals(back_pressure),
+        is_balanced_bellows,
+        has_rupture_disk,
+        mass_flow.map(kilograms_per_second),
+        temperature.map(kelvins),
+        molar_mass.map(kilograms_per_mole),
+        compressibility,
+        specific_heat_ratio,
+        volume_flow.map(cubic_meters_per_second),
+        liquid_density.map(kilograms_per_cubic_meter),
+        viscosity.map(pascal_seconds),
+        gas_fraction,
+        gas_density.map(kilograms_per_cubic_meter),
+        latent_heat,
+        liquid_heat_capacity.map(joules_per_kilogram_kelvin),
+        orifice_area.map(square_meters),
+        capacity_discharge_coefficient,
+    )
+    .map(|r| crate::transport_gen::PyPsvSizingResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Relief disposal network.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (contributions))]
+#[pyo3(text_signature = "(contributions)")]
+pub fn relief_disposal_network(
+    py: Python<'_>,
+    contributions: Vec<crate::records_gen::ReliefContribution>,
+) -> PyResult<crate::transport_gen::PyReliefDisposalNetworkResult> {
+    let contributions_records: Vec<
+        azoth_process::models::relief_disposal_network::ReliefContribution,
+    > = contributions
+        .into_iter()
+        .map(
+            |row| azoth_process::models::relief_disposal_network::ReliefContribution {
+                item_name: row.item_name,
+                cause: row.cause,
+                phase: row.phase,
+                mass_flow: kilograms_per_second(row.mass_flow),
+                simultaneous: row.simultaneous,
+            },
+        )
+        .collect();
+    azoth_process::models::relief_disposal_network::relief_disposal_network(&contributions_records)
+        .map(|r| crate::transport_gen::PyReliefDisposalNetworkResult::from(&r))
         .map_err(|e| to_pyerr(py, e))
 }
 
@@ -7313,6 +7528,45 @@ pub fn throttling_valve(
         sizing_standard,
     )
     .map(|r| crate::transport_gen::PyThrottlingValveResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// TR3001 compliance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (scenarios, capacity_adequate, required_area_in2, acceptance_accepted, accumulation_fraction))]
+#[pyo3(
+    text_signature = "(scenarios, capacity_adequate, required_area_in2, acceptance_accepted, accumulation_fraction)"
+)]
+pub fn tr3001_compliance(
+    py: Python<'_>,
+    scenarios: Vec<crate::records_gen::Tr3001Scenario>,
+    capacity_adequate: bool,
+    required_area_in2: Option<f64>,
+    acceptance_accepted: Option<bool>,
+    accumulation_fraction: Option<f64>,
+) -> PyResult<crate::transport_gen::PyTr3001ComplianceResult> {
+    let scenarios_records: Vec<azoth_process::models::tr3001_compliance::Tr3001Scenario> =
+        scenarios
+            .into_iter()
+            .map(
+                |row| azoth_process::models::tr3001_compliance::Tr3001Scenario {
+                    cause: row.cause,
+                    relief_rate: kilograms_per_second(row.relief_rate),
+                    dynamically_determined: row.dynamically_determined,
+                    credible: row.credible,
+                },
+            )
+            .collect();
+    azoth_process::models::tr3001_compliance::tr3001_compliance(
+        &scenarios_records,
+        required_area_in2,
+        capacity_adequate,
+        acceptance_accepted,
+        accumulation_fraction,
+    )
+    .map(|r| crate::transport_gen::PyTr3001ComplianceResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

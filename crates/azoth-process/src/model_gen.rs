@@ -18,6 +18,7 @@
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
 //!   - specs/models/process/filter.toml
+//!   - specs/models/process/fire_case_relief.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
 //!   - specs/models/process/fire_water_coverage_assessment.toml
 //!   - specs/models/process/fire_water_demand.toml
@@ -36,14 +37,19 @@
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/nog070_sil_determination.toml
+//!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
+//!   - specs/models/process/pipeline_pressure_protection.toml
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/probit.toml
+//!   - specs/models/process/psv_fire_sizing.toml
+//!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/separator.toml
@@ -57,6 +63,7 @@
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml
+//!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
 //!
@@ -27665,6 +27672,261 @@ pub static FILTER_SPEC: ModelSpec = ModelSpec {
     cases: FILTER_CASES,
 };
 
+static FIRE_CASE_RELIEF_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "wetted_area",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative area is not a wetted area; the class silently falls back",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "vessel_diameter",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative diameter is not a diameter; the class silently falls back",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "wetted_height",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative height is not a height; the class silently falls back",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "latent_heat",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative latent heat is not a latent heat; the class silently defaults it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "relieving_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a non-positive absolute temperature is not a relieving state",
+        },
+    },
+];
+
+static FIRE_CASE_RELIEF_CASES: &[TestCase] = &[
+    TestCase {
+        id: "fc_area_drainage",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("wetted_area", 100.0),
+            ("latent_heat", 300000.0),
+            ("relieving_temperature", 350.0),
+        ],
+        flags: &[("has_drainage", true), ("has_fire_fighting", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("latent_heat", 300000.0),
+            ("relief_rate", 6.284722503339891),
+            ("relief_rate_kg_per_hr", 22625.001012023607),
+            ("relieving_temperature", 350.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "fc_area_no_drainage",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("wetted_area", 100.0),
+            ("latent_heat", 300000.0),
+            ("relieving_temperature", 350.0),
+        ],
+        flags: &[("has_drainage", false), ("has_fire_fighting", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("latent_heat", 300000.0),
+            ("relief_rate", 10.324901255486964),
+            ("relief_rate_kg_per_hr", 37169.64451975307),
+            ("relieving_temperature", 350.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "fc_geometry",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("vessel_diameter", 2.0), ("wetted_height", 5.0)],
+        flags: &[("has_drainage", true), ("has_fire_fighting", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("latent_heat", 350000.0),
+            ("relief_rate", 2.0845015025699842),
+            ("relief_rate_kg_per_hr", 7504.205409251943),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "fc_no_area",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[("has_drainage", true), ("has_fire_fighting", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("latent_heat", 350000.0),
+            ("relief_rate", 0.0),
+            ("relief_rate_kg_per_hr", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "fc_latent_default",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("wetted_area", 100.0)],
+        flags: &[("has_drainage", true), ("has_fire_fighting", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("latent_heat", 350000.0),
+            ("relief_rate", 5.386905002862764),
+            ("relief_rate_kg_per_hr", 19392.85801030595),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "fc_firefighting_unread",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("wetted_area", 100.0),
+            ("latent_heat", 300000.0),
+            ("relieving_temperature", 350.0),
+        ],
+        flags: &[("has_drainage", true), ("has_fire_fighting", false)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("latent_heat", 300000.0),
+            ("relief_rate", 6.284722503339891),
+            ("relief_rate_kg_per_hr", 22625.001012023607),
+            ("relieving_temperature", 350.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static FIRE_CASE_RELIEF_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_fire_case_relief",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.fire_case_relief`.
+pub static FIRE_CASE_RELIEF_SPEC: ModelSpec = ModelSpec {
+    id: "process.fire_case_relief",
+    kind: "procedure",
+    algorithm: Some(&FIRE_CASE_RELIEF_ALGORITHM),
+    checks: FIRE_CASE_RELIEF_CHECKS,
+    cases: FIRE_CASE_RELIEF_CASES,
+};
+
 static FIRE_MONITOR_COVERAGE_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -46566,6 +46828,201 @@ pub static NOG070_SIL_DETERMINATION_SPEC: ModelSpec = ModelSpec {
     cases: NOG070_SIL_DETERMINATION_CASES,
 };
 
+static OVERPRESSURE_ACCEPTANCE_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "peak_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class compares any number; a non-positive absolute pressure is not a relieving state",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "mawp",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class compares any number; a non-positive MAWP is not a protected item",
+        },
+    },
+];
+
+static OVERPRESSURE_ACCEPTANCE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "oa_fire",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1050000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", false)],
+        lists: &[],
+        strings: &[("cause", "fire")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.21),
+            ("allowable_pressure", 1210000.0),
+            ("margin", 159999.99999999997),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oa_single_at_limit",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1100000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", false)],
+        lists: &[],
+        strings: &[("cause", "blocked_outlet")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.1),
+            ("allowable_pressure", 1100000.0),
+            ("margin", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oa_multiple",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1150000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", true)],
+        lists: &[],
+        strings: &[("cause", "blocked_outlet")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.16),
+            ("allowable_pressure", 1160000.0),
+            ("margin", 9999.999999999964),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oa_fire_multiple_ignored",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1200000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", true)],
+        lists: &[],
+        strings: &[("cause", "fire")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.21),
+            ("allowable_pressure", 1210000.0),
+            ("margin", 9999.999999999964),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oa_exceeded",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1220000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", false)],
+        lists: &[],
+        strings: &[("cause", "fire")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.21),
+            ("allowable_pressure", 1210000.0),
+            ("margin", -9999.999999999964),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "oa_single_exceeded",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("peak_pressure", 1110000.0), ("mawp", 1000000.0)],
+        flags: &[("multiple_devices", false)],
+        lists: &[],
+        strings: &[("cause", "blocked_outlet")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("accumulation_factor", 1.1),
+            ("allowable_pressure", 1100000.0),
+            ("margin", -9999.999999999964),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static OVERPRESSURE_ACCEPTANCE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_overpressure_acceptance",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.overpressure_acceptance`.
+pub static OVERPRESSURE_ACCEPTANCE_SPEC: ModelSpec = ModelSpec {
+    id: "process.overpressure_acceptance",
+    kind: "procedure",
+    algorithm: Some(&OVERPRESSURE_ACCEPTANCE_ALGORITHM),
+    checks: OVERPRESSURE_ACCEPTANCE_CHECKS,
+    cases: OVERPRESSURE_ACCEPTANCE_CASES,
+};
+
 static PACKED_COLUMN_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -47702,6 +48159,258 @@ pub static PIPE_SPEC: ModelSpec = ModelSpec {
     cases: PIPE_CASES,
 };
 
+static PIPELINE_PRESSURE_PROTECTION_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "max_source_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class accepts a non-positive source pressure; it is not a pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "design_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class accepts a non-positive design pressure; it is not a pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "incidental_factor",
+            min: Some(1.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's javadoc calls for at least one and its setter does not check",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "barrier1_setpoint",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class accepts a non-positive set point; it is not a pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "barrier2_setpoint",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class accepts a non-positive set point; it is not a pressure",
+        },
+    },
+];
+
+static PIPELINE_PRESSURE_PROTECTION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "pp_fully_rated",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("max_source_pressure", 5.0),
+            ("design_pressure", 10.0),
+            ("incidental_factor", 1.1),
+            ("barrier1_setpoint", 8.0),
+            ("barrier2_setpoint", 10.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("max_incidental_pressure", 11.0), ("design_margin", 5.0)],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "FULLY_RATED")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pp_two_barriers",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("max_source_pressure", 12.0),
+            ("design_pressure", 10.0),
+            ("incidental_factor", 1.1),
+            ("barrier1_setpoint", 8.0),
+            ("barrier2_setpoint", 10.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("max_incidental_pressure", 11.0), ("design_margin", -2.0)],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "TWO_BARRIERS_REQUIRED")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pp_insufficient",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("max_source_pressure", 12.0),
+            ("design_pressure", 10.0),
+            ("incidental_factor", 1.1),
+            ("barrier1_setpoint", 11.0),
+            ("barrier2_setpoint", 10.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("max_incidental_pressure", 11.0), ("design_margin", -2.0)],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "INSUFFICIENT")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pp_source_at_design",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("max_source_pressure", 10.0),
+            ("design_pressure", 10.0),
+            ("incidental_factor", 1.1),
+            ("barrier1_setpoint", 8.0),
+            ("barrier2_setpoint", 10.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("max_incidental_pressure", 11.0), ("design_margin", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "FULLY_RATED")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pp_barrier2_at_mip",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("max_source_pressure", 12.0),
+            ("design_pressure", 10.0),
+            ("incidental_factor", 1.1),
+            ("barrier1_setpoint", 8.0),
+            ("barrier2_setpoint", 11.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("max_incidental_pressure", 11.0), ("design_margin", -2.0)],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "TWO_BARRIERS_REQUIRED")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pp_barrier1_above_design",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("max_source_pressure", 12.0),
+            ("design_pressure", 10.0),
+            ("incidental_factor", 1.2),
+            ("barrier1_setpoint", 10.5),
+            ("barrier2_setpoint", 11.5),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("max_incidental_pressure", 12.0), ("design_margin", -2.0)],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "INSUFFICIENT")],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static PIPELINE_PRESSURE_PROTECTION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_pipeline_pressure_protection",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.pipeline_pressure_protection`.
+pub static PIPELINE_PRESSURE_PROTECTION_SPEC: ModelSpec = ModelSpec {
+    id: "process.pipeline_pressure_protection",
+    kind: "procedure",
+    algorithm: Some(&PIPELINE_PRESSURE_PROTECTION_ALGORITHM),
+    checks: PIPELINE_PRESSURE_PROTECTION_CHECKS,
+    cases: PIPELINE_PRESSURE_PROTECTION_CASES,
+};
+
 static PLUG_FLOW_REACTOR_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -48705,6 +49414,1192 @@ pub static PROBIT_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&PROBIT_ALGORITHM),
     checks: PROBIT_CHECKS,
     cases: PROBIT_CASES,
+};
+
+static PSV_FIRE_SIZING_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "initial_mass",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the average flow divides by the inventory",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "initial_pressure",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure is not negative, though no formula reads it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "set_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the gas sizing refuses a non-positive set pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "initial_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the gas sizing refuses a non-positive temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "fire_heat_input",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative fire is not a fire",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "vessel_volume",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a volume is not negative, though no formula reads it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "molar_mass",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the gas sizing refuses a non-positive molar mass",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "specific_heat_ratio",
+            min: Some(1.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the isentropic exponents divide by k - 1",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "compressibility",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a zero or negative Z makes the gas flux non-finite",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "heat_capacity",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the peak and average flows divide by it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "blowdown_time",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the average flow divides by it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "blowdown_percent",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative blowdown raises the reseat pressure above the set pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "blowdown_percent",
+            min: None,
+            min_inclusive: true,
+            max: Some(100.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a blowdown above 100 % answers a negative reseat pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "orifice_area",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the Cv relation multiplies the area",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "cv_discharge_coefficient",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the Cv relation multiplies the coefficient",
+        },
+    },
+];
+
+static PSV_FIRE_SIZING_CASES: &[TestCase] = &[
+    TestCase {
+        id: "pf_peak_dominated",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initial_mass", 1000.0),
+            ("initial_pressure", 2000000.0),
+            ("set_pressure", 1000000.0),
+            ("initial_temperature", 300.0),
+            ("fire_heat_input", 5000000.0),
+            ("vessel_volume", 10.0),
+            ("molar_mass", 0.02),
+            ("specific_heat_ratio", 1.3),
+            ("compressibility", 0.9),
+            ("heat_capacity", 2000.0),
+            ("blowdown_time", 900.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("overpressure_fraction", 0.21),
+            ("required_area", 0.026034670628401386),
+            ("required_area_in2", 40.35382018166251),
+            ("selected_area_in2", 26.0),
+            ("back_pressure_fraction", 0.0837396694214876),
+            ("discharge_coefficient", 0.975),
+            ("back_pressure_correction", 1.0),
+            ("combination_correction", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "T")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pf_average_dominated",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initial_mass", 5000.0),
+            ("initial_pressure", 2000000.0),
+            ("set_pressure", 1000000.0),
+            ("initial_temperature", 300.0),
+            ("fire_heat_input", 100000.0),
+            ("vessel_volume", 10.0),
+            ("molar_mass", 0.02),
+            ("specific_heat_ratio", 1.3),
+            ("compressibility", 0.9),
+            ("heat_capacity", 2000.0),
+            ("blowdown_time", 900.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("overpressure_fraction", 0.21),
+            ("required_area", 0.0023642740172476065),
+            ("required_area_in2", 3.6646320559979024),
+            ("selected_area_in2", 4.34),
+            ("back_pressure_fraction", 0.0837396694214876),
+            ("discharge_coefficient", 0.975),
+            ("back_pressure_correction", 1.0),
+            ("combination_correction", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "N")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pf_helpers",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initial_mass", 1000.0),
+            ("initial_pressure", 2000000.0),
+            ("set_pressure", 1000000.0),
+            ("initial_temperature", 300.0),
+            ("fire_heat_input", 5000000.0),
+            ("vessel_volume", 10.0),
+            ("molar_mass", 0.02),
+            ("specific_heat_ratio", 1.3),
+            ("compressibility", 0.9),
+            ("heat_capacity", 2000.0),
+            ("blowdown_time", 900.0),
+            ("blowdown_percent", 10.0),
+            ("orifice_area", 0.001),
+            ("cv_discharge_coefficient", 0.975),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("overpressure_fraction", 0.21),
+            ("required_area", 0.026034670628401386),
+            ("required_area_in2", 40.35382018166251),
+            ("selected_area_in2", 26.0),
+            ("back_pressure_fraction", 0.0837396694214876),
+            ("discharge_coefficient", 0.975),
+            ("back_pressure_correction", 1.0),
+            ("combination_correction", 1.0),
+            ("blowdown_pressure", 900000.0),
+            ("flow_coefficient", 37.176824353648705),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "T")],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static PSV_FIRE_SIZING_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_psv_fire_sizing",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.psv_fire_sizing`.
+pub static PSV_FIRE_SIZING_SPEC: ModelSpec = ModelSpec {
+    id: "process.psv_fire_sizing",
+    kind: "procedure",
+    algorithm: Some(&PSV_FIRE_SIZING_ALGORITHM),
+    checks: PSV_FIRE_SIZING_CHECKS,
+    cases: PSV_FIRE_SIZING_CASES,
+};
+
+static PSV_SIZING_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "set_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive set pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "overpressure_fraction",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative overpressure fraction lowers the relieving pressure below the set pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "back_pressure",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure is not negative",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "mass_flow",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive mass flow",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "molar_mass",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive molar mass",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "compressibility",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a zero or negative Z makes the gas flux non-finite",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "specific_heat_ratio",
+            min: Some(1.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the isentropic exponents divide by k - 1",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "volume_flow",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive volume flow",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "liquid_density",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive liquid density",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "viscosity",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class applies no correction at zero and none below it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "gas_fraction",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a mass fraction outside [0, 1] is not a two-phase state",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "gas_fraction",
+            min: None,
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a mass fraction outside [0, 1] is not a two-phase state",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "gas_density",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the specific volume is its reciprocal",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "latent_heat",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the omega term divides by its square",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "liquid_heat_capacity",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the omega term multiplies by it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "orifice_area",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the capacity helper multiplies the area",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "capacity_discharge_coefficient",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the capacity helper multiplies the coefficient",
+        },
+    },
+];
+
+static PSV_SIZING_CASES: &[TestCase] = &[
+    TestCase {
+        id: "ps_gas_choked",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 101325.0),
+            ("mass_flow", 1.0),
+            ("temperature", 300.0),
+            ("molar_mass", 0.02),
+            ("compressibility", 0.9),
+            ("specific_heat_ratio", 1.3),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "gas")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.09211363636363637),
+            ("discharge_coefficient", 0.975),
+            ("required_area", 0.00046765883018072297),
+            ("required_area_in2", 0.7248726365253937),
+            ("selected_area_in2", 0.785),
+            ("back_pressure_correction", 1.0),
+            ("combination_correction", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "H")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_gas_balanced_subcritical",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 800000.0),
+            ("mass_flow", 1.0),
+            ("temperature", 300.0),
+            ("molar_mass", 0.02),
+            ("compressibility", 0.9),
+            ("specific_heat_ratio", 1.3),
+        ],
+        flags: &[("is_balanced_bellows", true)],
+        lists: &[],
+        strings: &[("service", "gas")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.7272727272727273),
+            ("discharge_coefficient", 0.975),
+            ("required_area", 0.0007267430890193706),
+            ("required_area_in2", 1.1264540408881063),
+            ("selected_area_in2", 1.287),
+            ("back_pressure_correction", 0.6434995216972169),
+            ("combination_correction", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "J")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_gas_conventional_high_back_pressure",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 660000.0),
+            ("mass_flow", 1.0),
+            ("temperature", 300.0),
+            ("molar_mass", 0.02),
+            ("compressibility", 0.9),
+            ("specific_heat_ratio", 1.3),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "gas")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.6),
+            ("discharge_coefficient", 0.975),
+            ("required_area", 0.0005845735377259038),
+            ("required_area_in2", 0.9060907956567421),
+            ("selected_area_in2", 1.287),
+            ("back_pressure_correction", 0.8),
+            ("combination_correction", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "J")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_gas_conventional_severe_back_pressure",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 950000.0),
+            ("mass_flow", 1.0),
+            ("temperature", 300.0),
+            ("molar_mass", 0.02),
+            ("compressibility", 0.9),
+            ("specific_heat_ratio", 1.3),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "gas")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.8636363636363636),
+            ("discharge_coefficient", 0.975),
+            ("required_area", 0.0017147490439959844),
+            ("required_area_in2", 2.6578663339264437),
+            ("selected_area_in2", 2.853),
+            ("back_pressure_correction", 0.2727272727272727),
+            ("combination_correction", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "L")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_gas_rupture_disk",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 101325.0),
+            ("mass_flow", 1.0),
+            ("temperature", 300.0),
+            ("molar_mass", 0.02),
+            ("compressibility", 0.9),
+            ("specific_heat_ratio", 1.3),
+        ],
+        flags: &[("has_rupture_disk", true)],
+        lists: &[],
+        strings: &[("service", "gas")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.09211363636363637),
+            ("discharge_coefficient", 0.975),
+            ("required_area", 0.0005196209224230255),
+            ("required_area_in2", 0.8054140405837706),
+            ("selected_area_in2", 1.287),
+            ("back_pressure_correction", 1.0),
+            ("combination_correction", 0.9),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "J")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_gas_orifice_exhausted",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 101325.0),
+            ("mass_flow", 100.0),
+            ("temperature", 300.0),
+            ("molar_mass", 0.02),
+            ("compressibility", 0.9),
+            ("specific_heat_ratio", 1.3),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "gas")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.09211363636363637),
+            ("discharge_coefficient", 0.975),
+            ("required_area", 0.04676588301807229),
+            ("required_area_in2", 72.48726365253935),
+            ("selected_area_in2", 26.0),
+            ("back_pressure_correction", 1.0),
+            ("combination_correction", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "T")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_gas_capacity_roundtrip",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 101325.0),
+            ("mass_flow", 1.0),
+            ("temperature", 300.0),
+            ("molar_mass", 0.02),
+            ("compressibility", 0.9),
+            ("specific_heat_ratio", 1.3),
+            ("orifice_area", 0.0005064506),
+            ("capacity_discharge_coefficient", 0.975),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "gas")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.09211363636363637),
+            ("discharge_coefficient", 0.975),
+            ("required_area", 0.00046765883018072297),
+            ("required_area_in2", 0.7248726365253937),
+            ("selected_area_in2", 0.785),
+            ("back_pressure_correction", 1.0),
+            ("combination_correction", 1.0),
+            ("mass_flow_capacity", 0.03421047608123555),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "H")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_liquid_low_viscosity",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 101325.0),
+            ("volume_flow", 0.01),
+            ("liquid_density", 800.0),
+            ("viscosity", 0.001),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "liquid")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.09211363636363637),
+            ("discharge_coefficient", 0.65),
+            ("required_area", 0.0003078347923878862),
+            ("required_area_in2", 0.4771448824909886),
+            ("selected_area_in2", 0.503),
+            ("back_pressure_correction", 1.0),
+            ("viscosity_correction", 1.0),
+            ("mass_flow_rate", 8.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "G")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_liquid_high_viscosity",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 101325.0),
+            ("volume_flow", 0.01),
+            ("liquid_density", 800.0),
+            ("viscosity", 1.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "liquid")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.09211363636363637),
+            ("discharge_coefficient", 0.65),
+            ("required_area", 0.0003539333390448297),
+            ("required_area_in2", 0.5485977727150315),
+            ("selected_area_in2", 0.785),
+            ("back_pressure_correction", 1.0),
+            ("viscosity_correction", 0.8697535903756594),
+            ("mass_flow_rate", 8.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "H")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_liquid_low_overpressure",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.05),
+            ("back_pressure", 101325.0),
+            ("volume_flow", 0.01),
+            ("liquid_density", 800.0),
+            ("viscosity", 0.001),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "liquid")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1050000.0),
+            ("back_pressure_fraction", 0.0965),
+            ("discharge_coefficient", 0.65),
+            ("required_area", 0.0003948035759431012),
+            ("required_area_in2", 0.6119467666053401),
+            ("selected_area_in2", 0.785),
+            ("back_pressure_correction", 1.0),
+            ("viscosity_correction", 1.0),
+            ("mass_flow_rate", 8.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "H")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_liquid_balanced_high_back_pressure",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 770000.0),
+            ("volume_flow", 0.01),
+            ("liquid_density", 800.0),
+            ("viscosity", 0.001),
+        ],
+        flags: &[("is_balanced_bellows", true)],
+        lists: &[],
+        strings: &[("service", "liquid")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.7),
+            ("discharge_coefficient", 0.65),
+            ("required_area", 0.00059501828688816),
+            ("required_area_in2", 0.9222801892370266),
+            ("selected_area_in2", 1.287),
+            ("back_pressure_correction", 0.9),
+            ("viscosity_correction", 1.0),
+            ("mass_flow_rate", 8.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "J")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_liquid_conventional_high_back_pressure",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 770000.0),
+            ("volume_flow", 0.01),
+            ("liquid_density", 800.0),
+            ("viscosity", 0.001),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "liquid")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.7),
+            ("discharge_coefficient", 0.65),
+            ("required_area", 0.0005355164581993441),
+            ("required_area_in2", 0.830052170313324),
+            ("selected_area_in2", 1.287),
+            ("back_pressure_correction", 1.0),
+            ("viscosity_correction", 1.0),
+            ("mass_flow_rate", 8.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("recommended_orifice", "J")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_two_phase_omega_high",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 100000.0),
+            ("mass_flow", 1.0),
+            ("temperature", 350.0),
+            ("gas_fraction", 0.2),
+            ("gas_density", 20.0),
+            ("liquid_density", 600.0),
+            ("latent_heat", 200000.0),
+            ("liquid_heat_capacity", 2500.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "two_phase")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.09090909090909091),
+            ("discharge_coefficient", 0.85),
+            ("required_area", 2.995876123738863e-05),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ps_two_phase_omega_low",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("set_pressure", 1000000.0),
+            ("overpressure_fraction", 0.1),
+            ("back_pressure", 100000.0),
+            ("mass_flow", 1.0),
+            ("temperature", 300.0),
+            ("gas_fraction", 0.01),
+            ("gas_density", 50.0),
+            ("liquid_density", 700.0),
+            ("latent_heat", 1000000.0),
+            ("liquid_heat_capacity", 2000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("service", "two_phase")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("relieving_pressure", 1100000.0),
+            ("back_pressure_fraction", 0.09090909090909091),
+            ("discharge_coefficient", 0.85),
+            ("required_area", 3.3633921275358553e-05),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static PSV_SIZING_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_psv_sizing",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.psv_sizing`.
+pub static PSV_SIZING_SPEC: ModelSpec = ModelSpec {
+    id: "process.psv_sizing",
+    kind: "procedure",
+    algorithm: Some(&PSV_SIZING_ALGORITHM),
+    checks: PSV_SIZING_CHECKS,
+    cases: PSV_SIZING_CASES,
 };
 
 static PUMP_CHECKS: &[SpecCheck] = &[
@@ -52274,6 +54169,636 @@ pub static RATE_BASED_PACKED_COLUMN_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&RATE_BASED_PACKED_COLUMN_ALGORITHM),
     checks: RATE_BASED_PACKED_COLUMN_CHECKS,
     cases: RATE_BASED_PACKED_COLUMN_CASES,
+};
+
+static RELIEF_DISPOSAL_NETWORK_CHECKS: &[SpecCheck] = &[];
+
+static RELIEF_DISPOSAL_NETWORK_CASES: &[TestCase] = &[
+    TestCase {
+        id: "dn_all_simultaneous",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("total_simultaneous", 3.5),
+            ("total_simultaneous_kg_hr", 12600.0),
+            ("peak_single", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("governing_contributor", "C")],
+        records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("fire"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("blocked_outlet"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("liquid"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("control_valve_failure"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("fire"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mass_flow_kg_hr",
+                        value: FieldValue::Number(3600.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("blocked_outlet"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("liquid"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "mass_flow_kg_hr",
+                        value: FieldValue::Number(1800.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("control_valve_failure"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mass_flow_kg_hr",
+                        value: FieldValue::Number(7200.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "dn_mixed",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("total_simultaneous", 1.5),
+            ("total_simultaneous_kg_hr", 5400.0),
+            ("peak_single", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("governing_contributor", "B")],
+        records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("fire"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("blocked_outlet"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("liquid"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("tube_rupture"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("two_phase"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("fire"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mass_flow_kg_hr",
+                        value: FieldValue::Number(3600.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("blocked_outlet"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("liquid"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mass_flow_kg_hr",
+                        value: FieldValue::Number(7200.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("tube_rupture"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("two_phase"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "mass_flow_kg_hr",
+                        value: FieldValue::Number(1800.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "dn_tie_first_wins",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("total_simultaneous", 2.0),
+            ("total_simultaneous_kg_hr", 7200.0),
+            ("peak_single", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("governing_contributor", "A")],
+        records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("fire"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("fire"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("fire"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mass_flow_kg_hr",
+                        value: FieldValue::Number(3600.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("fire"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mass_flow_kg_hr",
+                        value: FieldValue::Number(3600.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "dn_all_zero",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("total_simultaneous", 0.0),
+            ("total_simultaneous_kg_hr", 0.0),
+            ("peak_single", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("other"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("other"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("other"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mass_flow_kg_hr",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item_name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("other"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mass_flow_kg_hr",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "simultaneous",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+static RELIEF_DISPOSAL_NETWORK_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_relief_disposal_network",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.relief_disposal_network`.
+pub static RELIEF_DISPOSAL_NETWORK_SPEC: ModelSpec = ModelSpec {
+    id: "process.relief_disposal_network",
+    kind: "procedure",
+    algorithm: Some(&RELIEF_DISPOSAL_NETWORK_ALGORITHM),
+    checks: RELIEF_DISPOSAL_NETWORK_CHECKS,
+    cases: RELIEF_DISPOSAL_NETWORK_CASES,
 };
 
 static RISK_MATRIX_CHECKS: &[SpecCheck] = &[
@@ -59879,6 +62404,904 @@ pub static THROTTLING_VALVE_SPEC: ModelSpec = ModelSpec {
     cases: THROTTLING_VALVE_CASES,
 };
 
+static TR3001_COMPLIANCE_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "required_area_in2",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative area is not a sizing result",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "accumulation_fraction",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a fraction below zero is not an accumulation basis",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "accumulation_fraction",
+            min: None,
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a fraction above one is not an accumulation basis",
+        },
+    },
+];
+
+static TR3001_COMPLIANCE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "tr_all_pass",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("required_area_in2", 0.5), ("accumulation_fraction", 0.21)],
+        flags: &[("capacity_adequate", true), ("acceptance_accepted", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("pass_count", 6.0),
+            ("review_count", 0.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "scenarios",
+            &[
+                &[
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("fire"),
+                    },
+                    RecordField {
+                        name: "relief_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "dynamically_determined",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "credible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("blocked_outlet"),
+                    },
+                    RecordField {
+                        name: "relief_rate",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "dynamically_determined",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "credible",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "findings",
+            &[
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("credible_scenarios"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("governing_case"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("capacity"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("acceptance"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("fire_basis"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("dynamic_determination"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "tr_no_credible",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("required_area_in2", 0.5), ("accumulation_fraction", 0.21)],
+        flags: &[("capacity_adequate", true), ("acceptance_accepted", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("pass_count", 1.0),
+            ("review_count", 0.0),
+            ("fail_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "scenarios",
+            &[
+                &[
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("fire"),
+                    },
+                    RecordField {
+                        name: "relief_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "dynamically_determined",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "credible",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("blocked_outlet"),
+                    },
+                    RecordField {
+                        name: "relief_rate",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "dynamically_determined",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "credible",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "findings",
+            &[
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("credible_scenarios"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("fail"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("governing_case"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("fail"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("acceptance"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "tr_unsized",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("accumulation_fraction", 0.21)],
+        flags: &[("capacity_adequate", false), ("acceptance_accepted", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("pass_count", 4.0),
+            ("review_count", 2.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("fire"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "dynamically_determined",
+                    value: FieldValue::Flag(false),
+                },
+                RecordField {
+                    name: "credible",
+                    value: FieldValue::Flag(true),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "findings",
+            &[
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("credible_scenarios"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("governing_case"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("capacity"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("needs_review"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("acceptance"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("fire_basis"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("dynamic_determination"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("needs_review"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "tr_capacity_fail",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("required_area_in2", 30.0), ("accumulation_fraction", 0.21)],
+        flags: &[("capacity_adequate", false), ("acceptance_accepted", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("pass_count", 5.0),
+            ("review_count", 0.0),
+            ("fail_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("fire"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "dynamically_determined",
+                    value: FieldValue::Flag(true),
+                },
+                RecordField {
+                    name: "credible",
+                    value: FieldValue::Flag(true),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "findings",
+            &[
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("credible_scenarios"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("governing_case"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("capacity"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("fail"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("acceptance"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("fire_basis"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("dynamic_determination"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "tr_acceptance_fail",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("required_area_in2", 0.5), ("accumulation_fraction", 0.21)],
+        flags: &[("capacity_adequate", true), ("acceptance_accepted", false)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("pass_count", 5.0),
+            ("review_count", 0.0),
+            ("fail_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("fire"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "dynamically_determined",
+                    value: FieldValue::Flag(true),
+                },
+                RecordField {
+                    name: "credible",
+                    value: FieldValue::Flag(true),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "findings",
+            &[
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("credible_scenarios"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("governing_case"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("capacity"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("acceptance"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("fail"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("fire_basis"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("dynamic_determination"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "tr_fire_basis_review",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("required_area_in2", 0.5), ("accumulation_fraction", 0.1)],
+        flags: &[("capacity_adequate", true), ("acceptance_accepted", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("pass_count", 5.0),
+            ("review_count", 1.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("fire"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "dynamically_determined",
+                    value: FieldValue::Flag(true),
+                },
+                RecordField {
+                    name: "credible",
+                    value: FieldValue::Flag(true),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "findings",
+            &[
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("credible_scenarios"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("governing_case"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("capacity"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("acceptance"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("fire_basis"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("needs_review"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("dynamic_determination"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "tr_other_cause",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("required_area_in2", 0.5), ("accumulation_fraction", 0.1)],
+        flags: &[("capacity_adequate", true), ("acceptance_accepted", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("pass_count", 4.0),
+            ("review_count", 0.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("control_valve_failure"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "dynamically_determined",
+                    value: FieldValue::Flag(false),
+                },
+                RecordField {
+                    name: "credible",
+                    value: FieldValue::Flag(true),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "findings",
+            &[
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("credible_scenarios"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("governing_case"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("capacity"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("acceptance"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "tr_null_acceptance",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("required_area_in2", 0.5)],
+        flags: &[("capacity_adequate", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("pass_count", 3.0),
+            ("review_count", 1.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("blocked_outlet"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "dynamically_determined",
+                    value: FieldValue::Flag(false),
+                },
+                RecordField {
+                    name: "credible",
+                    value: FieldValue::Flag(true),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "findings",
+            &[
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("credible_scenarios"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("governing_case"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("capacity"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("pass"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check",
+                        value: FieldValue::Name("dynamic_determination"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("needs_review"),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+static TR3001_COMPLIANCE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_tr3001_compliance",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.tr3001_compliance`.
+pub static TR3001_COMPLIANCE_SPEC: ModelSpec = ModelSpec {
+    id: "process.tr3001_compliance",
+    kind: "procedure",
+    algorithm: Some(&TR3001_COMPLIANCE_ALGORITHM),
+    checks: TR3001_COMPLIANCE_CHECKS,
+    cases: TR3001_COMPLIANCE_CASES,
+};
+
 static TURBO_EXPANDER_COMPRESSOR_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -62309,6 +65732,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &EXPANDER_SPEC,
     &FAULT_TREE_SPEC,
     &FILTER_SPEC,
+    &FIRE_CASE_RELIEF_SPEC,
     &FIRE_MONITOR_COVERAGE_SPEC,
     &FIRE_WATER_COVERAGE_ASSESSMENT_SPEC,
     &FIRE_WATER_DEMAND_SPEC,
@@ -62327,14 +65751,19 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &MAP_TURBO_EXPANDER_COMPRESSOR_SPEC,
     &MIXER_SPEC,
     &NOG070_SIL_DETERMINATION_SPEC,
+    &OVERPRESSURE_ACCEPTANCE_SPEC,
     &PACKED_COLUMN_SPEC,
     &PFP_DEMAND_SPEC,
     &PIPE_SPEC,
+    &PIPELINE_PRESSURE_PROTECTION_SPEC,
     &PLUG_FLOW_REACTOR_SPEC,
     &POOL_FIRE_SPEC,
     &PROBIT_SPEC,
+    &PSV_FIRE_SIZING_SPEC,
+    &PSV_SIZING_SPEC,
     &PUMP_SPEC,
     &RATE_BASED_PACKED_COLUMN_SPEC,
+    &RELIEF_DISPOSAL_NETWORK_SPEC,
     &RISK_MATRIX_SPEC,
     &SAFETY_INSTRUMENTED_FUNCTION_SPEC,
     &SEPARATOR_SPEC,
@@ -62348,6 +65777,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &TANK_SPEC,
     &THREE_PHASE_SEPARATOR_SPEC,
     &THROTTLING_VALVE_SPEC,
+    &TR3001_COMPLIANCE_SPEC,
     &TURBO_EXPANDER_COMPRESSOR_SPEC,
     &VCE_SPEC,
 ];

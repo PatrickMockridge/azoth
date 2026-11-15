@@ -96,6 +96,7 @@ from azoth.core.result import (
     FeSMorphology,
     FilippovConductivityResult,
     FilterResult,
+    FireCaseReliefResult,
     FireMonitorCoverageResult,
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
@@ -194,6 +195,7 @@ from azoth.core.result import (
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
     OrificeFlowResult,
+    OverpressureAcceptanceResult,
     PackedColumnResult,
     PackingHydraulicsResult,
     PackingSizingResult,
@@ -207,6 +209,7 @@ from azoth.core.result import (
     PhFlashResult,
     PipeBeggsAndBrillsResult,
     PipelineCooldownResult,
+    PipelinePressureProtectionResult,
     PipeResult,
     PitzerHydrateFormationPressureResult,
     PitzerHydrateFormationTemperatureResult,
@@ -231,6 +234,8 @@ from azoth.core.result import (
     PrsvKappaResult,
     PrZFactorResult,
     PsFlashResult,
+    PsvFireSizingResult,
+    PsvSizingResult,
     PtFlashResult,
     PtPhaseEnvelopeResult,
     PuFlashResult,
@@ -249,6 +254,8 @@ from azoth.core.result import (
     ReactivePhFlashResult,
     ReactiveTpFlashResult,
     ReferencePotentialsResult,
+    ReliefDisposalNetworkResult,
+    ReliefDisposalRow,
     RemediationOptionRow,
     ReynoldsNumberResult,
     RiskAssessmentRow,
@@ -324,6 +331,8 @@ from azoth.core.result import (
     TpMultiflashResult,
     TpMultiflashWaxResult,
     TpSolidFlashResult,
+    Tr3001ComplianceResult,
+    Tr3001Finding,
     TransferBinaryInteractionParametersResult,
     TrayHydraulicsResult,
     TsFlashResult,
@@ -469,6 +478,7 @@ __all__ = [
     "fault_tree",
     "filippov_conductivity",
     "filter",
+    "fire_case_relief",
     "fire_monitor_coverage",
     "fire_water_coverage_assessment",
     "fire_water_demand",
@@ -549,6 +559,7 @@ __all__ = [
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
     "orifice_flow",
+    "overpressure_acceptance",
     "packed_column",
     "packing_hydraulics",
     "packing_sizing",
@@ -563,6 +574,7 @@ __all__ = [
     "pipe",
     "pipe_beggs_and_brills",
     "pipeline_cooldown",
+    "pipeline_pressure_protection",
     "pitzer_hydrate_formation_pressure",
     "pitzer_hydrate_formation_temperature",
     "pitzer_phase",
@@ -586,6 +598,8 @@ __all__ = [
     "production_chemical_scale_scenario",
     "prsv_kappa",
     "ps_flash",
+    "psv_fire_sizing",
+    "psv_sizing",
     "pt_flash",
     "pt_phase_envelope",
     "pu_flash",
@@ -604,6 +618,7 @@ __all__ = [
     "reactive_phase_equilibrium",
     "reactive_tp_flash",
     "reference_potentials",
+    "relief_disposal_network",
     "reynolds_number",
     "risk_matrix",
     "rk_alpha_ab",
@@ -665,6 +680,7 @@ __all__ = [
     "tp_multiflash",
     "tp_multiflash_wax",
     "tp_solid_flash",
+    "tr3001_compliance",
     "transfer_binary_interaction_parameters",
     "tray_hydraulics",
     "ts_flash",
@@ -6304,6 +6320,27 @@ def filter(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
     )
 
 
+def fire_case_relief(has_drainage: bool, has_fire_fighting: bool, wetted_area: Q | None=None, vessel_diameter: Q | None=None, wetted_height: Q | None=None, latent_heat: float | None=None, relieving_temperature: Q | None=None) -> FireCaseReliefResult:
+    """``process.fire_case_relief``, computed in Rust."""
+    spec = _models_gen.model("process.fire_case_relief")
+    result = _core.fire_case_relief(
+        has_drainage,
+        has_fire_fighting,
+        None if wetted_area is None else input_to_si(spec, "wetted_area", wetted_area),
+        None if vessel_diameter is None else input_to_si(spec, "vessel_diameter", vessel_diameter),
+        None if wetted_height is None else input_to_si(spec, "wetted_height", wetted_height),
+        None if latent_heat is None else latent_heat,
+        None if relieving_temperature is None else input_to_si(spec, "relieving_temperature", relieving_temperature),
+    )
+    return FireCaseReliefResult(
+        latent_heat=result.latent_heat,
+        relief_rate=from_si(result.relief_rate.magnitude_si, result.relief_rate.unit),
+        relief_rate_kg_per_hr=from_si(result.relief_rate_kg_per_hr.magnitude_si, result.relief_rate_kg_per_hr.unit),
+        relieving_temperature=None if result.relieving_temperature is None else from_si(result.relieving_temperature.magnitude_si, result.relieving_temperature.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def fire_monitor_coverage(target_area: Q, required_density: float, monitor_count: float | None=None, monitor_flow: Q | None=None, effective_throw: Q | None=None, sweep_angle: float | None=None, wind_speed: Q | None=None, fall_height: Q | None=None, droplet_terminal_velocity: Q | None=None, characteristic_dimension: Q | None=None, line_of_sight_obstructed: bool | None=None) -> FireMonitorCoverageResult:
     """``process.fire_monitor_coverage``, computed in Rust."""
     spec = _models_gen.model("process.fire_monitor_coverage")
@@ -7080,6 +7117,24 @@ def nog070_sil_determination(sif_type: str, pfd_average: float, minimum_sil: flo
     )
 
 
+def overpressure_acceptance(peak_pressure: Q, mawp: Q, cause: str, multiple_devices: bool) -> OverpressureAcceptanceResult:
+    """``process.overpressure_acceptance``, computed in Rust."""
+    spec = _models_gen.model("process.overpressure_acceptance")
+    result = _core.overpressure_acceptance(
+        input_to_si(spec, "peak_pressure", peak_pressure),
+        input_to_si(spec, "mawp", mawp),
+        cause,
+        multiple_devices,
+    )
+    return OverpressureAcceptanceResult(
+        accumulation_factor=result.accumulation_factor,
+        allowable_pressure=from_si(result.allowable_pressure.magnitude_si, result.allowable_pressure.unit),
+        margin=from_si(result.margin.magnitude_si, result.margin.unit),
+        accepted=result.accepted,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def packed_column(components: list[str], feed_n: Q, feed_z: list[float], feed_p: Q, feed_t: Q, packed_height: Q, feed_stage: int, has_reboiler: bool, has_condenser: bool, top_pressure: Q, bottom_pressure: Q, temperature_tolerance: float=1e-06, max_iterations: int=200, reboiler_temperature: Q | None=None, condenser_temperature: Q | None=None, packing_type: str | None=None, structured_packing: bool | None=None, design_flood_fraction: float | None=None, packing_hydraulic_capacity_factor: float | None=None, column_diameter: Q | None=None, murphree_efficiency: float | None=None, tray_murphree_efficiency: list[float] | None=None, reactive: bool | None=None, reactive_start_tray: int | None=None, reactive_end_tray: int | None=None, solver_type: str | None=None, top_specification_type: str | None=None, top_specification_target: float | None=None, top_specification_component: str | None=None, bottom_specification_type: str | None=None, bottom_specification_target: float | None=None, bottom_specification_component: str | None=None, gas_side_draw_fractions: list[float] | None=None, liquid_side_draw_fractions: list[float] | None=None, pumparound_fractions: list[float] | None=None, side_draw_flow_tray: int | None=None, side_draw_flow_phase: str | None=None, side_draw_flow_target: Q | None=None, side_draw_flow_tolerance: float | None=None, side_draw_flow_max_iterations: int | None=None, pumparound_return_tray: int | None=None, pumparound_draw_tray: int | None=None, pumparound_draw_fraction: float | None=None, pumparound_temperature_drop: Q | None=None, pumparound_tolerance: float | None=None, pumparound_max_iterations: int | None=None, max_allowable_fs_factor: float | None=None) -> PackedColumnResult:
     """``process.packed_column``, computed in Rust."""
     spec = _models_gen.model("process.packed_column")
@@ -7237,6 +7292,28 @@ def pipe(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, in
     )
 
 
+def pipeline_pressure_protection(max_source_pressure: Q, design_pressure: Q, incidental_factor: float, barrier1_setpoint: Q, barrier2_setpoint: Q) -> PipelinePressureProtectionResult:
+    """``process.pipeline_pressure_protection``, computed in Rust."""
+    spec = _models_gen.model("process.pipeline_pressure_protection")
+    result = _core.pipeline_pressure_protection(
+        input_to_si(spec, "max_source_pressure", max_source_pressure),
+        input_to_si(spec, "design_pressure", design_pressure),
+        incidental_factor,
+        input_to_si(spec, "barrier1_setpoint", barrier1_setpoint),
+        input_to_si(spec, "barrier2_setpoint", barrier2_setpoint),
+    )
+    return PipelinePressureProtectionResult(
+        max_incidental_pressure=from_si(result.max_incidental_pressure.magnitude_si, result.max_incidental_pressure.unit),
+        design_margin=from_si(result.design_margin.magnitude_si, result.design_margin.unit),
+        fully_rated=result.fully_rated,
+        barrier1_adequate=result.barrier1_adequate,
+        barrier2_adequate=result.barrier2_adequate,
+        protection_adequate=result.protection_adequate,
+        verdict=result.verdict,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def plug_flow_reactor(components: list[str], feed_n: Q, feed_z: list[float], feed_p: Q, feed_t: Q, length: float, diameter: float, number_of_tubes: float, energy_mode: str, coolant_temperature: Q, overall_heat_transfer_coefficient: Q, number_of_steps: float, integration_method: str, property_update_frequency: float, thermodynamic_coupling: str, reaction: str, reaction_orders: list[float], rate_type: str, pre_exponential_factor: float, activation_energy: float, temperature_exponent: float, heat_of_reaction: float, catalyst_bulk_density: Q | None=None, catalyst_activity_factor: float | None=None, catalyst_particle_diameter: float | None=None, catalyst_void_fraction: float | None=None, catalyst_molecular_diffusivity: Q | None=None, catalyst_effectiveness_enabled: bool | None=None, key_component: str | None=None) -> PlugFlowReactorResult:
     """``process.plug_flow_reactor``, computed in Rust."""
     spec = _models_gen.model("process.plug_flow_reactor")
@@ -7326,6 +7403,83 @@ def probit(a: float, b: float, n: float, dose: Q | None=None, probit_value: Q | 
     return ProbitResult(
         probit=result.probit,
         probability=result.probability,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def psv_fire_sizing(initial_mass: Q, initial_pressure: Q, set_pressure: Q, initial_temperature: Q, fire_heat_input: Q, vessel_volume: Q, molar_mass: Q, specific_heat_ratio: float, compressibility: float, heat_capacity: Q, blowdown_time: Q, blowdown_percent: float | None=None, orifice_area: Q | None=None, cv_discharge_coefficient: float | None=None) -> PsvFireSizingResult:
+    """``process.psv_fire_sizing``, computed in Rust."""
+    spec = _models_gen.model("process.psv_fire_sizing")
+    result = _core.psv_fire_sizing(
+        input_to_si(spec, "initial_mass", initial_mass),
+        input_to_si(spec, "initial_pressure", initial_pressure),
+        input_to_si(spec, "set_pressure", set_pressure),
+        input_to_si(spec, "initial_temperature", initial_temperature),
+        input_to_si(spec, "fire_heat_input", fire_heat_input),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "molar_mass", molar_mass),
+        specific_heat_ratio,
+        compressibility,
+        input_to_si(spec, "heat_capacity", heat_capacity),
+        input_to_si(spec, "blowdown_time", blowdown_time),
+        None if blowdown_percent is None else blowdown_percent,
+        None if orifice_area is None else input_to_si(spec, "orifice_area", orifice_area),
+        None if cv_discharge_coefficient is None else cv_discharge_coefficient,
+    )
+    return PsvFireSizingResult(
+        overpressure_fraction=result.overpressure_fraction,
+        required_area=from_si(result.required_area.magnitude_si, result.required_area.unit),
+        required_area_in2=result.required_area_in2,
+        recommended_orifice=result.recommended_orifice,
+        selected_area_in2=result.selected_area_in2,
+        back_pressure_fraction=result.back_pressure_fraction,
+        discharge_coefficient=result.discharge_coefficient,
+        back_pressure_correction=result.back_pressure_correction,
+        combination_correction=result.combination_correction,
+        blowdown_pressure=None if result.blowdown_pressure is None else from_si(result.blowdown_pressure.magnitude_si, result.blowdown_pressure.unit),
+        flow_coefficient=result.flow_coefficient,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def psv_sizing(service: str, set_pressure: Q, overpressure_fraction: float, back_pressure: Q, is_balanced_bellows: bool | None=None, has_rupture_disk: bool | None=None, mass_flow: Q | None=None, temperature: Q | None=None, molar_mass: Q | None=None, compressibility: float | None=None, specific_heat_ratio: float | None=None, volume_flow: Q | None=None, liquid_density: Q | None=None, viscosity: Q | None=None, gas_fraction: float | None=None, gas_density: Q | None=None, latent_heat: float | None=None, liquid_heat_capacity: Q | None=None, orifice_area: Q | None=None, capacity_discharge_coefficient: float | None=None) -> PsvSizingResult:
+    """``process.psv_sizing``, computed in Rust."""
+    spec = _models_gen.model("process.psv_sizing")
+    result = _core.psv_sizing(
+        service,
+        input_to_si(spec, "set_pressure", set_pressure),
+        overpressure_fraction,
+        input_to_si(spec, "back_pressure", back_pressure),
+        None if mass_flow is None else input_to_si(spec, "mass_flow", mass_flow),
+        None if temperature is None else input_to_si(spec, "temperature", temperature),
+        None if molar_mass is None else input_to_si(spec, "molar_mass", molar_mass),
+        None if compressibility is None else compressibility,
+        None if specific_heat_ratio is None else specific_heat_ratio,
+        is_balanced_bellows,
+        has_rupture_disk,
+        None if volume_flow is None else input_to_si(spec, "volume_flow", volume_flow),
+        None if liquid_density is None else input_to_si(spec, "liquid_density", liquid_density),
+        None if viscosity is None else input_to_si(spec, "viscosity", viscosity),
+        None if gas_fraction is None else gas_fraction,
+        None if gas_density is None else input_to_si(spec, "gas_density", gas_density),
+        None if latent_heat is None else latent_heat,
+        None if liquid_heat_capacity is None else input_to_si(spec, "liquid_heat_capacity", liquid_heat_capacity),
+        None if orifice_area is None else input_to_si(spec, "orifice_area", orifice_area),
+        None if capacity_discharge_coefficient is None else capacity_discharge_coefficient,
+    )
+    return PsvSizingResult(
+        relieving_pressure=from_si(result.relieving_pressure.magnitude_si, result.relieving_pressure.unit),
+        back_pressure_fraction=result.back_pressure_fraction,
+        discharge_coefficient=result.discharge_coefficient,
+        required_area=from_si(result.required_area.magnitude_si, result.required_area.unit),
+        required_area_in2=result.required_area_in2,
+        recommended_orifice=result.recommended_orifice,
+        selected_area_in2=result.selected_area_in2,
+        back_pressure_correction=result.back_pressure_correction,
+        combination_correction=result.combination_correction,
+        viscosity_correction=result.viscosity_correction,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        mass_flow_capacity=None if result.mass_flow_capacity is None else from_si(result.mass_flow_capacity.magnitude_si, result.mass_flow_capacity.unit),
         warnings=_warnings(result.warnings),
     )
 
@@ -7502,6 +7656,22 @@ def rate_based_packed_column(gas_components: list[str], gas_n: Q, gas_z: list[fl
         segment_percent_flood=tuple(result.segment_percent_flood),
         segment_net_molar_transfer=tuple(from_si(q.magnitude_si, q.unit) for q in result.segment_net_molar_transfer),
         segment_enthalpy_balance_residual=tuple(from_si(q.magnitude_si, q.unit) for q in result.segment_enthalpy_balance_residual),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def relief_disposal_network(contributions: list[dict[str, object]]) -> ReliefDisposalNetworkResult:
+    """``process.relief_disposal_network``, computed in Rust."""
+    spec = _models_gen.model("process.relief_disposal_network")
+    result = _core.relief_disposal_network(
+        input_records_to_si(spec, "contributions", contributions),
+    )
+    return ReliefDisposalNetworkResult(
+        total_simultaneous=from_si(result.total_simultaneous.magnitude_si, result.total_simultaneous.unit),
+        total_simultaneous_kg_hr=from_si(result.total_simultaneous_kg_hr.magnitude_si, result.total_simultaneous_kg_hr.unit),
+        peak_single=from_si(result.peak_single.magnitude_si, result.peak_single.unit),
+        governing_contributor=result.governing_contributor,
+        contributions=tuple(ReliefDisposalRow(item_name=c.item_name, cause=c.cause, phase=c.phase, mass_flow=from_si(c.mass_flow.magnitude_si, c.mass_flow.unit), mass_flow_kg_hr=from_si(c.mass_flow_kg_hr.magnitude_si, c.mass_flow_kg_hr.unit), simultaneous=c.simultaneous) for c in result.contributions),
         warnings=_warnings(result.warnings),
     )
 
@@ -8123,6 +8293,26 @@ def throttling_valve(components: list[str], inlet_n: Q, inlet_z: list[float], in
         choked=result.choked,
         gas_valve=result.gas_valve,
         calculated_molar_flow=from_si(result.calculated_molar_flow.magnitude_si, result.calculated_molar_flow.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def tr3001_compliance(scenarios: list[dict[str, object]], capacity_adequate: bool, required_area_in2: float | None=None, acceptance_accepted: bool | None=None, accumulation_fraction: float | None=None) -> Tr3001ComplianceResult:
+    """``process.tr3001_compliance``, computed in Rust."""
+    spec = _models_gen.model("process.tr3001_compliance")
+    result = _core.tr3001_compliance(
+        input_records_to_si(spec, "scenarios", scenarios),
+        capacity_adequate,
+        None if required_area_in2 is None else required_area_in2,
+        acceptance_accepted,
+        None if accumulation_fraction is None else accumulation_fraction,
+    )
+    return Tr3001ComplianceResult(
+        findings=tuple(Tr3001Finding(check=c.check, status=c.status) for c in result.findings),
+        pass_count=result.pass_count,
+        review_count=result.review_count,
+        fail_count=result.fail_count,
+        compliant=result.compliant,
         warnings=_warnings(result.warnings),
     )
 

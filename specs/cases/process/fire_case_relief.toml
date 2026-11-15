@@ -1,0 +1,88 @@
+model = "process.fire_case_relief"
+
+[[cases]]
+id = "fc_area_drainage"
+tolerance = 1.0e-12
+source = "100 m2 of wetted area with drainage, a 300 kJ/kg latent heat and a 350 K relieving temperature. From `validation/neqsim/captures/process_fire_case_relief.tsv` (`fc_area_drainage`)."
+[cases.inputs]
+has_drainage = true
+has_fire_fighting = true
+wetted_area = 100.0
+latent_heat = 300000.0
+relieving_temperature = 350.0
+[cases.expected]
+latent_heat = 300000.0
+relief_rate = 6.284722503339891
+relief_rate_kg_per_hr = 22625.001012023607
+relieving_temperature = 350.0
+
+[[cases]]
+id = "fc_area_no_drainage"
+tolerance = 1.0e-12
+source = "The same area without drainage: the 34500 BTU/hr ft2 coefficient. From (`fc_area_no_drainage`)."
+[cases.inputs]
+has_drainage = false
+has_fire_fighting = true
+wetted_area = 100.0
+latent_heat = 300000.0
+relieving_temperature = 350.0
+[cases.expected]
+latent_heat = 300000.0
+relief_rate = 10.324901255486964
+relief_rate_kg_per_hr = 37169.64451975307
+relieving_temperature = 350.0
+
+[[cases]]
+id = "fc_geometry"
+tolerance = 1.0e-12
+source = "No supplied area: pi times the 2 m diameter times the 5 m wetted height, with the class's default latent heat. From (`fc_geometry`)."
+[cases.inputs]
+has_drainage = true
+has_fire_fighting = true
+vessel_diameter = 2.0
+wetted_height = 5.0
+[cases.expected]
+latent_heat = 350000.0
+relief_rate = 2.0845015025699842
+relief_rate_kg_per_hr = 7504.205409251943
+
+[[cases]]
+id = "fc_no_area"
+tolerance = 1.0e-12
+source = "No area and no geometry: a zero heat input and a zero rate, with the default latent heat. From (`fc_no_area`)."
+[cases.inputs]
+has_drainage = true
+has_fire_fighting = true
+[cases.expected]
+latent_heat = 350000.0
+relief_rate = 0.0
+relief_rate_kg_per_hr = 0.0
+
+[[cases]]
+id = "fc_latent_default"
+tolerance = 1.0e-12
+source = "An area with no latent heat: the class's 350 kJ/kg default. From (`fc_latent_default`)."
+[cases.inputs]
+has_drainage = true
+has_fire_fighting = true
+wetted_area = 100.0
+[cases.expected]
+latent_heat = 350000.0
+relief_rate = 5.386905002862764
+relief_rate_kg_per_hr = 19392.85801030595
+
+[[cases]]
+id = "fc_firefighting_unread"
+tolerance = 1.0e-12
+source = "The drainage row with firefighting false: identical, because the flag is read by no formula. From (`fc_firefighting_unread`)."
+[cases.inputs]
+has_drainage = true
+has_fire_fighting = false
+wetted_area = 100.0
+latent_heat = 300000.0
+relieving_temperature = 350.0
+[cases.expected]
+latent_heat = 300000.0
+relief_rate = 6.284722503339891
+relief_rate_kg_per_hr = 22625.001012023607
+relieving_temperature = 350.0

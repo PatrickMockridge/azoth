@@ -242,6 +242,17 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `TestCase`. `crates/azoth-process/tests/nog070_sil_determination.rs` asserts it
         # against the capture, and `test_cross_impl` compares it on both results.
         "compliant",
+        # `overpressure_acceptance`'s verdict, a boolean with no slot in `TestCase`.
+        # `crates/azoth-process/tests/overpressure_acceptance.rs` asserts it against the
+        # capture, and `test_cross_impl` compares it on both results.
+        "accepted",
+        # `pipeline_pressure_protection`'s four flags, booleans with no slot in `TestCase`.
+        # `crates/azoth-process/tests/pipeline_pressure_protection.rs` asserts them against
+        # the capture, and `test_cross_impl` compares them on both results.
+        "fully_rated",
+        "barrier1_adequate",
+        "barrier2_adequate",
+        "protection_adequate",
         # `fire_water_coverage_assessment`'s two feasibility flags, booleans with no slot in
         # `TestCase`. `crates/azoth-process/tests/fire_water_coverage_assessment.rs` asserts
         # them against the capture, and `test_cross_impl` compares them on both results.

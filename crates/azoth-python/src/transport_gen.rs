@@ -21,9 +21,9 @@ use crate::record_outputs_gen::{
     PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
     PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow,
-    PyRemediationOptionRow, PyRiskAssessmentRow, PyScaleControlRiskRow, PyScaleControlRow,
-    PyScenarioChangeRow, PyScenarioIndexRow, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
-    PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
+    PyReliefDisposalRow, PyRemediationOptionRow, PyRiskAssessmentRow, PyScaleControlRiskRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySilIssue, PySterileRadius,
+    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -16561,6 +16561,68 @@ impl From<&azoth_process::models::filter::FilterResult> for PyFilterResult {
         }
     }
 }
+/// Result of `process.fire_case_relief`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FireCaseReliefResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFireCaseReliefResult {
+    /// the latent heat used, in J/kg.
+    #[pyo3(get)]
+    pub latent_heat: f64,
+    /// `heat_input / latent_heat`.
+    #[pyo3(get)]
+    pub relief_rate: PyQty,
+    /// the relief rate times 3600.
+    #[pyo3(get)]
+    pub relief_rate_kg_per_hr: PyQty,
+    /// the relieving temperature, echoed when stated.
+    #[pyo3(get)]
+    pub relieving_temperature: Option<PyQty>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFireCaseReliefResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FireCaseReliefResult(latent_heat={:?}, relief_rate={:?}, relief_rate_kg_per_hr={:?}, relieving_temperature={:?}, {} warning(s))",
+            self.latent_heat,
+            self.relief_rate,
+            self.relief_rate_kg_per_hr,
+            self.relieving_temperature,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fire_case_relief::FireCaseReliefResult>
+    for PyFireCaseReliefResult
+{
+    fn from(r: &azoth_process::models::fire_case_relief::FireCaseReliefResult) -> Self {
+        Self {
+            latent_heat: r.latent_heat,
+            relief_rate: PyQty {
+                magnitude_si: r.relief_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            relief_rate_kg_per_hr: PyQty {
+                magnitude_si: r.relief_rate_kg_per_hr.value,
+                unit: "kg/h".to_string(),
+            },
+            relieving_temperature: r.relieving_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.fire_monitor_coverage`, transported.
 #[pyclass(
     frozen,
@@ -19332,6 +19394,67 @@ impl From<&azoth_process::models::nog070_sil_determination::Nog070SilDeterminati
         }
     }
 }
+/// Result of `process.overpressure_acceptance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OverpressureAcceptanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOverpressureAcceptanceResult {
+    /// 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.
+    #[pyo3(get)]
+    pub accumulation_factor: f64,
+    /// `mawp accumulation_factor`.
+    #[pyo3(get)]
+    pub allowable_pressure: PyQty,
+    /// `allowable_pressure - peak_pressure`.
+    #[pyo3(get)]
+    pub margin: PyQty,
+    /// whether the peak is at or below the allowable pressure.
+    #[pyo3(get)]
+    pub accepted: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyOverpressureAcceptanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "OverpressureAcceptanceResult(accumulation_factor={:?}, allowable_pressure={:?}, margin={:?}, accepted={:?}, {} warning(s))",
+            self.accumulation_factor,
+            self.allowable_pressure,
+            self.margin,
+            self.accepted,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::overpressure_acceptance::OverpressureAcceptanceResult>
+    for PyOverpressureAcceptanceResult
+{
+    fn from(
+        r: &azoth_process::models::overpressure_acceptance::OverpressureAcceptanceResult,
+    ) -> Self {
+        Self {
+            accumulation_factor: r.accumulation_factor,
+            allowable_pressure: PyQty {
+                magnitude_si: r.allowable_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            margin: PyQty {
+                magnitude_si: r.margin.value,
+                unit: "Pa".to_string(),
+            },
+            accepted: r.accepted,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.packed_column`, transported.
 #[pyclass(
     frozen,
@@ -19863,6 +19986,82 @@ impl From<&azoth_process::models::pipe::PipeResult> for PyPipeResult {
         }
     }
 }
+/// Result of `process.pipeline_pressure_protection`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipelinePressureProtectionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipelinePressureProtectionResult {
+    /// `incidental_factor design_pressure`.
+    #[pyo3(get)]
+    pub max_incidental_pressure: PyQty,
+    /// `design_pressure - max_source_pressure`, negative when under-rated.
+    #[pyo3(get)]
+    pub design_margin: PyQty,
+    /// whether the maximum source pressure is at or below the design pressure.
+    #[pyo3(get)]
+    pub fully_rated: bool,
+    /// whether barrier 1's set point is at or below the design pressure.
+    #[pyo3(get)]
+    pub barrier1_adequate: bool,
+    /// whether barrier 2's set point is at or below the maximum incidental pressure.
+    #[pyo3(get)]
+    pub barrier2_adequate: bool,
+    /// whether the segment is fully rated or both barriers are adequate.
+    #[pyo3(get)]
+    pub protection_adequate: bool,
+    /// `FULLY_RATED`, `TWO_BARRIERS_REQUIRED` or `INSUFFICIENT`, the class's own spellings.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPipelinePressureProtectionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipelinePressureProtectionResult(max_incidental_pressure={:?}, design_margin={:?}, fully_rated={:?}, barrier1_adequate={:?}, barrier2_adequate={:?}, protection_adequate={:?}, verdict={:?}, {} warning(s))",
+            self.max_incidental_pressure,
+            self.design_margin,
+            self.fully_rated,
+            self.barrier1_adequate,
+            self.barrier2_adequate,
+            self.protection_adequate,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::pipeline_pressure_protection::PipelinePressureProtectionResult>
+    for PyPipelinePressureProtectionResult
+{
+    fn from(
+        r: &azoth_process::models::pipeline_pressure_protection::PipelinePressureProtectionResult,
+    ) -> Self {
+        Self {
+            max_incidental_pressure: PyQty {
+                magnitude_si: r.max_incidental_pressure.value,
+                unit: "bar".to_string(),
+            },
+            design_margin: PyQty {
+                magnitude_si: r.design_margin.value,
+                unit: "bar".to_string(),
+            },
+            fully_rated: r.fully_rated,
+            barrier1_adequate: r.barrier1_adequate,
+            barrier2_adequate: r.barrier2_adequate,
+            protection_adequate: r.protection_adequate,
+            verdict: r.verdict.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.plug_flow_reactor`, transported.
 #[pyclass(
     frozen,
@@ -20152,6 +20351,201 @@ impl From<&azoth_process::models::probit::ProbitResult> for PyProbitResult {
         Self {
             probit: r.probit,
             probability: r.probability,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.psv_fire_sizing`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PsvFireSizingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPsvFireSizingResult {
+    /// the class's fire overpressure fraction, 0.21.
+    #[pyo3(get)]
+    pub overpressure_fraction: f64,
+    /// the required orifice area.
+    #[pyo3(get)]
+    pub required_area: PyQty,
+    /// the required area in in2.
+    #[pyo3(get)]
+    pub required_area_in2: f64,
+    /// the first ladder letter whose area meets the requirement, or `T` when the requirement exceeds 26 in2.
+    #[pyo3(get)]
+    pub recommended_orifice: String,
+    /// the selected ladder area in in2.
+    #[pyo3(get)]
+    pub selected_area_in2: f64,
+    /// `101325 / (set_pressure 1.21)`.
+    #[pyo3(get)]
+    pub back_pressure_fraction: f64,
+    /// the gas `Kd`, 0.975.
+    #[pyo3(get)]
+    pub discharge_coefficient: f64,
+    /// the gas `Kb` for a conventional PSV at the atmospheric back pressure.
+    #[pyo3(get)]
+    pub back_pressure_correction: f64,
+    /// the gas `Kc`, 1.0 with no rupture disk.
+    #[pyo3(get)]
+    pub combination_correction: f64,
+    /// `set_pressure (1 - blowdown_percent / 100)`, when the percentage is stated.
+    #[pyo3(get)]
+    pub blowdown_pressure: Option<PyQty>,
+    /// `24.6 cv_discharge_coefficient A_in2`, when the area and coefficient are stated.
+    #[pyo3(get)]
+    pub flow_coefficient: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPsvFireSizingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PsvFireSizingResult(overpressure_fraction={:?}, required_area={:?}, required_area_in2={:?}, recommended_orifice={:?}, selected_area_in2={:?}, back_pressure_fraction={:?}, discharge_coefficient={:?}, back_pressure_correction={:?}, combination_correction={:?}, blowdown_pressure={:?}, flow_coefficient={:?}, {} warning(s))",
+            self.overpressure_fraction,
+            self.required_area,
+            self.required_area_in2,
+            self.recommended_orifice,
+            self.selected_area_in2,
+            self.back_pressure_fraction,
+            self.discharge_coefficient,
+            self.back_pressure_correction,
+            self.combination_correction,
+            self.blowdown_pressure,
+            self.flow_coefficient,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::psv_fire_sizing::PsvFireSizingResult> for PyPsvFireSizingResult {
+    fn from(r: &azoth_process::models::psv_fire_sizing::PsvFireSizingResult) -> Self {
+        Self {
+            overpressure_fraction: r.overpressure_fraction,
+            required_area: PyQty {
+                magnitude_si: r.required_area.value,
+                unit: "m**2".to_string(),
+            },
+            required_area_in2: r.required_area_in2,
+            recommended_orifice: r.recommended_orifice.clone(),
+            selected_area_in2: r.selected_area_in2,
+            back_pressure_fraction: r.back_pressure_fraction,
+            discharge_coefficient: r.discharge_coefficient,
+            back_pressure_correction: r.back_pressure_correction,
+            combination_correction: r.combination_correction,
+            blowdown_pressure: r.blowdown_pressure.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            flow_coefficient: r.flow_coefficient,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.psv_sizing`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PsvSizingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPsvSizingResult {
+    /// `set_pressure (1 + overpressure_fraction)`.
+    #[pyo3(get)]
+    pub relieving_pressure: PyQty,
+    /// `back_pressure / relieving_pressure`.
+    #[pyo3(get)]
+    pub back_pressure_fraction: f64,
+    /// the class's `Kd`: 0.975 gas, 0.65 liquid, 0.85 two-phase.
+    #[pyo3(get)]
+    pub discharge_coefficient: f64,
+    /// the required orifice area.
+    #[pyo3(get)]
+    pub required_area: PyQty,
+    /// the required area in in2, gas and liquid only; the two-phase method publishes m2 alone.
+    #[pyo3(get)]
+    pub required_area_in2: Option<f64>,
+    /// the first ladder letter whose area meets the requirement, or `T` when the requirement exceeds 26 in2; gas and liquid only.
+    #[pyo3(get)]
+    pub recommended_orifice: Option<String>,
+    /// the selected ladder area in in2; gas and liquid only.
+    #[pyo3(get)]
+    pub selected_area_in2: Option<f64>,
+    /// the gas `Kb` or the liquid `Kw`.
+    #[pyo3(get)]
+    pub back_pressure_correction: Option<f64>,
+    /// the gas `Kc`, 0.9 with a rupture disk and 1.0 without; gas only.
+    #[pyo3(get)]
+    pub combination_correction: Option<f64>,
+    /// the liquid `Kv`, 1.0 when the Reynolds number is at or above 1e5; liquid only.
+    #[pyo3(get)]
+    pub viscosity_correction: Option<f64>,
+    /// the liquid mass flow `volume_flow liquid_density`; liquid only.
+    #[pyo3(get)]
+    pub mass_flow_rate: Option<PyQty>,
+    /// `calculateMassFlowCapacity`'s result when `orifice_area` is stated. It is not the inverse of the sizing equation.
+    #[pyo3(get)]
+    pub mass_flow_capacity: Option<PyQty>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPsvSizingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PsvSizingResult(relieving_pressure={:?}, back_pressure_fraction={:?}, discharge_coefficient={:?}, required_area={:?}, required_area_in2={:?}, recommended_orifice={:?}, selected_area_in2={:?}, back_pressure_correction={:?}, combination_correction={:?}, viscosity_correction={:?}, mass_flow_rate={:?}, mass_flow_capacity={:?}, {} warning(s))",
+            self.relieving_pressure,
+            self.back_pressure_fraction,
+            self.discharge_coefficient,
+            self.required_area,
+            self.required_area_in2,
+            self.recommended_orifice,
+            self.selected_area_in2,
+            self.back_pressure_correction,
+            self.combination_correction,
+            self.viscosity_correction,
+            self.mass_flow_rate,
+            self.mass_flow_capacity,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::psv_sizing::PsvSizingResult> for PyPsvSizingResult {
+    fn from(r: &azoth_process::models::psv_sizing::PsvSizingResult) -> Self {
+        Self {
+            relieving_pressure: PyQty {
+                magnitude_si: r.relieving_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            back_pressure_fraction: r.back_pressure_fraction,
+            discharge_coefficient: r.discharge_coefficient,
+            required_area: PyQty {
+                magnitude_si: r.required_area.value,
+                unit: "m**2".to_string(),
+            },
+            required_area_in2: r.required_area_in2,
+            recommended_orifice: r.recommended_orifice.clone(),
+            selected_area_in2: r.selected_area_in2,
+            back_pressure_correction: r.back_pressure_correction,
+            combination_correction: r.combination_correction,
+            viscosity_correction: r.viscosity_correction,
+            mass_flow_rate: r.mass_flow_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            mass_flow_capacity: r.mass_flow_capacity.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
             warnings: transport(&r.warnings),
         }
     }
@@ -21058,6 +21452,79 @@ impl From<&azoth_process::models::rate_based_packed_column::RateBasedPackedColum
                     magnitude_si: v.value,
                     unit: "W".to_string(),
                 })
+                .collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.relief_disposal_network`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ReliefDisposalNetworkResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyReliefDisposalNetworkResult {
+    /// the sum of the simultaneous rates.
+    #[pyo3(get)]
+    pub total_simultaneous: PyQty,
+    /// the simultaneous total times 3600.
+    #[pyo3(get)]
+    pub total_simultaneous_kg_hr: PyQty,
+    /// the largest single rate, over every row.
+    #[pyo3(get)]
+    pub peak_single: PyQty,
+    /// the item name of the first peak, absent when no rate is positive.
+    #[pyo3(get)]
+    pub governing_contributor: Option<String>,
+    /// one row per input row, in caller order.
+    #[pyo3(get)]
+    pub contributions: Vec<PyReliefDisposalRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyReliefDisposalNetworkResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "ReliefDisposalNetworkResult(total_simultaneous={:?}, total_simultaneous_kg_hr={:?}, peak_single={:?}, governing_contributor={:?}, contributions={:?}, {} warning(s))",
+            self.total_simultaneous,
+            self.total_simultaneous_kg_hr,
+            self.peak_single,
+            self.governing_contributor,
+            self.contributions,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::relief_disposal_network::ReliefDisposalNetworkResult>
+    for PyReliefDisposalNetworkResult
+{
+    fn from(
+        r: &azoth_process::models::relief_disposal_network::ReliefDisposalNetworkResult,
+    ) -> Self {
+        Self {
+            total_simultaneous: PyQty {
+                magnitude_si: r.total_simultaneous.value,
+                unit: "kg/s".to_string(),
+            },
+            total_simultaneous_kg_hr: PyQty {
+                magnitude_si: r.total_simultaneous_kg_hr.value,
+                unit: "kg/h".to_string(),
+            },
+            peak_single: PyQty {
+                magnitude_si: r.peak_single.value,
+                unit: "kg/s".to_string(),
+            },
+            governing_contributor: r.governing_contributor.clone(),
+            contributions: r
+                .contributions
+                .iter()
+                .map(PyReliefDisposalRow::from)
                 .collect(),
             warnings: transport(&r.warnings),
         }
@@ -23308,6 +23775,64 @@ impl From<&azoth_process::models::throttling_valve::ThrottlingValveResult>
                 magnitude_si: r.calculated_molar_flow,
                 unit: "mol/s".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.tr3001_compliance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Tr3001ComplianceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTr3001ComplianceResult {
+    /// one row per check the class raised, in its order.
+    #[pyo3(get)]
+    pub findings: Vec<PyTr3001Finding>,
+    /// the number of passing checks.
+    #[pyo3(get)]
+    pub pass_count: f64,
+    /// the number of needs-review checks.
+    #[pyo3(get)]
+    pub review_count: f64,
+    /// the number of failing checks.
+    #[pyo3(get)]
+    pub fail_count: f64,
+    /// whether no check failed.
+    #[pyo3(get)]
+    pub compliant: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyTr3001ComplianceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Tr3001ComplianceResult(findings={:?}, pass_count={:?}, review_count={:?}, fail_count={:?}, compliant={:?}, {} warning(s))",
+            self.findings,
+            self.pass_count,
+            self.review_count,
+            self.fail_count,
+            self.compliant,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::tr3001_compliance::Tr3001ComplianceResult>
+    for PyTr3001ComplianceResult
+{
+    fn from(r: &azoth_process::models::tr3001_compliance::Tr3001ComplianceResult) -> Self {
+        Self {
+            findings: r.findings.iter().map(PyTr3001Finding::from).collect(),
+            pass_count: r.pass_count,
+            review_count: r.review_count,
+            fail_count: r.fail_count,
+            compliant: r.compliant,
             warnings: transport(&r.warnings),
         }
     }

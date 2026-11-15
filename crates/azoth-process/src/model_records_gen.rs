@@ -28,6 +28,7 @@ use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
 use crate::models::fault_tree::FaultTreeResult;
 use crate::models::filter::FilterResult;
+use crate::models::fire_case_relief::FireCaseReliefResult;
 use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
 use crate::models::fire_water_demand::FireWaterDemandResult;
@@ -46,14 +47,19 @@ use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mixer::MixerResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
+use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
 use crate::models::packed_column::PackedColumnResult;
 use crate::models::pfp_demand::PfpDemandResult;
 use crate::models::pipe::PipeResult;
+use crate::models::pipeline_pressure_protection::PipelinePressureProtectionResult;
 use crate::models::plug_flow_reactor::PlugFlowReactorResult;
 use crate::models::pool_fire::PoolFireResult;
 use crate::models::probit::ProbitResult;
+use crate::models::psv_fire_sizing::PsvFireSizingResult;
+use crate::models::psv_sizing::PsvSizingResult;
 use crate::models::pump::PumpResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
+use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
 use crate::models::separator::SeparatorResult;
@@ -67,6 +73,7 @@ use crate::models::stripping_column::StrippingColumnResult;
 use crate::models::tank::TankResult;
 use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
+use crate::models::tr3001_compliance::Tr3001ComplianceResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vce::VceResult;
 
@@ -573,6 +580,21 @@ impl CalcResult for FilterResult {
         "collapse_pressure_utilization",
         "differential_pressure_design_acceptable",
         "design_media_area",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FireCaseReliefResult {
+    const CALC_ID: &'static str = "process.fire_case_relief";
+    const FIELDS: &'static [&'static str] = &[
+        "latent_heat",
+        "relief_rate",
+        "relief_rate_kg_per_hr",
+        "relieving_temperature",
         "warnings",
     ];
 
@@ -1101,6 +1123,21 @@ impl CalcResult for Nog070SilDeterminationResult {
     }
 }
 
+impl CalcResult for OverpressureAcceptanceResult {
+    const CALC_ID: &'static str = "process.overpressure_acceptance";
+    const FIELDS: &'static [&'static str] = &[
+        "accumulation_factor",
+        "allowable_pressure",
+        "margin",
+        "accepted",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for PackedColumnResult {
     const CALC_ID: &'static str = "process.packed_column";
     const FIELDS: &'static [&'static str] = &[
@@ -1192,6 +1229,24 @@ impl CalcResult for PipeResult {
     }
 }
 
+impl CalcResult for PipelinePressureProtectionResult {
+    const CALC_ID: &'static str = "process.pipeline_pressure_protection";
+    const FIELDS: &'static [&'static str] = &[
+        "max_incidental_pressure",
+        "design_margin",
+        "fully_rated",
+        "barrier1_adequate",
+        "barrier2_adequate",
+        "protection_adequate",
+        "verdict",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for PlugFlowReactorResult {
     const CALC_ID: &'static str = "process.plug_flow_reactor";
     const FIELDS: &'static [&'static str] = &[
@@ -1239,6 +1294,51 @@ impl CalcResult for PoolFireResult {
 impl CalcResult for ProbitResult {
     const CALC_ID: &'static str = "process.probit";
     const FIELDS: &'static [&'static str] = &["probit", "probability", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PsvFireSizingResult {
+    const CALC_ID: &'static str = "process.psv_fire_sizing";
+    const FIELDS: &'static [&'static str] = &[
+        "overpressure_fraction",
+        "required_area",
+        "required_area_in2",
+        "recommended_orifice",
+        "selected_area_in2",
+        "back_pressure_fraction",
+        "discharge_coefficient",
+        "back_pressure_correction",
+        "combination_correction",
+        "blowdown_pressure",
+        "flow_coefficient",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PsvSizingResult {
+    const CALC_ID: &'static str = "process.psv_sizing";
+    const FIELDS: &'static [&'static str] = &[
+        "relieving_pressure",
+        "back_pressure_fraction",
+        "discharge_coefficient",
+        "required_area",
+        "required_area_in2",
+        "recommended_orifice",
+        "selected_area_in2",
+        "back_pressure_correction",
+        "combination_correction",
+        "viscosity_correction",
+        "mass_flow_rate",
+        "mass_flow_capacity",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -1366,6 +1466,22 @@ impl CalcResult for RateBasedPackedColumnResult {
         "segment_percent_flood",
         "segment_net_molar_transfer",
         "segment_enthalpy_balance_residual",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ReliefDisposalNetworkResult {
+    const CALC_ID: &'static str = "process.relief_disposal_network";
+    const FIELDS: &'static [&'static str] = &[
+        "total_simultaneous",
+        "total_simultaneous_kg_hr",
+        "peak_single",
+        "governing_contributor",
+        "contributions",
         "warnings",
     ];
 
@@ -1755,6 +1871,22 @@ impl CalcResult for ThrottlingValveResult {
         "choked",
         "gas_valve",
         "calculated_molar_flow",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for Tr3001ComplianceResult {
+    const CALC_ID: &'static str = "process.tr3001_compliance";
+    const FIELDS: &'static [&'static str] = &[
+        "findings",
+        "pass_count",
+        "review_count",
+        "fail_count",
+        "compliant",
         "warnings",
     ];
 

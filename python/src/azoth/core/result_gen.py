@@ -46,6 +46,7 @@ from azoth.core.record_outputs_gen import (
     MineralEquilibriumRow,
     MinimalCutSet,
     NaceIssueRow,
+    ReliefDisposalRow,
     RemediationOptionRow,
     RiskAssessmentRow,
     ScaleControlRiskRow,
@@ -56,6 +57,7 @@ from azoth.core.record_outputs_gen import (
     SterileRadius,
     StreamScaleMineralRow,
     SubFraction,
+    Tr3001Finding,
     WaterMixingResult,
     ZoneRatingRow,
 )
@@ -6645,6 +6647,28 @@ class FilterResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class FireCaseReliefResult(_HasWarnings):
+    """Result of ``process.fire_case_relief``."""
+
+    CALC_ID: ClassVar[str] = "process.fire_case_relief"
+
+    #: the latent heat used, in J/kg.
+    latent_heat: float
+
+    #: `heat_input / latent_heat`.
+    relief_rate: Q
+
+    #: the relief rate times 3600.
+    relief_rate_kg_per_hr: Q
+
+    #: the relieving temperature, echoed when stated.
+    relieving_temperature: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class FireMonitorCoverageResult(_HasWarnings):
     """Result of ``process.fire_monitor_coverage``."""
 
@@ -7791,6 +7815,28 @@ class Nog070SilDeterminationResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class OverpressureAcceptanceResult(_HasWarnings):
+    """Result of ``process.overpressure_acceptance``."""
+
+    CALC_ID: ClassVar[str] = "process.overpressure_acceptance"
+
+    #: 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.
+    accumulation_factor: float
+
+    #: `mawp accumulation_factor`.
+    allowable_pressure: Q
+
+    #: `allowable_pressure - peak_pressure`.
+    margin: Q
+
+    #: whether the peak is at or below the allowable pressure.
+    accepted: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PackedColumnResult(_HasWarnings):
     """Result of ``process.packed_column``."""
 
@@ -7995,6 +8041,37 @@ class PipeResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PipelinePressureProtectionResult(_HasWarnings):
+    """Result of ``process.pipeline_pressure_protection``."""
+
+    CALC_ID: ClassVar[str] = "process.pipeline_pressure_protection"
+
+    #: `incidental_factor design_pressure`.
+    max_incidental_pressure: Q
+
+    #: `design_pressure - max_source_pressure`, negative when under-rated.
+    design_margin: Q
+
+    #: whether the maximum source pressure is at or below the design pressure.
+    fully_rated: bool
+
+    #: whether barrier 1's set point is at or below the design pressure.
+    barrier1_adequate: bool
+
+    #: whether barrier 2's set point is at or below the maximum incidental pressure.
+    barrier2_adequate: bool
+
+    #: whether the segment is fully rated or both barriers are adequate.
+    protection_adequate: bool
+
+    #: `FULLY_RATED`, `TWO_BARRIERS_REQUIRED` or `INSUFFICIENT`, the class's own spellings.
+    verdict: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PlugFlowReactorResult(_HasWarnings):
     """Result of ``process.plug_flow_reactor``."""
 
@@ -8091,6 +8168,95 @@ class ProbitResult(_HasWarnings):
 
     #: `0.5 (1 + erf((Y - 5) / sqrt(2)))` at the stated `probit_value` or the computed probit.
     probability: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PsvFireSizingResult(_HasWarnings):
+    """Result of ``process.psv_fire_sizing``."""
+
+    CALC_ID: ClassVar[str] = "process.psv_fire_sizing"
+
+    #: the class's fire overpressure fraction, 0.21.
+    overpressure_fraction: float
+
+    #: the required orifice area.
+    required_area: Q
+
+    #: the required area in in2.
+    required_area_in2: float
+
+    #: the first ladder letter whose area meets the requirement, or `T` when the requirement exceeds 26 in2.
+    recommended_orifice: str
+
+    #: the selected ladder area in in2.
+    selected_area_in2: float
+
+    #: `101325 / (set_pressure 1.21)`.
+    back_pressure_fraction: float
+
+    #: the gas `Kd`, 0.975.
+    discharge_coefficient: float
+
+    #: the gas `Kb` for a conventional PSV at the atmospheric back pressure.
+    back_pressure_correction: float
+
+    #: the gas `Kc`, 1.0 with no rupture disk.
+    combination_correction: float
+
+    #: `set_pressure (1 - blowdown_percent / 100)`, when the percentage is stated.
+    blowdown_pressure: Q | None
+
+    #: `24.6 cv_discharge_coefficient A_in2`, when the area and coefficient are stated.
+    flow_coefficient: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PsvSizingResult(_HasWarnings):
+    """Result of ``process.psv_sizing``."""
+
+    CALC_ID: ClassVar[str] = "process.psv_sizing"
+
+    #: `set_pressure (1 + overpressure_fraction)`.
+    relieving_pressure: Q
+
+    #: `back_pressure / relieving_pressure`.
+    back_pressure_fraction: float
+
+    #: the class's `Kd`: 0.975 gas, 0.65 liquid, 0.85 two-phase.
+    discharge_coefficient: float
+
+    #: the required orifice area.
+    required_area: Q
+
+    #: the required area in in2, gas and liquid only; the two-phase method publishes m2 alone.
+    required_area_in2: float | None
+
+    #: the first ladder letter whose area meets the requirement, or `T` when the requirement exceeds 26 in2; gas and liquid only.
+    recommended_orifice: str | None
+
+    #: the selected ladder area in in2; gas and liquid only.
+    selected_area_in2: float | None
+
+    #: the gas `Kb` or the liquid `Kw`.
+    back_pressure_correction: float | None
+
+    #: the gas `Kc`, 0.9 with a rupture disk and 1.0 without; gas only.
+    combination_correction: float | None
+
+    #: the liquid `Kv`, 1.0 when the Reynolds number is at or above 1e5; liquid only.
+    viscosity_correction: float | None
+
+    #: the liquid mass flow `volume_flow liquid_density`; liquid only.
+    mass_flow_rate: Q | None
+
+    #: `calculateMassFlowCapacity`'s result when `orifice_area` is stated. It is not the inverse of the sizing equation.
+    mass_flow_capacity: Q | None
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -8432,6 +8598,31 @@ class RateBasedPackedColumnResult(_HasWarnings):
 
     #: the segment's own enthalpy closure, `out - in`.
     segment_enthalpy_balance_residual: tuple[Q, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ReliefDisposalNetworkResult(_HasWarnings):
+    """Result of ``process.relief_disposal_network``."""
+
+    CALC_ID: ClassVar[str] = "process.relief_disposal_network"
+
+    #: the sum of the simultaneous rates.
+    total_simultaneous: Q
+
+    #: the simultaneous total times 3600.
+    total_simultaneous_kg_hr: Q
+
+    #: the largest single rate, over every row.
+    peak_single: Q
+
+    #: the item name of the first peak, absent when no rate is positive.
+    governing_contributor: str | None
+
+    #: one row per input row, in caller order.
+    contributions: tuple[ReliefDisposalRow, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -9339,6 +9530,31 @@ class ThrottlingValveResult(_HasWarnings):
 
     #: `calculateMolarFlow()`: the mole flow the adjusted `Kv` and the drop give - the inverse of the sizing, and the class's own consistency check.
     calculated_molar_flow: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class Tr3001ComplianceResult(_HasWarnings):
+    """Result of ``process.tr3001_compliance``."""
+
+    CALC_ID: ClassVar[str] = "process.tr3001_compliance"
+
+    #: one row per check the class raised, in its order.
+    findings: tuple[Tr3001Finding, ...]
+
+    #: the number of passing checks.
+    pass_count: float
+
+    #: the number of needs-review checks.
+    review_count: float
+
+    #: the number of failing checks.
+    fail_count: float
+
+    #: whether no check failed.
+    compliant: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]

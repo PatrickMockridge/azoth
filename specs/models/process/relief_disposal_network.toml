@@ -1,0 +1,115 @@
+id = "process.relief_disposal_network"
+name = "Relief disposal network"
+kind = "procedure"
+assumptions = [
+    "**the total is the sum of the simultaneous contributions**, and the hourly total is that times 3600.",
+    "**the peak single contribution is the largest rate over every contribution**, simultaneous or not, with a strict `>` so the first row wins a tie.",
+    "**the governing contributor is the item name of the first peak**, absent when no rate is positive.",
+    "**the rows echo the contributions in list order**, with each rate's hourly value beside it.",
+    "**an empty network is a defined state**: zero totals and no governing contributor. It is an evidence row because the schema cannot carry an empty list.",
+    "**the class validates nothing**: a negative rate is subtracted from the total and never becomes the peak. The port refuses it.",
+]
+references = [
+    "API STD 521 (7th edition, 2020). Pressure-relieving and depressuring systems, disposal systems.",
+    "TR3001. Relief disposal networks and simultaneous load summation.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/overpressure/ReliefDisposalNetwork.java` is the port source.",
+    "`validation/neqsim/captures/process_relief_disposal_network.tsv` - all-simultaneous, mixed, tied, zero, empty and negative networks.",
+]
+[source]
+standard = "NeqSim process/safety/overpressure/ReliefDisposalNetwork.java"
+edition = "Its `addContribution` and `calculate`, with `ReliefLoadContribution`'s hourly rate."
+[algorithm]
+scheme = "closed_form_relief_disposal_network"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.contributions]
+type = "record_list"
+row_type = "ReliefContribution"
+description = "the network's contributions in caller order.\n"
+[inputs.contributions.fields.item_name]
+type = "string"
+description = "the protected item's name.\n"
+[inputs.contributions.fields.cause]
+type = "enum"
+values = [
+    "blocked_outlet",
+    "check_valve_leakage",
+    "gas_blow_by",
+    "liquid_blow_by",
+    "volatile_liquid_ingress",
+    "inadvertent_valve_opening",
+    "control_valve_failure",
+    "fire",
+    "thermal_expansion",
+    "choke_collapse",
+    "tube_rupture",
+    "vacuum",
+    "other",
+]
+description = "the overpressure cause, carried on the row.\n"
+[inputs.contributions.fields.phase]
+type = "enum"
+values = ["vapour", "liquid", "two_phase"]
+description = "the relieving phase, carried on the row.\n"
+[inputs.contributions.fields.mass_flow]
+unit = "kg/s"
+description = "the contribution's relief rate, at least zero.\n"
+[inputs.contributions.fields.simultaneous]
+type = "boolean"
+description = "whether the load is concurrent with the network's other contributions.\n"
+[outputs]
+[outputs.total_simultaneous]
+unit = "kg/s"
+description = "the sum of the simultaneous rates.\n"
+[outputs.total_simultaneous_kg_hr]
+unit = "kg/h"
+description = "the simultaneous total times 3600.\n"
+[outputs.peak_single]
+unit = "kg/s"
+description = "the largest single rate, over every row.\n"
+[outputs.governing_contributor]
+type = "string"
+optional = true
+description = "the item name of the first peak, absent when no rate is positive.\n"
+[outputs.contributions]
+type = "record_list"
+description = "one row per input row, in caller order.\n"
+[outputs.contributions.fields.item_name]
+type = "string"
+description = "the protected item's name.\n"
+[outputs.contributions.fields.cause]
+type = "enum"
+values = [
+    "blocked_outlet",
+    "check_valve_leakage",
+    "gas_blow_by",
+    "liquid_blow_by",
+    "volatile_liquid_ingress",
+    "inadvertent_valve_opening",
+    "control_valve_failure",
+    "fire",
+    "thermal_expansion",
+    "choke_collapse",
+    "tube_rupture",
+    "vacuum",
+    "other",
+]
+description = "the overpressure cause.\n"
+[outputs.contributions.fields.phase]
+type = "enum"
+values = ["vapour", "liquid", "two_phase"]
+description = "the relieving phase.\n"
+[outputs.contributions.fields.mass_flow]
+unit = "kg/s"
+description = "the rate, echoed.\n"
+[outputs.contributions.fields.mass_flow_kg_hr]
+unit = "kg/h"
+description = "the rate times 3600.\n"
+[outputs.contributions.fields.simultaneous]
+type = "boolean"
+description = "whether the load is concurrent.\n"
+[implementations]
+python = "azoth.process.relief_disposal_network"
+rust = "azoth_process::relief_disposal_network"

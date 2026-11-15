@@ -526,6 +526,15 @@ class PumpCurvePoint(TypedDict):
     efficiency: float
     npsh_required: float | None
 
+class ReliefContribution(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    item_name: str
+    cause: str
+    phase: str
+    mass_flow: float
+    simultaneous: bool
+
 class RiskEquipment(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -540,6 +549,14 @@ class EfficiencyPoint(TypedDict):
 
     diameter: float
     efficiency: float
+
+class Tr3001Scenario(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    cause: str
+    relief_rate: float
+    dynamically_determined: bool
+    credible: bool
 
 class TurboUcPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -945,6 +962,17 @@ class LopaLayerContribution:
     rrf: float | None
 
 @final
+class ReliefDisposalRow:
+    """one row per input row, in caller order."""
+
+    item_name: str
+    cause: str
+    phase: str
+    mass_flow: Qty
+    mass_flow_kg_hr: Qty
+    simultaneous: bool
+
+@final
 class RiskAssessmentRow:
     """one row per input row, in caller order."""
 
@@ -970,6 +998,13 @@ class SilIssue:
 
     severity: str
     category: str
+
+@final
+class Tr3001Finding:
+    """one row per check the class raised, in its order."""
+
+    check: str
+    status: str
 
 # --- results --------------------------------------------------------------
 # Generated from the result dataclasses, so the stub and `azoth.core.result`
@@ -3321,6 +3356,14 @@ class FilterResult:
     warnings: list[Warning]
 
 @final
+class FireCaseReliefResult:
+    latent_heat: float
+    relief_rate: Qty
+    relief_rate_kg_per_hr: Qty
+    relieving_temperature: Qty | None
+    warnings: list[Warning]
+
+@final
 class FireMonitorCoverageResult:
     total_flow: Qty
     swept_area: Qty
@@ -3715,6 +3758,14 @@ class Nog070SilDeterminationResult:
     warnings: list[Warning]
 
 @final
+class OverpressureAcceptanceResult:
+    accumulation_factor: float
+    allowable_pressure: Qty
+    margin: Qty
+    accepted: bool
+    warnings: list[Warning]
+
+@final
 class PackedColumnResult:
     tray_temperature: list[Qty]
     tray_pressure: list[Qty]
@@ -3785,6 +3836,17 @@ class PipeResult:
     warnings: list[Warning]
 
 @final
+class PipelinePressureProtectionResult:
+    max_incidental_pressure: Qty
+    design_margin: Qty
+    fully_rated: bool
+    barrier1_adequate: bool
+    barrier2_adequate: bool
+    protection_adequate: bool
+    verdict: str
+    warnings: list[Warning]
+
+@final
 class PlugFlowReactorResult:
     product_n: Qty
     product_z: list[float]
@@ -3818,6 +3880,37 @@ class PoolFireResult:
 class ProbitResult:
     probit: float | None
     probability: float
+    warnings: list[Warning]
+
+@final
+class PsvFireSizingResult:
+    overpressure_fraction: float
+    required_area: Qty
+    required_area_in2: float
+    recommended_orifice: str
+    selected_area_in2: float
+    back_pressure_fraction: float
+    discharge_coefficient: float
+    back_pressure_correction: float
+    combination_correction: float
+    blowdown_pressure: Qty | None
+    flow_coefficient: float | None
+    warnings: list[Warning]
+
+@final
+class PsvSizingResult:
+    relieving_pressure: Qty
+    back_pressure_fraction: float
+    discharge_coefficient: float
+    required_area: Qty
+    required_area_in2: float | None
+    recommended_orifice: str | None
+    selected_area_in2: float | None
+    back_pressure_correction: float | None
+    combination_correction: float | None
+    viscosity_correction: float | None
+    mass_flow_rate: Qty | None
+    mass_flow_capacity: Qty | None
     warnings: list[Warning]
 
 @final
@@ -3933,6 +4026,15 @@ class RateBasedPackedColumnResult:
     segment_percent_flood: list[float]
     segment_net_molar_transfer: list[Qty]
     segment_enthalpy_balance_residual: list[Qty]
+    warnings: list[Warning]
+
+@final
+class ReliefDisposalNetworkResult:
+    total_simultaneous: Qty
+    total_simultaneous_kg_hr: Qty
+    peak_single: Qty
+    governing_contributor: str | None
+    contributions: list[ReliefDisposalRow]
     warnings: list[Warning]
 
 @final
@@ -4244,6 +4346,15 @@ class ThrottlingValveResult:
     choked: bool
     gas_valve: bool
     calculated_molar_flow: Qty
+    warnings: list[Warning]
+
+@final
+class Tr3001ComplianceResult:
+    findings: list[Tr3001Finding]
+    pass_count: float
+    review_count: float
+    fail_count: float
+    compliant: bool
     warnings: list[Warning]
 
 @final
@@ -6875,6 +6986,15 @@ def filter(
     element_collapse_pressure: float | None = None,
     element_integrity_verified: bool | None = None,
 ) -> FilterResult: ...
+def fire_case_relief(
+    has_drainage: bool,
+    has_fire_fighting: bool,
+    wetted_area: float | None = None,
+    vessel_diameter: float | None = None,
+    wetted_height: float | None = None,
+    latent_heat: float | None = None,
+    relieving_temperature: float | None = None,
+) -> FireCaseReliefResult: ...
 def fire_monitor_coverage(
     target_area: float,
     required_density: float,
@@ -7186,6 +7306,12 @@ def nog070_sil_determination(
     pfd_average: float,
     minimum_sil: float | None = None,
 ) -> Nog070SilDeterminationResult: ...
+def overpressure_acceptance(
+    peak_pressure: float,
+    mawp: float,
+    cause: str,
+    multiple_devices: bool,
+) -> OverpressureAcceptanceResult: ...
 def packed_column(
     components: list[str],
     feed_n: float,
@@ -7261,6 +7387,13 @@ def pipe(
     number_of_increments: float | None = None,
     elevation: float | None = None,
 ) -> PipeResult: ...
+def pipeline_pressure_protection(
+    max_source_pressure: float,
+    design_pressure: float,
+    incidental_factor: float,
+    barrier1_setpoint: float,
+    barrier2_setpoint: float,
+) -> PipelinePressureProtectionResult: ...
 def plug_flow_reactor(
     components: list[str],
     feed_n: float,
@@ -7306,6 +7439,44 @@ def probit(
     dose: float | None = None,
     probit_value: float | None = None,
 ) -> ProbitResult: ...
+def psv_fire_sizing(
+    initial_mass: float,
+    initial_pressure: float,
+    set_pressure: float,
+    initial_temperature: float,
+    fire_heat_input: float,
+    vessel_volume: float,
+    molar_mass: float,
+    specific_heat_ratio: float,
+    compressibility: float,
+    heat_capacity: float,
+    blowdown_time: float,
+    blowdown_percent: float | None = None,
+    orifice_area: float | None = None,
+    cv_discharge_coefficient: float | None = None,
+) -> PsvFireSizingResult: ...
+def psv_sizing(
+    service: str,
+    set_pressure: float,
+    overpressure_fraction: float,
+    back_pressure: float,
+    mass_flow: float | None = None,
+    temperature: float | None = None,
+    molar_mass: float | None = None,
+    compressibility: float | None = None,
+    specific_heat_ratio: float | None = None,
+    is_balanced_bellows: bool | None = None,
+    has_rupture_disk: bool | None = None,
+    volume_flow: float | None = None,
+    liquid_density: float | None = None,
+    viscosity: float | None = None,
+    gas_fraction: float | None = None,
+    gas_density: float | None = None,
+    latent_heat: float | None = None,
+    liquid_heat_capacity: float | None = None,
+    orifice_area: float | None = None,
+    capacity_discharge_coefficient: float | None = None,
+) -> PsvSizingResult: ...
 def pump(
     components: list[str],
     inlet_n: float,
@@ -7359,6 +7530,9 @@ def rate_based_packed_column(
     segment_solver: str | None = None,
     column_solver: str | None = None,
 ) -> RateBasedPackedColumnResult: ...
+def relief_disposal_network(
+    contributions: list[ReliefContribution],
+) -> ReliefDisposalNetworkResult: ...
 def risk_matrix(
     equipment: list[RiskEquipment],
     product_price_per_kg: float | None = None,
@@ -7619,6 +7793,13 @@ def throttling_valve(
     is_isothermal: bool | None = None,
     sizing_standard: str | None = None,
 ) -> ThrottlingValveResult: ...
+def tr3001_compliance(
+    scenarios: list[Tr3001Scenario],
+    capacity_adequate: bool,
+    required_area_in2: float | None = None,
+    acceptance_accepted: bool | None = None,
+    accumulation_fraction: float | None = None,
+) -> Tr3001ComplianceResult: ...
 def turbo_expander_compressor(
     expander_components: list[str],
     compressor_components: list[str],

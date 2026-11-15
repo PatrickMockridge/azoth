@@ -475,6 +475,21 @@ pub struct ReferenceRow {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct ReliefContribution {
+    #[pyo3(item)]
+    pub item_name: String,
+    #[pyo3(item)]
+    pub cause: String,
+    #[pyo3(item)]
+    pub phase: String,
+    #[pyo3(item)]
+    pub mass_flow: f64,
+    #[pyo3(item)]
+    pub simultaneous: bool,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct RiskEquipment {
     #[pyo3(item)]
     pub name: String,
@@ -518,6 +533,19 @@ pub struct SourceRow {
     pub density: Option<f64>,
     #[pyo3(item)]
     pub boiling_point: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct Tr3001Scenario {
+    #[pyo3(item)]
+    pub cause: String,
+    #[pyo3(item)]
+    pub relief_rate: f64,
+    #[pyo3(item)]
+    pub dynamically_determined: bool,
+    #[pyo3(item)]
+    pub credible: bool,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

@@ -2271,3 +2271,123 @@ the consequence from `ProductionImpactAnalyzer`; the port takes the production l
 input, as `process.consequence_analysis` takes the streams' results. A negative or NaN
 frequency answers `VERY_HIGH` and a loss outside `[0, 100]` answers `CATASTROPHIC`, neither
 refused; the port refuses both.
+
+## The PSV sizing
+
+`process_psv_sizing.tsv` is `ReliefValveSizing`'s gas, liquid and two-phase required areas,
+the API 520 orifice ladder, the Kb / Kw / Kv / Kp branches and the class's capacity helper,
+over the choked and subcritical gas states, the balanced-bellows and conventional back
+pressure branches, a rupture disk, an exhausted ladder, a low- and high-viscosity liquid,
+a low-overpressure liquid, a back pressure above the relieving pressure and the inputs the
+class does not guard.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe psv_sizing \
+  > captures/process_psv_sizing.tsv
+```
+
+**The capacity helper is not the sizing inverse.** `calculateMassFlowCapacity` uses
+`R_GAS = 8314.0` with a molar mass the javadoc calls kg/mol, while `calculateRequiredArea`
+converts kg/mol to g/mol by ×1000: the round trip on the H orifice (`ps_gas_capacity_roundtrip`)
+answers 0.0342 kg/s for a 1.0 kg/s sizing, √1000 low. **The two-phase method selects no
+orifice**, and a back pressure above the relieving pressure answers zero area. A liquid back
+pressure above the relieving pressure silently sets `dp = 1.0` psi and still sizes. `k = 1`
+and a zero liquid density are accepted by the class and are evidence rows; the port refuses
+both.
+
+## The dynamic fire sizing
+
+`process_psv_fire_sizing.tsv` is `ReliefValveSizing.dynamicFireSizing`'s 21 % overpressure
+area, the class's peak-versus-average design flow, the blowdown pressure, the Cv relation
+and the next-orifice lookup over a peak-dominated and an average-dominated state, the helper
+states and two rows identical except `initialPressure` and `vesselVolume`.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe psv_fire_sizing \
+  > captures/process_psv_fire_sizing.tsv
+```
+
+**`initialPressure` and `vesselVolume` are read by no formula** (`pf_unused_inputs_a` and
+`pf_unused_inputs_b` are identical), and the computed `relievingPressure` is unused too.
+A zero blowdown time is accepted: the average flow is infinite and the selected orifice is
+still T / 26.0 in². The 50 K superheat is the class's constant.
+
+## The fire case relief
+
+`process_fire_case_relief.tsv` is `FireCaseRelief`'s API 521 Table 4 heat input and
+`Q / latent` rate on a supplied area with and without drainage, a geometry-derived area,
+no area, the default and a negative latent heat, and the firefighting flag.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe fire_case_relief \
+  > captures/process_fire_case_relief.tsv
+```
+
+**`hasFireFighting` is read by no formula** — the environment factor is 1.0 on both
+branches, so only drainage selects 21000 or 34500 BTU/hr·ft² (`fc_area_drainage` and
+`fc_firefighting_unread` are identical). A negative latent heat is silently replaced by
+350000 J/kg (`fc_negative_latent`); the port treats absence as the default and refuses a
+negative value. The fluid-enriched property path is the thermo seam and is not captured.
+
+## The overpressure acceptance
+
+`process_overpressure_acceptance.tsv` is `OverpressureAcceptanceChecker`'s accumulation
+factor, allowable pressure, margin and verdict over the fire, single non-fire, multiple
+non-fire, equality and exceeded states.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe overpressure_acceptance \
+  > captures/process_overpressure_acceptance.tsv
+```
+
+**Fire ignores `multipleDevices`** and takes 1.21, while non-fire takes 1.10 for one device
+and 1.16 for several. Acceptance is `peak <= allowable`, so the equality row is accepted.
+
+## The pipeline pressure protection
+
+`process_pipeline_pressure_protection.tsv` is `PipelinePressureProtectionCalculator`'s
+maximum incidental pressure, design margin, the three booleans and the three-verdict
+screening.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe pipeline_pressure_protection \
+  > captures/process_pipeline_pressure_protection.tsv
+```
+
+The verdict is fully-rated first, then the two barriers, else insufficient; a source at the
+design pressure is fully rated and a barrier at its limit is adequate.
+
+## The relief disposal network
+
+`process_relief_disposal_network.tsv` is `ReliefDisposalNetwork`'s simultaneous sum, peak
+single contribution, governing contributor and the per-row kg/hr echoes over all-simultaneous,
+mixed, tied, all-zero and empty networks and a negative rate.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe relief_disposal_network \
+  > captures/process_relief_disposal_network.tsv
+```
+
+**The peak is over every contribution, simultaneous or not**, and a strict `>` makes the
+first row win a tie. An empty network is a defined state (zeros and no governing
+contributor); a negative rate is accepted and subtracted from the total. The port refuses
+the negative rate.
+
+## The TR3001 compliance
+
+`process_tr3001_compliance.tsv` is `TR3001ComplianceChecker`'s six checks in order over a
+fully compliant study, no credible scenario, an unsized governing case, a capacity failure,
+an acceptance failure, the fire-basis review, a non-fire cause, a null acceptance and an
+empty scenario list.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe tr3001_compliance \
+  > captures/process_tr3001_compliance.tsv
+```
+
+**The capacity check is skipped only when no governing case exists**, the acceptance check
+only when acceptance is null, the fire-basis check only for FIRE and the dynamic check only
+for FIRE or blocked outlet. `isCompliant` ignores needs-review. The fire-basis needs-review
+branch is reachable only through a directly constructed acceptance (the class's study
+emits 1.10 / 1.16 / 1.21, all at or above 0.20), and the INFO status is never emitted. The
+requirement ids, titles and details are prose and are not carried.

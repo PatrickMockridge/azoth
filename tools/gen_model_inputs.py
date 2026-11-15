@@ -441,6 +441,11 @@ NON_UNIT_MODELS = {
     "process.risk_matrix": "the risk matrix over equipment rows, not a unit",
     "process.hem_release": "a release source term is a calculation over a fluid, not a unit",
     "process.pfp_demand": "the PFP demand screen over scalars, not a unit",
+    "process.fire_case_relief": "the fire-case relief load over scalars, not a unit",
+    "process.overpressure_acceptance": "the accumulated-pressure gate over scalars, not a unit",
+    "process.pipeline_pressure_protection": "the two-barrier pipeline screen, not a unit",
+    "process.relief_disposal_network": "the disposal-load summation over rows, not a unit",
+    "process.tr3001_compliance": "the TR3001 rule engine over rows, not a unit",
     "process.fire_water_demand": "the fire-water demand screen over scalars and rows, not a unit",
     "process.deluge_nozzle_layout": "the deluge nozzle layout screen over scalars, not a unit",
     "process.fire_monitor_coverage": "the fire-monitor coverage screen over scalars, not a unit",
@@ -456,6 +461,8 @@ NON_UNIT_MODELS = {
     "process.jet_fire": "the jet-fire radiation over scalars, not a unit",
     "process.pool_fire": "the pool-fire radiation over scalars, not a unit",
     "process.probit": "a dose-response over scalars, not a unit",
+    "process.psv_fire_sizing": "the API 521 fire-case sizing over scalars, not a unit",
+    "process.psv_sizing": "the API 520 relief-orifice arithmetic over scalars, not a unit",
     "process.vce": "the explosion overpressure over scalars, not a unit",
 }
 

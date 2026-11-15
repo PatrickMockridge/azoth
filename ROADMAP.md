@@ -918,12 +918,33 @@ a claim nothing holds.
   `DynamicRiskSimulator`, `PortfolioRiskAnalyzer`, `RealTimeRiskMonitor`,
   `PhysicsBasedRiskMonitor`, `ConditionBasedReliability`, `OREDADataImporter`, `RiskMLInterface`
   and `BowTieAnalyzer.autoGenerateFromProcess`; `BowTieSvgExporter` is presentation. The safety
-  tree still carries **229 further classes** across `barrier/`, `alarp/`, `hazid/`, `inherent/`,
+  tree still carries **224 further classes** across `barrier/`, `alarp/`, `hazid/`, `inherent/`,
   `escalation/`, `selfheating/`, `vibration/`, `compliance/`, `processsafetysystem/`,
   `overpressure/`, `rupture/`, `depressurization/`, `release/`, `esd/`, `sif/`, `api14c/`,
   `opendrain/`, `blowby/`, `vacuum/`, `settleout/`, `pump/`, `reaction/`, `inventory/`,
   `mdmt/`, `leakdetection/`, `cfd/`, `envelope/`, `scenario/` and `dto/`, plus the risk
-  subpackages — none ported, each with its class.
+  subpackages — the five overpressure calculators below are the exception; the rest are not
+  ported, each with its class.
+- **The relief and overpressure arithmetic** — seven ids. **`process.psv_sizing` is
+  `ReliefValveSizing`'s three area methods and the API 520 D to T ladder**: gas with the
+  conventional/balanced-bellows `Kb` and the rupture-disk `Kc`, liquid with `Kw`, the
+  Reynolds `Kv` and `Kp`, and three-phase omega; the capacity helper is published and is
+  **not** the sizing inverse — `R = 8314` against a molar mass the javadoc calls kg/mol
+  makes a round trip sqrt(1000) low, measured at 0.0342 kg/s for a 1.0 kg/s sizing.
+  **`process.psv_fire_sizing` is `dynamicFireSizing`**: the `max(peak, average)` design
+  flow, the one-minute heat-up, the 21 % overpressure, the blowdown pressure and the Cv
+  helper; `initialPressure` and `vesselVolume` are read by no formula.
+  **`process.fire_case_relief` is `FireCaseRelief`'s no-fluid path**: the `pi D h` fallback,
+  Table 4's 21000/34500 heat input, the 350 kJ/kg latent default, and a `hasFireFighting`
+  that is read by nothing. **`process.overpressure_acceptance`** carries the 1.10/1.16/1.21
+  factors and accepts on the equality. **`process.pipeline_pressure_protection`** is the
+  fully-rated / two-barrier / insufficient verdict. **`process.relief_disposal_network`**
+  sums the simultaneous loads and names the first peak. **`process.tr3001_compliance`** runs
+  the six checks, with a fire-basis needs-review that the class's own study cannot reach.
+  The thermo-bound relief loads (`BlockedOutletRelief`, `ControlValveFailureRelief`,
+  `CheckValveLeakRelief`, `TubeRuptureRelief`, `ReliefFluidState`), the package-private
+  `NozzleFlow`, `OverpressureProtectionStudy` and `ReliefSizingCalculation`'s explicit-SI
+  kernel remain owed.
 - **The reactions family's**: the **ionic branch** of `reactions.reactive_tp_flash` and
   `reactions.reactive_ph_flash`, which is why a charged substance is refused at all;
   `reactions.reactive_ph_flash`'s **entropy-specified variant** and its `NR = 0` delegation to
