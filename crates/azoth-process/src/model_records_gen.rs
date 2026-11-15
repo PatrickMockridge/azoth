@@ -832,6 +832,22 @@ impl CalcResult for GibbsReactorResult {
     }
 }
 
+impl CalcResult for HazardousAreaResult {
+    const CALC_ID: &'static str = "process.hazardous_area";
+    const FIELDS: &'static [&'static str] = &[
+        "effective_diameter",
+        "lfl_mass_fraction",
+        "hazardous_distance",
+        "release_grade",
+        "zone_classification",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for HeatExchangerResult {
     const CALC_ID: &'static str = "process.heat_exchanger";
     const FIELDS: &'static [&'static str] = &[
@@ -965,22 +981,6 @@ impl CalcResult for HeaterResult {
         "used_overall_heat_transfer_coefficient",
         "calculated_ua",
         "mechanical_types",
-        "warnings",
-    ];
-
-    fn warnings(&self) -> &[Warning] {
-        &self.warnings
-    }
-}
-
-impl CalcResult for HazardousAreaResult {
-    const CALC_ID: &'static str = "process.hazardous_area";
-    const FIELDS: &'static [&'static str] = &[
-        "effective_diameter",
-        "lfl_mass_fraction",
-        "hazardous_distance",
-        "release_grade",
-        "zone_classification",
         "warnings",
     ];
 

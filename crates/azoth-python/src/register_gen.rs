@@ -266,8 +266,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyGasScrubberResult>()?;
     m.add_class::<crate::transport_gen::PyGaussianPlumeResult>()?;
     m.add_class::<crate::transport_gen::PyGibbsReactorResult>()?;
+    m.add_class::<crate::transport_gen::PyHazardousAreaResult>()?;
     m.add_class::<crate::transport_gen::PyHeatExchangerResult>()?;
     m.add_class::<crate::transport_gen::PyHeaterResult>()?;
+    m.add_class::<crate::transport_gen::PyHeavyGasDispersionResult>()?;
     m.add_class::<crate::transport_gen::PyHemReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyJetFireResult>()?;
     m.add_class::<crate::transport_gen::PyLeakBlowdownResult>()?;
@@ -302,6 +304,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyTankResult>()?;
     m.add_class::<crate::transport_gen::PyThreePhaseSeparatorResult>()?;
     m.add_class::<crate::transport_gen::PyThrottlingValveResult>()?;
+    m.add_class::<crate::transport_gen::PyToxicLibraryResult>()?;
     m.add_class::<crate::transport_gen::PyTr3001ComplianceResult>()?;
     m.add_class::<crate::transport_gen::PyTurboExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyVceResult>()?;
@@ -955,8 +958,13 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_scrubber, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gaussian_plume, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gibbs_reactor, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::hazardous_area, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::heat_exchanger, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::heater, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::heavy_gas_dispersion,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::hem_release, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::jet_fire, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::leak_blowdown, m)?)?;
@@ -1021,6 +1029,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::throttling_valve, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::toxic_library, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::tr3001_compliance, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::process::turbo_expander_compressor,

@@ -41,9 +41,17 @@ fn area(
 fn the_documentation_state_reproduces() {
     let result = area(0.1, 6.0, 340.0, 0.044, 0.01604, None, None, None)
         .expect("the capture state is valid");
-    close(result.effective_diameter.value, 0.007_900_234_374_579_8, "d_e");
+    close(
+        result.effective_diameter.value,
+        0.007_900_234_374_579_8,
+        "d_e",
+    );
     close(result.lfl_mass_fraction, 0.024_854_779_008_840_32, "Y_LFL");
-    close(result.hazardous_distance.value, 7.597_337_258_328_827, "the distance");
+    close(
+        result.hazardous_distance.value,
+        7.597_337_258_328_827,
+        "the distance",
+    );
     assert_eq!(result.release_grade, "SECONDARY");
     assert_eq!(result.zone_classification, "Zone 2");
 }
@@ -52,19 +60,35 @@ fn the_documentation_state_reproduces() {
 fn the_safety_factor_and_ambient_density_overrides() {
     let tighter = area(0.1, 6.0, 340.0, 0.044, 0.01604, None, Some(0.25), None)
         .expect("the capture state is valid");
-    close(tighter.hazardous_distance.value, 15.194_674_516_657_654, "k = 0.25");
+    close(
+        tighter.hazardous_distance.value,
+        15.194_674_516_657_654,
+        "k = 0.25",
+    );
 
     let ambient = area(0.1, 6.0, 340.0, 0.044, 0.01604, Some(1.0), None, None)
         .expect("the capture state is valid");
-    close(ambient.hazardous_distance.value, 8.408_711_461_072_347, "rho_a = 1.0");
+    close(
+        ambient.hazardous_distance.value,
+        8.408_711_461_072_347,
+        "rho_a = 1.0",
+    );
 }
 
 #[test]
 fn a_tenfold_flow_scales_the_diameter_and_the_distance() {
     let result = area(1.0, 6.0, 340.0, 0.044, 0.01604, None, None, None)
         .expect("the capture state is valid");
-    close(result.effective_diameter.value, 0.024_982_734_672_828_01, "d_e");
-    close(result.hazardous_distance.value, 24.024_889_888_778_134, "the distance");
+    close(
+        result.effective_diameter.value,
+        0.024_982_734_672_828_01,
+        "d_e",
+    );
+    close(
+        result.hazardous_distance.value,
+        24.024_889_888_778_134,
+        "the distance",
+    );
 }
 
 #[test]
@@ -73,10 +97,23 @@ fn the_grade_maps_to_the_class_zone() {
         .expect("a primary grade is valid");
     assert_eq!(primary.release_grade, "PRIMARY");
     assert_eq!(primary.zone_classification, "Zone 1");
-    close(primary.hazardous_distance.value, 7.597_337_258_328_827, "the unchanged distance");
+    close(
+        primary.hazardous_distance.value,
+        7.597_337_258_328_827,
+        "the unchanged distance",
+    );
 
-    let continuous = area(0.1, 6.0, 340.0, 0.044, 0.01604, None, None, Some("continuous"))
-        .expect("a continuous grade is valid");
+    let continuous = area(
+        0.1,
+        6.0,
+        340.0,
+        0.044,
+        0.01604,
+        None,
+        None,
+        Some("continuous"),
+    )
+    .expect("a continuous grade is valid");
     assert_eq!(continuous.release_grade, "CONTINUOUS");
     assert_eq!(continuous.zone_classification, "Zone 0");
 }

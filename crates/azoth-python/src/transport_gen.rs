@@ -17875,6 +17875,68 @@ impl From<&azoth_process::models::gibbs_reactor::GibbsReactorResult> for PyGibbs
         }
     }
 }
+/// Result of `process.hazardous_area`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "HazardousAreaResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyHazardousAreaResult {
+    /// `d_e = sqrt(4 mdot / (pi rho_e U_e))`, the notional source diameter.
+    #[pyo3(get)]
+    pub effective_diameter: PyQty,
+    /// `Y_LFL = y M / (y M + (1 - y) M_air)`, the class's ideal mole-to-mass conversion.
+    #[pyo3(get)]
+    pub lfl_mass_fraction: f64,
+    /// `5.4 sqrt(rho_e/rho_a) d_e / (k Y_LFL)`, the distance to the de-rated LFL.
+    #[pyo3(get)]
+    pub hazardous_distance: PyQty,
+    /// the class's label: `CONTINUOUS`, `PRIMARY` or `SECONDARY`.
+    #[pyo3(get)]
+    pub release_grade: String,
+    /// the class's zone label: `Zone 0`, `Zone 1` or `Zone 2`.
+    #[pyo3(get)]
+    pub zone_classification: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyHazardousAreaResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "HazardousAreaResult(effective_diameter={:?}, lfl_mass_fraction={:?}, hazardous_distance={:?}, release_grade={:?}, zone_classification={:?}, {} warning(s))",
+            self.effective_diameter,
+            self.lfl_mass_fraction,
+            self.hazardous_distance,
+            self.release_grade,
+            self.zone_classification,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::hazardous_area::HazardousAreaResult> for PyHazardousAreaResult {
+    fn from(r: &azoth_process::models::hazardous_area::HazardousAreaResult) -> Self {
+        Self {
+            effective_diameter: PyQty {
+                magnitude_si: r.effective_diameter.value,
+                unit: "m".to_string(),
+            },
+            lfl_mass_fraction: r.lfl_mass_fraction,
+            hazardous_distance: PyQty {
+                magnitude_si: r.hazardous_distance.value,
+                unit: "m".to_string(),
+            },
+            release_grade: r.release_grade.clone(),
+            zone_classification: r.zone_classification.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.heat_exchanger`, transported.
 #[pyclass(
     frozen,
@@ -18694,6 +18756,57 @@ impl From<&azoth_process::models::heater::HeaterResult> for PyHeaterResult {
                 .iter()
                 .map(PyHeaterMechanicalType::from)
                 .collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.heavy_gas_dispersion`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "HeavyGasDispersionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyHeavyGasDispersionResult {
+    /// `g0 = 9.81 (rho_s - rho_a) / rho_a`, signed; its value is in m/s2.
+    #[pyo3(get)]
+    pub reduced_gravity: f64,
+    /// `alpha = (|g0|^2 q / U^5)^0.2`, published unfloored.
+    #[pyo3(get)]
+    pub britter_parameter: f64,
+    /// the downwind distance at which the centerline falls to the stated ratio; absent without a ratio.
+    #[pyo3(get)]
+    pub distance_to_concentration_ratio: Option<PyQty>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyHeavyGasDispersionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "HeavyGasDispersionResult(reduced_gravity={:?}, britter_parameter={:?}, distance_to_concentration_ratio={:?}, {} warning(s))",
+            self.reduced_gravity,
+            self.britter_parameter,
+            self.distance_to_concentration_ratio,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::heavy_gas_dispersion::HeavyGasDispersionResult>
+    for PyHeavyGasDispersionResult
+{
+    fn from(r: &azoth_process::models::heavy_gas_dispersion::HeavyGasDispersionResult) -> Self {
+        Self {
+            reduced_gravity: r.reduced_gravity,
+            britter_parameter: r.britter_parameter,
+            distance_to_concentration_ratio: r.distance_to_concentration_ratio.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m".to_string(),
+            }),
             warnings: transport(&r.warnings),
         }
     }
@@ -23775,6 +23888,70 @@ impl From<&azoth_process::models::throttling_valve::ThrottlingValveResult>
                 magnitude_si: r.calculated_molar_flow,
                 unit: "mol/s".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.toxic_library`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ToxicLibraryResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyToxicLibraryResult {
+    /// whether the chemical is in the table; present iff a chemical is stated.
+    #[pyo3(get)]
+    pub known: Option<bool>,
+    /// the table's display name for the chemical; present iff it is known.
+    #[pyo3(get)]
+    pub name: Option<String>,
+    /// the NIOSH IDLH in ppm; present iff the chemical is known.
+    #[pyo3(get)]
+    pub idlh_ppm: Option<f64>,
+    /// the AIHA ERPG-2 in ppm; present iff the chemical is known.
+    #[pyo3(get)]
+    pub erpg2_ppm: Option<f64>,
+    /// the EPA AEGL-2 (60 min) in ppm; present iff the chemical is known.
+    #[pyo3(get)]
+    pub aegl2_ppm: Option<f64>,
+    /// the converted concentration; present iff the conversion group is stated.
+    #[pyo3(get)]
+    pub mass_concentration: Option<PyQty>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyToxicLibraryResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "ToxicLibraryResult(known={:?}, name={:?}, idlh_ppm={:?}, erpg2_ppm={:?}, aegl2_ppm={:?}, mass_concentration={:?}, {} warning(s))",
+            self.known,
+            self.name,
+            self.idlh_ppm,
+            self.erpg2_ppm,
+            self.aegl2_ppm,
+            self.mass_concentration,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::toxic_library::ToxicLibraryResult> for PyToxicLibraryResult {
+    fn from(r: &azoth_process::models::toxic_library::ToxicLibraryResult) -> Self {
+        Self {
+            known: r.known,
+            name: r.name.clone(),
+            idlh_ppm: r.idlh_ppm,
+            erpg2_ppm: r.erpg2_ppm,
+            aegl2_ppm: r.aegl2_ppm,
+            mass_concentration: r.mass_concentration.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/m**3".to_string(),
+            }),
             warnings: transport(&r.warnings),
         }
     }

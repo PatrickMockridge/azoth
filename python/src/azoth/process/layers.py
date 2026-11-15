@@ -1265,9 +1265,7 @@ def _hazardous_area(inputs: Mapping[str, Any]) -> dict[str, float]:
     return {
         "effective_diameter_m": diameter,
         "lfl_mass_fraction": lfl_mass,
-        "hazardous_distance_m": _hazardous_distance(
-            density, ambient, diameter, factor, lfl_mass
-        ),
+        "hazardous_distance_m": _hazardous_distance(density, ambient, diameter, factor, lfl_mass),
     }
 
 
@@ -3083,56 +3081,56 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         case="threshold_h2s",
         capture="process_toxic_library.tsv",
         block=0,
-        identified_by=("#label", "threshold_h2s"),
+        identified_by=("#label", "threshold_H2S"),
     ),
     LayerCase(
         model="process.toxic_library",
         case="threshold_co",
         capture="process_toxic_library.tsv",
         block=2,
-        identified_by=("#label", "threshold_co"),
+        identified_by=("#label", "threshold_CO"),
     ),
     LayerCase(
         model="process.toxic_library",
         case="threshold_cl2",
         capture="process_toxic_library.tsv",
         block=4,
-        identified_by=("#label", "threshold_cl2"),
+        identified_by=("#label", "threshold_Cl2"),
     ),
     LayerCase(
         model="process.toxic_library",
         case="threshold_nh3",
         capture="process_toxic_library.tsv",
         block=6,
-        identified_by=("#label", "threshold_nh3"),
+        identified_by=("#label", "threshold_NH3"),
     ),
     LayerCase(
         model="process.toxic_library",
         case="threshold_so2",
         capture="process_toxic_library.tsv",
         block=8,
-        identified_by=("#label", "threshold_so2"),
+        identified_by=("#label", "threshold_SO2"),
     ),
     LayerCase(
         model="process.toxic_library",
         case="threshold_hcn",
         capture="process_toxic_library.tsv",
         block=10,
-        identified_by=("#label", "threshold_hcn"),
+        identified_by=("#label", "threshold_HCN"),
     ),
     LayerCase(
         model="process.toxic_library",
         case="threshold_hf",
         capture="process_toxic_library.tsv",
         block=11,
-        identified_by=("#label", "threshold_hf"),
+        identified_by=("#label", "threshold_HF"),
     ),
     LayerCase(
         model="process.toxic_library",
         case="threshold_hcl",
         capture="process_toxic_library.tsv",
         block=12,
-        identified_by=("#label", "threshold_hcl"),
+        identified_by=("#label", "threshold_HCl"),
     ),
     LayerCase(
         model="process.toxic_library",
@@ -3153,14 +3151,14 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         case="h2s_100ppm_288k",
         capture="process_toxic_library.tsv",
         block=30,
-        identified_by=("#label", "h2s_100ppm_288k"),
+        identified_by=("#label", "h2s_100ppm_288K"),
     ),
     LayerCase(
         model="process.toxic_library",
         case="h2s_100ppm_1bar_300k",
         capture="process_toxic_library.tsv",
         block=31,
-        identified_by=("#label", "h2s_100ppm_1bar_300k"),
+        identified_by=("#label", "h2s_100ppm_1bar_300K"),
     ),
     # The hazardous area's six: the documentation state, the safety-factor and ambient
     # overrides, a tenfold flow and both other grades; the nine guards are uncased.

@@ -4,9 +4,7 @@
 use azoth_core::units::{
     VolumeRate, cubic_meter_per_second, kilograms_per_cubic_meter, meters_per_second,
 };
-use azoth_process::models::heavy_gas_dispersion::{
-    HeavyGasDispersionResult, heavy_gas_dispersion,
-};
+use azoth_process::models::heavy_gas_dispersion::{HeavyGasDispersionResult, heavy_gas_dispersion};
 
 fn close(actual: f64, expected: f64, what: &str) {
     let error = (actual - expected).abs() / expected.abs().max(f64::MIN_POSITIVE);
@@ -44,8 +42,16 @@ fn the_methane_rows_are_the_analyzers_dense_arm() {
         Some(0.044),
     )
     .expect("the capture state is valid");
-    close(lfl.reduced_gravity, -4.364_033_533_659_363, "the reduced gravity");
-    close(lfl.britter_parameter, 0.389_471_738_142_793_9, "the Britter parameter");
+    close(
+        lfl.reduced_gravity,
+        -4.364_033_533_659_363,
+        "the reduced gravity",
+    );
+    close(
+        lfl.britter_parameter,
+        0.389_471_738_142_793_9,
+        "the Britter parameter",
+    );
     close(
         lfl.distance_to_concentration_ratio
             .expect("a ratio is stated")
@@ -105,7 +111,11 @@ fn equal_density_publishes_zero_and_the_floor_carries_the_distance() {
 #[test]
 fn a_buoyant_source_is_accepted() {
     let result = dense(1.0, 0.5, 1.225, 5.0, Some(0.1)).expect("a light source is valid");
-    close(result.reduced_gravity, -5.805_918_367_346_94, "the negative g0");
+    close(
+        result.reduced_gravity,
+        -5.805_918_367_346_94,
+        "the negative g0",
+    );
     close(
         result.britter_parameter,
         0.404_183_300_320_682_84,
@@ -123,8 +133,8 @@ fn a_buoyant_source_is_accepted() {
 
 #[test]
 fn the_distance_is_absent_without_a_ratio() {
-    let result = dense(1.0, 1.0, 1.225, 5.0, None)
-        .expect("the parameters without a ratio are a state");
+    let result =
+        dense(1.0, 1.0, 1.225, 5.0, None).expect("the parameters without a ratio are a state");
     close(result.reduced_gravity, -1.801_836_734_693_878_2, "g0");
     close(result.britter_parameter, 0.253_114_001_909_182_2, "alpha");
     assert!(result.distance_to_concentration_ratio.is_none());

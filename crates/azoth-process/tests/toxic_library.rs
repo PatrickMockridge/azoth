@@ -1,7 +1,7 @@
 //! `process.toxic_library` against
 //! `validation/neqsim/captures/process_toxic_library.tsv`.
 
-use azoth_core::units::{kilograms_per_mole, kelvins, pascals};
+use azoth_core::units::{kelvins, kilograms_per_mole, pascals};
 use azoth_process::models::toxic_library::{ToxicLibraryResult, toxic_library};
 
 fn close(actual: f64, expected: f64, what: &str) {
@@ -16,7 +16,12 @@ fn row(chemical: &str) -> ToxicLibraryResult {
     toxic_library(Some(chemical), None, None, None, None).expect("a threshold lookup is a state")
 }
 
-fn convert(ppm: f64, molar: f64, temperature: f64, pressure: f64) -> ToxicLibraryResult {
+fn convert_raw(
+    ppm: f64,
+    molar: f64,
+    temperature: f64,
+    pressure: f64,
+) -> azoth_core::Result<ToxicLibraryResult> {
     toxic_library(
         None,
         Some(ppm),
@@ -24,7 +29,10 @@ fn convert(ppm: f64, molar: f64, temperature: f64, pressure: f64) -> ToxicLibrar
         Some(kelvins(temperature)),
         Some(pascals(pressure)),
     )
-    .expect("a complete conversion group is a state")
+}
+
+fn convert(ppm: f64, molar: f64, temperature: f64, pressure: f64) -> ToxicLibraryResult {
+    convert_raw(ppm, molar, temperature, pressure).expect("a complete conversion group is a state")
 }
 
 #[test]
@@ -53,11 +61,20 @@ fn the_ten_rows_are_the_class_table() {
 
 #[test]
 fn the_aliases_and_the_lowercase_names_resolve() {
-    assert_eq!(row("hydrogen sulfide").name.as_deref(), Some("Hydrogen sulfide"));
-    assert_eq!(row("carbon monoxide").name.as_deref(), Some("Carbon monoxide"));
+    assert_eq!(
+        row("hydrogen sulfide").name.as_deref(),
+        Some("Hydrogen sulfide")
+    );
+    assert_eq!(
+        row("carbon monoxide").name.as_deref(),
+        Some("Carbon monoxide")
+    );
     assert_eq!(row("chlorine").name.as_deref(), Some("Chlorine"));
     assert_eq!(row("ammonia").name.as_deref(), Some("Ammonia"));
-    assert_eq!(row("sulfur dioxide").name.as_deref(), Some("Sulfur dioxide"));
+    assert_eq!(
+        row("sulfur dioxide").name.as_deref(),
+        Some("Sulfur dioxide")
+    );
     // The two lowercase names are case-insensitive because their keys are lowercase.
     assert_eq!(row("METHANOL").name.as_deref(), Some("Methanol"));
     assert_eq!(row("Benzene").name.as_deref(), Some("Benzene"));
@@ -66,7 +83,9 @@ fn the_aliases_and_the_lowercase_names_resolve() {
 #[test]
 fn the_measured_case_sensitivity_is_reproduced() {
     // The javadoc says case-insensitive; the code is exact-case for the formula keys.
-    for chemical in ["h2s", "H2s", "co", "cl2", "nh3", "so2", "hcn", "Hcn", "hf", "hcl"] {
+    for chemical in [
+        "h2s", "H2s", "co", "cl2", "nh3", "so2", "hcn", "Hcn", "hf", "hcl",
+    ] {
         assert_eq!(row(chemical).known, Some(false), "{chemical} must miss");
         assert!(row(chemical).name.is_none(), "{chemical} has no name");
     }
@@ -115,9 +134,9 @@ fn the_guards_are_refusals() {
         .is_err(),
         "a conversion group without a pressure is refused"
     );
-    assert!(convert(-100.0, 0.0340819, 288.15, 101_325.0).is_err());
-    assert!(convert(100.0, 0.0340819, 0.0, 101_325.0).is_err());
-    assert!(convert(100.0, 0.0340819, 288.15, 0.0).is_err());
-    assert!(convert(100.0, 0.0, 288.15, 101_325.0).is_err());
-    assert!(convert(f64::NAN, 0.0340819, 288.15, 101_325.0).is_err());
+    assert!(convert_raw(-100.0, 0.0340819, 288.15, 101_325.0).is_err());
+    assert!(convert_raw(100.0, 0.0340819, 0.0, 101_325.0).is_err());
+    assert!(convert_raw(100.0, 0.0340819, 288.15, 0.0).is_err());
+    assert!(convert_raw(100.0, 0.0, 288.15, 101_325.0).is_err());
+    assert!(convert_raw(f64::NAN, 0.0340819, 288.15, 101_325.0).is_err());
 }

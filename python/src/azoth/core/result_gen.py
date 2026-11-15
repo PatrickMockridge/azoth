@@ -7078,50 +7078,6 @@ class GaussianPlumeResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
-class HazardousAreaResult(_HasWarnings):
-    """Result of ``process.hazardous_area``."""
-
-    CALC_ID: ClassVar[str] = "process.hazardous_area"
-
-    #: `d_e = sqrt(4 mdot / (pi rho_e U_e))`, the notional source diameter.
-    effective_diameter: Q
-
-    #: the class's ideal mole-to-mass LFL.
-    lfl_mass_fraction: float
-
-    #: `5.4 sqrt(rho_e/rho_a) d_e / (k Y_LFL)`, the distance to the de-rated LFL.
-    hazardous_distance: Q
-
-    #: the class's grade label.
-    release_grade: str
-
-    #: the class's zone label.
-    zone_classification: str
-
-    #: Caveats.
-    warnings: tuple[Warning, ...]
-
-
-@dataclass(frozen=True, slots=True, eq=False)
-class HeavyGasDispersionResult(_HasWarnings):
-    """Result of ``process.heavy_gas_dispersion``."""
-
-    CALC_ID: ClassVar[str] = "process.heavy_gas_dispersion"
-
-    #: `g0 = 9.81 (rho_s - rho_a) / rho_a`, signed; the value is in m/s2.
-    reduced_gravity: float
-
-    #: `alpha = (|g0|^2 q / U^5)^0.2`, unfloored.
-    britter_parameter: float
-
-    #: the downwind distance at which the centerline falls to the stated ratio; absent without a ratio.
-    distance_to_concentration_ratio: Q | None
-
-    #: Caveats.
-    warnings: tuple[Warning, ...]
-
-
-@dataclass(frozen=True, slots=True, eq=False)
 class GibbsReactorResult(_HasWarnings):
     """Result of ``process.gibbs_reactor``."""
 
@@ -7201,6 +7157,31 @@ class GibbsReactorResult(_HasWarnings):
 
     #: `getConditionNumberHistory()`: the Jacobian's 2-norm condition number, recorded at `:3009-3026` before the update. **A diagnostic, not an answer** - it is what says the iteration is ill-conditioned rather than only saying so in prose.
     condition_number_history: tuple[float, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class HazardousAreaResult(_HasWarnings):
+    """Result of ``process.hazardous_area``."""
+
+    CALC_ID: ClassVar[str] = "process.hazardous_area"
+
+    #: `d_e = sqrt(4 mdot / (pi rho_e U_e))`, the notional source diameter.
+    effective_diameter: Q
+
+    #: `Y_LFL = y M / (y M + (1 - y) M_air)`, the class's ideal mole-to-mass conversion.
+    lfl_mass_fraction: float
+
+    #: `5.4 sqrt(rho_e/rho_a) d_e / (k Y_LFL)`, the distance to the de-rated LFL.
+    hazardous_distance: Q
+
+    #: the class's label: `CONTINUOUS`, `PRIMARY` or `SECONDARY`.
+    release_grade: str
+
+    #: the class's zone label: `Zone 0`, `Zone 1` or `Zone 2`.
+    zone_classification: str
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -7578,6 +7559,25 @@ class HeaterResult(_HasWarnings):
 
     #: the five candidates in the class's enum order; empty when the design did not run.
     mechanical_types: tuple[HeaterMechanicalType, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class HeavyGasDispersionResult(_HasWarnings):
+    """Result of ``process.heavy_gas_dispersion``."""
+
+    CALC_ID: ClassVar[str] = "process.heavy_gas_dispersion"
+
+    #: `g0 = 9.81 (rho_s - rho_a) / rho_a`, signed; its value is in m/s2.
+    reduced_gravity: float
+
+    #: `alpha = (|g0|^2 q / U^5)^0.2`, published unfloored.
+    britter_parameter: float
+
+    #: the downwind distance at which the centerline falls to the stated ratio; absent without a ratio.
+    distance_to_concentration_ratio: Q | None
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -9588,7 +9588,7 @@ class ToxicLibraryResult(_HasWarnings):
     #: whether the chemical is in the table; present iff a chemical is stated.
     known: bool | None
 
-    #: the table's display name; present iff the chemical is known.
+    #: the table's display name for the chemical; present iff it is known.
     name: str | None
 
     #: the NIOSH IDLH in ppm; present iff the chemical is known.

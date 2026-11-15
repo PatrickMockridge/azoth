@@ -6424,6 +6424,40 @@ pub fn gibbs_reactor(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Hazardous-area classification.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (mass_flow, exit_density, exit_velocity, lfl_volume_fraction, gas_molar_mass, ambient_density, safety_factor, release_grade))]
+#[pyo3(
+    text_signature = "(mass_flow, exit_density, exit_velocity, lfl_volume_fraction, gas_molar_mass, ambient_density, safety_factor, release_grade)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn hazardous_area(
+    py: Python<'_>,
+    mass_flow: f64,
+    exit_density: f64,
+    exit_velocity: f64,
+    lfl_volume_fraction: f64,
+    gas_molar_mass: f64,
+    ambient_density: Option<f64>,
+    safety_factor: Option<f64>,
+    release_grade: Option<&str>,
+) -> PyResult<crate::transport_gen::PyHazardousAreaResult> {
+    azoth_process::models::hazardous_area::hazardous_area(
+        kilograms_per_second(mass_flow),
+        kilograms_per_cubic_meter(exit_density),
+        meters_per_second(exit_velocity),
+        lfl_volume_fraction,
+        kilograms_per_mole(gas_molar_mass),
+        ambient_density.map(kilograms_per_cubic_meter),
+        safety_factor,
+        release_grade,
+    )
+    .map(|r| crate::transport_gen::PyHazardousAreaResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Heater.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6507,6 +6541,33 @@ pub fn heater(
         mechanical_selection,
     )
     .map(|r| crate::transport_gen::PyHeaterResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Heavy-gas dispersion.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (volumetric_rate, source_density, air_density, wind_speed, concentration_ratio))]
+#[pyo3(
+    text_signature = "(volumetric_rate, source_density, air_density, wind_speed, concentration_ratio)"
+)]
+pub fn heavy_gas_dispersion(
+    py: Python<'_>,
+    volumetric_rate: f64,
+    source_density: f64,
+    air_density: f64,
+    wind_speed: f64,
+    concentration_ratio: Option<f64>,
+) -> PyResult<crate::transport_gen::PyHeavyGasDispersionResult> {
+    azoth_process::models::heavy_gas_dispersion::heavy_gas_dispersion(
+        cubic_meters_per_second(volumetric_rate),
+        kilograms_per_cubic_meter(source_density),
+        kilograms_per_cubic_meter(air_density),
+        meters_per_second(wind_speed),
+        concentration_ratio,
+    )
+    .map(|r| crate::transport_gen::PyHeavyGasDispersionResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -7528,6 +7589,31 @@ pub fn throttling_valve(
         sizing_standard,
     )
     .map(|r| crate::transport_gen::PyThrottlingValveResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Toxic-exposure thresholds.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (chemical, concentration_ppm, molar_mass, temperature, pressure))]
+#[pyo3(text_signature = "(chemical, concentration_ppm, molar_mass, temperature, pressure)")]
+pub fn toxic_library(
+    py: Python<'_>,
+    chemical: Option<&str>,
+    concentration_ppm: Option<f64>,
+    molar_mass: Option<f64>,
+    temperature: Option<f64>,
+    pressure: Option<f64>,
+) -> PyResult<crate::transport_gen::PyToxicLibraryResult> {
+    azoth_process::models::toxic_library::toxic_library(
+        chemical,
+        concentration_ppm,
+        molar_mass.map(kilograms_per_mole),
+        temperature.map(kelvins),
+        pressure.map(pascals),
+    )
+    .map(|r| crate::transport_gen::PyToxicLibraryResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

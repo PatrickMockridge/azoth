@@ -114,9 +114,7 @@ pub fn hazardous_area(
     {
         return Err(AzothError::invalid_input(
             "lfl_volume_fraction",
-            format!(
-                "an LFL in (0, 1) is required, and {lfl_volume_fraction} is not"
-            ),
+            format!("an LFL in (0, 1) is required, and {lfl_volume_fraction} is not"),
         ));
     }
     if !factor.is_finite() || factor <= 0.0 || factor > 1.0 {

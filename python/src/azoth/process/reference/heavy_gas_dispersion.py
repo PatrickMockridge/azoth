@@ -34,7 +34,8 @@ def _reduced_gravity(source_density: float, air_density: float) -> float:
 
 def _britter_parameter(reduced: float, volumetric_rate: float, wind_speed: float) -> float:
     """The class's characteristic parameter, over ``|g0|`` and unfloored."""
-    return (abs(reduced) * abs(reduced) * volumetric_rate / wind_speed**5) ** 0.2
+    parameter: float = (abs(reduced) * abs(reduced) * volumetric_rate / wind_speed**5) ** 0.2
+    return parameter
 
 
 def _distance(volumetric_rate: float, wind_speed: float, alpha: float, ratio: float) -> float:
@@ -42,7 +43,8 @@ def _distance(volumetric_rate: float, wind_speed: float, alpha: float, ratio: fl
     scale = math.sqrt(volumetric_rate / wind_speed)
     b = -0.25 * math.log10(max(alpha, 0.01))
     log_d = -0.85 * math.log10(ratio) + b
-    return scale * 10.0**log_d
+    distance: float = scale * 10.0**log_d
+    return distance
 
 
 def _require_positive(name: str, value: float) -> None:

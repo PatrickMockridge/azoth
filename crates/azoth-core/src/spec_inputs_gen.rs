@@ -248,8 +248,10 @@
 //!   - specs/models/process/gas_scrubber.toml
 //!   - specs/models/process/gaussian_plume.toml
 //!   - specs/models/process/gibbs_reactor.toml
+//!   - specs/models/process/hazardous_area.toml
 //!   - specs/models/process/heat_exchanger.toml
 //!   - specs/models/process/heater.toml
+//!   - specs/models/process/heavy_gas_dispersion.toml
 //!   - specs/models/process/hem_release.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
@@ -284,6 +286,7 @@
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml
+//!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
@@ -3433,6 +3436,17 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "regularization_tau",
         "dimensionless",
     ),
+    ("process.hazardous_area", "mass_flow", "mass_rate"),
+    ("process.hazardous_area", "exit_density", "mass_density"),
+    ("process.hazardous_area", "exit_velocity", "velocity"),
+    (
+        "process.hazardous_area",
+        "lfl_volume_fraction",
+        "dimensionless",
+    ),
+    ("process.hazardous_area", "gas_molar_mass", "molar_mass"),
+    ("process.hazardous_area", "ambient_density", "mass_density"),
+    ("process.hazardous_area", "safety_factor", "dimensionless"),
     ("process.heat_exchanger", "hot_in_n", "molar_flow"),
     ("process.heat_exchanger", "hot_in_z", "dimensionless"),
     ("process.heat_exchanger", "hot_in_p", "pressure"),
@@ -3636,6 +3650,27 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.heater",
         "utility_overall_heat_transfer_coefficient",
         "heat_transfer",
+    ),
+    (
+        "process.heavy_gas_dispersion",
+        "volumetric_rate",
+        "volume_rate",
+    ),
+    (
+        "process.heavy_gas_dispersion",
+        "source_density",
+        "mass_density",
+    ),
+    (
+        "process.heavy_gas_dispersion",
+        "air_density",
+        "mass_density",
+    ),
+    ("process.heavy_gas_dispersion", "wind_speed", "velocity"),
+    (
+        "process.heavy_gas_dispersion",
+        "concentration_ratio",
+        "dimensionless",
     ),
     ("process.hem_release", "upstream_z", "dimensionless"),
     (
@@ -4900,6 +4935,18 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "dimensionless",
     ),
     ("process.throttling_valve", "xt", "dimensionless"),
+    (
+        "process.toxic_library",
+        "concentration_ppm",
+        "dimensionless",
+    ),
+    ("process.toxic_library", "molar_mass", "molar_mass"),
+    (
+        "process.toxic_library",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.toxic_library", "pressure", "pressure"),
     (
         "process.tr3001_compliance",
         "required_area_in2",

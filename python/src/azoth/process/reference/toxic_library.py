@@ -61,7 +61,9 @@ def _lookup(chemical: str) -> tuple[str, float, float, float] | None:
     return None
 
 
-def _ppm_to_kg_per_m3(ppm: float, molar_mass: float, temperature: float, pressure_pa: float) -> float:
+def _ppm_to_kg_per_m3(
+    ppm: float, molar_mass: float, temperature: float, pressure_pa: float
+) -> float:
     """The class's ``ppmToKgPerM3``, with its bara round trip and ``R = 8.314``."""
     bara = pressure_pa / 1.0e5
     return (ppm / 1.0e6) * molar_mass * (bara * 1.0e5) / (R_GAS * temperature)
@@ -96,9 +98,7 @@ def toxic_library(
 
     ppm = None if concentration_ppm is None else float(concentration_ppm)
     molar_si = None if molar_mass is None else input_to_si(spec, "molar_mass", molar_mass)
-    temperature_si = (
-        None if temperature is None else input_to_si(spec, "temperature", temperature)
-    )
+    temperature_si = None if temperature is None else input_to_si(spec, "temperature", temperature)
     pressure_si = None if pressure is None else input_to_si(spec, "pressure", pressure)
     if ppm is not None:
         for name, value in (

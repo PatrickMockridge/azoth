@@ -27,8 +27,10 @@
 //!   - specs/models/process/gas_scrubber.toml
 //!   - specs/models/process/gaussian_plume.toml
 //!   - specs/models/process/gibbs_reactor.toml
+//!   - specs/models/process/hazardous_area.toml
 //!   - specs/models/process/heat_exchanger.toml
 //!   - specs/models/process/heater.toml
+//!   - specs/models/process/heavy_gas_dispersion.toml
 //!   - specs/models/process/hem_release.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
@@ -63,6 +65,7 @@
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml
+//!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
