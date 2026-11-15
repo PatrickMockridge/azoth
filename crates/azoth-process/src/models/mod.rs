@@ -71,6 +71,7 @@ pub mod pipe;
 pub mod plug_flow_reactor;
 pub mod pool_fire;
 pub mod probit;
+pub mod psv_sizing;
 pub mod pump;
 pub mod rate_based_packed_column;
 pub mod risk_matrix;
@@ -143,6 +144,7 @@ pub use pipe::{PipeResult, pipe};
 pub use plug_flow_reactor::{PlugFlowReactorResult, plug_flow_reactor};
 pub use pool_fire::{PoolFireResult, pool_fire};
 pub use probit::{ProbitResult, probit};
+pub use psv_sizing::{PsvSizingResult, psv_sizing};
 pub use pump::{PumpResult, pump};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};
 pub use risk_matrix::{

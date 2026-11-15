@@ -8097,6 +8097,52 @@ class ProbitResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PsvSizingResult(_HasWarnings):
+    """Result of ``process.psv_sizing``."""
+
+    CALC_ID: ClassVar[str] = "process.psv_sizing"
+
+    #: `set_pressure (1 + overpressure_fraction)`.
+    relieving_pressure: Q
+
+    #: `back_pressure / relieving_pressure`.
+    back_pressure_fraction: float
+
+    #: the class's `Kd`: 0.975 gas, 0.65 liquid, 0.85 two-phase.
+    discharge_coefficient: float
+
+    #: the required orifice area.
+    required_area: Q
+
+    #: the required area in in2, gas and liquid only; the two-phase method publishes m2 alone.
+    required_area_in2: float | None
+
+    #: the first ladder letter whose area meets the requirement, or `T` when the requirement exceeds 26 in2; gas and liquid only.
+    recommended_orifice: str | None
+
+    #: the selected ladder area in in2; gas and liquid only.
+    selected_area_in2: float | None
+
+    #: the gas `Kb` or the liquid `Kw`.
+    back_pressure_correction: float | None
+
+    #: the gas `Kc`, 0.9 with a rupture disk and 1.0 without; gas only.
+    combination_correction: float | None
+
+    #: the liquid `Kv`, 1.0 when the Reynolds number is at or above 1e5; liquid only.
+    viscosity_correction: float | None
+
+    #: the liquid mass flow `volume_flow liquid_density`; liquid only.
+    mass_flow_rate: Q | None
+
+    #: `calculateMassFlowCapacity`'s result when `orifice_area` is stated. It is not the inverse of the sizing equation.
+    mass_flow_capacity: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PumpResult(_HasWarnings):
     """Result of ``process.pump``."""
 

@@ -52,6 +52,7 @@ use crate::models::pipe::PipeResult;
 use crate::models::plug_flow_reactor::PlugFlowReactorResult;
 use crate::models::pool_fire::PoolFireResult;
 use crate::models::probit::ProbitResult;
+use crate::models::psv_sizing::PsvSizingResult;
 use crate::models::pump::PumpResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
 use crate::models::risk_matrix::RiskMatrixResult;
@@ -1239,6 +1240,29 @@ impl CalcResult for PoolFireResult {
 impl CalcResult for ProbitResult {
     const CALC_ID: &'static str = "process.probit";
     const FIELDS: &'static [&'static str] = &["probit", "probability", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PsvSizingResult {
+    const CALC_ID: &'static str = "process.psv_sizing";
+    const FIELDS: &'static [&'static str] = &[
+        "relieving_pressure",
+        "back_pressure_fraction",
+        "discharge_coefficient",
+        "required_area",
+        "required_area_in2",
+        "recommended_orifice",
+        "selected_area_in2",
+        "back_pressure_correction",
+        "combination_correction",
+        "viscosity_correction",
+        "mass_flow_rate",
+        "mass_flow_capacity",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

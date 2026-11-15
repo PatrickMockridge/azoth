@@ -231,6 +231,7 @@ from azoth.core.result import (
     PrsvKappaResult,
     PrZFactorResult,
     PsFlashResult,
+    PsvSizingResult,
     PtFlashResult,
     PtPhaseEnvelopeResult,
     PuFlashResult,
@@ -586,6 +587,7 @@ __all__ = [
     "production_chemical_scale_scenario",
     "prsv_kappa",
     "ps_flash",
+    "psv_sizing",
     "pt_flash",
     "pt_phase_envelope",
     "pu_flash",
@@ -7326,6 +7328,48 @@ def probit(a: float, b: float, n: float, dose: Q | None=None, probit_value: Q | 
     return ProbitResult(
         probit=result.probit,
         probability=result.probability,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def psv_sizing(service: str, set_pressure: Q, overpressure_fraction: float, back_pressure: Q, is_balanced_bellows: bool | None=None, has_rupture_disk: bool | None=None, mass_flow: Q | None=None, temperature: Q | None=None, molar_mass: Q | None=None, compressibility: float | None=None, specific_heat_ratio: float | None=None, volume_flow: Q | None=None, liquid_density: Q | None=None, viscosity: Q | None=None, gas_fraction: float | None=None, gas_density: Q | None=None, latent_heat: float | None=None, liquid_heat_capacity: Q | None=None, orifice_area: Q | None=None, capacity_discharge_coefficient: float | None=None) -> PsvSizingResult:
+    """``process.psv_sizing``, computed in Rust."""
+    spec = _models_gen.model("process.psv_sizing")
+    result = _core.psv_sizing(
+        service,
+        input_to_si(spec, "set_pressure", set_pressure),
+        overpressure_fraction,
+        input_to_si(spec, "back_pressure", back_pressure),
+        None if mass_flow is None else input_to_si(spec, "mass_flow", mass_flow),
+        None if temperature is None else input_to_si(spec, "temperature", temperature),
+        None if molar_mass is None else input_to_si(spec, "molar_mass", molar_mass),
+        None if compressibility is None else compressibility,
+        None if specific_heat_ratio is None else specific_heat_ratio,
+        is_balanced_bellows,
+        has_rupture_disk,
+        None if volume_flow is None else input_to_si(spec, "volume_flow", volume_flow),
+        None if liquid_density is None else input_to_si(spec, "liquid_density", liquid_density),
+        None if viscosity is None else input_to_si(spec, "viscosity", viscosity),
+        None if gas_fraction is None else gas_fraction,
+        None if gas_density is None else input_to_si(spec, "gas_density", gas_density),
+        None if latent_heat is None else latent_heat,
+        None if liquid_heat_capacity is None else input_to_si(spec, "liquid_heat_capacity", liquid_heat_capacity),
+        None if orifice_area is None else input_to_si(spec, "orifice_area", orifice_area),
+        None if capacity_discharge_coefficient is None else capacity_discharge_coefficient,
+    )
+    return PsvSizingResult(
+        relieving_pressure=from_si(result.relieving_pressure.magnitude_si, result.relieving_pressure.unit),
+        back_pressure_fraction=result.back_pressure_fraction,
+        discharge_coefficient=result.discharge_coefficient,
+        required_area=from_si(result.required_area.magnitude_si, result.required_area.unit),
+        required_area_in2=result.required_area_in2,
+        recommended_orifice=result.recommended_orifice,
+        selected_area_in2=result.selected_area_in2,
+        back_pressure_correction=result.back_pressure_correction,
+        combination_correction=result.combination_correction,
+        viscosity_correction=result.viscosity_correction,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        mass_flow_capacity=None if result.mass_flow_capacity is None else from_si(result.mass_flow_capacity.magnitude_si, result.mass_flow_capacity.unit),
         warnings=_warnings(result.warnings),
     )
 

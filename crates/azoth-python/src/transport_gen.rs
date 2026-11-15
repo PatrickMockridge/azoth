@@ -20156,6 +20156,109 @@ impl From<&azoth_process::models::probit::ProbitResult> for PyProbitResult {
         }
     }
 }
+/// Result of `process.psv_sizing`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PsvSizingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPsvSizingResult {
+    /// `set_pressure (1 + overpressure_fraction)`.
+    #[pyo3(get)]
+    pub relieving_pressure: PyQty,
+    /// `back_pressure / relieving_pressure`.
+    #[pyo3(get)]
+    pub back_pressure_fraction: f64,
+    /// the class's `Kd`: 0.975 gas, 0.65 liquid, 0.85 two-phase.
+    #[pyo3(get)]
+    pub discharge_coefficient: f64,
+    /// the required orifice area.
+    #[pyo3(get)]
+    pub required_area: PyQty,
+    /// the required area in in2, gas and liquid only; the two-phase method publishes m2 alone.
+    #[pyo3(get)]
+    pub required_area_in2: Option<f64>,
+    /// the first ladder letter whose area meets the requirement, or `T` when the requirement exceeds 26 in2; gas and liquid only.
+    #[pyo3(get)]
+    pub recommended_orifice: Option<String>,
+    /// the selected ladder area in in2; gas and liquid only.
+    #[pyo3(get)]
+    pub selected_area_in2: Option<f64>,
+    /// the gas `Kb` or the liquid `Kw`.
+    #[pyo3(get)]
+    pub back_pressure_correction: Option<f64>,
+    /// the gas `Kc`, 0.9 with a rupture disk and 1.0 without; gas only.
+    #[pyo3(get)]
+    pub combination_correction: Option<f64>,
+    /// the liquid `Kv`, 1.0 when the Reynolds number is at or above 1e5; liquid only.
+    #[pyo3(get)]
+    pub viscosity_correction: Option<f64>,
+    /// the liquid mass flow `volume_flow liquid_density`; liquid only.
+    #[pyo3(get)]
+    pub mass_flow_rate: Option<PyQty>,
+    /// `calculateMassFlowCapacity`'s result when `orifice_area` is stated. It is not the inverse of the sizing equation.
+    #[pyo3(get)]
+    pub mass_flow_capacity: Option<PyQty>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPsvSizingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PsvSizingResult(relieving_pressure={:?}, back_pressure_fraction={:?}, discharge_coefficient={:?}, required_area={:?}, required_area_in2={:?}, recommended_orifice={:?}, selected_area_in2={:?}, back_pressure_correction={:?}, combination_correction={:?}, viscosity_correction={:?}, mass_flow_rate={:?}, mass_flow_capacity={:?}, {} warning(s))",
+            self.relieving_pressure,
+            self.back_pressure_fraction,
+            self.discharge_coefficient,
+            self.required_area,
+            self.required_area_in2,
+            self.recommended_orifice,
+            self.selected_area_in2,
+            self.back_pressure_correction,
+            self.combination_correction,
+            self.viscosity_correction,
+            self.mass_flow_rate,
+            self.mass_flow_capacity,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::psv_sizing::PsvSizingResult> for PyPsvSizingResult {
+    fn from(r: &azoth_process::models::psv_sizing::PsvSizingResult) -> Self {
+        Self {
+            relieving_pressure: PyQty {
+                magnitude_si: r.relieving_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            back_pressure_fraction: r.back_pressure_fraction,
+            discharge_coefficient: r.discharge_coefficient,
+            required_area: PyQty {
+                magnitude_si: r.required_area.value,
+                unit: "m**2".to_string(),
+            },
+            required_area_in2: r.required_area_in2,
+            recommended_orifice: r.recommended_orifice.clone(),
+            selected_area_in2: r.selected_area_in2,
+            back_pressure_correction: r.back_pressure_correction,
+            combination_correction: r.combination_correction,
+            viscosity_correction: r.viscosity_correction,
+            mass_flow_rate: r.mass_flow_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            mass_flow_capacity: r.mass_flow_capacity.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.pump`, transported.
 #[pyclass(
     frozen,

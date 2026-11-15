@@ -6887,6 +6887,64 @@ pub fn probit(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// PSV sizing.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (service, set_pressure, overpressure_fraction, back_pressure, mass_flow, temperature, molar_mass, compressibility, specific_heat_ratio, is_balanced_bellows, has_rupture_disk, volume_flow, liquid_density, viscosity, gas_fraction, gas_density, latent_heat, liquid_heat_capacity, orifice_area, capacity_discharge_coefficient))]
+#[pyo3(
+    text_signature = "(service, set_pressure, overpressure_fraction, back_pressure, mass_flow, temperature, molar_mass, compressibility, specific_heat_ratio, is_balanced_bellows, has_rupture_disk, volume_flow, liquid_density, viscosity, gas_fraction, gas_density, latent_heat, liquid_heat_capacity, orifice_area, capacity_discharge_coefficient)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn psv_sizing(
+    py: Python<'_>,
+    service: &str,
+    set_pressure: f64,
+    overpressure_fraction: f64,
+    back_pressure: f64,
+    mass_flow: Option<f64>,
+    temperature: Option<f64>,
+    molar_mass: Option<f64>,
+    compressibility: Option<f64>,
+    specific_heat_ratio: Option<f64>,
+    is_balanced_bellows: Option<bool>,
+    has_rupture_disk: Option<bool>,
+    volume_flow: Option<f64>,
+    liquid_density: Option<f64>,
+    viscosity: Option<f64>,
+    gas_fraction: Option<f64>,
+    gas_density: Option<f64>,
+    latent_heat: Option<f64>,
+    liquid_heat_capacity: Option<f64>,
+    orifice_area: Option<f64>,
+    capacity_discharge_coefficient: Option<f64>,
+) -> PyResult<crate::transport_gen::PyPsvSizingResult> {
+    azoth_process::models::psv_sizing::psv_sizing(
+        service,
+        pascals(set_pressure),
+        overpressure_fraction,
+        pascals(back_pressure),
+        is_balanced_bellows,
+        has_rupture_disk,
+        mass_flow.map(kilograms_per_second),
+        temperature.map(kelvins),
+        molar_mass.map(kilograms_per_mole),
+        compressibility,
+        specific_heat_ratio,
+        volume_flow.map(cubic_meters_per_second),
+        liquid_density.map(kilograms_per_cubic_meter),
+        viscosity.map(pascal_seconds),
+        gas_fraction,
+        gas_density.map(kilograms_per_cubic_meter),
+        latent_heat,
+        liquid_heat_capacity.map(joules_per_kilogram_kelvin),
+        orifice_area.map(square_meters),
+        capacity_discharge_coefficient,
+    )
+    .map(|r| crate::transport_gen::PyPsvSizingResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Risk matrix.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

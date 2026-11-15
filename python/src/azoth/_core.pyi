@@ -3821,6 +3821,22 @@ class ProbitResult:
     warnings: list[Warning]
 
 @final
+class PsvSizingResult:
+    relieving_pressure: Qty
+    back_pressure_fraction: float
+    discharge_coefficient: float
+    required_area: Qty
+    required_area_in2: float | None
+    recommended_orifice: str | None
+    selected_area_in2: float | None
+    back_pressure_correction: float | None
+    combination_correction: float | None
+    viscosity_correction: float | None
+    mass_flow_rate: Qty | None
+    mass_flow_capacity: Qty | None
+    warnings: list[Warning]
+
+@final
 class PumpResult:
     outlet_n: Qty
     outlet_z: list[float]
@@ -7306,6 +7322,28 @@ def probit(
     dose: float | None = None,
     probit_value: float | None = None,
 ) -> ProbitResult: ...
+def psv_sizing(
+    service: str,
+    set_pressure: float,
+    overpressure_fraction: float,
+    back_pressure: float,
+    mass_flow: float | None = None,
+    temperature: float | None = None,
+    molar_mass: float | None = None,
+    compressibility: float | None = None,
+    specific_heat_ratio: float | None = None,
+    is_balanced_bellows: bool | None = None,
+    has_rupture_disk: bool | None = None,
+    volume_flow: float | None = None,
+    liquid_density: float | None = None,
+    viscosity: float | None = None,
+    gas_fraction: float | None = None,
+    gas_density: float | None = None,
+    latent_heat: float | None = None,
+    liquid_heat_capacity: float | None = None,
+    orifice_area: float | None = None,
+    capacity_discharge_coefficient: float | None = None,
+) -> PsvSizingResult: ...
 def pump(
     components: list[str],
     inlet_n: float,

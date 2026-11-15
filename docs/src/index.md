@@ -367,6 +367,7 @@ Five sections, and the difference between them is the point:
 - [`process.plug_flow_reactor`](./process/plug_flow_reactor.md) — Plug-flow reactor
 - [`process.pool_fire`](./process/pool_fire.md) — Pool fire radiation
 - [`process.probit`](./process/probit.md) — Probit dose-response
+- [`process.psv_sizing`](./process/psv_sizing.md) — PSV sizing
 - [`process.pump`](./process/pump.md) — Pump
 - [`process.rate_based_packed_column`](./process/rate_based_packed_column.md) — Rate-based packed column
 - [`process.risk_matrix`](./process/risk_matrix.md) — Risk matrix

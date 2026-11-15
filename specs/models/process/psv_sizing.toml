@@ -1,0 +1,264 @@
+id = "process.psv_sizing"
+name = "PSV sizing"
+kind = "procedure"
+assumptions = [
+    "**the `service` selects one of the class's three methods.** `gas` and `liquid` publish the API 520 orifice ladder; `two_phase` publishes an area only, because the omega method selects no orifice.",
+    "**the relieving pressure is `set_pressure (1 + overpressure_fraction)`**, and the gas area is the API 520 US-customary equation converted through the class's own constants: 7936.64 lb/hr per kg/s, 6894.76 Pa per psia, 1.8 R per K and 1000 g per kg of molar mass.",
+    "**the gas back-pressure factor is the class's two branches.** Balanced bellows above the critical ratio uses the isentropic subcritical expression capped at 1; a conventional valve above half the relieving pressure uses `1 - 2 (r - 0.5)` floored at 0.1.",
+    "**the liquid branch is API 520 Section 5.8 with the class's corrections.** `Kw` derates only a balanced-bellows valve above half the relieving pressure, `Kv` is the Reynolds correction clamped to `[0.2, 1]`, and `Kp` is `min(0.6 + 4 f, 1)` below 0.25 overpressure.",
+    "**the liquid pressure difference is in psig, and a non-positive difference is silently 1 psi**, the class's substitution. The port refuses a back pressure at or above the relieving pressure instead of reproducing that state.",
+    "**the two-phase branch is the class's omega method.** The class validates no input; a non-positive mass flux answers zero area, and the port refuses the states that make it non-finite or non-positive.",
+    "**the orifice ladder is the standard API 520 D to T table, and the first area at or above the requirement is selected.** Above 26 in2 the class still answers T at 26.0 in2, undersized; the port publishes that area and not a verdict.",
+    "**the capacity helper is not the sizing inverse.** `calculateMassFlowCapacity` uses `R = 8314` with a molar mass the class's javadoc calls kg/mol while the sizing path multiplies by 1000, so a round trip is sqrt(1000) low. Both are reproduced.",
+    "**`PSVSizingResult.getMassFlowCapacity` is the input mass flow echoed**, not a capacity; it is not published. `mass_flow_capacity` is only the `calculateMassFlowCapacity` result.",
+    "**the liquid mass flow is `volume_flow liquid_density`**, the class's own product; the two-phase mass flow is the caller's.",
+]
+references = [
+    "API STD 520, Part I (9th edition, 2014). Sizing, selection and installation of pressure-relieving devices.",
+    "API STD 521 (7th edition, 2020). Pressure-relieving and depressuring systems.",
+    "TR3001. Overpressure protection, relief-load screening and the 21 % fire basis.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/util/fire/ReliefValveSizing.java` is the port source.",
+    "`validation/neqsim/captures/process_psv_sizing.tsv` - the gas, liquid and two-phase branches, the ladder, the capacity round trip and the values the class accepts.",
+]
+[source]
+standard = "NeqSim process/util/fire/ReliefValveSizing.java"
+edition = "Its `calculateRequiredArea`, `calculateLiquidReliefArea`, `calculateTwoPhaseReliefArea`, `calculateMassFlowCapacity` and the `STANDARD_ORIFICE_AREAS_IN2` ladder."
+[algorithm]
+scheme = "closed_form_psv_sizing"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.service]
+type = "enum"
+values = ["gas", "liquid", "two_phase"]
+description = "the relieving service, selecting one of the class's three sizing methods.\n"
+[inputs.set_pressure]
+unit = "Pa"
+description = "the PSV set pressure, absolute, above zero.\n"
+[inputs.overpressure_fraction]
+unit = "dimensionless"
+description = "the overpressure fraction, at least zero; 0.10 is the usual non-fire basis and 0.21 the fire basis.\n"
+[inputs.back_pressure]
+unit = "Pa"
+description = "the downstream pressure, absolute, below the relieving pressure.\n"
+[inputs.mass_flow]
+unit = "kg/s"
+optional = true
+description = "the gas or two-phase mass flow, above zero. Required for `gas` and `two_phase`; refused for `liquid`.\n"
+[inputs.temperature]
+unit = "K"
+optional = true
+description = "the relieving temperature, above zero. Required for `gas` and `two_phase`.\n"
+[inputs.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "the relieving gas's molar mass, above zero. Required for `gas`.\n"
+[inputs.compressibility]
+unit = "dimensionless"
+optional = true
+description = "the gas compressibility factor Z, above zero. Required for `gas`.\n"
+[inputs.specific_heat_ratio]
+unit = "dimensionless"
+optional = true
+description = "the gas specific-heat ratio Cp/Cv, above one. Required for `gas`.\n"
+[inputs.is_balanced_bellows]
+type = "boolean"
+optional = true
+description = "whether the PSV is balanced bellows. **Absent is false**; it selects the `Kb` / `Kw` branch of the gas and liquid methods.\n"
+[inputs.has_rupture_disk]
+type = "boolean"
+optional = true
+description = "whether a rupture disk is installed upstream. **Absent is false**; it selects the gas combination factor `Kc = 0.9`, and is read by no other service.\n"
+[inputs.volume_flow]
+unit = "m**3/s"
+optional = true
+description = "the liquid volume flow at relieving conditions, above zero. Required for `liquid`; refused for the other services.\n"
+[inputs.liquid_density]
+unit = "kg/m**3"
+optional = true
+description = "the liquid density at relieving conditions, above zero. Required for `liquid` and `two_phase`.\n"
+[inputs.viscosity]
+unit = "Pa*s"
+optional = true
+description = "the liquid dynamic viscosity, at least zero; zero or absent applies no `Kv` correction. Required for `liquid`.\n"
+[inputs.gas_fraction]
+unit = "dimensionless"
+optional = true
+description = "the two-phase inlet gas mass fraction, in `[0, 1]`. Required for `two_phase`.\n"
+[inputs.gas_density]
+unit = "kg/m**3"
+optional = true
+description = "the two-phase inlet gas density, above zero. Required for `two_phase`.\n"
+[inputs.latent_heat]
+unit = "dimensionless"
+optional = true
+description = "the two-phase latent heat in J/kg, above zero. Required for `two_phase`; dimensionless because the vocabulary has no specific-energy unit.\n"
+[inputs.liquid_heat_capacity]
+unit = "J/(kg*K)"
+optional = true
+description = "the two-phase liquid heat capacity, above zero. Required for `two_phase`.\n"
+[inputs.orifice_area]
+unit = "m**2"
+optional = true
+description = "an orifice area to rate with the capacity helper, above zero. Present only for `gas`, and requires `capacity_discharge_coefficient`.\n"
+[inputs.capacity_discharge_coefficient]
+unit = "dimensionless"
+optional = true
+description = "the discharge coefficient the capacity helper is called with, above zero. Required with `orifice_area`.\n"
+[outputs]
+[outputs.relieving_pressure]
+unit = "Pa"
+description = "`set_pressure (1 + overpressure_fraction)`.\n"
+[outputs.back_pressure_fraction]
+unit = "dimensionless"
+description = "`back_pressure / relieving_pressure`.\n"
+[outputs.discharge_coefficient]
+unit = "dimensionless"
+description = "the class's `Kd`: 0.975 gas, 0.65 liquid, 0.85 two-phase.\n"
+[outputs.required_area]
+unit = "m**2"
+description = "the required orifice area.\n"
+[outputs.required_area_in2]
+unit = "dimensionless"
+optional = true
+description = "the required area in in2, gas and liquid only; the two-phase method publishes m2 alone.\n"
+[outputs.recommended_orifice]
+type = "string"
+optional = true
+description = "the first ladder letter whose area meets the requirement, or `T` when the requirement exceeds 26 in2; gas and liquid only.\n"
+[outputs.selected_area_in2]
+unit = "dimensionless"
+optional = true
+description = "the selected ladder area in in2; gas and liquid only.\n"
+[outputs.back_pressure_correction]
+unit = "dimensionless"
+optional = true
+description = "the gas `Kb` or the liquid `Kw`.\n"
+[outputs.combination_correction]
+unit = "dimensionless"
+optional = true
+description = "the gas `Kc`, 0.9 with a rupture disk and 1.0 without; gas only.\n"
+[outputs.viscosity_correction]
+unit = "dimensionless"
+optional = true
+description = "the liquid `Kv`, 1.0 when the Reynolds number is at or above 1e5; liquid only.\n"
+[outputs.mass_flow_rate]
+unit = "kg/s"
+optional = true
+description = "the liquid mass flow `volume_flow liquid_density`; liquid only.\n"
+[outputs.mass_flow_capacity]
+unit = "kg/s"
+optional = true
+description = "`calculateMassFlowCapacity`'s result when `orifice_area` is stated. It is not the inverse of the sizing equation.\n"
+[[valid_range]]
+quantity = "set_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive set pressure"
+[[valid_range]]
+quantity = "overpressure_fraction"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative overpressure fraction lowers the relieving pressure below the set pressure"
+[[valid_range]]
+quantity = "back_pressure"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "an absolute pressure is not negative"
+[[valid_range]]
+quantity = "mass_flow"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive mass flow"
+[[valid_range]]
+quantity = "temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive temperature"
+[[valid_range]]
+quantity = "molar_mass"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive molar mass"
+[[valid_range]]
+quantity = "compressibility"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a zero or negative Z makes the gas flux non-finite"
+[[valid_range]]
+quantity = "specific_heat_ratio"
+min = 1
+min_inclusive = false
+severity = "error"
+rationale = "the isentropic exponents divide by k - 1"
+[[valid_range]]
+quantity = "volume_flow"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive volume flow"
+[[valid_range]]
+quantity = "liquid_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive liquid density"
+[[valid_range]]
+quantity = "viscosity"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class applies no correction at zero and none below it"
+[[valid_range]]
+quantity = "gas_fraction"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a mass fraction outside [0, 1] is not a two-phase state"
+[[valid_range]]
+quantity = "gas_fraction"
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "a mass fraction outside [0, 1] is not a two-phase state"
+[[valid_range]]
+quantity = "gas_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the specific volume is its reciprocal"
+[[valid_range]]
+quantity = "latent_heat"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the omega term divides by its square"
+[[valid_range]]
+quantity = "liquid_heat_capacity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the omega term multiplies by it"
+[[valid_range]]
+quantity = "orifice_area"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the capacity helper multiplies the area"
+[[valid_range]]
+quantity = "capacity_discharge_coefficient"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the capacity helper multiplies the coefficient"
+[implementations]
+python = "azoth.process.psv_sizing"
+rust = "azoth_process::psv_sizing"

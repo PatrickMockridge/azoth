@@ -263,6 +263,7 @@
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/probit.toml
+//!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/rate_based_packed_column.toml
 //!   - specs/models/process/risk_matrix.toml
@@ -4059,6 +4060,39 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.probit", "n", "dimensionless"),
     ("process.probit", "dose", "dimensionless"),
     ("process.probit", "probit_value", "dimensionless"),
+    ("process.psv_sizing", "set_pressure", "pressure"),
+    (
+        "process.psv_sizing",
+        "overpressure_fraction",
+        "dimensionless",
+    ),
+    ("process.psv_sizing", "back_pressure", "pressure"),
+    ("process.psv_sizing", "mass_flow", "mass_rate"),
+    (
+        "process.psv_sizing",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.psv_sizing", "molar_mass", "molar_mass"),
+    ("process.psv_sizing", "compressibility", "dimensionless"),
+    ("process.psv_sizing", "specific_heat_ratio", "dimensionless"),
+    ("process.psv_sizing", "volume_flow", "volume_rate"),
+    ("process.psv_sizing", "liquid_density", "mass_density"),
+    ("process.psv_sizing", "viscosity", "dynamic_viscosity"),
+    ("process.psv_sizing", "gas_fraction", "dimensionless"),
+    ("process.psv_sizing", "gas_density", "mass_density"),
+    ("process.psv_sizing", "latent_heat", "dimensionless"),
+    (
+        "process.psv_sizing",
+        "liquid_heat_capacity",
+        "specific_heat_capacity",
+    ),
+    ("process.psv_sizing", "orifice_area", "area"),
+    (
+        "process.psv_sizing",
+        "capacity_discharge_coefficient",
+        "dimensionless",
+    ),
     ("process.pump", "inlet_n", "molar_flow"),
     ("process.pump", "inlet_z", "dimensionless"),
     ("process.pump", "inlet_p", "pressure"),

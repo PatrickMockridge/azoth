@@ -282,6 +282,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.plug_flow_reactor" => azoth_process::models::plug_flow_reactor::PlugFlowReactorResult::FIELDS.to_vec(),
         "process.pool_fire" => azoth_process::models::pool_fire::PoolFireResult::FIELDS.to_vec(),
         "process.probit" => azoth_process::models::probit::ProbitResult::FIELDS.to_vec(),
+        "process.psv_sizing" => azoth_process::models::psv_sizing::PsvSizingResult::FIELDS.to_vec(),
         "process.pump" => azoth_process::models::pump::PumpResult::FIELDS.to_vec(),
         "process.rate_based_packed_column" => azoth_process::models::rate_based_packed_column::RateBasedPackedColumnResult::FIELDS.to_vec(),
         "process.risk_matrix" => azoth_process::models::risk_matrix::RiskMatrixResult::FIELDS.to_vec(),

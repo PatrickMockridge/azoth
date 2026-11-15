@@ -2318,6 +2318,64 @@ def _risk_matrix(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _psv_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.psv_sizing`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.psv_sizing import psv_sizing as evaluate
+
+    def optional(name: str, unit: str):
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    def number(name: str):
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    result = evaluate(
+        str(inputs["service"]),
+        quantity(float(inputs["set_pressure"]), "Pa"),
+        float(inputs["overpressure_fraction"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        None if inputs.get("is_balanced_bellows") is None else bool(inputs["is_balanced_bellows"]),
+        None if inputs.get("has_rupture_disk") is None else bool(inputs["has_rupture_disk"]),
+        optional("mass_flow", "kg/s"),
+        optional("temperature", "K"),
+        optional("molar_mass", "kg/mol"),
+        number("compressibility"),
+        number("specific_heat_ratio"),
+        optional("volume_flow", "m**3/s"),
+        optional("liquid_density", "kg/m**3"),
+        optional("viscosity", "Pa*s"),
+        number("gas_fraction"),
+        optional("gas_density", "kg/m**3"),
+        number("latent_heat"),
+        optional("liquid_heat_capacity", "J/(kg*K)"),
+        optional("orifice_area", "m**2"),
+        number("capacity_discharge_coefficient"),
+    )
+    layers: dict[str, float] = {
+        "relieving_pressure": result.relieving_pressure.to("Pa").magnitude,
+        "back_pressure_fraction": result.back_pressure_fraction,
+        "discharge_coefficient": result.discharge_coefficient,
+        "required_area": result.required_area.to("m**2").magnitude,
+    }
+    if result.required_area_in2 is not None:
+        layers["required_area_in2"] = result.required_area_in2
+    if result.selected_area_in2 is not None:
+        layers["selected_area_in2"] = result.selected_area_in2
+    if result.back_pressure_correction is not None:
+        layers["back_pressure_correction"] = result.back_pressure_correction
+    if result.combination_correction is not None:
+        layers["combination_correction"] = result.combination_correction
+    if result.viscosity_correction is not None:
+        layers["viscosity_correction"] = result.viscosity_correction
+    if result.mass_flow_rate is not None:
+        layers["mass_flow_rate"] = result.mass_flow_rate.to("kg/s").magnitude
+    if result.mass_flow_capacity is not None:
+        layers["mass_flow_capacity"] = result.mass_flow_capacity.to("kg/s").magnitude
+    return layers
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2341,6 +2399,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.sil_verification": _sil_verification,
     "process.nog070_sil_determination": _nog070_sil_determination,
     "process.risk_matrix": _risk_matrix,
+    "process.psv_sizing": _psv_sizing,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3592,6 +3651,106 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_risk_matrix.tsv",
         block=3,
         identified_by=("#label", "rm_zero_failures"),
+    ),
+    # The PSV's fourteen cased blocks: seven gas, five liquid and two two-phase. The
+    # refused and accepted-by-the-class states sit outside the cases.
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_choked",
+        capture="process_psv_sizing.tsv",
+        block=0,
+        identified_by=("#label", "ps_gas_choked"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_balanced_subcritical",
+        capture="process_psv_sizing.tsv",
+        block=1,
+        identified_by=("#label", "ps_gas_balanced_subcritical"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_conventional_high_back_pressure",
+        capture="process_psv_sizing.tsv",
+        block=2,
+        identified_by=("#label", "ps_gas_conventional_high_back_pressure"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_conventional_severe_back_pressure",
+        capture="process_psv_sizing.tsv",
+        block=3,
+        identified_by=("#label", "ps_gas_conventional_severe_back_pressure"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_rupture_disk",
+        capture="process_psv_sizing.tsv",
+        block=4,
+        identified_by=("#label", "ps_gas_rupture_disk"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_orifice_exhausted",
+        capture="process_psv_sizing.tsv",
+        block=5,
+        identified_by=("#label", "ps_gas_orifice_exhausted"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_gas_capacity_roundtrip",
+        capture="process_psv_sizing.tsv",
+        block=6,
+        identified_by=("#label", "ps_gas_capacity_roundtrip"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_liquid_low_viscosity",
+        capture="process_psv_sizing.tsv",
+        block=7,
+        identified_by=("#label", "ps_liquid_low_viscosity"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_liquid_high_viscosity",
+        capture="process_psv_sizing.tsv",
+        block=8,
+        identified_by=("#label", "ps_liquid_high_viscosity"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_liquid_low_overpressure",
+        capture="process_psv_sizing.tsv",
+        block=9,
+        identified_by=("#label", "ps_liquid_low_overpressure"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_liquid_balanced_high_back_pressure",
+        capture="process_psv_sizing.tsv",
+        block=10,
+        identified_by=("#label", "ps_liquid_balanced_high_back_pressure"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_liquid_conventional_high_back_pressure",
+        capture="process_psv_sizing.tsv",
+        block=11,
+        identified_by=("#label", "ps_liquid_conventional_high_back_pressure"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_two_phase_omega_high",
+        capture="process_psv_sizing.tsv",
+        block=13,
+        identified_by=("#label", "ps_two_phase_omega_high"),
+    ),
+    LayerCase(
+        model="process.psv_sizing",
+        case="ps_two_phase_omega_low",
+        capture="process_psv_sizing.tsv",
+        block=14,
+        identified_by=("#label", "ps_two_phase_omega_low"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4848,6 +5007,10 @@ UNCASED_ROWS: dict[str, int] = {
     # The risk matrix's six: a negative frequency, a NaN frequency, a loss above 100 %,
     # a negative loss, a negative repair time and a negative mass loss.
     "process_risk_matrix.tsv": 6,
+    # The PSV's six: a back pressure above the relieving pressure in both the liquid and
+    # two-phase branches, a zero mass flow and a zero liquid volume the class refuses, and
+    # the exponent of one and zero liquid density it accepts.
+    "process_psv_sizing.tsv": 6,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,
