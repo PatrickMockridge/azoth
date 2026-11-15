@@ -48,6 +48,7 @@
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml
 //!   - specs/models/process/shortcut_distillation_column.toml
+//!   - specs/models/process/sil_verification.toml
 //!   - specs/models/process/splitter.toml
 //!   - specs/models/process/stirred_tank_reactor.toml
 //!   - specs/models/process/stripping_column.toml

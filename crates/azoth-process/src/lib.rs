@@ -66,7 +66,7 @@ pub use models::{
     MixerResult, PackedColumnResult, PfpDemandResult, PipeResult, PlugFlowReactorResult,
     PoolFireResult, ProbitResult, PumpResult, RateBasedPackedColumnResult,
     SafetyInstrumentedFunctionResult, SeparatorPerformanceResult, SeparatorResult,
-    ShortcutDistillationColumnResult, SplitterResult,
+    ShortcutDistillationColumnResult, SilVerificationResult, SplitterResult,
     StirredTankReactorResult, StrippingColumnResult, TankResult, ThreePhaseSeparatorResult,
     ThrottlingValveResult, TurboExpanderResult, VceResult, absorption_column,
     active_fire_protection_screening, anti_surge_recycle, api537_flare_flame_model, bleve,
@@ -78,7 +78,8 @@ pub use models::{
     lopa, manifold, map_turbo_expander_compressor, mixer, packed_column, pfp_demand, pipe,
     plug_flow_reactor, pool_fire, probit, pump, rate_based_packed_column,
     safety_instrumented_function, separator,
-    separator_capacity_assessment, separator_performance, shortcut_distillation_column, splitter,
+    separator_capacity_assessment, separator_performance, shortcut_distillation_column,
+    sil_verification, splitter,
     stirred_tank_reactor, stripping_column, tank, three_phase_separator, throttling_valve,
     turbo_expander_compressor, vce,
 };

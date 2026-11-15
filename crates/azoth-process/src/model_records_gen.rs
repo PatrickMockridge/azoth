@@ -58,6 +58,7 @@ use crate::models::separator::SeparatorResult;
 use crate::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult;
 use crate::models::separator_performance::SeparatorPerformanceResult;
 use crate::models::shortcut_distillation_column::ShortcutDistillationColumnResult;
+use crate::models::sil_verification::SilVerificationResult;
 use crate::models::splitter::SplitterResult;
 use crate::models::stirred_tank_reactor::StirredTankReactorResult;
 use crate::models::stripping_column::StrippingColumnResult;
@@ -1536,6 +1537,30 @@ impl CalcResult for ShortcutDistillationColumnResult {
         "condenser_duty",
         "reboiler_duty",
         "relative_volatility",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SilVerificationResult {
+    const CALC_ID: &'static str = "process.sil_verification";
+    const FIELDS: &'static [&'static str] = &[
+        "claimed_sil",
+        "achieved_sil",
+        "sil_achieved",
+        "pfd_average",
+        "pfd_upper",
+        "hardware_fault_tolerance",
+        "systematic_capability",
+        "diagnostic_coverage",
+        "issue_count",
+        "error_count",
+        "warning_count",
+        "verification_passed",
+        "issues",
         "warnings",
     ];
 

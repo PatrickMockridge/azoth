@@ -373,6 +373,7 @@ Five sections, and the difference between them is the point:
 - [`process.separator_capacity_assessment`](./process/separator_capacity_assessment.md) — Separator capacity assessment
 - [`process.separator_performance`](./process/separator_performance.md) — Separator performance calculator
 - [`process.shortcut_distillation_column`](./process/shortcut_distillation_column.md) — Shortcut distillation column
+- [`process.sil_verification`](./process/sil_verification.md) — SIL verification
 - [`process.splitter`](./process/splitter.md) — Splitter
 - [`process.stirred_tank_reactor`](./process/stirred_tank_reactor.md) — Stirred-tank reactor
 - [`process.stripping_column`](./process/stripping_column.md) — Stripping column

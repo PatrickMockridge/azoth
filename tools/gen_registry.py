@@ -233,6 +233,11 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `crates/azoth-process/tests/lopa.rs` asserts it against the capture, and
         # `test_cross_impl` compares it on both results.
         "target_met",
+        # `sil_verification`'s two verdicts, booleans with no slot in `TestCase`.
+        # `crates/azoth-process/tests/sil_verification.rs` asserts them against the
+        # capture, and `test_cross_impl` compares them on both results.
+        "sil_achieved",
+        "verification_passed",
         # `fire_water_coverage_assessment`'s two feasibility flags, booleans with no slot in
         # `TestCase`. `crates/azoth-process/tests/fire_water_coverage_assessment.rs` asserts
         # them against the capture, and `test_cross_impl` compares them on both results.

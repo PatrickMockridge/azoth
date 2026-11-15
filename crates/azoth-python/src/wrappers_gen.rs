@@ -7056,6 +7056,29 @@ pub fn shortcut_distillation_column(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// SIL verification.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (pfd_average, claimed_sil, architecture, test_interval_hours))]
+#[pyo3(text_signature = "(pfd_average, claimed_sil, architecture, test_interval_hours)")]
+pub fn sil_verification(
+    py: Python<'_>,
+    pfd_average: f64,
+    claimed_sil: f64,
+    architecture: &str,
+    test_interval_hours: f64,
+) -> PyResult<crate::transport_gen::PySilVerificationResult> {
+    azoth_process::models::sil_verification::sil_verification(
+        pfd_average,
+        claimed_sil,
+        architecture,
+        test_interval_hours,
+    )
+    .map(|r| crate::transport_gen::PySilVerificationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Splitter.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

@@ -269,6 +269,7 @@
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml
 //!   - specs/models/process/shortcut_distillation_column.toml
+//!   - specs/models/process/sil_verification.toml
 //!   - specs/models/process/splitter.toml
 //!   - specs/models/process/stirred_tank_reactor.toml
 //!   - specs/models/process/stripping_column.toml
@@ -4451,6 +4452,13 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.shortcut_distillation_column",
         "reboiler_pressure",
         "pressure",
+    ),
+    ("process.sil_verification", "pfd_average", "dimensionless"),
+    ("process.sil_verification", "claimed_sil", "dimensionless"),
+    (
+        "process.sil_verification",
+        "test_interval_hours",
+        "dimensionless",
     ),
     ("process.splitter", "feed_n", "molar_flow"),
     ("process.splitter", "feed_z", "dimensionless"),

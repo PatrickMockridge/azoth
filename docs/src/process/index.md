@@ -60,6 +60,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.separator_capacity_assessment`](./separator_capacity_assessment.md) | `direct composition` | NeqSim process/equipment/separator/SeparatorCapacityAssessment.java |
 | [`process.separator_performance`](./separator_performance.md) | `direct composition` | NeqSim process/equipment/separator/entrainment/SeparatorPerformanceCalculator.java |
 | [`process.shortcut_distillation_column`](./shortcut_distillation_column.md) | `underwood_bisection` | NeqSim process/equipment/distillation/ShortcutDistillationColumn.java |
+| [`process.sil_verification`](./sil_verification.md) | `closed_form_sil_verification` | NeqSim process/safety/risk/sis/SILVerificationResult.java |
 | [`process.splitter`](./splitter.md) | `direct composition` | NeqSim process/equipment/splitter/Splitter.java |
 | [`process.stirred_tank_reactor`](./stirred_tank_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/StirredTankReactor.java |
 | [`process.stripping_column`](./stripping_column.md) | `direct composition` | NeqSim process/equipment/absorber/StrippingColumn.java |

@@ -48,6 +48,7 @@
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml
 //!   - specs/models/process/shortcut_distillation_column.toml
+//!   - specs/models/process/sil_verification.toml
 //!   - specs/models/process/splitter.toml
 //!   - specs/models/process/stirred_tank_reactor.toml
 //!   - specs/models/process/stripping_column.toml
@@ -55737,6 +55738,308 @@ pub static SHORTCUT_DISTILLATION_COLUMN_SPEC: ModelSpec = ModelSpec {
     cases: SHORTCUT_DISTILLATION_COLUMN_CASES,
 };
 
+static SIL_VERIFICATION_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "pfd_average",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class accepts a negative or NaN PFD; the port refuses it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "claimed_sil",
+            min: Some(1.0),
+            min_inclusive: true,
+            max: Some(4.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's builder refuses a SIL outside 1..4",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "test_interval_hours",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative interval is not an interval",
+        },
+    },
+];
+
+static SIL_VERIFICATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "sv_canonical",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.005),
+            ("claimed_sil", 2.0),
+            ("test_interval_hours", 8760.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("architecture", "1oo1")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("claimed_sil", 2.0),
+            ("achieved_sil", 2.0),
+            ("pfd_average", 0.005),
+            ("pfd_upper", 0.0075),
+            ("hardware_fault_tolerance", 0.0),
+            ("systematic_capability", 2.0),
+            ("diagnostic_coverage", 0.5),
+            ("issue_count", 0.0),
+            ("error_count", 0.0),
+            ("warning_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "sv_pfd_exceeded",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.05),
+            ("claimed_sil", 2.0),
+            ("test_interval_hours", 8760.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("architecture", "1oo1")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("claimed_sil", 2.0),
+            ("achieved_sil", 1.0),
+            ("pfd_average", 0.05),
+            ("pfd_upper", 0.07500000000000001),
+            ("hardware_fault_tolerance", 0.0),
+            ("systematic_capability", 2.0),
+            ("diagnostic_coverage", 0.5),
+            ("issue_count", 1.0),
+            ("error_count", 1.0),
+            ("warning_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[(
+            "issues",
+            &[&[
+                RecordField {
+                    name: "severity",
+                    value: FieldValue::Name("error"),
+                },
+                RecordField {
+                    name: "category",
+                    value: FieldValue::Name("pfd_exceeded"),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "sv_sil4_1oo2",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 5e-05),
+            ("claimed_sil", 4.0),
+            ("test_interval_hours", 8760.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("architecture", "1oo2")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("claimed_sil", 4.0),
+            ("achieved_sil", 4.0),
+            ("pfd_average", 5e-05),
+            ("pfd_upper", 7.500000000000001e-05),
+            ("hardware_fault_tolerance", 1.0),
+            ("systematic_capability", 4.0),
+            ("diagnostic_coverage", 0.6),
+            ("issue_count", 2.0),
+            ("error_count", 1.0),
+            ("warning_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[(
+            "issues",
+            &[
+                &[
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Name("error"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("architecture"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Name("warning"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("diagnostic_coverage"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "sv_sil3_1oo1",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.0005),
+            ("claimed_sil", 3.0),
+            ("test_interval_hours", 8760.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("architecture", "1oo1")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("claimed_sil", 3.0),
+            ("achieved_sil", 3.0),
+            ("pfd_average", 0.0005),
+            ("pfd_upper", 0.00075),
+            ("hardware_fault_tolerance", 0.0),
+            ("systematic_capability", 3.0),
+            ("diagnostic_coverage", 0.5),
+            ("issue_count", 2.0),
+            ("error_count", 0.0),
+            ("warning_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[(
+            "issues",
+            &[
+                &[
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Name("warning"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("architecture"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Name("warning"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("diagnostic_coverage"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "sv_unknown_architecture",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.005),
+            ("claimed_sil", 2.0),
+            ("test_interval_hours", 8760.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("architecture", "2oo4")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("claimed_sil", 2.0),
+            ("achieved_sil", 2.0),
+            ("pfd_average", 0.005),
+            ("pfd_upper", 0.0075),
+            ("hardware_fault_tolerance", 0.0),
+            ("systematic_capability", 2.0),
+            ("diagnostic_coverage", 0.5),
+            ("issue_count", 0.0),
+            ("error_count", 0.0),
+            ("warning_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static SIL_VERIFICATION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_sil_verification",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.sil_verification`.
+pub static SIL_VERIFICATION_SPEC: ModelSpec = ModelSpec {
+    id: "process.sil_verification",
+    kind: "procedure",
+    algorithm: Some(&SIL_VERIFICATION_ALGORITHM),
+    checks: SIL_VERIFICATION_CHECKS,
+    cases: SIL_VERIFICATION_CASES,
+};
+
 static SPLITTER_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -60598,6 +60901,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &SEPARATOR_CAPACITY_ASSESSMENT_SPEC,
     &SEPARATOR_PERFORMANCE_SPEC,
     &SHORTCUT_DISTILLATION_COLUMN_SPEC,
+    &SIL_VERIFICATION_SPEC,
     &SPLITTER_SPEC,
     &STIRRED_TANK_REACTOR_SPEC,
     &STRIPPING_COLUMN_SPEC,

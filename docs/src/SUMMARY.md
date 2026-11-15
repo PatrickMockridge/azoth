@@ -281,6 +281,7 @@
   - [Separator capacity assessment](./process/separator_capacity_assessment.md)
   - [Separator performance calculator](./process/separator_performance.md)
   - [Shortcut distillation column](./process/shortcut_distillation_column.md)
+  - [SIL verification](./process/sil_verification.md)
   - [Splitter](./process/splitter.md)
   - [Stirred-tank reactor](./process/stirred_tank_reactor.md)
   - [Stripping column](./process/stripping_column.md)

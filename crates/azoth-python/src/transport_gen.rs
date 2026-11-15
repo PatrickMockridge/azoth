@@ -22,7 +22,7 @@ use crate::record_outputs_gen::{
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
     PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow,
     PyRemediationOptionRow, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySterileRadius, PyStreamScaleMineralRow, PySubFraction,
+    PyScenarioIndexRow, PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySubFraction,
     PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
@@ -22101,6 +22101,104 @@ impl From<&azoth_process::models::shortcut_distillation_column::ShortcutDistilla
                 unit: "W".to_string(),
             },
             relative_volatility: r.relative_volatility,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.sil_verification`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SilVerificationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySilVerificationResult {
+    /// the claimed SIL, echoed.
+    #[pyo3(get)]
+    pub claimed_sil: f64,
+    /// the SIL the PFD maps to.
+    #[pyo3(get)]
+    pub achieved_sil: f64,
+    /// whether the achieved SIL is at least the claimed one.
+    #[pyo3(get)]
+    pub sil_achieved: bool,
+    /// the PFD, echoed.
+    #[pyo3(get)]
+    pub pfd_average: f64,
+    /// `1.5 PFD`, the class's conservative upper bound.
+    #[pyo3(get)]
+    pub pfd_upper: f64,
+    /// the architecture's fault tolerance from the class's table.
+    #[pyo3(get)]
+    pub hardware_fault_tolerance: f64,
+    /// the claimed SIL, the class's systematic-capability claim.
+    #[pyo3(get)]
+    pub systematic_capability: f64,
+    /// 0.6 for an architecture containing `oo2` or `oo3`, otherwise 0.5.
+    #[pyo3(get)]
+    pub diagnostic_coverage: f64,
+    /// the number of issues raised.
+    #[pyo3(get)]
+    pub issue_count: f64,
+    /// the number of errors among them.
+    #[pyo3(get)]
+    pub error_count: f64,
+    /// the number of warnings among them.
+    #[pyo3(get)]
+    pub warning_count: f64,
+    /// whether no error was raised.
+    #[pyo3(get)]
+    pub verification_passed: bool,
+    /// one row per issue, in the class's check order.
+    #[pyo3(get)]
+    pub issues: Vec<PySilIssue>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySilVerificationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SilVerificationResult(claimed_sil={:?}, achieved_sil={:?}, sil_achieved={:?}, pfd_average={:?}, pfd_upper={:?}, hardware_fault_tolerance={:?}, systematic_capability={:?}, diagnostic_coverage={:?}, issue_count={:?}, error_count={:?}, warning_count={:?}, verification_passed={:?}, issues={:?}, {} warning(s))",
+            self.claimed_sil,
+            self.achieved_sil,
+            self.sil_achieved,
+            self.pfd_average,
+            self.pfd_upper,
+            self.hardware_fault_tolerance,
+            self.systematic_capability,
+            self.diagnostic_coverage,
+            self.issue_count,
+            self.error_count,
+            self.warning_count,
+            self.verification_passed,
+            self.issues,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::sil_verification::SilVerificationResult>
+    for PySilVerificationResult
+{
+    fn from(r: &azoth_process::models::sil_verification::SilVerificationResult) -> Self {
+        Self {
+            claimed_sil: r.claimed_sil,
+            achieved_sil: r.achieved_sil,
+            sil_achieved: r.sil_achieved,
+            pfd_average: r.pfd_average,
+            pfd_upper: r.pfd_upper,
+            hardware_fault_tolerance: r.hardware_fault_tolerance,
+            systematic_capability: r.systematic_capability,
+            diagnostic_coverage: r.diagnostic_coverage,
+            issue_count: r.issue_count,
+            error_count: r.error_count,
+            warning_count: r.warning_count,
+            verification_passed: r.verification_passed,
+            issues: r.issues.iter().map(PySilIssue::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

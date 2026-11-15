@@ -1946,6 +1946,37 @@ impl From<&azoth_eos::results::ScenarioIndexRow> for PyScenarioIndexRow {
     }
 }
 
+/// one row per issue, in the class's check order.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "SilIssue")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySilIssue {
+    /// the issue's severity.
+    #[pyo3(get)]
+    pub severity: String,
+    /// the issue's category, from the class's full set.
+    #[pyo3(get)]
+    pub category: String,
+}
+
+#[pymethods]
+impl PySilIssue {
+    fn __repr__(&self) -> String {
+        format!(
+            "SilIssue(severity={}, category={})",
+            self.severity, self.category
+        )
+    }
+}
+
+impl From<&azoth_process::models::sil_verification::SilIssue> for PySilIssue {
+    fn from(row: &azoth_process::models::sil_verification::SilIssue) -> Self {
+        Self {
+            severity: row.severity.as_str().to_string(),
+            category: row.category.as_str().to_string(),
+        }
+    }
+}
+
 /// one row per target flux, in the caller's order.
 #[pyclass(
     frozen,

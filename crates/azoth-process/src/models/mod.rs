@@ -77,6 +77,7 @@ pub mod separator;
 pub mod separator_capacity_assessment;
 pub mod separator_performance;
 pub mod shortcut_distillation_column;
+pub mod sil_verification;
 pub mod splitter;
 pub mod stirred_tank_reactor;
 pub mod stripping_column;
@@ -155,6 +156,9 @@ pub use separator_capacity_assessment::{
 pub use separator_performance::{SeparatorPerformanceResult, separator_performance};
 pub use shortcut_distillation_column::{
     ShortcutDistillationColumnResult, shortcut_distillation_column,
+};
+pub use sil_verification::{
+    IssueCategory, IssueSeverity, SilIssue, SilVerificationResult, sil_verification,
 };
 pub use splitter::{SplitterResult, splitter};
 pub use stirred_tank_reactor::{StirredTankReactorResult, stirred_tank_reactor};

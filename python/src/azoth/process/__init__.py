@@ -66,6 +66,7 @@ from azoth.core.result import (
     SeparatorPerformanceResult,
     SeparatorResult,
     ShortcutDistillationColumnResult,
+    SilVerificationResult,
     SplitterResult,
     StirredTankReactorResult,
     StrippingColumnResult,
@@ -146,6 +147,7 @@ __all__ = [
     "separator",
     "separator_capacity_assessment",
     "shortcut_distillation_column",
+    "sil_verification",
     "splitter",
     "stirred_tank_reactor",
     "stripping_column",
@@ -200,6 +202,7 @@ _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
 _SHORTCUT_DISTILLATION_COLUMN = "process.shortcut_distillation_column"
+_SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
@@ -2307,6 +2310,29 @@ def lopa(
         event_pressure=event_pressure,
         design_pressure=design_pressure,
         test_pressure=test_pressure,
+    )
+
+
+def sil_verification(
+    pfd_average: float,
+    claimed_sil: float,
+    architecture: str,
+    test_interval_hours: float,
+) -> SilVerificationResult:
+    """The SIL verification: the achieved SIL, the architecture and the issues.
+
+    The fault tolerance is the class's exact-match table and the diagnostic coverage its
+    substring rule; any other architecture answers 0 and 0.5. **Warnings alone do not
+    fail the verification**; an error does. A NaN or negative PFD, which the class lets
+    through to achieved SIL 4, is refused.
+
+    See :func:`azoth.process.reference.sil_verification`.
+    """
+    return resolve(_SIL_VERIFICATION)(  # type: ignore[no-any-return]
+        pfd_average=pfd_average,
+        claimed_sil=claimed_sil,
+        architecture=architecture,
+        test_interval_hours=test_interval_hours,
     )
 
 

@@ -2963,6 +2963,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'process.sil_verification': {
+        "calc_id": 'process.sil_verification',
+        "name": 'SIL verification',
+        "spec": {'path': 'specs/models/process/sil_verification.toml', 'sha256': '22e567da681845bfe69fe893ce8d7281d675717f0e4901f2ea08c0378f77e0db'},
+        "code": [{'path': 'python/src/azoth/process/reference/sil_verification.py', 'sha256': '721961823af248071e6e65bcf0639073ec78ac8bf72116cd80c4dbe2098b9e5a'}, {'path': 'crates/azoth-process/src/models/sil_verification.rs', 'sha256': 'aa2118d60be13a4866bd1610373842b4dd33461622ed193c2df5ceb7e3c64c17'}],
+        "source": 'NeqSim process/safety/risk/sis/SILVerificationResult.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 5,
+        "tests_skipped": 0,
+    },
     'process.splitter': {
         "calc_id": 'process.splitter',
         "name": 'Splitter',

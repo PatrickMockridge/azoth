@@ -51,6 +51,7 @@ from azoth.core.record_outputs_gen import (
     ScaleControlRow,
     ScenarioChangeRow,
     ScenarioIndexRow,
+    SilIssue,
     SterileRadius,
     StreamScaleMineralRow,
     SubFraction,
@@ -8857,6 +8858,55 @@ class ShortcutDistillationColumnResult(_HasWarnings):
 
     #: `alpha_LK/HK`, the K-value ratio the whole calculation is written in. **The one intermediate the class exposes**, and what makes the capture's K-values checkable against the class's own flash.
     relative_volatility: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SilVerificationResult(_HasWarnings):
+    """Result of ``process.sil_verification``."""
+
+    CALC_ID: ClassVar[str] = "process.sil_verification"
+
+    #: the claimed SIL, echoed.
+    claimed_sil: float
+
+    #: the SIL the PFD maps to.
+    achieved_sil: float
+
+    #: whether the achieved SIL is at least the claimed one.
+    sil_achieved: bool
+
+    #: the PFD, echoed.
+    pfd_average: float
+
+    #: `1.5 PFD`, the class's conservative upper bound.
+    pfd_upper: float
+
+    #: the architecture's fault tolerance from the class's table.
+    hardware_fault_tolerance: float
+
+    #: the claimed SIL, the class's systematic-capability claim.
+    systematic_capability: float
+
+    #: 0.6 for an architecture containing `oo2` or `oo3`, otherwise 0.5.
+    diagnostic_coverage: float
+
+    #: the number of issues raised.
+    issue_count: float
+
+    #: the number of errors among them.
+    error_count: float
+
+    #: the number of warnings among them.
+    warning_count: float
+
+    #: whether no error was raised.
+    verification_passed: bool
+
+    #: one row per issue, in the class's check order.
+    issues: tuple[SilIssue, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

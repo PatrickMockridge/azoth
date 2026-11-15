@@ -707,6 +707,17 @@ class ScenarioIndexRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SilIssue:
+    """one row per issue, in the class's check order."""
+
+    #: the issue's severity.
+    severity: str
+
+    #: the issue's category, from the class's full set.
+    category: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SterileRadius:
     """one row per target flux, in the caller's order."""
 

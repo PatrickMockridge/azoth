@@ -935,6 +935,13 @@ class LopaLayerContribution:
     contribution_per_year: float
     rrf: float | None
 
+@final
+class SilIssue:
+    """one row per issue, in the class's check order."""
+
+    severity: str
+    category: str
+
 # --- results --------------------------------------------------------------
 # Generated from the result dataclasses, so the stub and `azoth.core.result`
 # cannot disagree about a field.
@@ -4042,6 +4049,23 @@ class ShortcutDistillationColumnResult:
     condenser_duty: Qty
     reboiler_duty: Qty
     relative_volatility: float
+    warnings: list[Warning]
+
+@final
+class SilVerificationResult:
+    claimed_sil: float
+    achieved_sil: float
+    sil_achieved: bool
+    pfd_average: float
+    pfd_upper: float
+    hardware_fault_tolerance: float
+    systematic_capability: float
+    diagnostic_coverage: float
+    issue_count: float
+    error_count: float
+    warning_count: float
+    verification_passed: bool
+    issues: list[SilIssue]
     warnings: list[Warning]
 
 @final
@@ -7404,6 +7428,12 @@ def shortcut_distillation_column(
     condenser_pressure: float | None = None,
     reboiler_pressure: float | None = None,
 ) -> ShortcutDistillationColumnResult: ...
+def sil_verification(
+    pfd_average: float,
+    claimed_sil: float,
+    architecture: str,
+    test_interval_hours: float,
+) -> SilVerificationResult: ...
 def splitter(
     components: list[str],
     feed_n: float,

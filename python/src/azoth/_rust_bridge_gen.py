@@ -280,6 +280,8 @@ from azoth.core.result import (
     ShellAndTubeVibrationResult,
     ShortcutDistillationColumnResult,
     SiddiqiLucasDiffusivityResult,
+    SilIssue,
+    SilVerificationResult,
     SolidFugacityResult,
     SoreideWhitsonAlphaResult,
     SoreideWhitsonPhaseResult,
@@ -623,6 +625,7 @@ __all__ = [
     "shell_and_tube_vibration",
     "shortcut_distillation_column",
     "siddiqi_lucas_diffusivity",
+    "sil_verification",
     "solid_fugacity",
     "soreide_whitson_alpha",
     "soreide_whitson_phase",
@@ -7767,6 +7770,32 @@ def shortcut_distillation_column(components: list[str], feed_n: Q, feed_z: list[
         condenser_duty=from_si(result.condenser_duty.magnitude_si, result.condenser_duty.unit),
         reboiler_duty=from_si(result.reboiler_duty.magnitude_si, result.reboiler_duty.unit),
         relative_volatility=result.relative_volatility,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def sil_verification(pfd_average: float, claimed_sil: float, architecture: str, test_interval_hours: float) -> SilVerificationResult:
+    """``process.sil_verification``, computed in Rust."""
+    result = _core.sil_verification(
+        pfd_average,
+        claimed_sil,
+        architecture,
+        test_interval_hours,
+    )
+    return SilVerificationResult(
+        claimed_sil=result.claimed_sil,
+        achieved_sil=result.achieved_sil,
+        sil_achieved=result.sil_achieved,
+        pfd_average=result.pfd_average,
+        pfd_upper=result.pfd_upper,
+        hardware_fault_tolerance=result.hardware_fault_tolerance,
+        systematic_capability=result.systematic_capability,
+        diagnostic_coverage=result.diagnostic_coverage,
+        issue_count=result.issue_count,
+        error_count=result.error_count,
+        warning_count=result.warning_count,
+        verification_passed=result.verification_passed,
+        issues=tuple(SilIssue(severity=c.severity, category=c.category) for c in result.issues),
         warnings=_warnings(result.warnings),
     )
 

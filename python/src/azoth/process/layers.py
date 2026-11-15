@@ -2227,6 +2227,36 @@ def _lopa(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _sil_verification(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.sil_verification`'s layers, from the reference's own arithmetic.
+
+    The issue severities and categories are names; they are asserted by the case and the
+    cross-impl test.
+    """
+    from azoth.process.reference.sil_verification import (
+        sil_verification as evaluate,
+    )
+
+    result = evaluate(
+        float(inputs["pfd_average"]),
+        float(inputs["claimed_sil"]),
+        str(inputs["architecture"]),
+        float(inputs["test_interval_hours"]),
+    )
+    return {
+        "claimed_sil": result.claimed_sil,
+        "achieved_sil": result.achieved_sil,
+        "pfd_average": result.pfd_average,
+        "pfd_upper": result.pfd_upper,
+        "hardware_fault_tolerance": result.hardware_fault_tolerance,
+        "systematic_capability": result.systematic_capability,
+        "diagnostic_coverage": result.diagnostic_coverage,
+        "issue_count": result.issue_count,
+        "error_count": result.error_count,
+        "warning_count": result.warning_count,
+    }
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2247,6 +2277,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.bow_tie": _bow_tie,
     "process.safety_instrumented_function": _safety_instrumented_function,
     "process.lopa": _lopa,
+    "process.sil_verification": _sil_verification,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3393,6 +3424,44 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_lopa.tsv",
         block=5,
         identified_by=("#label", "lopa_zero_target_unmet"),
+    ),
+    # The SIL verification's five caseable states. The six blocks after them (1oo3, the
+    # `4oo2` substring, the two proof boundaries, a NaN and a negative PFD) are declared
+    # in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.sil_verification",
+        case="sv_canonical",
+        capture="process_sil_verification.tsv",
+        block=0,
+        identified_by=("#label", "sv_canonical"),
+    ),
+    LayerCase(
+        model="process.sil_verification",
+        case="sv_pfd_exceeded",
+        capture="process_sil_verification.tsv",
+        block=1,
+        identified_by=("#label", "sv_pfd_exceeded"),
+    ),
+    LayerCase(
+        model="process.sil_verification",
+        case="sv_sil4_1oo2",
+        capture="process_sil_verification.tsv",
+        block=2,
+        identified_by=("#label", "sv_sil4_1oo2"),
+    ),
+    LayerCase(
+        model="process.sil_verification",
+        case="sv_sil3_1oo1",
+        capture="process_sil_verification.tsv",
+        block=3,
+        identified_by=("#label", "sv_sil3_1oo1"),
+    ),
+    LayerCase(
+        model="process.sil_verification",
+        case="sv_unknown_architecture",
+        capture="process_sil_verification.tsv",
+        block=4,
+        identified_by=("#label", "sv_unknown_architecture"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4640,6 +4709,9 @@ UNCASED_ROWS: dict[str, int] = {
     # boundaries, a zero-PFD layer, a negative initiating frequency, and the four STS0131
     # refusals (a zero pressure three times and a test below design).
     "process_lopa.tsv": 13,
+    # The SIL verification's six: 1oo3, the `4oo2` substring, a ten-year proof interval,
+    # exactly five years, a NaN PFD and a negative PFD.
+    "process_sil_verification.tsv": 6,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,
