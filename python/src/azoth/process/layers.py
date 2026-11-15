@@ -2323,11 +2323,11 @@ def _psv_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
     from azoth.core.units import quantity
     from azoth.process.reference.psv_sizing import psv_sizing as evaluate
 
-    def optional(name: str, unit: str):
+    def optional(name: str, unit: str) -> Any:
         value = inputs.get(name)
         return None if value is None else quantity(float(value), unit)
 
-    def number(name: str):
+    def number(name: str) -> float | None:
         value = inputs.get(name)
         return None if value is None else float(value)
 

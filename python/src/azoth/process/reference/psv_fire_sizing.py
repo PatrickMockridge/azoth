@@ -208,11 +208,11 @@ def psv_fire_sizing(
         raise InvalidInputError("cv_discharge_coefficient", "is required with orifice_area")
     if orifice_area_si is None and cv_discharge_coefficient is not None:
         raise InvalidInputError("orifice_area", "is required with cv_discharge_coefficient")
-    flow_coefficient = (
-        None
-        if orifice_area_si is None
-        else 24.6 * float(cv_discharge_coefficient) * (orifice_area_si / 6.4516e-4)
-    )
+    if orifice_area_si is None:
+        flow_coefficient = None
+    else:
+        assert cv_discharge_coefficient is not None
+        flow_coefficient = 24.6 * float(cv_discharge_coefficient) * (orifice_area_si / 6.4516e-4)
     blowdown_pressure = (
         None
         if blowdown_percent is None

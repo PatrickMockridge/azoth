@@ -82,7 +82,7 @@ def tr3001_compliance(
             f"a finite non-negative area is required, and {required_area_in2} is not",
         )
 
-    rows = input_records_to_si(spec, "scenarios", scenarios)
+    rows: list[dict[str, Any]] = input_records_to_si(spec, "scenarios", scenarios)
     parsed: list[tuple[str, float, bool, bool]] = []
     for index, row in enumerate(rows):
         rate = float(row["relief_rate"])
@@ -98,11 +98,11 @@ def tr3001_compliance(
             )
         parsed.append((cause, rate, bool(row["dynamically_determined"]), bool(row["credible"])))
 
-    credible = [row for row in parsed if row[3]]
-    governing = None
-    for row in credible:
-        if governing is None or row[1] > governing[1]:
-            governing = row
+    credible = [candidate for candidate in parsed if candidate[3]]
+    governing: tuple[str, float, bool, bool] | None = None
+    for candidate in credible:
+        if governing is None or candidate[1] > governing[1]:
+            governing = candidate
 
     findings: list[Tr3001Finding] = [
         Tr3001Finding(

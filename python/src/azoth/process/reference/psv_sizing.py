@@ -363,10 +363,11 @@ def psv_sizing(
             raise InvalidInputError(
                 "orifice_area", "is required with capacity_discharge_coefficient"
             )
-        capacity_value = (
-            None
-            if orifice_area_si is None
-            else _capacity(
+        if orifice_area_si is None:
+            capacity_value = None
+        else:
+            assert capacity_discharge_coefficient is not None
+            capacity_value = _capacity(
                 orifice_area_si,
                 set_pressure_si,
                 overpressure_fraction,
@@ -377,7 +378,6 @@ def psv_sizing(
                 specific_heat_ratio_value,
                 float(capacity_discharge_coefficient),
             )
-        )
         return PsvSizingResult(
             relieving_pressure=from_si(relieving_pressure, "Pa"),
             back_pressure_fraction=float(gas["back_pressure_fraction"]),

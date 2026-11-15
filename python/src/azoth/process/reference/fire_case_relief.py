@@ -30,7 +30,8 @@ def _spec() -> dict[str, Any]:
 def _fire_heat_input(area_m2: float, has_drainage: bool) -> float:
     area_ft2 = area_m2 * 10.7639
     coefficient = 21_000.0 if has_drainage else 34_500.0
-    return coefficient * area_ft2**0.82 * 0.29307107
+    heat_input: float = coefficient * area_ft2**0.82 * 0.29307107
+    return heat_input
 
 
 def fire_case_relief(
