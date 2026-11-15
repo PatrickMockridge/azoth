@@ -1,0 +1,162 @@
+id = "process.safety_instrumented_function"
+name = "Safety instrumented function"
+kind = "procedure"
+assumptions = [
+    "**the risk reduction factor is `1 / PFD`**, and it is absent at a PFD of zero, where the class answers `+Infinity`.",
+    "**the mitigated frequency is `unmitigated_frequency PFD`**, the SIF's credit applied to the initiating frequency.",
+    "**the required PFD is `target_frequency / unmitigated_frequency`**, and `1.0` when the unmitigated frequency is zero, the class's own answer.",
+    "**the required SIL maps the required PFD by `>= 0.01` to 1, `>= 0.001` to 2, `>= 1e-4` to 3 and below that to 4**, so a PFD of exactly `0.01` reads SIL 1.",
+    "**the PFD band per claimed SIL is `[0, 0.01 / 0.001 / 1e-4 / 1e-5, 1 / 0.1 / 0.01 / 0.001 / 1e-4]`**: a PFD inside it is within the claimed SIL, and the class only prints a warning when it is not. The port publishes the boolean and an `OUT_OF_VALID_RANGE` warning rather than refusing.",
+    "**the proof-test interval is the class's hours over 8760**, in years.",
+    "**the three architecture PFDs are `lambda test_interval / 2`, `(lambda test_interval)^2 / 3` and `(lambda test_interval)^2`** for 1oo1, 1oo2 and 2oo3, each absent when the failure rate is not supplied.",
+    "**the availability with spurious trips is `base (1 - rate mttr / 8760)` when the rate is positive and the base availability otherwise**, present when both the base availability and the MTTR are supplied.",
+    "**the class accepts a negative PFD and a NaN**, answering `+Infinity` and NaN; the port refuses both. A SIL outside 1..4 is refused by the class's constructor.",
+]
+references = [
+    "IEC 61508-1:2010, table 3. Safety integrity levels and the PFD ranges.",
+    "IEC 61511-1:2016. Functional safety - Safety instrumented systems for the process industry sector.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/risk/sis/SafetyInstrumentedFunction.java` is the port source.",
+    "`validation/neqsim/captures/process_safety_instrumented_function.tsv` - the class's SIL 2 state, a zero unmitigated frequency, a zero PFD, the spurious-trip availability, an out-of-band PFD and the states the class accepts or refuses.",
+]
+[source]
+standard = "NeqSim process/safety/risk/sis/SafetyInstrumentedFunction.java"
+edition = "Its `getRiskReductionFactor`, `getMitigatedFrequency`, `calculateRequiredPfd`, `getRequiredSil`, `getMaxPfdForSil`, `getProofTestIntervalYears`, the three `calculatePfd*` methods and `getAvailabilityWithSpuriousTrips`."
+[algorithm]
+scheme = "closed_form_safety_instrumented_function"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.pfd_average]
+unit = "dimensionless"
+description = "the SIF's average probability of failure on demand, in `[0, 1]`.\n"
+[inputs.claimed_sil]
+unit = "dimensionless"
+description = "the claimed safety integrity level, a whole number in `[1, 4]`.\n"
+[inputs.unmitigated_frequency_per_year]
+unit = "dimensionless"
+description = "the initiating event's frequency in 1/year, at least zero.\n"
+[inputs.target_frequency_per_year]
+unit = "dimensionless"
+description = "the target mitigated frequency in 1/year, at least zero.\n"
+[inputs.test_interval_hours]
+unit = "dimensionless"
+description = "the proof-test interval in hours, at least zero; dimensionless because the vocabulary has no hour unit, so the hours cross unconverted.\n"
+[inputs.lambda_du_per_hour]
+unit = "dimensionless"
+optional = true
+description = "a channel's dangerous-undetected failure rate in 1/hour, at least zero. **Absent means the three architecture PFDs are absent.**\n"
+[inputs.spurious_trip_rate_per_year]
+unit = "dimensionless"
+optional = true
+description = "the spurious-trip rate in 1/year, at least zero. **Absent is 0**, the class's field default.\n"
+[inputs.mttr_hours]
+unit = "dimensionless"
+optional = true
+description = "the mean time to repair in hours, at least zero; dimensionless for the same reason. **Absent means the availability with spurious trips is absent.**\n"
+[inputs.base_availability]
+unit = "dimensionless"
+optional = true
+description = "the baseline availability, in `[0, 1]`. **Absent means the availability with spurious trips is absent.**\n"
+[outputs]
+[outputs.risk_reduction_factor]
+unit = "dimensionless"
+optional = true
+description = "`1 / PFD`; absent at a PFD of zero, where the class answers `+Infinity`.\n"
+[outputs.mitigated_frequency_per_year]
+unit = "dimensionless"
+description = "`unmitigated_frequency PFD`, in 1/year.\n"
+[outputs.required_pfd]
+unit = "dimensionless"
+description = "`target_frequency / unmitigated_frequency`; `1.0` at a zero unmitigated frequency.\n"
+[outputs.required_sil]
+unit = "dimensionless"
+description = "the SIL the required PFD maps to, by the class's thresholds.\n"
+[outputs.max_pfd_for_claimed_sil]
+unit = "dimensionless"
+description = "the largest PFD the claimed SIL allows.\n"
+[outputs.proof_test_interval_years]
+unit = "dimensionless"
+description = "the proof-test interval in years, `hours / 8760`.\n"
+[outputs.pfd_within_claimed_sil]
+type = "boolean"
+description = "whether the PFD lies inside the claimed SIL's two-sided band; the class only prints a warning when it does not.\n"
+[outputs.pfd_1oo1]
+unit = "dimensionless"
+optional = true
+description = "`lambda test_interval / 2`; absent when the failure rate is absent.\n"
+[outputs.pfd_1oo2]
+unit = "dimensionless"
+optional = true
+description = "`(lambda test_interval)^2 / 3`; absent when the failure rate is absent.\n"
+[outputs.pfd_2oo3]
+unit = "dimensionless"
+optional = true
+description = "`(lambda test_interval)^2`; absent when the failure rate is absent.\n"
+[outputs.availability_with_spurious_trips]
+unit = "dimensionless"
+optional = true
+description = "`base (1 - rate mttr / 8760)`; absent when the base availability or the MTTR is absent.\n"
+[[valid_range]]
+quantity = "pfd_average"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "a probability of failure on demand is in [0, 1]; the class accepts a negative or NaN value and answers Infinity or NaN"
+[[valid_range]]
+quantity = "claimed_sil"
+min = 1
+min_inclusive = true
+max = 4
+max_inclusive = true
+severity = "error"
+rationale = "the class's constructor refuses a SIL outside 1..4"
+[[valid_range]]
+quantity = "unmitigated_frequency_per_year"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative frequency is not a frequency"
+[[valid_range]]
+quantity = "target_frequency_per_year"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative frequency is not a frequency"
+[[valid_range]]
+quantity = "test_interval_hours"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative interval is not an interval"
+[[valid_range]]
+quantity = "lambda_du_per_hour"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative failure rate is not a rate"
+[[valid_range]]
+quantity = "spurious_trip_rate_per_year"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative rate is not a rate"
+[[valid_range]]
+quantity = "mttr_hours"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative repair time is not a time"
+[[valid_range]]
+quantity = "base_availability"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "an availability is in [0, 1]"
+[implementations]
+python = "azoth.process.safety_instrumented_function"
+rust = "azoth_process::safety_instrumented_function"

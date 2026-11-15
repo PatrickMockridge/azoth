@@ -1,0 +1,159 @@
+id = "process.lopa"
+name = "Layer of protection analysis"
+kind = "procedure"
+assumptions = [
+    "**the frequencies are the caller's**: the initiating, target and mitigated frequencies are stated, and the protection layers are descriptive rows the class records rather than terms it multiplies.",
+    "**the target is met when the mitigated frequency is at or below the target**, and `gap_to_target` is `mitigated - target` — signed, so a positive gap is a shortfall; the class's javadoc says the same and its code stores that difference.",
+    "**`total_rrf` is `initiating / mitigated`, and zero when the mitigated frequency is zero**, which is the class's own answer rather than `+Infinity`.",
+    "**the required additional RRF is zero when the target is met**, otherwise `mitigated / target`; when the target is zero and is not met the class answers `+Infinity`, and the port publishes the output as absent.",
+    "**the required additional SIL is zero when the target is met**, otherwise the class's required-SIL map applied to `1 / required_additional_RRF`; an absent RRF reads as zero and answers SIL 4.",
+    "**a layer's contribution is `frequency_before - frequency_after`**, and its RRF is `1 / PFD`, absent at a zero PFD where the class answers `+Infinity`.",
+    "**the STS0131 category bands are `> 2 design` above two times, `> test` above test, `> design` above design and otherwise at or below design**, with target frequencies `1e-5`, `1e-4`, `1e-3` and `1e-2` 1/year.",
+    "**the STS0131 pressures are all three or none**, and the class refuses a non-positive pressure or a test pressure below design; a partial triple is refused here too.",
+    "**the class's visualization and JSON are presentation** and sit outside this id; the machine facts they format are the outputs.",
+]
+references = [
+    "IEC 61511-3:2016. Guidance for the determination of the required safety integrity levels, layer of protection analysis.",
+    "CCPS (2001). Layer of Protection Analysis: Simplified Process Risk Assessment.",
+    "NORSOK Z-013 / STS0131, overpressure acceptance criteria and the target-frequency bands.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/risk/sis/LOPAResult.java` is the port source.",
+    "`validation/neqsim/captures/process_lopa.tsv` - the MCP runner's target-met and gap states, a true and a floating-point boundary, zero mitigated, zero target, and the four STS0131 bands with their exact boundaries.",
+]
+[source]
+standard = "NeqSim process/safety/risk/sis/LOPAResult.java"
+edition = "Its `updateTargetStatus`, `getTotalRRF`, `getRequiredAdditionalRRF`, `getRequiredAdditionalSIL`, the `ProtectionLayer` row and the STS0131 static pair."
+[algorithm]
+scheme = "closed_form_lopa"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.initiating_event_frequency_per_year]
+unit = "dimensionless"
+description = "the initiating event's frequency in 1/year, at least zero.\n"
+[inputs.target_frequency_per_year]
+unit = "dimensionless"
+description = "the target mitigated frequency in 1/year, at least zero.\n"
+[inputs.mitigated_frequency_per_year]
+unit = "dimensionless"
+description = "the caller's mitigated frequency in 1/year, at least zero; the layers below do not compute it.\n"
+[inputs.layers]
+type = "record_list"
+row_type = "LopaProtectionLayer"
+description = "the protection layers in caller order. They are recorded and reported; **their PFDs do not multiply the mitigated frequency**, which is an input.\n"
+[inputs.layers.fields.name]
+type = "string"
+description = "the layer's name.\n"
+[inputs.layers.fields.pfd]
+unit = "dimensionless"
+description = "the layer's probability of failure on demand, in `[0, 1]`.\n"
+[inputs.layers.fields.frequency_before_per_year]
+unit = "dimensionless"
+description = "the frequency the caller records before this layer, in 1/year, at least zero.\n"
+[inputs.layers.fields.frequency_after_per_year]
+unit = "dimensionless"
+description = "the frequency the caller records after this layer, in 1/year, at least zero.\n"
+[inputs.event_pressure]
+unit = "bar"
+optional = true
+description = "the maximum event pressure, above zero; the first of the STS0131 triple, which is all three or none.\n"
+[inputs.design_pressure]
+unit = "bar"
+optional = true
+description = "the design pressure, above zero; the second of the triple.\n"
+[inputs.test_pressure]
+unit = "bar"
+optional = true
+description = "the test pressure, above zero and at least the design pressure; the third of the triple.\n"
+[outputs]
+[outputs.target_met]
+type = "boolean"
+description = "whether the mitigated frequency is at or below the target.\n"
+[outputs.gap_to_target]
+unit = "dimensionless"
+description = "`mitigated - target`, in 1/year; positive is a shortfall.\n"
+[outputs.total_rrf]
+unit = "dimensionless"
+description = "`initiating / mitigated`; zero when the mitigated frequency is zero.\n"
+[outputs.required_additional_rrf]
+unit = "dimensionless"
+optional = true
+description = "`mitigated / target` when the target is not met and the target is positive; absent when the target is zero, where the class answers `+Infinity`.\n"
+[outputs.required_additional_sil]
+unit = "dimensionless"
+description = "the SIL the required RRF asks for, or zero when the target is met.\n"
+[outputs.layer_contributions]
+type = "record_list"
+description = "one row per input layer, in caller order.\n"
+[outputs.layer_contributions.fields.name]
+type = "string"
+description = "the layer's name.\n"
+[outputs.layer_contributions.fields.pfd]
+unit = "dimensionless"
+description = "the layer's PFD.\n"
+[outputs.layer_contributions.fields.frequency_before_per_year]
+unit = "dimensionless"
+description = "the recorded frequency before the layer.\n"
+[outputs.layer_contributions.fields.frequency_after_per_year]
+unit = "dimensionless"
+description = "the recorded frequency after the layer.\n"
+[outputs.layer_contributions.fields.contribution_per_year]
+unit = "dimensionless"
+description = "`before - after`, in 1/year.\n"
+[outputs.layer_contributions.fields.rrf]
+unit = "dimensionless"
+optional = true
+description = "`1 / PFD`; absent at a zero PFD, where the class answers `+Infinity`.\n"
+[outputs.sts0131_pressure_category]
+type = "enum"
+optional = true
+values = [
+    "below_or_at_design_pressure",
+    "above_design_to_test_pressure",
+    "above_test_to_two_times_design_pressure",
+    "above_two_times_design_pressure",
+]
+description = "the STS0131 pressure band; absent when the pressure triple is absent.\n"
+[outputs.sts0131_target_frequency_per_year]
+unit = "dimensionless"
+optional = true
+description = "the target frequency the band asks for, in 1/year; absent with the category.\n"
+[[valid_range]]
+quantity = "initiating_event_frequency_per_year"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative frequency is not a frequency"
+[[valid_range]]
+quantity = "target_frequency_per_year"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative frequency is not a frequency"
+[[valid_range]]
+quantity = "mitigated_frequency_per_year"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative frequency is not a frequency"
+[[valid_range]]
+quantity = "event_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive pressure"
+[[valid_range]]
+quantity = "design_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive pressure"
+[[valid_range]]
+quantity = "test_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive pressure"
+[implementations]
+python = "azoth.process.lopa"
+rust = "azoth_process::lopa"

@@ -42,13 +42,17 @@ from azoth.core.record_outputs_gen import (
     KComponent,
     LeakBlowdownDiagnostic,
     LeakBlowdownPoint,
+    LopaLayerContribution,
     MineralEquilibriumRow,
+    MinimalCutSet,
     NaceIssueRow,
     RemediationOptionRow,
+    RiskAssessmentRow,
     ScaleControlRiskRow,
     ScaleControlRow,
     ScenarioChangeRow,
     ScenarioIndexRow,
+    SilIssue,
     SterileRadius,
     StreamScaleMineralRow,
     SubFraction,
@@ -72,6 +76,7 @@ from azoth.core.result_base import (
     PlusModel,
     RootStructure,
     StabilityVerdict,
+    Sts0131PressureCategory,
     SupplyVerdict,
     TpMultiflashSeed,
     _HasWarnings,
@@ -5734,6 +5739,28 @@ class BleveResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class BowTieResult(_HasWarnings):
+    """Result of ``process.bow_tie``."""
+
+    CALC_ID: ClassVar[str] = "process.bow_tie"
+
+    #: the sum of the active threats' frequencies, in 1/year.
+    unmitigated_frequency_per_year: float
+
+    #: the unmitigated frequency times the functional prevention barriers' PFDs, in 1/year.
+    mitigated_frequency_per_year: float
+
+    #: `unmitigated / mitigated`; zero when the mitigated frequency is zero.
+    total_rrf: float
+
+    #: the largest consequence severity, or zero when there are no consequences.
+    max_severity: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ComponentSplitterResult(_HasWarnings):
     """Result of ``process.component_splitter``."""
 
@@ -6472,6 +6499,25 @@ class ExpanderResult(_HasWarnings):
 
     #: `getModuleHeight`.
     design_module_height: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FaultTreeResult(_HasWarnings):
+    """Result of ``process.fault_tree``."""
+
+    CALC_ID: ClassVar[str] = "process.fault_tree"
+
+    #: the recursive gate probability; OR is the exact complement union, AND the product, VOTING the Poisson-binomial sum.
+    top_event_probability: float
+
+    #: the number of minimal cut sets.
+    cut_set_count: float
+
+    #: the minimal cut sets, ordered by cardinality and then by member name.
+    minimal_cut_sets: tuple[MinimalCutSet, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -7572,6 +7618,40 @@ class LeakBlowdownResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class LopaResult(_HasWarnings):
+    """Result of ``process.lopa``."""
+
+    CALC_ID: ClassVar[str] = "process.lopa"
+
+    #: whether the mitigated frequency is at or below the target.
+    target_met: bool
+
+    #: `mitigated - target`, in 1/year; positive is a shortfall.
+    gap_to_target: float
+
+    #: `initiating / mitigated`; zero when the mitigated frequency is zero.
+    total_rrf: float
+
+    #: `mitigated / target` when the target is not met and the target is positive; absent when the target is zero, where the class answers `+Infinity`.
+    required_additional_rrf: float | None
+
+    #: the SIL the required RRF asks for, or zero when the target is met.
+    required_additional_sil: float
+
+    #: one row per input layer, in caller order.
+    layer_contributions: tuple[LopaLayerContribution, ...]
+
+    #: the STS0131 pressure band; absent when the pressure triple is absent.
+    sts0131_pressure_category: Sts0131PressureCategory | None
+
+    #: the target frequency the band asks for, in 1/year; absent with the category.
+    sts0131_target_frequency_per_year: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ManifoldResult(_HasWarnings):
     """Result of ``process.manifold``."""
 
@@ -7680,6 +7760,31 @@ class MixerResult(_HasWarnings):
 
     #: the outlet molar enthalpy, the flow-weighted average of the feeds'. Mixing adds no heat and no work, so this is the whole of the energy balance.
     product_h: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class Nog070SilDeterminationResult(_HasWarnings):
+    """Result of ``process.nog070_sil_determination``."""
+
+    CALC_ID: ClassVar[str] = "process.nog070_sil_determination"
+
+    #: the catalogue's minimum SIL for the type.
+    catalogue_minimum_sil: float
+
+    #: the minimum applied: the caller's when stated, otherwise the catalogue's.
+    minimum_sil: float
+
+    #: the SIL the PFD maps to, by the class's `pfdToSil`.
+    achieved_sil: float
+
+    #: whether the achieved SIL is at least the minimum.
+    compliant: bool
+
+    #: `10^(minimum - achieved)`, published only when the SIF is not compliant.
+    required_pfd_reduction_factor: float | None
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -8333,6 +8438,65 @@ class RateBasedPackedColumnResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class RiskMatrixResult(_HasWarnings):
+    """Result of ``process.risk_matrix``."""
+
+    CALC_ID: ClassVar[str] = "process.risk_matrix"
+
+    #: one row per input row, in caller order.
+    assessments: tuple[RiskAssessmentRow, ...]
+
+    #: the sum of the annual costs.
+    total_annual_risk_cost: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SafetyInstrumentedFunctionResult(_HasWarnings):
+    """Result of ``process.safety_instrumented_function``."""
+
+    CALC_ID: ClassVar[str] = "process.safety_instrumented_function"
+
+    #: `1 / PFD`; absent at a PFD of zero, where the class answers `+Infinity`.
+    risk_reduction_factor: float | None
+
+    #: `unmitigated_frequency PFD`, in 1/year.
+    mitigated_frequency_per_year: float
+
+    #: `target_frequency / unmitigated_frequency`; `1.0` at a zero unmitigated frequency.
+    required_pfd: float
+
+    #: the SIL the required PFD maps to, by the class's thresholds.
+    required_sil: float
+
+    #: the largest PFD the claimed SIL allows.
+    max_pfd_for_claimed_sil: float
+
+    #: the proof-test interval in years, `hours / 8760`.
+    proof_test_interval_years: float
+
+    #: whether the PFD lies inside the claimed SIL's two-sided band; the class only prints a warning when it does not.
+    pfd_within_claimed_sil: bool
+
+    #: `lambda test_interval / 2`; absent when the failure rate is absent.
+    pfd_1oo1: float | None
+
+    #: `(lambda test_interval)^2 / 3`; absent when the failure rate is absent.
+    pfd_1oo2: float | None
+
+    #: `(lambda test_interval)^2`; absent when the failure rate is absent.
+    pfd_2oo3: float | None
+
+    #: `base (1 - rate mttr / 8760)`; absent when the base availability or the MTTR is absent.
+    availability_with_spurious_trips: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SeparatorResult(_HasWarnings):
     """Result of ``process.separator``."""
 
@@ -8736,6 +8900,55 @@ class ShortcutDistillationColumnResult(_HasWarnings):
 
     #: `alpha_LK/HK`, the K-value ratio the whole calculation is written in. **The one intermediate the class exposes**, and what makes the capture's K-values checkable against the class's own flash.
     relative_volatility: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SilVerificationResult(_HasWarnings):
+    """Result of ``process.sil_verification``."""
+
+    CALC_ID: ClassVar[str] = "process.sil_verification"
+
+    #: the claimed SIL, echoed.
+    claimed_sil: float
+
+    #: the SIL the PFD maps to.
+    achieved_sil: float
+
+    #: whether the achieved SIL is at least the claimed one.
+    sil_achieved: bool
+
+    #: the PFD, echoed.
+    pfd_average: float
+
+    #: `1.5 PFD`, the class's conservative upper bound.
+    pfd_upper: float
+
+    #: the architecture's fault tolerance from the class's table.
+    hardware_fault_tolerance: float
+
+    #: the claimed SIL, the class's systematic-capability claim.
+    systematic_capability: float
+
+    #: 0.6 for an architecture containing `oo2` or `oo3`, otherwise 0.5.
+    diagnostic_coverage: float
+
+    #: the number of issues raised.
+    issue_count: float
+
+    #: the number of errors among them.
+    error_count: float
+
+    #: the number of warnings among them.
+    warning_count: float
+
+    #: whether no error was raised.
+    verification_passed: bool
+
+    #: one row per issue, in the class's check order.
+    issues: tuple[SilIssue, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

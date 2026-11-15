@@ -41,6 +41,33 @@ pub struct AssayCutDerivation {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BowTieBarrier {
+    #[pyo3(item)]
+    pub pfd: f64,
+    #[pyo3(item)]
+    pub barrier_type: String,
+    #[pyo3(item)]
+    pub functional: Option<bool>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BowTieConsequence {
+    #[pyo3(item)]
+    pub severity: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BowTieThreat {
+    #[pyo3(item)]
+    pub frequency: f64,
+    #[pyo3(item)]
+    pub active: Option<bool>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct BrineAnalysis {
     #[pyo3(item)]
     pub calcium: f64,
@@ -173,6 +200,23 @@ pub struct ExpanderMapPoint {
     pub uc: f64,
     #[pyo3(item)]
     pub efficiency: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct FaultTreeNodeSpec {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub parent_index: f64,
+    #[pyo3(item)]
+    pub gate: String,
+    #[pyo3(item)]
+    pub probability: Option<f64>,
+    #[pyo3(item)]
+    pub k_of_n: Option<f64>,
+    #[pyo3(item)]
+    pub beta_ccf: Option<f64>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
@@ -325,6 +369,19 @@ pub struct InteractionComponent {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct LopaProtectionLayer {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub pfd: f64,
+    #[pyo3(item)]
+    pub frequency_before_per_year: f64,
+    #[pyo3(item)]
+    pub frequency_after_per_year: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct Lump {
     #[pyo3(item)]
     pub name: String,
@@ -414,6 +471,21 @@ pub struct ReferenceRow {
     pub moles: Option<f64>,
     #[pyo3(item)]
     pub density: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct RiskEquipment {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub failures_per_year: f64,
+    #[pyo3(item)]
+    pub mttr_hours: f64,
+    #[pyo3(item)]
+    pub production_loss_percent: f64,
+    #[pyo3(item)]
+    pub production_loss_kg_per_hr: f64,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

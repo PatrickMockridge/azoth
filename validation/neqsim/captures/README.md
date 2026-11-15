@@ -2152,3 +2152,122 @@ example, a zero flow, a reduced transmissivity, the three clamps and the five re
 in that order and flattened by the port into a per-target list. `setWindSpeedMPerS` and
 `setTransmissivity` clamp, and `setStackHeightM` is unguarded: the negative-stack row
 publishes flame geometry below grade.
+
+## The fault tree
+
+`process_fault_tree.tsv` is `FaultTreeAnalyzer`'s AND, OR, 2-of-3 voting, β-factor and
+minimal-cut-set states, plus the gates the class does not validate.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe fault_tree \
+  > captures/process_fault_tree.tsv
+```
+
+**The cut sets are printed in the port's order, `(cardinality, members)`**, and
+`class_cut_set_order` beside them is the class's own `HashSet` iteration order — the
+evidence that the class fixes none. **β is applied on OR only**, though the javadoc names
+OR / VOTING: `ft_beta_on_voting` is unchanged at 0.028. `k <= 0` answers 1.0 and `k > n`
+answers 0.0; a 31-basic tree overflows `1 << n` and answers an empty cut-set set.
+
+## The bow-tie model
+
+`process_bow_tie.tsv` is `BowTieModel.calculateRisk`'s threat sum, the functional
+prevention-barrier product, the maximum severity and the RRF, on the class's own test
+state and the degenerate ones.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe bow_tie \
+  > captures/process_bow_tie.tsv
+```
+
+**A `MITIGATION` barrier is read by no formula**: `bt_mitigation_ignored` adds one at PFD
+0.5 beside a prevention barrier at 0.01 and the mitigated frequency moves by the 0.01 only.
+**`linkBarrierToThreat` drives no arithmetic**: both prevention barriers multiply whether
+linked or not. The class validates no input: a negative frequency, a PFD above one and a
+NaN are accepted and published.
+
+## The safety instrumented function
+
+`process_safety_instrumented_function.tsv` is `SafetyInstrumentedFunction`'s RRF,
+mitigated frequency, required PFD and SIL, the proof-test interval, the three architecture
+PFD formulas and the spurious-trip availability.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe safety_instrumented_function \
+  > captures/process_safety_instrumented_function.tsv
+```
+
+**`getRiskReductionFactor` is `+Infinity` at PFD 0**, which the port publishes as an absent
+output. **`validatePfd` only prints to `System.err`** (`sif_pfd_zero`, `sif_out_of_band`
+and `sif_negative_pfd` each warn and are accepted); the port publishes
+`pfd_within_claimed_sil` and a range warning instead. `calculateRequiredPfd` answers 1.0 at
+an unmitigated frequency of zero.
+
+## The layer of protection analysis
+
+`process_lopa.tsv` is `LOPAResult`'s target/gap/RRF/SIL arithmetic on the MCP runner's
+canonical target-met and gap states, a true equality boundary, a floating-point boundary
+one step away, zero mitigated, zero target, and the four STS0131 bands with their exact
+boundaries.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe lopa \
+  > captures/process_lopa.tsv
+```
+
+**`gapToTarget` is `mitigated - target`**, whatever the javadoc says about a positive
+shortfall. **The layers drive no arithmetic**: `frequencyBefore` and `frequencyAfter` are
+the caller's, and the class multiplies nothing. `getRequiredAdditionalRRF` is `+Infinity`
+when the target is zero and not met, and the required SIL then reads 4.
+
+## The SIL verification
+
+`process_sil_verification.tsv` is `SILVerificationResult`'s achieved SIL, PFD upper bound,
+hardware fault tolerance, diagnostic coverage, systematic capability and the five issue
+conditions, over the canonical state, each issue class, the architecture table and the
+states the class accepts.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe sil_verification \
+  > captures/process_sil_verification.tsv
+```
+
+**Diagnostic coverage is a substring rule**: `contains("oo2") || contains("oo3")` answers
+0.6 and everything else 0.5, so `4oo2` gets 0.6 and `2oo4` gets 0.5. **A NaN or negative
+PFD is reported as achieved SIL 4 with `verificationPassed = true`**; the port refuses it.
+The issue descriptions and recommendations are prose and are not carried.
+
+## The NOG 070 SIL determination
+
+`process_nog070_sil_determination.tsv` is `Nog070SilDetermination`'s PFD-to-SIL mapping,
+the 18-row minimum-SIL catalogue, the compliant, non-compliant and CUSTOM states and the
+class's guards.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe nog070_sil_determination \
+  > captures/process_nog070_sil_determination.tsv
+```
+
+**`pfdToSil` maps `[0.1, 1)` to SIL 0**, where `SafetyInstrumentedFunction.getRequiredSil`
+maps it to 1: the two are different functions and both are reproduced. CUSTOM carries a
+catalogue minimum of 0, so an omitted project minimum is compliant by construction.
+
+## The risk matrix
+
+`process_risk_matrix.tsv` is `RiskMatrix`'s static core — the five probability bands, the
+five consequence bands, the score and level, MTBF, downtime and the two cost terms — on the
+class's band tests, the boundaries, a cost state, zero failures, and the inputs the class
+silently maps to its top category.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe risk_matrix \
+  > captures/process_risk_matrix.tsv
+```
+
+**The probe reaches the package-private setters by reflection** (`setConsequenceData`,
+`calculateRisk`, `calculateCost`) over `new RiskMatrix(new ProcessSystem())`, so the capture
+pins the class's own arithmetic rather than a second implementation of it. The class derives
+the consequence from `ProductionImpactAnalyzer`; the port takes the production loss as an
+input, as `process.consequence_analysis` takes the streams' results. A negative or NaN
+frequency answers `VERY_HIGH` and a loss outside `[0, 100]` answers `CATASTROPHIC`, neither
+refused; the port refuses both.

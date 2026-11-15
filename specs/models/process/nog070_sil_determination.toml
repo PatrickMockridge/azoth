@@ -1,0 +1,92 @@
+id = "process.nog070_sil_determination"
+name = "NOG 070 SIL determination"
+kind = "procedure"
+assumptions = [
+    "**the catalogue is the class's 18-row table**, the NOG 070 (2020 revision) minimum SIL per standard SIF, carried verbatim in both kernels and pinned by a capture block.",
+    "**the achieved SIL maps the PFD by `>= 0.1` to 0, `>= 0.01` to 1, `>= 0.001` to 2, `>= 1e-4` to 3 and below that to 4**, so the `[0.1, 1)` band reads SIL 0 — a different function from `process.safety_instrumented_function`'s required-SIL map, which answers 1 there.",
+    "**the minimum SIL is the catalogue's unless the caller states one**, which is how a project-specific SIF is handled; `CUSTOM` carries a catalogue minimum of 0.",
+    "**compliance is `achieved >= minimum`**, and a SIF at the catalogue minimum passes.",
+    "**the required PFD reduction factor is `10^(minimum - achieved)`**, the class's message arithmetic, published only when the SIF is not compliant.",
+    "**the class refuses a PFD outside `(0, 1)` and a minimum outside `[0, 4]`**, and the port refuses the same.",
+]
+references = [
+    "NOG 070 (2020). Application of IEC 61508 and IEC 61511 in the Norwegian petroleum industry, appendix A.",
+    "IEC 61508-1:2010, table 3. The SIL and PFD ranges.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/risk/sis/nog070/Nog070SilDetermination.java`, `Nog070SilCatalogue.java` and `Nog070SifType.java` are the port sources.",
+    "`validation/neqsim/captures/process_nog070_sil_determination.tsv` - the catalogue, the PFD-to-SIL boundaries, a compliant and a non-compliant HIPPS, the CUSTOM states and the guards.",
+]
+[source]
+standard = "NeqSim process/safety/risk/sis/nog070/Nog070SilDetermination.java"
+edition = "Its `evaluate` and `pfdToSil`, with `Nog070SilCatalogue.getMinimumSil` and the `Nog070SifType` members."
+[algorithm]
+scheme = "closed_form_nog070_sil_determination"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.sif_type]
+type = "enum"
+values = [
+    "psd_process_segment",
+    "esd_topside_isolation",
+    "esd_subsea_isolation",
+    "hipps_pipeline",
+    "blowdown_hydrocarbon_segment",
+    "fg_gas_detection_esd",
+    "fg_fire_detection_esd",
+    "fg_hvac_shutdown",
+    "fg_deluge_release",
+    "psd_compressor_anti_surge",
+    "psd_high_vibration",
+    "psd_high_level",
+    "psd_low_low_level",
+    "psd_burner_management",
+    "esd_riser",
+    "esd_wellhead",
+    "esd_loading_release",
+    "custom",
+]
+description = "the standard SIF the catalogue names; `custom` carries a catalogue minimum of 0 and takes the caller's.\n"
+[inputs.pfd_average]
+unit = "dimensionless"
+description = "the SIF's average probability of failure on demand, above zero and below one.\n"
+[inputs.minimum_sil]
+unit = "dimensionless"
+optional = true
+description = "a project-specific minimum SIL, a whole number in `[0, 4]`. **Absent is the catalogue's value.**\n"
+[outputs]
+[outputs.catalogue_minimum_sil]
+unit = "dimensionless"
+description = "the catalogue's minimum SIL for the type.\n"
+[outputs.minimum_sil]
+unit = "dimensionless"
+description = "the minimum applied: the caller's when stated, otherwise the catalogue's.\n"
+[outputs.achieved_sil]
+unit = "dimensionless"
+description = "the SIL the PFD maps to, by the class's `pfdToSil`.\n"
+[outputs.compliant]
+type = "boolean"
+description = "whether the achieved SIL is at least the minimum.\n"
+[outputs.required_pfd_reduction_factor]
+unit = "dimensionless"
+optional = true
+description = "`10^(minimum - achieved)`, published only when the SIF is not compliant.\n"
+[[valid_range]]
+quantity = "pfd_average"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = false
+severity = "error"
+rationale = "the class refuses a PFD outside (0, 1)"
+[[valid_range]]
+quantity = "minimum_sil"
+min = 0
+min_inclusive = true
+max = 4
+max_inclusive = true
+severity = "error"
+rationale = "the class refuses a minimum outside [0, 4]"
+[implementations]
+python = "azoth.process.nog070_sil_determination"
+rust = "azoth_process::nog070_sil_determination"

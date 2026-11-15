@@ -331,6 +331,7 @@ Five sections, and the difference between them is the point:
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
 - [`process.api537_flare_flame_model`](./process/api537_flare_flame_model.md) — API 537 flare flame model
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation
+- [`process.bow_tie`](./process/bow_tie.md) — Bow-tie risk
 - [`process.component_splitter`](./process/component_splitter.md) — Component splitter
 - [`process.compressor`](./process/compressor.md) — Compressor
 - [`process.consequence_analysis`](./process/consequence_analysis.md) — Consequence analysis
@@ -340,6 +341,7 @@ Five sections, and the difference between them is the point:
 - [`process.ejector`](./process/ejector.md) — Ejector
 - [`process.event_tree`](./process/event_tree.md) — Event tree
 - [`process.expander`](./process/expander.md) — Expander
+- [`process.fault_tree`](./process/fault_tree.md) — Fault tree
 - [`process.filter`](./process/filter.md) — Filter
 - [`process.fire_monitor_coverage`](./process/fire_monitor_coverage.md) — Fire monitor coverage
 - [`process.fire_water_coverage_assessment`](./process/fire_water_coverage_assessment.md) — Fire-water coverage assessment
@@ -354,9 +356,11 @@ Five sections, and the difference between them is the point:
 - [`process.hem_release`](./process/hem_release.md) — Homogeneous-equilibrium orifice release
 - [`process.jet_fire`](./process/jet_fire.md) — Jet fire radiation
 - [`process.leak_blowdown`](./process/leak_blowdown.md) — Vessel leak blowdown
+- [`process.lopa`](./process/lopa.md) — Layer of protection analysis
 - [`process.manifold`](./process/manifold.md) — Manifold
 - [`process.map_turbo_expander_compressor`](./process/map_turbo_expander_compressor.md) — Map turbo-expander compressor
 - [`process.mixer`](./process/mixer.md) — Mixer
+- [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
 - [`process.packed_column`](./process/packed_column.md) — Packed column
 - [`process.pfp_demand`](./process/pfp_demand.md) — Passive fire protection demand
 - [`process.pipe`](./process/pipe.md) — Pipe
@@ -365,10 +369,13 @@ Five sections, and the difference between them is the point:
 - [`process.probit`](./process/probit.md) — Probit dose-response
 - [`process.pump`](./process/pump.md) — Pump
 - [`process.rate_based_packed_column`](./process/rate_based_packed_column.md) — Rate-based packed column
+- [`process.risk_matrix`](./process/risk_matrix.md) — Risk matrix
+- [`process.safety_instrumented_function`](./process/safety_instrumented_function.md) — Safety instrumented function
 - [`process.separator`](./process/separator.md) — Separator
 - [`process.separator_capacity_assessment`](./process/separator_capacity_assessment.md) — Separator capacity assessment
 - [`process.separator_performance`](./process/separator_performance.md) — Separator performance calculator
 - [`process.shortcut_distillation_column`](./process/shortcut_distillation_column.md) — Shortcut distillation column
+- [`process.sil_verification`](./process/sil_verification.md) — SIL verification
 - [`process.splitter`](./process/splitter.md) — Splitter
 - [`process.stirred_tank_reactor`](./process/stirred_tank_reactor.md) — Stirred-tank reactor
 - [`process.stripping_column`](./process/stripping_column.md) — Stripping column

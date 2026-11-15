@@ -409,6 +409,24 @@ class FlareTargetFlux(TypedDict):
 
     flux: float
 
+class BowTieThreat(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    frequency: float
+    active: bool | None
+
+class BowTieConsequence(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    severity: float
+
+class BowTieBarrier(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    pfd: float
+    barrier_type: str
+    functional: bool | None
+
 class DepositMass(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -449,6 +467,16 @@ class EventTreeBranch(TypedDict):
     name: str
     probability_of_yes: float
 
+class FaultTreeNodeSpec(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    parent_index: float
+    gate: str
+    probability: float | None
+    k_of_n: float | None
+    beta_ccf: float | None
+
 class FilterDropPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -466,6 +494,14 @@ class ProtectedObject(TypedDict):
 
     surface_area: float
     application_rate: float
+
+class LopaProtectionLayer(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    pfd: float
+    frequency_before_per_year: float
+    frequency_after_per_year: float
 
 class MapCurvePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -489,6 +525,15 @@ class PumpCurvePoint(TypedDict):
     head: float
     efficiency: float
     npsh_required: float | None
+
+class RiskEquipment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    failures_per_year: float
+    mttr_hours: float
+    production_loss_percent: float
+    production_loss_kg_per_hr: float
 
 class EfficiencyPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -782,6 +827,13 @@ class EventTreeOutcome:
     frequency_per_year: float
 
 @final
+class MinimalCutSet:
+    """the minimal cut sets, ordered by cardinality and then by member name."""
+
+    members: str
+    cardinality: float
+
+@final
 class HeatExchangerMechanicalType:
     """the five candidates in the class's enum order; empty when the design did not run."""
 
@@ -880,6 +932,44 @@ class LeakBlowdownDiagnostic:
 
     code: str
     message: str
+
+@final
+class LopaLayerContribution:
+    """one row per input layer, in caller order."""
+
+    name: str
+    pfd: float
+    frequency_before_per_year: float
+    frequency_after_per_year: float
+    contribution_per_year: float
+    rrf: float | None
+
+@final
+class RiskAssessmentRow:
+    """one row per input row, in caller order."""
+
+    name: str
+    failures_per_year: float
+    mtbf_hours: float
+    mttr_hours: float
+    expected_downtime_hours_per_year: float
+    probability_category: str
+    probability_level: float
+    production_loss_percent: float
+    production_loss_kg_hr: Qty
+    consequence_category: str
+    consequence_level: float
+    risk_score: float
+    risk_level: str
+    cost_per_failure: float
+    annual_risk_cost: float
+
+@final
+class SilIssue:
+    """one row per issue, in the class's check order."""
+
+    severity: str
+    category: str
 
 # --- results --------------------------------------------------------------
 # Generated from the result dataclasses, so the stub and `azoth.core.result`
@@ -2921,6 +3011,14 @@ class BleveResult:
     warnings: list[Warning]
 
 @final
+class BowTieResult:
+    unmitigated_frequency_per_year: float
+    mitigated_frequency_per_year: float
+    total_rrf: float
+    max_severity: float
+    warnings: list[Warning]
+
+@final
 class ComponentSplitterResult:
     overhead_n: Qty
     overhead_z: list[float]
@@ -3172,6 +3270,13 @@ class ExpanderResult:
     design_module_length: Qty | None
     design_module_width: Qty | None
     design_module_height: Qty | None
+    warnings: list[Warning]
+
+@final
+class FaultTreeResult:
+    top_event_probability: float
+    cut_set_count: float
+    minimal_cut_sets: list[MinimalCutSet]
     warnings: list[Warning]
 
 @final
@@ -3549,6 +3654,18 @@ class LeakBlowdownResult:
     warnings: list[Warning]
 
 @final
+class LopaResult:
+    target_met: bool
+    gap_to_target: float
+    total_rrf: float
+    required_additional_rrf: float | None
+    required_additional_sil: float
+    layer_contributions: list[LopaLayerContribution]
+    sts0131_pressure_category: str | None
+    sts0131_target_frequency_per_year: float | None
+    warnings: list[Warning]
+
+@final
 class ManifoldResult:
     products_n: list[Qty]
     products_z: list[list[float]]
@@ -3586,6 +3703,15 @@ class MixerResult:
     inlet_pressure_spread: Qty
     pressure_mismatch: bool
     product_h: Qty
+    warnings: list[Warning]
+
+@final
+class Nog070SilDeterminationResult:
+    catalogue_minimum_sil: float
+    minimum_sil: float
+    achieved_sil: float
+    compliant: bool
+    required_pfd_reduction_factor: float | None
     warnings: list[Warning]
 
 @final
@@ -3810,6 +3936,27 @@ class RateBasedPackedColumnResult:
     warnings: list[Warning]
 
 @final
+class RiskMatrixResult:
+    assessments: list[RiskAssessmentRow]
+    total_annual_risk_cost: float
+    warnings: list[Warning]
+
+@final
+class SafetyInstrumentedFunctionResult:
+    risk_reduction_factor: float | None
+    mitigated_frequency_per_year: float
+    required_pfd: float
+    required_sil: float
+    max_pfd_for_claimed_sil: float
+    proof_test_interval_years: float
+    pfd_within_claimed_sil: bool
+    pfd_1oo1: float | None
+    pfd_1oo2: float | None
+    pfd_2oo3: float | None
+    availability_with_spurious_trips: float | None
+    warnings: list[Warning]
+
+@final
 class SeparatorResult:
     vapour_n: Qty
     vapour_z: list[float]
@@ -3946,6 +4093,23 @@ class ShortcutDistillationColumnResult:
     condenser_duty: Qty
     reboiler_duty: Qty
     relative_volatility: float
+    warnings: list[Warning]
+
+@final
+class SilVerificationResult:
+    claimed_sil: float
+    achieved_sil: float
+    sil_achieved: bool
+    pfd_average: float
+    pfd_upper: float
+    hardware_fault_tolerance: float
+    systematic_capability: float
+    diagnostic_coverage: float
+    issue_count: float
+    error_count: float
+    warning_count: float
+    verification_passed: bool
+    issues: list[SilIssue]
     warnings: list[Warning]
 
 @final
@@ -6478,6 +6642,11 @@ def bleve(
     distance: float | None = None,
     target_flux: float | None = None,
 ) -> BleveResult: ...
+def bow_tie(
+    threats: list[BowTieThreat],
+    consequences: list[BowTieConsequence],
+    barriers: list[BowTieBarrier],
+) -> BowTieResult: ...
 def component_splitter(
     components: list[str],
     feed_n: float,
@@ -6655,6 +6824,7 @@ def expander(
     outlet_temperature: float | None = None,
     mechanical_design: bool | None = None,
 ) -> ExpanderResult: ...
+def fault_tree(nodes: list[FaultTreeNodeSpec], max_cardinality: float) -> FaultTreeResult: ...
 def filter(
     components: list[str],
     inlet_n: float,
@@ -6960,6 +7130,15 @@ def leak_blowdown(
     time_step: float | None = None,
     scenario_name: str | None = None,
 ) -> LeakBlowdownResult: ...
+def lopa(
+    initiating_event_frequency_per_year: float,
+    target_frequency_per_year: float,
+    mitigated_frequency_per_year: float,
+    layers: list[LopaProtectionLayer],
+    event_pressure: float | None = None,
+    design_pressure: float | None = None,
+    test_pressure: float | None = None,
+) -> LopaResult: ...
 def manifold(
     components: list[str],
     feed_n: list[float],
@@ -7002,6 +7181,11 @@ def mixer(
     feed_t: list[float],
     outlet_pressure: float | None = None,
 ) -> MixerResult: ...
+def nog070_sil_determination(
+    sif_type: str,
+    pfd_average: float,
+    minimum_sil: float | None = None,
+) -> Nog070SilDeterminationResult: ...
 def packed_column(
     components: list[str],
     feed_n: float,
@@ -7175,6 +7359,22 @@ def rate_based_packed_column(
     segment_solver: str | None = None,
     column_solver: str | None = None,
 ) -> RateBasedPackedColumnResult: ...
+def risk_matrix(
+    equipment: list[RiskEquipment],
+    product_price_per_kg: float | None = None,
+    downtime_cost_per_hour: float | None = None,
+) -> RiskMatrixResult: ...
+def safety_instrumented_function(
+    pfd_average: float,
+    claimed_sil: float,
+    unmitigated_frequency_per_year: float,
+    target_frequency_per_year: float,
+    test_interval_hours: float,
+    lambda_du_per_hour: float | None = None,
+    spurious_trip_rate_per_year: float | None = None,
+    mttr_hours: float | None = None,
+    base_availability: float | None = None,
+) -> SafetyInstrumentedFunctionResult: ...
 def separator(
     components: list[str],
     feed_n: float,
@@ -7282,6 +7482,12 @@ def shortcut_distillation_column(
     condenser_pressure: float | None = None,
     reboiler_pressure: float | None = None,
 ) -> ShortcutDistillationColumnResult: ...
+def sil_verification(
+    pfd_average: float,
+    claimed_sil: float,
+    architecture: str,
+    test_interval_hours: float,
+) -> SilVerificationResult: ...
 def splitter(
     components: list[str],
     feed_n: float,

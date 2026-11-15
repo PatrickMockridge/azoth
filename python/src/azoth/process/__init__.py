@@ -24,6 +24,7 @@ from azoth.core.result import (
     AntiSurgeRecycleResult,
     Api537FlareFlameModelResult,
     BleveResult,
+    BowTieResult,
     ComponentSplitterResult,
     CompressorResult,
     ConsequenceAnalysisResult,
@@ -33,6 +34,7 @@ from azoth.core.result import (
     EjectorResult,
     EventTreeResult,
     ExpanderResult,
+    FaultTreeResult,
     FilterResult,
     FireMonitorCoverageResult,
     FireWaterCoverageAssessmentResult,
@@ -47,9 +49,11 @@ from azoth.core.result import (
     HemReleaseResult,
     JetFireResult,
     LeakBlowdownResult,
+    LopaResult,
     ManifoldResult,
     MapTurboExpanderResult,
     MixerResult,
+    Nog070SilDeterminationResult,
     PackedColumnResult,
     PfpDemandResult,
     PipeResult,
@@ -58,10 +62,13 @@ from azoth.core.result import (
     ProbitResult,
     PumpResult,
     RateBasedPackedColumnResult,
+    RiskMatrixResult,
+    SafetyInstrumentedFunctionResult,
     SeparatorCapacityAssessmentResult,
     SeparatorPerformanceResult,
     SeparatorResult,
     ShortcutDistillationColumnResult,
+    SilVerificationResult,
     SplitterResult,
     StirredTankReactorResult,
     StrippingColumnResult,
@@ -97,6 +104,7 @@ __all__ = [
     "anti_surge_recycle",
     "api537_flare_flame_model",
     "bleve",
+    "bow_tie",
     "catalogue",
     "component_splitter",
     "compressor",
@@ -107,6 +115,7 @@ __all__ = [
     "ejector",
     "event_tree",
     "expander",
+    "fault_tree",
     "filter",
     "fire_monitor_coverage",
     "fire_water_coverage_assessment",
@@ -123,9 +132,11 @@ __all__ = [
     "jet_fire",
     "leak_blowdown",
     "load_flowsheet",
+    "lopa",
     "manifold",
     "map_turbo_expander_compressor",
     "mixer",
+    "nog070_sil_determination",
     "packed_column",
     "pfp_demand",
     "pipe",
@@ -134,10 +145,13 @@ __all__ = [
     "probit",
     "pump",
     "rate_based_packed_column",
+    "risk_matrix",
     "run_flowsheet",
+    "safety_instrumented_function",
     "separator",
     "separator_capacity_assessment",
     "shortcut_distillation_column",
+    "sil_verification",
     "splitter",
     "stirred_tank_reactor",
     "stripping_column",
@@ -154,9 +168,12 @@ _FIRE_WATER_COVERAGE_ASSESSMENT = "process.fire_water_coverage_assessment"
 _FIRE_WATER_DEMAND = "process.fire_water_demand"
 _MANIFOLD = "process.manifold"
 _MIXER = "process.mixer"
+_NOG070_SIL_DETERMINATION = "process.nog070_sil_determination"
 _PACKED_COLUMN = "process.packed_column"
 _PFP_DEMAND = "process.pfp_demand"
 _RATE_BASED_PACKED_COLUMN = "process.rate_based_packed_column"
+_RISK_MATRIX = "process.risk_matrix"
+_SAFETY_INSTRUMENTED_FUNCTION = "process.safety_instrumented_function"
 _PIPE = "process.pipe"
 _GAS_SCRUBBER = "process.gas_scrubber"
 _HEAT_EXCHANGER = "process.heat_exchanger"
@@ -171,6 +188,8 @@ _COOLER = "process.cooler"
 _DELUGE_NOZZLE_LAYOUT = "process.deluge_nozzle_layout"
 _EJECTOR = "process.ejector"
 _EVENT_TREE = "process.event_tree"
+_FAULT_TREE = "process.fault_tree"
+_BOW_TIE = "process.bow_tie"
 _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
@@ -181,6 +200,7 @@ _HEATER = "process.heater"
 _HEM_RELEASE = "process.hem_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
+_LOPA = "process.lopa"
 _GAS_DISPERSION = "process.gas_dispersion"
 _GAUSSIAN_PLUME = "process.gaussian_plume"
 _PROBIT = "process.probit"
@@ -188,6 +208,7 @@ _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
 _SHORTCUT_DISTILLATION_COLUMN = "process.shortcut_distillation_column"
+_SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
@@ -2192,6 +2213,174 @@ def event_tree(
     return resolve(_EVENT_TREE)(  # type: ignore[no-any-return]
         initiating_frequency_per_year=initiating_frequency_per_year,
         branches=branches,
+    )
+
+
+def fault_tree(
+    nodes: list[dict[str, object]],
+    max_cardinality: float,
+) -> FaultTreeResult:
+    """The recursive gate probability and the minimal cut sets.
+
+    The flat node list is the tree: a row's position is its index, ``parent_index`` names
+    its parent and ``-1`` is the single root. AND is the product, OR the exact complement
+    union, VOTING the Poisson-binomial sum, and the beta factor is read on an OR gate only.
+    **The cut sets are sorted by cardinality and then member name**, where the class's
+    ``HashSet`` order is unspecified.
+
+    See :func:`azoth.process.reference.fault_tree`.
+    """
+    return resolve(_FAULT_TREE)(  # type: ignore[no-any-return]
+        nodes=nodes,
+        max_cardinality=max_cardinality,
+    )
+
+
+def bow_tie(
+    threats: list[dict[str, object]],
+    consequences: list[dict[str, object]],
+    barriers: list[dict[str, object]],
+) -> BowTieResult:
+    """The bow-tie risk: the threat sum, the prevention barriers and the RRF.
+
+    The unmitigated frequency is the active threats' sum; the mitigated frequency
+    multiplies the functional ``prevention`` and ``both`` barriers' PFDs in list order.
+    **A ``mitigation`` barrier is read by no formula**, and neither is a threat-to-barrier
+    link. ``total_rrf`` is zero at a zero mitigated frequency, the class's own answer.
+
+    See :func:`azoth.process.reference.bow_tie`.
+    """
+    return resolve(_BOW_TIE)(  # type: ignore[no-any-return]
+        threats=threats,
+        consequences=consequences,
+        barriers=barriers,
+    )
+
+
+def safety_instrumented_function(
+    pfd_average: float,
+    claimed_sil: float,
+    unmitigated_frequency_per_year: float,
+    target_frequency_per_year: float,
+    test_interval_hours: float,
+    lambda_du_per_hour: float | None = None,
+    spurious_trip_rate_per_year: float | None = None,
+    mttr_hours: float | None = None,
+    base_availability: float | None = None,
+) -> SafetyInstrumentedFunctionResult:
+    """The SIF's RRF, required PFD and SIL, architecture PFDs and availability.
+
+    ``risk_reduction_factor`` is absent at a PFD of zero, where the class answers
+    ``+Infinity``. **A PFD outside the claimed SIL's band is published, not refused**:
+    the class prints a warning, so the result carries ``pfd_within_claimed_sil`` and an
+    ``OUT_OF_VALID_RANGE`` warning.
+
+    See :func:`azoth.process.reference.safety_instrumented_function`.
+    """
+    return resolve(_SAFETY_INSTRUMENTED_FUNCTION)(  # type: ignore[no-any-return]
+        pfd_average=pfd_average,
+        claimed_sil=claimed_sil,
+        unmitigated_frequency_per_year=unmitigated_frequency_per_year,
+        target_frequency_per_year=target_frequency_per_year,
+        test_interval_hours=test_interval_hours,
+        lambda_du_per_hour=lambda_du_per_hour,
+        spurious_trip_rate_per_year=spurious_trip_rate_per_year,
+        mttr_hours=mttr_hours,
+        base_availability=base_availability,
+    )
+
+
+def lopa(
+    initiating_event_frequency_per_year: float,
+    target_frequency_per_year: float,
+    mitigated_frequency_per_year: float,
+    layers: list[dict[str, object]],
+    event_pressure: Q | None = None,
+    design_pressure: Q | None = None,
+    test_pressure: Q | None = None,
+) -> LopaResult:
+    """The LOPA result: the target status, the RRFs, the layers and the STS0131 band.
+
+    ``gap_to_target`` is ``mitigated - target``, positive on a shortfall. **The layers
+    are recorded, not multiplied**: the mitigated frequency is an input. The required
+    additional RRF is absent when the target is zero and not met, where the class answers
+    ``+Infinity``, and the required SIL then reads 4.
+
+    See :func:`azoth.process.reference.lopa`.
+    """
+    return resolve(_LOPA)(  # type: ignore[no-any-return]
+        initiating_event_frequency_per_year=initiating_event_frequency_per_year,
+        target_frequency_per_year=target_frequency_per_year,
+        mitigated_frequency_per_year=mitigated_frequency_per_year,
+        layers=layers,
+        event_pressure=event_pressure,
+        design_pressure=design_pressure,
+        test_pressure=test_pressure,
+    )
+
+
+def sil_verification(
+    pfd_average: float,
+    claimed_sil: float,
+    architecture: str,
+    test_interval_hours: float,
+) -> SilVerificationResult:
+    """The SIL verification: the achieved SIL, the architecture and the issues.
+
+    The fault tolerance is the class's exact-match table and the diagnostic coverage its
+    substring rule; any other architecture answers 0 and 0.5. **Warnings alone do not
+    fail the verification**; an error does. A NaN or negative PFD, which the class lets
+    through to achieved SIL 4, is refused.
+
+    See :func:`azoth.process.reference.sil_verification`.
+    """
+    return resolve(_SIL_VERIFICATION)(  # type: ignore[no-any-return]
+        pfd_average=pfd_average,
+        claimed_sil=claimed_sil,
+        architecture=architecture,
+        test_interval_hours=test_interval_hours,
+    )
+
+
+def nog070_sil_determination(
+    sif_type: str,
+    pfd_average: float,
+    minimum_sil: float | None = None,
+) -> Nog070SilDeterminationResult:
+    """A SIF against the NOG 070 catalogue: the catalogue minimum and compliance.
+
+    ``pfdToSil`` reads ``[0.1, 1)`` as SIL 0, where ``process.safety_instrumented_function``'s
+    required-SIL map reads 1: the two are different functions. **``custom`` carries a
+    catalogue minimum of 0**, so an omitted project minimum is compliant by construction.
+    The required PFD reduction factor is published only when the SIF is not compliant.
+
+    See :func:`azoth.process.reference.nog070_sil_determination`.
+    """
+    return resolve(_NOG070_SIL_DETERMINATION)(  # type: ignore[no-any-return]
+        sif_type=sif_type,
+        pfd_average=pfd_average,
+        minimum_sil=minimum_sil,
+    )
+
+
+def risk_matrix(
+    equipment: list[dict[str, object]],
+    product_price_per_kg: float | None = None,
+    downtime_cost_per_hour: float | None = None,
+) -> RiskMatrixResult:
+    """The risk matrix's bands, score, MTBF, downtime and costs.
+
+    The production loss and the failure frequency are inputs: the class derives them from
+    a process system and a reliability database, which this id does not carry. The price
+    defaults to 0.5 per kg and the downtime cost to 5000 per hour; the MTBF is **1e6 hours
+    at zero failures**, the class's sentinel.
+
+    See :func:`azoth.process.reference.risk_matrix`.
+    """
+    return resolve(_RISK_MATRIX)(  # type: ignore[no-any-return]
+        equipment=equipment,
+        product_price_per_kg=product_price_per_kg,
+        downtime_cost_per_hour=downtime_cost_per_hour,
     )
 
 

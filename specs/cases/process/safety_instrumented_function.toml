@@ -1,0 +1,130 @@
+model = "process.safety_instrumented_function"
+[[cases]]
+id = "sif_class_test"
+tolerance = 1.0e-12
+source = "`SISIntegrationTest`: SIL 2 at PFD 0.005, a one-year proof interval, 1e-6 /h failure rate and a 0.99 base availability. From `validation/neqsim/captures/process_safety_instrumented_function.tsv` (`sif_class_test`)."
+[cases.inputs]
+pfd_average = 0.005
+claimed_sil = 2.0
+unmitigated_frequency_per_year = 0.1
+target_frequency_per_year = 1.0e-5
+test_interval_hours = 8760.0
+lambda_du_per_hour = 1.0e-6
+spurious_trip_rate_per_year = 0.0
+mttr_hours = 0.0
+base_availability = 0.99
+[cases.expected]
+risk_reduction_factor = 200.0
+mitigated_frequency_per_year = 5.0e-4
+required_pfd = 1.0e-4
+required_sil = 3.0
+max_pfd_for_claimed_sil = 0.01
+proof_test_interval_years = 1.0
+pfd_within_claimed_sil = true
+pfd_1oo1 = 0.00438
+pfd_1oo2 = 2.5579200000000004e-5
+pfd_2oo3 = 7.673760000000001e-5
+availability_with_spurious_trips = 0.99
+[[cases]]
+id = "sif_required_pfd_at_zero"
+tolerance = 1.0e-12
+source = "An unmitigated frequency of zero: the class answers a required PFD of 1.0 and SIL 1. From (`sif_required_pfd_at_zero`)."
+[cases.inputs]
+pfd_average = 0.005
+claimed_sil = 2.0
+unmitigated_frequency_per_year = 0.0
+target_frequency_per_year = 1.0e-5
+test_interval_hours = 8760.0
+lambda_du_per_hour = 1.0e-6
+spurious_trip_rate_per_year = 0.0
+mttr_hours = 0.0
+base_availability = 0.99
+[cases.expected]
+risk_reduction_factor = 200.0
+mitigated_frequency_per_year = 0.0
+required_pfd = 1.0
+required_sil = 1.0
+max_pfd_for_claimed_sil = 0.01
+proof_test_interval_years = 1.0
+pfd_within_claimed_sil = true
+pfd_1oo1 = 0.00438
+pfd_1oo2 = 2.5579200000000004e-5
+pfd_2oo3 = 7.673760000000001e-5
+availability_with_spurious_trips = 0.99
+[[cases]]
+id = "sif_pfd_zero"
+tolerance = 1.0e-12
+source = "A PFD of zero: the class's RRF is `+Infinity`, published as absent, and the PFD is below the SIL 2 band. From (`sif_pfd_zero`)."
+[cases.inputs]
+pfd_average = 0.0
+claimed_sil = 2.0
+unmitigated_frequency_per_year = 0.1
+target_frequency_per_year = 1.0e-5
+test_interval_hours = 8760.0
+lambda_du_per_hour = 1.0e-6
+spurious_trip_rate_per_year = 0.0
+mttr_hours = 0.0
+base_availability = 0.99
+[cases.expected]
+mitigated_frequency_per_year = 0.0
+required_pfd = 1.0e-4
+required_sil = 3.0
+max_pfd_for_claimed_sil = 0.01
+proof_test_interval_years = 1.0
+pfd_within_claimed_sil = false
+pfd_1oo1 = 0.00438
+pfd_1oo2 = 2.5579200000000004e-5
+pfd_2oo3 = 7.673760000000001e-5
+availability_with_spurious_trips = 0.99
+[[cases]]
+id = "sif_spurious_trips"
+tolerance = 1.0e-12
+source = "Two spurious trips a year and a 48 h repair: `0.99 (1 - 96 / 8760)`. From (`sif_spurious_trips`)."
+[cases.inputs]
+pfd_average = 0.005
+claimed_sil = 2.0
+unmitigated_frequency_per_year = 0.1
+target_frequency_per_year = 1.0e-5
+test_interval_hours = 8760.0
+lambda_du_per_hour = 1.0e-6
+spurious_trip_rate_per_year = 2.0
+mttr_hours = 48.0
+base_availability = 0.99
+[cases.expected]
+risk_reduction_factor = 200.0
+mitigated_frequency_per_year = 5.0e-4
+required_pfd = 1.0e-4
+required_sil = 3.0
+max_pfd_for_claimed_sil = 0.01
+proof_test_interval_years = 1.0
+pfd_within_claimed_sil = true
+pfd_1oo1 = 0.00438
+pfd_1oo2 = 2.5579200000000004e-5
+pfd_2oo3 = 7.673760000000001e-5
+availability_with_spurious_trips = 0.9791506849315069
+[[cases]]
+id = "sif_out_of_band"
+tolerance = 1.0e-12
+source = "A PFD of 0.5 claimed as SIL 1: the class prints a warning and publishes the number, so `pfd_within_claimed_sil` is false and no refusal is raised. From (`sif_out_of_band`)."
+[cases.inputs]
+pfd_average = 0.5
+claimed_sil = 1.0
+unmitigated_frequency_per_year = 0.1
+target_frequency_per_year = 1.0e-5
+test_interval_hours = 8760.0
+lambda_du_per_hour = 1.0e-6
+spurious_trip_rate_per_year = 0.0
+mttr_hours = 0.0
+base_availability = 0.99
+[cases.expected]
+risk_reduction_factor = 2.0
+mitigated_frequency_per_year = 0.05
+required_pfd = 1.0e-4
+required_sil = 3.0
+max_pfd_for_claimed_sil = 0.1
+proof_test_interval_years = 1.0
+pfd_within_claimed_sil = false
+pfd_1oo1 = 0.00438
+pfd_1oo2 = 2.5579200000000004e-5
+pfd_2oo3 = 7.673760000000001e-5
+availability_with_spurious_trips = 0.99

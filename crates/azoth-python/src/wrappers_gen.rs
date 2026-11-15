@@ -5606,6 +5606,48 @@ pub fn bleve(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Bow-tie risk.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (threats, consequences, barriers))]
+#[pyo3(text_signature = "(threats, consequences, barriers)")]
+pub fn bow_tie(
+    py: Python<'_>,
+    threats: Vec<crate::records_gen::BowTieThreat>,
+    consequences: Vec<crate::records_gen::BowTieConsequence>,
+    barriers: Vec<crate::records_gen::BowTieBarrier>,
+) -> PyResult<crate::transport_gen::PyBowTieResult> {
+    let threats_records: Vec<azoth_process::models::bow_tie::BowTieThreat> = threats
+        .into_iter()
+        .map(|row| azoth_process::models::bow_tie::BowTieThreat {
+            frequency: row.frequency,
+            active: row.active,
+        })
+        .collect();
+    let consequences_records: Vec<azoth_process::models::bow_tie::BowTieConsequence> = consequences
+        .into_iter()
+        .map(|row| azoth_process::models::bow_tie::BowTieConsequence {
+            severity: row.severity,
+        })
+        .collect();
+    let barriers_records: Vec<azoth_process::models::bow_tie::BowTieBarrier> = barriers
+        .into_iter()
+        .map(|row| azoth_process::models::bow_tie::BowTieBarrier {
+            pfd: row.pfd,
+            barrier_type: row.barrier_type,
+            functional: row.functional,
+        })
+        .collect();
+    azoth_process::models::bow_tie::bow_tie(
+        &threats_records,
+        &consequences_records,
+        &barriers_records,
+    )
+    .map(|r| crate::transport_gen::PyBowTieResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Component splitter.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -5983,6 +6025,33 @@ pub fn expander(
     )
     .map(|r| crate::transport_gen::PyExpanderResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
+}
+
+/// Fault tree.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (nodes, max_cardinality))]
+#[pyo3(text_signature = "(nodes, max_cardinality)")]
+pub fn fault_tree(
+    py: Python<'_>,
+    nodes: Vec<crate::records_gen::FaultTreeNodeSpec>,
+    max_cardinality: f64,
+) -> PyResult<crate::transport_gen::PyFaultTreeResult> {
+    let nodes_records: Vec<azoth_process::models::fault_tree::FaultTreeNodeSpec> = nodes
+        .into_iter()
+        .map(|row| azoth_process::models::fault_tree::FaultTreeNodeSpec {
+            name: row.name,
+            parent_index: row.parent_index,
+            gate: row.gate,
+            probability: row.probability,
+            k_of_n: row.k_of_n,
+            beta_ccf: row.beta_ccf,
+        })
+        .collect();
+    azoth_process::models::fault_tree::fault_tree(&nodes_records, max_cardinality)
+        .map(|r| crate::transport_gen::PyFaultTreeResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
 }
 
 /// Fire monitor coverage.
@@ -6510,6 +6579,47 @@ pub fn leak_blowdown(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Layer of protection analysis.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (initiating_event_frequency_per_year, target_frequency_per_year, mitigated_frequency_per_year, layers, event_pressure, design_pressure, test_pressure))]
+#[pyo3(
+    text_signature = "(initiating_event_frequency_per_year, target_frequency_per_year, mitigated_frequency_per_year, layers, event_pressure, design_pressure, test_pressure)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn lopa(
+    py: Python<'_>,
+    initiating_event_frequency_per_year: f64,
+    target_frequency_per_year: f64,
+    mitigated_frequency_per_year: f64,
+    layers: Vec<crate::records_gen::LopaProtectionLayer>,
+    event_pressure: Option<f64>,
+    design_pressure: Option<f64>,
+    test_pressure: Option<f64>,
+) -> PyResult<crate::transport_gen::PyLopaResult> {
+    let layers_records: Vec<azoth_process::models::lopa::LopaProtectionLayer> = layers
+        .into_iter()
+        .map(|row| azoth_process::models::lopa::LopaProtectionLayer {
+            name: row.name,
+            pfd: row.pfd,
+            frequency_before_per_year: row.frequency_before_per_year,
+            frequency_after_per_year: row.frequency_after_per_year,
+        })
+        .collect();
+    azoth_process::models::lopa::lopa(
+        initiating_event_frequency_per_year,
+        target_frequency_per_year,
+        mitigated_frequency_per_year,
+        &layers_records,
+        event_pressure.map(pascals),
+        design_pressure.map(pascals),
+        test_pressure.map(pascals),
+    )
+    .map(|r| crate::transport_gen::PyLopaResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Manifold.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6561,6 +6671,27 @@ pub fn mixer(
         outlet_pressure.map(pascals),
     )
     .map(|r| crate::transport_gen::PyMixerResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// NOG 070 SIL determination.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (sif_type, pfd_average, minimum_sil))]
+#[pyo3(text_signature = "(sif_type, pfd_average, minimum_sil)")]
+pub fn nog070_sil_determination(
+    py: Python<'_>,
+    sif_type: &str,
+    pfd_average: f64,
+    minimum_sil: Option<f64>,
+) -> PyResult<crate::transport_gen::PyNog070SilDeterminationResult> {
+    azoth_process::models::nog070_sil_determination::nog070_sil_determination(
+        sif_type,
+        pfd_average,
+        minimum_sil,
+    )
+    .map(|r| crate::transport_gen::PyNog070SilDeterminationResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -6756,6 +6887,73 @@ pub fn probit(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Risk matrix.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (equipment, product_price_per_kg, downtime_cost_per_hour))]
+#[pyo3(text_signature = "(equipment, product_price_per_kg, downtime_cost_per_hour)")]
+pub fn risk_matrix(
+    py: Python<'_>,
+    equipment: Vec<crate::records_gen::RiskEquipment>,
+    product_price_per_kg: Option<f64>,
+    downtime_cost_per_hour: Option<f64>,
+) -> PyResult<crate::transport_gen::PyRiskMatrixResult> {
+    let equipment_records: Vec<azoth_process::models::risk_matrix::RiskEquipment> = equipment
+        .into_iter()
+        .map(|row| azoth_process::models::risk_matrix::RiskEquipment {
+            name: row.name,
+            failures_per_year: row.failures_per_year,
+            mttr_hours: row.mttr_hours,
+            production_loss_percent: row.production_loss_percent,
+            production_loss_kg_per_hr: kilograms_per_second(row.production_loss_kg_per_hr),
+        })
+        .collect();
+    azoth_process::models::risk_matrix::risk_matrix(
+        &equipment_records,
+        product_price_per_kg,
+        downtime_cost_per_hour,
+    )
+    .map(|r| crate::transport_gen::PyRiskMatrixResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Safety instrumented function.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (pfd_average, claimed_sil, unmitigated_frequency_per_year, target_frequency_per_year, test_interval_hours, lambda_du_per_hour, spurious_trip_rate_per_year, mttr_hours, base_availability))]
+#[pyo3(
+    text_signature = "(pfd_average, claimed_sil, unmitigated_frequency_per_year, target_frequency_per_year, test_interval_hours, lambda_du_per_hour, spurious_trip_rate_per_year, mttr_hours, base_availability)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn safety_instrumented_function(
+    py: Python<'_>,
+    pfd_average: f64,
+    claimed_sil: f64,
+    unmitigated_frequency_per_year: f64,
+    target_frequency_per_year: f64,
+    test_interval_hours: f64,
+    lambda_du_per_hour: Option<f64>,
+    spurious_trip_rate_per_year: Option<f64>,
+    mttr_hours: Option<f64>,
+    base_availability: Option<f64>,
+) -> PyResult<crate::transport_gen::PySafetyInstrumentedFunctionResult> {
+    azoth_process::models::safety_instrumented_function::safety_instrumented_function(
+        pfd_average,
+        claimed_sil,
+        unmitigated_frequency_per_year,
+        target_frequency_per_year,
+        test_interval_hours,
+        lambda_du_per_hour,
+        spurious_trip_rate_per_year,
+        mttr_hours,
+        base_availability,
+    )
+    .map(|r| crate::transport_gen::PySafetyInstrumentedFunctionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Separator.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6907,6 +7105,29 @@ pub fn shortcut_distillation_column(
         reboiler_pressure.map(pascals),
     )
     .map(|r| crate::transport_gen::PyShortcutDistillationColumnResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// SIL verification.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (pfd_average, claimed_sil, architecture, test_interval_hours))]
+#[pyo3(text_signature = "(pfd_average, claimed_sil, architecture, test_interval_hours)")]
+pub fn sil_verification(
+    py: Python<'_>,
+    pfd_average: f64,
+    claimed_sil: f64,
+    architecture: &str,
+    test_interval_hours: f64,
+) -> PyResult<crate::transport_gen::PySilVerificationResult> {
+    azoth_process::models::sil_verification::sil_verification(
+        pfd_average,
+        claimed_sil,
+        architecture,
+        test_interval_hours,
+    )
+    .map(|r| crate::transport_gen::PySilVerificationResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

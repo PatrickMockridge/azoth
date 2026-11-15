@@ -20,9 +20,10 @@ use crate::record_outputs_gen::{
     PyFlowlineScaleSegment, PyHeatExchangerMechanicalType, PyHeaterInstrument,
     PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyMineralEquilibriumRow, PyNaceIssueRow, PyRemediationOptionRow, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySterileRadius,
-    PyStreamScaleMineralRow, PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
+    PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow,
+    PyRemediationOptionRow, PyRiskAssessmentRow, PyScaleControlRiskRow, PyScaleControlRow,
+    PyScenarioChangeRow, PyScenarioIndexRow, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
+    PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -14341,6 +14342,57 @@ impl From<&azoth_process::models::bleve::BleveResult> for PyBleveResult {
         }
     }
 }
+/// Result of `process.bow_tie`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BowTieResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBowTieResult {
+    /// the sum of the active threats' frequencies, in 1/year.
+    #[pyo3(get)]
+    pub unmitigated_frequency_per_year: f64,
+    /// the unmitigated frequency times the functional prevention barriers' PFDs, in 1/year.
+    #[pyo3(get)]
+    pub mitigated_frequency_per_year: f64,
+    /// `unmitigated / mitigated`; zero when the mitigated frequency is zero.
+    #[pyo3(get)]
+    pub total_rrf: f64,
+    /// the largest consequence severity, or zero when there are no consequences.
+    #[pyo3(get)]
+    pub max_severity: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBowTieResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BowTieResult(unmitigated_frequency_per_year={:?}, mitigated_frequency_per_year={:?}, total_rrf={:?}, max_severity={:?}, {} warning(s))",
+            self.unmitigated_frequency_per_year,
+            self.mitigated_frequency_per_year,
+            self.total_rrf,
+            self.max_severity,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::bow_tie::BowTieResult> for PyBowTieResult {
+    fn from(r: &azoth_process::models::bow_tie::BowTieResult) -> Self {
+        Self {
+            unmitigated_frequency_per_year: r.unmitigated_frequency_per_year,
+            mitigated_frequency_per_year: r.mitigated_frequency_per_year,
+            total_rrf: r.total_rrf,
+            max_severity: r.max_severity,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.component_splitter`, transported.
 #[pyclass(
     frozen,
@@ -16164,6 +16216,56 @@ impl From<&azoth_process::models::expander::ExpanderResult> for PyExpanderResult
                 magnitude_si: v.value,
                 unit: "m".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.fault_tree`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FaultTreeResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFaultTreeResult {
+    /// the recursive gate probability; OR is the exact complement union, AND the product, VOTING the Poisson-binomial sum.
+    #[pyo3(get)]
+    pub top_event_probability: f64,
+    /// the number of minimal cut sets.
+    #[pyo3(get)]
+    pub cut_set_count: f64,
+    /// the minimal cut sets, ordered by cardinality and then by member name.
+    #[pyo3(get)]
+    pub minimal_cut_sets: Vec<PyMinimalCutSet>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFaultTreeResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FaultTreeResult(top_event_probability={:?}, cut_set_count={:?}, minimal_cut_sets={:?}, {} warning(s))",
+            self.top_event_probability,
+            self.cut_set_count,
+            self.minimal_cut_sets,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fault_tree::FaultTreeResult> for PyFaultTreeResult {
+    fn from(r: &azoth_process::models::fault_tree::FaultTreeResult) -> Self {
+        Self {
+            top_event_probability: r.top_event_probability,
+            cut_set_count: r.cut_set_count,
+            minimal_cut_sets: r
+                .minimal_cut_sets
+                .iter()
+                .map(PyMinimalCutSet::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }
@@ -18782,6 +18884,81 @@ impl From<&azoth_process::models::leak_blowdown::LeakBlowdownResult> for PyLeakB
         }
     }
 }
+/// Result of `process.lopa`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "LopaResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyLopaResult {
+    /// whether the mitigated frequency is at or below the target.
+    #[pyo3(get)]
+    pub target_met: bool,
+    /// `mitigated - target`, in 1/year; positive is a shortfall.
+    #[pyo3(get)]
+    pub gap_to_target: f64,
+    /// `initiating / mitigated`; zero when the mitigated frequency is zero.
+    #[pyo3(get)]
+    pub total_rrf: f64,
+    /// `mitigated / target` when the target is not met and the target is positive; absent when the target is zero, where the class answers `+Infinity`.
+    #[pyo3(get)]
+    pub required_additional_rrf: Option<f64>,
+    /// the SIL the required RRF asks for, or zero when the target is met.
+    #[pyo3(get)]
+    pub required_additional_sil: f64,
+    /// one row per input layer, in caller order.
+    #[pyo3(get)]
+    pub layer_contributions: Vec<PyLopaLayerContribution>,
+    /// the STS0131 pressure band; absent when the pressure triple is absent.
+    #[pyo3(get)]
+    pub sts0131_pressure_category: Option<String>,
+    /// the target frequency the band asks for, in 1/year; absent with the category.
+    #[pyo3(get)]
+    pub sts0131_target_frequency_per_year: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyLopaResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "LopaResult(target_met={:?}, gap_to_target={:?}, total_rrf={:?}, required_additional_rrf={:?}, required_additional_sil={:?}, layer_contributions={:?}, sts0131_pressure_category={:?}, sts0131_target_frequency_per_year={:?}, {} warning(s))",
+            self.target_met,
+            self.gap_to_target,
+            self.total_rrf,
+            self.required_additional_rrf,
+            self.required_additional_sil,
+            self.layer_contributions,
+            self.sts0131_pressure_category,
+            self.sts0131_target_frequency_per_year,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::lopa::LopaResult> for PyLopaResult {
+    fn from(r: &azoth_process::models::lopa::LopaResult) -> Self {
+        Self {
+            target_met: r.target_met,
+            gap_to_target: r.gap_to_target,
+            total_rrf: r.total_rrf,
+            required_additional_rrf: r.required_additional_rrf,
+            required_additional_sil: r.required_additional_sil,
+            layer_contributions: r
+                .layer_contributions
+                .iter()
+                .map(PyLopaLayerContribution::from)
+                .collect(),
+            sts0131_pressure_category: r.sts0131_pressure_category.map(|v| v.as_str().to_string()),
+            sts0131_target_frequency_per_year: r.sts0131_target_frequency_per_year,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.manifold`, transported.
 #[pyclass(
     frozen,
@@ -19091,6 +19268,66 @@ impl From<&azoth_process::models::mixer::MixerResult> for PyMixerResult {
                 magnitude_si: r.product_h.value,
                 unit: "J/mol".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.nog070_sil_determination`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Nog070SilDeterminationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyNog070SilDeterminationResult {
+    /// the catalogue's minimum SIL for the type.
+    #[pyo3(get)]
+    pub catalogue_minimum_sil: f64,
+    /// the minimum applied: the caller's when stated, otherwise the catalogue's.
+    #[pyo3(get)]
+    pub minimum_sil: f64,
+    /// the SIL the PFD maps to, by the class's `pfdToSil`.
+    #[pyo3(get)]
+    pub achieved_sil: f64,
+    /// whether the achieved SIL is at least the minimum.
+    #[pyo3(get)]
+    pub compliant: bool,
+    /// `10^(minimum - achieved)`, published only when the SIF is not compliant.
+    #[pyo3(get)]
+    pub required_pfd_reduction_factor: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyNog070SilDeterminationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Nog070SilDeterminationResult(catalogue_minimum_sil={:?}, minimum_sil={:?}, achieved_sil={:?}, compliant={:?}, required_pfd_reduction_factor={:?}, {} warning(s))",
+            self.catalogue_minimum_sil,
+            self.minimum_sil,
+            self.achieved_sil,
+            self.compliant,
+            self.required_pfd_reduction_factor,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::nog070_sil_determination::Nog070SilDeterminationResult>
+    for PyNog070SilDeterminationResult
+{
+    fn from(
+        r: &azoth_process::models::nog070_sil_determination::Nog070SilDeterminationResult,
+    ) -> Self {
+        Self {
+            catalogue_minimum_sil: r.catalogue_minimum_sil,
+            minimum_sil: r.minimum_sil,
+            achieved_sil: r.achieved_sil,
+            compliant: r.compliant,
+            required_pfd_reduction_factor: r.required_pfd_reduction_factor,
             warnings: transport(&r.warnings),
         }
     }
@@ -20826,6 +21063,141 @@ impl From<&azoth_process::models::rate_based_packed_column::RateBasedPackedColum
         }
     }
 }
+/// Result of `process.risk_matrix`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RiskMatrixResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRiskMatrixResult {
+    /// one row per input row, in caller order.
+    #[pyo3(get)]
+    pub assessments: Vec<PyRiskAssessmentRow>,
+    /// the sum of the annual costs.
+    #[pyo3(get)]
+    pub total_annual_risk_cost: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyRiskMatrixResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "RiskMatrixResult(assessments={:?}, total_annual_risk_cost={:?}, {} warning(s))",
+            self.assessments,
+            self.total_annual_risk_cost,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::risk_matrix::RiskMatrixResult> for PyRiskMatrixResult {
+    fn from(r: &azoth_process::models::risk_matrix::RiskMatrixResult) -> Self {
+        Self {
+            assessments: r
+                .assessments
+                .iter()
+                .map(PyRiskAssessmentRow::from)
+                .collect(),
+            total_annual_risk_cost: r.total_annual_risk_cost,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.safety_instrumented_function`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SafetyInstrumentedFunctionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySafetyInstrumentedFunctionResult {
+    /// `1 / PFD`; absent at a PFD of zero, where the class answers `+Infinity`.
+    #[pyo3(get)]
+    pub risk_reduction_factor: Option<f64>,
+    /// `unmitigated_frequency PFD`, in 1/year.
+    #[pyo3(get)]
+    pub mitigated_frequency_per_year: f64,
+    /// `target_frequency / unmitigated_frequency`; `1.0` at a zero unmitigated frequency.
+    #[pyo3(get)]
+    pub required_pfd: f64,
+    /// the SIL the required PFD maps to, by the class's thresholds.
+    #[pyo3(get)]
+    pub required_sil: f64,
+    /// the largest PFD the claimed SIL allows.
+    #[pyo3(get)]
+    pub max_pfd_for_claimed_sil: f64,
+    /// the proof-test interval in years, `hours / 8760`.
+    #[pyo3(get)]
+    pub proof_test_interval_years: f64,
+    /// whether the PFD lies inside the claimed SIL's two-sided band; the class only prints a warning when it does not.
+    #[pyo3(get)]
+    pub pfd_within_claimed_sil: bool,
+    /// `lambda test_interval / 2`; absent when the failure rate is absent.
+    #[pyo3(get)]
+    pub pfd_1oo1: Option<f64>,
+    /// `(lambda test_interval)^2 / 3`; absent when the failure rate is absent.
+    #[pyo3(get)]
+    pub pfd_1oo2: Option<f64>,
+    /// `(lambda test_interval)^2`; absent when the failure rate is absent.
+    #[pyo3(get)]
+    pub pfd_2oo3: Option<f64>,
+    /// `base (1 - rate mttr / 8760)`; absent when the base availability or the MTTR is absent.
+    #[pyo3(get)]
+    pub availability_with_spurious_trips: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySafetyInstrumentedFunctionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SafetyInstrumentedFunctionResult(risk_reduction_factor={:?}, mitigated_frequency_per_year={:?}, required_pfd={:?}, required_sil={:?}, max_pfd_for_claimed_sil={:?}, proof_test_interval_years={:?}, pfd_within_claimed_sil={:?}, pfd_1oo1={:?}, pfd_1oo2={:?}, pfd_2oo3={:?}, availability_with_spurious_trips={:?}, {} warning(s))",
+            self.risk_reduction_factor,
+            self.mitigated_frequency_per_year,
+            self.required_pfd,
+            self.required_sil,
+            self.max_pfd_for_claimed_sil,
+            self.proof_test_interval_years,
+            self.pfd_within_claimed_sil,
+            self.pfd_1oo1,
+            self.pfd_1oo2,
+            self.pfd_2oo3,
+            self.availability_with_spurious_trips,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_instrumented_function::SafetyInstrumentedFunctionResult>
+    for PySafetyInstrumentedFunctionResult
+{
+    fn from(
+        r: &azoth_process::models::safety_instrumented_function::SafetyInstrumentedFunctionResult,
+    ) -> Self {
+        Self {
+            risk_reduction_factor: r.risk_reduction_factor,
+            mitigated_frequency_per_year: r.mitigated_frequency_per_year,
+            required_pfd: r.required_pfd,
+            required_sil: r.required_sil,
+            max_pfd_for_claimed_sil: r.max_pfd_for_claimed_sil,
+            proof_test_interval_years: r.proof_test_interval_years,
+            pfd_within_claimed_sil: r.pfd_within_claimed_sil,
+            pfd_1oo1: r.pfd_1oo1,
+            pfd_1oo2: r.pfd_1oo2,
+            pfd_2oo3: r.pfd_2oo3,
+            availability_with_spurious_trips: r.availability_with_spurious_trips,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.separator`, transported.
 #[pyclass(
     frozen,
@@ -21834,6 +22206,104 @@ impl From<&azoth_process::models::shortcut_distillation_column::ShortcutDistilla
                 unit: "W".to_string(),
             },
             relative_volatility: r.relative_volatility,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.sil_verification`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SilVerificationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySilVerificationResult {
+    /// the claimed SIL, echoed.
+    #[pyo3(get)]
+    pub claimed_sil: f64,
+    /// the SIL the PFD maps to.
+    #[pyo3(get)]
+    pub achieved_sil: f64,
+    /// whether the achieved SIL is at least the claimed one.
+    #[pyo3(get)]
+    pub sil_achieved: bool,
+    /// the PFD, echoed.
+    #[pyo3(get)]
+    pub pfd_average: f64,
+    /// `1.5 PFD`, the class's conservative upper bound.
+    #[pyo3(get)]
+    pub pfd_upper: f64,
+    /// the architecture's fault tolerance from the class's table.
+    #[pyo3(get)]
+    pub hardware_fault_tolerance: f64,
+    /// the claimed SIL, the class's systematic-capability claim.
+    #[pyo3(get)]
+    pub systematic_capability: f64,
+    /// 0.6 for an architecture containing `oo2` or `oo3`, otherwise 0.5.
+    #[pyo3(get)]
+    pub diagnostic_coverage: f64,
+    /// the number of issues raised.
+    #[pyo3(get)]
+    pub issue_count: f64,
+    /// the number of errors among them.
+    #[pyo3(get)]
+    pub error_count: f64,
+    /// the number of warnings among them.
+    #[pyo3(get)]
+    pub warning_count: f64,
+    /// whether no error was raised.
+    #[pyo3(get)]
+    pub verification_passed: bool,
+    /// one row per issue, in the class's check order.
+    #[pyo3(get)]
+    pub issues: Vec<PySilIssue>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySilVerificationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SilVerificationResult(claimed_sil={:?}, achieved_sil={:?}, sil_achieved={:?}, pfd_average={:?}, pfd_upper={:?}, hardware_fault_tolerance={:?}, systematic_capability={:?}, diagnostic_coverage={:?}, issue_count={:?}, error_count={:?}, warning_count={:?}, verification_passed={:?}, issues={:?}, {} warning(s))",
+            self.claimed_sil,
+            self.achieved_sil,
+            self.sil_achieved,
+            self.pfd_average,
+            self.pfd_upper,
+            self.hardware_fault_tolerance,
+            self.systematic_capability,
+            self.diagnostic_coverage,
+            self.issue_count,
+            self.error_count,
+            self.warning_count,
+            self.verification_passed,
+            self.issues,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::sil_verification::SilVerificationResult>
+    for PySilVerificationResult
+{
+    fn from(r: &azoth_process::models::sil_verification::SilVerificationResult) -> Self {
+        Self {
+            claimed_sil: r.claimed_sil,
+            achieved_sil: r.achieved_sil,
+            sil_achieved: r.sil_achieved,
+            pfd_average: r.pfd_average,
+            pfd_upper: r.pfd_upper,
+            hardware_fault_tolerance: r.hardware_fault_tolerance,
+            systematic_capability: r.systematic_capability,
+            diagnostic_coverage: r.diagnostic_coverage,
+            issue_count: r.issue_count,
+            error_count: r.error_count,
+            warning_count: r.warning_count,
+            verification_passed: r.verification_passed,
+            issues: r.issues.iter().map(PySilIssue::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

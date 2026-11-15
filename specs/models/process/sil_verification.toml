@@ -1,0 +1,119 @@
+id = "process.sil_verification"
+name = "SIL verification"
+kind = "procedure"
+assumptions = [
+    "**the PFD average is the input**; the upper bound is `1.5 PFD`, the class's conservative estimate.",
+    "**the achieved SIL maps the PFD by `>= 0.01` to 1, `>= 0.001` to 2, `>= 1e-4` to 3 and below that to 4**, and the claim is met when the achieved SIL is at least the claimed one.",
+    "**the hardware fault tolerance is an exact-match table**: `1oo1` 0, `1oo2` 1, `2oo2` 0, `2oo3` 1, `1oo3` 2, and anything else 0. The architecture crosses as a string because the class matches those five and defaults the rest.",
+    "**the systematic capability is the claimed SIL**, the class's simplification.",
+    "**the diagnostic coverage is a substring rule**: `0.6` when the architecture's spelling contains `oo2` or `oo3`, otherwise `0.5`, so `4oo2` reads 0.6 and `2oo4` reads 0.5.",
+    "**the issues are raised in the class's order**: a PFD above the claimed SIL's maximum is an error, SIL 4 with fault tolerance below 2 an error, SIL 3 with fault tolerance below 1 a warning, a proof interval above five years a warning, and SIL 3 or 4 with coverage below 0.9 a warning.",
+    "**verification passes when no error is raised**, so warnings alone do not fail it.",
+    "**the issue descriptions and recommendations are prose** and sit outside this id; the rows carry the severity and category the class assigns.",
+    "**the class accepts a NaN or negative PFD**, reports achieved SIL 4 and passes the verification; the port refuses both.",
+]
+references = [
+    "IEC 61508-1:2010, table 3. The SIL and PFD ranges.",
+    "IEC 61511-1:2016, clause 11.9. The hardware fault tolerance and systematic capability.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/risk/sis/SILVerificationResult.java` is the port source.",
+    "`validation/neqsim/captures/process_sil_verification.tsv` - the canonical state, each issue class, every architecture mapping, the proof-interval boundary and the values the class accepts.",
+]
+[source]
+standard = "NeqSim process/safety/risk/sis/SILVerificationResult.java"
+edition = "Its `performVerification`, `analyzeArchitecture`, `checkForIssues` and the `VerificationIssue` record."
+[algorithm]
+scheme = "closed_form_sil_verification"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.pfd_average]
+unit = "dimensionless"
+description = "the SIF's average probability of failure on demand, at least zero.\n"
+[inputs.claimed_sil]
+unit = "dimensionless"
+description = "the claimed safety integrity level, a whole number in `[1, 4]`.\n"
+[inputs.architecture]
+type = "string"
+description = "the architecture's spelling: `1oo1`, `1oo2`, `2oo2`, `2oo3` or `1oo3` are matched exactly, and any other string answers fault tolerance 0.\n"
+[inputs.test_interval_hours]
+unit = "dimensionless"
+description = "the proof-test interval in hours, at least zero; dimensionless because the vocabulary has no hour unit.\n"
+[outputs]
+[outputs.claimed_sil]
+unit = "dimensionless"
+description = "the claimed SIL, echoed.\n"
+[outputs.achieved_sil]
+unit = "dimensionless"
+description = "the SIL the PFD maps to.\n"
+[outputs.sil_achieved]
+type = "boolean"
+description = "whether the achieved SIL is at least the claimed one.\n"
+[outputs.pfd_average]
+unit = "dimensionless"
+description = "the PFD, echoed.\n"
+[outputs.pfd_upper]
+unit = "dimensionless"
+description = "`1.5 PFD`, the class's conservative upper bound.\n"
+[outputs.hardware_fault_tolerance]
+unit = "dimensionless"
+description = "the architecture's fault tolerance from the class's table.\n"
+[outputs.systematic_capability]
+unit = "dimensionless"
+description = "the claimed SIL, the class's systematic-capability claim.\n"
+[outputs.diagnostic_coverage]
+unit = "dimensionless"
+description = "0.6 for an architecture containing `oo2` or `oo3`, otherwise 0.5.\n"
+[outputs.issue_count]
+unit = "dimensionless"
+description = "the number of issues raised.\n"
+[outputs.error_count]
+unit = "dimensionless"
+description = "the number of errors among them.\n"
+[outputs.warning_count]
+unit = "dimensionless"
+description = "the number of warnings among them.\n"
+[outputs.verification_passed]
+type = "boolean"
+description = "whether no error was raised.\n"
+[outputs.issues]
+type = "record_list"
+description = "one row per issue, in the class's check order.\n"
+[outputs.issues.fields.severity]
+type = "enum"
+values = ["warning", "error", "info"]
+description = "the issue's severity.\n"
+[outputs.issues.fields.category]
+type = "enum"
+values = [
+    "pfd_exceeded",
+    "architecture",
+    "diagnostic_coverage",
+    "proof_test_interval",
+    "common_cause",
+    "systematic",
+]
+description = "the issue's category, from the class's full set.\n"
+[[valid_range]]
+quantity = "pfd_average"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class accepts a negative or NaN PFD; the port refuses it"
+[[valid_range]]
+quantity = "claimed_sil"
+min = 1
+min_inclusive = true
+max = 4
+max_inclusive = true
+severity = "error"
+rationale = "the class's builder refuses a SIL outside 1..4"
+[[valid_range]]
+quantity = "test_interval_hours"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative interval is not an interval"
+[implementations]
+python = "azoth.process.sil_verification"
+rust = "azoth_process::sil_verification"

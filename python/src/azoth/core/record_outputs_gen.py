@@ -554,6 +554,29 @@ class LeakBlowdownPoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class LopaLayerContribution:
+    """one row per input layer, in caller order."""
+
+    #: the layer's name.
+    name: str
+
+    #: the layer's PFD.
+    pfd: float
+
+    #: the recorded frequency before the layer.
+    frequency_before_per_year: float
+
+    #: the recorded frequency after the layer.
+    frequency_after_per_year: float
+
+    #: `before - after`, in 1/year.
+    contribution_per_year: float
+
+    #: `1 / PFD`; absent at a zero PFD, where the class answers `+Infinity`.
+    rrf: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class MineralEquilibriumRow:
     """The registered minerals, in the class's order; a mineral whose ion is below the registration floor is absent rather than zero."""
 
@@ -583,6 +606,17 @@ class MineralEquilibriumRow:
 
     #: Whether a limiting ion was exhausted while solid was present.
     limiting_ion_exhausted: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MinimalCutSet:
+    """the minimal cut sets, ordered by cardinality and then by member name."""
+
+    #: the sorted basic-event names joined by `", "`; a record field cannot carry a vector, so the join is the wire shape.
+    members: str
+
+    #: the number of members.
+    cardinality: float
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -629,6 +663,56 @@ class RemediationOptionRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class RiskAssessmentRow:
+    """one row per input row, in caller order."""
+
+    #: the equipment's name.
+    name: str
+
+    #: the failure frequency, echoed.
+    failures_per_year: float
+
+    #: `8760 / failures_per_year`, or `1e6` at zero failures.
+    mtbf_hours: float
+
+    #: the mean time to repair, echoed.
+    mttr_hours: float
+
+    #: `failures_per_year mttr`.
+    expected_downtime_hours_per_year: float
+
+    #: the frequency band.
+    probability_category: str
+
+    #: the band's level, 1 to 5.
+    probability_level: float
+
+    #: the production loss, echoed.
+    production_loss_percent: float
+
+    #: the absolute production loss, echoed.
+    production_loss_kg_hr: Q
+
+    #: the production-loss band.
+    consequence_category: str
+
+    #: the band's level, 1 to 5.
+    consequence_level: float
+
+    #: the two levels' product.
+    risk_score: float
+
+    #: the score's band.
+    risk_level: str
+
+    #: `loss_kg_hr mttr price + mttr downtime_cost`, in the currency the price carries.
+    cost_per_failure: float
+
+    #: `cost_per_failure failures_per_year`, in the same currency per year.
+    annual_risk_cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ScaleControlRiskRow:
     """The inhibited risk index, one row per scale in the same order."""
 
@@ -670,6 +754,17 @@ class ScenarioIndexRow:
 
     #: the index.
     saturation_index: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SilIssue:
+    """one row per issue, in the class's check order."""
+
+    #: the issue's severity.
+    severity: str
+
+    #: the issue's category, from the class's full set.
+    category: str
 
 
 @dataclass(frozen=True, slots=True, eq=False)

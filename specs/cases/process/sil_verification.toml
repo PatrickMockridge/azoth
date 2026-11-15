@@ -1,0 +1,120 @@
+model = "process.sil_verification"
+[[cases]]
+id = "sv_canonical"
+tolerance = 1.0e-12
+source = "`SILRunnerTest.calculatesCanonicalScreeningCase`: claimed SIL 2 at PFD 0.005, 1oo1, one-year proof interval. From `validation/neqsim/captures/process_sil_verification.tsv` (`sv_canonical`)."
+[cases.inputs]
+pfd_average = 0.005
+claimed_sil = 2.0
+architecture = "1oo1"
+test_interval_hours = 8760.0
+[cases.expected]
+claimed_sil = 2.0
+achieved_sil = 2.0
+sil_achieved = true
+pfd_average = 0.005
+pfd_upper = 0.0075
+hardware_fault_tolerance = 0.0
+systematic_capability = 2.0
+diagnostic_coverage = 0.5
+issue_count = 0.0
+error_count = 0.0
+warning_count = 0.0
+verification_passed = true
+[[cases]]
+id = "sv_pfd_exceeded"
+tolerance = 1.0e-12
+source = "A PFD of 0.05 claimed as SIL 2: the PFD exceeds the SIL 2 maximum and the issue is an error. From (`sv_pfd_exceeded`)."
+[cases.inputs]
+pfd_average = 0.05
+claimed_sil = 2.0
+architecture = "1oo1"
+test_interval_hours = 8760.0
+[cases.expected]
+claimed_sil = 2.0
+achieved_sil = 1.0
+sil_achieved = false
+pfd_average = 0.05
+pfd_upper = 0.07500000000000001
+hardware_fault_tolerance = 0.0
+systematic_capability = 2.0
+diagnostic_coverage = 0.5
+issue_count = 1.0
+error_count = 1.0
+warning_count = 0.0
+verification_passed = false
+issues = [{ severity = "error", category = "pfd_exceeded" }]
+[[cases]]
+id = "sv_sil4_1oo2"
+tolerance = 1.0e-12
+source = "SIL 4 on 1oo2: fault tolerance 1 is below the 2 the class asks for, and coverage 0.6 is below 0.9. From (`sv_sil4_1oo2`)."
+[cases.inputs]
+pfd_average = 5.0e-5
+claimed_sil = 4.0
+architecture = "1oo2"
+test_interval_hours = 8760.0
+[cases.expected]
+claimed_sil = 4.0
+achieved_sil = 4.0
+sil_achieved = true
+pfd_average = 5.0e-5
+pfd_upper = 7.500000000000001e-5
+hardware_fault_tolerance = 1.0
+systematic_capability = 4.0
+diagnostic_coverage = 0.6
+issue_count = 2.0
+error_count = 1.0
+warning_count = 1.0
+verification_passed = false
+issues = [
+  { severity = "error", category = "architecture" },
+  { severity = "warning", category = "diagnostic_coverage" },
+]
+[[cases]]
+id = "sv_sil3_1oo1"
+tolerance = 1.0e-12
+source = "SIL 3 on 1oo1: the architecture and coverage warnings, with no error. From (`sv_sil3_1oo1`)."
+[cases.inputs]
+pfd_average = 5.0e-4
+claimed_sil = 3.0
+architecture = "1oo1"
+test_interval_hours = 8760.0
+[cases.expected]
+claimed_sil = 3.0
+achieved_sil = 3.0
+sil_achieved = true
+pfd_average = 5.0e-4
+pfd_upper = 7.5e-4
+hardware_fault_tolerance = 0.0
+systematic_capability = 3.0
+diagnostic_coverage = 0.5
+issue_count = 2.0
+error_count = 0.0
+warning_count = 2.0
+verification_passed = true
+issues = [
+  { severity = "warning", category = "architecture" },
+  { severity = "warning", category = "diagnostic_coverage" },
+]
+[[cases]]
+id = "sv_unknown_architecture"
+tolerance = 1.0e-12
+source = "An architecture the class does not know (`2oo4`): fault tolerance 0 and coverage 0.5, no issue. From (`sv_unknown_architecture`)."
+[cases.inputs]
+pfd_average = 0.005
+claimed_sil = 2.0
+architecture = "2oo4"
+test_interval_hours = 8760.0
+[cases.expected]
+claimed_sil = 2.0
+achieved_sil = 2.0
+sil_achieved = true
+pfd_average = 0.005
+pfd_upper = 0.0075
+hardware_fault_tolerance = 0.0
+systematic_capability = 2.0
+diagnostic_coverage = 0.5
+issue_count = 0.0
+error_count = 0.0
+warning_count = 0.0
+verification_passed = true

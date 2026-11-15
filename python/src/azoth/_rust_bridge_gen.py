@@ -32,6 +32,7 @@ from azoth.core.result import (
     BeggsBrillSegmentResult,
     BleveResult,
     BoilingHeatTransferResult,
+    BowTieResult,
     BrineMixingPointRow,
     BrineMixingScaleEvaluatorResult,
     BubblePressureResult,
@@ -91,6 +92,7 @@ from azoth.core.result import (
     EventTreeOutcome,
     EventTreeResult,
     ExpanderResult,
+    FaultTreeResult,
     FeSMorphology,
     FilippovConductivityResult,
     FilterResult,
@@ -168,6 +170,8 @@ from azoth.core.result import (
     LiquidHeatCapacityResult,
     LiquidViscosityPureResult,
     LmtdCorrectionFactorResult,
+    LopaLayerContribution,
+    LopaResult,
     LumpingResult,
     ManifoldResult,
     MapTurboExpanderResult,
@@ -178,6 +182,7 @@ from azoth.core.result import (
     MatcopPrumrAlphaResult,
     MatcopPrumrNewAlphaResult,
     MineralEquilibriumRow,
+    MinimalCutSet,
     MixerResult,
     MolarEnthalpyEntropyResult,
     MollerupAlphaResult,
@@ -185,6 +190,7 @@ from azoth.core.result import (
     MultiMineralScaleEquilibriumResult,
     NaceIssueRow,
     NitricSulfuricAcidVaporPressureResult,
+    Nog070SilDeterminationResult,
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
     OrificeFlowResult,
@@ -245,9 +251,12 @@ from azoth.core.result import (
     ReferencePotentialsResult,
     RemediationOptionRow,
     ReynoldsNumberResult,
+    RiskAssessmentRow,
+    RiskMatrixResult,
     RkAlphaAbResult,
     RkDepartureResult,
     RootStructure,
+    SafetyInstrumentedFunctionResult,
     SaftVrMiePhaseResult,
     SaltPrecipitationResult,
     SaturateWithWaterResult,
@@ -274,6 +283,8 @@ from azoth.core.result import (
     ShellAndTubeVibrationResult,
     ShortcutDistillationColumnResult,
     SiddiqiLucasDiffusivityResult,
+    SilIssue,
+    SilVerificationResult,
     SolidFugacityResult,
     SoreideWhitsonAlphaResult,
     SoreideWhitsonPhaseResult,
@@ -291,6 +302,7 @@ from azoth.core.result import (
     StreamScaleAnalyzerResult,
     StreamScaleMineralRow,
     StrippingColumnResult,
+    Sts0131PressureCategory,
     SubFraction,
     SupplyVerdict,
     SurfCooldownResult,
@@ -405,6 +417,7 @@ __all__ = [
     "beggs_brill_segment",
     "bleve",
     "boiling_heat_transfer",
+    "bow_tie",
     "brine_mixing_scale_evaluator",
     "bubble_pressure",
     "bubble_temperature",
@@ -453,6 +466,7 @@ __all__ = [
     "erosion_prediction",
     "event_tree",
     "expander",
+    "fault_tree",
     "filippov_conductivity",
     "filter",
     "fire_monitor_coverage",
@@ -515,6 +529,7 @@ __all__ = [
     "liquid_heat_capacity",
     "liquid_viscosity_pure",
     "lmtd_correction_factor",
+    "lopa",
     "lumping",
     "manifold",
     "map_turbo_expander_compressor",
@@ -530,6 +545,7 @@ __all__ = [
     "multi_mineral_scale_equilibrium",
     "multiflash_stability_test",
     "nitric_sulfuric_acid_vapor_pressure",
+    "nog070_sil_determination",
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
     "orifice_flow",
@@ -589,8 +605,10 @@ __all__ = [
     "reactive_tp_flash",
     "reference_potentials",
     "reynolds_number",
+    "risk_matrix",
     "rk_alpha_ab",
     "rk_departure",
+    "safety_instrumented_function",
     "saft_vr_mie_phase",
     "salt_precipitation",
     "saturate_with_water",
@@ -613,6 +631,7 @@ __all__ = [
     "shell_and_tube_vibration",
     "shortcut_distillation_column",
     "siddiqi_lucas_diffusivity",
+    "sil_verification",
     "solid_fugacity",
     "soreide_whitson_alpha",
     "soreide_whitson_phase",
@@ -5691,6 +5710,23 @@ def bleve(fuel_mass: Q, heat_of_combustion: float, radiative_fraction: float, re
     )
 
 
+def bow_tie(threats: list[dict[str, object]], consequences: list[dict[str, object]], barriers: list[dict[str, object]]) -> BowTieResult:
+    """``process.bow_tie``, computed in Rust."""
+    spec = _models_gen.model("process.bow_tie")
+    result = _core.bow_tie(
+        input_records_to_si(spec, "threats", threats),
+        input_records_to_si(spec, "consequences", consequences),
+        input_records_to_si(spec, "barriers", barriers),
+    )
+    return BowTieResult(
+        unmitigated_frequency_per_year=result.unmitigated_frequency_per_year,
+        mitigated_frequency_per_year=result.mitigated_frequency_per_year,
+        total_rrf=result.total_rrf,
+        max_severity=result.max_severity,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def component_splitter(components: list[str], feed_n: Q, feed_z: list[float], feed_p: Q, feed_t: Q, split_factors: list[float]) -> ComponentSplitterResult:
     """``process.component_splitter``, computed in Rust."""
     spec = _models_gen.model("process.component_splitter")
@@ -6154,6 +6190,21 @@ def expander(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q
         design_module_length=None if result.design_module_length is None else from_si(result.design_module_length.magnitude_si, result.design_module_length.unit),
         design_module_width=None if result.design_module_width is None else from_si(result.design_module_width.magnitude_si, result.design_module_width.unit),
         design_module_height=None if result.design_module_height is None else from_si(result.design_module_height.magnitude_si, result.design_module_height.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def fault_tree(nodes: list[dict[str, object]], max_cardinality: float) -> FaultTreeResult:
+    """``process.fault_tree``, computed in Rust."""
+    spec = _models_gen.model("process.fault_tree")
+    result = _core.fault_tree(
+        input_records_to_si(spec, "nodes", nodes),
+        max_cardinality,
+    )
+    return FaultTreeResult(
+        top_event_probability=result.top_event_probability,
+        cut_set_count=result.cut_set_count,
+        minimal_cut_sets=tuple(MinimalCutSet(members=c.members, cardinality=c.cardinality) for c in result.minimal_cut_sets),
         warnings=_warnings(result.warnings),
     )
 
@@ -6893,6 +6944,31 @@ def leak_blowdown(components: list[str], initial_z: list[float], initial_t: Q, i
     )
 
 
+def lopa(initiating_event_frequency_per_year: float, target_frequency_per_year: float, mitigated_frequency_per_year: float, layers: list[dict[str, object]], event_pressure: Q | None=None, design_pressure: Q | None=None, test_pressure: Q | None=None) -> LopaResult:
+    """``process.lopa``, computed in Rust."""
+    spec = _models_gen.model("process.lopa")
+    result = _core.lopa(
+        initiating_event_frequency_per_year,
+        target_frequency_per_year,
+        mitigated_frequency_per_year,
+        input_records_to_si(spec, "layers", layers),
+        None if event_pressure is None else input_to_si(spec, "event_pressure", event_pressure),
+        None if design_pressure is None else input_to_si(spec, "design_pressure", design_pressure),
+        None if test_pressure is None else input_to_si(spec, "test_pressure", test_pressure),
+    )
+    return LopaResult(
+        target_met=result.target_met,
+        gap_to_target=result.gap_to_target,
+        total_rrf=result.total_rrf,
+        required_additional_rrf=result.required_additional_rrf,
+        required_additional_sil=result.required_additional_sil,
+        layer_contributions=tuple(LopaLayerContribution(name=c.name, pfd=c.pfd, frequency_before_per_year=c.frequency_before_per_year, frequency_after_per_year=c.frequency_after_per_year, contribution_per_year=c.contribution_per_year, rrf=c.rrf) for c in result.layer_contributions),
+        sts0131_pressure_category=None if result.sts0131_pressure_category is None else Sts0131PressureCategory(result.sts0131_pressure_category),
+        sts0131_target_frequency_per_year=result.sts0131_target_frequency_per_year,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def manifold(components: list[str], feed_n: list[Q], feed_z: list[list[float]], feed_p: list[Q], feed_t: list[Q], split_factors: list[float]) -> ManifoldResult:
     """``process.manifold``, computed in Rust."""
     spec = _models_gen.model("process.manifold")
@@ -6983,6 +7059,23 @@ def mixer(components: list[str], feed_n: list[Q], feed_z: list[list[float]], fee
         inlet_pressure_spread=from_si(result.inlet_pressure_spread.magnitude_si, result.inlet_pressure_spread.unit),
         pressure_mismatch=result.pressure_mismatch,
         product_h=from_si(result.product_h.magnitude_si, result.product_h.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def nog070_sil_determination(sif_type: str, pfd_average: float, minimum_sil: float | None=None) -> Nog070SilDeterminationResult:
+    """``process.nog070_sil_determination``, computed in Rust."""
+    result = _core.nog070_sil_determination(
+        sif_type,
+        pfd_average,
+        None if minimum_sil is None else minimum_sil,
+    )
+    return Nog070SilDeterminationResult(
+        catalogue_minimum_sil=result.catalogue_minimum_sil,
+        minimum_sil=result.minimum_sil,
+        achieved_sil=result.achieved_sil,
+        compliant=result.compliant,
+        required_pfd_reduction_factor=result.required_pfd_reduction_factor,
         warnings=_warnings(result.warnings),
     )
 
@@ -7413,6 +7506,50 @@ def rate_based_packed_column(gas_components: list[str], gas_n: Q, gas_z: list[fl
     )
 
 
+def risk_matrix(equipment: list[dict[str, object]], product_price_per_kg: float | None=None, downtime_cost_per_hour: float | None=None) -> RiskMatrixResult:
+    """``process.risk_matrix``, computed in Rust."""
+    spec = _models_gen.model("process.risk_matrix")
+    result = _core.risk_matrix(
+        input_records_to_si(spec, "equipment", equipment),
+        None if product_price_per_kg is None else product_price_per_kg,
+        None if downtime_cost_per_hour is None else downtime_cost_per_hour,
+    )
+    return RiskMatrixResult(
+        assessments=tuple(RiskAssessmentRow(name=c.name, failures_per_year=c.failures_per_year, mtbf_hours=c.mtbf_hours, mttr_hours=c.mttr_hours, expected_downtime_hours_per_year=c.expected_downtime_hours_per_year, probability_category=c.probability_category, probability_level=c.probability_level, production_loss_percent=c.production_loss_percent, production_loss_kg_hr=from_si(c.production_loss_kg_hr.magnitude_si, c.production_loss_kg_hr.unit), consequence_category=c.consequence_category, consequence_level=c.consequence_level, risk_score=c.risk_score, risk_level=c.risk_level, cost_per_failure=c.cost_per_failure, annual_risk_cost=c.annual_risk_cost) for c in result.assessments),
+        total_annual_risk_cost=result.total_annual_risk_cost,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def safety_instrumented_function(pfd_average: float, claimed_sil: float, unmitigated_frequency_per_year: float, target_frequency_per_year: float, test_interval_hours: float, lambda_du_per_hour: float | None=None, spurious_trip_rate_per_year: float | None=None, mttr_hours: float | None=None, base_availability: float | None=None) -> SafetyInstrumentedFunctionResult:
+    """``process.safety_instrumented_function``, computed in Rust."""
+    result = _core.safety_instrumented_function(
+        pfd_average,
+        claimed_sil,
+        unmitigated_frequency_per_year,
+        target_frequency_per_year,
+        test_interval_hours,
+        None if lambda_du_per_hour is None else lambda_du_per_hour,
+        None if spurious_trip_rate_per_year is None else spurious_trip_rate_per_year,
+        None if mttr_hours is None else mttr_hours,
+        None if base_availability is None else base_availability,
+    )
+    return SafetyInstrumentedFunctionResult(
+        risk_reduction_factor=result.risk_reduction_factor,
+        mitigated_frequency_per_year=result.mitigated_frequency_per_year,
+        required_pfd=result.required_pfd,
+        required_sil=result.required_sil,
+        max_pfd_for_claimed_sil=result.max_pfd_for_claimed_sil,
+        proof_test_interval_years=result.proof_test_interval_years,
+        pfd_within_claimed_sil=result.pfd_within_claimed_sil,
+        pfd_1oo1=result.pfd_1oo1,
+        pfd_1oo2=result.pfd_1oo2,
+        pfd_2oo3=result.pfd_2oo3,
+        availability_with_spurious_trips=result.availability_with_spurious_trips,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def separator(components: list[str], feed_n: Q, feed_z: list[float], feed_p: Q, feed_t: Q, pressure_drop: Q, gas_in_liquid: float, heat_input: Q | None=None, internal_diameter: Q | None=None, design_gas_load_factor: Q | None=None, orientation: str | None=None, design_liquid_level_fraction: float | None=None, separator_length: Q | None=None, liquid_level_fraction: float | None=None, safety_factor: float | None=None, mechanical_design: bool | None=None, auto_size: bool | None=None, fg: float | None=None, volume_safety_factor: float | None=None, retention_time: Q | None=None, max_operation_pressure: Q | None=None, allowable_stress: Q | None=None, joint_efficiency: float | None=None, corrosion_allowance: Q | None=None) -> SeparatorResult:
     """``process.separator``, computed in Rust."""
     spec = _models_gen.model("process.separator")
@@ -7671,6 +7808,32 @@ def shortcut_distillation_column(components: list[str], feed_n: Q, feed_z: list[
         condenser_duty=from_si(result.condenser_duty.magnitude_si, result.condenser_duty.unit),
         reboiler_duty=from_si(result.reboiler_duty.magnitude_si, result.reboiler_duty.unit),
         relative_volatility=result.relative_volatility,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def sil_verification(pfd_average: float, claimed_sil: float, architecture: str, test_interval_hours: float) -> SilVerificationResult:
+    """``process.sil_verification``, computed in Rust."""
+    result = _core.sil_verification(
+        pfd_average,
+        claimed_sil,
+        architecture,
+        test_interval_hours,
+    )
+    return SilVerificationResult(
+        claimed_sil=result.claimed_sil,
+        achieved_sil=result.achieved_sil,
+        sil_achieved=result.sil_achieved,
+        pfd_average=result.pfd_average,
+        pfd_upper=result.pfd_upper,
+        hardware_fault_tolerance=result.hardware_fault_tolerance,
+        systematic_capability=result.systematic_capability,
+        diagnostic_coverage=result.diagnostic_coverage,
+        issue_count=result.issue_count,
+        error_count=result.error_count,
+        warning_count=result.warning_count,
+        verification_passed=result.verification_passed,
+        issues=tuple(SilIssue(severity=c.severity, category=c.category) for c in result.issues),
         warnings=_warnings(result.warnings),
     )
 

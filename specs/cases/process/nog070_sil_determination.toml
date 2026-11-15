@@ -1,0 +1,65 @@
+model = "process.nog070_sil_determination"
+[[cases]]
+id = "n070_hipps_compliant"
+tolerance = 1.0e-12
+source = "`Nog070SilCatalogueTest`: a HIPPS at PFD 1e-4 achieves SIL 3 and meets the catalogue minimum of 3. From `validation/neqsim/captures/process_nog070_sil_determination.tsv` (`n070_hipps_compliant`)."
+[cases.inputs]
+sif_type = "hipps_pipeline"
+pfd_average = 1.0e-4
+[cases.expected]
+catalogue_minimum_sil = 3.0
+minimum_sil = 3.0
+achieved_sil = 3.0
+compliant = true
+[[cases]]
+id = "n070_hipps_noncompliant"
+tolerance = 1.0e-12
+source = "A HIPPS at PFD 5e-3 achieves SIL 2 against a minimum of 3, so the PFD must fall by a factor of 10. From (`n070_hipps_noncompliant`)."
+[cases.inputs]
+sif_type = "hipps_pipeline"
+pfd_average = 5.0e-3
+[cases.expected]
+catalogue_minimum_sil = 3.0
+minimum_sil = 3.0
+achieved_sil = 2.0
+compliant = false
+required_pfd_reduction_factor = 10.0
+[[cases]]
+id = "n070_custom_minimum"
+tolerance = 1.0e-12
+source = "`CUSTOM` with an explicit project minimum of 3: the catalogue reads 0 and the caller's value governs. From (`n070_custom_minimum`)."
+[cases.inputs]
+sif_type = "custom"
+pfd_average = 5.0e-3
+minimum_sil = 3.0
+[cases.expected]
+catalogue_minimum_sil = 0.0
+minimum_sil = 3.0
+achieved_sil = 2.0
+compliant = false
+required_pfd_reduction_factor = 10.0
+[[cases]]
+id = "n070_custom_no_minimum"
+tolerance = 1.0e-12
+source = "`CUSTOM` with no minimum: the catalogue's 0 applies and every achieved SIL is compliant. From (`n070_custom_no_minimum`)."
+[cases.inputs]
+sif_type = "custom"
+pfd_average = 5.0e-3
+[cases.expected]
+catalogue_minimum_sil = 0.0
+minimum_sil = 0.0
+achieved_sil = 2.0
+compliant = true
+[[cases]]
+id = "n070_sil_zero_band"
+tolerance = 1.0e-12
+source = "A PFD of 0.2 reads SIL 0 in `pfdToSil`, where `process.safety_instrumented_function`'s required-SIL map reads 1; the high-vibration minimum is 1. From (`n070_sil_zero_band`)."
+[cases.inputs]
+sif_type = "psd_high_vibration"
+pfd_average = 0.2
+[cases.expected]
+catalogue_minimum_sil = 1.0
+minimum_sil = 1.0
+achieved_sil = 0.0
+compliant = false
+required_pfd_reduction_factor = 10.0

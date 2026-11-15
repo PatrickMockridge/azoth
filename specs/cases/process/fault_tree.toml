@@ -1,0 +1,92 @@
+model = "process.fault_tree"
+[[cases]]
+id = "ft_and"
+tolerance = 1.0e-12
+source = "`FaultTreeAnalyzerTest.andGateIsProductOfBasics`: two basics at 0.1 and 0.2 under an AND. From `validation/neqsim/captures/process_fault_tree.tsv` (`ft_and`)."
+[cases.inputs]
+max_cardinality = 3
+nodes = [
+  { name = "Both fail", parent_index = -1, gate = "and" },
+  { name = "A", parent_index = 0, gate = "basic", probability = 0.1 },
+  { name = "B", parent_index = 0, gate = "basic", probability = 0.2 },
+]
+[cases.expected]
+top_event_probability = 0.020000000000000004
+cut_set_count = 1
+minimal_cut_sets = [{ members = "A, B", cardinality = 2 }]
+[[cases]]
+id = "ft_or"
+tolerance = 1.0e-12
+source = "`FaultTreeAnalyzerTest.orGateIsRareEventComplement`: the same basics under an OR. From (`ft_or`)."
+[cases.inputs]
+max_cardinality = 3
+nodes = [
+  { name = "Either fail", parent_index = -1, gate = "or" },
+  { name = "A", parent_index = 0, gate = "basic", probability = 0.1 },
+  { name = "B", parent_index = 0, gate = "basic", probability = 0.2 },
+]
+[cases.expected]
+top_event_probability = 0.2799999999999999
+cut_set_count = 2
+minimal_cut_sets = [
+  { members = "A", cardinality = 1 },
+  { members = "B", cardinality = 1 },
+]
+[[cases]]
+id = "ft_voting"
+tolerance = 1.0e-12
+source = "`FaultTreeAnalyzerTest.votingTwoOfThree`: 2 of 3 at 0.1. From (`ft_voting`)."
+[cases.inputs]
+max_cardinality = 3
+nodes = [
+  { name = "2oo3", parent_index = -1, gate = "voting", k_of_n = 2 },
+  { name = "A", parent_index = 0, gate = "basic", probability = 0.1 },
+  { name = "B", parent_index = 0, gate = "basic", probability = 0.1 },
+  { name = "C", parent_index = 0, gate = "basic", probability = 0.1 },
+]
+[cases.expected]
+top_event_probability = 0.028000000000000004
+cut_set_count = 3
+minimal_cut_sets = [
+  { members = "A, B", cardinality = 2 },
+  { members = "A, C", cardinality = 2 },
+  { members = "B, C", cardinality = 2 },
+]
+[[cases]]
+id = "ft_beta_or"
+tolerance = 1.0e-12
+source = "`FaultTreeAnalyzerTest.betaFactorChangesORProbability`: two basics at 0.01 under an OR with beta 0.10. From (`ft_beta_or`)."
+[cases.inputs]
+max_cardinality = 3
+nodes = [
+  { name = "any", parent_index = -1, gate = "or", beta_ccf = 0.1 },
+  { name = "A", parent_index = 0, gate = "basic", probability = 0.01 },
+  { name = "B", parent_index = 0, gate = "basic", probability = 0.01 },
+]
+[cases.expected]
+top_event_probability = 0.018910000000000027
+cut_set_count = 2
+minimal_cut_sets = [
+  { members = "A", cardinality = 1 },
+  { members = "B", cardinality = 1 },
+]
+[[cases]]
+id = "ft_cut_sets"
+tolerance = 1.0e-12
+source = "`FaultTreeAnalyzerTest.minimalCutSets`: `(A AND B) OR C` gives `{C}` and `{A, B}`. The capture's `class_cut_set_order` is the class's `HashSet` order; the port sorts. From (`ft_cut_sets`)."
+[cases.inputs]
+max_cardinality = 3
+nodes = [
+  { name = "top", parent_index = -1, gate = "or" },
+  { name = "ab", parent_index = 0, gate = "and" },
+  { name = "A", parent_index = 1, gate = "basic", probability = 0.1 },
+  { name = "B", parent_index = 1, gate = "basic", probability = 0.1 },
+  { name = "C", parent_index = 0, gate = "basic", probability = 0.1 },
+]
+[cases.expected]
+top_event_probability = 0.10899999999999999
+cut_set_count = 2
+minimal_cut_sets = [
+  { members = "C", cardinality = 1 },
+  { members = "A, B", cardinality = 2 },
+]

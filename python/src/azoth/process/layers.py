@@ -2105,6 +2105,219 @@ def _anti_surge_recycle(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _fault_tree(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fault_tree`'s layers, from the reference's own arithmetic.
+
+    The cut-set members are strings and are asserted by the case and the cross-impl test;
+    the cardinalities are numbers and are dumped here.
+    """
+    from azoth.process.reference.fault_tree import fault_tree as evaluate
+
+    result = evaluate(
+        [dict(row) for row in inputs["nodes"]],
+        float(inputs["max_cardinality"]),
+    )
+    layers = {
+        "top_event_probability": result.top_event_probability,
+        "cut_set_count": result.cut_set_count,
+    }
+    for index, row in enumerate(result.minimal_cut_sets):
+        layers[f"cut_set{index}_cardinality"] = row.cardinality
+    return layers
+
+
+def _bow_tie(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.bow_tie`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.bow_tie import bow_tie as evaluate
+
+    result = evaluate(
+        [dict(row) for row in inputs["threats"]],
+        [dict(row) for row in inputs["consequences"]],
+        [dict(row) for row in inputs["barriers"]],
+    )
+    return {
+        "unmitigated_frequency_per_year": result.unmitigated_frequency_per_year,
+        "mitigated_frequency_per_year": result.mitigated_frequency_per_year,
+        "total_rrf": result.total_rrf,
+        "max_severity": result.max_severity,
+    }
+
+
+def _safety_instrumented_function(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.safety_instrumented_function`'s layers, from the reference's arithmetic.
+
+    An optional output the class answers with `+Infinity` is absent from the dump, so the
+    capture's `Infinity` row is not compared against it.
+    """
+    from azoth.process.reference.safety_instrumented_function import (
+        safety_instrumented_function as evaluate,
+    )
+
+    result = evaluate(
+        float(inputs["pfd_average"]),
+        float(inputs["claimed_sil"]),
+        float(inputs["unmitigated_frequency_per_year"]),
+        float(inputs["target_frequency_per_year"]),
+        float(inputs["test_interval_hours"]),
+        None if inputs.get("lambda_du_per_hour") is None else float(inputs["lambda_du_per_hour"]),
+        (
+            None
+            if inputs.get("spurious_trip_rate_per_year") is None
+            else float(inputs["spurious_trip_rate_per_year"])
+        ),
+        None if inputs.get("mttr_hours") is None else float(inputs["mttr_hours"]),
+        (None if inputs.get("base_availability") is None else float(inputs["base_availability"])),
+    )
+    layers = {
+        "mitigated_frequency_per_year": result.mitigated_frequency_per_year,
+        "required_pfd": result.required_pfd,
+        "required_sil": result.required_sil,
+        "max_pfd_for_claimed_sil": result.max_pfd_for_claimed_sil,
+        "proof_test_interval_years": result.proof_test_interval_years,
+    }
+    for name in (
+        "risk_reduction_factor",
+        "pfd_1oo1",
+        "pfd_1oo2",
+        "pfd_2oo3",
+        "availability_with_spurious_trips",
+    ):
+        value = getattr(result, name)
+        if value is not None:
+            layers[name] = float(value)
+    return layers
+
+
+def _lopa(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.lopa`'s layers, from the reference's own arithmetic.
+
+    The layer names and the STS0131 category are not numbers; they are asserted by the
+    case and the cross-impl test. A layer's RRF absent at a zero PFD is absent here too.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.lopa import lopa as evaluate
+
+    def optional(name: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), "bar")
+
+    result = evaluate(
+        float(inputs["initiating_event_frequency_per_year"]),
+        float(inputs["target_frequency_per_year"]),
+        float(inputs["mitigated_frequency_per_year"]),
+        [dict(row) for row in inputs["layers"]],
+        optional("event_pressure"),
+        optional("design_pressure"),
+        optional("test_pressure"),
+    )
+    layers: dict[str, float] = {
+        "gap_to_target": result.gap_to_target,
+        "total_rrf": result.total_rrf,
+        "required_additional_sil": result.required_additional_sil,
+        "layer_count": float(len(result.layer_contributions)),
+    }
+    if result.required_additional_rrf is not None:
+        layers["required_additional_rrf"] = result.required_additional_rrf
+    if result.sts0131_target_frequency_per_year is not None:
+        layers["sts0131_target_frequency_per_year"] = result.sts0131_target_frequency_per_year
+    for index, row in enumerate(result.layer_contributions):
+        layers[f"layer{index}_contribution_per_year"] = row.contribution_per_year
+        if row.rrf is not None:
+            layers[f"layer{index}_rrf"] = row.rrf
+    return layers
+
+
+def _sil_verification(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.sil_verification`'s layers, from the reference's own arithmetic.
+
+    The issue severities and categories are names; they are asserted by the case and the
+    cross-impl test.
+    """
+    from azoth.process.reference.sil_verification import (
+        sil_verification as evaluate,
+    )
+
+    result = evaluate(
+        float(inputs["pfd_average"]),
+        float(inputs["claimed_sil"]),
+        str(inputs["architecture"]),
+        float(inputs["test_interval_hours"]),
+    )
+    return {
+        "claimed_sil": result.claimed_sil,
+        "achieved_sil": result.achieved_sil,
+        "pfd_average": result.pfd_average,
+        "pfd_upper": result.pfd_upper,
+        "hardware_fault_tolerance": result.hardware_fault_tolerance,
+        "systematic_capability": result.systematic_capability,
+        "diagnostic_coverage": result.diagnostic_coverage,
+        "issue_count": result.issue_count,
+        "error_count": result.error_count,
+        "warning_count": result.warning_count,
+    }
+
+
+def _nog070_sil_determination(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.nog070_sil_determination`'s layers, from the reference's arithmetic."""
+    from azoth.process.reference.nog070_sil_determination import (
+        nog070_sil_determination as evaluate,
+    )
+
+    minimum = inputs.get("minimum_sil")
+    result = evaluate(
+        str(inputs["sif_type"]),
+        float(inputs["pfd_average"]),
+        None if minimum is None else float(minimum),
+    )
+    layers = {
+        "catalogue_minimum_sil": result.catalogue_minimum_sil,
+        "minimum_sil": result.minimum_sil,
+        "achieved_sil": result.achieved_sil,
+    }
+    if result.required_pfd_reduction_factor is not None:
+        layers["required_pfd_reduction_factor"] = result.required_pfd_reduction_factor
+    return layers
+
+
+def _risk_matrix(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.risk_matrix`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.risk_matrix import risk_matrix as evaluate
+
+    price = inputs.get("product_price_per_kg")
+    downtime = inputs.get("downtime_cost_per_hour")
+    equipment = []
+    for row in inputs["equipment"]:
+        converted = dict(row)
+        converted["production_loss_kg_per_hr"] = quantity(
+            float(row["production_loss_kg_per_hr"]), "kg/h"
+        )
+        equipment.append(converted)
+    result = evaluate(
+        equipment,
+        None if price is None else float(price),
+        None if downtime is None else float(downtime),
+    )
+    layers = {"total_annual_risk_cost": result.total_annual_risk_cost}
+    for index, row in enumerate(result.assessments):
+        layers[f"assessment{index}_failures_per_year"] = row.failures_per_year
+        layers[f"assessment{index}_mtbf_hours"] = row.mtbf_hours
+        layers[f"assessment{index}_mttr_hours"] = row.mttr_hours
+        layers[f"assessment{index}_expected_downtime_hours_per_year"] = (
+            row.expected_downtime_hours_per_year
+        )
+        layers[f"assessment{index}_probability_level"] = row.probability_level
+        layers[f"assessment{index}_production_loss_percent"] = row.production_loss_percent
+        layers[f"assessment{index}_production_loss_kg_hr"] = row.production_loss_kg_hr.to(
+            "kg/h"
+        ).magnitude
+        layers[f"assessment{index}_consequence_level"] = row.consequence_level
+        layers[f"assessment{index}_risk_score"] = row.risk_score
+        layers[f"assessment{index}_cost_per_failure"] = row.cost_per_failure
+        layers[f"assessment{index}_annual_risk_cost"] = row.annual_risk_cost
+    return layers
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2121,6 +2334,13 @@ DUMPERS: dict[str, Dumper] = {
     "process.fire_water_coverage_assessment": _fire_water_coverage_assessment,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.api537_flare_flame_model": _api537_flare_flame_model,
+    "process.fault_tree": _fault_tree,
+    "process.bow_tie": _bow_tie,
+    "process.safety_instrumented_function": _safety_instrumented_function,
+    "process.lopa": _lopa,
+    "process.sil_verification": _sil_verification,
+    "process.nog070_sil_determination": _nog070_sil_determination,
+    "process.risk_matrix": _risk_matrix,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3117,6 +3337,261 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_api537_flare_flame.tsv",
         block=5,
         identified_by=("#label", "api537_transmissivity"),
+    ),
+    # The fault tree's five class states. The eleven blocks after them are the class's
+    # unvalidated gates and inputs, declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.fault_tree",
+        case="ft_and",
+        capture="process_fault_tree.tsv",
+        block=0,
+        identified_by=("#label", "ft_and"),
+    ),
+    LayerCase(
+        model="process.fault_tree",
+        case="ft_or",
+        capture="process_fault_tree.tsv",
+        block=1,
+        identified_by=("#label", "ft_or"),
+    ),
+    LayerCase(
+        model="process.fault_tree",
+        case="ft_voting",
+        capture="process_fault_tree.tsv",
+        block=2,
+        identified_by=("#label", "ft_voting"),
+    ),
+    LayerCase(
+        model="process.fault_tree",
+        case="ft_beta_or",
+        capture="process_fault_tree.tsv",
+        block=3,
+        identified_by=("#label", "ft_beta_or"),
+    ),
+    LayerCase(
+        model="process.fault_tree",
+        case="ft_cut_sets",
+        capture="process_fault_tree.tsv",
+        block=4,
+        identified_by=("#label", "ft_cut_sets"),
+    ),
+    # The bow-tie's five caseable states. The eight blocks after them (an empty bow-tie,
+    # a negative frequency, PFDs outside [0, 1], a NaN, no consequences, all threats
+    # inactive) are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.bow_tie",
+        case="bt_class_test",
+        capture="process_bow_tie.tsv",
+        block=0,
+        identified_by=("#label", "bt_class_test"),
+    ),
+    LayerCase(
+        model="process.bow_tie",
+        case="bt_mitigation_ignored",
+        capture="process_bow_tie.tsv",
+        block=1,
+        identified_by=("#label", "bt_mitigation_ignored"),
+    ),
+    LayerCase(
+        model="process.bow_tie",
+        case="bt_both_types",
+        capture="process_bow_tie.tsv",
+        block=2,
+        identified_by=("#label", "bt_both_types"),
+    ),
+    LayerCase(
+        model="process.bow_tie",
+        case="bt_link_ignored",
+        capture="process_bow_tie.tsv",
+        block=3,
+        identified_by=("#label", "bt_link_ignored"),
+    ),
+    LayerCase(
+        model="process.bow_tie",
+        case="bt_nonfunctional",
+        capture="process_bow_tie.tsv",
+        block=5,
+        identified_by=("#label", "bt_nonfunctional"),
+    ),
+    # The SIF's five caseable states. The five blocks after them (a negative PFD, a NaN,
+    # the two SIL refusals and the static max-PFD table) are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.safety_instrumented_function",
+        case="sif_class_test",
+        capture="process_safety_instrumented_function.tsv",
+        block=0,
+        identified_by=("#label", "sif_class_test"),
+    ),
+    LayerCase(
+        model="process.safety_instrumented_function",
+        case="sif_required_pfd_at_zero",
+        capture="process_safety_instrumented_function.tsv",
+        block=1,
+        identified_by=("#label", "sif_required_pfd_at_zero"),
+    ),
+    LayerCase(
+        model="process.safety_instrumented_function",
+        case="sif_pfd_zero",
+        capture="process_safety_instrumented_function.tsv",
+        block=2,
+        identified_by=("#label", "sif_pfd_zero"),
+    ),
+    LayerCase(
+        model="process.safety_instrumented_function",
+        case="sif_spurious_trips",
+        capture="process_safety_instrumented_function.tsv",
+        block=3,
+        identified_by=("#label", "sif_spurious_trips"),
+    ),
+    LayerCase(
+        model="process.safety_instrumented_function",
+        case="sif_out_of_band",
+        capture="process_safety_instrumented_function.tsv",
+        block=4,
+        identified_by=("#label", "sif_out_of_band"),
+    ),
+    # The LOPA's five caseable states. The thirteen blocks after them (the floating-point
+    # boundary, the six STS0131 bands, a zero-PFD layer, a negative initiating frequency
+    # and the four refusals) are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.lopa",
+        case="lopa_target_met",
+        capture="process_lopa.tsv",
+        block=0,
+        identified_by=("#label", "lopa_target_met"),
+    ),
+    LayerCase(
+        model="process.lopa",
+        case="lopa_gap",
+        capture="process_lopa.tsv",
+        block=1,
+        identified_by=("#label", "lopa_gap"),
+    ),
+    LayerCase(
+        model="process.lopa",
+        case="lopa_boundary_equal",
+        capture="process_lopa.tsv",
+        block=2,
+        identified_by=("#label", "lopa_boundary_equal"),
+    ),
+    LayerCase(
+        model="process.lopa",
+        case="lopa_zero_mitigated",
+        capture="process_lopa.tsv",
+        block=4,
+        identified_by=("#label", "lopa_zero_mitigated"),
+    ),
+    LayerCase(
+        model="process.lopa",
+        case="lopa_zero_target_unmet",
+        capture="process_lopa.tsv",
+        block=5,
+        identified_by=("#label", "lopa_zero_target_unmet"),
+    ),
+    # The SIL verification's five caseable states. The six blocks after them (1oo3, the
+    # `4oo2` substring, the two proof boundaries, a NaN and a negative PFD) are declared
+    # in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.sil_verification",
+        case="sv_canonical",
+        capture="process_sil_verification.tsv",
+        block=0,
+        identified_by=("#label", "sv_canonical"),
+    ),
+    LayerCase(
+        model="process.sil_verification",
+        case="sv_pfd_exceeded",
+        capture="process_sil_verification.tsv",
+        block=1,
+        identified_by=("#label", "sv_pfd_exceeded"),
+    ),
+    LayerCase(
+        model="process.sil_verification",
+        case="sv_sil4_1oo2",
+        capture="process_sil_verification.tsv",
+        block=2,
+        identified_by=("#label", "sv_sil4_1oo2"),
+    ),
+    LayerCase(
+        model="process.sil_verification",
+        case="sv_sil3_1oo1",
+        capture="process_sil_verification.tsv",
+        block=3,
+        identified_by=("#label", "sv_sil3_1oo1"),
+    ),
+    LayerCase(
+        model="process.sil_verification",
+        case="sv_unknown_architecture",
+        capture="process_sil_verification.tsv",
+        block=4,
+        identified_by=("#label", "sv_unknown_architecture"),
+    ),
+    # The NOG 070's five caseable states. The eight blocks after them (the PFD boundary
+    # sweep, the full catalogue and the six guards) are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.nog070_sil_determination",
+        case="n070_hipps_compliant",
+        capture="process_nog070_sil_determination.tsv",
+        block=0,
+        identified_by=("#label", "n070_hipps_compliant"),
+    ),
+    LayerCase(
+        model="process.nog070_sil_determination",
+        case="n070_hipps_noncompliant",
+        capture="process_nog070_sil_determination.tsv",
+        block=1,
+        identified_by=("#label", "n070_hipps_noncompliant"),
+    ),
+    LayerCase(
+        model="process.nog070_sil_determination",
+        case="n070_custom_minimum",
+        capture="process_nog070_sil_determination.tsv",
+        block=2,
+        identified_by=("#label", "n070_custom_minimum"),
+    ),
+    LayerCase(
+        model="process.nog070_sil_determination",
+        case="n070_custom_no_minimum",
+        capture="process_nog070_sil_determination.tsv",
+        block=3,
+        identified_by=("#label", "n070_custom_no_minimum"),
+    ),
+    LayerCase(
+        model="process.nog070_sil_determination",
+        case="n070_sil_zero_band",
+        capture="process_nog070_sil_determination.tsv",
+        block=4,
+        identified_by=("#label", "n070_sil_zero_band"),
+    ),
+    # The risk matrix's four caseable states. The six blocks after them are the values
+    # the class silently maps to its top category, declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.risk_matrix",
+        case="rm_bands",
+        capture="process_risk_matrix.tsv",
+        block=0,
+        identified_by=("#label", "rm_bands"),
+    ),
+    LayerCase(
+        model="process.risk_matrix",
+        case="rm_boundaries",
+        capture="process_risk_matrix.tsv",
+        block=1,
+        identified_by=("#label", "rm_boundaries"),
+    ),
+    LayerCase(
+        model="process.risk_matrix",
+        case="rm_costs",
+        capture="process_risk_matrix.tsv",
+        block=2,
+        identified_by=("#label", "rm_costs"),
+    ),
+    LayerCase(
+        model="process.risk_matrix",
+        case="rm_zero_failures",
+        capture="process_risk_matrix.tsv",
+        block=3,
+        identified_by=("#label", "rm_zero_failures"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4350,6 +4825,29 @@ UNCASED_ROWS: dict[str, int] = {
     # The flare flame's nine: the three clamp states, the negative stack the class accepts,
     # and the five constructor and method refusals.
     "process_api537_flare_flame.tsv": 9,
+    # The fault tree's fourteen: beta on VOTING, k of zero, above n and negative, the two
+    # empty gates, duplicate names, a NaN basic, the 31-basic shift overflow, the zero
+    # cardinality and the four constructor guards.
+    "process_fault_tree.tsv": 14,
+    # The bow-tie's eight: the empty bow-tie, no barriers, no consequences, all threats
+    # inactive, a negative frequency, a PFD above one, a negative PFD and a NaN.
+    "process_bow_tie.tsv": 8,
+    # The SIF's five: a negative PFD, a NaN, the SIL 0 and SIL 5 refusals, and the static
+    # max-PFD table for a SIL it does not know.
+    "process_safety_instrumented_function.tsv": 5,
+    # The LOPA's thirteen: the floating-point boundary, the six STS0131 bands and their
+    # boundaries, a zero-PFD layer, a negative initiating frequency, and the four STS0131
+    # refusals (a zero pressure three times and a test below design).
+    "process_lopa.tsv": 13,
+    # The SIL verification's six: 1oo3, the `4oo2` substring, a ten-year proof interval,
+    # exactly five years, a NaN PFD and a negative PFD.
+    "process_sil_verification.tsv": 6,
+    # The NOG 070's eight: the PFD-to-SIL boundary sweep, the full 18-row catalogue and
+    # the six guards (a zero PFD, one, above one, a NaN, and two minimum-SIL bounds).
+    "process_nog070_sil_determination.tsv": 8,
+    # The risk matrix's six: a negative frequency, a NaN frequency, a loss above 100 %,
+    # a negative loss, a negative repair time and a negative mass loss.
+    "process_risk_matrix.tsv": 6,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

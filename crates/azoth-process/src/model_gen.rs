@@ -6,6 +6,7 @@
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/bow_tie.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
@@ -15,6 +16,7 @@
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
+//!   - specs/models/process/fault_tree.toml
 //!   - specs/models/process/filter.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
 //!   - specs/models/process/fire_water_coverage_assessment.toml
@@ -29,9 +31,11 @@
 //!   - specs/models/process/hem_release.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
+//!   - specs/models/process/lopa.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mixer.toml
+//!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
@@ -40,10 +44,13 @@
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/risk_matrix.toml
+//!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml
 //!   - specs/models/process/shortcut_distillation_column.toml
+//!   - specs/models/process/sil_verification.toml
 //!   - specs/models/process/splitter.toml
 //!   - specs/models/process/stirred_tank_reactor.toml
 //!   - specs/models/process/stripping_column.toml
@@ -5520,6 +5527,420 @@ pub static BLEVE_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&BLEVE_ALGORITHM),
     checks: BLEVE_CHECKS,
     cases: BLEVE_CASES,
+};
+
+static BOW_TIE_CHECKS: &[SpecCheck] = &[];
+
+static BOW_TIE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "bt_class_test",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("unmitigated_frequency_per_year", 0.15000000000000002),
+            ("mitigated_frequency_per_year", 0.0015000000000000002),
+            ("total_rrf", 100.0),
+            ("max_severity", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "threats",
+                &[
+                    &[
+                        RecordField {
+                            name: "frequency",
+                            value: FieldValue::Number(0.1),
+                        },
+                        RecordField {
+                            name: "active",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "frequency",
+                            value: FieldValue::Number(0.05),
+                        },
+                        RecordField {
+                            name: "active",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "consequences",
+                &[&[RecordField {
+                    name: "severity",
+                    value: FieldValue::Number(5.0),
+                }]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                    RecordField {
+                        name: "barrier_type",
+                        value: FieldValue::Name("prevention"),
+                    },
+                    RecordField {
+                        name: "functional",
+                        value: FieldValue::Flag(true),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "bt_mitigation_ignored",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("unmitigated_frequency_per_year", 0.1),
+            ("mitigated_frequency_per_year", 0.001),
+            ("total_rrf", 100.0),
+            ("max_severity", 4.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "threats",
+                &[&[
+                    RecordField {
+                        name: "frequency",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "active",
+                        value: FieldValue::Flag(true),
+                    },
+                ]],
+            ),
+            (
+                "consequences",
+                &[&[RecordField {
+                    name: "severity",
+                    value: FieldValue::Number(4.0),
+                }]],
+            ),
+            (
+                "barriers",
+                &[
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.01),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.5),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("mitigation"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "bt_both_types",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("unmitigated_frequency_per_year", 0.1),
+            ("mitigated_frequency_per_year", 0.010000000000000002),
+            ("total_rrf", 9.999999999999998),
+            ("max_severity", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "threats",
+                &[
+                    &[
+                        RecordField {
+                            name: "frequency",
+                            value: FieldValue::Number(0.1),
+                        },
+                        RecordField {
+                            name: "active",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "frequency",
+                            value: FieldValue::Number(0.2),
+                        },
+                        RecordField {
+                            name: "active",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "consequences",
+                &[
+                    &[RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(3.0),
+                    }],
+                    &[RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(5.0),
+                    }],
+                ],
+            ),
+            (
+                "barriers",
+                &[
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.1),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("both"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.01),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "bt_link_ignored",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("unmitigated_frequency_per_year", 0.1),
+            ("mitigated_frequency_per_year", 0.0020000000000000005),
+            ("total_rrf", 49.99999999999999),
+            ("max_severity", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "threats",
+                &[&[
+                    RecordField {
+                        name: "frequency",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "active",
+                        value: FieldValue::Flag(true),
+                    },
+                ]],
+            ),
+            (
+                "consequences",
+                &[&[RecordField {
+                    name: "severity",
+                    value: FieldValue::Number(2.0),
+                }]],
+            ),
+            (
+                "barriers",
+                &[
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.1),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.2),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "functional",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "bt_nonfunctional",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("unmitigated_frequency_per_year", 0.2),
+            ("mitigated_frequency_per_year", 0.2),
+            ("total_rrf", 1.0),
+            ("max_severity", 4.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "threats",
+                &[&[
+                    RecordField {
+                        name: "frequency",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "active",
+                        value: FieldValue::Flag(true),
+                    },
+                ]],
+            ),
+            (
+                "consequences",
+                &[&[RecordField {
+                    name: "severity",
+                    value: FieldValue::Number(4.0),
+                }]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                    RecordField {
+                        name: "barrier_type",
+                        value: FieldValue::Name("prevention"),
+                    },
+                    RecordField {
+                        name: "functional",
+                        value: FieldValue::Flag(false),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+];
+
+static BOW_TIE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_bow_tie",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.bow_tie`.
+pub static BOW_TIE_SPEC: ModelSpec = ModelSpec {
+    id: "process.bow_tie",
+    kind: "procedure",
+    algorithm: Some(&BOW_TIE_ALGORITHM),
+    checks: BOW_TIE_CHECKS,
+    cases: BOW_TIE_CASES,
 };
 
 static COMPONENT_SPLITTER_CHECKS: &[SpecCheck] = &[
@@ -24960,6 +25381,602 @@ pub static EXPANDER_SPEC: ModelSpec = ModelSpec {
     cases: EXPANDER_CASES,
 };
 
+static FAULT_TREE_CHECKS: &[SpecCheck] = &[SpecCheck {
+    on_input: true,
+    check: RangeCheck {
+        quantity: "max_cardinality",
+        min: Some(1.0),
+        min_inclusive: true,
+        max: None,
+        max_inclusive: true,
+        equals: None,
+        band: Band::Outside,
+        severity: Severity::Error,
+        code: WarningCode::OutOfValidRange,
+        rationale: "the class's mask loop starts at one and can never return the empty cut set",
+    },
+}];
+
+static FAULT_TREE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "ft_and",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("max_cardinality", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("top_event_probability", 0.020000000000000004),
+            ("cut_set_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "nodes",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Both fail"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(-1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("and"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "minimal_cut_sets",
+            &[&[
+                RecordField {
+                    name: "members",
+                    value: FieldValue::Name("A, B"),
+                },
+                RecordField {
+                    name: "cardinality",
+                    value: FieldValue::Number(2.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "ft_or",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("max_cardinality", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("top_event_probability", 0.2799999999999999),
+            ("cut_set_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "nodes",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Either fail"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(-1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("or"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "minimal_cut_sets",
+            &[
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "ft_voting",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("max_cardinality", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("top_event_probability", 0.028000000000000004),
+            ("cut_set_count", 3.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "nodes",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(-1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("voting"),
+                    },
+                    RecordField {
+                        name: "k_of_n",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "minimal_cut_sets",
+            &[
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("A, B"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("A, C"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("B, C"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "ft_beta_or",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("max_cardinality", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("top_event_probability", 0.018910000000000027),
+            ("cut_set_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "nodes",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("any"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(-1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("or"),
+                    },
+                    RecordField {
+                        name: "beta_ccf",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "minimal_cut_sets",
+            &[
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "ft_cut_sets",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("max_cardinality", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("top_event_probability", 0.10899999999999999),
+            ("cut_set_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "nodes",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("top"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(-1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("or"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ab"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("and"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "parent_index",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "gate",
+                        value: FieldValue::Name("basic"),
+                    },
+                    RecordField {
+                        name: "probability",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "minimal_cut_sets",
+            &[
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "members",
+                        value: FieldValue::Name("A, B"),
+                    },
+                    RecordField {
+                        name: "cardinality",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+static FAULT_TREE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "recursive_gate_evaluation",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 20,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.fault_tree`.
+pub static FAULT_TREE_SPEC: ModelSpec = ModelSpec {
+    id: "process.fault_tree",
+    kind: "procedure",
+    algorithm: Some(&FAULT_TREE_ALGORITHM),
+    checks: FAULT_TREE_CHECKS,
+    cases: FAULT_TREE_CASES,
+};
+
 static FILTER_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -41961,6 +42978,546 @@ pub static LEAK_BLOWDOWN_SPEC: ModelSpec = ModelSpec {
     cases: LEAK_BLOWDOWN_CASES,
 };
 
+static LOPA_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "initiating_event_frequency_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative frequency is not a frequency",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "target_frequency_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative frequency is not a frequency",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "mitigated_frequency_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative frequency is not a frequency",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "event_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "design_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "test_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive pressure",
+        },
+    },
+];
+
+static LOPA_CASES: &[TestCase] = &[
+    TestCase {
+        id: "lopa_target_met",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initiating_event_frequency_per_year", 0.1),
+            ("target_frequency_per_year", 0.00011),
+            ("mitigated_frequency_per_year", 0.00010000000000000002),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("gap_to_target", -9.999999999999986e-06),
+            ("total_rrf", 999.9999999999999),
+            ("required_additional_rrf", 0.0),
+            ("required_additional_sil", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "layers",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("L0"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "frequency_before_per_year",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "frequency_after_per_year",
+                        value: FieldValue::Number(0.010000000000000002),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("L1"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                    RecordField {
+                        name: "frequency_before_per_year",
+                        value: FieldValue::Number(0.010000000000000002),
+                    },
+                    RecordField {
+                        name: "frequency_after_per_year",
+                        value: FieldValue::Number(0.00010000000000000002),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "layer_contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("L0"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "frequency_before_per_year",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "frequency_after_per_year",
+                        value: FieldValue::Number(0.010000000000000002),
+                    },
+                    RecordField {
+                        name: "contribution_per_year",
+                        value: FieldValue::Number(0.09),
+                    },
+                    RecordField {
+                        name: "rrf",
+                        value: FieldValue::Number(10.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("L1"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                    RecordField {
+                        name: "frequency_before_per_year",
+                        value: FieldValue::Number(0.010000000000000002),
+                    },
+                    RecordField {
+                        name: "frequency_after_per_year",
+                        value: FieldValue::Number(0.00010000000000000002),
+                    },
+                    RecordField {
+                        name: "contribution_per_year",
+                        value: FieldValue::Number(0.009900000000000003),
+                    },
+                    RecordField {
+                        name: "rrf",
+                        value: FieldValue::Number(100.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "lopa_gap",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initiating_event_frequency_per_year", 0.5),
+            ("target_frequency_per_year", 1e-05),
+            ("mitigated_frequency_per_year", 0.05),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("gap_to_target", 0.04999),
+            ("total_rrf", 10.0),
+            ("required_additional_rrf", 5000.0),
+            ("required_additional_sil", 3.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "layers",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.05),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "layer_contributions",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.05),
+                },
+                RecordField {
+                    name: "contribution_per_year",
+                    value: FieldValue::Number(0.45),
+                },
+                RecordField {
+                    name: "rrf",
+                    value: FieldValue::Number(10.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "lopa_boundary_equal",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initiating_event_frequency_per_year", 0.5),
+            ("target_frequency_per_year", 0.05),
+            ("mitigated_frequency_per_year", 0.05),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("gap_to_target", 0.0),
+            ("total_rrf", 10.0),
+            ("required_additional_rrf", 0.0),
+            ("required_additional_sil", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "layers",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.05),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "layer_contributions",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.05),
+                },
+                RecordField {
+                    name: "contribution_per_year",
+                    value: FieldValue::Number(0.45),
+                },
+                RecordField {
+                    name: "rrf",
+                    value: FieldValue::Number(10.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "lopa_zero_mitigated",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initiating_event_frequency_per_year", 0.1),
+            ("target_frequency_per_year", 0.0001),
+            ("mitigated_frequency_per_year", 0.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("gap_to_target", -0.0001),
+            ("total_rrf", 0.0),
+            ("required_additional_rrf", 0.0),
+            ("required_additional_sil", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "layers",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "layer_contributions",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "contribution_per_year",
+                    value: FieldValue::Number(0.1),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "lopa_zero_target_unmet",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("initiating_event_frequency_per_year", 0.1),
+            ("target_frequency_per_year", 0.0),
+            ("mitigated_frequency_per_year", 0.010000000000000002),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("gap_to_target", 0.010000000000000002),
+            ("total_rrf", 9.999999999999998),
+            ("required_additional_sil", 4.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "layers",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.010000000000000002),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "layer_contributions",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("L0"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_before_per_year",
+                    value: FieldValue::Number(0.1),
+                },
+                RecordField {
+                    name: "frequency_after_per_year",
+                    value: FieldValue::Number(0.010000000000000002),
+                },
+                RecordField {
+                    name: "contribution_per_year",
+                    value: FieldValue::Number(0.09),
+                },
+                RecordField {
+                    name: "rrf",
+                    value: FieldValue::Number(10.0),
+                },
+            ]],
+        )],
+    },
+];
+
+static LOPA_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_lopa",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.lopa`.
+pub static LOPA_SPEC: ModelSpec = ModelSpec {
+    id: "process.lopa",
+    kind: "procedure",
+    algorithm: Some(&LOPA_ALGORITHM),
+    checks: LOPA_CHECKS,
+    cases: LOPA_CASES,
+};
+
 static MANIFOLD_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -44832,6 +46389,181 @@ pub static MIXER_SPEC: ModelSpec = ModelSpec {
     algorithm: None,
     checks: MIXER_CHECKS,
     cases: MIXER_CASES,
+};
+
+static NOG070_SIL_DETERMINATION_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "pfd_average",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: Some(1.0),
+            max_inclusive: false,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a PFD outside (0, 1)",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "minimum_sil",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(4.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a minimum outside [0, 4]",
+        },
+    },
+];
+
+static NOG070_SIL_DETERMINATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "n070_hipps_compliant",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pfd_average", 0.0001)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_type", "hipps_pipeline")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("catalogue_minimum_sil", 3.0),
+            ("minimum_sil", 3.0),
+            ("achieved_sil", 3.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "n070_hipps_noncompliant",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pfd_average", 0.005)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_type", "hipps_pipeline")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("catalogue_minimum_sil", 3.0),
+            ("minimum_sil", 3.0),
+            ("achieved_sil", 2.0),
+            ("required_pfd_reduction_factor", 10.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "n070_custom_minimum",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pfd_average", 0.005), ("minimum_sil", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_type", "custom")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("catalogue_minimum_sil", 0.0),
+            ("minimum_sil", 3.0),
+            ("achieved_sil", 2.0),
+            ("required_pfd_reduction_factor", 10.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "n070_custom_no_minimum",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pfd_average", 0.005)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_type", "custom")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("catalogue_minimum_sil", 0.0),
+            ("minimum_sil", 0.0),
+            ("achieved_sil", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "n070_sil_zero_band",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pfd_average", 0.2)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_type", "psd_high_vibration")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("catalogue_minimum_sil", 1.0),
+            ("minimum_sil", 1.0),
+            ("achieved_sil", 0.0),
+            ("required_pfd_reduction_factor", 10.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static NOG070_SIL_DETERMINATION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_nog070_sil_determination",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.nog070_sil_determination`.
+pub static NOG070_SIL_DETERMINATION_SPEC: ModelSpec = ModelSpec {
+    id: "process.nog070_sil_determination",
+    kind: "procedure",
+    algorithm: Some(&NOG070_SIL_DETERMINATION_ALGORITHM),
+    checks: NOG070_SIL_DETERMINATION_CHECKS,
+    cases: NOG070_SIL_DETERMINATION_CASES,
 };
 
 static PACKED_COLUMN_CHECKS: &[SpecCheck] = &[
@@ -50544,6 +52276,1628 @@ pub static RATE_BASED_PACKED_COLUMN_SPEC: ModelSpec = ModelSpec {
     cases: RATE_BASED_PACKED_COLUMN_CASES,
 };
 
+static RISK_MATRIX_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "product_price_per_kg",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative price is not a price",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "downtime_cost_per_hour",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative cost is not a cost",
+        },
+    },
+];
+
+static RISK_MATRIX_CASES: &[TestCase] = &[
+    TestCase {
+        id: "rm_bands",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("product_price_per_kg", 0.5),
+            ("downtime_cost_per_hour", 5000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("total_annual_risk_cost", 1465200.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ0"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.05),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ1"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.3),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ2"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.7),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(35.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ3"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(1.5),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(65.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ4"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "assessments",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ0"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.05),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(175200.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(2.4000000000000004),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("very_low"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("negligible"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(13200.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ1"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.3),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(29200.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(14.399999999999999),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("minor"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(79200.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ2"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.7),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(12514.285714285716),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(33.599999999999994),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("medium"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(35.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("moderate"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(9.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("medium"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(184800.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ3"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(1.5),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(5840.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(72.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("high"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(65.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("major"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(16.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("critical"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(396000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ4"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(2920.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(144.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("very_high"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("catastrophic"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(25.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("critical"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(792000.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "rm_boundaries",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("product_price_per_kg", 0.5),
+            ("downtime_cost_per_hour", 5000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("total_annual_risk_cost", 1610400.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ0"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ1"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ2"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ3"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(50.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ4"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(80.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ5"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(2.5),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "assessments",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ0"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("very_low"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("negligible"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ1"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(87600.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(4.800000000000001),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("minor"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(26400.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ2"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(17520.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(24.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("medium"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("moderate"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(9.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("medium"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(132000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ3"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(8760.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("high"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(50.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("major"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(16.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("critical"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(264000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ4"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(4380.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(96.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("very_high"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(80.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("catastrophic"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(25.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("critical"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(528000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ5"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(2.5),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(3504.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("very_high"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("catastrophic"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(25.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("critical"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(660000.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "rm_costs",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("product_price_per_kg", 0.5),
+            ("downtime_cost_per_hour", 5000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("total_annual_risk_cost", 132000.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("EQ0"),
+                },
+                RecordField {
+                    name: "failures_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "mttr_hours",
+                    value: FieldValue::Number(48.0),
+                },
+                RecordField {
+                    name: "production_loss_percent",
+                    value: FieldValue::Number(50.0),
+                },
+                RecordField {
+                    name: "production_loss_kg_per_hr",
+                    value: FieldValue::Number(1000.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "assessments",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("EQ0"),
+                },
+                RecordField {
+                    name: "failures_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "mtbf_hours",
+                    value: FieldValue::Number(17520.0),
+                },
+                RecordField {
+                    name: "mttr_hours",
+                    value: FieldValue::Number(48.0),
+                },
+                RecordField {
+                    name: "expected_downtime_hours_per_year",
+                    value: FieldValue::Number(24.0),
+                },
+                RecordField {
+                    name: "probability_category",
+                    value: FieldValue::Name("medium"),
+                },
+                RecordField {
+                    name: "probability_level",
+                    value: FieldValue::Number(3.0),
+                },
+                RecordField {
+                    name: "production_loss_percent",
+                    value: FieldValue::Number(50.0),
+                },
+                RecordField {
+                    name: "production_loss_kg_hr",
+                    value: FieldValue::Number(1000.0),
+                },
+                RecordField {
+                    name: "consequence_category",
+                    value: FieldValue::Name("major"),
+                },
+                RecordField {
+                    name: "consequence_level",
+                    value: FieldValue::Number(4.0),
+                },
+                RecordField {
+                    name: "risk_score",
+                    value: FieldValue::Number(12.0),
+                },
+                RecordField {
+                    name: "risk_level",
+                    value: FieldValue::Name("high"),
+                },
+                RecordField {
+                    name: "cost_per_failure",
+                    value: FieldValue::Number(264000.0),
+                },
+                RecordField {
+                    name: "annual_risk_cost",
+                    value: FieldValue::Number(132000.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "rm_zero_failures",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("product_price_per_kg", 0.5),
+            ("downtime_cost_per_hour", 5000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("total_annual_risk_cost", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("EQ0"),
+                },
+                RecordField {
+                    name: "failures_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "mttr_hours",
+                    value: FieldValue::Number(24.0),
+                },
+                RecordField {
+                    name: "production_loss_percent",
+                    value: FieldValue::Number(10.0),
+                },
+                RecordField {
+                    name: "production_loss_kg_per_hr",
+                    value: FieldValue::Number(500.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "assessments",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("EQ0"),
+                },
+                RecordField {
+                    name: "failures_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "mtbf_hours",
+                    value: FieldValue::Number(1000000.0),
+                },
+                RecordField {
+                    name: "mttr_hours",
+                    value: FieldValue::Number(24.0),
+                },
+                RecordField {
+                    name: "expected_downtime_hours_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "probability_category",
+                    value: FieldValue::Name("very_low"),
+                },
+                RecordField {
+                    name: "probability_level",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "production_loss_percent",
+                    value: FieldValue::Number(10.0),
+                },
+                RecordField {
+                    name: "production_loss_kg_hr",
+                    value: FieldValue::Number(500.0),
+                },
+                RecordField {
+                    name: "consequence_category",
+                    value: FieldValue::Name("minor"),
+                },
+                RecordField {
+                    name: "consequence_level",
+                    value: FieldValue::Number(2.0),
+                },
+                RecordField {
+                    name: "risk_score",
+                    value: FieldValue::Number(2.0),
+                },
+                RecordField {
+                    name: "risk_level",
+                    value: FieldValue::Name("low"),
+                },
+                RecordField {
+                    name: "cost_per_failure",
+                    value: FieldValue::Number(126000.0),
+                },
+                RecordField {
+                    name: "annual_risk_cost",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+    },
+];
+
+static RISK_MATRIX_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_risk_matrix",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.risk_matrix`.
+pub static RISK_MATRIX_SPEC: ModelSpec = ModelSpec {
+    id: "process.risk_matrix",
+    kind: "procedure",
+    algorithm: Some(&RISK_MATRIX_ALGORITHM),
+    checks: RISK_MATRIX_CHECKS,
+    cases: RISK_MATRIX_CASES,
+};
+
+static SAFETY_INSTRUMENTED_FUNCTION_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "pfd_average",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a probability of failure on demand is in [0, 1]; the class accepts a negative or NaN value and answers Infinity or NaN",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "claimed_sil",
+            min: Some(1.0),
+            min_inclusive: true,
+            max: Some(4.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a SIL outside 1..4",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "unmitigated_frequency_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative frequency is not a frequency",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "target_frequency_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative frequency is not a frequency",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "test_interval_hours",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative interval is not an interval",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "lambda_du_per_hour",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative failure rate is not a rate",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "spurious_trip_rate_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative rate is not a rate",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "mttr_hours",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative repair time is not a time",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "base_availability",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an availability is in [0, 1]",
+        },
+    },
+];
+
+static SAFETY_INSTRUMENTED_FUNCTION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "sif_class_test",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.005),
+            ("claimed_sil", 2.0),
+            ("unmitigated_frequency_per_year", 0.1),
+            ("target_frequency_per_year", 1e-05),
+            ("test_interval_hours", 8760.0),
+            ("lambda_du_per_hour", 1e-06),
+            ("spurious_trip_rate_per_year", 0.0),
+            ("mttr_hours", 0.0),
+            ("base_availability", 0.99),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("risk_reduction_factor", 200.0),
+            ("mitigated_frequency_per_year", 0.0005),
+            ("required_pfd", 0.0001),
+            ("required_sil", 3.0),
+            ("max_pfd_for_claimed_sil", 0.01),
+            ("proof_test_interval_years", 1.0),
+            ("pfd_1oo1", 0.00438),
+            ("pfd_1oo2", 2.5579200000000004e-05),
+            ("pfd_2oo3", 7.673760000000001e-05),
+            ("availability_with_spurious_trips", 0.99),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "sif_required_pfd_at_zero",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.005),
+            ("claimed_sil", 2.0),
+            ("unmitigated_frequency_per_year", 0.0),
+            ("target_frequency_per_year", 1e-05),
+            ("test_interval_hours", 8760.0),
+            ("lambda_du_per_hour", 1e-06),
+            ("spurious_trip_rate_per_year", 0.0),
+            ("mttr_hours", 0.0),
+            ("base_availability", 0.99),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("risk_reduction_factor", 200.0),
+            ("mitigated_frequency_per_year", 0.0),
+            ("required_pfd", 1.0),
+            ("required_sil", 1.0),
+            ("max_pfd_for_claimed_sil", 0.01),
+            ("proof_test_interval_years", 1.0),
+            ("pfd_1oo1", 0.00438),
+            ("pfd_1oo2", 2.5579200000000004e-05),
+            ("pfd_2oo3", 7.673760000000001e-05),
+            ("availability_with_spurious_trips", 0.99),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "sif_pfd_zero",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.0),
+            ("claimed_sil", 2.0),
+            ("unmitigated_frequency_per_year", 0.1),
+            ("target_frequency_per_year", 1e-05),
+            ("test_interval_hours", 8760.0),
+            ("lambda_du_per_hour", 1e-06),
+            ("spurious_trip_rate_per_year", 0.0),
+            ("mttr_hours", 0.0),
+            ("base_availability", 0.99),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("mitigated_frequency_per_year", 0.0),
+            ("required_pfd", 0.0001),
+            ("required_sil", 3.0),
+            ("max_pfd_for_claimed_sil", 0.01),
+            ("proof_test_interval_years", 1.0),
+            ("pfd_1oo1", 0.00438),
+            ("pfd_1oo2", 2.5579200000000004e-05),
+            ("pfd_2oo3", 7.673760000000001e-05),
+            ("availability_with_spurious_trips", 0.99),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "sif_spurious_trips",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.005),
+            ("claimed_sil", 2.0),
+            ("unmitigated_frequency_per_year", 0.1),
+            ("target_frequency_per_year", 1e-05),
+            ("test_interval_hours", 8760.0),
+            ("lambda_du_per_hour", 1e-06),
+            ("spurious_trip_rate_per_year", 2.0),
+            ("mttr_hours", 48.0),
+            ("base_availability", 0.99),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("risk_reduction_factor", 200.0),
+            ("mitigated_frequency_per_year", 0.0005),
+            ("required_pfd", 0.0001),
+            ("required_sil", 3.0),
+            ("max_pfd_for_claimed_sil", 0.01),
+            ("proof_test_interval_years", 1.0),
+            ("pfd_1oo1", 0.00438),
+            ("pfd_1oo2", 2.5579200000000004e-05),
+            ("pfd_2oo3", 7.673760000000001e-05),
+            ("availability_with_spurious_trips", 0.9791506849315069),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "sif_out_of_band",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.5),
+            ("claimed_sil", 1.0),
+            ("unmitigated_frequency_per_year", 0.1),
+            ("target_frequency_per_year", 1e-05),
+            ("test_interval_hours", 8760.0),
+            ("lambda_du_per_hour", 1e-06),
+            ("spurious_trip_rate_per_year", 0.0),
+            ("mttr_hours", 0.0),
+            ("base_availability", 0.99),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("risk_reduction_factor", 2.0),
+            ("mitigated_frequency_per_year", 0.05),
+            ("required_pfd", 0.0001),
+            ("required_sil", 3.0),
+            ("max_pfd_for_claimed_sil", 0.1),
+            ("proof_test_interval_years", 1.0),
+            ("pfd_1oo1", 0.00438),
+            ("pfd_1oo2", 2.5579200000000004e-05),
+            ("pfd_2oo3", 7.673760000000001e-05),
+            ("availability_with_spurious_trips", 0.99),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static SAFETY_INSTRUMENTED_FUNCTION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_safety_instrumented_function",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.safety_instrumented_function`.
+pub static SAFETY_INSTRUMENTED_FUNCTION_SPEC: ModelSpec = ModelSpec {
+    id: "process.safety_instrumented_function",
+    kind: "procedure",
+    algorithm: Some(&SAFETY_INSTRUMENTED_FUNCTION_ALGORITHM),
+    checks: SAFETY_INSTRUMENTED_FUNCTION_CHECKS,
+    cases: SAFETY_INSTRUMENTED_FUNCTION_CASES,
+};
+
 static SEPARATOR_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -53820,6 +57174,308 @@ pub static SHORTCUT_DISTILLATION_COLUMN_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&SHORTCUT_DISTILLATION_COLUMN_ALGORITHM),
     checks: SHORTCUT_DISTILLATION_COLUMN_CHECKS,
     cases: SHORTCUT_DISTILLATION_COLUMN_CASES,
+};
+
+static SIL_VERIFICATION_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "pfd_average",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class accepts a negative or NaN PFD; the port refuses it",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "claimed_sil",
+            min: Some(1.0),
+            min_inclusive: true,
+            max: Some(4.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's builder refuses a SIL outside 1..4",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "test_interval_hours",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative interval is not an interval",
+        },
+    },
+];
+
+static SIL_VERIFICATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "sv_canonical",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.005),
+            ("claimed_sil", 2.0),
+            ("test_interval_hours", 8760.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("architecture", "1oo1")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("claimed_sil", 2.0),
+            ("achieved_sil", 2.0),
+            ("pfd_average", 0.005),
+            ("pfd_upper", 0.0075),
+            ("hardware_fault_tolerance", 0.0),
+            ("systematic_capability", 2.0),
+            ("diagnostic_coverage", 0.5),
+            ("issue_count", 0.0),
+            ("error_count", 0.0),
+            ("warning_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "sv_pfd_exceeded",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.05),
+            ("claimed_sil", 2.0),
+            ("test_interval_hours", 8760.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("architecture", "1oo1")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("claimed_sil", 2.0),
+            ("achieved_sil", 1.0),
+            ("pfd_average", 0.05),
+            ("pfd_upper", 0.07500000000000001),
+            ("hardware_fault_tolerance", 0.0),
+            ("systematic_capability", 2.0),
+            ("diagnostic_coverage", 0.5),
+            ("issue_count", 1.0),
+            ("error_count", 1.0),
+            ("warning_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[(
+            "issues",
+            &[&[
+                RecordField {
+                    name: "severity",
+                    value: FieldValue::Name("error"),
+                },
+                RecordField {
+                    name: "category",
+                    value: FieldValue::Name("pfd_exceeded"),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "sv_sil4_1oo2",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 5e-05),
+            ("claimed_sil", 4.0),
+            ("test_interval_hours", 8760.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("architecture", "1oo2")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("claimed_sil", 4.0),
+            ("achieved_sil", 4.0),
+            ("pfd_average", 5e-05),
+            ("pfd_upper", 7.500000000000001e-05),
+            ("hardware_fault_tolerance", 1.0),
+            ("systematic_capability", 4.0),
+            ("diagnostic_coverage", 0.6),
+            ("issue_count", 2.0),
+            ("error_count", 1.0),
+            ("warning_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[(
+            "issues",
+            &[
+                &[
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Name("error"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("architecture"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Name("warning"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("diagnostic_coverage"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "sv_sil3_1oo1",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.0005),
+            ("claimed_sil", 3.0),
+            ("test_interval_hours", 8760.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("architecture", "1oo1")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("claimed_sil", 3.0),
+            ("achieved_sil", 3.0),
+            ("pfd_average", 0.0005),
+            ("pfd_upper", 0.00075),
+            ("hardware_fault_tolerance", 0.0),
+            ("systematic_capability", 3.0),
+            ("diagnostic_coverage", 0.5),
+            ("issue_count", 2.0),
+            ("error_count", 0.0),
+            ("warning_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[(
+            "issues",
+            &[
+                &[
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Name("warning"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("architecture"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Name("warning"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("diagnostic_coverage"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "sv_unknown_architecture",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("pfd_average", 0.005),
+            ("claimed_sil", 2.0),
+            ("test_interval_hours", 8760.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("architecture", "2oo4")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("claimed_sil", 2.0),
+            ("achieved_sil", 2.0),
+            ("pfd_average", 0.005),
+            ("pfd_upper", 0.0075),
+            ("hardware_fault_tolerance", 0.0),
+            ("systematic_capability", 2.0),
+            ("diagnostic_coverage", 0.5),
+            ("issue_count", 0.0),
+            ("error_count", 0.0),
+            ("warning_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static SIL_VERIFICATION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_sil_verification",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.sil_verification`.
+pub static SIL_VERIFICATION_SPEC: ModelSpec = ModelSpec {
+    id: "process.sil_verification",
+    kind: "procedure",
+    algorithm: Some(&SIL_VERIFICATION_ALGORITHM),
+    checks: SIL_VERIFICATION_CHECKS,
+    cases: SIL_VERIFICATION_CASES,
 };
 
 static SPLITTER_CHECKS: &[SpecCheck] = &[
@@ -58641,6 +62297,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &ANTI_SURGE_RECYCLE_SPEC,
     &API537_FLARE_FLAME_MODEL_SPEC,
     &BLEVE_SPEC,
+    &BOW_TIE_SPEC,
     &COMPONENT_SPLITTER_SPEC,
     &COMPRESSOR_SPEC,
     &CONSEQUENCE_ANALYSIS_SPEC,
@@ -58650,6 +62307,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &EJECTOR_SPEC,
     &EVENT_TREE_SPEC,
     &EXPANDER_SPEC,
+    &FAULT_TREE_SPEC,
     &FILTER_SPEC,
     &FIRE_MONITOR_COVERAGE_SPEC,
     &FIRE_WATER_COVERAGE_ASSESSMENT_SPEC,
@@ -58664,9 +62322,11 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &HEM_RELEASE_SPEC,
     &JET_FIRE_SPEC,
     &LEAK_BLOWDOWN_SPEC,
+    &LOPA_SPEC,
     &MANIFOLD_SPEC,
     &MAP_TURBO_EXPANDER_COMPRESSOR_SPEC,
     &MIXER_SPEC,
+    &NOG070_SIL_DETERMINATION_SPEC,
     &PACKED_COLUMN_SPEC,
     &PFP_DEMAND_SPEC,
     &PIPE_SPEC,
@@ -58675,10 +62335,13 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &PROBIT_SPEC,
     &PUMP_SPEC,
     &RATE_BASED_PACKED_COLUMN_SPEC,
+    &RISK_MATRIX_SPEC,
+    &SAFETY_INSTRUMENTED_FUNCTION_SPEC,
     &SEPARATOR_SPEC,
     &SEPARATOR_CAPACITY_ASSESSMENT_SPEC,
     &SEPARATOR_PERFORMANCE_SPEC,
     &SHORTCUT_DISTILLATION_COLUMN_SPEC,
+    &SIL_VERIFICATION_SPEC,
     &SPLITTER_SPEC,
     &STIRRED_TANK_REACTOR_SPEC,
     &STRIPPING_COLUMN_SPEC,

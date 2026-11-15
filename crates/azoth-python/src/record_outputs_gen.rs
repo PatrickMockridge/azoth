@@ -1516,6 +1516,63 @@ impl From<&azoth_process::models::leak_blowdown::LeakBlowdownPoint> for PyLeakBl
     }
 }
 
+/// one row per input layer, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "LopaLayerContribution"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyLopaLayerContribution {
+    /// the layer's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the layer's PFD.
+    #[pyo3(get)]
+    pub pfd: f64,
+    /// the recorded frequency before the layer.
+    #[pyo3(get)]
+    pub frequency_before_per_year: f64,
+    /// the recorded frequency after the layer.
+    #[pyo3(get)]
+    pub frequency_after_per_year: f64,
+    /// `before - after`, in 1/year.
+    #[pyo3(get)]
+    pub contribution_per_year: f64,
+    /// `1 / PFD`; absent at a zero PFD, where the class answers `+Infinity`.
+    #[pyo3(get)]
+    pub rrf: Option<f64>,
+}
+
+#[pymethods]
+impl PyLopaLayerContribution {
+    fn __repr__(&self) -> String {
+        format!(
+            "LopaLayerContribution(name={}, pfd={}, frequency_before_per_year={}, frequency_after_per_year={}, contribution_per_year={}, rrf={:?})",
+            self.name,
+            self.pfd,
+            self.frequency_before_per_year,
+            self.frequency_after_per_year,
+            self.contribution_per_year,
+            self.rrf
+        )
+    }
+}
+
+impl From<&azoth_process::models::lopa::LopaLayerContribution> for PyLopaLayerContribution {
+    fn from(row: &azoth_process::models::lopa::LopaLayerContribution) -> Self {
+        Self {
+            name: row.name.clone(),
+            pfd: row.pfd,
+            frequency_before_per_year: row.frequency_before_per_year,
+            frequency_after_per_year: row.frequency_after_per_year,
+            contribution_per_year: row.contribution_per_year,
+            rrf: row.rrf,
+        }
+    }
+}
+
 /// The registered minerals, in the class's order; a mineral whose ion is below the registration floor is absent rather than zero.
 #[pyclass(
     frozen,
@@ -1593,6 +1650,42 @@ impl From<&azoth_eos::results::MineralEquilibriumRow> for PyMineralEquilibriumRo
                 unit: "kg".to_string(),
             },
             limiting_ion_exhausted: row.limiting_ion_exhausted,
+        }
+    }
+}
+
+/// the minimal cut sets, ordered by cardinality and then by member name.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MinimalCutSet"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMinimalCutSet {
+    /// the sorted basic-event names joined by `", "`; a record field cannot carry a vector, so the join is the wire shape.
+    #[pyo3(get)]
+    pub members: String,
+    /// the number of members.
+    #[pyo3(get)]
+    pub cardinality: f64,
+}
+
+#[pymethods]
+impl PyMinimalCutSet {
+    fn __repr__(&self) -> String {
+        format!(
+            "MinimalCutSet(members={}, cardinality={})",
+            self.members, self.cardinality
+        )
+    }
+}
+
+impl From<&azoth_process::models::fault_tree::MinimalCutSet> for PyMinimalCutSet {
+    fn from(row: &azoth_process::models::fault_tree::MinimalCutSet) -> Self {
+        Self {
+            members: row.members.clone(),
+            cardinality: row.cardinality,
         }
     }
 }
@@ -1705,6 +1798,111 @@ impl From<&azoth_eos::results::RemediationOptionRow> for PyRemediationOptionRow 
             },
             cautions: row.cautions.clone(),
             standard: row.standard.clone(),
+        }
+    }
+}
+
+/// one row per input row, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RiskAssessmentRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRiskAssessmentRow {
+    /// the equipment's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the failure frequency, echoed.
+    #[pyo3(get)]
+    pub failures_per_year: f64,
+    /// `8760 / failures_per_year`, or `1e6` at zero failures.
+    #[pyo3(get)]
+    pub mtbf_hours: f64,
+    /// the mean time to repair, echoed.
+    #[pyo3(get)]
+    pub mttr_hours: f64,
+    /// `failures_per_year mttr`.
+    #[pyo3(get)]
+    pub expected_downtime_hours_per_year: f64,
+    /// the frequency band.
+    #[pyo3(get)]
+    pub probability_category: String,
+    /// the band's level, 1 to 5.
+    #[pyo3(get)]
+    pub probability_level: f64,
+    /// the production loss, echoed.
+    #[pyo3(get)]
+    pub production_loss_percent: f64,
+    /// the absolute production loss, echoed.
+    #[pyo3(get)]
+    pub production_loss_kg_hr: PyQty,
+    /// the production-loss band.
+    #[pyo3(get)]
+    pub consequence_category: String,
+    /// the band's level, 1 to 5.
+    #[pyo3(get)]
+    pub consequence_level: f64,
+    /// the two levels' product.
+    #[pyo3(get)]
+    pub risk_score: f64,
+    /// the score's band.
+    #[pyo3(get)]
+    pub risk_level: String,
+    /// `loss_kg_hr mttr price + mttr downtime_cost`, in the currency the price carries.
+    #[pyo3(get)]
+    pub cost_per_failure: f64,
+    /// `cost_per_failure failures_per_year`, in the same currency per year.
+    #[pyo3(get)]
+    pub annual_risk_cost: f64,
+}
+
+#[pymethods]
+impl PyRiskAssessmentRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "RiskAssessmentRow(name={}, failures_per_year={}, mtbf_hours={}, mttr_hours={}, expected_downtime_hours_per_year={}, probability_category={}, probability_level={}, production_loss_percent={}, production_loss_kg_hr={:?}, consequence_category={}, consequence_level={}, risk_score={}, risk_level={}, cost_per_failure={}, annual_risk_cost={})",
+            self.name,
+            self.failures_per_year,
+            self.mtbf_hours,
+            self.mttr_hours,
+            self.expected_downtime_hours_per_year,
+            self.probability_category,
+            self.probability_level,
+            self.production_loss_percent,
+            self.production_loss_kg_hr,
+            self.consequence_category,
+            self.consequence_level,
+            self.risk_score,
+            self.risk_level,
+            self.cost_per_failure,
+            self.annual_risk_cost
+        )
+    }
+}
+
+impl From<&azoth_process::models::risk_matrix::RiskAssessmentRow> for PyRiskAssessmentRow {
+    fn from(row: &azoth_process::models::risk_matrix::RiskAssessmentRow) -> Self {
+        Self {
+            name: row.name.clone(),
+            failures_per_year: row.failures_per_year,
+            mtbf_hours: row.mtbf_hours,
+            mttr_hours: row.mttr_hours,
+            expected_downtime_hours_per_year: row.expected_downtime_hours_per_year,
+            probability_category: row.probability_category.as_str().to_string(),
+            probability_level: row.probability_level,
+            production_loss_percent: row.production_loss_percent,
+            production_loss_kg_hr: PyQty {
+                magnitude_si: row.production_loss_kg_hr.value,
+                unit: "kg/h".to_string(),
+            },
+            consequence_category: row.consequence_category.as_str().to_string(),
+            consequence_level: row.consequence_level,
+            risk_score: row.risk_score,
+            risk_level: row.risk_level.as_str().to_string(),
+            cost_per_failure: row.cost_per_failure,
+            annual_risk_cost: row.annual_risk_cost,
         }
     }
 }
@@ -1849,6 +2047,37 @@ impl From<&azoth_eos::results::ScenarioIndexRow> for PyScenarioIndexRow {
         Self {
             mineral: row.mineral.clone(),
             saturation_index: row.saturation_index,
+        }
+    }
+}
+
+/// one row per issue, in the class's check order.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "SilIssue")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySilIssue {
+    /// the issue's severity.
+    #[pyo3(get)]
+    pub severity: String,
+    /// the issue's category, from the class's full set.
+    #[pyo3(get)]
+    pub category: String,
+}
+
+#[pymethods]
+impl PySilIssue {
+    fn __repr__(&self) -> String {
+        format!(
+            "SilIssue(severity={}, category={})",
+            self.severity, self.category
+        )
+    }
+}
+
+impl From<&azoth_process::models::sil_verification::SilIssue> for PySilIssue {
+    fn from(row: &azoth_process::models::sil_verification::SilIssue) -> Self {
+        Self {
+            severity: row.severity.as_str().to_string(),
+            category: row.category.as_str().to_string(),
         }
     }
 }

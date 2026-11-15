@@ -16,6 +16,7 @@ use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeni
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
 use crate::models::bleve::BleveResult;
+use crate::models::bow_tie::BowTieResult;
 use crate::models::component_splitter::ComponentSplitterResult;
 use crate::models::compressor::CompressorResult;
 use crate::models::consequence_analysis::ConsequenceAnalysisResult;
@@ -25,6 +26,7 @@ use crate::models::distillation_column::DistillationColumnResult;
 use crate::models::ejector::EjectorResult;
 use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
+use crate::models::fault_tree::FaultTreeResult;
 use crate::models::filter::FilterResult;
 use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
@@ -39,9 +41,11 @@ use crate::models::heater::HeaterResult;
 use crate::models::hem_release::HemReleaseResult;
 use crate::models::jet_fire::JetFireResult;
 use crate::models::leak_blowdown::LeakBlowdownResult;
+use crate::models::lopa::LopaResult;
 use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mixer::MixerResult;
+use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
 use crate::models::packed_column::PackedColumnResult;
 use crate::models::pfp_demand::PfpDemandResult;
 use crate::models::pipe::PipeResult;
@@ -50,10 +54,13 @@ use crate::models::pool_fire::PoolFireResult;
 use crate::models::probit::ProbitResult;
 use crate::models::pump::PumpResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
+use crate::models::risk_matrix::RiskMatrixResult;
+use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
 use crate::models::separator::SeparatorResult;
 use crate::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult;
 use crate::models::separator_performance::SeparatorPerformanceResult;
 use crate::models::shortcut_distillation_column::ShortcutDistillationColumnResult;
+use crate::models::sil_verification::SilVerificationResult;
 use crate::models::splitter::SplitterResult;
 use crate::models::stirred_tank_reactor::StirredTankReactorResult;
 use crate::models::stripping_column::StrippingColumnResult;
@@ -178,6 +185,21 @@ impl CalcResult for BleveResult {
         "transmissivity",
         "incident_heat_flux",
         "distance_to_flux",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for BowTieResult {
+    const CALC_ID: &'static str = "process.bow_tie";
+    const FIELDS: &'static [&'static str] = &[
+        "unmitigated_frequency_per_year",
+        "mitigated_frequency_per_year",
+        "total_rrf",
+        "max_severity",
         "warnings",
     ];
 
@@ -489,6 +511,20 @@ impl CalcResult for ExpanderResult {
         "design_module_length",
         "design_module_width",
         "design_module_height",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FaultTreeResult {
+    const CALC_ID: &'static str = "process.fault_tree";
+    const FIELDS: &'static [&'static str] = &[
+        "top_event_probability",
+        "cut_set_count",
+        "minimal_cut_sets",
         "warnings",
     ];
 
@@ -969,6 +1005,25 @@ impl CalcResult for LeakBlowdownResult {
     }
 }
 
+impl CalcResult for LopaResult {
+    const CALC_ID: &'static str = "process.lopa";
+    const FIELDS: &'static [&'static str] = &[
+        "target_met",
+        "gap_to_target",
+        "total_rrf",
+        "required_additional_rrf",
+        "required_additional_sil",
+        "layer_contributions",
+        "sts0131_pressure_category",
+        "sts0131_target_frequency_per_year",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for ManifoldResult {
     const CALC_ID: &'static str = "process.manifold";
     const FIELDS: &'static [&'static str] = &[
@@ -1022,6 +1077,22 @@ impl CalcResult for MixerResult {
         "inlet_pressure_spread",
         "pressure_mismatch",
         "product_h",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for Nog070SilDeterminationResult {
+    const CALC_ID: &'static str = "process.nog070_sil_determination";
+    const FIELDS: &'static [&'static str] = &[
+        "catalogue_minimum_sil",
+        "minimum_sil",
+        "achieved_sil",
+        "compliant",
+        "required_pfd_reduction_factor",
         "warnings",
     ];
 
@@ -1303,6 +1374,37 @@ impl CalcResult for RateBasedPackedColumnResult {
     }
 }
 
+impl CalcResult for RiskMatrixResult {
+    const CALC_ID: &'static str = "process.risk_matrix";
+    const FIELDS: &'static [&'static str] = &["assessments", "total_annual_risk_cost", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SafetyInstrumentedFunctionResult {
+    const CALC_ID: &'static str = "process.safety_instrumented_function";
+    const FIELDS: &'static [&'static str] = &[
+        "risk_reduction_factor",
+        "mitigated_frequency_per_year",
+        "required_pfd",
+        "required_sil",
+        "max_pfd_for_claimed_sil",
+        "proof_test_interval_years",
+        "pfd_within_claimed_sil",
+        "pfd_1oo1",
+        "pfd_1oo2",
+        "pfd_2oo3",
+        "availability_with_spurious_trips",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for SeparatorResult {
     const CALC_ID: &'static str = "process.separator";
     const FIELDS: &'static [&'static str] = &[
@@ -1462,6 +1564,30 @@ impl CalcResult for ShortcutDistillationColumnResult {
         "condenser_duty",
         "reboiler_duty",
         "relative_volatility",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SilVerificationResult {
+    const CALC_ID: &'static str = "process.sil_verification";
+    const FIELDS: &'static [&'static str] = &[
+        "claimed_sil",
+        "achieved_sil",
+        "sil_achieved",
+        "pfd_average",
+        "pfd_upper",
+        "hardware_fault_tolerance",
+        "systematic_capability",
+        "diagnostic_coverage",
+        "issue_count",
+        "error_count",
+        "warning_count",
+        "verification_passed",
+        "issues",
         "warnings",
     ];
 

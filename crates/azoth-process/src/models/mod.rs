@@ -35,6 +35,7 @@ pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
 pub mod api537_flare_flame_model;
 pub mod bleve;
+pub mod bow_tie;
 pub mod component_splitter;
 pub mod compressor;
 pub mod consequence_analysis;
@@ -44,6 +45,7 @@ pub mod distillation_column;
 pub mod ejector;
 pub mod event_tree;
 pub mod expander;
+pub mod fault_tree;
 pub mod filter;
 pub mod fire_monitor_coverage;
 pub mod fire_water_coverage_assessment;
@@ -58,9 +60,11 @@ pub mod heater;
 pub mod hem_release;
 pub mod jet_fire;
 pub mod leak_blowdown;
+pub mod lopa;
 pub mod manifold;
 pub mod map_turbo_expander_compressor;
 pub mod mixer;
+pub mod nog070_sil_determination;
 pub mod packed_column;
 pub mod pfp_demand;
 pub mod pipe;
@@ -69,10 +73,13 @@ pub mod pool_fire;
 pub mod probit;
 pub mod pump;
 pub mod rate_based_packed_column;
+pub mod risk_matrix;
+pub mod safety_instrumented_function;
 pub mod separator;
 pub mod separator_capacity_assessment;
 pub mod separator_performance;
 pub mod shortcut_distillation_column;
+pub mod sil_verification;
 pub mod splitter;
 pub mod stirred_tank_reactor;
 pub mod stripping_column;
@@ -91,6 +98,7 @@ pub use api537_flare_flame_model::{
     Api537FlareFlameModelResult, FlareTargetFlux, SterileRadius, api537_flare_flame_model,
 };
 pub use bleve::{BleveResult, bleve};
+pub use bow_tie::{BowTieBarrier, BowTieConsequence, BowTieResult, BowTieThreat, bow_tie};
 pub use component_splitter::{ComponentSplitterResult, component_splitter};
 pub use compressor::{CompressorResult, compressor};
 pub use consequence_analysis::{
@@ -105,6 +113,7 @@ pub use distillation_column::{DistillationColumnResult, distillation_column};
 pub use ejector::{EjectorResult, ejector};
 pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_tree};
 pub use expander::{ExpanderResult, expander};
+pub use fault_tree::{FaultTreeNodeSpec, FaultTreeResult, MinimalCutSet, fault_tree};
 pub use filter::{FilterResult, filter};
 pub use fire_monitor_coverage::{FireMonitorCoverageResult, fire_monitor_coverage};
 pub use fire_water_coverage_assessment::{
@@ -121,9 +130,13 @@ pub use heater::{HeaterResult, heater};
 pub use hem_release::{HemReleaseResult, hem_release};
 pub use jet_fire::{JetFireResult, jet_fire};
 pub use leak_blowdown::{LeakBlowdownResult, leak_blowdown};
+pub use lopa::{
+    LopaLayerContribution, LopaProtectionLayer, LopaResult, Sts0131PressureCategory, lopa,
+};
 pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};
 pub use mixer::{MixerResult, mixer};
+pub use nog070_sil_determination::{Nog070SilDeterminationResult, nog070_sil_determination};
 pub use packed_column::{PackedColumnResult, packed_column};
 pub use pfp_demand::{PfpDemandResult, pfp_demand};
 pub use pipe::{PipeResult, pipe};
@@ -132,6 +145,13 @@ pub use pool_fire::{PoolFireResult, pool_fire};
 pub use probit::{ProbitResult, probit};
 pub use pump::{PumpResult, pump};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};
+pub use risk_matrix::{
+    RiskAssessmentRow, RiskConsequenceCategory, RiskEquipment, RiskLevel, RiskMatrixResult,
+    RiskProbabilityCategory, risk_matrix,
+};
+pub use safety_instrumented_function::{
+    SafetyInstrumentedFunctionResult, safety_instrumented_function,
+};
 pub use separator::{SeparatorResult, separator};
 pub use separator_capacity_assessment::{
     SeparatorCapacityAssessmentResult, separator_capacity_assessment,
@@ -139,6 +159,9 @@ pub use separator_capacity_assessment::{
 pub use separator_performance::{SeparatorPerformanceResult, separator_performance};
 pub use shortcut_distillation_column::{
     ShortcutDistillationColumnResult, shortcut_distillation_column,
+};
+pub use sil_verification::{
+    IssueCategory, IssueSeverity, SilIssue, SilVerificationResult, sil_verification,
 };
 pub use splitter::{SplitterResult, splitter};
 pub use stirred_tank_reactor::{StirredTankReactorResult, stirred_tank_reactor};
