@@ -3978,7 +3978,7 @@ pub static ALL_PROVENANCE: &[ProvenanceStatic] = &[
         calc_id: "process.risk_matrix",
         name: "Risk matrix",
         spec_path: "specs/models/process/risk_matrix.toml",
-        spec_sha256: "810cbbdd090865bf39ae7bed8fa493962b09157fb05725c9652432e908640599",
+        spec_sha256: "a6c23ab58e54c177d36f25ecd5bd5b93b97d93438a08fbe4c85dd972567f208f",
         python_path: "python/src/azoth/process/reference/risk_matrix.py",
         python_sha256: "b20275554127998a97b2f14668c58be5f57f14cb236f75e758e9ad791f672875",
         rust_path: "crates/azoth-process/src/models/risk_matrix.rs",

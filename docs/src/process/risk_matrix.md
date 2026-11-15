@@ -46,7 +46,7 @@ not an equation, and both implementations read it from here.
 
 ## Assumptions
 
-- **the production loss and the failure frequency are inputs**: the class derives them from a `ProcessSystem` (the production-impact analyzer) and a reliability database, and the port takes the percentages and rates the caller states, the same flattening `process.consequence_analysis` makes of streams.
+- **the production loss and the failure frequency are inputs**: the class derives them from a `ProcessSystem` and a reliability database, and the port takes the percentages and rates the caller states, the flattening `process.consequence_analysis` makes of streams.
 - **the probability bands are `[0, 0.1)` very low, `[0.1, 0.5)` low, `[0.5, 1)` medium, `[1, 2)` high and `2` and above very high**, levels 1 to 5.
 - **the consequence bands are `[0, 5)` negligible, `[5, 20)` minor, `[20, 50)` moderate, `[50, 80)` major and `80` and above catastrophic**, levels 1 to 5.
 - **the risk score is the two levels' product**, and the level is low at 1-4, medium at 5-9, high at 10-15 and critical at 16-25.

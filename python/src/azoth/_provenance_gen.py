@@ -2922,7 +2922,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.risk_matrix': {
         "calc_id": 'process.risk_matrix',
         "name": 'Risk matrix',
-        "spec": {'path': 'specs/models/process/risk_matrix.toml', 'sha256': '810cbbdd090865bf39ae7bed8fa493962b09157fb05725c9652432e908640599'},
+        "spec": {'path': 'specs/models/process/risk_matrix.toml', 'sha256': 'a6c23ab58e54c177d36f25ecd5bd5b93b97d93438a08fbe4c85dd972567f208f'},
         "code": [{'path': 'python/src/azoth/process/reference/risk_matrix.py', 'sha256': 'b20275554127998a97b2f14668c58be5f57f14cb236f75e758e9ad791f672875'}, {'path': 'crates/azoth-process/src/models/risk_matrix.rs', 'sha256': '9e543c6a332ea83d72b6201a729cfb4bf57cba9f3a619c9b50d500bbbb655bb8'}],
         "source": 'NeqSim process/safety/risk/RiskMatrix.java',
         "verification": 'partially_verified',
