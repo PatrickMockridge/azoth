@@ -44,6 +44,7 @@
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
@@ -52275,6 +52276,1267 @@ pub static RATE_BASED_PACKED_COLUMN_SPEC: ModelSpec = ModelSpec {
     cases: RATE_BASED_PACKED_COLUMN_CASES,
 };
 
+static RISK_MATRIX_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "product_price_per_kg",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative price is not a price",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "downtime_cost_per_hour",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative cost is not a cost",
+        },
+    },
+];
+
+static RISK_MATRIX_CASES: &[TestCase] = &[
+    TestCase {
+        id: "rm_bands",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("product_price_per_kg", 0.5),
+            ("downtime_cost_per_hour", 5000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("total_annual_risk_cost", 1465200.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ0"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.05),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ1"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.3),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ2"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.7),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(35.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ3"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(1.5),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(65.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ4"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "assessments",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ0"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.05),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(175200.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(2.4000000000000004),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("very_low"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("negligible"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(13200.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ1"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.3),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(29200.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(14.399999999999999),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("minor"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(79200.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ2"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.7),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(12514.285714285716),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(33.599999999999994),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("medium"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(35.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("moderate"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(9.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("medium"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(184800.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ3"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(1.5),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(5840.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(72.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("high"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(65.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("major"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(16.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("critical"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(396000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ4"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(2920.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(144.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("very_high"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("catastrophic"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(25.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("critical"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(792000.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "rm_boundaries",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("product_price_per_kg", 0.5),
+            ("downtime_cost_per_hour", 5000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("total_annual_risk_cost", 1610400.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ0"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ1"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ2"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ3"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(50.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ4"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(80.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ5"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(2.5),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_per_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "assessments",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ0"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("very_low"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("negligible"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ1"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(87600.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(4.800000000000001),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("minor"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("low"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(26400.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ2"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(17520.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(24.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("medium"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("moderate"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(9.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("medium"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(132000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ3"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(8760.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("high"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(50.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("major"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(16.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("critical"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(264000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ4"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(4380.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(96.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("very_high"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(80.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("catastrophic"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(25.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("critical"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(528000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("EQ5"),
+                    },
+                    RecordField {
+                        name: "failures_per_year",
+                        value: FieldValue::Number(2.5),
+                    },
+                    RecordField {
+                        name: "mtbf_hours",
+                        value: FieldValue::Number(3504.0),
+                    },
+                    RecordField {
+                        name: "mttr_hours",
+                        value: FieldValue::Number(48.0),
+                    },
+                    RecordField {
+                        name: "expected_downtime_hours_per_year",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "probability_category",
+                        value: FieldValue::Name("very_high"),
+                    },
+                    RecordField {
+                        name: "probability_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "production_loss_percent",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "production_loss_kg_hr",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "consequence_category",
+                        value: FieldValue::Name("catastrophic"),
+                    },
+                    RecordField {
+                        name: "consequence_level",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "risk_score",
+                        value: FieldValue::Number(25.0),
+                    },
+                    RecordField {
+                        name: "risk_level",
+                        value: FieldValue::Name("critical"),
+                    },
+                    RecordField {
+                        name: "cost_per_failure",
+                        value: FieldValue::Number(264000.0),
+                    },
+                    RecordField {
+                        name: "annual_risk_cost",
+                        value: FieldValue::Number(660000.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "rm_costs",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("product_price_per_kg", 0.5),
+            ("downtime_cost_per_hour", 5000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("total_annual_risk_cost", 132000.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("EQ0"),
+                },
+                RecordField {
+                    name: "failures_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "mttr_hours",
+                    value: FieldValue::Number(48.0),
+                },
+                RecordField {
+                    name: "production_loss_percent",
+                    value: FieldValue::Number(50.0),
+                },
+                RecordField {
+                    name: "production_loss_kg_per_hr",
+                    value: FieldValue::Number(1000.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "assessments",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("EQ0"),
+                },
+                RecordField {
+                    name: "failures_per_year",
+                    value: FieldValue::Number(0.5),
+                },
+                RecordField {
+                    name: "mtbf_hours",
+                    value: FieldValue::Number(17520.0),
+                },
+                RecordField {
+                    name: "mttr_hours",
+                    value: FieldValue::Number(48.0),
+                },
+                RecordField {
+                    name: "expected_downtime_hours_per_year",
+                    value: FieldValue::Number(24.0),
+                },
+                RecordField {
+                    name: "probability_category",
+                    value: FieldValue::Name("medium"),
+                },
+                RecordField {
+                    name: "probability_level",
+                    value: FieldValue::Number(3.0),
+                },
+                RecordField {
+                    name: "production_loss_percent",
+                    value: FieldValue::Number(50.0),
+                },
+                RecordField {
+                    name: "production_loss_kg_hr",
+                    value: FieldValue::Number(1000.0),
+                },
+                RecordField {
+                    name: "consequence_category",
+                    value: FieldValue::Name("major"),
+                },
+                RecordField {
+                    name: "consequence_level",
+                    value: FieldValue::Number(4.0),
+                },
+                RecordField {
+                    name: "risk_score",
+                    value: FieldValue::Number(12.0),
+                },
+                RecordField {
+                    name: "risk_level",
+                    value: FieldValue::Name("high"),
+                },
+                RecordField {
+                    name: "cost_per_failure",
+                    value: FieldValue::Number(264000.0),
+                },
+                RecordField {
+                    name: "annual_risk_cost",
+                    value: FieldValue::Number(132000.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "rm_zero_failures",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("product_price_per_kg", 0.5),
+            ("downtime_cost_per_hour", 5000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("total_annual_risk_cost", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("EQ0"),
+                },
+                RecordField {
+                    name: "failures_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "mttr_hours",
+                    value: FieldValue::Number(24.0),
+                },
+                RecordField {
+                    name: "production_loss_percent",
+                    value: FieldValue::Number(10.0),
+                },
+                RecordField {
+                    name: "production_loss_kg_per_hr",
+                    value: FieldValue::Number(500.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "assessments",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("EQ0"),
+                },
+                RecordField {
+                    name: "failures_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "mtbf_hours",
+                    value: FieldValue::Number(1000000.0),
+                },
+                RecordField {
+                    name: "mttr_hours",
+                    value: FieldValue::Number(24.0),
+                },
+                RecordField {
+                    name: "expected_downtime_hours_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "probability_category",
+                    value: FieldValue::Name("very_low"),
+                },
+                RecordField {
+                    name: "probability_level",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "production_loss_percent",
+                    value: FieldValue::Number(10.0),
+                },
+                RecordField {
+                    name: "production_loss_kg_hr",
+                    value: FieldValue::Number(500.0),
+                },
+                RecordField {
+                    name: "consequence_category",
+                    value: FieldValue::Name("minor"),
+                },
+                RecordField {
+                    name: "consequence_level",
+                    value: FieldValue::Number(2.0),
+                },
+                RecordField {
+                    name: "risk_score",
+                    value: FieldValue::Number(2.0),
+                },
+                RecordField {
+                    name: "risk_level",
+                    value: FieldValue::Name("low"),
+                },
+                RecordField {
+                    name: "cost_per_failure",
+                    value: FieldValue::Number(126000.0),
+                },
+                RecordField {
+                    name: "annual_risk_cost",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+    },
+];
+
+static RISK_MATRIX_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_risk_matrix",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.risk_matrix`.
+pub static RISK_MATRIX_SPEC: ModelSpec = ModelSpec {
+    id: "process.risk_matrix",
+    kind: "procedure",
+    algorithm: Some(&RISK_MATRIX_ALGORITHM),
+    checks: RISK_MATRIX_CHECKS,
+    cases: RISK_MATRIX_CASES,
+};
+
 static SAFETY_INSTRUMENTED_FUNCTION_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -61073,6 +62335,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &PROBIT_SPEC,
     &PUMP_SPEC,
     &RATE_BASED_PACKED_COLUMN_SPEC,
+    &RISK_MATRIX_SPEC,
     &SAFETY_INSTRUMENTED_FUNCTION_SPEC,
     &SEPARATOR_SPEC,
     &SEPARATOR_CAPACITY_ASSESSMENT_SPEC,

@@ -1802,6 +1802,111 @@ impl From<&azoth_eos::results::RemediationOptionRow> for PyRemediationOptionRow 
     }
 }
 
+/// one row per input row, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RiskAssessmentRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRiskAssessmentRow {
+    /// the equipment's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the failure frequency, echoed.
+    #[pyo3(get)]
+    pub failures_per_year: f64,
+    /// `8760 / failures_per_year`, or `1e6` at zero failures.
+    #[pyo3(get)]
+    pub mtbf_hours: f64,
+    /// the mean time to repair, echoed.
+    #[pyo3(get)]
+    pub mttr_hours: f64,
+    /// `failures_per_year mttr`.
+    #[pyo3(get)]
+    pub expected_downtime_hours_per_year: f64,
+    /// the frequency band.
+    #[pyo3(get)]
+    pub probability_category: String,
+    /// the band's level, 1 to 5.
+    #[pyo3(get)]
+    pub probability_level: f64,
+    /// the production loss, echoed.
+    #[pyo3(get)]
+    pub production_loss_percent: f64,
+    /// the absolute production loss, echoed.
+    #[pyo3(get)]
+    pub production_loss_kg_hr: PyQty,
+    /// the production-loss band.
+    #[pyo3(get)]
+    pub consequence_category: String,
+    /// the band's level, 1 to 5.
+    #[pyo3(get)]
+    pub consequence_level: f64,
+    /// the two levels' product.
+    #[pyo3(get)]
+    pub risk_score: f64,
+    /// the score's band.
+    #[pyo3(get)]
+    pub risk_level: String,
+    /// `loss_kg_hr mttr price + mttr downtime_cost`, in the currency the price carries.
+    #[pyo3(get)]
+    pub cost_per_failure: f64,
+    /// `cost_per_failure failures_per_year`, in the same currency per year.
+    #[pyo3(get)]
+    pub annual_risk_cost: f64,
+}
+
+#[pymethods]
+impl PyRiskAssessmentRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "RiskAssessmentRow(name={}, failures_per_year={}, mtbf_hours={}, mttr_hours={}, expected_downtime_hours_per_year={}, probability_category={}, probability_level={}, production_loss_percent={}, production_loss_kg_hr={:?}, consequence_category={}, consequence_level={}, risk_score={}, risk_level={}, cost_per_failure={}, annual_risk_cost={})",
+            self.name,
+            self.failures_per_year,
+            self.mtbf_hours,
+            self.mttr_hours,
+            self.expected_downtime_hours_per_year,
+            self.probability_category,
+            self.probability_level,
+            self.production_loss_percent,
+            self.production_loss_kg_hr,
+            self.consequence_category,
+            self.consequence_level,
+            self.risk_score,
+            self.risk_level,
+            self.cost_per_failure,
+            self.annual_risk_cost
+        )
+    }
+}
+
+impl From<&azoth_process::models::risk_matrix::RiskAssessmentRow> for PyRiskAssessmentRow {
+    fn from(row: &azoth_process::models::risk_matrix::RiskAssessmentRow) -> Self {
+        Self {
+            name: row.name.clone(),
+            failures_per_year: row.failures_per_year,
+            mtbf_hours: row.mtbf_hours,
+            mttr_hours: row.mttr_hours,
+            expected_downtime_hours_per_year: row.expected_downtime_hours_per_year,
+            probability_category: row.probability_category.as_str().to_string(),
+            probability_level: row.probability_level,
+            production_loss_percent: row.production_loss_percent,
+            production_loss_kg_hr: PyQty {
+                magnitude_si: row.production_loss_kg_hr.value,
+                unit: "kg/h".to_string(),
+            },
+            consequence_category: row.consequence_category.as_str().to_string(),
+            consequence_level: row.consequence_level,
+            risk_score: row.risk_score,
+            risk_level: row.risk_level.as_str().to_string(),
+            cost_per_failure: row.cost_per_failure,
+            annual_risk_cost: row.annual_risk_cost,
+        }
+    }
+}
+
 /// The inhibited risk index, one row per scale in the same order.
 #[pyclass(
     frozen,

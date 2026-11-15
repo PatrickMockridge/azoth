@@ -47,6 +47,7 @@ from azoth.core.record_outputs_gen import (
     MinimalCutSet,
     NaceIssueRow,
     RemediationOptionRow,
+    RiskAssessmentRow,
     ScaleControlRiskRow,
     ScaleControlRow,
     ScenarioChangeRow,
@@ -8431,6 +8432,22 @@ class RateBasedPackedColumnResult(_HasWarnings):
 
     #: the segment's own enthalpy closure, `out - in`.
     segment_enthalpy_balance_residual: tuple[Q, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class RiskMatrixResult(_HasWarnings):
+    """Result of ``process.risk_matrix``."""
+
+    CALC_ID: ClassVar[str] = "process.risk_matrix"
+
+    #: one row per input row, in caller order.
+    assessments: tuple[RiskAssessmentRow, ...]
+
+    #: the sum of the annual costs.
+    total_annual_risk_cost: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

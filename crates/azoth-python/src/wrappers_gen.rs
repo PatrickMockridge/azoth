@@ -6887,6 +6887,37 @@ pub fn probit(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Risk matrix.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (equipment, product_price_per_kg, downtime_cost_per_hour))]
+#[pyo3(text_signature = "(equipment, product_price_per_kg, downtime_cost_per_hour)")]
+pub fn risk_matrix(
+    py: Python<'_>,
+    equipment: Vec<crate::records_gen::RiskEquipment>,
+    product_price_per_kg: Option<f64>,
+    downtime_cost_per_hour: Option<f64>,
+) -> PyResult<crate::transport_gen::PyRiskMatrixResult> {
+    let equipment_records: Vec<azoth_process::models::risk_matrix::RiskEquipment> = equipment
+        .into_iter()
+        .map(|row| azoth_process::models::risk_matrix::RiskEquipment {
+            name: row.name,
+            failures_per_year: row.failures_per_year,
+            mttr_hours: row.mttr_hours,
+            production_loss_percent: row.production_loss_percent,
+            production_loss_kg_per_hr: kilograms_per_second(row.production_loss_kg_per_hr),
+        })
+        .collect();
+    azoth_process::models::risk_matrix::risk_matrix(
+        &equipment_records,
+        product_price_per_kg,
+        downtime_cost_per_hour,
+    )
+    .map(|r| crate::transport_gen::PyRiskMatrixResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Safety instrumented function.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

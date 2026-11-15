@@ -251,6 +251,8 @@ from azoth.core.result import (
     ReferencePotentialsResult,
     RemediationOptionRow,
     ReynoldsNumberResult,
+    RiskAssessmentRow,
+    RiskMatrixResult,
     RkAlphaAbResult,
     RkDepartureResult,
     RootStructure,
@@ -602,6 +604,7 @@ __all__ = [
     "reactive_tp_flash",
     "reference_potentials",
     "reynolds_number",
+    "risk_matrix",
     "rk_alpha_ab",
     "rk_departure",
     "safety_instrumented_function",
@@ -7498,6 +7501,21 @@ def rate_based_packed_column(gas_components: list[str], gas_n: Q, gas_z: list[fl
         segment_percent_flood=tuple(result.segment_percent_flood),
         segment_net_molar_transfer=tuple(from_si(q.magnitude_si, q.unit) for q in result.segment_net_molar_transfer),
         segment_enthalpy_balance_residual=tuple(from_si(q.magnitude_si, q.unit) for q in result.segment_enthalpy_balance_residual),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def risk_matrix(equipment: list[dict[str, object]], product_price_per_kg: float | None=None, downtime_cost_per_hour: float | None=None) -> RiskMatrixResult:
+    """``process.risk_matrix``, computed in Rust."""
+    spec = _models_gen.model("process.risk_matrix")
+    result = _core.risk_matrix(
+        input_records_to_si(spec, "equipment", equipment),
+        None if product_price_per_kg is None else product_price_per_kg,
+        None if downtime_cost_per_hour is None else downtime_cost_per_hour,
+    )
+    return RiskMatrixResult(
+        assessments=tuple(RiskAssessmentRow(name=c.name, failures_per_year=c.failures_per_year, mtbf_hours=c.mtbf_hours, mttr_hours=c.mttr_hours, expected_downtime_hours_per_year=c.expected_downtime_hours_per_year, probability_category=c.probability_category, probability_level=c.probability_level, production_loss_percent=c.production_loss_percent, production_loss_kg_hr=from_si(c.production_loss_kg_hr.magnitude_si, c.production_loss_kg_hr.unit), consequence_category=c.consequence_category, consequence_level=c.consequence_level, risk_score=c.risk_score, risk_level=c.risk_level, cost_per_failure=c.cost_per_failure, annual_risk_cost=c.annual_risk_cost) for c in result.assessments),
+        total_annual_risk_cost=result.total_annual_risk_cost,
         warnings=_warnings(result.warnings),
     )
 

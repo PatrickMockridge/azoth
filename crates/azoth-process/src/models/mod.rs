@@ -73,6 +73,7 @@ pub mod pool_fire;
 pub mod probit;
 pub mod pump;
 pub mod rate_based_packed_column;
+pub mod risk_matrix;
 pub mod safety_instrumented_function;
 pub mod separator;
 pub mod separator_capacity_assessment;
@@ -150,6 +151,10 @@ pub use pool_fire::{PoolFireResult, pool_fire};
 pub use probit::{ProbitResult, probit};
 pub use pump::{PumpResult, pump};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};
+pub use risk_matrix::{
+    RiskAssessmentRow, RiskConsequenceCategory, RiskEquipment, RiskLevel, RiskMatrixResult,
+    RiskProbabilityCategory, risk_matrix,
+};
 pub use safety_instrumented_function::{
     SafetyInstrumentedFunctionResult, safety_instrumented_function,
 };

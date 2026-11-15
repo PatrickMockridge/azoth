@@ -283,6 +283,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyProbitResult>()?;
     m.add_class::<crate::transport_gen::PyPumpResult>()?;
     m.add_class::<crate::transport_gen::PyRateBasedPackedColumnResult>()?;
+    m.add_class::<crate::transport_gen::PyRiskMatrixResult>()?;
     m.add_class::<crate::transport_gen::PySafetyInstrumentedFunctionResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorCapacityAssessmentResult>()?;
@@ -346,6 +347,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyMinimalCutSet>()?;
     m.add_class::<crate::record_outputs_gen::PyNaceIssueRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyRiskAssessmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScaleControlRiskRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScaleControlRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioChangeRow>()?;
@@ -970,6 +972,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::process::rate_based_packed_column,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::risk_matrix, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::safety_instrumented_function,
         m

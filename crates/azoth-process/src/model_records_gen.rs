@@ -54,6 +54,7 @@ use crate::models::pool_fire::PoolFireResult;
 use crate::models::probit::ProbitResult;
 use crate::models::pump::PumpResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
+use crate::models::risk_matrix::RiskMatrixResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
 use crate::models::separator::SeparatorResult;
 use crate::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult;
@@ -1367,6 +1368,15 @@ impl CalcResult for RateBasedPackedColumnResult {
         "segment_enthalpy_balance_residual",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for RiskMatrixResult {
+    const CALC_ID: &'static str = "process.risk_matrix";
+    const FIELDS: &'static [&'static str] = &["assessments", "total_annual_risk_cost", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

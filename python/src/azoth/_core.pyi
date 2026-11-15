@@ -526,6 +526,15 @@ class PumpCurvePoint(TypedDict):
     efficiency: float
     npsh_required: float | None
 
+class RiskEquipment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    failures_per_year: float
+    mttr_hours: float
+    production_loss_percent: float
+    production_loss_kg_per_hr: float
+
 class EfficiencyPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -934,6 +943,26 @@ class LopaLayerContribution:
     frequency_after_per_year: float
     contribution_per_year: float
     rrf: float | None
+
+@final
+class RiskAssessmentRow:
+    """one row per input row, in caller order."""
+
+    name: str
+    failures_per_year: float
+    mtbf_hours: float
+    mttr_hours: float
+    expected_downtime_hours_per_year: float
+    probability_category: str
+    probability_level: float
+    production_loss_percent: float
+    production_loss_kg_hr: Qty
+    consequence_category: str
+    consequence_level: float
+    risk_score: float
+    risk_level: str
+    cost_per_failure: float
+    annual_risk_cost: float
 
 @final
 class SilIssue:
@@ -3904,6 +3933,12 @@ class RateBasedPackedColumnResult:
     segment_percent_flood: list[float]
     segment_net_molar_transfer: list[Qty]
     segment_enthalpy_balance_residual: list[Qty]
+    warnings: list[Warning]
+
+@final
+class RiskMatrixResult:
+    assessments: list[RiskAssessmentRow]
+    total_annual_risk_cost: float
     warnings: list[Warning]
 
 @final
@@ -7324,6 +7359,11 @@ def rate_based_packed_column(
     segment_solver: str | None = None,
     column_solver: str | None = None,
 ) -> RateBasedPackedColumnResult: ...
+def risk_matrix(
+    equipment: list[RiskEquipment],
+    product_price_per_kg: float | None = None,
+    downtime_cost_per_hour: float | None = None,
+) -> RiskMatrixResult: ...
 def safety_instrumented_function(
     pfd_average: float,
     claimed_sil: float,

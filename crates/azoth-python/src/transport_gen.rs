@@ -21,9 +21,9 @@ use crate::record_outputs_gen::{
     PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
     PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow,
-    PyRemediationOptionRow, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySubFraction,
-    PyWaterMixingResult, PyZoneRatingRow,
+    PyRemediationOptionRow, PyRiskAssessmentRow, PyScaleControlRiskRow, PyScaleControlRow,
+    PyScenarioChangeRow, PyScenarioIndexRow, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
+    PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -21059,6 +21059,51 @@ impl From<&azoth_process::models::rate_based_packed_column::RateBasedPackedColum
                     unit: "W".to_string(),
                 })
                 .collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.risk_matrix`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RiskMatrixResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRiskMatrixResult {
+    /// one row per input row, in caller order.
+    #[pyo3(get)]
+    pub assessments: Vec<PyRiskAssessmentRow>,
+    /// the sum of the annual costs.
+    #[pyo3(get)]
+    pub total_annual_risk_cost: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyRiskMatrixResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "RiskMatrixResult(assessments={:?}, total_annual_risk_cost={:?}, {} warning(s))",
+            self.assessments,
+            self.total_annual_risk_cost,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::risk_matrix::RiskMatrixResult> for PyRiskMatrixResult {
+    fn from(r: &azoth_process::models::risk_matrix::RiskMatrixResult) -> Self {
+        Self {
+            assessments: r
+                .assessments
+                .iter()
+                .map(PyRiskAssessmentRow::from)
+                .collect(),
+            total_annual_risk_cost: r.total_annual_risk_cost,
             warnings: transport(&r.warnings),
         }
     }

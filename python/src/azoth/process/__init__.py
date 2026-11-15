@@ -62,6 +62,7 @@ from azoth.core.result import (
     ProbitResult,
     PumpResult,
     RateBasedPackedColumnResult,
+    RiskMatrixResult,
     SafetyInstrumentedFunctionResult,
     SeparatorCapacityAssessmentResult,
     SeparatorPerformanceResult,
@@ -144,6 +145,7 @@ __all__ = [
     "probit",
     "pump",
     "rate_based_packed_column",
+    "risk_matrix",
     "run_flowsheet",
     "safety_instrumented_function",
     "separator",
@@ -170,6 +172,7 @@ _NOG070_SIL_DETERMINATION = "process.nog070_sil_determination"
 _PACKED_COLUMN = "process.packed_column"
 _PFP_DEMAND = "process.pfp_demand"
 _RATE_BASED_PACKED_COLUMN = "process.rate_based_packed_column"
+_RISK_MATRIX = "process.risk_matrix"
 _SAFETY_INSTRUMENTED_FUNCTION = "process.safety_instrumented_function"
 _PIPE = "process.pipe"
 _GAS_SCRUBBER = "process.gas_scrubber"
@@ -2357,6 +2360,27 @@ def nog070_sil_determination(
         sif_type=sif_type,
         pfd_average=pfd_average,
         minimum_sil=minimum_sil,
+    )
+
+
+def risk_matrix(
+    equipment: list[dict[str, object]],
+    product_price_per_kg: float | None = None,
+    downtime_cost_per_hour: float | None = None,
+) -> RiskMatrixResult:
+    """The risk matrix's bands, score, MTBF, downtime and costs.
+
+    The production loss and the failure frequency are inputs: the class derives them from
+    a process system and a reliability database, which this id does not carry. The price
+    defaults to 0.5 per kg and the downtime cost to 5000 per hour; the MTBF is **1e6 hours
+    at zero failures**, the class's sentinel.
+
+    See :func:`azoth.process.reference.risk_matrix`.
+    """
+    return resolve(_RISK_MATRIX)(  # type: ignore[no-any-return]
+        equipment=equipment,
+        product_price_per_kg=product_price_per_kg,
+        downtime_cost_per_hour=downtime_cost_per_hour,
     )
 
 

@@ -1,0 +1,126 @@
+id = "process.risk_matrix"
+name = "Risk matrix"
+kind = "procedure"
+assumptions = [
+    "**the production loss and the failure frequency are inputs**: the class derives them from a `ProcessSystem` (the production-impact analyzer) and a reliability database, and the port takes the percentages and rates the caller states, the same flattening `process.consequence_analysis` makes of streams.",
+    "**the probability bands are `[0, 0.1)` very low, `[0.1, 0.5)` low, `[0.5, 1)` medium, `[1, 2)` high and `2` and above very high**, levels 1 to 5.",
+    "**the consequence bands are `[0, 5)` negligible, `[5, 20)` minor, `[20, 50)` moderate, `[50, 80)` major and `80` and above catastrophic**, levels 1 to 5.",
+    "**the risk score is the two levels' product**, and the level is low at 1-4, medium at 5-9, high at 10-15 and critical at 16-25.",
+    "**the mean time between failures is `8760 / failures_per_year`, and `1e6` hours at zero failures**, the class's sentinel.",
+    "**the expected downtime is `failures_per_year mttr`**, in hours per year.",
+    "**the cost per failure is `loss_kg_hr mttr price + mttr downtime_cost`**, and the annual cost is that times the failure frequency, in the class's operation order.",
+    "**the class's `operatingHoursPerYear` is read by no formula** and sits outside this id; the price defaults to 0.5 per kg and the downtime cost to 5000 per hour.",
+    "**the class maps a negative or NaN frequency to `VERY_HIGH` and a negative or over-band loss to `CATASTROPHIC`**, neither refused; the port refuses both.",
+]
+references = [
+    "ISO 31010:2019. Risk management - Risk assessment techniques.",
+    "NORSOK Z-013. Risk and emergency preparedness assessment.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/risk/RiskMatrix.java` is the port source.",
+    "`validation/neqsim/captures/process_risk_matrix.tsv` - the five bands, the boundaries, a cost state, zero failures and the values the class maps to its top category.",
+]
+[source]
+standard = "NeqSim process/safety/risk/RiskMatrix.java"
+edition = "Its `ProbabilityCategory.fromFrequency`, `ConsequenceCategory.fromProductionLoss`, `RiskLevel.fromScore`, `RiskAssessment.setProbabilityData`, `calculateRisk` and `calculateCost`."
+[algorithm]
+scheme = "closed_form_risk_matrix"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.equipment]
+type = "record_list"
+row_type = "RiskEquipment"
+description = "the equipment rows in caller order; one assessment per row, in the same order.\n"
+[inputs.equipment.fields.name]
+type = "string"
+description = "the equipment's name.\n"
+[inputs.equipment.fields.failures_per_year]
+unit = "dimensionless"
+description = "the failure frequency in 1/year, at least zero.\n"
+[inputs.equipment.fields.mttr_hours]
+unit = "dimensionless"
+description = "the mean time to repair in hours, at least zero.\n"
+[inputs.equipment.fields.production_loss_percent]
+unit = "dimensionless"
+description = "the production loss the failure causes, in percent, in `[0, 100]`.\n"
+[inputs.equipment.fields.production_loss_kg_per_hr]
+unit = "kg/h"
+description = "the absolute production loss the failure causes, at least zero.\n"
+[inputs.product_price_per_kg]
+unit = "dimensionless"
+optional = true
+description = "the product's price per kilogram, at least zero. **Absent is 0.5**, the class's default.\n"
+[inputs.downtime_cost_per_hour]
+unit = "dimensionless"
+optional = true
+description = "the fixed cost of downtime per hour, at least zero. **Absent is 5000**, the class's default.\n"
+[outputs]
+[outputs.assessments]
+type = "record_list"
+description = "one row per input row, in caller order.\n"
+[outputs.assessments.fields.name]
+type = "string"
+description = "the equipment's name.\n"
+[outputs.assessments.fields.failures_per_year]
+unit = "dimensionless"
+description = "the failure frequency, echoed.\n"
+[outputs.assessments.fields.mtbf_hours]
+unit = "dimensionless"
+description = "`8760 / failures_per_year`, or `1e6` at zero failures.\n"
+[outputs.assessments.fields.mttr_hours]
+unit = "dimensionless"
+description = "the mean time to repair, echoed.\n"
+[outputs.assessments.fields.expected_downtime_hours_per_year]
+unit = "dimensionless"
+description = "`failures_per_year mttr`.\n"
+[outputs.assessments.fields.probability_category]
+type = "enum"
+values = ["very_low", "low", "medium", "high", "very_high"]
+description = "the frequency band.\n"
+[outputs.assessments.fields.probability_level]
+unit = "dimensionless"
+description = "the band's level, 1 to 5.\n"
+[outputs.assessments.fields.production_loss_percent]
+unit = "dimensionless"
+description = "the production loss, echoed.\n"
+[outputs.assessments.fields.production_loss_kg_hr]
+unit = "kg/h"
+description = "the absolute production loss, echoed.\n"
+[outputs.assessments.fields.consequence_category]
+type = "enum"
+values = ["negligible", "minor", "moderate", "major", "catastrophic"]
+description = "the production-loss band.\n"
+[outputs.assessments.fields.consequence_level]
+unit = "dimensionless"
+description = "the band's level, 1 to 5.\n"
+[outputs.assessments.fields.risk_score]
+unit = "dimensionless"
+description = "the two levels' product.\n"
+[outputs.assessments.fields.risk_level]
+type = "enum"
+values = ["low", "medium", "high", "critical"]
+description = "the score's band.\n"
+[outputs.assessments.fields.cost_per_failure]
+unit = "dimensionless"
+description = "`loss_kg_hr mttr price + mttr downtime_cost`, in the currency the price carries.\n"
+[outputs.assessments.fields.annual_risk_cost]
+unit = "dimensionless"
+description = "`cost_per_failure failures_per_year`, in the same currency per year.\n"
+[outputs.total_annual_risk_cost]
+unit = "dimensionless"
+description = "the sum of the annual costs.\n"
+[[valid_range]]
+quantity = "product_price_per_kg"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative price is not a price"
+[[valid_range]]
+quantity = "downtime_cost_per_hour"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative cost is not a cost"
+[implementations]
+python = "azoth.process.risk_matrix"
+rust = "azoth_process::risk_matrix"

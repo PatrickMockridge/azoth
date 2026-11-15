@@ -475,6 +475,21 @@ pub struct ReferenceRow {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct RiskEquipment {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub failures_per_year: f64,
+    #[pyo3(item)]
+    pub mttr_hours: f64,
+    #[pyo3(item)]
+    pub production_loss_percent: f64,
+    #[pyo3(item)]
+    pub production_loss_kg_per_hr: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct ScaleInhibitor {
     #[pyo3(item)]
     pub scale_type: String,

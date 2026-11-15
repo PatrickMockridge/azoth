@@ -265,6 +265,7 @@
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
@@ -4125,6 +4126,16 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.rate_based_packed_column",
         "mass_transfer_correction",
+        "dimensionless",
+    ),
+    (
+        "process.risk_matrix",
+        "product_price_per_kg",
+        "dimensionless",
+    ),
+    (
+        "process.risk_matrix",
+        "downtime_cost_per_hour",
         "dimensionless",
     ),
     (

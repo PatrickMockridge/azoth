@@ -277,6 +277,7 @@
   - [Probit dose-response](./process/probit.md)
   - [Pump](./process/pump.md)
   - [Rate-based packed column](./process/rate_based_packed_column.md)
+  - [Risk matrix](./process/risk_matrix.md)
   - [Safety instrumented function](./process/safety_instrumented_function.md)
   - [Separator](./process/separator.md)
   - [Separator capacity assessment](./process/separator_capacity_assessment.md)

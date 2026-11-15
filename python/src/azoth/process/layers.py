@@ -2279,6 +2279,45 @@ def _nog070_sil_determination(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _risk_matrix(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.risk_matrix`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.risk_matrix import risk_matrix as evaluate
+
+    price = inputs.get("product_price_per_kg")
+    downtime = inputs.get("downtime_cost_per_hour")
+    equipment = []
+    for row in inputs["equipment"]:
+        converted = dict(row)
+        converted["production_loss_kg_per_hr"] = quantity(
+            float(row["production_loss_kg_per_hr"]), "kg/h"
+        )
+        equipment.append(converted)
+    result = evaluate(
+        equipment,
+        None if price is None else float(price),
+        None if downtime is None else float(downtime),
+    )
+    layers = {"total_annual_risk_cost": result.total_annual_risk_cost}
+    for index, row in enumerate(result.assessments):
+        layers[f"assessment{index}_failures_per_year"] = row.failures_per_year
+        layers[f"assessment{index}_mtbf_hours"] = row.mtbf_hours
+        layers[f"assessment{index}_mttr_hours"] = row.mttr_hours
+        layers[f"assessment{index}_expected_downtime_hours_per_year"] = (
+            row.expected_downtime_hours_per_year
+        )
+        layers[f"assessment{index}_probability_level"] = row.probability_level
+        layers[f"assessment{index}_production_loss_percent"] = row.production_loss_percent
+        layers[f"assessment{index}_production_loss_kg_hr"] = row.production_loss_kg_hr.to(
+            "kg/h"
+        ).magnitude
+        layers[f"assessment{index}_consequence_level"] = row.consequence_level
+        layers[f"assessment{index}_risk_score"] = row.risk_score
+        layers[f"assessment{index}_cost_per_failure"] = row.cost_per_failure
+        layers[f"assessment{index}_annual_risk_cost"] = row.annual_risk_cost
+    return layers
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2301,6 +2340,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.lopa": _lopa,
     "process.sil_verification": _sil_verification,
     "process.nog070_sil_determination": _nog070_sil_determination,
+    "process.risk_matrix": _risk_matrix,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3522,6 +3562,36 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_nog070_sil_determination.tsv",
         block=4,
         identified_by=("#label", "n070_sil_zero_band"),
+    ),
+    # The risk matrix's four caseable states. The six blocks after them are the values
+    # the class silently maps to its top category, declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.risk_matrix",
+        case="rm_bands",
+        capture="process_risk_matrix.tsv",
+        block=0,
+        identified_by=("#label", "rm_bands"),
+    ),
+    LayerCase(
+        model="process.risk_matrix",
+        case="rm_boundaries",
+        capture="process_risk_matrix.tsv",
+        block=1,
+        identified_by=("#label", "rm_boundaries"),
+    ),
+    LayerCase(
+        model="process.risk_matrix",
+        case="rm_costs",
+        capture="process_risk_matrix.tsv",
+        block=2,
+        identified_by=("#label", "rm_costs"),
+    ),
+    LayerCase(
+        model="process.risk_matrix",
+        case="rm_zero_failures",
+        capture="process_risk_matrix.tsv",
+        block=3,
+        identified_by=("#label", "rm_zero_failures"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4775,6 +4845,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The NOG 070's eight: the PFD-to-SIL boundary sweep, the full 18-row catalogue and
     # the six guards (a zero PFD, one, above one, a NaN, and two minimum-SIL bounds).
     "process_nog070_sil_determination.tsv": 8,
+    # The risk matrix's six: a negative frequency, a NaN frequency, a loss above 100 %,
+    # a negative loss, a negative repair time and a negative mass loss.
+    "process_risk_matrix.tsv": 6,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,
