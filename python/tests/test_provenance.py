@@ -156,8 +156,11 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # consequence analysis; 290: the passive fire protection demand; 291: the
     # fire-water demand; 292: the deluge nozzle layout; 293: the fire-monitor
     # coverage; 294: the fire-water coverage assessment; 295: the active fire
-    # protection screening; 296: the API 537 flare flame.
-    assert len(registered) == 296
+    # protection screening; 296: the API 537 flare flame; 297: the fault tree; 298: the
+    # bow tie; 299: the safety instrumented function; 300: the layer of protection
+    # analysis; 301: the SIL verification; 302: the NOG 070 SIL determination; 303: the
+    # risk matrix.
+    assert len(registered) == 303
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

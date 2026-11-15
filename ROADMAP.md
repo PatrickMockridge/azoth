@@ -884,9 +884,46 @@ a claim nothing holds.
   flame temperature, with the class's clamps mirrored and a negative stack height, which its
   setter accepts, refused (`#5018`). Held to six captures. **All six have no executable caller**: the
   cross-references inside `FireWaterDemandCalculator` are javadoc links, and each class's
-  only reader is its own test. What remains owed in the safety tree: **`FaultTreeAnalyzer`**,
-  the bowtie and the risk simulators (`RiskMatrix`, `OperationalRiskSimulator`, LOPA/SIL) are
-  outside this chain and need the simulation seam.
+  only reader is its own test.
+- **The risk and SIS arithmetic** — the static core of `process/safety/risk/`, seven ids.
+  **`process.fault_tree` is `FaultTreeAnalyzer` and `FaultTreeNode`**: the flat node list, the
+  recursive AND/OR/VOTING probability (OR is the exact complement union, not the javadoc's
+  rare-event sum), the beta correction the class's code applies on OR while its javadoc names
+  VOTING, and the minimal cut sets sorted by cardinality and name where the class's `HashSet`
+  fixes no order. The unvalidated `k`, duplicate basic names, the NaN probability and the
+  `1 << n` overflow at 31 basics are measured by the capture and refused. **`process.bow_tie`
+  is `BowTieModel.calculateRisk`**: the active-threat sum, the functional prevention and both
+  barriers' product, the maximum severity and the class's zero RRF at a zero mitigated
+  frequency; a mitigation barrier and a threat-to-barrier link are read by no formula.
+  **`process.safety_instrumented_function` is `SafetyInstrumentedFunction`**: the RRF (absent at
+  a zero PFD, where the class answers `+Infinity`), the required PFD and SIL, the claimed-SIL
+  band's warning (the class prints it, the port publishes `pfd_within_claimed_sil`), the
+  proof-test years, the three architecture PFDs and the spurious-trip availability.
+  **`process.lopa` is `LOPAResult`**: the inclusive target test and signed gap, the RRFs, the
+  required additional SIL, the caller's layer rows (recorded rather than multiplied) and the
+  four STS0131 bands. **`process.sil_verification` is `SILVerificationResult`**: the achieved
+  SIL, the 1.5x upper PFD, the exact-match fault-tolerance table, the substring diagnostic
+  coverage and the five issue checks, with the class's NaN-passes-as-SIL-4 state refused.
+  **`process.nog070_sil_determination` is the `nog070/` catalogue**: eighteen minimum SILs and
+  a `pfdToSil` whose SIL-0 band differs from the SIF id's required-SIL map.
+  **`process.risk_matrix` is `RiskMatrix`'s static core**: the five probability and consequence
+  bands, the score and four levels, the 1e6-hour MTBF sentinel at zero failures and the two cost
+  terms, with the production loss and the failure frequency as inputs where the class reads a
+  process system and a reliability database. All seven have live `src/main` callers — the MCP
+  LOPA, SIL and RiskMatrix runners, the engineering-safety workflows, the barrier register and
+  the STS0131 gate — except `FaultTreeAnalyzer`, whose only reader is its own test. Held to
+  seven captures. **The simulation seam holds what the seven do not**: `OperationalRiskSimulator`
+  (the ProcessSystem baseline and the production impact), `RiskModel`'s Monte Carlo (its
+  `ProcessSystem` field is read by no live path), `SISIntegratedRiskModel`/`SISRiskResult`,
+  `DynamicRiskSimulator`, `PortfolioRiskAnalyzer`, `RealTimeRiskMonitor`,
+  `PhysicsBasedRiskMonitor`, `ConditionBasedReliability`, `OREDADataImporter`, `RiskMLInterface`
+  and `BowTieAnalyzer.autoGenerateFromProcess`; `BowTieSvgExporter` is presentation. The safety
+  tree still carries **229 further classes** across `barrier/`, `alarp/`, `hazid/`, `inherent/`,
+  `escalation/`, `selfheating/`, `vibration/`, `compliance/`, `processsafetysystem/`,
+  `overpressure/`, `rupture/`, `depressurization/`, `release/`, `esd/`, `sif/`, `api14c/`,
+  `opendrain/`, `blowby/`, `vacuum/`, `settleout/`, `pump/`, `reaction/`, `inventory/`,
+  `mdmt/`, `leakdetection/`, `cfd/`, `envelope/`, `scenario/` and `dto/`, plus the risk
+  subpackages — none ported, each with its class.
 - **The reactions family's**: the **ionic branch** of `reactions.reactive_tp_flash` and
   `reactions.reactive_ph_flash`, which is why a charged substance is refused at all;
   `reactions.reactive_ph_flash`'s **entropy-specified variant** and its `NR = 0` delegation to
