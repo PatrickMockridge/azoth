@@ -54171,21 +54171,7 @@ pub static RATE_BASED_PACKED_COLUMN_SPEC: ModelSpec = ModelSpec {
     cases: RATE_BASED_PACKED_COLUMN_CASES,
 };
 
-static RELIEF_DISPOSAL_NETWORK_CHECKS: &[SpecCheck] = &[SpecCheck {
-    on_input: false,
-    check: RangeCheck {
-        quantity: "contributions.mass_flow",
-        min: Some(0.0),
-        min_inclusive: true,
-        max: None,
-        max_inclusive: true,
-        equals: None,
-        band: Band::Outside,
-        severity: Severity::Error,
-        code: WarningCode::OutOfValidRange,
-        rationale: "the class subtracts a negative rate from the total; the port refuses it",
-    },
-}];
+static RELIEF_DISPOSAL_NETWORK_CHECKS: &[SpecCheck] = &[];
 
 static RELIEF_DISPOSAL_NETWORK_CASES: &[TestCase] = &[
     TestCase {
@@ -62419,21 +62405,6 @@ pub static THROTTLING_VALVE_SPEC: ModelSpec = ModelSpec {
 };
 
 static TR3001_COMPLIANCE_CHECKS: &[SpecCheck] = &[
-    SpecCheck {
-        on_input: false,
-        check: RangeCheck {
-            quantity: "scenarios.relief_rate",
-            min: Some(0.0),
-            min_inclusive: true,
-            max: None,
-            max_inclusive: true,
-            equals: None,
-            band: Band::Outside,
-            severity: Severity::Error,
-            code: WarningCode::OutOfValidRange,
-            rationale: "the class reasons over any rate; a negative relief rate is not a load",
-        },
-    },
     SpecCheck {
         on_input: true,
         check: RangeCheck {

@@ -199,10 +199,11 @@ def _two_phase_area(
         * (v_g - v_l) ** 2
         / (latent_heat**2 * mix)
     )
-    if omega <= 1.0:
-        eta_c = 0.55 + 0.217 * math.log(omega)
-    else:
-        eta_c = 0.85 / (1.0 + omega)
+    eta_c = (
+        0.55 + 0.217 * math.log(omega)
+        if omega <= 1.0
+        else 0.85 / (1.0 + omega)
+    )
     eta_c = max(eta_c, back_pressure / p0)
     g2 = p0 / mix * (
         2.0 * (omega * math.log(1.0 / eta_c) + (1.0 - omega) * (1.0 - eta_c))

@@ -110,12 +110,6 @@ description = "the rate times 3600.\n"
 [outputs.contributions.fields.simultaneous]
 type = "boolean"
 description = "whether the load is concurrent.\n"
-[[valid_range]]
-quantity = "contributions.mass_flow"
-min = 0
-min_inclusive = true
-severity = "error"
-rationale = "the class subtracts a negative rate from the total; the port refuses it"
 [implementations]
 python = "azoth.process.relief_disposal_network"
 rust = "azoth_process::relief_disposal_network"

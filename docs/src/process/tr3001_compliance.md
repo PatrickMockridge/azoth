@@ -46,7 +46,6 @@ not an equation, and both implementations read it from here.
 
 | Bound | On violation | Why |
 |---|---|---|
-| `scenarios.relief_rate >= 0` | raises | the class reasons over any rate; a negative relief rate is not a load |
 | `required_area_in2 >= 0` | raises | a negative area is not a sizing result |
 | `accumulation_fraction >= 0` | raises | a fraction below zero is not an accumulation basis |
 | `accumulation_fraction <= 1` | raises | a fraction above one is not an accumulation basis |

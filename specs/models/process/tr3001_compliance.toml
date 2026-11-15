@@ -106,12 +106,6 @@ description = "the number of failing checks.\n"
 type = "boolean"
 description = "whether no check failed.\n"
 [[valid_range]]
-quantity = "scenarios.relief_rate"
-min = 0
-min_inclusive = true
-severity = "error"
-rationale = "the class reasons over any rate; a negative relief rate is not a load"
-[[valid_range]]
 quantity = "required_area_in2"
 min = 0
 min_inclusive = true

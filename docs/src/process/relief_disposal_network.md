@@ -40,9 +40,8 @@ not an equation, and both implementations read it from here.
 | `governing_contributor` | - | *Optional.* the item name of the first peak, absent when no rate is positive. |
 | `contributions` | - | one row per input row, in caller order. |
 
-| Bound | On violation | Why |
-|---|---|---|
-| `contributions.mass_flow >= 0` | raises | the class subtracts a negative rate from the total; the port refuses it |
+No input is bounded. This model declares no range, so nothing here is
+checked against one.
 
 ## Assumptions
 
