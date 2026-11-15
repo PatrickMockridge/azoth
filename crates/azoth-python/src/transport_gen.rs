@@ -16561,6 +16561,68 @@ impl From<&azoth_process::models::filter::FilterResult> for PyFilterResult {
         }
     }
 }
+/// Result of `process.fire_case_relief`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FireCaseReliefResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFireCaseReliefResult {
+    /// the latent heat used, in J/kg.
+    #[pyo3(get)]
+    pub latent_heat: f64,
+    /// `heat_input / latent_heat`.
+    #[pyo3(get)]
+    pub relief_rate: PyQty,
+    /// the relief rate times 3600.
+    #[pyo3(get)]
+    pub relief_rate_kg_per_hr: PyQty,
+    /// the relieving temperature, echoed when stated.
+    #[pyo3(get)]
+    pub relieving_temperature: Option<PyQty>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFireCaseReliefResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FireCaseReliefResult(latent_heat={:?}, relief_rate={:?}, relief_rate_kg_per_hr={:?}, relieving_temperature={:?}, {} warning(s))",
+            self.latent_heat,
+            self.relief_rate,
+            self.relief_rate_kg_per_hr,
+            self.relieving_temperature,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fire_case_relief::FireCaseReliefResult>
+    for PyFireCaseReliefResult
+{
+    fn from(r: &azoth_process::models::fire_case_relief::FireCaseReliefResult) -> Self {
+        Self {
+            latent_heat: r.latent_heat,
+            relief_rate: PyQty {
+                magnitude_si: r.relief_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            relief_rate_kg_per_hr: PyQty {
+                magnitude_si: r.relief_rate_kg_per_hr.value,
+                unit: "kg/h".to_string(),
+            },
+            relieving_temperature: r.relieving_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.fire_monitor_coverage`, transported.
 #[pyclass(
     frozen,

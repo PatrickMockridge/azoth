@@ -239,6 +239,7 @@
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
 //!   - specs/models/process/filter.toml
+//!   - specs/models/process/fire_case_relief.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
 //!   - specs/models/process/fire_water_coverage_assessment.toml
 //!   - specs/models/process/fire_water_demand.toml
@@ -3190,6 +3191,15 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.filter", "joint_efficiency", "dimensionless"),
     ("process.filter", "corrosion_allowance", "length"),
     ("process.filter", "element_collapse_pressure", "pressure"),
+    ("process.fire_case_relief", "wetted_area", "area"),
+    ("process.fire_case_relief", "vessel_diameter", "length"),
+    ("process.fire_case_relief", "wetted_height", "length"),
+    ("process.fire_case_relief", "latent_heat", "dimensionless"),
+    (
+        "process.fire_case_relief",
+        "relieving_temperature",
+        "thermodynamic_temperature",
+    ),
     ("process.fire_monitor_coverage", "target_area", "area"),
     (
         "process.fire_monitor_coverage",

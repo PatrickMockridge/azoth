@@ -1,0 +1,99 @@
+id = "process.fire_case_relief"
+name = "Fire case relief"
+kind = "procedure"
+assumptions = [
+    "**the wetted area is the supplied area, else `pi D h` when both geometry values are positive, else zero**, the class's fallback order.",
+    "**the heat input is API 521 Table 4**: `Q = C1 A_ft2^0.82` with `C1 = 21000` BTU/hr ft2 with adequate drainage and `34500` without, converted through 10.7639 ft2 per m2 and 0.29307107 W per BTU/hr.",
+    "**`has_fire_fighting` is read by no formula**: the environment factor is 1.0 on both branches, so only drainage selects the coefficient and two rows differing only in the flag answer identically.",
+    "**the latent heat defaults to 350000 J/kg when absent**, the class's light-hydrocarbon value; the port treats a zero as the default and refuses a negative value.",
+    "**the relief rate is `Q / latent_heat`**, and the hourly rate is that times 3600.",
+    "**the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and density, and this id carries the no-fluid path only.",
+]
+references = [
+    "API STD 521 (7th edition, 2020). Pressure-relieving and depressuring systems, the fire case and Table 4.",
+    "TR3001. Overpressure protection, the fire case and SR-26504.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/overpressure/FireCaseRelief.java` is the port source.",
+    "`validation/neqsim/captures/process_fire_case_relief.tsv` - the drainage branches, the geometry-derived area, the latent default, the no-area state and the unread firefighting flag.",
+]
+[source]
+standard = "NeqSim process/safety/overpressure/FireCaseRelief.java"
+edition = "Its `calculate` no-fluid path and `ReliefValveSizing.calculateAPI521FireHeatInput`."
+[algorithm]
+scheme = "closed_form_fire_case_relief"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.has_drainage]
+type = "boolean"
+description = "whether adequate drainage exists; it selects 21000 or 34500 BTU/hr ft2.\n"
+[inputs.has_fire_fighting]
+type = "boolean"
+description = "whether firefighting is credited. **Read by no formula**, the class's unread flag; retained because the class takes it.\n"
+[inputs.wetted_area]
+unit = "m**2"
+optional = true
+description = "the fire-exposed wetted area, at least zero. **Absent or zero falls back to the geometry**, the class's order.\n"
+[inputs.vessel_diameter]
+unit = "m"
+optional = true
+description = "the vessel shell diameter, at least zero; with `wetted_height` it derives `pi D h`.\n"
+[inputs.wetted_height]
+unit = "m"
+optional = true
+description = "the liquid-wetted shell height, at least zero; with `vessel_diameter` it derives `pi D h`.\n"
+[inputs.latent_heat]
+unit = "dimensionless"
+optional = true
+description = "the latent heat in J/kg, at least zero. **Absent or zero is 350000 J/kg**, the class's default; dimensionless because the vocabulary has no specific-energy unit.\n"
+[inputs.relieving_temperature]
+unit = "K"
+optional = true
+description = "the relieving temperature, above zero. Absent omits `relieving_temperature` from the result.\n"
+[outputs]
+[outputs.latent_heat]
+unit = "dimensionless"
+description = "the latent heat used, in J/kg.\n"
+[outputs.relief_rate]
+unit = "kg/s"
+description = "`heat_input / latent_heat`.\n"
+[outputs.relief_rate_kg_per_hr]
+unit = "kg/h"
+description = "the relief rate times 3600.\n"
+[outputs.relieving_temperature]
+unit = "K"
+optional = true
+description = "the relieving temperature, echoed when stated.\n"
+[[valid_range]]
+quantity = "wetted_area"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative area is not a wetted area; the class silently falls back"
+[[valid_range]]
+quantity = "vessel_diameter"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative diameter is not a diameter; the class silently falls back"
+[[valid_range]]
+quantity = "wetted_height"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative height is not a height; the class silently falls back"
+[[valid_range]]
+quantity = "latent_heat"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative latent heat is not a latent heat; the class silently defaults it"
+[[valid_range]]
+quantity = "relieving_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a non-positive absolute temperature is not a relieving state"
+[implementations]
+python = "azoth.process.fire_case_relief"
+rust = "azoth_process::fire_case_relief"

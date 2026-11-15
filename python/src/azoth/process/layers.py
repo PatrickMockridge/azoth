@@ -2422,6 +2422,44 @@ def _psv_fire_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _fire_case_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fire_case_relief`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.fire_case_relief import fire_case_relief as evaluate
+
+    result = evaluate(
+        bool(inputs["has_drainage"]),
+        bool(inputs["has_fire_fighting"]),
+        None
+        if inputs.get("wetted_area") is None
+        else quantity(float(inputs["wetted_area"]), "m**2"),
+        (
+            None
+            if inputs.get("vessel_diameter") is None
+            else quantity(float(inputs["vessel_diameter"]), "m")
+        ),
+        (
+            None
+            if inputs.get("wetted_height") is None
+            else quantity(float(inputs["wetted_height"]), "m")
+        ),
+        None if inputs.get("latent_heat") is None else float(inputs["latent_heat"]),
+        (
+            None
+            if inputs.get("relieving_temperature") is None
+            else quantity(float(inputs["relieving_temperature"]), "K")
+        ),
+    )
+    layers: dict[str, float] = {
+        "latent_heat": result.latent_heat,
+        "relief_rate": result.relief_rate.to("kg/s").magnitude,
+        "relief_rate_kg_per_hr": result.relief_rate_kg_per_hr.to("kg/h").magnitude,
+    }
+    if result.relieving_temperature is not None:
+        layers["relieving_temperature"] = result.relieving_temperature.to("K").magnitude
+    return layers
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2432,6 +2470,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.consequence_analysis": _consequence_analysis,
     "process.jet_fire": _jet_fire,
     "process.pfp_demand": _pfp_demand,
+    "process.fire_case_relief": _fire_case_relief,
     "process.fire_water_demand": _fire_water_demand,
     "process.deluge_nozzle_layout": _deluge_nozzle_layout,
     "process.fire_monitor_coverage": _fire_monitor_coverage,
@@ -3822,6 +3861,51 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=2,
         identified_by=("#label", "pf_helpers"),
     ),
+    # The fire relief's six cased blocks: both drainage branches, the geometry, the
+    # no-area state, the latent default and the unread firefighting flag. The negative
+    # latent heat the class silently defaults sits outside them.
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_area_drainage",
+        capture="process_fire_case_relief.tsv",
+        block=0,
+        identified_by=("#label", "fc_area_drainage"),
+    ),
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_area_no_drainage",
+        capture="process_fire_case_relief.tsv",
+        block=1,
+        identified_by=("#label", "fc_area_no_drainage"),
+    ),
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_geometry",
+        capture="process_fire_case_relief.tsv",
+        block=2,
+        identified_by=("#label", "fc_geometry"),
+    ),
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_no_area",
+        capture="process_fire_case_relief.tsv",
+        block=3,
+        identified_by=("#label", "fc_no_area"),
+    ),
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_latent_default",
+        capture="process_fire_case_relief.tsv",
+        block=4,
+        identified_by=("#label", "fc_latent_default"),
+    ),
+    LayerCase(
+        model="process.fire_case_relief",
+        case="fc_firefighting_unread",
+        capture="process_fire_case_relief.tsv",
+        block=6,
+        identified_by=("#label", "fc_firefighting_unread"),
+    ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
     # the 1 MPa target and the zero target are uncased.
@@ -5084,6 +5168,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The fire sizing's three: two rows differing only in the dead initial pressure and
     # volume, and the zero blowdown time the class accepts as an infinite average flow.
     "process_psv_fire_sizing.tsv": 3,
+    # The fire relief's one: the negative latent heat the class silently replaces with
+    # 350000 J/kg.
+    "process_fire_case_relief.tsv": 1,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

@@ -6645,6 +6645,28 @@ class FilterResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class FireCaseReliefResult(_HasWarnings):
+    """Result of ``process.fire_case_relief``."""
+
+    CALC_ID: ClassVar[str] = "process.fire_case_relief"
+
+    #: the latent heat used, in J/kg.
+    latent_heat: float
+
+    #: `heat_input / latent_heat`.
+    relief_rate: Q
+
+    #: the relief rate times 3600.
+    relief_rate_kg_per_hr: Q
+
+    #: the relieving temperature, echoed when stated.
+    relieving_temperature: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class FireMonitorCoverageResult(_HasWarnings):
     """Result of ``process.fire_monitor_coverage``."""
 

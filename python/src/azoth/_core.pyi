@@ -3321,6 +3321,14 @@ class FilterResult:
     warnings: list[Warning]
 
 @final
+class FireCaseReliefResult:
+    latent_heat: float
+    relief_rate: Qty
+    relief_rate_kg_per_hr: Qty
+    relieving_temperature: Qty | None
+    warnings: list[Warning]
+
+@final
 class FireMonitorCoverageResult:
     total_flow: Qty
     swept_area: Qty
@@ -6906,6 +6914,15 @@ def filter(
     element_collapse_pressure: float | None = None,
     element_integrity_verified: bool | None = None,
 ) -> FilterResult: ...
+def fire_case_relief(
+    has_drainage: bool,
+    has_fire_fighting: bool,
+    wetted_area: float | None = None,
+    vessel_diameter: float | None = None,
+    wetted_height: float | None = None,
+    latent_heat: float | None = None,
+    relieving_temperature: float | None = None,
+) -> FireCaseReliefResult: ...
 def fire_monitor_coverage(
     target_area: float,
     required_density: float,

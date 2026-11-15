@@ -6054,6 +6054,38 @@ pub fn fault_tree(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Fire case relief.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (has_drainage, has_fire_fighting, wetted_area, vessel_diameter, wetted_height, latent_heat, relieving_temperature))]
+#[pyo3(
+    text_signature = "(has_drainage, has_fire_fighting, wetted_area, vessel_diameter, wetted_height, latent_heat, relieving_temperature)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn fire_case_relief(
+    py: Python<'_>,
+    has_drainage: bool,
+    has_fire_fighting: bool,
+    wetted_area: Option<f64>,
+    vessel_diameter: Option<f64>,
+    wetted_height: Option<f64>,
+    latent_heat: Option<f64>,
+    relieving_temperature: Option<f64>,
+) -> PyResult<crate::transport_gen::PyFireCaseReliefResult> {
+    azoth_process::models::fire_case_relief::fire_case_relief(
+        wetted_area.map(square_meters),
+        vessel_diameter.map(meters),
+        wetted_height.map(meters),
+        has_drainage,
+        has_fire_fighting,
+        latent_heat,
+        relieving_temperature.map(kelvins),
+    )
+    .map(|r| crate::transport_gen::PyFireCaseReliefResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Fire monitor coverage.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

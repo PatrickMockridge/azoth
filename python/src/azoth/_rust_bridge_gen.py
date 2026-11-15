@@ -96,6 +96,7 @@ from azoth.core.result import (
     FeSMorphology,
     FilippovConductivityResult,
     FilterResult,
+    FireCaseReliefResult,
     FireMonitorCoverageResult,
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
@@ -471,6 +472,7 @@ __all__ = [
     "fault_tree",
     "filippov_conductivity",
     "filter",
+    "fire_case_relief",
     "fire_monitor_coverage",
     "fire_water_coverage_assessment",
     "fire_water_demand",
@@ -6304,6 +6306,27 @@ def filter(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
         collapse_pressure_utilization=result.collapse_pressure_utilization,
         differential_pressure_design_acceptable=result.differential_pressure_design_acceptable,
         design_media_area=None if result.design_media_area is None else from_si(result.design_media_area.magnitude_si, result.design_media_area.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def fire_case_relief(has_drainage: bool, has_fire_fighting: bool, wetted_area: Q | None=None, vessel_diameter: Q | None=None, wetted_height: Q | None=None, latent_heat: float | None=None, relieving_temperature: Q | None=None) -> FireCaseReliefResult:
+    """``process.fire_case_relief``, computed in Rust."""
+    spec = _models_gen.model("process.fire_case_relief")
+    result = _core.fire_case_relief(
+        has_drainage,
+        has_fire_fighting,
+        None if wetted_area is None else input_to_si(spec, "wetted_area", wetted_area),
+        None if vessel_diameter is None else input_to_si(spec, "vessel_diameter", vessel_diameter),
+        None if wetted_height is None else input_to_si(spec, "wetted_height", wetted_height),
+        None if latent_heat is None else latent_heat,
+        None if relieving_temperature is None else input_to_si(spec, "relieving_temperature", relieving_temperature),
+    )
+    return FireCaseReliefResult(
+        latent_heat=result.latent_heat,
+        relief_rate=from_si(result.relief_rate.magnitude_si, result.relief_rate.unit),
+        relief_rate_kg_per_hr=from_si(result.relief_rate_kg_per_hr.magnitude_si, result.relief_rate_kg_per_hr.unit),
+        relieving_temperature=None if result.relieving_temperature is None else from_si(result.relieving_temperature.magnitude_si, result.relieving_temperature.unit),
         warnings=_warnings(result.warnings),
     )
 

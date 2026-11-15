@@ -47,6 +47,7 @@ pub mod event_tree;
 pub mod expander;
 pub mod fault_tree;
 pub mod filter;
+pub mod fire_case_relief;
 pub mod fire_monitor_coverage;
 pub mod fire_water_coverage_assessment;
 pub mod fire_water_demand;
@@ -117,6 +118,7 @@ pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_t
 pub use expander::{ExpanderResult, expander};
 pub use fault_tree::{FaultTreeNodeSpec, FaultTreeResult, MinimalCutSet, fault_tree};
 pub use filter::{FilterResult, filter};
+pub use fire_case_relief::{FireCaseReliefResult, fire_case_relief};
 pub use fire_monitor_coverage::{FireMonitorCoverageResult, fire_monitor_coverage};
 pub use fire_water_coverage_assessment::{
     FireWaterCoverageAssessmentResult, SupplyVerdict, fire_water_coverage_assessment,

@@ -36,6 +36,7 @@ from azoth.core.result import (
     ExpanderResult,
     FaultTreeResult,
     FilterResult,
+    FireCaseReliefResult,
     FireMonitorCoverageResult,
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
@@ -119,6 +120,7 @@ __all__ = [
     "expander",
     "fault_tree",
     "filter",
+    "fire_case_relief",
     "fire_monitor_coverage",
     "fire_water_coverage_assessment",
     "fire_water_demand",
@@ -199,6 +201,7 @@ _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _VCE = "process.vce"
 _FILTER = "process.filter"
+_FIRE_CASE_RELIEF = "process.fire_case_relief"
 _FLARE = "process.flare"
 _HEATER = "process.heater"
 _HEM_RELEASE = "process.hem_release"
@@ -2387,6 +2390,30 @@ def risk_matrix(
         equipment=equipment,
         product_price_per_kg=product_price_per_kg,
         downtime_cost_per_hour=downtime_cost_per_hour,
+    )
+
+
+def fire_case_relief(
+    has_drainage: bool,
+    has_fire_fighting: bool,
+    wetted_area: Q | None = None,
+    vessel_diameter: Q | None = None,
+    wetted_height: Q | None = None,
+    latent_heat: float | None = None,
+    relieving_temperature: Q | None = None,
+) -> FireCaseReliefResult:
+    """The API 521 fire-case heat input and the vapour relief rate.
+
+    See :func:`azoth.process.reference.fire_case_relief`.
+    """
+    return resolve(_FIRE_CASE_RELIEF)(  # type: ignore[no-any-return]
+        has_drainage=has_drainage,
+        has_fire_fighting=has_fire_fighting,
+        wetted_area=wetted_area,
+        vessel_diameter=vessel_diameter,
+        wetted_height=wetted_height,
+        latent_heat=latent_heat,
+        relieving_temperature=relieving_temperature,
     )
 
 

@@ -441,6 +441,7 @@ NON_UNIT_MODELS = {
     "process.risk_matrix": "the risk matrix over equipment rows, not a unit",
     "process.hem_release": "a release source term is a calculation over a fluid, not a unit",
     "process.pfp_demand": "the PFP demand screen over scalars, not a unit",
+    "process.fire_case_relief": "the fire-case relief load over scalars, not a unit",
     "process.fire_water_demand": "the fire-water demand screen over scalars and rows, not a unit",
     "process.deluge_nozzle_layout": "the deluge nozzle layout screen over scalars, not a unit",
     "process.fire_monitor_coverage": "the fire-monitor coverage screen over scalars, not a unit",

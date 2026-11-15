@@ -28,6 +28,7 @@ use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
 use crate::models::fault_tree::FaultTreeResult;
 use crate::models::filter::FilterResult;
+use crate::models::fire_case_relief::FireCaseReliefResult;
 use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
 use crate::models::fire_water_demand::FireWaterDemandResult;
@@ -575,6 +576,21 @@ impl CalcResult for FilterResult {
         "collapse_pressure_utilization",
         "differential_pressure_design_acceptable",
         "design_media_area",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FireCaseReliefResult {
+    const CALC_ID: &'static str = "process.fire_case_relief";
+    const FIELDS: &'static [&'static str] = &[
+        "latent_heat",
+        "relief_rate",
+        "relief_rate_kg_per_hr",
+        "relieving_temperature",
         "warnings",
     ];
 

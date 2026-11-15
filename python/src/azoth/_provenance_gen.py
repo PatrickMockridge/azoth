@@ -2633,6 +2633,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 28,
         "tests_skipped": 0,
     },
+    'process.fire_case_relief': {
+        "calc_id": 'process.fire_case_relief',
+        "name": 'Fire case relief',
+        "spec": {'path': 'specs/models/process/fire_case_relief.toml', 'sha256': '4127990df842cd1977b00395a76a7700ebed5364a7838c406a412efadbf9f9cf'},
+        "code": [{'path': 'python/src/azoth/process/reference/fire_case_relief.py', 'sha256': '0ca883057ffce197edeaedc8a2a4f774c26ce1d898df3d6a991c75c8c2ee39e8'}, {'path': 'crates/azoth-process/src/models/fire_case_relief.rs', 'sha256': '68a3380586e219d31235d83476dc5fd01b573aa243620ae2f8e39c0f0d943d82'}],
+        "source": 'NeqSim process/safety/overpressure/FireCaseRelief.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'process.fire_monitor_coverage': {
         "calc_id": 'process.fire_monitor_coverage',
         "name": 'Fire monitor coverage',

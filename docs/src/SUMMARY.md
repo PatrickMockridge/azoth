@@ -251,6 +251,7 @@
   - [Expander](./process/expander.md)
   - [Fault tree](./process/fault_tree.md)
   - [Filter](./process/filter.md)
+  - [Fire case relief](./process/fire_case_relief.md)
   - [Fire monitor coverage](./process/fire_monitor_coverage.md)
   - [Fire-water coverage assessment](./process/fire_water_coverage_assessment.md)
   - [Fire-water demand](./process/fire_water_demand.md)
