@@ -1211,6 +1211,38 @@ def _hem_release(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _hazardous_area(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.hazardous_area`'s layers, from the reference's own arithmetic.
+
+    The zone and grade labels are strings and have no layer here; the three numbers are
+    the ones the capture prints.
+    """
+    from azoth.process.reference.hazardous_area import (
+        DEFAULT_AMBIENT_DENSITY,
+        DEFAULT_SAFETY_FACTOR,
+        _effective_diameter,
+        _hazardous_distance,
+        _lfl_mass_fraction,
+    )
+
+    flow = float(inputs["mass_flow"])
+    density = float(inputs["exit_density"])
+    velocity = float(inputs["exit_velocity"])
+    lfl = float(inputs["lfl_volume_fraction"])
+    molar = float(inputs["gas_molar_mass"])
+    ambient = float(inputs.get("ambient_density", DEFAULT_AMBIENT_DENSITY))
+    factor = float(inputs.get("safety_factor", DEFAULT_SAFETY_FACTOR))
+    diameter = _effective_diameter(flow, density, velocity)
+    lfl_mass = _lfl_mass_fraction(lfl, molar)
+    return {
+        "effective_diameter_m": diameter,
+        "lfl_mass_fraction": lfl_mass,
+        "hazardous_distance_m": _hazardous_distance(
+            density, ambient, diameter, factor, lfl_mass
+        ),
+    }
+
+
 def _heavy_gas_dispersion(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.heavy_gas_dispersion`'s layers, from the reference's own arithmetic.
 
@@ -2588,6 +2620,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
     "process.leak_blowdown": _leak_blowdown,
+    "process.hazardous_area": _hazardous_area,
     "process.heavy_gas_dispersion": _heavy_gas_dispersion,
     "process.gaussian_plume": _gaussian_plume,
     "process.gas_dispersion": _gas_dispersion,
@@ -3012,6 +3045,50 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_leak_blowdown.tsv",
         block=0,
         identified_by=("#label", "pr_methane_50bara_10s_1s"),
+    ),
+    # The hazardous area's six: the documentation state, the safety-factor and ambient
+    # overrides, a tenfold flow and both other grades; the nine guards are uncased.
+    LayerCase(
+        model="process.hazardous_area",
+        case="methane_default",
+        capture="process_hazardous_area.tsv",
+        block=0,
+        identified_by=("#label", "methane_default"),
+    ),
+    LayerCase(
+        model="process.hazardous_area",
+        case="methane_safety_025",
+        capture="process_hazardous_area.tsv",
+        block=1,
+        identified_by=("#label", "methane_safety_025"),
+    ),
+    LayerCase(
+        model="process.hazardous_area",
+        case="methane_flow_1",
+        capture="process_hazardous_area.tsv",
+        block=2,
+        identified_by=("#label", "methane_flow_1"),
+    ),
+    LayerCase(
+        model="process.hazardous_area",
+        case="methane_ambient_1",
+        capture="process_hazardous_area.tsv",
+        block=3,
+        identified_by=("#label", "methane_ambient_1"),
+    ),
+    LayerCase(
+        model="process.hazardous_area",
+        case="primary_zone",
+        capture="process_hazardous_area.tsv",
+        block=4,
+        identified_by=("#label", "primary_zone"),
+    ),
+    LayerCase(
+        model="process.hazardous_area",
+        case="continuous_zone",
+        capture="process_hazardous_area.tsv",
+        block=5,
+        identified_by=("#label", "continuous_zone"),
     ),
     # The dense gas's five: the analyzer's two distances, the alpha floor, equal
     # densities and a buoyant source; the six guards are uncased.
@@ -5444,6 +5521,8 @@ UNCASED_ROWS: dict[str, int] = {
     "process_gas_dispersion.tsv": 5,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
+    # The hazardous area's nine: the constructor's six guards and the setters' three.
+    "process_hazardous_area.tsv": 9,
     # The event tree's four: the no-branch tree, the two refusals and the shift count, which
     # cannot be cased (an empty record value is not a case).
     "process_event_tree.tsv": 4,

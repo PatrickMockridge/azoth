@@ -37,6 +37,7 @@ use crate::models::gas_dispersion::GasDispersionResult;
 use crate::models::gas_scrubber::GasScrubberResult;
 use crate::models::gaussian_plume::GaussianPlumeResult;
 use crate::models::gibbs_reactor::GibbsReactorResult;
+use crate::models::hazardous_area::HazardousAreaResult;
 use crate::models::heat_exchanger::HeatExchangerResult;
 use crate::models::heater::HeaterResult;
 use crate::models::heavy_gas_dispersion::HeavyGasDispersionResult;
@@ -963,6 +964,22 @@ impl CalcResult for HeaterResult {
         "used_overall_heat_transfer_coefficient",
         "calculated_ua",
         "mechanical_types",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for HazardousAreaResult {
+    const CALC_ID: &'static str = "process.hazardous_area";
+    const FIELDS: &'static [&'static str] = &[
+        "effective_diameter",
+        "lfl_mass_fraction",
+        "hazardous_distance",
+        "release_grade",
+        "zone_classification",
         "warnings",
     ];
 

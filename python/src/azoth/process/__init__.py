@@ -45,6 +45,7 @@ from azoth.core.result import (
     GasScrubberResult,
     GaussianPlumeResult,
     GibbsReactorResult,
+    HazardousAreaResult,
     HeaterResult,
     HeatExchangerResult,
     HeavyGasDispersionResult,
@@ -135,6 +136,7 @@ __all__ = [
     "gas_scrubber",
     "gaussian_plume",
     "gibbs_reactor",
+    "hazardous_area",
     "heat_exchanger",
     "heater",
     "heavy_gas_dispersion",
@@ -223,6 +225,7 @@ _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
 _GAS_DISPERSION = "process.gas_dispersion"
 _GAUSSIAN_PLUME = "process.gaussian_plume"
+_HAZARDOUS_AREA = "process.hazardous_area"
 _HEAVY_GAS_DISPERSION = "process.heavy_gas_dispersion"
 _PROBIT = "process.probit"
 _PSV_FIRE_SIZING = "process.psv_fire_sizing"
@@ -2899,6 +2902,40 @@ def heavy_gas_dispersion(
         air_density=air_density,
         wind_speed=wind_speed,
         concentration_ratio=concentration_ratio,
+    )
+
+
+def hazardous_area(
+    mass_flow: Q,
+    exit_density: Q,
+    exit_velocity: Q,
+    lfl_volume_fraction: float,
+    gas_molar_mass: Q,
+    ambient_density: Q | None = None,
+    safety_factor: float | None = None,
+    release_grade: str | None = None,
+) -> HazardousAreaResult:
+    """The hazardous distance and IEC 60079-10-1 zone for a continuous gas jet.
+
+    The notional source diameter, the class's ideal mole-to-mass LFL, the de-rated
+    downwind distance and the zone the grade of release selects.
+
+    Raises:
+        InvalidInputError: for a non-positive flow, density, velocity, molar mass or
+            ambient density, an LFL outside ``(0, 1)``, a safety factor outside
+            ``(0, 1]``, or an unknown grade.
+
+    See :func:`azoth.process.reference.hazardous_area`.
+    """
+    return resolve(_HAZARDOUS_AREA)(  # type: ignore[no-any-return]
+        mass_flow=mass_flow,
+        exit_density=exit_density,
+        exit_velocity=exit_velocity,
+        lfl_volume_fraction=lfl_volume_fraction,
+        gas_molar_mass=gas_molar_mass,
+        ambient_density=ambient_density,
+        safety_factor=safety_factor,
+        release_grade=release_grade,
     )
 
 

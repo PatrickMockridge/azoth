@@ -7078,6 +7078,31 @@ class GaussianPlumeResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class HazardousAreaResult(_HasWarnings):
+    """Result of ``process.hazardous_area``."""
+
+    CALC_ID: ClassVar[str] = "process.hazardous_area"
+
+    #: `d_e = sqrt(4 mdot / (pi rho_e U_e))`, the notional source diameter.
+    effective_diameter: Q
+
+    #: the class's ideal mole-to-mass LFL.
+    lfl_mass_fraction: float
+
+    #: `5.4 sqrt(rho_e/rho_a) d_e / (k Y_LFL)`, the distance to the de-rated LFL.
+    hazardous_distance: Q
+
+    #: the class's grade label.
+    release_grade: str
+
+    #: the class's zone label.
+    zone_classification: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class HeavyGasDispersionResult(_HasWarnings):
     """Result of ``process.heavy_gas_dispersion``."""
 
