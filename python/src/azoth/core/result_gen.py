@@ -7765,6 +7765,31 @@ class MixerResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class Nog070SilDeterminationResult(_HasWarnings):
+    """Result of ``process.nog070_sil_determination``."""
+
+    CALC_ID: ClassVar[str] = "process.nog070_sil_determination"
+
+    #: the catalogue's minimum SIL for the type.
+    catalogue_minimum_sil: float
+
+    #: the minimum applied: the caller's when stated, otherwise the catalogue's.
+    minimum_sil: float
+
+    #: the SIL the PFD maps to, by the class's `pfdToSil`.
+    achieved_sil: float
+
+    #: whether the achieved SIL is at least the minimum.
+    compliant: bool
+
+    #: `10^(minimum - achieved)`, published only when the SIF is not compliant.
+    required_pfd_reduction_factor: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PackedColumnResult(_HasWarnings):
     """Result of ``process.packed_column``."""
 

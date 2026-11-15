@@ -238,6 +238,10 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # capture, and `test_cross_impl` compares them on both results.
         "sil_achieved",
         "verification_passed",
+        # `nog070_sil_determination`'s compliance flag, a boolean with no slot in
+        # `TestCase`. `crates/azoth-process/tests/nog070_sil_determination.rs` asserts it
+        # against the capture, and `test_cross_impl` compares it on both results.
+        "compliant",
         # `fire_water_coverage_assessment`'s two feasibility flags, booleans with no slot in
         # `TestCase`. `crates/azoth-process/tests/fire_water_coverage_assessment.rs` asserts
         # them against the capture, and `test_cross_impl` compares them on both results.

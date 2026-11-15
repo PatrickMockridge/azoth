@@ -45,6 +45,7 @@ use crate::models::lopa::LopaResult;
 use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mixer::MixerResult;
+use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
 use crate::models::packed_column::PackedColumnResult;
 use crate::models::pfp_demand::PfpDemandResult;
 use crate::models::pipe::PipeResult;
@@ -1075,6 +1076,22 @@ impl CalcResult for MixerResult {
         "inlet_pressure_spread",
         "pressure_mismatch",
         "product_h",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for Nog070SilDeterminationResult {
+    const CALC_ID: &'static str = "process.nog070_sil_determination";
+    const FIELDS: &'static [&'static str] = &[
+        "catalogue_minimum_sil",
+        "minimum_sil",
+        "achieved_sil",
+        "compliant",
+        "required_pfd_reduction_factor",
         "warnings",
     ];
 

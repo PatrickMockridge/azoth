@@ -190,6 +190,7 @@ from azoth.core.result import (
     MultiMineralScaleEquilibriumResult,
     NaceIssueRow,
     NitricSulfuricAcidVaporPressureResult,
+    Nog070SilDeterminationResult,
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
     OrificeFlowResult,
@@ -541,6 +542,7 @@ __all__ = [
     "multi_mineral_scale_equilibrium",
     "multiflash_stability_test",
     "nitric_sulfuric_acid_vapor_pressure",
+    "nog070_sil_determination",
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
     "orifice_flow",
@@ -7053,6 +7055,23 @@ def mixer(components: list[str], feed_n: list[Q], feed_z: list[list[float]], fee
         inlet_pressure_spread=from_si(result.inlet_pressure_spread.magnitude_si, result.inlet_pressure_spread.unit),
         pressure_mismatch=result.pressure_mismatch,
         product_h=from_si(result.product_h.magnitude_si, result.product_h.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def nog070_sil_determination(sif_type: str, pfd_average: float, minimum_sil: float | None=None) -> Nog070SilDeterminationResult:
+    """``process.nog070_sil_determination``, computed in Rust."""
+    result = _core.nog070_sil_determination(
+        sif_type,
+        pfd_average,
+        None if minimum_sil is None else minimum_sil,
+    )
+    return Nog070SilDeterminationResult(
+        catalogue_minimum_sil=result.catalogue_minimum_sil,
+        minimum_sil=result.minimum_sil,
+        achieved_sil=result.achieved_sil,
+        compliant=result.compliant,
+        required_pfd_reduction_factor=result.required_pfd_reduction_factor,
         warnings=_warnings(result.warnings),
     )
 

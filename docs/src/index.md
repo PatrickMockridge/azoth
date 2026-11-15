@@ -360,6 +360,7 @@ Five sections, and the difference between them is the point:
 - [`process.manifold`](./process/manifold.md) — Manifold
 - [`process.map_turbo_expander_compressor`](./process/map_turbo_expander_compressor.md) — Map turbo-expander compressor
 - [`process.mixer`](./process/mixer.md) — Mixer
+- [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
 - [`process.packed_column`](./process/packed_column.md) — Packed column
 - [`process.pfp_demand`](./process/pfp_demand.md) — Passive fire protection demand
 - [`process.pipe`](./process/pipe.md) — Pipe

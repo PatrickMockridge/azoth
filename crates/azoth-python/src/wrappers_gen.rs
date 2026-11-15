@@ -6674,6 +6674,27 @@ pub fn mixer(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// NOG 070 SIL determination.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (sif_type, pfd_average, minimum_sil))]
+#[pyo3(text_signature = "(sif_type, pfd_average, minimum_sil)")]
+pub fn nog070_sil_determination(
+    py: Python<'_>,
+    sif_type: &str,
+    pfd_average: f64,
+    minimum_sil: Option<f64>,
+) -> PyResult<crate::transport_gen::PyNog070SilDeterminationResult> {
+    azoth_process::models::nog070_sil_determination::nog070_sil_determination(
+        sif_type,
+        pfd_average,
+        minimum_sil,
+    )
+    .map(|r| crate::transport_gen::PyNog070SilDeterminationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Packed column.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

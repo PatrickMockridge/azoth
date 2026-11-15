@@ -53,6 +53,7 @@ from azoth.core.result import (
     ManifoldResult,
     MapTurboExpanderResult,
     MixerResult,
+    Nog070SilDeterminationResult,
     PackedColumnResult,
     PfpDemandResult,
     PipeResult,
@@ -134,6 +135,7 @@ __all__ = [
     "manifold",
     "map_turbo_expander_compressor",
     "mixer",
+    "nog070_sil_determination",
     "packed_column",
     "pfp_demand",
     "pipe",
@@ -164,6 +166,7 @@ _FIRE_WATER_COVERAGE_ASSESSMENT = "process.fire_water_coverage_assessment"
 _FIRE_WATER_DEMAND = "process.fire_water_demand"
 _MANIFOLD = "process.manifold"
 _MIXER = "process.mixer"
+_NOG070_SIL_DETERMINATION = "process.nog070_sil_determination"
 _PACKED_COLUMN = "process.packed_column"
 _PFP_DEMAND = "process.pfp_demand"
 _RATE_BASED_PACKED_COLUMN = "process.rate_based_packed_column"
@@ -2333,6 +2336,27 @@ def sil_verification(
         claimed_sil=claimed_sil,
         architecture=architecture,
         test_interval_hours=test_interval_hours,
+    )
+
+
+def nog070_sil_determination(
+    sif_type: str,
+    pfd_average: float,
+    minimum_sil: float | None = None,
+) -> Nog070SilDeterminationResult:
+    """A SIF against the NOG 070 catalogue: the catalogue minimum and compliance.
+
+    ``pfdToSil`` reads ``[0.1, 1)`` as SIL 0, where ``process.safety_instrumented_function``'s
+    required-SIL map reads 1: the two are different functions. **``custom`` carries a
+    catalogue minimum of 0**, so an omitted project minimum is compliant by construction.
+    The required PFD reduction factor is published only when the SIF is not compliant.
+
+    See :func:`azoth.process.reference.nog070_sil_determination`.
+    """
+    return resolve(_NOG070_SIL_DETERMINATION)(  # type: ignore[no-any-return]
+        sif_type=sif_type,
+        pfd_average=pfd_average,
+        minimum_sil=minimum_sil,
     )
 
 

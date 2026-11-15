@@ -64,6 +64,7 @@ pub mod lopa;
 pub mod manifold;
 pub mod map_turbo_expander_compressor;
 pub mod mixer;
+pub mod nog070_sil_determination;
 pub mod packed_column;
 pub mod pfp_demand;
 pub mod pipe;
@@ -138,6 +139,9 @@ pub use lopa::{
 pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};
 pub use mixer::{MixerResult, mixer};
+pub use nog070_sil_determination::{
+    Nog070SilDeterminationResult, nog070_sil_determination,
+};
 pub use packed_column::{PackedColumnResult, packed_column};
 pub use pfp_demand::{PfpDemandResult, pfp_demand};
 pub use pipe::{PipeResult, pipe};

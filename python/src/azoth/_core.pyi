@@ -3677,6 +3677,15 @@ class MixerResult:
     warnings: list[Warning]
 
 @final
+class Nog070SilDeterminationResult:
+    catalogue_minimum_sil: float
+    minimum_sil: float
+    achieved_sil: float
+    compliant: bool
+    required_pfd_reduction_factor: float | None
+    warnings: list[Warning]
+
+@final
 class PackedColumnResult:
     tray_temperature: list[Qty]
     tray_pressure: list[Qty]
@@ -7137,6 +7146,11 @@ def mixer(
     feed_t: list[float],
     outlet_pressure: float | None = None,
 ) -> MixerResult: ...
+def nog070_sil_determination(
+    sif_type: str,
+    pfd_average: float,
+    minimum_sil: float | None = None,
+) -> Nog070SilDeterminationResult: ...
 def packed_column(
     components: list[str],
     feed_n: float,

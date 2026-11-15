@@ -256,6 +256,7 @@
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mixer.toml
+//!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
@@ -3775,6 +3776,16 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.mixer", "feed_p", "pressure"),
     ("process.mixer", "feed_t", "thermodynamic_temperature"),
     ("process.mixer", "outlet_pressure", "pressure"),
+    (
+        "process.nog070_sil_determination",
+        "pfd_average",
+        "dimensionless",
+    ),
+    (
+        "process.nog070_sil_determination",
+        "minimum_sil",
+        "dimensionless",
+    ),
     ("process.packed_column", "feed_n", "molar_flow"),
     ("process.packed_column", "feed_z", "dimensionless"),
     ("process.packed_column", "feed_p", "pressure"),

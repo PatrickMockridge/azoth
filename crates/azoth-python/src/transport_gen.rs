@@ -19272,6 +19272,66 @@ impl From<&azoth_process::models::mixer::MixerResult> for PyMixerResult {
         }
     }
 }
+/// Result of `process.nog070_sil_determination`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Nog070SilDeterminationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyNog070SilDeterminationResult {
+    /// the catalogue's minimum SIL for the type.
+    #[pyo3(get)]
+    pub catalogue_minimum_sil: f64,
+    /// the minimum applied: the caller's when stated, otherwise the catalogue's.
+    #[pyo3(get)]
+    pub minimum_sil: f64,
+    /// the SIL the PFD maps to, by the class's `pfdToSil`.
+    #[pyo3(get)]
+    pub achieved_sil: f64,
+    /// whether the achieved SIL is at least the minimum.
+    #[pyo3(get)]
+    pub compliant: bool,
+    /// `10^(minimum - achieved)`, published only when the SIF is not compliant.
+    #[pyo3(get)]
+    pub required_pfd_reduction_factor: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyNog070SilDeterminationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Nog070SilDeterminationResult(catalogue_minimum_sil={:?}, minimum_sil={:?}, achieved_sil={:?}, compliant={:?}, required_pfd_reduction_factor={:?}, {} warning(s))",
+            self.catalogue_minimum_sil,
+            self.minimum_sil,
+            self.achieved_sil,
+            self.compliant,
+            self.required_pfd_reduction_factor,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::nog070_sil_determination::Nog070SilDeterminationResult>
+    for PyNog070SilDeterminationResult
+{
+    fn from(
+        r: &azoth_process::models::nog070_sil_determination::Nog070SilDeterminationResult,
+    ) -> Self {
+        Self {
+            catalogue_minimum_sil: r.catalogue_minimum_sil,
+            minimum_sil: r.minimum_sil,
+            achieved_sil: r.achieved_sil,
+            compliant: r.compliant,
+            required_pfd_reduction_factor: r.required_pfd_reduction_factor,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.packed_column`, transported.
 #[pyclass(
     frozen,

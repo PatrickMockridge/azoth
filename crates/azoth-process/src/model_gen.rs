@@ -35,6 +35,7 @@
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mixer.toml
+//!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
@@ -46389,6 +46390,181 @@ pub static MIXER_SPEC: ModelSpec = ModelSpec {
     cases: MIXER_CASES,
 };
 
+static NOG070_SIL_DETERMINATION_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "pfd_average",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: Some(1.0),
+            max_inclusive: false,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a PFD outside (0, 1)",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "minimum_sil",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(4.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a minimum outside [0, 4]",
+        },
+    },
+];
+
+static NOG070_SIL_DETERMINATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "n070_hipps_compliant",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pfd_average", 0.0001)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_type", "hipps_pipeline")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("catalogue_minimum_sil", 3.0),
+            ("minimum_sil", 3.0),
+            ("achieved_sil", 3.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "n070_hipps_noncompliant",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pfd_average", 0.005)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_type", "hipps_pipeline")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("catalogue_minimum_sil", 3.0),
+            ("minimum_sil", 3.0),
+            ("achieved_sil", 2.0),
+            ("required_pfd_reduction_factor", 10.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "n070_custom_minimum",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pfd_average", 0.005), ("minimum_sil", 3.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_type", "custom")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("catalogue_minimum_sil", 0.0),
+            ("minimum_sil", 3.0),
+            ("achieved_sil", 2.0),
+            ("required_pfd_reduction_factor", 10.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "n070_custom_no_minimum",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pfd_average", 0.005)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_type", "custom")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("catalogue_minimum_sil", 0.0),
+            ("minimum_sil", 0.0),
+            ("achieved_sil", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "n070_sil_zero_band",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pfd_average", 0.2)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_type", "psd_high_vibration")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("catalogue_minimum_sil", 1.0),
+            ("minimum_sil", 1.0),
+            ("achieved_sil", 0.0),
+            ("required_pfd_reduction_factor", 10.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static NOG070_SIL_DETERMINATION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "closed_form_nog070_sil_determination",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.nog070_sil_determination`.
+pub static NOG070_SIL_DETERMINATION_SPEC: ModelSpec = ModelSpec {
+    id: "process.nog070_sil_determination",
+    kind: "procedure",
+    algorithm: Some(&NOG070_SIL_DETERMINATION_ALGORITHM),
+    checks: NOG070_SIL_DETERMINATION_CHECKS,
+    cases: NOG070_SIL_DETERMINATION_CASES,
+};
+
 static PACKED_COLUMN_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -60888,6 +61064,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &MANIFOLD_SPEC,
     &MAP_TURBO_EXPANDER_COMPRESSOR_SPEC,
     &MIXER_SPEC,
+    &NOG070_SIL_DETERMINATION_SPEC,
     &PACKED_COLUMN_SPEC,
     &PFP_DEMAND_SPEC,
     &PIPE_SPEC,

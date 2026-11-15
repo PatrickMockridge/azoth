@@ -2257,6 +2257,28 @@ def _sil_verification(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _nog070_sil_determination(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.nog070_sil_determination`'s layers, from the reference's arithmetic."""
+    from azoth.process.reference.nog070_sil_determination import (
+        nog070_sil_determination as evaluate,
+    )
+
+    minimum = inputs.get("minimum_sil")
+    result = evaluate(
+        str(inputs["sif_type"]),
+        float(inputs["pfd_average"]),
+        None if minimum is None else float(minimum),
+    )
+    layers = {
+        "catalogue_minimum_sil": result.catalogue_minimum_sil,
+        "minimum_sil": result.minimum_sil,
+        "achieved_sil": result.achieved_sil,
+    }
+    if result.required_pfd_reduction_factor is not None:
+        layers["required_pfd_reduction_factor"] = result.required_pfd_reduction_factor
+    return layers
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2278,6 +2300,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.safety_instrumented_function": _safety_instrumented_function,
     "process.lopa": _lopa,
     "process.sil_verification": _sil_verification,
+    "process.nog070_sil_determination": _nog070_sil_determination,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3462,6 +3485,43 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_sil_verification.tsv",
         block=4,
         identified_by=("#label", "sv_unknown_architecture"),
+    ),
+    # The NOG 070's five caseable states. The eight blocks after them (the PFD boundary
+    # sweep, the full catalogue and the six guards) are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.nog070_sil_determination",
+        case="n070_hipps_compliant",
+        capture="process_nog070_sil_determination.tsv",
+        block=0,
+        identified_by=("#label", "n070_hipps_compliant"),
+    ),
+    LayerCase(
+        model="process.nog070_sil_determination",
+        case="n070_hipps_noncompliant",
+        capture="process_nog070_sil_determination.tsv",
+        block=1,
+        identified_by=("#label", "n070_hipps_noncompliant"),
+    ),
+    LayerCase(
+        model="process.nog070_sil_determination",
+        case="n070_custom_minimum",
+        capture="process_nog070_sil_determination.tsv",
+        block=2,
+        identified_by=("#label", "n070_custom_minimum"),
+    ),
+    LayerCase(
+        model="process.nog070_sil_determination",
+        case="n070_custom_no_minimum",
+        capture="process_nog070_sil_determination.tsv",
+        block=3,
+        identified_by=("#label", "n070_custom_no_minimum"),
+    ),
+    LayerCase(
+        model="process.nog070_sil_determination",
+        case="n070_sil_zero_band",
+        capture="process_nog070_sil_determination.tsv",
+        block=4,
+        identified_by=("#label", "n070_sil_zero_band"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4712,6 +4772,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The SIL verification's six: 1oo3, the `4oo2` substring, a ten-year proof interval,
     # exactly five years, a NaN PFD and a negative PFD.
     "process_sil_verification.tsv": 6,
+    # The NOG 070's eight: the PFD-to-SIL boundary sweep, the full 18-row catalogue and
+    # the six guards (a zero PFD, one, above one, a NaN, and two minimum-SIL bounds).
+    "process_nog070_sil_determination.tsv": 8,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,
