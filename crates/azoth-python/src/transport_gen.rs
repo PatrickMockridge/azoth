@@ -20156,6 +20156,98 @@ impl From<&azoth_process::models::probit::ProbitResult> for PyProbitResult {
         }
     }
 }
+/// Result of `process.psv_fire_sizing`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PsvFireSizingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPsvFireSizingResult {
+    /// the class's fire overpressure fraction, 0.21.
+    #[pyo3(get)]
+    pub overpressure_fraction: f64,
+    /// the required orifice area.
+    #[pyo3(get)]
+    pub required_area: PyQty,
+    /// the required area in in2.
+    #[pyo3(get)]
+    pub required_area_in2: f64,
+    /// the first ladder letter whose area meets the requirement, or `T` when the requirement exceeds 26 in2.
+    #[pyo3(get)]
+    pub recommended_orifice: String,
+    /// the selected ladder area in in2.
+    #[pyo3(get)]
+    pub selected_area_in2: f64,
+    /// `101325 / (set_pressure 1.21)`.
+    #[pyo3(get)]
+    pub back_pressure_fraction: f64,
+    /// the gas `Kd`, 0.975.
+    #[pyo3(get)]
+    pub discharge_coefficient: f64,
+    /// the gas `Kb` for a conventional PSV at the atmospheric back pressure.
+    #[pyo3(get)]
+    pub back_pressure_correction: f64,
+    /// the gas `Kc`, 1.0 with no rupture disk.
+    #[pyo3(get)]
+    pub combination_correction: f64,
+    /// `set_pressure (1 - blowdown_percent / 100)`, when the percentage is stated.
+    #[pyo3(get)]
+    pub blowdown_pressure: Option<PyQty>,
+    /// `24.6 cv_discharge_coefficient A_in2`, when the area and coefficient are stated.
+    #[pyo3(get)]
+    pub flow_coefficient: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPsvFireSizingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PsvFireSizingResult(overpressure_fraction={:?}, required_area={:?}, required_area_in2={:?}, recommended_orifice={:?}, selected_area_in2={:?}, back_pressure_fraction={:?}, discharge_coefficient={:?}, back_pressure_correction={:?}, combination_correction={:?}, blowdown_pressure={:?}, flow_coefficient={:?}, {} warning(s))",
+            self.overpressure_fraction,
+            self.required_area,
+            self.required_area_in2,
+            self.recommended_orifice,
+            self.selected_area_in2,
+            self.back_pressure_fraction,
+            self.discharge_coefficient,
+            self.back_pressure_correction,
+            self.combination_correction,
+            self.blowdown_pressure,
+            self.flow_coefficient,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::psv_fire_sizing::PsvFireSizingResult> for PyPsvFireSizingResult {
+    fn from(r: &azoth_process::models::psv_fire_sizing::PsvFireSizingResult) -> Self {
+        Self {
+            overpressure_fraction: r.overpressure_fraction,
+            required_area: PyQty {
+                magnitude_si: r.required_area.value,
+                unit: "m**2".to_string(),
+            },
+            required_area_in2: r.required_area_in2,
+            recommended_orifice: r.recommended_orifice.clone(),
+            selected_area_in2: r.selected_area_in2,
+            back_pressure_fraction: r.back_pressure_fraction,
+            discharge_coefficient: r.discharge_coefficient,
+            back_pressure_correction: r.back_pressure_correction,
+            combination_correction: r.combination_correction,
+            blowdown_pressure: r.blowdown_pressure.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            flow_coefficient: r.flow_coefficient,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.psv_sizing`, transported.
 #[pyclass(
     frozen,

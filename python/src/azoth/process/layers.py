@@ -2376,6 +2376,52 @@ def _psv_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _psv_fire_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.psv_fire_sizing`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.psv_fire_sizing import psv_fire_sizing as evaluate
+
+    result = evaluate(
+        quantity(float(inputs["initial_mass"]), "kg"),
+        quantity(float(inputs["initial_pressure"]), "Pa"),
+        quantity(float(inputs["set_pressure"]), "Pa"),
+        quantity(float(inputs["initial_temperature"]), "K"),
+        quantity(float(inputs["fire_heat_input"]), "W"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["molar_mass"]), "kg/mol"),
+        float(inputs["specific_heat_ratio"]),
+        float(inputs["compressibility"]),
+        quantity(float(inputs["heat_capacity"]), "J/(kg*K)"),
+        quantity(float(inputs["blowdown_time"]), "s"),
+        None if inputs.get("blowdown_percent") is None else float(inputs["blowdown_percent"]),
+        (
+            None
+            if inputs.get("orifice_area") is None
+            else quantity(float(inputs["orifice_area"]), "m**2")
+        ),
+        (
+            None
+            if inputs.get("cv_discharge_coefficient") is None
+            else float(inputs["cv_discharge_coefficient"])
+        ),
+    )
+    layers: dict[str, float] = {
+        "overpressure_fraction": result.overpressure_fraction,
+        "required_area": result.required_area.to("m**2").magnitude,
+        "required_area_in2": result.required_area_in2,
+        "selected_area_in2": result.selected_area_in2,
+        "back_pressure_fraction": result.back_pressure_fraction,
+        "discharge_coefficient": result.discharge_coefficient,
+        "back_pressure_correction": result.back_pressure_correction,
+        "combination_correction": result.combination_correction,
+    }
+    if result.blowdown_pressure is not None:
+        layers["blowdown_pressure"] = result.blowdown_pressure.to("Pa").magnitude
+    if result.flow_coefficient is not None:
+        layers["flow_coefficient"] = result.flow_coefficient
+    return layers
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2399,6 +2445,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.sil_verification": _sil_verification,
     "process.nog070_sil_determination": _nog070_sil_determination,
     "process.risk_matrix": _risk_matrix,
+    "process.psv_fire_sizing": _psv_fire_sizing,
     "process.psv_sizing": _psv_sizing,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
@@ -3752,6 +3799,29 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=14,
         identified_by=("#label", "ps_two_phase_omega_low"),
     ),
+    # The fire sizing's three cased blocks; the two dead-input rows and the zero-blowdown
+    # state the class accepts sit outside the cases.
+    LayerCase(
+        model="process.psv_fire_sizing",
+        case="pf_peak_dominated",
+        capture="process_psv_fire_sizing.tsv",
+        block=0,
+        identified_by=("#label", "pf_peak_dominated"),
+    ),
+    LayerCase(
+        model="process.psv_fire_sizing",
+        case="pf_average_dominated",
+        capture="process_psv_fire_sizing.tsv",
+        block=1,
+        identified_by=("#label", "pf_average_dominated"),
+    ),
+    LayerCase(
+        model="process.psv_fire_sizing",
+        case="pf_helpers",
+        capture="process_psv_fire_sizing.tsv",
+        block=2,
+        identified_by=("#label", "pf_helpers"),
+    ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
     # the 1 MPa target and the zero target are uncased.
@@ -5011,6 +5081,9 @@ UNCASED_ROWS: dict[str, int] = {
     # two-phase branches, a zero mass flow and a zero liquid volume the class refuses, and
     # the exponent of one and zero liquid density it accepts.
     "process_psv_sizing.tsv": 6,
+    # The fire sizing's three: two rows differing only in the dead initial pressure and
+    # volume, and the zero blowdown time the class accepts as an infinite average flow.
+    "process_psv_fire_sizing.tsv": 3,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

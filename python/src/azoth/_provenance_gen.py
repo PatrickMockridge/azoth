@@ -2897,6 +2897,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 9,
         "tests_skipped": 0,
     },
+    'process.psv_fire_sizing': {
+        "calc_id": 'process.psv_fire_sizing',
+        "name": 'PSV fire sizing',
+        "spec": {'path': 'specs/models/process/psv_fire_sizing.toml', 'sha256': '2d38b1efd9fad75b3b0f0e88d2f36f90221e18f5c774f1504c5675336efd247c'},
+        "code": [{'path': 'python/src/azoth/process/reference/psv_fire_sizing.py', 'sha256': '337e19fb2234981c04d1d4b6bbfcb5abab1c2c0d66c52e05a73f77da8a52125e'}, {'path': 'crates/azoth-process/src/models/psv_fire_sizing.rs', 'sha256': '00603eb8121ee720fd836e5dc58b49f2eb5154324756bb0a9612115a64a916f8'}],
+        "source": 'NeqSim process/util/fire/ReliefValveSizing.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 3,
+        "tests_skipped": 0,
+    },
     'process.psv_sizing': {
         "calc_id": 'process.psv_sizing',
         "name": 'PSV sizing',

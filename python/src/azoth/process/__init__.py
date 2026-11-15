@@ -60,6 +60,7 @@ from azoth.core.result import (
     PlugFlowReactorResult,
     PoolFireResult,
     ProbitResult,
+    PsvFireSizingResult,
     PsvSizingResult,
     PumpResult,
     RateBasedPackedColumnResult,
@@ -144,6 +145,7 @@ __all__ = [
     "plug_flow_reactor",
     "pool_fire",
     "probit",
+    "psv_fire_sizing",
     "psv_sizing",
     "pump",
     "rate_based_packed_column",
@@ -206,6 +208,7 @@ _LOPA = "process.lopa"
 _GAS_DISPERSION = "process.gas_dispersion"
 _GAUSSIAN_PLUME = "process.gaussian_plume"
 _PROBIT = "process.probit"
+_PSV_FIRE_SIZING = "process.psv_fire_sizing"
 _PSV_SIZING = "process.psv_sizing"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
@@ -2837,6 +2840,44 @@ def probit(
         n=n,
         dose=dose,
         probit_value=probit_value,
+    )
+
+
+def psv_fire_sizing(
+    initial_mass: Q,
+    initial_pressure: Q,
+    set_pressure: Q,
+    initial_temperature: Q,
+    fire_heat_input: Q,
+    vessel_volume: Q,
+    molar_mass: Q,
+    specific_heat_ratio: float,
+    compressibility: float,
+    heat_capacity: Q,
+    blowdown_time: Q,
+    blowdown_percent: float | None = None,
+    orifice_area: Q | None = None,
+    cv_discharge_coefficient: float | None = None,
+) -> PsvFireSizingResult:
+    """The API 521 dynamic fire-case area, blowdown pressure, Cv and next orifice.
+
+    See :func:`azoth.process.reference.psv_fire_sizing`.
+    """
+    return resolve(_PSV_FIRE_SIZING)(  # type: ignore[no-any-return]
+        initial_mass=initial_mass,
+        initial_pressure=initial_pressure,
+        set_pressure=set_pressure,
+        initial_temperature=initial_temperature,
+        fire_heat_input=fire_heat_input,
+        vessel_volume=vessel_volume,
+        molar_mass=molar_mass,
+        specific_heat_ratio=specific_heat_ratio,
+        compressibility=compressibility,
+        heat_capacity=heat_capacity,
+        blowdown_time=blowdown_time,
+        blowdown_percent=blowdown_percent,
+        orifice_area=orifice_area,
+        cv_discharge_coefficient=cv_discharge_coefficient,
     )
 
 

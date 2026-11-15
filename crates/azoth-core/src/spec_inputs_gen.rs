@@ -263,6 +263,7 @@
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/probit.toml
+//!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/rate_based_packed_column.toml
@@ -4060,6 +4061,44 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.probit", "n", "dimensionless"),
     ("process.probit", "dose", "dimensionless"),
     ("process.probit", "probit_value", "dimensionless"),
+    ("process.psv_fire_sizing", "initial_mass", "mass"),
+    ("process.psv_fire_sizing", "initial_pressure", "pressure"),
+    ("process.psv_fire_sizing", "set_pressure", "pressure"),
+    (
+        "process.psv_fire_sizing",
+        "initial_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.psv_fire_sizing", "fire_heat_input", "power"),
+    ("process.psv_fire_sizing", "vessel_volume", "volume"),
+    ("process.psv_fire_sizing", "molar_mass", "molar_mass"),
+    (
+        "process.psv_fire_sizing",
+        "specific_heat_ratio",
+        "dimensionless",
+    ),
+    (
+        "process.psv_fire_sizing",
+        "compressibility",
+        "dimensionless",
+    ),
+    (
+        "process.psv_fire_sizing",
+        "heat_capacity",
+        "specific_heat_capacity",
+    ),
+    ("process.psv_fire_sizing", "blowdown_time", "time"),
+    (
+        "process.psv_fire_sizing",
+        "blowdown_percent",
+        "dimensionless",
+    ),
+    ("process.psv_fire_sizing", "orifice_area", "area"),
+    (
+        "process.psv_fire_sizing",
+        "cv_discharge_coefficient",
+        "dimensionless",
+    ),
     ("process.psv_sizing", "set_pressure", "pressure"),
     (
         "process.psv_sizing",

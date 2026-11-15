@@ -1,0 +1,202 @@
+id = "process.psv_fire_sizing"
+name = "PSV fire sizing"
+kind = "procedure"
+assumptions = [
+    "**the design flow is `max(peak, average)`**: `peak = fire_heat_input / (heat_capacity 50)` from the class's 50 K superheat, and `average = initial_mass / blowdown_time` to empty the inventory in the blowdown time.",
+    "**the relieving temperature is `initial_temperature + fire_heat_input 60 / (initial_mass heat_capacity)`**, the class's one-minute heat-up.",
+    "**the area is the gas branch at 21 % overpressure**, conventional PSV, no rupture disk and atmospheric back pressure 101325 Pa; the class's own `relievingPressure` is computed and read by no formula.",
+    "**`initial_pressure` and `vessel_volume` are read by no formula**: two states differing only in them answer the same area, which the capture pins.",
+    "**the blowdown pressure is `set_pressure (1 - blowdown_percent / 100)`**, and the flow coefficient is `24.6 cv_discharge_coefficient A_in2`.",
+    "**`getNextLargerOrifice` is a ladder lookup and is not carried**: the ladder is published by `process.psv_sizing`, and a misspelling and an exhausted ladder are indistinguishable in the class's answer.",
+    "**`validateSizing` is a message builder**: its four clauses are visible in the published corrections and areas, and the concatenated string is not carried.",
+]
+references = [
+    "API STD 521 (7th edition, 2020). Pressure-relieving and depressuring systems, the fire case.",
+    "API STD 520, Part I (9th edition, 2014). Sizing, selection and installation of pressure-relieving devices.",
+    "TR3001. Overpressure protection and the 21 % fire basis.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/util/fire/ReliefValveSizing.java` is the port source.",
+    "`validation/neqsim/captures/process_psv_fire_sizing.tsv` - the peak- and average-dominated states, the blowdown/Cv/orifice helpers, the two dead inputs and the zero-blowdown state the class accepts.",
+]
+[source]
+standard = "NeqSim process/util/fire/ReliefValveSizing.java"
+edition = "Its `dynamicFireSizing`, `calculateBlowdownPressure`, `calculateCv`, `getNextLargerOrifice` and the `calculateRequiredArea` call it makes."
+[algorithm]
+scheme = "closed_form_psv_fire_sizing"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.initial_mass]
+unit = "kg"
+description = "the vessel's initial fluid inventory, above zero.\n"
+[inputs.initial_pressure]
+unit = "Pa"
+description = "the initial pressure, absolute. **Read by no formula**, the class's dead parameter; retained because the class method takes it.\n"
+[inputs.set_pressure]
+unit = "Pa"
+description = "the PSV set pressure, absolute, above zero.\n"
+[inputs.initial_temperature]
+unit = "K"
+description = "the initial temperature, above zero.\n"
+[inputs.fire_heat_input]
+unit = "W"
+description = "the fire heat input, at least zero.\n"
+[inputs.vessel_volume]
+unit = "m**3"
+description = "the vessel volume. **Read by no formula**, the class's dead parameter; retained because the class method takes it.\n"
+[inputs.molar_mass]
+unit = "kg/mol"
+description = "the relieving gas's molar mass, above zero.\n"
+[inputs.specific_heat_ratio]
+unit = "dimensionless"
+description = "the gas specific-heat ratio Cp/Cv, above one.\n"
+[inputs.compressibility]
+unit = "dimensionless"
+description = "the gas compressibility factor Z, above zero.\n"
+[inputs.heat_capacity]
+unit = "J/(kg*K)"
+description = "the gas heat capacity at the relieving conditions, above zero.\n"
+[inputs.blowdown_time]
+unit = "s"
+description = "the target blowdown time, above zero; typically 900 s per API 521.\n"
+[inputs.blowdown_percent]
+unit = "dimensionless"
+optional = true
+description = "the blowdown percentage for the reseat pressure, in `[0, 100]`. Absent omits `blowdown_pressure`.\n"
+[inputs.orifice_area]
+unit = "m**2"
+optional = true
+description = "an orifice area to convert to a flow coefficient, above zero. Requires `cv_discharge_coefficient`.\n"
+[inputs.cv_discharge_coefficient]
+unit = "dimensionless"
+optional = true
+description = "the discharge coefficient the Cv relation is called with, above zero. Requires `orifice_area`.\n"
+[outputs]
+[outputs.overpressure_fraction]
+unit = "dimensionless"
+description = "the class's fire overpressure fraction, 0.21.\n"
+[outputs.required_area]
+unit = "m**2"
+description = "the required orifice area.\n"
+[outputs.required_area_in2]
+unit = "dimensionless"
+description = "the required area in in2.\n"
+[outputs.recommended_orifice]
+type = "string"
+description = "the first ladder letter whose area meets the requirement, or `T` when the requirement exceeds 26 in2.\n"
+[outputs.selected_area_in2]
+unit = "dimensionless"
+description = "the selected ladder area in in2.\n"
+[outputs.back_pressure_fraction]
+unit = "dimensionless"
+description = "`101325 / (set_pressure 1.21)`.\n"
+[outputs.discharge_coefficient]
+unit = "dimensionless"
+description = "the gas `Kd`, 0.975.\n"
+[outputs.back_pressure_correction]
+unit = "dimensionless"
+description = "the gas `Kb` for a conventional PSV at the atmospheric back pressure.\n"
+[outputs.combination_correction]
+unit = "dimensionless"
+description = "the gas `Kc`, 1.0 with no rupture disk.\n"
+[outputs.blowdown_pressure]
+unit = "Pa"
+optional = true
+description = "`set_pressure (1 - blowdown_percent / 100)`, when the percentage is stated.\n"
+[outputs.flow_coefficient]
+unit = "dimensionless"
+optional = true
+description = "`24.6 cv_discharge_coefficient A_in2`, when the area and coefficient are stated.\n"
+[[valid_range]]
+quantity = "initial_mass"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the average flow divides by the inventory"
+[[valid_range]]
+quantity = "initial_pressure"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "an absolute pressure is not negative, though no formula reads it"
+[[valid_range]]
+quantity = "set_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the gas sizing refuses a non-positive set pressure"
+[[valid_range]]
+quantity = "initial_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the gas sizing refuses a non-positive temperature"
+[[valid_range]]
+quantity = "fire_heat_input"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative fire is not a fire"
+[[valid_range]]
+quantity = "vessel_volume"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a volume is not negative, though no formula reads it"
+[[valid_range]]
+quantity = "molar_mass"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the gas sizing refuses a non-positive molar mass"
+[[valid_range]]
+quantity = "specific_heat_ratio"
+min = 1
+min_inclusive = false
+severity = "error"
+rationale = "the isentropic exponents divide by k - 1"
+[[valid_range]]
+quantity = "compressibility"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a zero or negative Z makes the gas flux non-finite"
+[[valid_range]]
+quantity = "heat_capacity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the peak and average flows divide by it"
+[[valid_range]]
+quantity = "blowdown_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the average flow divides by it"
+[[valid_range]]
+quantity = "blowdown_percent"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative blowdown raises the reseat pressure above the set pressure"
+[[valid_range]]
+quantity = "blowdown_percent"
+max = 100
+max_inclusive = true
+severity = "error"
+rationale = "a blowdown above 100 % answers a negative reseat pressure"
+[[valid_range]]
+quantity = "orifice_area"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the Cv relation multiplies the area"
+[[valid_range]]
+quantity = "cv_discharge_coefficient"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the Cv relation multiplies the coefficient"
+[implementations]
+python = "azoth.process.psv_fire_sizing"
+rust = "azoth_process::psv_fire_sizing"

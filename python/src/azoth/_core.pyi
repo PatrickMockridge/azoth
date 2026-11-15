@@ -3821,6 +3821,21 @@ class ProbitResult:
     warnings: list[Warning]
 
 @final
+class PsvFireSizingResult:
+    overpressure_fraction: float
+    required_area: Qty
+    required_area_in2: float
+    recommended_orifice: str
+    selected_area_in2: float
+    back_pressure_fraction: float
+    discharge_coefficient: float
+    back_pressure_correction: float
+    combination_correction: float
+    blowdown_pressure: Qty | None
+    flow_coefficient: float | None
+    warnings: list[Warning]
+
+@final
 class PsvSizingResult:
     relieving_pressure: Qty
     back_pressure_fraction: float
@@ -7322,6 +7337,22 @@ def probit(
     dose: float | None = None,
     probit_value: float | None = None,
 ) -> ProbitResult: ...
+def psv_fire_sizing(
+    initial_mass: float,
+    initial_pressure: float,
+    set_pressure: float,
+    initial_temperature: float,
+    fire_heat_input: float,
+    vessel_volume: float,
+    molar_mass: float,
+    specific_heat_ratio: float,
+    compressibility: float,
+    heat_capacity: float,
+    blowdown_time: float,
+    blowdown_percent: float | None = None,
+    orifice_area: float | None = None,
+    cv_discharge_coefficient: float | None = None,
+) -> PsvFireSizingResult: ...
 def psv_sizing(
     service: str,
     set_pressure: float,

@@ -8097,6 +8097,49 @@ class ProbitResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PsvFireSizingResult(_HasWarnings):
+    """Result of ``process.psv_fire_sizing``."""
+
+    CALC_ID: ClassVar[str] = "process.psv_fire_sizing"
+
+    #: the class's fire overpressure fraction, 0.21.
+    overpressure_fraction: float
+
+    #: the required orifice area.
+    required_area: Q
+
+    #: the required area in in2.
+    required_area_in2: float
+
+    #: the first ladder letter whose area meets the requirement, or `T` when the requirement exceeds 26 in2.
+    recommended_orifice: str
+
+    #: the selected ladder area in in2.
+    selected_area_in2: float
+
+    #: `101325 / (set_pressure 1.21)`.
+    back_pressure_fraction: float
+
+    #: the gas `Kd`, 0.975.
+    discharge_coefficient: float
+
+    #: the gas `Kb` for a conventional PSV at the atmospheric back pressure.
+    back_pressure_correction: float
+
+    #: the gas `Kc`, 1.0 with no rupture disk.
+    combination_correction: float
+
+    #: `set_pressure (1 - blowdown_percent / 100)`, when the percentage is stated.
+    blowdown_pressure: Q | None
+
+    #: `24.6 cv_discharge_coefficient A_in2`, when the area and coefficient are stated.
+    flow_coefficient: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PsvSizingResult(_HasWarnings):
     """Result of ``process.psv_sizing``."""
 

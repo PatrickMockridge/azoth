@@ -231,6 +231,7 @@ from azoth.core.result import (
     PrsvKappaResult,
     PrZFactorResult,
     PsFlashResult,
+    PsvFireSizingResult,
     PsvSizingResult,
     PtFlashResult,
     PtPhaseEnvelopeResult,
@@ -587,6 +588,7 @@ __all__ = [
     "production_chemical_scale_scenario",
     "prsv_kappa",
     "ps_flash",
+    "psv_fire_sizing",
     "psv_sizing",
     "pt_flash",
     "pt_phase_envelope",
@@ -7328,6 +7330,41 @@ def probit(a: float, b: float, n: float, dose: Q | None=None, probit_value: Q | 
     return ProbitResult(
         probit=result.probit,
         probability=result.probability,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def psv_fire_sizing(initial_mass: Q, initial_pressure: Q, set_pressure: Q, initial_temperature: Q, fire_heat_input: Q, vessel_volume: Q, molar_mass: Q, specific_heat_ratio: float, compressibility: float, heat_capacity: Q, blowdown_time: Q, blowdown_percent: float | None=None, orifice_area: Q | None=None, cv_discharge_coefficient: float | None=None) -> PsvFireSizingResult:
+    """``process.psv_fire_sizing``, computed in Rust."""
+    spec = _models_gen.model("process.psv_fire_sizing")
+    result = _core.psv_fire_sizing(
+        input_to_si(spec, "initial_mass", initial_mass),
+        input_to_si(spec, "initial_pressure", initial_pressure),
+        input_to_si(spec, "set_pressure", set_pressure),
+        input_to_si(spec, "initial_temperature", initial_temperature),
+        input_to_si(spec, "fire_heat_input", fire_heat_input),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "molar_mass", molar_mass),
+        specific_heat_ratio,
+        compressibility,
+        input_to_si(spec, "heat_capacity", heat_capacity),
+        input_to_si(spec, "blowdown_time", blowdown_time),
+        None if blowdown_percent is None else blowdown_percent,
+        None if orifice_area is None else input_to_si(spec, "orifice_area", orifice_area),
+        None if cv_discharge_coefficient is None else cv_discharge_coefficient,
+    )
+    return PsvFireSizingResult(
+        overpressure_fraction=result.overpressure_fraction,
+        required_area=from_si(result.required_area.magnitude_si, result.required_area.unit),
+        required_area_in2=result.required_area_in2,
+        recommended_orifice=result.recommended_orifice,
+        selected_area_in2=result.selected_area_in2,
+        back_pressure_fraction=result.back_pressure_fraction,
+        discharge_coefficient=result.discharge_coefficient,
+        back_pressure_correction=result.back_pressure_correction,
+        combination_correction=result.combination_correction,
+        blowdown_pressure=None if result.blowdown_pressure is None else from_si(result.blowdown_pressure.magnitude_si, result.blowdown_pressure.unit),
+        flow_coefficient=result.flow_coefficient,
         warnings=_warnings(result.warnings),
     )
 

@@ -456,6 +456,7 @@ NON_UNIT_MODELS = {
     "process.jet_fire": "the jet-fire radiation over scalars, not a unit",
     "process.pool_fire": "the pool-fire radiation over scalars, not a unit",
     "process.probit": "a dose-response over scalars, not a unit",
+    "process.psv_fire_sizing": "the API 521 fire-case sizing over scalars, not a unit",
     "process.psv_sizing": "the API 520 relief-orifice arithmetic over scalars, not a unit",
     "process.vce": "the explosion overpressure over scalars, not a unit",
 }

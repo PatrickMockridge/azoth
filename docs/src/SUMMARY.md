@@ -275,6 +275,7 @@
   - [Plug-flow reactor](./process/plug_flow_reactor.md)
   - [Pool fire radiation](./process/pool_fire.md)
   - [Probit dose-response](./process/probit.md)
+  - [PSV fire sizing](./process/psv_fire_sizing.md)
   - [PSV sizing](./process/psv_sizing.md)
   - [Pump](./process/pump.md)
   - [Rate-based packed column](./process/rate_based_packed_column.md)

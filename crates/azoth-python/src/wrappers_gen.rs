@@ -6887,6 +6887,52 @@ pub fn probit(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// PSV fire sizing.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (initial_mass, initial_pressure, set_pressure, initial_temperature, fire_heat_input, vessel_volume, molar_mass, specific_heat_ratio, compressibility, heat_capacity, blowdown_time, blowdown_percent, orifice_area, cv_discharge_coefficient))]
+#[pyo3(
+    text_signature = "(initial_mass, initial_pressure, set_pressure, initial_temperature, fire_heat_input, vessel_volume, molar_mass, specific_heat_ratio, compressibility, heat_capacity, blowdown_time, blowdown_percent, orifice_area, cv_discharge_coefficient)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn psv_fire_sizing(
+    py: Python<'_>,
+    initial_mass: f64,
+    initial_pressure: f64,
+    set_pressure: f64,
+    initial_temperature: f64,
+    fire_heat_input: f64,
+    vessel_volume: f64,
+    molar_mass: f64,
+    specific_heat_ratio: f64,
+    compressibility: f64,
+    heat_capacity: f64,
+    blowdown_time: f64,
+    blowdown_percent: Option<f64>,
+    orifice_area: Option<f64>,
+    cv_discharge_coefficient: Option<f64>,
+) -> PyResult<crate::transport_gen::PyPsvFireSizingResult> {
+    azoth_process::models::psv_fire_sizing::psv_fire_sizing(
+        kilograms(initial_mass),
+        pascals(initial_pressure),
+        pascals(set_pressure),
+        kelvins(initial_temperature),
+        watts(fire_heat_input),
+        cubic_meters(vessel_volume),
+        kilograms_per_mole(molar_mass),
+        specific_heat_ratio,
+        compressibility,
+        joules_per_kilogram_kelvin(heat_capacity),
+        seconds(blowdown_time),
+        blowdown_percent,
+        orifice_area.map(square_meters),
+        cv_discharge_coefficient,
+    )
+    .map(|r| crate::transport_gen::PyPsvFireSizingResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// PSV sizing.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
