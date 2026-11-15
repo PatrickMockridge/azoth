@@ -2642,12 +2642,98 @@ def _tr3001_compliance(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _blowdown_pressure_profile(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.blowdown_pressure_profile`'s two pressures, through the reference."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.blowdown_pressure_profile import _evaluate
+
+    points = [
+        {
+            "time": quantity(float(row["time"]), "s"),
+            "pressure": quantity(float(row["pressure"]), "bar"),
+        }
+        for row in inputs["points"]
+    ]
+    offset = inputs.get("gauge_offset")
+    solution, _ = _evaluate(
+        points,
+        quantity(float(inputs["time"]), "s"),
+        inputs.get("interpolation_mode"),
+        None if offset is None else quantity(float(offset), "bar"),
+    )
+    return {
+        "pressure_absolute_bara": solution.pressure_absolute / 1.0e5,
+        "pressure_gauge_barg": solution.pressure_gauge / 1.0e5,
+    }
+
+
+def _pipe_fire_rupture_material(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.pipe_fire_rupture_material`'s curves, through the reference."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.pipe_fire_rupture_material import _evaluate
+
+    curve = inputs.get("curve")
+    points = None
+    if curve is not None:
+        points = [
+            {
+                "temperature": quantity(float(row["temperature"]), "K"),
+                "heat_capacity": quantity(float(row["heat_capacity"]), "J/(kg*K)"),
+                "thermal_conductivity": quantity(
+                    float(row["thermal_conductivity"]), "W/(m*K)"
+                ),
+                "ultimate_tensile_strength": quantity(
+                    float(row["ultimate_tensile_strength"]), "MPa"
+                ),
+                "strain_effect_factor": float(row["strain_effect_factor"]),
+                "rupture_strain_limit": float(row["rupture_strain_limit"]),
+            }
+            for row in curve
+        ]
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        str(inputs["material_name"]),
+        quantity(float(inputs["evaluation_temperature"]), "K"),
+        quantity(float(inputs["evaluation_stress"]), "MPa"),
+        points,
+        optional("density", "kg/m**3"),
+        None
+        if inputs.get("sellars_tegart_a") is None
+        else float(inputs["sellars_tegart_a"]),
+        None
+        if inputs.get("sellars_tegart_alpha") is None
+        else float(inputs["sellars_tegart_alpha"]),
+        None
+        if inputs.get("sellars_tegart_n") is None
+        else float(inputs["sellars_tegart_n"]),
+        optional("activation_temperature", "K"),
+        optional("correction_strain_rate", "1/s"),
+        optional("correction_limit_temperature", "K"),
+    )
+    return {
+        "density_kg_m3": solution.density,
+        "heat_capacity_j_kg_k": solution.heat_capacity,
+        "thermal_conductivity_w_m_k": solution.thermal_conductivity,
+        "ultimate_tensile_strength_mpa": solution.ultimate_tensile_strength / 1.0e6,
+        "strain_effect_factor": solution.strain_effect_factor,
+        "rupture_strain_limit": solution.rupture_strain_limit,
+        "temperature_correction_factor": solution.temperature_correction_factor,
+        "strain_rate_per_minute": solution.strain_rate * 60.0,
+    }
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
     "process.leak_blowdown": _leak_blowdown,
     "process.hazardous_area": _hazardous_area,
     "process.toxic_library": _toxic_library,
+    "process.blowdown_pressure_profile": _blowdown_pressure_profile,
+    "process.pipe_fire_rupture_material": _pipe_fire_rupture_material,
     "process.heavy_gas_dispersion": _heavy_gas_dispersion,
     "process.gaussian_plume": _gaussian_plume,
     "process.gas_dispersion": _gas_dispersion,
@@ -5618,6 +5704,170 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=2,
         identified_by=(LABEL_KEY, "low_flow_margin_010"),
     ),
+    # The blowdown profile's eleven states; the six refusals are in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="step_exact",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=0,
+        identified_by=(LABEL_KEY, "blowdown_step_exact"),
+    ),
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="step_between",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=1,
+        identified_by=(LABEL_KEY, "blowdown_step_between"),
+    ),
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="clamp_before",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=2,
+        identified_by=(LABEL_KEY, "blowdown_step_clamp_before"),
+    ),
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="clamp_after",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=3,
+        identified_by=(LABEL_KEY, "blowdown_step_clamp_after"),
+    ),
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="linear_between",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=4,
+        identified_by=(LABEL_KEY, "blowdown_linear_between"),
+    ),
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="near_equal_upper_step",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=5,
+        identified_by=(LABEL_KEY, "blowdown_step_near_equal_upper"),
+    ),
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="near_equal_lower_step",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=6,
+        identified_by=(LABEL_KEY, "blowdown_step_near_equal_lower"),
+    ),
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="near_equal_upper_linear",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=7,
+        identified_by=(LABEL_KEY, "blowdown_linear_near_equal_upper"),
+    ),
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="near_equal_lower_linear",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=8,
+        identified_by=(LABEL_KEY, "blowdown_linear_near_equal_lower"),
+    ),
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="gauge_offset_two",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=9,
+        identified_by=(LABEL_KEY, "blowdown_gauge_offset_two"),
+    ),
+    LayerCase(
+        model="process.blowdown_pressure_profile",
+        case="gauge_offset_zero",
+        capture="process_blowdown_pressure_profile.tsv",
+        block=10,
+        identified_by=(LABEL_KEY, "blowdown_gauge_offset_zero"),
+    ),
+    # The material's twelve property states; the six aliases and eight refusals are in
+    # `UNCASED_ROWS`.
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="duplex_22cr_600c",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=0,
+        identified_by=(LABEL_KEY, "material_22cr_duplex"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="ss_316_600c",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=1,
+        identified_by=(LABEL_KEY, "material_ss_316"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="cs_235_600c",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=2,
+        identified_by=(LABEL_KEY, "material_cs_235_asme_a106_b"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="cs_360_x52_600c",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=3,
+        identified_by=(LABEL_KEY, "material_cs_360_api_5l_x52"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="superduplex_600c",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=4,
+        identified_by=(LABEL_KEY, "material_superduplex"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="6mo_600c",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=5,
+        identified_by=(LABEL_KEY, "material_6mo"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="duplex_22cr_800c",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=6,
+        identified_by=(LABEL_KEY, "material_22cr_800c"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="duplex_22cr_clamp_low",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=7,
+        identified_by=(LABEL_KEY, "material_22cr_clamp_low"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="duplex_22cr_clamp_high",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=8,
+        identified_by=(LABEL_KEY, "material_22cr_clamp_high"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="custom_50c",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=9,
+        identified_by=(LABEL_KEY, "material_custom_50c"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="custom_clamp_low",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=10,
+        identified_by=(LABEL_KEY, "material_custom_clamp_low"),
+    ),
+    LayerCase(
+        model="process.pipe_fire_rupture_material",
+        case="custom_clamp_high",
+        capture="process_pipe_fire_rupture_material.tsv",
+        block=11,
+        identified_by=(LABEL_KEY, "material_custom_clamp_high"),
+    ),
 )
 
 #: Probe rows that are **deliberately not cases**, per capture, by the count they take.
@@ -5640,6 +5890,12 @@ UNCASED_ROWS: dict[str, int] = {
     # The toxic library's twenty-four: five aliases, ten case-failure states, two
     # case-resolved duplicates, three unknown names and four unguarded evidence rows.
     "process_toxic_library.tsv": 24,
+    # The blowdown profile's six: the point-count, time, pressure, query and offset
+    # refusals.
+    "process_blowdown_pressure_profile.tsv": 6,
+    # The material curve's fourteen: the six resolved-name aliases and the eight
+    # constructor refusals.
+    "process_pipe_fire_rupture_material.tsv": 14,
     # The event tree's four: the no-branch tree, the two refusals and the shift count, which
     # cannot be cased (an empty record value is not a case).
     "process_event_tree.tsv": 4,

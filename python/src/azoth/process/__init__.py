@@ -24,6 +24,7 @@ from azoth.core.result import (
     AntiSurgeRecycleResult,
     Api537FlareFlameModelResult,
     BleveResult,
+    BlowdownPressureProfileResult,
     BowTieResult,
     ComponentSplitterResult,
     CompressorResult,
@@ -61,6 +62,8 @@ from azoth.core.result import (
     PackedColumnResult,
     PfpDemandResult,
     PipelinePressureProtectionResult,
+    PipeFireRuptureMaterialResult,
+    PipeFireRuptureResult,
     PipeResult,
     PlugFlowReactorResult,
     PoolFireResult,
@@ -87,6 +90,7 @@ from azoth.core.result import (
     Tr3001ComplianceResult,
     TurboExpanderResult,
     VceResult,
+    VesselRuptureResult,
 )
 from azoth.core.units import Q
 from azoth.process.flowsheet import (
@@ -114,6 +118,7 @@ __all__ = [
     "anti_surge_recycle",
     "api537_flare_flame_model",
     "bleve",
+    "blowdown_pressure_profile",
     "bow_tie",
     "catalogue",
     "component_splitter",
@@ -154,6 +159,8 @@ __all__ = [
     "packed_column",
     "pfp_demand",
     "pipe",
+    "pipe_fire_rupture",
+    "pipe_fire_rupture_material",
     "pipeline_pressure_protection",
     "plug_flow_reactor",
     "pool_fire",
@@ -181,6 +188,7 @@ __all__ = [
     "tr3001_compliance",
     "validate",
     "vce",
+    "vessel_rupture",
 ]
 
 _FIRE_MONITOR_COVERAGE = "process.fire_monitor_coverage"
@@ -251,6 +259,10 @@ _THREE_PHASE_SEPARATOR = "process.three_phase_separator"
 _ANTI_SURGE_RECYCLE = "process.anti_surge_recycle"
 _API537_FLARE_FLAME_MODEL = "process.api537_flare_flame_model"
 _BLEVE = "process.bleve"
+_BLOWDOWN_PRESSURE_PROFILE = "process.blowdown_pressure_profile"
+_PIPE_FIRE_RUPTURE = "process.pipe_fire_rupture"
+_PIPE_FIRE_RUPTURE_MATERIAL = "process.pipe_fire_rupture_material"
+_VESSEL_RUPTURE = "process.vessel_rupture"
 
 
 def validate(flowsheet: str, palette_dir: str = "specs/unit_ops") -> list[str]:
@@ -3871,4 +3883,171 @@ def vce(
         ambient_pressure=ambient_pressure,
         distance=distance,
         target_overpressure=target_overpressure,
+    )
+
+
+def blowdown_pressure_profile(
+    points: list[dict[str, object]],
+    time: Q,
+    interpolation_mode: str | None = None,
+    gauge_offset: Q | None = None,
+) -> BlowdownPressureProfileResult:
+    """The blowdown profile's pressure at one query time.
+
+    The class's step or linear lookup, its absolute ``1e-10`` second window, both endpoint
+    clamps, and the absolute pressure less the gauge offset.
+
+    Raises:
+        InvalidInputError: for fewer than two points, a negative or non-finite time, a
+            non-positive pressure, times that are not strictly increasing, a negative
+            gauge offset, or an unknown mode.
+
+    See :func:`azoth.process.reference.blowdown_pressure_profile`.
+    """
+    return resolve(_BLOWDOWN_PRESSURE_PROFILE)(  # type: ignore[no-any-return]
+        points=points,
+        time=time,
+        interpolation_mode=interpolation_mode,
+        gauge_offset=gauge_offset,
+    )
+
+
+def pipe_fire_rupture_material(
+    material_name: str,
+    evaluation_temperature: Q,
+    evaluation_stress: Q,
+    curve: list[dict[str, object]] | None = None,
+    density: Q | None = None,
+    sellars_tegart_a: float | None = None,
+    sellars_tegart_alpha: float | None = None,
+    sellars_tegart_n: float | None = None,
+    activation_temperature: Q | None = None,
+    correction_strain_rate: Q | None = None,
+    correction_limit_temperature: Q | None = None,
+) -> PipeFireRuptureMaterialResult:
+    """A pipe-fire material's properties and Sellars-Tegart strain rate.
+
+    The six workbook tables or the caller's curve, their clamped interpolation, the
+    class's temperature-correction factor and the strain rate at one state.
+
+    Raises:
+        InvalidInputError: for an unknown name, a curve and constants that are not
+            all-or-none, an invalid grid or constant, or a non-positive temperature.
+
+    See :func:`azoth.process.reference.pipe_fire_rupture_material`.
+    """
+    return resolve(_PIPE_FIRE_RUPTURE_MATERIAL)(  # type: ignore[no-any-return]
+        material_name=material_name,
+        evaluation_temperature=evaluation_temperature,
+        evaluation_stress=evaluation_stress,
+        curve=curve,
+        density=density,
+        sellars_tegart_a=sellars_tegart_a,
+        sellars_tegart_alpha=sellars_tegart_alpha,
+        sellars_tegart_n=sellars_tegart_n,
+        activation_temperature=activation_temperature,
+        correction_strain_rate=correction_strain_rate,
+        correction_limit_temperature=correction_limit_temperature,
+    )
+
+
+def pipe_fire_rupture(
+    outside_diameter: Q,
+    nominal_wall_thickness: Q,
+    material_name: str,
+    fire_scenario: str,
+    pressure_profile: list[dict[str, object]],
+    corrosion_allowance: Q | None = None,
+    wall_thickness_undertolerance: float | None = None,
+    exposed_length: Q | None = None,
+    weight_stress: Q | None = None,
+    fluid_density: Q | None = None,
+    fluid_heat_capacity: Q | None = None,
+    gas_molecular_weight: Q | None = None,
+    initial_temperature: Q | None = None,
+    fire_temperature: Q | None = None,
+    gas_temperature: Q | None = None,
+    convective_heat_transfer_coefficient: Q | None = None,
+    fire_emissivity: float | None = None,
+    metal_emissivity: float | None = None,
+    metal_absorptivity: float | None = None,
+    passive_protection_heat_flux_factor: float | None = None,
+    gauge_offset: Q | None = None,
+    interpolation_mode: str | None = None,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+    spreadsheet_gas_thermal_mass: bool | None = None,
+) -> PipeFireRuptureResult:
+    """The pipe fire-rupture strain-rate march.
+
+    The thick-wall von Mises stress, the Sellars-Tegart strain rate, the accumulated-strain
+    limit and the class's spreadsheet-style release, with the step history.
+
+    Raises:
+        InvalidInputError: for a non-positive geometry, fluid or temperature, an unknown
+            material or scenario, a malformed profile, a step or time out of range, or a
+            non-finite value.
+
+    See :func:`azoth.process.reference.pipe_fire_rupture`.
+    """
+    return resolve(_PIPE_FIRE_RUPTURE)(  # type: ignore[no-any-return]
+        outside_diameter=outside_diameter,
+        nominal_wall_thickness=nominal_wall_thickness,
+        material_name=material_name,
+        fire_scenario=fire_scenario,
+        pressure_profile=pressure_profile,
+        corrosion_allowance=corrosion_allowance,
+        wall_thickness_undertolerance=wall_thickness_undertolerance,
+        exposed_length=exposed_length,
+        weight_stress=weight_stress,
+        fluid_density=fluid_density,
+        fluid_heat_capacity=fluid_heat_capacity,
+        gas_molecular_weight=gas_molecular_weight,
+        initial_temperature=initial_temperature,
+        fire_temperature=fire_temperature,
+        gas_temperature=gas_temperature,
+        convective_heat_transfer_coefficient=convective_heat_transfer_coefficient,
+        fire_emissivity=fire_emissivity,
+        metal_emissivity=metal_emissivity,
+        metal_absorptivity=metal_absorptivity,
+        passive_protection_heat_flux_factor=passive_protection_heat_flux_factor,
+        gauge_offset=gauge_offset,
+        interpolation_mode=interpolation_mode,
+        time_step=time_step,
+        max_time=max_time,
+        spreadsheet_gas_thermal_mass=spreadsheet_gas_thermal_mass,
+    )
+
+
+def vessel_rupture(
+    inner_radius: Q,
+    wall_thickness: Q,
+    material: str,
+    history: list[dict[str, object]],
+    yield_strength: Q | None = None,
+    tensile_strength: Q | None = None,
+    grade: str | None = None,
+    tensile_strength_factor: float | None = None,
+) -> VesselRuptureResult:
+    """The thin-wall vessel rupture crossover.
+
+    The von Mises wall stress against the temperature-derated allowable strength, the first
+    margin at or below zero and the interpolated crossover time.
+
+    Raises:
+        InvalidInputError: for a non-positive radius, wall or strength, a missing strength
+            or grade, an unknown grade, an empty or non-increasing history, or a
+            non-finite value.
+
+    See :func:`azoth.process.reference.vessel_rupture`.
+    """
+    return resolve(_VESSEL_RUPTURE)(  # type: ignore[no-any-return]
+        inner_radius=inner_radius,
+        wall_thickness=wall_thickness,
+        material=material,
+        history=history,
+        yield_strength=yield_strength,
+        tensile_strength=tensile_strength,
+        grade=grade,
+        tensile_strength_factor=tensile_strength_factor,
     )
