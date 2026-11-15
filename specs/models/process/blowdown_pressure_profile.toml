@@ -1,0 +1,68 @@
+id = "process.blowdown_pressure_profile"
+name = "Blowdown pressure profile"
+kind = "procedure"
+assumptions = [
+    "**the profile is a piecewise lookup over the caller's points**: the point before the query in `step_previous`, the bracketing pair in `linear`.",
+    "**an absolute `1e-10` second window snaps to the node**: a query within it of an interior time returns that node's pressure, even in step mode.",
+    "**both endpoints clamp**: a query before the first time answers the first pressure, one after the last answers the last.",
+    "**gauge pressure is absolute minus `gauge_offset`**, whose default is 1 bar.",
+    "**the class's `fromMinutesAndBara` multiplies minutes by 60**, so a nine-decimal minute grid is a grid a fraction of a second off; the caller states seconds here.",
+    "**`fromDepressurizationResult` sits outside this id**: the caller states the trajectory's points, and the depressurization model is a separate id.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/rupture/BlowdownPressureProfile.java` is the port source.",
+    "`validation/neqsim/captures/process_blowdown_pressure_profile.tsv` - the workbook grid's exact and between states, both clamps, the two interpolation modes, the near-equality pair on both sides, the gauge offsets and the refusals.",
+]
+[source]
+standard = "NeqSim process/safety/rupture/BlowdownPressureProfile.java"
+edition = "Its `pressureBaraAt` and `pressureBargAt`, over its `InterpolationMode` pair."
+[algorithm]
+scheme = "piecewise_step_or_linear_pressure_profile"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.points]
+type = "record_list"
+row_type = "BlowdownProfilePoint"
+description = "the profile's time and absolute-pressure points, in increasing time, at least two.\n"
+[inputs.points.fields.time]
+unit = "s"
+description = "the point's time, at least zero.\n"
+[inputs.points.fields.pressure]
+unit = "bar"
+description = "the point's absolute pressure, above zero.\n"
+[inputs.time]
+unit = "s"
+description = "the time at which the pressure is asked, at least zero.\n"
+[inputs.interpolation_mode]
+type = "enum"
+values = ["step_previous", "linear"]
+optional = true
+description = "how a query between two points is answered. **Absent is `step_previous`.**\n"
+[inputs.gauge_offset]
+unit = "bar"
+optional = true
+description = "the absolute-to-gauge offset, at least zero. **Absent is 1 bar.**\n"
+[outputs]
+[outputs.pressure_absolute]
+unit = "bar"
+description = "the profile's absolute pressure at `time`.\n"
+[outputs.pressure_gauge]
+unit = "bar"
+description = "`pressure_absolute - gauge_offset`.\n"
+[[valid_range]]
+quantity = "time"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative query time is not an instant on the profile"
+[[valid_range]]
+quantity = "gauge_offset"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class's constructor refuses a negative gauge offset"
+[implementations]
+python = "azoth.process.blowdown_pressure_profile"
+rust = "azoth_process::blowdown_pressure_profile"

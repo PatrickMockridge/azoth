@@ -1,0 +1,153 @@
+id = "process.vessel_rupture"
+name = "Vessel rupture"
+kind = "procedure"
+assumptions = [
+    "**the stress is the thin-wall von Mises**: `hoop = P r/t`, `axial = P r/(2t)` and `sqrt(hoop^2 + axial^2 - hoop axial)`.",
+    "**the allowable is `ambient_tensile retained_factor(T) tensile_strength_factor`**, and the retained factor is the class's generic carbon-steel curve for both material branches.",
+    "**rupture is the first margin `<= 0`**, and the time between the bracketing steps is `t_prev + m_prev/(m_prev - m) (t - t_prev)`; a first-point crossover reports that point's time.",
+    "**the class stores the ambient yield strength and the rupture path reads only the tensile strength**: the yield is published as material data and no margin uses it.",
+    "**the API 5L fallback table is the class's own**: fourteen grades, `L`-grades normalised to X-grades, a leading `GRADE ` stripped, X90's strengths literal MPa rather than psi times 6894.76.",
+    "**the class's `forApi5LPipeGrade` first queries `MaterialPipeProperties`**; this id carries the fallback rows and refuses an unknown grade, and the capture prints the database answer as evidence.",
+    "**the class's javadoc requires strictly increasing times and the code does not check**: this id refuses a non-increasing history, and the capture records the class's acceptance.",
+    "**the class's `+273.0` is not involved**: this id's metal temperature is kelvin, and the retained curve is a kelvin grid.",
+]
+references = [
+    "Birk, A. M. and Cunningham, M. H. (1996). A medium-scale vessel rupture test. Journal of Loss Prevention in the Process Industries 9(3).",
+    "Moodie, K. et al. (1988). Fire engulfment tests on a 5 tonne LPG tank. Journal of Hazardous Materials 20.",
+    "API STD 521 (2021). Pressure-relieving and Depressuring Systems, fire exposure.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/rupture/VesselRuptureAnalyzer.java` and `MaterialStrengthCurve.java` are the port sources, with `process/util/fire/VesselRuptureCalculator.java`.",
+    "`validation/neqsim/captures/process_vessel_rupture.tsv` - the severe and mild X65 states, the bare and insulated LPG cases, the fourteen grades, X90, the L450 alias, the non-monotonic evidence and the refusals.",
+]
+[source]
+standard = "NeqSim process/safety/rupture/VesselRuptureAnalyzer.java"
+edition = "Its `analyze`, over `MaterialStrengthCurve`'s `forApi5LPipeGrade` and `carbonSteel`, and `VesselRuptureCalculator.vonMisesStress`."
+[algorithm]
+scheme = "thin_wall_vessel_rupture_crossover"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 100000
+[inputs]
+[inputs.inner_radius]
+unit = "m"
+description = "the vessel's inner radius, above zero.\n"
+[inputs.wall_thickness]
+unit = "m"
+description = "the wall thickness, above zero.\n"
+[inputs.material]
+type = "enum"
+values = ["carbon_steel", "api_5l"]
+description = "the material construction: explicit ambient strengths or the class's API 5L fallback table.\n"
+[inputs.history]
+type = "record_list"
+row_type = "VesselRuptureState"
+description = "the transient's states, at least one, in increasing time.\n"
+[inputs.history.fields.time]
+unit = "s"
+description = "the state's time, at least zero.\n"
+[inputs.history.fields.internal_pressure]
+unit = "Pa"
+description = "the state's absolute internal pressure, at least zero.\n"
+[inputs.history.fields.metal_temperature]
+unit = "K"
+description = "the state's metal temperature, above absolute zero.\n"
+[inputs.yield_strength]
+unit = "MPa"
+optional = true
+description = "the carbon-steel ambient yield strength, above zero; required with `carbon_steel`.\n"
+[inputs.tensile_strength]
+unit = "MPa"
+optional = true
+description = "the carbon-steel ambient tensile strength, above zero; required with `carbon_steel`.\n"
+[inputs.grade]
+type = "string"
+optional = true
+description = "the API 5L grade, normalised by the class; required with `api_5l`. An unknown grade is refused.\n"
+[inputs.tensile_strength_factor]
+unit = "dimensionless"
+optional = true
+description = "the fraction of the derated tensile strength taken as allowable, in `(0, 1]`. **Absent is 1.**\n"
+[outputs]
+[outputs.ruptured]
+type = "boolean"
+description = "whether any step's margin is at or below zero.\n"
+[outputs.rupture_time]
+unit = "s"
+optional = true
+description = "the interpolated first crossover time; absent when no step reaches zero.\n"
+[outputs.rupture_stress]
+unit = "Pa"
+optional = true
+description = "the von Mises stress at the rupture step; absent when none.\n"
+[outputs.rupture_allowable_stress]
+unit = "Pa"
+optional = true
+description = "the allowable stress at the rupture step; absent when none.\n"
+[outputs.rupture_metal_temperature]
+unit = "K"
+optional = true
+description = "the metal temperature at the rupture step; absent when none.\n"
+[outputs.min_margin]
+unit = "Pa"
+description = "the smallest margin over the history.\n"
+[outputs.min_margin_time]
+unit = "s"
+description = "the time of the first occurrence of the smallest margin.\n"
+[outputs.material_name]
+type = "string"
+description = "the class's name: `CS` for the carbon-steel branch and `API 5L <grade>` for the grade branch.\n"
+[outputs.ambient_yield_strength]
+unit = "MPa"
+description = "the ambient yield strength the material curve carries.\n"
+[outputs.ambient_tensile_strength]
+unit = "MPa"
+description = "the ambient tensile strength the allowable is built from.\n"
+[outputs.history]
+type = "record_list"
+description = "one row per input state, in the caller's order.\n"
+[outputs.history.fields.time]
+unit = "s"
+description = "the state's time.\n"
+[outputs.history.fields.von_mises_stress]
+unit = "Pa"
+description = "the state's thin-wall von Mises stress.\n"
+[outputs.history.fields.allowable_stress]
+unit = "Pa"
+description = "the state's derated allowable stress.\n"
+[outputs.history.fields.margin]
+unit = "Pa"
+description = "`allowable_stress - von_mises_stress`.\n"
+[[valid_range]]
+quantity = "inner_radius"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive radius"
+[[valid_range]]
+quantity = "wall_thickness"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive wall"
+[[valid_range]]
+quantity = "yield_strength"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's material constructor refuses a non-positive yield strength"
+[[valid_range]]
+quantity = "tensile_strength"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's material constructor refuses a non-positive tensile strength"
+[[valid_range]]
+quantity = "tensile_strength_factor"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class's setter refuses a factor outside (0, 1]"
+[implementations]
+python = "azoth.process.vessel_rupture"
+rust = "azoth_process::vessel_rupture"

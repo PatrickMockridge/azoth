@@ -1,0 +1,165 @@
+id = "process.pipe_fire_rupture_material"
+name = "Pipe fire-rupture material"
+kind = "procedure"
+assumptions = [
+    "**the six workbook tables are carried verbatim**: 22Cr duplex, SS 316, CS 235 ASME A106-B, CS 360 API 5L-X52, superduplex and 6Mo, each on the 0-1350 degC grid with density 7850 kg/m3.",
+    "**the selector is lowercased `contains`, in the class's order**: superduplex or 25cr, then 22cr or duplex, then 316, then 360, x52 or 5l, then 235 or a106, then 6mo or 6 mo.",
+    "**interpolation clamps at both endpoints**, and the class's odd literals are kept: the 1450 degC point and the repeated 574.3566 degC entries.",
+    "**temperature is the class's Celsius**: the input is kelvin, converted by `C = K - 273.15`, and the class's own absolute temperature is `C + 273.0`, not `C + 273.15`.",
+    "**the Sellars-Tegart strain rate is `strainEffect A sinh(alpha max(0, stress))^n exp(-corr Q/T)`**; `corr` is 1 at or above the correction limit and the class's log form below it.",
+    "**the correction rate is carried in 1/s**: the class's per-minute constant is 60 times it, and the output strain rate is the class's per-minute result divided by 60.",
+    "**a supplied curve is the caller's own material**: the name is a label and no built-in lookup runs; the curve and all six constants are all-or-none.",
+]
+references = [
+    "Sellars, C. M. and Tegart, W. J. McG. (1972). Hot workability. International Metallurgical Reviews 17, 1-24.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/rupture/PipeFireRuptureMaterial.java` is the port source.",
+    "`validation/neqsim/captures/process_pipe_fire_rupture_material.tsv` - the six tables at 600 degC, 22Cr at 800 degC, both clamps, a custom curve and its clamps, the six aliases and the refusals.",
+]
+[source]
+standard = "NeqSim process/safety/rupture/PipeFireRuptureMaterial.java"
+edition = "Its `heatCapacityAt`, `thermalConductivityAt`, `ultimateTensileStrengthAt`, `strainEffectAt`, `ruptureStrainLimitAt`, `temperatureCorrectionFactor` and `strainRatePerMinute`."
+[algorithm]
+scheme = "sellars_tegart_pipe_material_curves"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1000
+[inputs]
+[inputs.material_name]
+type = "string"
+description = "the material name, resolved by the class's lowercased substring selector when no curve is supplied; with a curve it is the label.\n"
+[inputs.evaluation_temperature]
+unit = "K"
+description = "the metal temperature at which the properties are evaluated, above absolute zero.\n"
+[inputs.evaluation_stress]
+unit = "MPa"
+description = "the von Mises stress at which the strain rate is evaluated; a negative value is clamped to zero as the class does.\n"
+[inputs.curve]
+type = "record_list"
+row_type = "PipeFireRuptureMaterialPoint"
+optional = true
+description = "the caller's temperature curve, at least two points in increasing temperature. **Absent is the built-in table named**, and the six constants below are required with it.\n"
+[inputs.curve.fields.temperature]
+unit = "K"
+description = "the point's metal temperature, above absolute zero.\n"
+[inputs.curve.fields.heat_capacity]
+unit = "J/(kg*K)"
+description = "the point's heat capacity.\n"
+[inputs.curve.fields.thermal_conductivity]
+unit = "W/(m*K)"
+description = "the point's thermal conductivity.\n"
+[inputs.curve.fields.ultimate_tensile_strength]
+unit = "MPa"
+description = "the point's ultimate tensile strength.\n"
+[inputs.curve.fields.strain_effect_factor]
+unit = "dimensionless"
+description = "the point's strain-rate multiplier.\n"
+[inputs.curve.fields.rupture_strain_limit]
+unit = "dimensionless"
+description = "the point's accumulated-strain limit.\n"
+[inputs.density]
+unit = "kg/m**3"
+optional = true
+description = "the material density, above zero; required with a curve.\n"
+[inputs.sellars_tegart_a]
+unit = "dimensionless"
+optional = true
+description = "the Sellars-Tegart pre-exponential constant, above zero; required with a curve.\n"
+[inputs.sellars_tegart_alpha]
+unit = "dimensionless"
+optional = true
+description = "the Sellars-Tegart alpha in 1/MPa, above zero; required with a curve.\n"
+[inputs.sellars_tegart_n]
+unit = "dimensionless"
+optional = true
+description = "the Sellars-Tegart exponent, above zero; required with a curve.\n"
+[inputs.activation_temperature]
+unit = "K"
+optional = true
+description = "the activation term Q/R in kelvin, above zero; required with a curve.\n"
+[inputs.correction_strain_rate]
+unit = "1/s"
+optional = true
+description = "the strain rate used to correct extrapolated temperatures, above zero; required with a curve and 60 times the class's per-minute constant.\n"
+[inputs.correction_limit_temperature]
+unit = "K"
+optional = true
+description = "the temperature above which the correction factor is exactly 1; required with a curve.\n"
+[outputs]
+[outputs.resolved_material_name]
+type = "string"
+description = "the built-in table's name, or the supplied label when a curve is used.\n"
+[outputs.density]
+unit = "kg/m**3"
+description = "the material density.\n"
+[outputs.heat_capacity]
+unit = "J/(kg*K)"
+description = "`heatCapacityAt(evaluation_temperature)`, with endpoint clamping.\n"
+[outputs.thermal_conductivity]
+unit = "W/(m*K)"
+description = "`thermalConductivityAt(evaluation_temperature)`.\n"
+[outputs.ultimate_tensile_strength]
+unit = "MPa"
+description = "`ultimateTensileStrengthAt(evaluation_temperature)`.\n"
+[outputs.strain_effect_factor]
+unit = "dimensionless"
+description = "`strainEffectAt(evaluation_temperature)`.\n"
+[outputs.rupture_strain_limit]
+unit = "dimensionless"
+description = "`ruptureStrainLimitAt(evaluation_temperature)`.\n"
+[outputs.temperature_correction_factor]
+unit = "dimensionless"
+description = "the class's `temperatureCorrectionFactor`: exactly 1 at or above the limit, else `T/Q (ln(sinh(alpha UTS)) n - ln(60 correction_strain_rate) + ln(A))`.\n"
+[outputs.strain_rate]
+unit = "1/s"
+description = "`temperatureCorrectionFactor`-corrected Sellars-Tegart strain rate, the class's per-minute rate divided by 60.\n"
+[[valid_range]]
+quantity = "evaluation_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's absolute temperature is a kelvin value; a non-positive one is not a temperature"
+[[valid_range]]
+quantity = "density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive density"
+[[valid_range]]
+quantity = "sellars_tegart_a"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive A"
+[[valid_range]]
+quantity = "sellars_tegart_alpha"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive alpha"
+[[valid_range]]
+quantity = "sellars_tegart_n"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive exponent"
+[[valid_range]]
+quantity = "activation_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive activation temperature"
+[[valid_range]]
+quantity = "correction_strain_rate"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive correction rate"
+[[valid_range]]
+quantity = "correction_limit_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's correction limit is an absolute temperature"
+[implementations]
+python = "azoth.process.pipe_fire_rupture_material"
+rust = "azoth_process::pipe_fire_rupture_material"

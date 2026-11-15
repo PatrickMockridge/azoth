@@ -1,0 +1,552 @@
+model = "process.pipe_fire_rupture"
+
+[[cases]]
+id = "benchmark"
+tolerance = 1.0e-9
+source = "The pipe rupture benchmark state. From `validation/neqsim/captures/process_pipe_fire_rupture.tsv` (`pipe_rupture_benchmark`)."
+[cases.inputs]
+outside_diameter = 88.9
+nominal_wall_thickness = 3.7
+material_name = "22Cr duplex"
+fire_scenario = "large_jet_fire"
+corrosion_allowance = 0.0
+wall_thickness_undertolerance = 0.1
+exposed_length = 1.0
+weight_stress = 0.0
+fluid_density = 23.7487037155012
+fluid_heat_capacity = 2283.35469905934
+gas_molecular_weight = 0.0182
+initial_temperature = 293.15
+time_step = 5.0
+spreadsheet_gas_thermal_mass = true
+max_time = 200.0
+pressure_profile = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+status = "rupture"
+fluid_basis = "gas"
+rupture_time = 115.0
+rupture_pressure = 32.0255
+rupture_mean_wall_temperature = 1363.9956502338634
+rupture_outer_surface_temperature = 1365.901405217305
+rupture_accumulated_strain = 0.9826275792826241
+rupture_strain_limit = 0.4844376053975677
+long_pipe_gas_two_sides = 22.34418418399767
+long_pipe_gas_one_side = 11.172092091998834
+short_pipe_gas_one_side = 17.2161939137702
+liquid_one_side = 0.0
+release_gas_temperature = 293.15
+
+[[cases]]
+id = "no_rupture_10s"
+tolerance = 1.0e-9
+source = "The pipe no rupture 10s state. From `validation/neqsim/captures/process_pipe_fire_rupture.tsv` (`pipe_no_rupture_10s`)."
+[cases.inputs]
+outside_diameter = 88.9
+nominal_wall_thickness = 3.7
+material_name = "22Cr duplex"
+fire_scenario = "large_jet_fire"
+corrosion_allowance = 0.0
+wall_thickness_undertolerance = 0.1
+exposed_length = 1.0
+weight_stress = 0.0
+fluid_density = 23.7487037155012
+fluid_heat_capacity = 2283.35469905934
+gas_molecular_weight = 0.0182
+initial_temperature = 293.15
+time_step = 5.0
+spreadsheet_gas_thermal_mass = true
+max_time = 10.0
+pressure_profile = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+status = "no_rupture"
+fluid_basis = "gas"
+
+[[cases]]
+id = "small_jet_builtin"
+tolerance = 1.0e-9
+source = "The pipe small jet builtin state. From `validation/neqsim/captures/process_pipe_fire_rupture.tsv` (`pipe_small_jet_builtin`)."
+[cases.inputs]
+outside_diameter = 88.9
+nominal_wall_thickness = 3.7
+material_name = "22Cr duplex"
+fire_scenario = "small_jet_fire"
+corrosion_allowance = 0.0
+wall_thickness_undertolerance = 0.1
+exposed_length = 1.0
+weight_stress = 0.0
+fluid_density = 23.7487037155012
+fluid_heat_capacity = 2283.35469905934
+gas_molecular_weight = 0.0182
+initial_temperature = 293.15
+time_step = 5.0
+spreadsheet_gas_thermal_mass = true
+max_time = 200.0
+pressure_profile = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+status = "no_rupture"
+fluid_basis = "gas"
+
+[[cases]]
+id = "explicit_small_jet"
+tolerance = 1.0e-9
+source = "The pipe explicit small jet state. From `validation/neqsim/captures/process_pipe_fire_rupture.tsv` (`pipe_explicit_small_jet`)."
+[cases.inputs]
+outside_diameter = 88.9
+nominal_wall_thickness = 3.7
+material_name = "22Cr duplex"
+fire_scenario = "explicit"
+corrosion_allowance = 0.0
+wall_thickness_undertolerance = 0.1
+exposed_length = 1.0
+weight_stress = 0.0
+fluid_density = 23.7487037155012
+fluid_heat_capacity = 2283.35469905934
+gas_molecular_weight = 0.0182
+initial_temperature = 293.15
+time_step = 5.0
+spreadsheet_gas_thermal_mass = true
+fire_temperature = 1273.15
+gas_temperature = 1273.15
+convective_heat_transfer_coefficient = 100.0
+fire_emissivity = 1.0
+metal_emissivity = 0.85
+metal_absorptivity = 0.85
+passive_protection_heat_flux_factor = 1.0
+max_time = 200.0
+pressure_profile = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+status = "no_rupture"
+fluid_basis = "gas"
+
+[[cases]]
+id = "ss_316"
+tolerance = 1.0e-9
+source = "The pipe ss316 state. From `validation/neqsim/captures/process_pipe_fire_rupture.tsv` (`pipe_ss316`)."
+[cases.inputs]
+outside_diameter = 88.9
+nominal_wall_thickness = 3.7
+material_name = "SS 316"
+fire_scenario = "large_jet_fire"
+corrosion_allowance = 0.0
+wall_thickness_undertolerance = 0.1
+exposed_length = 1.0
+weight_stress = 0.0
+fluid_density = 23.7487037155012
+fluid_heat_capacity = 2283.35469905934
+gas_molecular_weight = 0.0182
+initial_temperature = 293.15
+time_step = 5.0
+spreadsheet_gas_thermal_mass = true
+max_time = 200.0
+pressure_profile = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+status = "rupture"
+fluid_basis = "gas"
+rupture_time = 180.0
+rupture_pressure = 30.1758
+rupture_mean_wall_temperature = 1427.187566305562
+rupture_outer_surface_temperature = 1427.218751010287
+rupture_accumulated_strain = 0.25125365824324236
+rupture_strain_limit = 0.2510093915763905
+long_pipe_gas_two_sides = 21.053648907885176
+long_pipe_gas_one_side = 10.526824453942588
+short_pipe_gas_one_side = 16.22183648352553
+liquid_one_side = 0.0
+release_gas_temperature = 293.15
+
+[[cases]]
+id = "liquid"
+tolerance = 1.0e-9
+source = "The pipe liquid state. From `validation/neqsim/captures/process_pipe_fire_rupture.tsv` (`pipe_liquid`)."
+[cases.inputs]
+outside_diameter = 88.9
+nominal_wall_thickness = 3.7
+material_name = "22Cr duplex"
+fire_scenario = "large_jet_fire"
+corrosion_allowance = 0.0
+wall_thickness_undertolerance = 0.1
+exposed_length = 1.0
+weight_stress = 0.0
+fluid_density = 800.0
+fluid_heat_capacity = 2283.35469905934
+gas_molecular_weight = 0.0182
+initial_temperature = 293.15
+time_step = 5.0
+spreadsheet_gas_thermal_mass = true
+max_time = 200.0
+pressure_profile = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+status = "no_rupture"
+fluid_basis = "liquid"
+
+[[cases]]
+id = "gas_thermal_mass_off"
+tolerance = 1.0e-9
+source = "The pipe gas thermal mass off state. From `validation/neqsim/captures/process_pipe_fire_rupture.tsv` (`pipe_gas_thermal_mass_off`)."
+[cases.inputs]
+outside_diameter = 88.9
+nominal_wall_thickness = 3.7
+material_name = "22Cr duplex"
+fire_scenario = "large_jet_fire"
+corrosion_allowance = 0.0
+wall_thickness_undertolerance = 0.1
+exposed_length = 1.0
+weight_stress = 0.0
+fluid_density = 23.7487037155012
+fluid_heat_capacity = 2283.35469905934
+gas_molecular_weight = 0.0182
+initial_temperature = 293.15
+time_step = 5.0
+spreadsheet_gas_thermal_mass = false
+max_time = 60.0
+pressure_profile = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+status = "no_rupture"
+fluid_basis = "gas"
+
+[[cases]]
+id = "gas_thermal_mass_on"
+tolerance = 1.0e-9
+source = "The pipe gas thermal mass on state. From `validation/neqsim/captures/process_pipe_fire_rupture.tsv` (`pipe_gas_thermal_mass_on`)."
+[cases.inputs]
+outside_diameter = 88.9
+nominal_wall_thickness = 3.7
+material_name = "22Cr duplex"
+fire_scenario = "large_jet_fire"
+corrosion_allowance = 0.0
+wall_thickness_undertolerance = 0.1
+exposed_length = 1.0
+weight_stress = 0.0
+fluid_density = 23.7487037155012
+fluid_heat_capacity = 2283.35469905934
+gas_molecular_weight = 0.0182
+initial_temperature = 293.15
+time_step = 5.0
+spreadsheet_gas_thermal_mass = true
+max_time = 60.0
+pressure_profile = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+status = "no_rupture"
+fluid_basis = "gas"
+
+[[cases]]
+id = "pool_fire"
+tolerance = 1.0e-9
+source = "The pipe pool fire state. From `validation/neqsim/captures/process_pipe_fire_rupture.tsv` (`pipe_pool_fire`)."
+[cases.inputs]
+outside_diameter = 88.9
+nominal_wall_thickness = 3.7
+material_name = "22Cr duplex"
+fire_scenario = "pool_fire"
+corrosion_allowance = 0.0
+wall_thickness_undertolerance = 0.1
+exposed_length = 1.0
+weight_stress = 0.0
+fluid_density = 23.7487037155012
+fluid_heat_capacity = 2283.35469905934
+gas_molecular_weight = 0.0182
+initial_temperature = 293.15
+time_step = 5.0
+spreadsheet_gas_thermal_mass = true
+max_time = 200.0
+pressure_profile = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+status = "rupture"
+fluid_basis = "gas"
+rupture_time = 160.0
+rupture_pressure = 30.1758
+rupture_mean_wall_temperature = 1356.0270670004556
+rupture_outer_surface_temperature = 1357.094264492638
+rupture_accumulated_strain = 0.7127751704624172
+rupture_strain_limit = 0.4708910139007745
+long_pipe_gas_two_sides = 21.053648907885176
+long_pipe_gas_one_side = 10.526824453942588
+short_pipe_gas_one_side = 16.22183648352553
+liquid_one_side = 0.0
+release_gas_temperature = 293.15
+
+[[cases]]
+id = "pfp_factor"
+tolerance = 1.0e-9
+source = "The pipe pfp 01 state. From `validation/neqsim/captures/process_pipe_fire_rupture.tsv` (`pipe_pfp_01`)."
+[cases.inputs]
+outside_diameter = 88.9
+nominal_wall_thickness = 3.7
+material_name = "22Cr duplex"
+fire_scenario = "large_jet_fire"
+corrosion_allowance = 0.0
+wall_thickness_undertolerance = 0.1
+exposed_length = 1.0
+weight_stress = 0.0
+fluid_density = 23.7487037155012
+fluid_heat_capacity = 2283.35469905934
+gas_molecular_weight = 0.0182
+initial_temperature = 293.15
+time_step = 5.0
+spreadsheet_gas_thermal_mass = true
+passive_protection_heat_flux_factor = 0.1
+max_time = 200.0
+pressure_profile = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+status = "no_rupture"
+fluid_basis = "gas"

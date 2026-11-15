@@ -1,0 +1,296 @@
+model = "process.blowdown_pressure_profile"
+
+[[cases]]
+id = "step_exact"
+tolerance = 1.0e-9
+source = "The workbook profile's 110 s step lookup, 33.0255 bara and 32.0255 barg. From `validation/neqsim/captures/process_blowdown_pressure_profile.tsv` (`blowdown_step_exact`)."
+[cases.inputs]
+time = 110.0
+interpolation_mode = "step_previous"
+gauge_offset = 1.0
+points = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+pressure_absolute = 33.0255
+pressure_gauge = 32.0255
+
+[[cases]]
+id = "step_between"
+tolerance = 1.0e-9
+source = "A 107 s query between the workbook nodes takes the previous point, 34.0082 bara. From (`blowdown_step_between`)."
+[cases.inputs]
+time = 107.0
+interpolation_mode = "step_previous"
+gauge_offset = 1.0
+points = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+pressure_absolute = 34.0082
+pressure_gauge = 33.0082
+
+[[cases]]
+id = "clamp_before"
+tolerance = 1.0e-9
+source = "A query at the first point answers its pressure. From (`blowdown_step_clamp_before`)."
+[cases.inputs]
+time = 0.0
+interpolation_mode = "step_previous"
+gauge_offset = 1.0
+points = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+pressure_absolute = 61.3
+pressure_gauge = 60.3
+
+[[cases]]
+id = "clamp_after"
+tolerance = 1.0e-9
+source = "A query past the last point answers its pressure. From (`blowdown_step_clamp_after`)."
+[cases.inputs]
+time = 130.0
+interpolation_mode = "step_previous"
+gauge_offset = 1.0
+points = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+pressure_absolute = 31.1758
+pressure_gauge = 30.1758
+
+[[cases]]
+id = "linear_between"
+tolerance = 1.0e-9
+source = "A 107.5 s linear query between the 105 and 110 s nodes. From (`blowdown_linear_between`)."
+[cases.inputs]
+time = 107.5
+interpolation_mode = "linear"
+gauge_offset = 1.0
+points = [
+  { time = 0.0, pressure = 61.3 },
+  { time = 4.99999998, pressure = 59.7053 },
+  { time = 10.00000002, pressure = 58.6349 },
+  { time = 15.0, pressure = 57.3483 },
+  { time = 19.99999998, pressure = 55.9731 },
+  { time = 25.00000002, pressure = 54.5583 },
+  { time = 30.0, pressure = 53.1249 },
+  { time = 34.99999998, pressure = 51.6842 },
+  { time = 40.00000002, pressure = 50.2472 },
+  { time = 45.0, pressure = 48.8145 },
+  { time = 49.99999998, pressure = 47.3977 },
+  { time = 55.00000002, pressure = 46.004 },
+  { time = 60.0, pressure = 44.6383 },
+  { time = 64.99999998, pressure = 43.3046 },
+  { time = 70.00000002, pressure = 42.0058 },
+  { time = 75.0, pressure = 40.7442 },
+  { time = 79.99999998, pressure = 39.5206 },
+  { time = 85.00000002, pressure = 38.3367 },
+  { time = 90.0, pressure = 37.1941 },
+  { time = 94.99999998, pressure = 36.0922 },
+  { time = 100.00000002, pressure = 35.0302 },
+  { time = 105.0, pressure = 34.0082 },
+  { time = 109.99999998, pressure = 33.0255 },
+  { time = 115.00000002, pressure = 32.0817 },
+  { time = 120.0, pressure = 31.1758 },
+]
+[cases.expected]
+pressure_absolute = 33.5168499980346
+pressure_gauge = 32.5168499980346
+
+[[cases]]
+id = "near_equal_upper_step"
+tolerance = 1.0e-9
+source = "The absolute 1e-10 window snaps to 80 bara at 5 s minus 5e-11. From (`blowdown_step_near_equal_upper`)."
+[cases.inputs]
+time = 4.99999999995
+interpolation_mode = "step_previous"
+gauge_offset = 1.0
+points = [
+  { time = 0.0, pressure = 87.0 },
+  { time = 5.0, pressure = 80.0 },
+  { time = 10.0, pressure = 74.0 },
+]
+[cases.expected]
+pressure_absolute = 80.0
+pressure_gauge = 79.0
+
+[[cases]]
+id = "near_equal_lower_step"
+tolerance = 1.0e-9
+source = "At 5 s minus 2e-10 the step lookup takes the previous point, 87 bara. From (`blowdown_step_near_equal_lower`)."
+[cases.inputs]
+time = 4.9999999998
+interpolation_mode = "step_previous"
+gauge_offset = 1.0
+points = [
+  { time = 0.0, pressure = 87.0 },
+  { time = 5.0, pressure = 80.0 },
+  { time = 10.0, pressure = 74.0 },
+]
+[cases.expected]
+pressure_absolute = 87.0
+pressure_gauge = 86.0
+
+[[cases]]
+id = "near_equal_upper_linear"
+tolerance = 1.0e-9
+source = "The linear mode also snaps inside the 1e-10 window. From (`blowdown_linear_near_equal_upper`)."
+[cases.inputs]
+time = 4.99999999995
+interpolation_mode = "linear"
+gauge_offset = 1.0
+points = [
+  { time = 0.0, pressure = 87.0 },
+  { time = 5.0, pressure = 80.0 },
+  { time = 10.0, pressure = 74.0 },
+]
+[cases.expected]
+pressure_absolute = 80.0
+pressure_gauge = 79.0
+
+[[cases]]
+id = "near_equal_lower_linear"
+tolerance = 1.0e-9
+source = "Outside the window the linear mode interpolates between 87 and 80 bara. From (`blowdown_linear_near_equal_lower`)."
+[cases.inputs]
+time = 4.9999999998
+interpolation_mode = "linear"
+gauge_offset = 1.0
+points = [
+  { time = 0.0, pressure = 87.0 },
+  { time = 5.0, pressure = 80.0 },
+  { time = 10.0, pressure = 74.0 },
+]
+[cases.expected]
+pressure_absolute = 80.00000000028
+pressure_gauge = 79.00000000028
+
+[[cases]]
+id = "gauge_offset_two"
+tolerance = 1.0e-9
+source = "An offset of 2 bar turns 80 bara into 78 barg. From (`blowdown_gauge_offset_two`)."
+[cases.inputs]
+time = 5.0
+interpolation_mode = "step_previous"
+gauge_offset = 2.0
+points = [
+  { time = 0.0, pressure = 87.0 },
+  { time = 5.0, pressure = 80.0 },
+]
+[cases.expected]
+pressure_absolute = 80.0
+pressure_gauge = 78.0
+
+[[cases]]
+id = "gauge_offset_zero"
+tolerance = 1.0e-9
+source = "A zero offset leaves the gauge pressure equal to the absolute. From (`blowdown_gauge_offset_zero`)."
+[cases.inputs]
+time = 5.0
+interpolation_mode = "step_previous"
+gauge_offset = 0.0
+points = [
+  { time = 0.0, pressure = 87.0 },
+  { time = 5.0, pressure = 80.0 },
+]
+[cases.expected]
+pressure_absolute = 80.0
+pressure_gauge = 80.0
