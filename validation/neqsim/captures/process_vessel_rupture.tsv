@@ -1,0 +1,458 @@
+vessel_severe_x65
+material_name=API 5L X65
+ambient_yield_strength_mpa=448.1594
+ambient_tensile_strength_mpa=530.89652
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+ruptured=true
+rupture_time_s=0.0
+rupture_stress_pa=4.330127018922193E7
+rupture_allowable_stress_pa=3.7162756400000006E7
+rupture_metal_temperature_k=973.15
+min_margin_pa=-3.958499454922193E8
+min_margin_time_s=300.0
+point_count=11
+history0_time_s=0.0
+history0_von_mises_stress_pa=4.330127018922193E7
+history0_allowable_stress_pa=3.7162756400000006E7
+history0_margin_pa=-6138513.7892219275
+history1_time_s=30.0
+history1_von_mises_stress_pa=8.227241335952167E7
+history1_allowable_stress_pa=3.7162756400000006E7
+history1_margin_pa=-4.5109656959521666E7
+history2_time_s=60.0
+history2_von_mises_stress_pa=1.2124355652982141E8
+history2_allowable_stress_pa=3.7162756400000006E7
+history2_margin_pa=-8.40808001298214E7
+history3_time_s=90.0
+history3_von_mises_stress_pa=1.6021469970012116E8
+history3_allowable_stress_pa=3.7162756400000006E7
+history3_margin_pa=-1.2305194330012116E8
+history4_time_s=120.0
+history4_von_mises_stress_pa=1.991858428704209E8
+history4_allowable_stress_pa=3.7162756400000006E7
+history4_margin_pa=-1.620230864704209E8
+history5_time_s=150.0
+history5_von_mises_stress_pa=2.3815698604072064E8
+history5_allowable_stress_pa=3.7162756400000006E7
+history5_margin_pa=-2.0099422964072064E8
+history6_time_s=180.0
+history6_von_mises_stress_pa=2.7712812921102035E8
+history6_allowable_stress_pa=3.7162756400000006E7
+history6_margin_pa=-2.3996537281102034E8
+history7_time_s=210.0
+history7_von_mises_stress_pa=3.160992723813201E8
+history7_allowable_stress_pa=3.7162756400000006E7
+history7_margin_pa=-2.7893651598132014E8
+history8_time_s=240.0
+history8_von_mises_stress_pa=3.550704155516198E8
+history8_allowable_stress_pa=3.7162756400000006E7
+history8_margin_pa=-3.179076591516198E8
+history9_time_s=270.0
+history9_von_mises_stress_pa=3.940415587219196E8
+history9_allowable_stress_pa=3.7162756400000006E7
+history9_margin_pa=-3.5687880232191956E8
+history10_time_s=300.0
+history10_von_mises_stress_pa=4.330127018922193E8
+history10_allowable_stress_pa=3.7162756400000006E7
+history10_margin_pa=-3.958499454922193E8
+
+vessel_mild_x65
+material_name=API 5L X65
+ambient_yield_strength_mpa=448.1594
+ambient_tensile_strength_mpa=530.89652
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+ruptured=false
+rupture_time_s=NaN
+rupture_stress_pa=NaN
+rupture_allowable_stress_pa=NaN
+rupture_metal_temperature_k=NaN
+min_margin_pa=4.853223490845281E8
+min_margin_time_s=0.0
+point_count=6
+history0_time_s=0.0
+history0_von_mises_stress_pa=4.330127018922193E7
+history0_allowable_stress_pa=5.2862361927375E8
+history0_margin_pa=4.853223490845281E8
+history1_time_s=30.0
+history1_von_mises_stress_pa=4.330127018922193E7
+history1_allowable_stress_pa=5.2862361927375E8
+history1_margin_pa=4.853223490845281E8
+history2_time_s=60.0
+history2_von_mises_stress_pa=4.330127018922193E7
+history2_allowable_stress_pa=5.2862361927375E8
+history2_margin_pa=4.853223490845281E8
+history3_time_s=90.0
+history3_von_mises_stress_pa=4.330127018922193E7
+history3_allowable_stress_pa=5.2862361927375E8
+history3_margin_pa=4.853223490845281E8
+history4_time_s=120.0
+history4_von_mises_stress_pa=4.330127018922193E7
+history4_allowable_stress_pa=5.2862361927375E8
+history4_margin_pa=4.853223490845281E8
+history5_time_s=150.0
+history5_von_mises_stress_pa=4.330127018922193E7
+history5_allowable_stress_pa=5.2862361927375E8
+history5_margin_pa=4.853223490845281E8
+
+vessel_lpg_bare
+material_name=CS
+ambient_yield_strength_mpa=245.0
+ambient_tensile_strength_mpa=415.0
+data_source=Generic carbon-steel retained-strength curve for fire screening
+ruptured=true
+rupture_time_s=536.4597344970786
+rupture_stress_pa=9.093266739736606E7
+rupture_allowable_stress_pa=8.841159999999999E7
+rupture_metal_temperature_k=840.0
+min_margin_pa=-3.74478937433142E7
+min_margin_time_s=600.0
+point_count=21
+history0_time_s=0.0
+history0_von_mises_stress_pa=6.49519052838329E7
+history0_allowable_stress_pa=4.1322328125E8
+history0_margin_pa=3.482713759661671E8
+history1_time_s=30.0
+history1_von_mises_stress_pa=6.639528095680695E7
+history1_allowable_stress_pa=4.0544203125E8
+history1_margin_pa=3.3904675029319304E8
+history2_time_s=60.0
+history2_von_mises_stress_pa=6.783865662978102E7
+history2_allowable_stress_pa=3.9766078124999994E8
+history2_margin_pa=3.2982212462021893E8
+history3_time_s=90.0
+history3_von_mises_stress_pa=6.928203230275509E7
+history3_allowable_stress_pa=3.8725724999999994E8
+history3_margin_pa=3.179752176972449E8
+history4_time_s=120.0
+history4_von_mises_stress_pa=7.072540797572917E7
+history4_allowable_stress_pa=3.7480724999999994E8
+history4_margin_pa=3.040818420242708E8
+history5_time_s=150.0
+history5_von_mises_stress_pa=7.216878364870322E7
+history5_allowable_stress_pa=3.6235725E8
+history5_margin_pa=2.901884663512968E8
+history6_time_s=180.0
+history6_von_mises_stress_pa=7.361215932167727E7
+history6_allowable_stress_pa=3.4905442499999994E8
+history6_margin_pa=2.754422656783227E8
+history7_time_s=210.0
+history7_von_mises_stress_pa=7.505553499465135E7
+history7_allowable_stress_pa=3.32869425E8
+history7_margin_pa=2.5781389000534865E8
+history8_time_s=240.0
+history8_von_mises_stress_pa=7.649891066762541E7
+history8_allowable_stress_pa=3.16684425E8
+history8_margin_pa=2.4018551433237457E8
+history9_time_s=270.0
+history9_von_mises_stress_pa=7.794228634059948E7
+history9_allowable_stress_pa=3.00499425E8
+history9_margin_pa=2.2255713865940052E8
+history10_time_s=300.0
+history10_von_mises_stress_pa=7.938566201357354E7
+history10_allowable_stress_pa=2.7651449999999994E8
+history10_margin_pa=1.971288379864264E8
+history11_time_s=330.0
+history11_von_mises_stress_pa=8.08290376865476E7
+history11_allowable_stress_pa=2.5161449999999997E8
+history11_margin_pa=1.7078546231345236E8
+history12_time_s=360.0
+history12_von_mises_stress_pa=8.227241335952167E7
+history12_allowable_stress_pa=2.267145E8
+history12_margin_pa=1.444420866404783E8
+history13_time_s=390.0
+history13_von_mises_stress_pa=8.371578903249575E7
+history13_allowable_stress_pa=2.0181449999999997E8
+history13_margin_pa=1.1809871096750422E8
+history14_time_s=420.0
+history14_von_mises_stress_pa=8.51591647054698E7
+history14_allowable_stress_pa=1.7691449999999997E8
+history14_margin_pa=9.175533529453017E7
+history15_time_s=450.0
+history15_von_mises_stress_pa=8.660254037844387E7
+history15_allowable_stress_pa=1.5201449999999997E8
+history15_margin_pa=6.54119596215561E7
+history16_time_s=480.0
+history16_von_mises_stress_pa=8.804591605141793E7
+history16_allowable_stress_pa=1.2825159999999999E8
+history16_margin_pa=4.020568394858205E7
+history17_time_s=510.0
+history17_von_mises_stress_pa=8.948929172439198E7
+history17_allowable_stress_pa=1.083316E8
+history17_margin_pa=1.8842308275608018E7
+history18_time_s=540.0
+history18_von_mises_stress_pa=9.093266739736606E7
+history18_allowable_stress_pa=8.841159999999999E7
+history18_margin_pa=-2521067.3973660767
+history19_time_s=570.0
+history19_von_mises_stress_pa=9.237604307034013E7
+history19_allowable_stress_pa=6.849159999999999E7
+history19_margin_pa=-2.388444307034014E7
+history20_time_s=600.0
+history20_von_mises_stress_pa=9.381941874331419E7
+history20_allowable_stress_pa=5.637152499999999E7
+history20_margin_pa=-3.74478937433142E7
+
+vessel_lpg_insulated
+material_name=CS
+ambient_yield_strength_mpa=245.0
+ambient_tensile_strength_mpa=415.0
+data_source=Generic carbon-steel retained-strength curve for fire screening
+ruptured=false
+rupture_time_s=NaN
+rupture_stress_pa=NaN
+rupture_allowable_stress_pa=NaN
+rupture_metal_temperature_k=NaN
+min_margin_pa=2.9596314880399126E8
+min_margin_time_s=600.0
+point_count=21
+history0_time_s=0.0
+history0_von_mises_stress_pa=6.49519052838329E7
+history0_allowable_stress_pa=4.1322328125E8
+history0_margin_pa=3.482713759661671E8
+history1_time_s=30.0
+history1_von_mises_stress_pa=6.585401507944169E7
+history1_allowable_stress_pa=4.1179671875E8
+history1_margin_pa=3.4594270367055833E8
+history2_time_s=60.0
+history2_von_mises_stress_pa=6.675612487505047E7
+history2_allowable_stress_pa=4.1037015625E8
+history2_margin_pa=3.436140313749495E8
+history3_time_s=90.0
+history3_von_mises_stress_pa=6.765823467065927E7
+history3_allowable_stress_pa=4.0894359374999994E8
+history3_margin_pa=3.412853590793407E8
+history4_time_s=120.0
+history4_von_mises_stress_pa=6.856034446626806E7
+history4_allowable_stress_pa=4.0751703125E8
+history4_margin_pa=3.3895668678373194E8
+history5_time_s=150.0
+history5_von_mises_stress_pa=6.946245426187685E7
+history5_allowable_stress_pa=4.0609046875E8
+history5_margin_pa=3.366280144881232E8
+history6_time_s=180.0
+history6_von_mises_stress_pa=7.036456405748564E7
+history6_allowable_stress_pa=4.0466390625E8
+history6_margin_pa=3.3429934219251436E8
+history7_time_s=210.0
+history7_von_mises_stress_pa=7.126667385309443E7
+history7_allowable_stress_pa=4.0323734375E8
+history7_margin_pa=3.3197066989690554E8
+history8_time_s=240.0
+history8_von_mises_stress_pa=7.216878364870322E7
+history8_allowable_stress_pa=4.0181078124999994E8
+history8_margin_pa=3.296419976012967E8
+history9_time_s=270.0
+history9_von_mises_stress_pa=7.3070893444312E7
+history9_allowable_stress_pa=4.0038421874999994E8
+history9_margin_pa=3.273133253056879E8
+history10_time_s=300.0
+history10_von_mises_stress_pa=7.397300323992081E7
+history10_allowable_stress_pa=3.9895765625E8
+history10_margin_pa=3.249846530100792E8
+history11_time_s=330.0
+history11_von_mises_stress_pa=7.48751130355296E7
+history11_allowable_stress_pa=3.9753109375E8
+history11_margin_pa=3.226559807144704E8
+history12_time_s=360.0
+history12_von_mises_stress_pa=7.577722283113839E7
+history12_allowable_stress_pa=3.9610453125E8
+history12_margin_pa=3.203273084188616E8
+history13_time_s=390.0
+history13_von_mises_stress_pa=7.667933262674718E7
+history13_allowable_stress_pa=3.9467796875E8
+history13_margin_pa=3.179986361232528E8
+history14_time_s=420.0
+history14_von_mises_stress_pa=7.758144242235596E7
+history14_allowable_stress_pa=3.9265225E8
+history14_margin_pa=3.1507080757764405E8
+history15_time_s=450.0
+history15_von_mises_stress_pa=7.848355221796475E7
+history15_allowable_stress_pa=3.9036975E8
+history15_margin_pa=3.1188619778203523E8
+history16_time_s=480.0
+history16_von_mises_stress_pa=7.938566201357354E7
+history16_allowable_stress_pa=3.8808724999999994E8
+history16_margin_pa=3.087015879864264E8
+history17_time_s=510.0
+history17_von_mises_stress_pa=8.028777180918233E7
+history17_allowable_stress_pa=3.8580475E8
+history17_margin_pa=3.0551697819081765E8
+history18_time_s=540.0
+history18_von_mises_stress_pa=8.118988160479112E7
+history18_allowable_stress_pa=3.8352224999999994E8
+history18_margin_pa=3.0233236839520884E8
+history19_time_s=570.0
+history19_von_mises_stress_pa=8.209199140039992E7
+history19_allowable_stress_pa=3.8123975E8
+history19_margin_pa=2.991477585996001E8
+history20_time_s=600.0
+history20_von_mises_stress_pa=8.29941011960087E7
+history20_allowable_stress_pa=3.7895724999999994E8
+history20_margin_pa=2.9596314880399126E8
+
+vessel_grade_b
+grade=B
+material_name=API 5L B
+ambient_yield_strength_mpa=241.3166
+ambient_tensile_strength_mpa=413.6856
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x42
+grade=X42
+material_name=API 5L X42
+ambient_yield_strength_mpa=289.57992
+ambient_tensile_strength_mpa=413.6856
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x52
+grade=X52
+material_name=API 5L X52
+ambient_yield_strength_mpa=358.52752
+ambient_tensile_strength_mpa=455.05416
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x60
+grade=X60
+material_name=API 5L X60
+ambient_yield_strength_mpa=413.6856
+ambient_tensile_strength_mpa=517.107
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x65
+grade=X65
+material_name=API 5L X65
+ambient_yield_strength_mpa=448.1594
+ambient_tensile_strength_mpa=530.89652
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x70
+grade=X70
+material_name=API 5L X70
+ambient_yield_strength_mpa=482.6332
+ambient_tensile_strength_mpa=565.37032
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x80
+grade=X80
+material_name=API 5L X80
+ambient_yield_strength_mpa=551.5808
+ambient_tensile_strength_mpa=620.5284
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_a25
+grade=A25
+material_name=API 5L A25
+ambient_yield_strength_mpa=172.369
+ambient_tensile_strength_mpa=310.2642
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_a
+grade=A
+material_name=API 5L A
+ambient_yield_strength_mpa=206.8428
+ambient_tensile_strength_mpa=330.94848
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x46
+grade=X46
+material_name=API 5L X46
+ambient_yield_strength_mpa=317.15896
+ambient_tensile_strength_mpa=434.36988
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x56
+grade=X56
+material_name=API 5L X56
+ambient_yield_strength_mpa=386.10656
+ambient_tensile_strength_mpa=489.52796
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x90
+grade=X90
+material_name=API 5L X90
+ambient_yield_strength_mpa=620.0
+ambient_tensile_strength_mpa=695.0
+data_source=Explicit built-in API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x100
+grade=X100
+material_name=API 5L X100
+ambient_yield_strength_mpa=689.476
+ambient_tensile_strength_mpa=758.4236
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_grade_x120
+grade=X120
+material_name=API 5L X120
+ambient_yield_strength_mpa=827.3712
+ambient_tensile_strength_mpa=896.3188
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+
+vessel_x90_one_row
+material_name=API 5L X90
+ambient_yield_strength_mpa=620.0
+ambient_tensile_strength_mpa=695.0
+data_source=Explicit built-in API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+ruptured=true
+rupture_time_s=0.0
+rupture_stress_pa=8.660254037844387E7
+rupture_allowable_stress_pa=4.865000000000001E7
+rupture_metal_temperature_k=973.15
+min_margin_pa=-3.795254037844386E7
+min_margin_time_s=0.0
+point_count=1
+history0_time_s=0.0
+history0_von_mises_stress_pa=8.660254037844387E7
+history0_allowable_stress_pa=4.865000000000001E7
+history0_margin_pa=-3.795254037844386E7
+
+vessel_l450_alias
+material_name=API 5L X65
+ambient_yield_strength_mpa=448.1594
+ambient_tensile_strength_mpa=530.89652
+data_source=MaterialPipeProperties API 5L ambient SMYS/SMTS with generic fire-temperature reduction
+ruptured=true
+rupture_time_s=0.0
+rupture_stress_pa=8.660254037844387E7
+rupture_allowable_stress_pa=3.7162756400000006E7
+rupture_metal_temperature_k=973.15
+min_margin_pa=-4.943978397844386E7
+min_margin_time_s=0.0
+point_count=1
+history0_time_s=0.0
+history0_von_mises_stress_pa=8.660254037844387E7
+history0_allowable_stress_pa=3.7162756400000006E7
+history0_margin_pa=-4.943978397844386E7
+
+vessel_factor_zero_refused
+refusal=IllegalArgumentException: tensileStrengthFactor must be in (0, 1]
+
+vessel_factor_high_refused
+refusal=IllegalArgumentException: tensileStrengthFactor must be in (0, 1]
+
+vessel_radius_zero_refused
+refusal=IllegalArgumentException: innerRadiusM and wallThicknessM must be positive
+
+vessel_wall_zero_refused
+refusal=IllegalArgumentException: innerRadiusM and wallThicknessM must be positive
+
+vessel_empty_history_refused
+refusal=IllegalArgumentException: input arrays must be non-empty and of equal length
+
+vessel_mismatched_history_refused
+refusal=IllegalArgumentException: input arrays must be non-empty and of equal length
+
+vessel_negative_pressure_refused
+refusal=IllegalArgumentException: Internal pressure cannot be negative
+
+vessel_unknown_grade_refused
+refusal=IllegalArgumentException: No API 5L material strength data for grade X999
+
+vessel_empty_grade_refused
+refusal=IllegalArgumentException: grade must not be empty
+
+vessel_non_monotonic_evidence
+accepted=true
+ruptured=false
+rupture_time_s=NaN
+

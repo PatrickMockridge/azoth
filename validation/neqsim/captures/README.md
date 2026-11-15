@@ -2449,3 +2449,84 @@ are case-insensitive. The threshold outputs are ppm by mole. `ppmToKgPerM3` take
 **bara**, uses the class's own `R = 8.314` rather than the analyzer's `8.314462618`, and
 does not guard a negative ppm or zero temperature, pressure or molar mass; those rows are
 evidence and the port refuses them.
+
+## The blowdown pressure profile
+
+`process_blowdown_pressure_profile.tsv` is `BlowdownPressureProfile`'s step and linear
+lookups over the workbook profile, the 87/80/74 bara linear profile, both endpoint clamps,
+the absolute `1e-10` near-equality on both sides and the gauge offset.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe blowdown_pressure_profile \
+  > captures/process_blowdown_pressure_profile.tsv
+```
+
+The workbook profile is the class's own `fromMinutesAndBara` grid (25 points, 5 s apart at
+the class's nine-decimal minutes), so `pressureBaraAt(110.0)` finds the 33.0255 bara node
+through the step rule even though `110` is not a grid time. **The near-equality is absolute
+and `< 1e-10`**: at `5 - 5e-11` the step lookup snaps to the node (80.0 bara) while at
+`5 - 2e-10` it returns the previous point (87.0); linear interpolates between them. The
+gauge pressure is the absolute minus the offset, default 1 bara.
+
+## The pipe fire-rupture material
+
+`process_pipe_fire_rupture_material.tsv` is the six workbook material tables at 600 °C and
+100 MPa, 22Cr at 800 °C, both endpoint clamps, a custom curve and its clamps, and the six
+substring aliases.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe pipe_fire_rupture_material \
+  > captures/process_pipe_fire_rupture_material.tsv
+```
+
+**The selector is lowercased `contains`, in order**: `superduplex`/`25cr`, then
+`22cr`/`duplex`, then `316`, then `360`/`x52`/`5l`, then `235`/`a106`, then `6mo`/`6 mo`;
+`SUPERDUPLEX`, `25Cr`, `API 5L-X52`, `6 Mo`, `A106` and `316` resolve as the class does.
+All six tables use the 0–1350 °C grid and density 7850, with the workbook's literal 1450 °C
+and repeated 574.3566 °C entries. Interpolation clamps at both ends. The temperature
+correction factor is exactly 1 above the 900 °C limit; the strain rate is
+`strainEffect A sinh(alpha max(0, stress))^n exp(-corr activationT / T)` per minute, with
+the class's `+273.0` absolute temperature.
+
+## The pipe fire rupture
+
+`process_pipe_fire_rupture.tsv` is `PipeFireRuptureStudy.run()` over the workbook Pipe 1
+state with its full history, a 10 s no-rupture state, the built-in and explicit small-jet
+pair, SS 316, a liquid state, the gas-thermal-mass pair, the pool fire, a PFP factor and the
+constructor and builder refusals.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe pipe_fire_rupture \
+  > captures/process_pipe_fire_rupture.tsv
+```
+
+**The workbook state ruptures at 115.0 s**, not 110 s: the class's own test allows
+`110 ± 5`, and the state's accumulated strain crosses the limit at the 115 s step
+(0.9826 against 0.4844). The captured release is 22.344 kg/s two-sided, against the test's
+`21.9 ± 1`. The 115 s pressure is 32.0255 barg because the class's nine-decimal minute grid
+puts 115 s just after a node and the step rule returns the previous one. **A no-rupture
+result carries no release estimate at all** — the builder is handed null, so the class's
+zero-filled `releaseEstimate(null)` branch is dead on that path. `spreadsheetGasThermalMass`
+defaults to **true**; the pair shows its effect. The gas release uses the initial
+temperature in its `sqrt(MW/max(1, T0+273))` denominator, and the gas mass uses
+`max(0, barg) 1e5` as if it were absolute.
+
+## The vessel rupture
+
+`process_vessel_rupture.tsv` is `VesselRuptureAnalyzer.analyze` over the severe X65 ramp
+(which ruptures at t = 0), the mild X65 state, the bare and insulated LPG cases, the
+fourteen API 5L grades, X90 and the `L450` alias, and the constructor and history guards.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe vessel_rupture \
+  > captures/process_vessel_rupture.tsv
+```
+
+**The jar's design database answers the grade query** (`dataSource` says
+`MaterialPipeProperties`), and its values equal the built-in fallback for the grades
+measured; X90 falls back to the explicit 620/695 MPa row. The retained-strength curve is the
+generic carbon-steel grid (1.00, 0.95, 0.85, 0.72, 0.52, 0.32, 0.16, 0.07, 0.03 at
+293.15…1073.15 K). Rupture is the first margin `<= 0` with the class's linear crossover;
+a first-point crossover reports that point's time, so the severe X65 state ruptures at 0.
+The class's javadoc says the times must be strictly increasing and the code does not check:
+the non-monotonic evidence block is accepted, and the port refuses it.

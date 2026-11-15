@@ -202,6 +202,14 @@ import neqsim.process.safety.overpressure.ReliefLoadContribution;
 import neqsim.process.safety.overpressure.ReliefPhase;
 import neqsim.process.safety.overpressure.ReliefScenario;
 import neqsim.process.safety.overpressure.TR3001ComplianceChecker;
+import neqsim.process.safety.rupture.BlowdownPressureProfile;
+import neqsim.process.safety.rupture.MaterialStrengthCurve;
+import neqsim.process.safety.rupture.PipeFireRuptureInput;
+import neqsim.process.safety.rupture.PipeFireRuptureMaterial;
+import neqsim.process.safety.rupture.PipeFireRuptureResult;
+import neqsim.process.safety.rupture.PipeFireRuptureScenario;
+import neqsim.process.safety.rupture.PipeFireRuptureStudy;
+import neqsim.process.safety.rupture.VesselRuptureAnalyzer;
 import neqsim.process.util.fire.ReliefValveSizing;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -450,6 +458,18 @@ public class ProcessProbe {
         break;
       case "tr3001_compliance":
         tr3001ComplianceRows();
+        break;
+      case "pipe_fire_rupture":
+        pipeFireRuptureRows();
+        break;
+      case "pipe_fire_rupture_material":
+        pipeFireRuptureMaterialRows();
+        break;
+      case "vessel_rupture":
+        vesselRuptureRows();
+        break;
+      case "blowdown_pressure_profile":
+        blowdownPressureProfileRows();
         break;
       case "expander_steps":
         expanderStepRows();
@@ -15171,5 +15191,542 @@ public class ProcessProbe {
       return "dynamic_determination";
     }
     return "unknown";
+  }
+
+  // === process.blowdown_pressure_profile ===================================
+
+  static BlowdownPressureProfile benchmarkProfile(BlowdownPressureProfile.InterpolationMode mode) {
+    double[] minutes = {0.0, 0.083333333, 0.166666667, 0.25, 0.333333333, 0.416666667, 0.5,
+        0.583333333, 0.666666667, 0.75, 0.833333333, 0.916666667, 1.0, 1.083333333, 1.166666667,
+        1.25, 1.333333333, 1.416666667, 1.5, 1.583333333, 1.666666667, 1.75, 1.833333333,
+        1.916666667, 2.0};
+    double[] bara = {61.3, 59.7053, 58.6349, 57.3483, 55.9731, 54.5583, 53.1249, 51.6842,
+        50.2472, 48.8145, 47.3977, 46.004, 44.6383, 43.3046, 42.0058, 40.7442, 39.5206, 38.3367,
+        37.1941, 36.0922, 35.0302, 34.0082, 33.0255, 32.0817, 31.1758};
+    BlowdownPressureProfile.Builder builder = BlowdownPressureProfile.builder()
+        .interpolationMode(mode);
+    for (int i = 0; i < minutes.length; i++) {
+      builder.addPoint(minutes[i], "min", bara[i], "bara");
+    }
+    return builder.build();
+  }
+
+  static BlowdownPressureProfile exactSecondProfile(
+      BlowdownPressureProfile.InterpolationMode mode) {
+    return BlowdownPressureProfile.builder()
+        .interpolationMode(mode)
+        .addPoint(0.0, "s", 87.0, "bara")
+        .addPoint(5.0, "s", 80.0, "bara")
+        .addPoint(10.0, "s", 74.0, "bara")
+        .build();
+  }
+
+  static void blowdownPressureProfileRows() {
+    BlowdownPressureProfile step = benchmarkProfile(
+        BlowdownPressureProfile.InterpolationMode.STEP_PREVIOUS);
+    BlowdownPressureProfile linear = benchmarkProfile(
+        BlowdownPressureProfile.InterpolationMode.LINEAR);
+
+    blowdownPoint("blowdown_step_exact", step, 110.0);
+    blowdownPoint("blowdown_step_between", step, 107.0);
+    blowdownPoint("blowdown_step_clamp_before", step, 0.0);
+    blowdownPoint("blowdown_step_clamp_after", step, 130.0);
+    blowdownPoint("blowdown_linear_between", linear, 107.5);
+
+    BlowdownPressureProfile exactStep = exactSecondProfile(
+        BlowdownPressureProfile.InterpolationMode.STEP_PREVIOUS);
+    BlowdownPressureProfile exactLinear = exactSecondProfile(
+        BlowdownPressureProfile.InterpolationMode.LINEAR);
+    blowdownPoint("blowdown_step_near_equal_upper", exactStep, 5.0 - 5.0e-11);
+    blowdownPoint("blowdown_step_near_equal_lower", exactStep, 5.0 - 2.0e-10);
+    blowdownPoint("blowdown_linear_near_equal_upper", exactLinear, 5.0 - 5.0e-11);
+    blowdownPoint("blowdown_linear_near_equal_lower", exactLinear, 5.0 - 2.0e-10);
+
+    BlowdownPressureProfile offsetTwo = BlowdownPressureProfile.builder()
+        .addPoint(0.0, "s", 87.0, "bara")
+        .addPoint(5.0, "s", 80.0, "bara")
+        .gaugeOffsetBara(2.0)
+        .build();
+    blowdownPoint("blowdown_gauge_offset_two", offsetTwo, 5.0);
+    BlowdownPressureProfile offsetZero = BlowdownPressureProfile.builder()
+        .addPoint(0.0, "s", 87.0, "bara")
+        .addPoint(5.0, "s", 80.0, "bara")
+        .gaugeOffsetBara(0.0)
+        .build();
+    blowdownPoint("blowdown_gauge_offset_zero", offsetZero, 5.0);
+
+    blowdownRefusal("blowdown_one_point_refused", () -> BlowdownPressureProfile.builder()
+        .addPoint(0.0, "s", 87.0, "bara").build());
+    blowdownRefusal("blowdown_non_increasing_refused", () -> BlowdownPressureProfile.builder()
+        .addPoint(0.0, "s", 87.0, "bara")
+        .addPoint(5.0, "s", 80.0, "bara")
+        .addPoint(5.0, "s", 74.0, "bara").build());
+    blowdownRefusal("blowdown_negative_time_refused", () -> BlowdownPressureProfile.builder()
+        .addPoint(-1.0, "s", 87.0, "bara")
+        .addPoint(5.0, "s", 80.0, "bara").build());
+    blowdownRefusal("blowdown_zero_pressure_refused", () -> BlowdownPressureProfile.builder()
+        .addPoint(0.0, "s", 87.0, "bara")
+        .addPoint(5.0, "s", 0.0, "bara").build());
+    blowdownRefusal("blowdown_negative_query_refused",
+        () -> exactStep.pressureBaraAt(-1.0));
+    blowdownRefusal("blowdown_negative_gauge_refused", () -> BlowdownPressureProfile.builder()
+        .addPoint(0.0, "s", 87.0, "bara")
+        .addPoint(5.0, "s", 80.0, "bara")
+        .gaugeOffsetBara(-1.0).build());
+  }
+
+  static void blowdownPoint(String label, BlowdownPressureProfile profile, double time) {
+    System.out.println(label);
+    System.out.println("time_s=" + time);
+    System.out.println("pressure_absolute_bara=" + profile.pressureBaraAt(time));
+    System.out.println("pressure_gauge_barg=" + profile.pressureBargAt(time));
+    System.out.println("interpolation_mode=" + profile.getInterpolationMode());
+    System.out.println();
+  }
+
+  interface ProbeCall {
+    void run();
+  }
+
+  static void blowdownRefusal(String label, ProbeCall call) {
+    System.out.println(label);
+    try {
+      call.run();
+      System.out.println("refusal=none");
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  // === process.pipe_fire_rupture_material ==================================
+
+  static void pipeFireRuptureMaterialRows() {
+    String[] names = {"22Cr duplex", "SS 316", "CS 235 ASME A106-B",
+        "CS 360 API 5L-X52", "Superduplex", "6Mo"};
+    for (String name : names) {
+      materialRow("material_" + materialLabel(name),
+          PipeFireRuptureMaterial.fromSpreadsheetMaterialName(name), 600.0, 100.0);
+    }
+    materialRow("material_22cr_800c",
+        PipeFireRuptureMaterial.spreadsheetDuplex22Cr(), 800.0, 100.0);
+    materialRow("material_22cr_clamp_low",
+        PipeFireRuptureMaterial.spreadsheetDuplex22Cr(), -100.0, 100.0);
+    materialRow("material_22cr_clamp_high",
+        PipeFireRuptureMaterial.spreadsheetDuplex22Cr(), 1400.0, 100.0);
+
+    PipeFireRuptureMaterial custom = new PipeFireRuptureMaterial("Probe custom",
+        new double[] {0.0, 100.0, 200.0},
+        new double[] {500.0, 520.0, 540.0},
+        new double[] {16.0, 17.0, 18.0},
+        new double[] {600.0, 550.0, 500.0},
+        new double[] {1.0, 1.1, 1.2},
+        new double[] {0.2, 0.2, 0.2},
+        8000.0, 1.0e10, 0.02, 2.0, 40000.0, 0.05, 900.0, "probe custom curve");
+    materialRow("material_custom_50c", custom, 50.0, 100.0);
+    materialRow("material_custom_clamp_low", custom, -100.0, 100.0);
+    materialRow("material_custom_clamp_high", custom, 400.0, 100.0);
+
+    materialAlias("material_alias_superduplex", "SUPERDUPLEX");
+    materialAlias("material_alias_25cr", "25Cr");
+    materialAlias("material_alias_api5l_x52", "API 5L-X52");
+    materialAlias("material_alias_6mo", "6 Mo");
+    materialAlias("material_alias_a106", "A106");
+    materialAlias("material_alias_316", "316");
+
+    blowdownRefusal("material_empty_name_refused",
+        () -> PipeFireRuptureMaterial.fromSpreadsheetMaterialName(""));
+    blowdownRefusal("material_unknown_name_refused",
+        () -> PipeFireRuptureMaterial.fromSpreadsheetMaterialName("unobtainium"));
+    blowdownRefusal("material_short_grid_refused", () -> new PipeFireRuptureMaterial("Short",
+        new double[] {0.0}, new double[] {500.0}, new double[] {16.0}, new double[] {600.0},
+        new double[] {1.0}, new double[] {0.2}, 8000.0, 1.0e10, 0.02, 2.0, 40000.0, 0.05, 900.0,
+        "probe"));
+    blowdownRefusal("material_non_increasing_grid_refused",
+        () -> new PipeFireRuptureMaterial("Bad grid",
+            new double[] {0.0, 100.0, 100.0}, new double[] {500.0, 520.0, 540.0},
+            new double[] {16.0, 17.0, 18.0}, new double[] {600.0, 550.0, 500.0},
+            new double[] {1.0, 1.1, 1.2}, new double[] {0.2, 0.2, 0.2}, 8000.0, 1.0e10, 0.02,
+            2.0, 40000.0, 0.05, 900.0, "probe"));
+    blowdownRefusal("material_mismatched_lengths_refused",
+        () -> new PipeFireRuptureMaterial("Bad length", new double[] {0.0, 100.0, 200.0},
+            new double[] {500.0, 520.0}, new double[] {16.0, 17.0, 18.0},
+            new double[] {600.0, 550.0, 500.0}, new double[] {1.0, 1.1, 1.2},
+            new double[] {0.2, 0.2, 0.2}, 8000.0, 1.0e10, 0.02, 2.0, 40000.0, 0.05, 900.0,
+            "probe"));
+    blowdownRefusal("material_zero_density_refused",
+        () -> new PipeFireRuptureMaterial("Zero density", new double[] {0.0, 100.0},
+            new double[] {500.0, 520.0}, new double[] {16.0, 17.0}, new double[] {600.0, 550.0},
+            new double[] {1.0, 1.1}, new double[] {0.2, 0.2}, 0.0, 1.0e10, 0.02, 2.0, 40000.0,
+            0.05, 900.0, "probe"));
+    blowdownRefusal("material_zero_alpha_refused",
+        () -> new PipeFireRuptureMaterial("Zero alpha", new double[] {0.0, 100.0},
+            new double[] {500.0, 520.0}, new double[] {16.0, 17.0}, new double[] {600.0, 550.0},
+            new double[] {1.0, 1.1}, new double[] {0.2, 0.2}, 8000.0, 1.0e10, 0.0, 2.0, 40000.0,
+            0.05, 900.0, "probe"));
+    blowdownRefusal("material_zero_correction_rate_refused",
+        () -> new PipeFireRuptureMaterial("Zero correction", new double[] {0.0, 100.0},
+            new double[] {500.0, 520.0}, new double[] {16.0, 17.0}, new double[] {600.0, 550.0},
+            new double[] {1.0, 1.1}, new double[] {0.2, 0.2}, 8000.0, 1.0e10, 0.02, 2.0, 40000.0,
+            0.0, 900.0, "probe"));
+  }
+
+  static String materialLabel(String name) {
+    return name.toLowerCase().replace(" ", "_").replace("-", "_").replace("/", "_");
+  }
+
+  static void materialRow(String label, PipeFireRuptureMaterial material, double metalC,
+      double stressMPa) {
+    System.out.println(label);
+    System.out.println("material_name=" + material.getMaterialName());
+    System.out.println("metal_temperature_c=" + metalC);
+    System.out.println("stress_mpa=" + stressMPa);
+    System.out.println("density_kg_m3=" + material.getDensityKgPerM3());
+    System.out.println("heat_capacity_j_kg_k=" + material.heatCapacityAt(metalC));
+    System.out.println("thermal_conductivity_w_m_k=" + material.thermalConductivityAt(metalC));
+    System.out.println("ultimate_tensile_strength_mpa="
+        + material.ultimateTensileStrengthAt(metalC));
+    System.out.println("strain_effect_factor=" + material.strainEffectAt(metalC));
+    System.out.println("rupture_strain_limit=" + material.ruptureStrainLimitAt(metalC));
+    System.out.println("temperature_correction_factor="
+        + material.temperatureCorrectionFactor(metalC));
+    System.out.println("strain_rate_per_minute=" + material.strainRatePerMinute(stressMPa, metalC));
+    System.out.println();
+  }
+
+  static void materialAlias(String label, String alias) {
+    System.out.println(label);
+    System.out.println("alias=" + alias);
+    try {
+      System.out.println("resolved_material_name="
+          + PipeFireRuptureMaterial.fromSpreadsheetMaterialName(alias).getMaterialName());
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  // === process.pipe_fire_rupture ===========================================
+
+  static PipeFireRuptureInput benchmarkPipeOne() {
+    return PipeFireRuptureInput.builder("3DD100").pipeClass("DD100").nominalDiameterInches(3.0)
+        .outsideDiameter(88.9, "mm").nominalWallThickness(3.7, "mm")
+        .corrosionAllowance(0.0, "mm").wallThicknessUndertoleranceFraction(0.10).weldFactor(1.0)
+        .weightStressMPa(0.0).fluidDensityKgPerM3(23.7487037155012)
+        .fluidHeatCapacityJPerKgK(2283.35469905934).gasMolecularWeightKgPerKmol(18.2)
+        .initialTemperatureC(20.0).exposedLength(1.0, "m").build();
+  }
+
+  static void pipeFireRuptureRows() {
+    PipeFireRuptureInput input = benchmarkPipeOne();
+    BlowdownPressureProfile profile = benchmarkProfile(
+        BlowdownPressureProfile.InterpolationMode.STEP_PREVIOUS);
+
+    pipeFireSummary("pipe_rupture_benchmark",
+        PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetLargeJetFire(), profile)
+            .timeStepSeconds(5.0).maxTimeSeconds(200.0).build().run());
+
+    pipeFireSummary("pipe_no_rupture_10s",
+        PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetLargeJetFire(), profile)
+            .timeStepSeconds(5.0).maxTimeSeconds(10.0).build().run());
+
+    pipeFireSummary("pipe_small_jet_builtin",
+        PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetSmallJetFire(), profile)
+            .timeStepSeconds(5.0).maxTimeSeconds(200.0).build().run());
+
+    pipeFireSummary("pipe_explicit_small_jet",
+        PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            new PipeFireRuptureScenario("Explicit small jet", 1000.0, 1000.0, 100.0, 1.0, 0.85,
+                0.85, 1.0), profile)
+            .timeStepSeconds(5.0).maxTimeSeconds(200.0).build().run());
+
+    pipeFireSummary("pipe_ss316",
+        PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetSs316(),
+            PipeFireRuptureScenario.spreadsheetLargeJetFire(), profile)
+            .timeStepSeconds(5.0).maxTimeSeconds(200.0).build().run());
+
+    PipeFireRuptureInput liquidInput = PipeFireRuptureInput.builder("LIQ").pipeClass("LIQ")
+        .nominalDiameterInches(3.0).outsideDiameter(88.9, "mm").nominalWallThickness(3.7, "mm")
+        .corrosionAllowance(0.0, "mm").wallThicknessUndertoleranceFraction(0.10).weldFactor(1.0)
+        .weightStressMPa(0.0).fluidDensityKgPerM3(800.0).fluidHeatCapacityJPerKgK(2000.0)
+        .gasMolecularWeightKgPerKmol(18.2).initialTemperatureC(20.0).exposedLength(1.0, "m")
+        .build();
+    pipeFireSummary("pipe_liquid",
+        PipeFireRuptureStudy.builder(liquidInput, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetLargeJetFire(), profile)
+            .timeStepSeconds(5.0).maxTimeSeconds(200.0).build().run());
+
+    pipeFireSummary("pipe_gas_thermal_mass_off",
+        PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetLargeJetFire(), profile)
+            .timeStepSeconds(5.0).maxTimeSeconds(60.0).spreadsheetGasThermalMass(false).build()
+            .run());
+
+    pipeFireSummary("pipe_gas_thermal_mass_on",
+        PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetLargeJetFire(), profile)
+            .timeStepSeconds(5.0).maxTimeSeconds(60.0).spreadsheetGasThermalMass(true).build()
+            .run());
+
+    pipeFireSummary("pipe_pool_fire",
+        PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetPoolFire(), profile)
+            .timeStepSeconds(5.0).maxTimeSeconds(200.0).build().run());
+
+    pipeFireSummary("pipe_pfp_01",
+        PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetLargeJetFire().withPassiveProtectionFactor(0.1),
+            profile).timeStepSeconds(5.0).maxTimeSeconds(200.0).build().run());
+
+    blowdownRefusal("pipe_weld_factor_zero_refused", () -> PipeFireRuptureInput.builder("BAD")
+        .outsideDiameter(88.9, "mm").nominalWallThickness(3.7, "mm").weldFactor(0.0).build());
+    blowdownRefusal("pipe_weld_factor_high_refused", () -> PipeFireRuptureInput.builder("BAD")
+        .outsideDiameter(88.9, "mm").nominalWallThickness(3.7, "mm").weldFactor(1.5).build());
+    blowdownRefusal("pipe_effective_wall_refused", () -> PipeFireRuptureInput.builder("BAD")
+        .outsideDiameter(88.9, "mm").nominalWallThickness(3.0, "mm")
+        .wallThicknessUndertoleranceFraction(0.5).corrosionAllowance(2.0, "mm").build());
+    blowdownRefusal("pipe_inside_diameter_refused", () -> PipeFireRuptureInput.builder("BAD")
+        .outsideDiameter(8.0, "mm").nominalWallThickness(4.9, "mm")
+        .wallThicknessUndertoleranceFraction(0.1).build());
+    blowdownRefusal("pipe_zero_diameter_refused", () -> PipeFireRuptureInput.builder("BAD")
+        .outsideDiameter(0.0, "mm").nominalWallThickness(3.7, "mm").build());
+    blowdownRefusal("pipe_bad_material_refused",
+        () -> PipeFireRuptureMaterial.fromSpreadsheetMaterialName("unobtainium"));
+    blowdownRefusal("pipe_bad_scenario_fraction_refused",
+        () -> new PipeFireRuptureScenario("bad", 1000.0, 1000.0, 100.0, 1.5, 0.85, 0.85, 1.0));
+    blowdownRefusal("pipe_one_point_profile_refused",
+        () -> PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetLargeJetFire(),
+            BlowdownPressureProfile.builder().addPoint(0.0, "s", 61.3, "bara").build())
+            .build().run());
+    blowdownRefusal("pipe_zero_step_refused",
+        () -> PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetLargeJetFire(), profile).timeStepSeconds(0.0)
+            .build());
+    blowdownRefusal("pipe_negative_max_time_refused",
+        () -> PipeFireRuptureStudy.builder(input, PipeFireRuptureMaterial.spreadsheetDuplex22Cr(),
+            PipeFireRuptureScenario.spreadsheetLargeJetFire(), profile).maxTimeSeconds(-1.0)
+            .build());
+  }
+
+  @SuppressWarnings("unchecked")
+  static void pipeFireSummary(String label, PipeFireRuptureResult result) {
+    Map<String, Object> map = result.toMap();
+    Map<String, Object> series = (Map<String, Object>) map.get("timeSeries");
+    Map<String, Object> release = (Map<String, Object>) map.get("releaseEstimate");
+    List<Double> times = (List<Double>) series.get("timeSeconds");
+    System.out.println(label);
+    System.out.println("status=" + map.get("status"));
+    System.out.println("rupture_predicted=" + map.get("rupturePredicted"));
+    System.out.println("rupture_time_s=" + map.get("ruptureTimeSeconds"));
+    System.out.println("rupture_pressure_barg=" + map.get("rupturePressureBarg"));
+    System.out.println("rupture_mean_wall_temperature_c="
+        + map.get("ruptureMeanWallTemperatureC"));
+    System.out.println("rupture_outer_surface_temperature_c="
+        + map.get("ruptureOuterSurfaceTemperatureC"));
+    System.out.println("rupture_accumulated_strain=" + map.get("ruptureAccumulatedStrain"));
+    System.out.println("rupture_strain_limit=" + map.get("ruptureStrainLimit"));
+    if (release == null) {
+      System.out.println("release_estimate=null");
+    } else {
+      System.out.println("long_pipe_gas_two_sides_kg_s="
+          + release.get("longPipeGasTwoSidesKgPerS"));
+      System.out.println("long_pipe_gas_one_side_kg_s="
+          + release.get("longPipeGasOneSideKgPerS"));
+      System.out.println("short_pipe_gas_one_side_kg_s="
+          + release.get("shortPipeGasOneSideKgPerS"));
+      System.out.println("liquid_one_side_kg_s=" + release.get("liquidOneSideKgPerS"));
+      System.out.println("release_gas_temperature_c=" + release.get("gasTemperatureC"));
+    }
+    System.out.println("point_count=" + times.size());
+    for (int i = 0; i < times.size(); i++) {
+      System.out.println("history" + i + "_time_s=" + times.get(i));
+      System.out.println("history" + i + "_pressure_barg="
+          + ((List<Double>) series.get("pressureBarg")).get(i));
+      System.out.println("history" + i + "_mean_wall_temperature_c="
+          + ((List<Double>) series.get("meanWallTemperatureC")).get(i));
+      System.out.println("history" + i + "_outer_surface_temperature_c="
+          + ((List<Double>) series.get("outerSurfaceTemperatureC")).get(i));
+      System.out.println("history" + i + "_heat_flux_kw_m2="
+          + ((List<Double>) series.get("heatFluxKWPerM2")).get(i));
+      System.out.println("history" + i + "_von_mises_stress_mpa="
+          + ((List<Double>) series.get("vonMisesStressMPa")).get(i));
+      System.out.println("history" + i + "_strain_rate_per_minute="
+          + ((List<Double>) series.get("strainRatePerMinute")).get(i));
+      System.out.println("history" + i + "_accumulated_strain="
+          + ((List<Double>) series.get("accumulatedStrain")).get(i));
+      System.out.println("history" + i + "_strain_limit="
+          + ((List<Double>) series.get("ruptureStrainLimit")).get(i));
+    }
+    System.out.println();
+  }
+
+  // === process.vessel_rupture ==============================================
+
+  static void vesselRuptureRows() {
+    vesselSevereCase();
+    vesselMildCase();
+    vesselLpgCase("vessel_lpg_bare", 18.0, 8.0, 300.0, 600.0);
+    vesselLpgCase("vessel_lpg_insulated", 18.0, 5.0, 300.0, 110.0);
+    vesselGradeSweep();
+    vesselOneRow("vessel_x90_one_row", "X90");
+    vesselOneRow("vessel_l450_alias", "L450");
+
+    blowdownRefusal("vessel_factor_zero_refused", () -> {
+      MaterialStrengthCurve material = MaterialStrengthCurve.carbonSteel("CS", 245.0e6, 415.0e6);
+      new VesselRuptureAnalyzer(0.5, 0.01, material).setTensileStrengthFactor(0.0);
+    });
+    blowdownRefusal("vessel_factor_high_refused", () -> {
+      MaterialStrengthCurve material = MaterialStrengthCurve.carbonSteel("CS", 245.0e6, 415.0e6);
+      new VesselRuptureAnalyzer(0.5, 0.01, material).setTensileStrengthFactor(1.5);
+    });
+    blowdownRefusal("vessel_radius_zero_refused", () -> {
+      MaterialStrengthCurve material = MaterialStrengthCurve.carbonSteel("CS", 245.0e6, 415.0e6);
+      new VesselRuptureAnalyzer(0.0, 0.01, material);
+    });
+    blowdownRefusal("vessel_wall_zero_refused", () -> {
+      MaterialStrengthCurve material = MaterialStrengthCurve.carbonSteel("CS", 245.0e6, 415.0e6);
+      new VesselRuptureAnalyzer(0.5, 0.0, material);
+    });
+    blowdownRefusal("vessel_empty_history_refused", () -> {
+      MaterialStrengthCurve material = MaterialStrengthCurve.carbonSteel("CS", 245.0e6, 415.0e6);
+      new VesselRuptureAnalyzer(0.5, 0.01, material).analyze(new double[] {}, new double[] {},
+          new double[] {});
+    });
+    blowdownRefusal("vessel_mismatched_history_refused", () -> {
+      MaterialStrengthCurve material = MaterialStrengthCurve.carbonSteel("CS", 245.0e6, 415.0e6);
+      new VesselRuptureAnalyzer(0.5, 0.01, material)
+          .analyze(new double[] {0.0, 30.0}, new double[] {20.0e5}, new double[] {300.0, 300.0});
+    });
+    blowdownRefusal("vessel_negative_pressure_refused", () -> {
+      MaterialStrengthCurve material = MaterialStrengthCurve.carbonSteel("CS", 245.0e6, 415.0e6);
+      new VesselRuptureAnalyzer(0.5, 0.01, material)
+          .analyze(new double[] {0.0}, new double[] {-1.0}, new double[] {300.0});
+    });
+    blowdownRefusal("vessel_unknown_grade_refused",
+        () -> MaterialStrengthCurve.forApi5LPipeGrade("X999"));
+    blowdownRefusal("vessel_empty_grade_refused",
+        () -> MaterialStrengthCurve.forApi5LPipeGrade(""));
+    vesselNonMonotonicEvidence();
+  }
+
+  static void vesselSevereCase() {
+    MaterialStrengthCurve material = MaterialStrengthCurve.forApi5LPipeGrade("X65");
+    VesselRuptureAnalyzer analyzer = new VesselRuptureAnalyzer(0.5, 0.01, material);
+    int n = 11;
+    double[] time = new double[n];
+    double[] pressure = new double[n];
+    double[] metalT = new double[n];
+    for (int i = 0; i < n; i++) {
+      time[i] = i * 30.0;
+      pressure[i] = (10.0 + i * 9.0) * 1.0e5;
+      metalT[i] = 700.0 + 273.15;
+    }
+    vesselSummary("vessel_severe_x65", analyzer, material, analyzer.analyze(time, pressure, metalT));
+  }
+
+  static void vesselMildCase() {
+    MaterialStrengthCurve material = MaterialStrengthCurve.forApi5LPipeGrade("X65");
+    VesselRuptureAnalyzer analyzer = new VesselRuptureAnalyzer(0.5, 0.02, material);
+    int n = 6;
+    double[] time = new double[n];
+    double[] pressure = new double[n];
+    double[] metalT = new double[n];
+    for (int i = 0; i < n; i++) {
+      time[i] = i * 30.0;
+      pressure[i] = 20.0e5;
+      metalT[i] = 300.0;
+    }
+    vesselSummary("vessel_mild_x65", analyzer, material, analyzer.analyze(time, pressure, metalT));
+  }
+
+  static void vesselLpgCase(String label, double startBar, double riseBar,
+      double startT, double riseT) {
+    MaterialStrengthCurve steel = MaterialStrengthCurve.carbonSteel("CS", 245.0e6, 415.0e6);
+    VesselRuptureAnalyzer analyzer = new VesselRuptureAnalyzer(0.5, 0.012, steel);
+    int n = 21;
+    double[] time = new double[n];
+    double[] pressure = new double[n];
+    double[] metalT = new double[n];
+    for (int i = 0; i < n; i++) {
+      double f = i / (double) (n - 1);
+      time[i] = i * 30.0;
+      pressure[i] = (startBar + riseBar * f) * 1.0e5;
+      metalT[i] = startT + riseT * f;
+    }
+    vesselSummary(label, analyzer, steel, analyzer.analyze(time, pressure, metalT));
+  }
+
+  static void vesselGradeSweep() {
+    String[] grades = {"B", "X42", "X52", "X60", "X65", "X70", "X80", "A25", "A", "X46", "X56",
+        "X90", "X100", "X120"};
+    for (String grade : grades) {
+      System.out.println("vessel_grade_" + grade.toLowerCase());
+      MaterialStrengthCurve material = MaterialStrengthCurve.forApi5LPipeGrade(grade);
+      System.out.println("grade=" + grade);
+      System.out.println("material_name=" + material.getMaterialName());
+      System.out.println("ambient_yield_strength_mpa="
+          + material.getAmbientYieldStrengthPa() / 1.0e6);
+      System.out.println("ambient_tensile_strength_mpa="
+          + material.getAmbientTensileStrengthPa() / 1.0e6);
+      System.out.println("data_source=" + material.getDataSource());
+      System.out.println();
+    }
+  }
+
+  static void vesselOneRow(String label, String grade) {
+    MaterialStrengthCurve material = MaterialStrengthCurve.forApi5LPipeGrade(grade);
+    VesselRuptureAnalyzer analyzer = new VesselRuptureAnalyzer(0.5, 0.01, material);
+    vesselSummary(label, analyzer, material,
+        analyzer.analyze(new double[] {0.0}, new double[] {20.0e5}, new double[] {973.15}));
+  }
+
+  static void vesselNonMonotonicEvidence() {
+    MaterialStrengthCurve material = MaterialStrengthCurve.carbonSteel("CS", 245.0e6, 415.0e6);
+    VesselRuptureAnalyzer analyzer = new VesselRuptureAnalyzer(0.5, 0.01, material);
+    System.out.println("vessel_non_monotonic_evidence");
+    try {
+      VesselRuptureAnalyzer.VesselRuptureResult result = analyzer
+          .analyze(new double[] {0.0, 30.0, 10.0}, new double[] {20.0e5, 30.0e5, 25.0e5},
+              new double[] {300.0, 500.0, 400.0});
+      System.out.println("accepted=true");
+      System.out.println("ruptured=" + result.ruptured);
+      System.out.println("rupture_time_s=" + result.ruptureTimeS);
+    } catch (RuntimeException ex) {
+      System.out.println("accepted=false");
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void vesselSummary(String label, VesselRuptureAnalyzer analyzer,
+      MaterialStrengthCurve material, VesselRuptureAnalyzer.VesselRuptureResult result) {
+    System.out.println(label);
+    System.out.println("material_name=" + material.getMaterialName());
+    System.out.println("ambient_yield_strength_mpa="
+        + material.getAmbientYieldStrengthPa() / 1.0e6);
+    System.out.println("ambient_tensile_strength_mpa="
+        + material.getAmbientTensileStrengthPa() / 1.0e6);
+    System.out.println("data_source=" + material.getDataSource());
+    System.out.println("ruptured=" + result.ruptured);
+    System.out.println("rupture_time_s=" + result.ruptureTimeS);
+    System.out.println("rupture_stress_pa=" + result.ruptureStressPa);
+    System.out.println("rupture_allowable_stress_pa=" + result.allowableAtRupturePa);
+    System.out.println("rupture_metal_temperature_k=" + result.ruptureMetalTemperatureK);
+    System.out.println("min_margin_pa=" + result.minMarginPa);
+    System.out.println("min_margin_time_s=" + result.minMarginTimeS);
+    System.out.println("point_count=" + result.timeS.size());
+    for (int i = 0; i < result.timeS.size(); i++) {
+      System.out.println("history" + i + "_time_s=" + result.timeS.get(i));
+      System.out.println("history" + i + "_von_mises_stress_pa="
+          + result.vonMisesStressPa.get(i));
+      System.out.println("history" + i + "_allowable_stress_pa="
+          + result.allowableStressPa.get(i));
+      System.out.println("history" + i + "_margin_pa=" + result.marginPa.get(i));
+    }
+    System.out.println();
   }
 }
