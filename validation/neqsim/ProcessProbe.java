@@ -184,6 +184,22 @@ import neqsim.process.safety.risk.sis.SILVerificationResult;
 import neqsim.process.safety.risk.sis.nog070.Nog070SilCatalogue;
 import neqsim.process.safety.risk.sis.nog070.Nog070SilDetermination;
 import neqsim.process.safety.risk.sis.nog070.Nog070SifType;
+import neqsim.process.safety.overpressure.AcceptanceResult;
+import neqsim.process.safety.overpressure.ComplianceFinding;
+import neqsim.process.safety.overpressure.ComplianceStatus;
+import neqsim.process.safety.overpressure.FireCaseRelief;
+import neqsim.process.safety.overpressure.OverpressureAcceptanceChecker;
+import neqsim.process.safety.overpressure.OverpressureStudyResult;
+import neqsim.process.safety.overpressure.PipelinePressureProtectionCalculator;
+import neqsim.process.safety.overpressure.ProtectedItem;
+import neqsim.process.safety.overpressure.ReliefCause;
+import neqsim.process.safety.overpressure.ReliefDisposalNetwork;
+import neqsim.process.safety.overpressure.ReliefDisposalResult;
+import neqsim.process.safety.overpressure.ReliefLoadContribution;
+import neqsim.process.safety.overpressure.ReliefPhase;
+import neqsim.process.safety.overpressure.ReliefScenario;
+import neqsim.process.safety.overpressure.TR3001ComplianceChecker;
+import neqsim.process.util.fire.ReliefValveSizing;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -401,6 +417,27 @@ public class ProcessProbe {
         break;
       case "risk_matrix":
         riskMatrixRows();
+        break;
+      case "psv_sizing":
+        psvSizingRows();
+        break;
+      case "psv_fire_sizing":
+        psvFireSizingRows();
+        break;
+      case "fire_case_relief":
+        fireCaseReliefRows();
+        break;
+      case "overpressure_acceptance":
+        overpressureAcceptanceRows();
+        break;
+      case "pipeline_pressure_protection":
+        pipelinePressureProtectionRows();
+        break;
+      case "relief_disposal_network":
+        reliefDisposalNetworkRows();
+        break;
+      case "tr3001_compliance":
+        tr3001ComplianceRows();
         break;
       case "expander_steps":
         expanderStepRows();
@@ -14437,5 +14474,510 @@ public class ProcessProbe {
     }
     System.out.println("total_annual_risk_cost=" + matrix.getTotalAnnualRiskCost());
     System.out.println();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Tranche 7: relief sizing and overpressure protection
+  // ---------------------------------------------------------------------------
+
+  static void psvSizingRows() {
+    psvGas("ps_gas_choked", 1.0, 1.0e6, 0.10, 1.01325e5, 300.0, 0.020, 0.9, 1.3, false, false,
+        null, null);
+    psvGas("ps_gas_balanced_subcritical", 1.0, 1.0e6, 0.10, 8.0e5, 300.0, 0.020, 0.9, 1.3, true,
+        false, null, null);
+    psvGas("ps_gas_conventional_high_back_pressure", 1.0, 1.0e6, 0.10, 6.6e5, 300.0, 0.020,
+        0.9, 1.3, false, false, null, null);
+    psvGas("ps_gas_conventional_severe_back_pressure", 1.0, 1.0e6, 0.10, 9.5e5, 300.0, 0.020,
+        0.9, 1.3, false, false, null, null);
+    psvGas("ps_gas_rupture_disk", 1.0, 1.0e6, 0.10, 1.01325e5, 300.0, 0.020, 0.9, 1.3, false,
+        true, null, null);
+    psvGas("ps_gas_orifice_exhausted", 100.0, 1.0e6, 0.10, 1.01325e5, 300.0, 0.020, 0.9, 1.3,
+        false, false, null, null);
+    psvGas("ps_gas_capacity_roundtrip", 1.0, 1.0e6, 0.10, 1.01325e5, 300.0, 0.020, 0.9, 1.3,
+        false, false, Double.NaN, 0.975);
+    psvLiquid("ps_liquid_low_viscosity", 0.01, 800.0, 1.0e6, 0.10, 1.01325e5, 1.0e-3, false);
+    psvLiquid("ps_liquid_high_viscosity", 0.01, 800.0, 1.0e6, 0.10, 1.01325e5, 1.0, false);
+    psvLiquid("ps_liquid_low_overpressure", 0.01, 800.0, 1.0e6, 0.05, 1.01325e5, 1.0e-3, false);
+    psvLiquid("ps_liquid_balanced_high_back_pressure", 0.01, 800.0, 1.0e6, 0.10, 7.7e5, 1.0e-3,
+        true);
+    psvLiquid("ps_liquid_conventional_high_back_pressure", 0.01, 800.0, 1.0e6, 0.10, 7.7e5,
+        1.0e-3, false);
+    psvLiquid("ps_liquid_back_above_relieving", 0.01, 800.0, 1.0e6, 0.10, 1.2e6, 1.0e-3,
+        false);
+    psvTwoPhase("ps_two_phase_omega_high", 1.0, 1.0e6, 0.10, 1.0e5, 350.0, 0.2, 20.0, 600.0,
+        2.0e5, 2500.0);
+    psvTwoPhase("ps_two_phase_omega_low", 1.0, 1.0e6, 0.10, 1.0e5, 300.0, 0.01, 50.0, 700.0,
+        1.0e6, 2000.0);
+    psvTwoPhase("ps_two_phase_back_above_relieving", 1.0, 1.0e6, 0.10, 1.2e6, 300.0, 0.01,
+        50.0, 700.0, 1.0e6, 2000.0);
+    refusalProbe("ps_gas_zero_mass", () -> ReliefValveSizing.calculateRequiredArea(0.0, 1.0e6,
+        0.10, 1.01325e5, 300.0, 0.020, 0.9, 1.3, false, false));
+    refusalProbe("ps_gas_k_one", () -> ReliefValveSizing.calculateRequiredArea(1.0, 1.0e6, 0.10,
+        1.01325e5, 300.0, 0.020, 0.9, 1.0, false, false));
+    refusalProbe("ps_liquid_zero_volume", () -> ReliefValveSizing.calculateLiquidReliefArea(0.0,
+        800.0, 1.0e6, 0.10, 1.01325e5, 1.0e-3, false));
+    refusalProbe("ps_two_phase_zero_liquid_density",
+        () -> ReliefValveSizing.calculateTwoPhaseReliefArea(1.0, 1.0e6, 0.10, 1.0e5, 300.0,
+            0.01, 50.0, 0.0, 1.0e6, 2000.0));
+  }
+
+  static void psvGas(String label, double massFlow, double setPressure, double overpressure,
+      double backPressure, double temperature, double molarMass, double compressibility,
+      double specificHeatRatio, boolean balancedBellows, boolean ruptureDisk, Double orificeArea,
+      Double capacityCd) {
+    System.out.println(label);
+    System.out.println("service=gas");
+    System.out.println("mass_flow=" + massFlow);
+    System.out.println("set_pressure=" + setPressure);
+    System.out.println("overpressure_fraction=" + overpressure);
+    System.out.println("back_pressure=" + backPressure);
+    System.out.println("temperature=" + temperature);
+    System.out.println("molar_mass=" + molarMass);
+    System.out.println("compressibility=" + compressibility);
+    System.out.println("specific_heat_ratio=" + specificHeatRatio);
+    System.out.println("is_balanced_bellows=" + balancedBellows);
+    System.out.println("has_rupture_disk=" + ruptureDisk);
+    try {
+      ReliefValveSizing.PSVSizingResult result = ReliefValveSizing.calculateRequiredArea(
+          massFlow, setPressure, overpressure, backPressure, temperature, molarMass,
+          compressibility, specificHeatRatio, balancedBellows, ruptureDisk);
+      System.out.println("relieving_pressure=" + (setPressure * (1.0 + overpressure)));
+      System.out.println("back_pressure_fraction=" + result.getBackPressureFraction());
+      System.out.println("discharge_coefficient=" + result.getDischargeCoefficient());
+      System.out.println("required_area=" + result.getRequiredArea());
+      System.out.println("required_area_in2=" + result.getRequiredAreaIn2());
+      System.out.println("recommended_orifice=" + result.getRecommendedOrifice());
+      System.out.println("selected_area_in2=" + result.getSelectedAreaIn2());
+      System.out.println("back_pressure_correction=" + result.getBackPressureCorrectionFactor());
+      System.out.println("combination_correction=" + result.getCombinationCorrectionFactor());
+      if (orificeArea != null) {
+        double area = orificeArea.isNaN() ? result.getSelectedArea() : orificeArea;
+        System.out.println("orifice_area=" + area);
+        System.out.println("capacity_discharge_coefficient=" + capacityCd);
+        System.out.println("mass_flow_capacity=" + ReliefValveSizing.calculateMassFlowCapacity(
+            area, setPressure, overpressure, backPressure, temperature, molarMass,
+            compressibility, specificHeatRatio, capacityCd));
+      }
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void psvLiquid(String label, double volumeFlow, double density, double setPressure,
+      double overpressure, double backPressure, double viscosity, boolean balancedBellows) {
+    System.out.println(label);
+    System.out.println("service=liquid");
+    System.out.println("volume_flow=" + volumeFlow);
+    System.out.println("liquid_density=" + density);
+    System.out.println("set_pressure=" + setPressure);
+    System.out.println("overpressure_fraction=" + overpressure);
+    System.out.println("back_pressure=" + backPressure);
+    System.out.println("viscosity=" + viscosity);
+    System.out.println("is_balanced_bellows=" + balancedBellows);
+    try {
+      ReliefValveSizing.LiquidPSVSizingResult result =
+          ReliefValveSizing.calculateLiquidReliefArea(volumeFlow, density, setPressure,
+              overpressure, backPressure, viscosity, balancedBellows);
+      double relieving = setPressure * (1.0 + overpressure);
+      System.out.println("relieving_pressure=" + relieving);
+      System.out.println("back_pressure_fraction=" + (backPressure / relieving));
+      System.out.println("discharge_coefficient=" + result.getDischargeCoefficient());
+      System.out.println("required_area=" + result.getRequiredAreaM2());
+      System.out.println("required_area_in2=" + result.getRequiredAreaIn2());
+      System.out.println("recommended_orifice=" + result.getRecommendedOrifice());
+      System.out.println("selected_area_in2=" + result.getSelectedAreaIn2());
+      System.out.println("back_pressure_correction=" + result.getBackPressureCorrectionFactor());
+      System.out.println("viscosity_correction=" + result.getViscosityCorrectionFactor());
+      System.out.println("mass_flow_rate=" + result.getMassFlowRate());
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void psvTwoPhase(String label, double massFlow, double setPressure, double overpressure,
+      double backPressure, double temperature, double gasFraction, double gasDensity,
+      double liquidDensity, double latentHeat, double liquidHeatCapacity) {
+    System.out.println(label);
+    System.out.println("service=two_phase");
+    System.out.println("mass_flow=" + massFlow);
+    System.out.println("set_pressure=" + setPressure);
+    System.out.println("overpressure_fraction=" + overpressure);
+    System.out.println("back_pressure=" + backPressure);
+    System.out.println("temperature=" + temperature);
+    System.out.println("gas_fraction=" + gasFraction);
+    System.out.println("gas_density=" + gasDensity);
+    System.out.println("liquid_density=" + liquidDensity);
+    System.out.println("latent_heat=" + latentHeat);
+    System.out.println("liquid_heat_capacity=" + liquidHeatCapacity);
+    try {
+      double area = ReliefValveSizing.calculateTwoPhaseReliefArea(massFlow, setPressure,
+          overpressure, backPressure, temperature, gasFraction, gasDensity, liquidDensity,
+          latentHeat, liquidHeatCapacity);
+      double relieving = setPressure * (1.0 + overpressure);
+      System.out.println("relieving_pressure=" + relieving);
+      System.out.println("back_pressure_fraction=" + (backPressure / relieving));
+      System.out.println("discharge_coefficient=0.85");
+      System.out.println("required_area=" + area);
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void refusalProbe(String label, Runnable call) {
+    System.out.println(label);
+    try {
+      call.run();
+      System.out.println("refusal=accepted");
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void psvFireSizingRows() {
+    psvFire("pf_peak_dominated", 1000.0, 2.0e6, 1.0e6, 300.0, 5.0e6, 10.0, 0.020, 1.3, 0.9,
+        2000.0, 900.0, null, null, null, null);
+    psvFire("pf_average_dominated", 5000.0, 2.0e6, 1.0e6, 300.0, 1.0e5, 10.0, 0.020, 1.3, 0.9,
+        2000.0, 900.0, null, null, null, null);
+    psvFire("pf_helpers", 1000.0, 2.0e6, 1.0e6, 300.0, 5.0e6, 10.0, 0.020, 1.3, 0.9, 2000.0,
+        900.0, 10.0, 0.001, 0.975, "H");
+    psvFire("pf_unused_inputs_a", 1000.0, 2.0e6, 1.0e6, 300.0, 5.0e6, 10.0, 0.020, 1.3, 0.9,
+        2000.0, 900.0, null, null, null, null);
+    psvFire("pf_unused_inputs_b", 1000.0, 5.0e6, 1.0e6, 300.0, 5.0e6, 30.0, 0.020, 1.3, 0.9,
+        2000.0, 900.0, null, null, null, null);
+    refusalProbe("pf_zero_blowdown", () -> ReliefValveSizing.dynamicFireSizing(1000.0, 2.0e6,
+        1.0e6, 300.0, 5.0e6, 10.0, 0.020, 1.3, 0.9, 2000.0, 0.0));
+  }
+
+  static void psvFire(String label, double initialMass, double initialPressure,
+      double setPressure, double initialTemperature, double fireHeatInput, double vesselVolume,
+      double molarMass, double specificHeatRatio, double compressibility, double heatCapacity,
+      double blowdownTime, Double blowdownPercent, Double orificeArea, Double cvCd,
+      String currentOrifice) {
+    System.out.println(label);
+    System.out.println("initial_mass=" + initialMass);
+    System.out.println("initial_pressure=" + initialPressure);
+    System.out.println("set_pressure=" + setPressure);
+    System.out.println("initial_temperature=" + initialTemperature);
+    System.out.println("fire_heat_input=" + fireHeatInput);
+    System.out.println("vessel_volume=" + vesselVolume);
+    System.out.println("molar_mass=" + molarMass);
+    System.out.println("specific_heat_ratio=" + specificHeatRatio);
+    System.out.println("compressibility=" + compressibility);
+    System.out.println("heat_capacity=" + heatCapacity);
+    System.out.println("blowdown_time=" + blowdownTime);
+    if (blowdownPercent != null) {
+      System.out.println("blowdown_percent=" + blowdownPercent);
+    }
+    if (orificeArea != null) {
+      System.out.println("orifice_area=" + orificeArea);
+      System.out.println("cv_discharge_coefficient=" + cvCd);
+    }
+    if (currentOrifice != null) {
+      System.out.println("current_orifice=" + currentOrifice);
+    }
+    try {
+      ReliefValveSizing.PSVSizingResult result = ReliefValveSizing.dynamicFireSizing(initialMass,
+          initialPressure, setPressure, initialTemperature, fireHeatInput, vesselVolume,
+          molarMass, specificHeatRatio, compressibility, heatCapacity, blowdownTime);
+      System.out.println("overpressure_fraction=" + result.getOverpressureFraction());
+      System.out.println("required_area=" + result.getRequiredArea());
+      System.out.println("required_area_in2=" + result.getRequiredAreaIn2());
+      System.out.println("recommended_orifice=" + result.getRecommendedOrifice());
+      System.out.println("selected_area_in2=" + result.getSelectedAreaIn2());
+      System.out.println("back_pressure_fraction=" + result.getBackPressureFraction());
+      System.out.println("discharge_coefficient=" + result.getDischargeCoefficient());
+      System.out.println("back_pressure_correction=" + result.getBackPressureCorrectionFactor());
+      System.out.println("combination_correction=" + result.getCombinationCorrectionFactor());
+      if (blowdownPercent != null) {
+        System.out.println("blowdown_pressure="
+            + ReliefValveSizing.calculateBlowdownPressure(setPressure, blowdownPercent));
+      }
+      if (orificeArea != null && cvCd != null) {
+        System.out.println("flow_coefficient="
+            + ReliefValveSizing.calculateCv(orificeArea, cvCd));
+      }
+      if (currentOrifice != null) {
+        System.out.println("next_orifice="
+            + ReliefValveSizing.getNextLargerOrifice(currentOrifice));
+      }
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void fireCaseReliefRows() {
+    fireCase("fc_area_drainage", 100.0, null, null, true, true, 300000.0, 350.0);
+    fireCase("fc_area_no_drainage", 100.0, null, null, false, true, 300000.0, 350.0);
+    fireCase("fc_geometry", null, 2.0, 5.0, true, true, null, null);
+    fireCase("fc_no_area", null, null, null, true, true, null, null);
+    fireCase("fc_latent_default", 100.0, null, null, true, true, null, null);
+    fireCase("fc_negative_latent", 100.0, null, null, true, true, -1.0, null);
+    fireCase("fc_firefighting_unread", 100.0, null, null, true, false, 300000.0, 350.0);
+  }
+
+  static void fireCase(String label, Double wettedArea, Double diameter, Double height,
+      boolean drainage, boolean firefighting, Double latentHeat, Double relievingTemperatureK) {
+    System.out.println(label);
+    if (wettedArea != null) {
+      System.out.println("wetted_area=" + wettedArea);
+    }
+    if (diameter != null) {
+      System.out.println("vessel_diameter=" + diameter);
+      System.out.println("wetted_height=" + height);
+    }
+    System.out.println("has_drainage=" + drainage);
+    System.out.println("has_fire_fighting=" + firefighting);
+    FireCaseRelief calculator = new FireCaseRelief();
+    if (wettedArea != null) {
+      calculator.setWettedAreaM2(wettedArea);
+    }
+    if (diameter != null) {
+      calculator.setVesselDiameterM(diameter).setWettedHeightM(height);
+    }
+    calculator.setHasDrainage(drainage).setHasFireFighting(firefighting);
+    if (latentHeat != null) {
+      calculator.setLatentHeatJPerKg(latentHeat);
+    }
+    if (relievingTemperatureK != null) {
+      calculator.setReliefTemperatureC(relievingTemperatureK - 273.15);
+    }
+    ReliefScenario scenario = calculator.calculate();
+    System.out.println("latent_heat=" + scenario.getLatentHeatJPerKg());
+    System.out.println("relief_rate=" + scenario.getReliefRateKgPerS());
+    System.out.println("relief_rate_kg_per_hr=" + scenario.getReliefRateKgPerHr());
+    if (!Double.isNaN(scenario.getReliefTemperatureK())) {
+      System.out.println("relieving_temperature=" + scenario.getReliefTemperatureK());
+    }
+    System.out.println();
+  }
+
+  static void overpressureAcceptanceRows() {
+    acceptance("oa_fire", 10.5e5, 10.0e5, ReliefCause.FIRE, false);
+    acceptance("oa_single_at_limit", 11.0e5, 10.0e5, ReliefCause.BLOCKED_OUTLET, false);
+    acceptance("oa_multiple", 11.5e5, 10.0e5, ReliefCause.BLOCKED_OUTLET, true);
+    acceptance("oa_fire_multiple_ignored", 12.0e5, 10.0e5, ReliefCause.FIRE, true);
+    acceptance("oa_exceeded", 12.2e5, 10.0e5, ReliefCause.FIRE, false);
+    acceptance("oa_single_exceeded", 11.1e5, 10.0e5, ReliefCause.BLOCKED_OUTLET, false);
+  }
+
+  static void acceptance(String label, double peakPressurePa, double mawpPa, ReliefCause cause,
+      boolean multipleDevices) {
+    System.out.println(label);
+    System.out.println("peak_pressure=" + peakPressurePa);
+    System.out.println("mawp=" + mawpPa);
+    System.out.println("cause=" + cause.name().toLowerCase());
+    System.out.println("multiple_devices=" + multipleDevices);
+    AcceptanceResult result = new OverpressureAcceptanceChecker().check(peakPressurePa / 1.0e5,
+        new ProtectedItem("V-100", mawpPa / 1.0e5), cause, multipleDevices);
+    System.out.println("accumulation_factor=" + result.getAccumulationFraction());
+    System.out.println("allowable_pressure=" + (result.getAllowableAccumulatedPressureBara() * 1.0e5));
+    System.out.println("margin=" + (result.getMarginBara() * 1.0e5));
+    System.out.println("accepted=" + result.isAccepted());
+    System.out.println();
+  }
+
+  static void pipelinePressureProtectionRows() {
+    pipeline("pp_fully_rated", 5.0, 10.0, 1.1, 8.0, 10.0);
+    pipeline("pp_two_barriers", 12.0, 10.0, 1.1, 8.0, 10.0);
+    pipeline("pp_insufficient", 12.0, 10.0, 1.1, 11.0, 10.0);
+    pipeline("pp_source_at_design", 10.0, 10.0, 1.1, 8.0, 10.0);
+    pipeline("pp_barrier2_at_mip", 12.0, 10.0, 1.1, 8.0, 11.0);
+    pipeline("pp_barrier1_above_design", 12.0, 10.0, 1.2, 10.5, 11.5);
+  }
+
+  static void pipeline(String label, double maxSource, double design, double incidental,
+      double barrier1, double barrier2) {
+    System.out.println(label);
+    System.out.println("max_source_pressure=" + maxSource);
+    System.out.println("design_pressure=" + design);
+    System.out.println("incidental_factor=" + incidental);
+    System.out.println("barrier1_setpoint=" + barrier1);
+    System.out.println("barrier2_setpoint=" + barrier2);
+    PipelinePressureProtectionCalculator calculator = new PipelinePressureProtectionCalculator();
+    calculator.setPressureBasis(maxSource, design, incidental);
+    calculator.setBarriers(barrier1, barrier2);
+    calculator.calcProtection();
+    System.out.println("max_incidental_pressure=" + calculator.getMaxIncidentalPressure());
+    System.out.println("design_margin=" + calculator.getDesignMargin());
+    System.out.println("fully_rated=" + calculator.isFullyRated());
+    System.out.println("barrier1_adequate=" + calculator.isBarrier1Adequate());
+    System.out.println("barrier2_adequate=" + calculator.isBarrier2Adequate());
+    System.out.println("protection_adequate=" + calculator.isProtectionAdequate());
+    System.out.println("verdict=" + calculator.getVerdict());
+    System.out.println();
+  }
+
+  static void reliefDisposalNetworkRows() {
+    disposal("dn_all_simultaneous", new String[] {"A", "B", "C"},
+        new ReliefCause[] {ReliefCause.FIRE, ReliefCause.BLOCKED_OUTLET,
+            ReliefCause.CONTROL_VALVE_FAILURE},
+        new ReliefPhase[] {ReliefPhase.VAPOUR, ReliefPhase.LIQUID, ReliefPhase.VAPOUR},
+        new double[] {1.0, 0.5, 2.0}, new boolean[] {true, true, true});
+    disposal("dn_mixed", new String[] {"A", "B", "C"},
+        new ReliefCause[] {ReliefCause.FIRE, ReliefCause.BLOCKED_OUTLET,
+            ReliefCause.TUBE_RUPTURE},
+        new ReliefPhase[] {ReliefPhase.VAPOUR, ReliefPhase.LIQUID, ReliefPhase.TWO_PHASE},
+        new double[] {1.0, 2.0, 0.5}, new boolean[] {true, false, true});
+    disposal("dn_tie_first_wins", new String[] {"A", "B"},
+        new ReliefCause[] {ReliefCause.FIRE, ReliefCause.FIRE},
+        new ReliefPhase[] {ReliefPhase.VAPOUR, ReliefPhase.VAPOUR}, new double[] {1.0, 1.0},
+        new boolean[] {true, true});
+    disposal("dn_all_zero", new String[] {"A", "B"},
+        new ReliefCause[] {ReliefCause.OTHER, ReliefCause.OTHER},
+        new ReliefPhase[] {ReliefPhase.VAPOUR, ReliefPhase.VAPOUR}, new double[] {0.0, 0.0},
+        new boolean[] {true, false});
+    disposal("dn_empty", new String[0], new ReliefCause[0], new ReliefPhase[0], new double[0],
+        new boolean[0]);
+    disposal("dn_negative_rate", new String[] {"A"}, new ReliefCause[] {ReliefCause.OTHER},
+        new ReliefPhase[] {ReliefPhase.VAPOUR}, new double[] {-1.0}, new boolean[] {true});
+  }
+
+  static void disposal(String label, String[] names, ReliefCause[] causes, ReliefPhase[] phases,
+      double[] rates, boolean[] simultaneous) {
+    System.out.println(label);
+    ReliefDisposalNetwork network = new ReliefDisposalNetwork(label);
+    for (int i = 0; i < names.length; i++) {
+      network.addContribution(
+          new ReliefLoadContribution(names[i], causes[i], phases[i], rates[i], simultaneous[i]));
+    }
+    ReliefDisposalResult result = network.calculate();
+    System.out.println("total_simultaneous=" + result.getTotalSimultaneousKgPerS());
+    System.out.println("total_simultaneous_kg_hr=" + result.getTotalSimultaneousKgPerHr());
+    System.out.println("peak_single=" + result.getPeakSingleKgPerS());
+    if (result.getGoverningContributor() != null) {
+      System.out.println("governing_contributor=" + result.getGoverningContributor());
+    }
+    for (int i = 0; i < result.getContributions().size(); i++) {
+      ReliefLoadContribution row = result.getContributions().get(i);
+      System.out.println("contribution" + i + "_item_name=" + row.getItemName());
+      System.out.println("contribution" + i + "_cause=" + row.getCause().name().toLowerCase());
+      System.out.println("contribution" + i + "_phase=" + row.getPhase().name().toLowerCase());
+      System.out.println("contribution" + i + "_mass_flow=" + row.getMassFlowKgPerS());
+      System.out.println(
+          "contribution" + i + "_mass_flow_kg_hr=" + row.getMassFlowKgPerHr());
+      System.out.println("contribution" + i + "_simultaneous=" + row.isSimultaneous());
+    }
+    System.out.println();
+  }
+
+  static void tr3001ComplianceRows() {
+    tr3001("tr_all_pass", new ReliefScenario[] {
+        trScenario("fire", ReliefCause.FIRE, 1.0, true, true),
+        trScenario("blocked", ReliefCause.BLOCKED_OUTLET, 0.5, true, true)}, 0.5, true, true,
+        0.21);
+    tr3001("tr_no_credible", new ReliefScenario[] {
+        trScenario("fire", ReliefCause.FIRE, 1.0, true, false),
+        trScenario("blocked", ReliefCause.BLOCKED_OUTLET, 0.5, true, false)}, 0.5, true, true,
+        0.21);
+    tr3001("tr_unsized", new ReliefScenario[] {
+        trScenario("fire", ReliefCause.FIRE, 1.0, false, true)}, null, false, true, 0.21);
+    tr3001("tr_capacity_fail", new ReliefScenario[] {
+        trScenario("fire", ReliefCause.FIRE, 1.0, true, true)}, 30.0, false, true, 0.21);
+    tr3001("tr_acceptance_fail", new ReliefScenario[] {
+        trScenario("fire", ReliefCause.FIRE, 1.0, true, true)}, 0.5, true, false, 0.21);
+    tr3001("tr_fire_basis_review", new ReliefScenario[] {
+        trScenario("fire", ReliefCause.FIRE, 1.0, true, true)}, 0.5, true, true, 0.10);
+    tr3001("tr_other_cause", new ReliefScenario[] {
+        trScenario("cv", ReliefCause.CONTROL_VALVE_FAILURE, 1.0, false, true)}, 0.5, true, true,
+        0.10);
+    tr3001("tr_null_acceptance", new ReliefScenario[] {
+        trScenario("blocked", ReliefCause.BLOCKED_OUTLET, 1.0, false, true)}, 0.5, true, false,
+        null);
+    tr3001("tr_empty_scenarios", new ReliefScenario[0], null, false, false, null);
+  }
+
+  static ReliefScenario trScenario(String name, ReliefCause cause, double rate, boolean dynamic,
+      boolean credible) {
+    return new ReliefScenario.Builder(name, cause).phase(ReliefPhase.VAPOUR)
+        .reliefRateKgPerS(rate).dynamicallyDetermined(dynamic).credible(credible).build();
+  }
+
+  static void tr3001(String label, ReliefScenario[] scenarios, Double requiredAreaIn2,
+      boolean capacityAdequate, boolean acceptanceAccepted, Double accumulationFraction) {
+    System.out.println(label);
+    System.out.println("scenario_count=" + scenarios.length);
+    for (int i = 0; i < scenarios.length; i++) {
+      System.out.println("scenario" + i + "_cause="
+          + scenarios[i].getCause().name().toLowerCase());
+      System.out.println("scenario" + i + "_relief_rate=" + scenarios[i].getReliefRateKgPerS());
+      System.out.println("scenario" + i + "_dynamically_determined="
+          + scenarios[i].isDynamicallyDetermined());
+      System.out.println("scenario" + i + "_credible=" + scenarios[i].isCredible());
+    }
+    if (requiredAreaIn2 != null) {
+      System.out.println("required_area_in2=" + requiredAreaIn2);
+    }
+    System.out.println("capacity_adequate=" + capacityAdequate);
+    boolean hasAcceptance = accumulationFraction != null;
+    if (hasAcceptance) {
+      System.out.println("acceptance_accepted=" + acceptanceAccepted);
+      System.out.println("accumulation_fraction=" + accumulationFraction);
+    }
+    ReliefScenario governing = null;
+    for (ReliefScenario scenario : scenarios) {
+      if (!scenario.isCredible()) {
+        continue;
+      }
+      if (governing == null || scenario.getReliefRateKgPerS() > governing.getReliefRateKgPerS()) {
+        governing = scenario;
+      }
+    }
+    AcceptanceResult acceptance = hasAcceptance
+        ? new AcceptanceResult(0.0, 0.0, accumulationFraction, acceptanceAccepted, 0.0, "capture")
+        : null;
+    OverpressureStudyResult study = new OverpressureStudyResult(new ProtectedItem("V-100", 10.0),
+        governing, new ArrayList<ReliefScenario>(List.of(scenarios)), Double.NaN,
+        requiredAreaIn2 == null ? Double.NaN : requiredAreaIn2, null, Double.NaN, Double.NaN,
+        capacityAdequate, acceptance, new ArrayList<String>(), null);
+    TR3001ComplianceChecker checker = new TR3001ComplianceChecker();
+    List<ComplianceFinding> findings = checker.check(study);
+    int pass = 0;
+    int review = 0;
+    int fail = 0;
+    for (int i = 0; i < findings.size(); i++) {
+      ComplianceStatus status = findings.get(i).getStatus();
+      System.out.println("finding" + i + "_check=" + checkName(findings.get(i)));
+      System.out.println("finding" + i + "_status=" + status.name().toLowerCase());
+      if (status == ComplianceStatus.PASS) {
+        pass++;
+      } else if (status == ComplianceStatus.FAIL) {
+        fail++;
+      } else if (status == ComplianceStatus.NEEDS_REVIEW) {
+        review++;
+      }
+    }
+    System.out.println("pass_count=" + pass);
+    System.out.println("review_count=" + review);
+    System.out.println("fail_count=" + fail);
+    System.out.println("compliant=" + checker.isCompliant(findings));
+    System.out.println();
+  }
+
+  static String checkName(ComplianceFinding finding) {
+    String title = finding.getTitle();
+    if (title.startsWith("Credible overpressure causes")) {
+      return "credible_scenarios";
+    }
+    if (title.startsWith("Governing relief case")) {
+      return "governing_case";
+    }
+    if (title.startsWith("Relief device sized") || title.startsWith("Relief device capacity")) {
+      return "capacity";
+    }
+    if (title.startsWith("Accumulated pressure")) {
+      return "acceptance";
+    }
+    if (title.startsWith("Fire case uses")) {
+      return "fire_basis";
+    }
+    if (title.startsWith("Dynamic determination")) {
+      return "dynamic_determination";
+    }
+    return "unknown";
   }
 }
