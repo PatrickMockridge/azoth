@@ -1211,6 +1211,92 @@ def _hem_release(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _toxic_library(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.toxic_library`'s layers, from the reference's own arithmetic.
+
+    A lookup and a conversion are separate arms: the row dumper returns the three
+    thresholds when a known chemical is named, and the converted concentration when the
+    conversion group is stated. An unknown name has no numeric layer.
+    """
+    from azoth.process.reference.toxic_library import _lookup, _ppm_to_kg_per_m3
+
+    dumped: dict[str, float] = {}
+    chemical = inputs.get("chemical")
+    if chemical is not None:
+        record = _lookup(str(chemical))
+        if record is not None:
+            dumped["idlh_ppm"] = record[1]
+            dumped["erpg2_ppm"] = record[2]
+            dumped["aegl2_ppm"] = record[3]
+    ppm = inputs.get("concentration_ppm")
+    if ppm is not None:
+        dumped["mass_concentration_kg_m3"] = _ppm_to_kg_per_m3(
+            float(ppm),
+            float(inputs["molar_mass"]),
+            float(inputs["temperature"]),
+            float(inputs["pressure"]),
+        )
+    return dumped
+
+
+def _hazardous_area(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.hazardous_area`'s layers, from the reference's own arithmetic.
+
+    The zone and grade labels are strings and have no layer here; the three numbers are
+    the ones the capture prints.
+    """
+    from azoth.process.reference.hazardous_area import (
+        DEFAULT_AMBIENT_DENSITY,
+        DEFAULT_SAFETY_FACTOR,
+        _effective_diameter,
+        _hazardous_distance,
+        _lfl_mass_fraction,
+    )
+
+    flow = float(inputs["mass_flow"])
+    density = float(inputs["exit_density"])
+    velocity = float(inputs["exit_velocity"])
+    lfl = float(inputs["lfl_volume_fraction"])
+    molar = float(inputs["gas_molar_mass"])
+    ambient = float(inputs.get("ambient_density", DEFAULT_AMBIENT_DENSITY))
+    factor = float(inputs.get("safety_factor", DEFAULT_SAFETY_FACTOR))
+    diameter = _effective_diameter(flow, density, velocity)
+    lfl_mass = _lfl_mass_fraction(lfl, molar)
+    return {
+        "effective_diameter_m": diameter,
+        "lfl_mass_fraction": lfl_mass,
+        "hazardous_distance_m": _hazardous_distance(density, ambient, diameter, factor, lfl_mass),
+    }
+
+
+def _heavy_gas_dispersion(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.heavy_gas_dispersion`'s layers, from the reference's own arithmetic.
+
+    **The distance is dumped only when a ratio is stated.** The published Britter parameter
+    is the unfloored one; the fit's 0.01 floor lives inside the distance.
+    """
+    from azoth.process.reference.heavy_gas_dispersion import (
+        _britter_parameter,
+        _distance,
+        _reduced_gravity,
+    )
+
+    rate = float(inputs["volumetric_rate"])
+    source = float(inputs["source_density"])
+    air = float(inputs["air_density"])
+    wind = float(inputs["wind_speed"])
+    reduced = _reduced_gravity(source, air)
+    alpha = _britter_parameter(reduced, rate, wind)
+    dumped: dict[str, float] = {
+        "reduced_gravity_m_per_s2": reduced,
+        "britter_parameter": alpha,
+    }
+    ratio = inputs.get("concentration_ratio")
+    if ratio is not None:
+        dumped["distance_to_concentration_ratio_m"] = _distance(rate, wind, alpha, float(ratio))
+    return dumped
+
+
 def _gaussian_plume(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.gaussian_plume`'s layers, from the reference's own arithmetic.
 
@@ -2560,6 +2646,9 @@ DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
     "process.leak_blowdown": _leak_blowdown,
+    "process.hazardous_area": _hazardous_area,
+    "process.toxic_library": _toxic_library,
+    "process.heavy_gas_dispersion": _heavy_gas_dispersion,
     "process.gaussian_plume": _gaussian_plume,
     "process.gas_dispersion": _gas_dispersion,
     "process.bleve": _bleve,
@@ -2983,6 +3072,174 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_leak_blowdown.tsv",
         block=0,
         identified_by=("#label", "pr_methane_50bara_10s_1s"),
+    ),
+    # The toxic library's twelve: the ten canonical rows and the two conversions; the
+    # five aliases, the case-failure states, three unknown names and four evidence rows
+    # are uncased.
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_h2s",
+        capture="process_toxic_library.tsv",
+        block=0,
+        identified_by=("#label", "threshold_H2S"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_co",
+        capture="process_toxic_library.tsv",
+        block=2,
+        identified_by=("#label", "threshold_CO"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_cl2",
+        capture="process_toxic_library.tsv",
+        block=4,
+        identified_by=("#label", "threshold_Cl2"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_nh3",
+        capture="process_toxic_library.tsv",
+        block=6,
+        identified_by=("#label", "threshold_NH3"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_so2",
+        capture="process_toxic_library.tsv",
+        block=8,
+        identified_by=("#label", "threshold_SO2"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_hcn",
+        capture="process_toxic_library.tsv",
+        block=10,
+        identified_by=("#label", "threshold_HCN"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_hf",
+        capture="process_toxic_library.tsv",
+        block=11,
+        identified_by=("#label", "threshold_HF"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_hcl",
+        capture="process_toxic_library.tsv",
+        block=12,
+        identified_by=("#label", "threshold_HCl"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_methanol",
+        capture="process_toxic_library.tsv",
+        block=13,
+        identified_by=("#label", "threshold_methanol"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="threshold_benzene",
+        capture="process_toxic_library.tsv",
+        block=14,
+        identified_by=("#label", "threshold_benzene"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="h2s_100ppm_288k",
+        capture="process_toxic_library.tsv",
+        block=30,
+        identified_by=("#label", "h2s_100ppm_288K"),
+    ),
+    LayerCase(
+        model="process.toxic_library",
+        case="h2s_100ppm_1bar_300k",
+        capture="process_toxic_library.tsv",
+        block=31,
+        identified_by=("#label", "h2s_100ppm_1bar_300K"),
+    ),
+    # The hazardous area's six: the documentation state, the safety-factor and ambient
+    # overrides, a tenfold flow and both other grades; the nine guards are uncased.
+    LayerCase(
+        model="process.hazardous_area",
+        case="methane_default",
+        capture="process_hazardous_area.tsv",
+        block=0,
+        identified_by=("#label", "methane_default"),
+    ),
+    LayerCase(
+        model="process.hazardous_area",
+        case="methane_safety_025",
+        capture="process_hazardous_area.tsv",
+        block=1,
+        identified_by=("#label", "methane_safety_025"),
+    ),
+    LayerCase(
+        model="process.hazardous_area",
+        case="methane_flow_1",
+        capture="process_hazardous_area.tsv",
+        block=2,
+        identified_by=("#label", "methane_flow_1"),
+    ),
+    LayerCase(
+        model="process.hazardous_area",
+        case="methane_ambient_1",
+        capture="process_hazardous_area.tsv",
+        block=3,
+        identified_by=("#label", "methane_ambient_1"),
+    ),
+    LayerCase(
+        model="process.hazardous_area",
+        case="primary_zone",
+        capture="process_hazardous_area.tsv",
+        block=4,
+        identified_by=("#label", "primary_zone"),
+    ),
+    LayerCase(
+        model="process.hazardous_area",
+        case="continuous_zone",
+        capture="process_hazardous_area.tsv",
+        block=5,
+        identified_by=("#label", "continuous_zone"),
+    ),
+    # The dense gas's five: the analyzer's two distances, the alpha floor, equal
+    # densities and a buoyant source; the six guards are uncased.
+    LayerCase(
+        model="process.heavy_gas_dispersion",
+        case="methane_forced_heavy_lfl",
+        capture="process_heavy_gas_dispersion.tsv",
+        block=0,
+        identified_by=("#label", "methane_forced_heavy_lfl"),
+    ),
+    LayerCase(
+        model="process.heavy_gas_dispersion",
+        case="methane_forced_heavy_half_lfl",
+        capture="process_heavy_gas_dispersion.tsv",
+        block=1,
+        identified_by=("#label", "methane_forced_heavy_half_lfl"),
+    ),
+    LayerCase(
+        model="process.heavy_gas_dispersion",
+        case="alpha_floor",
+        capture="process_heavy_gas_dispersion.tsv",
+        block=2,
+        identified_by=("#label", "alpha_floor"),
+    ),
+    LayerCase(
+        model="process.heavy_gas_dispersion",
+        case="equal_density",
+        capture="process_heavy_gas_dispersion.tsv",
+        block=3,
+        identified_by=("#label", "equal_density"),
+    ),
+    LayerCase(
+        model="process.heavy_gas_dispersion",
+        case="buoyant_source",
+        capture="process_heavy_gas_dispersion.tsv",
+        block=4,
+        identified_by=("#label", "buoyant_source"),
     ),
     # The plume's nine: every block is a state the port reproduces, so all nine are cased.
     LayerCase(
@@ -5376,6 +5633,13 @@ UNCASED_ROWS: dict[str, int] = {
     # evidence beside the PR oracle, and the zero-rate refusal the port raises rather than
     # reproduces.
     "process_gas_dispersion.tsv": 5,
+    # The dense gas's six: the constructor's four guards and the ratio's two.
+    "process_heavy_gas_dispersion.tsv": 6,
+    # The hazardous area's nine: the constructor's six guards and the setters' three.
+    "process_hazardous_area.tsv": 9,
+    # The toxic library's twenty-four: five aliases, ten case-failure states, two
+    # case-resolved duplicates, three unknown names and four unguarded evidence rows.
+    "process_toxic_library.tsv": 24,
     # The event tree's four: the no-branch tree, the two refusals and the shift count, which
     # cannot be cased (an empty record value is not a case).
     "process_event_tree.tsv": 4,

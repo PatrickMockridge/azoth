@@ -1,0 +1,122 @@
+id = "process.hazardous_area"
+name = "Hazardous-area classification"
+kind = "procedure"
+assumptions = [
+    "**the class's jet model is `Y(x) = 5.4 sqrt(rho_e/rho_a) d_e / x` in mass fraction**, with `d_e = sqrt(4 mdot / (pi rho_e U_e))` the effective source diameter.",
+    "**the LFL is converted mole to mass with `M_air = 0.028964`**: `Y_LFL = y M / (y M + (1 - y) M_air)`, independent of pressure and temperature.",
+    "**the target is the de-rated `k Y_LFL`**, with `k` the class's safety factor, commonly 0.25 to 0.5.",
+    "**the defaults are the class's**: ambient density `1.225` kg/m3, safety factor `0.5` and grade `secondary`.",
+    "**the grade maps to the class's label**: continuous is `Zone 0`, primary `Zone 1` and secondary `Zone 2`.",
+    "**the constructor and setters guard** positive flow, density, velocity and molar mass, an LFL in `(0, 1)`, a factor in `(0, 1]` and a known grade; the port also refuses non-finite values.",
+    "**`summary()` is prose** and sits outside this id; the class's only `src/main` readers are its own test and a documentation example.",
+    "**this is IEC 60079-10-1 area classification**, not plume dispersion; the class's `5.4` decay is carried as the class's model and is not re-derived.",
+]
+references = [
+    "IEC 60079-10-1:2020. Explosive atmospheres - Classification of areas - Explosive gas atmospheres.",
+    "API RP 505 (2018). Recommended Practice for Classification of Locations for Electrical Installations at Petroleum Facilities.",
+    "Chen, C. J.; Rodi, W. (1980). Vertical Turbulent Buoyant Jets. Pergamon.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/dispersion/HazardousAreaCalculator.java` is the port source.",
+    "`validation/neqsim/captures/process_hazardous_area.tsv` - the class's documentation state, the safety-factor and ambient-density overrides, a tenfold flow, both other grades and the guards.",
+]
+[source]
+standard = "NeqSim process/safety/dispersion/HazardousAreaCalculator.java"
+edition = "Its `effectiveDiameterM`, `lflMassFraction`, `hazardousDistanceM`, the `ReleaseGrade` zone mapping and the constructor and setters."
+[algorithm]
+scheme = "iec_60079_10_1_jet_axial_decay"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.mass_flow]
+unit = "kg/s"
+description = "the release mass flow, above zero.\n"
+[inputs.exit_density]
+unit = "kg/m**3"
+description = "the gas density at the release plane, above zero.\n"
+[inputs.exit_velocity]
+unit = "m/s"
+description = "the gas velocity at the release plane, above zero.\n"
+[inputs.lfl_volume_fraction]
+unit = "dimensionless"
+description = "the lower flammable limit as a volume (mole) fraction, in `(0, 1)`.\n"
+[inputs.gas_molar_mass]
+unit = "kg/mol"
+description = "the gas molar mass, above zero.\n"
+[inputs.ambient_density]
+unit = "kg/m**3"
+optional = true
+description = "the ambient air density, above zero. **Absent is `1.225` kg/m3.**\n"
+[inputs.safety_factor]
+unit = "dimensionless"
+optional = true
+description = "the factor applied below the LFL, in `(0, 1]`. **Absent is `0.5`.**\n"
+[inputs.release_grade]
+type = "enum"
+values = ["continuous", "primary", "secondary"]
+optional = true
+description = "the grade of release, which selects the zone. **Absent is `secondary`.**\n"
+[outputs]
+[outputs.effective_diameter]
+unit = "m"
+description = "`d_e = sqrt(4 mdot / (pi rho_e U_e))`, the notional source diameter.\n"
+[outputs.lfl_mass_fraction]
+unit = "dimensionless"
+description = "`Y_LFL = y M / (y M + (1 - y) M_air)`, the class's ideal mole-to-mass conversion.\n"
+[outputs.hazardous_distance]
+unit = "m"
+description = "`5.4 sqrt(rho_e/rho_a) d_e / (k Y_LFL)`, the distance to the de-rated LFL.\n"
+[outputs.release_grade]
+type = "string"
+description = "the class's label: `CONTINUOUS`, `PRIMARY` or `SECONDARY`.\n"
+[outputs.zone_classification]
+type = "string"
+description = "the class's zone label: `Zone 0`, `Zone 1` or `Zone 2`.\n"
+[[valid_range]]
+quantity = "mass_flow"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive mass flow"
+[[valid_range]]
+quantity = "exit_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive density"
+[[valid_range]]
+quantity = "exit_velocity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive velocity"
+[[valid_range]]
+quantity = "lfl_volume_fraction"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses an LFL outside (0, 1)"
+[[valid_range]]
+quantity = "gas_molar_mass"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive molar mass"
+[[valid_range]]
+quantity = "ambient_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive ambient density"
+[[valid_range]]
+quantity = "safety_factor"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class's setter refuses a factor outside (0, 1]"
+[implementations]
+python = "azoth.process.hazardous_area"
+rust = "azoth_process::hazardous_area"

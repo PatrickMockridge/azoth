@@ -1,0 +1,107 @@
+model = "process.hazardous_area"
+
+[[cases]]
+id = "methane_default"
+tolerance = 1.0e-12
+source = "The class's documentation-example state: 0.1 kg/s of methane at 6 kg/m3 and 340 m/s, LFL 0.044, M 0.01604 kg/mol, with the default ambient density, factor and grade. From `validation/neqsim/captures/process_hazardous_area.tsv` (`methane_default`)."
+[cases.inputs]
+mass_flow = 0.1
+exit_density = 6.0
+exit_velocity = 340.0
+lfl_volume_fraction = 0.044
+gas_molar_mass = 0.01604
+[cases.expected]
+effective_diameter = 0.0079002343745798
+lfl_mass_fraction = 0.02485477900884032
+hazardous_distance = 7.597337258328827
+release_grade = "SECONDARY"
+zone_classification = "Zone 2"
+
+[[cases]]
+id = "methane_safety_025"
+tolerance = 1.0e-12
+source = "The same state at a safety factor of 0.25; the distance doubles. From (`methane_safety_025`)."
+[cases.inputs]
+mass_flow = 0.1
+exit_density = 6.0
+exit_velocity = 340.0
+lfl_volume_fraction = 0.044
+gas_molar_mass = 0.01604
+safety_factor = 0.25
+[cases.expected]
+effective_diameter = 0.0079002343745798
+lfl_mass_fraction = 0.02485477900884032
+hazardous_distance = 15.194674516657654
+release_grade = "SECONDARY"
+zone_classification = "Zone 2"
+
+[[cases]]
+id = "methane_flow_1"
+tolerance = 1.0e-12
+source = "A tenfold mass flow; the diameter scales by sqrt(10). From (`methane_flow_1`)."
+[cases.inputs]
+mass_flow = 1.0
+exit_density = 6.0
+exit_velocity = 340.0
+lfl_volume_fraction = 0.044
+gas_molar_mass = 0.01604
+[cases.expected]
+effective_diameter = 0.02498273467282801
+lfl_mass_fraction = 0.02485477900884032
+hazardous_distance = 24.024889888778134
+release_grade = "SECONDARY"
+zone_classification = "Zone 2"
+
+[[cases]]
+id = "methane_ambient_1"
+tolerance = 1.0e-12
+source = "The same state at an ambient density of 1.0 kg/m3. From (`methane_ambient_1`)."
+[cases.inputs]
+mass_flow = 0.1
+exit_density = 6.0
+exit_velocity = 340.0
+lfl_volume_fraction = 0.044
+gas_molar_mass = 0.01604
+ambient_density = 1.0
+[cases.expected]
+effective_diameter = 0.0079002343745798
+lfl_mass_fraction = 0.02485477900884032
+hazardous_distance = 8.408711461072347
+release_grade = "SECONDARY"
+zone_classification = "Zone 2"
+
+[[cases]]
+id = "primary_zone"
+tolerance = 1.0e-12
+source = "The same state with a primary release grade; the numbers are unchanged and the zone is 1. From (`primary_zone`)."
+[cases.inputs]
+mass_flow = 0.1
+exit_density = 6.0
+exit_velocity = 340.0
+lfl_volume_fraction = 0.044
+gas_molar_mass = 0.01604
+release_grade = "primary"
+[cases.expected]
+effective_diameter = 0.0079002343745798
+lfl_mass_fraction = 0.02485477900884032
+hazardous_distance = 7.597337258328827
+release_grade = "PRIMARY"
+zone_classification = "Zone 1"
+
+[[cases]]
+id = "continuous_zone"
+tolerance = 1.0e-12
+source = "The same state with a continuous release grade; the numbers are unchanged and the zone is 0. From (`continuous_zone`)."
+[cases.inputs]
+mass_flow = 0.1
+exit_density = 6.0
+exit_velocity = 340.0
+lfl_volume_fraction = 0.044
+gas_molar_mass = 0.01604
+release_grade = "continuous"
+[cases.expected]
+effective_diameter = 0.0079002343745798
+lfl_mass_fraction = 0.02485477900884032
+hazardous_distance = 7.597337258328827
+release_grade = "CONTINUOUS"
+zone_classification = "Zone 0"

@@ -147,8 +147,11 @@ import neqsim.process.safety.BoundaryConditions;
 import neqsim.process.safety.dispersion.GasDispersionAnalyzer;
 import neqsim.process.safety.dispersion.GasDispersionResult;
 import neqsim.process.safety.dispersion.GaussianPlume;
+import neqsim.process.safety.dispersion.HazardousAreaCalculator;
+import neqsim.process.safety.dispersion.HazardousAreaCalculator.ReleaseGrade;
 import neqsim.process.safety.dispersion.HeavyGasDispersion;
 import neqsim.process.safety.dispersion.ProbitModel;
+import neqsim.process.safety.dispersion.ToxicLibrary;
 import neqsim.process.safety.fire.Api537FlareFlameModel;
 import neqsim.process.safety.fire.BLEVECalculator;
 import neqsim.process.safety.fire.JetFireModel;
@@ -357,6 +360,15 @@ public class ProcessProbe {
         break;
       case "probit":
         probitRows();
+        break;
+      case "heavy_gas_dispersion":
+        heavyGasDispersionRows();
+        break;
+      case "hazardous_area":
+        hazardousAreaRows();
+        break;
+      case "toxic_library":
+        toxicLibraryRows();
         break;
       case "jet_fire":
         jetFireRows();
@@ -12670,6 +12682,186 @@ public class ProcessProbe {
         "probability_from_dose=" + (Double.isNaN(dose) ? "" : model.probabilityFromDose(dose)));
     System.out.println("probit_value=" + (Double.isNaN(y) ? "" : y));
     System.out.println("probability=" + (Double.isNaN(y) ? "" : model.probability(y)));
+    System.out.println();
+  }
+
+  // === process.heavy_gas_dispersion, process.hazardous_area, process.toxic_library ===
+
+  static void heavyGasDispersionRows() {
+    // The identical-input state behind `process_gas_dispersion.tsv`'s pr_methane_forced_heavy:
+    // 1 kg/s of methane at the analyzer's source density, over 5 m/s.
+    heavyGasRow("methane_forced_heavy_lfl", 1.4704613275596858, 0.6800586872009459,
+        1.2250122659906946, 5.0, 0.044);
+    heavyGasRow("methane_forced_heavy_half_lfl", 1.4704613275596858, 0.6800586872009459,
+        1.2250122659906946, 5.0, 0.022);
+    // The fit floors alpha at 0.01; the published britter parameter is unfloored.
+    heavyGasRow("alpha_floor", 1.0e-6, 1.0, 1.225, 10.0, 0.5);
+    // Equal density: g0 = 0, alpha = 0, the floor carries the distance.
+    heavyGasRow("equal_density", 1.0, 1.225, 1.225, 5.0, 0.1);
+    // A source lighter than air: the class accepts it, and |g0| keeps the fit finite.
+    heavyGasRow("buoyant_source", 1.0, 0.5, 1.225, 5.0, 0.1);
+    System.out.println();
+    heavyGasRow("zero_rate_evidence", 0.0, 1.0, 1.225, 5.0, 0.2);
+    heavyGasRow("zero_source_density_evidence", 1.0, 0.0, 1.225, 5.0, 0.2);
+    heavyGasRow("zero_air_density_evidence", 1.0, 1.0, 0.0, 5.0, 0.2);
+    heavyGasRow("zero_wind_evidence", 1.0, 1.0, 1.225, 0.0, 0.2);
+    heavyGasRow("ratio_zero_evidence", 1.0, 1.0, 1.225, 5.0, 0.0);
+    heavyGasRow("ratio_one_evidence", 1.0, 1.0, 1.225, 5.0, 1.0);
+  }
+
+  static void heavyGasRow(String label, double rate, double sourceDensity, double airDensity,
+      double wind, double ratio) {
+    System.out.println(label);
+    System.out.println("volumetric_rate_m3_s=" + rate);
+    System.out.println("source_density_kg_m3=" + sourceDensity);
+    System.out.println("air_density_kg_m3=" + airDensity);
+    System.out.println("wind_speed_m_s=" + wind);
+    System.out.println("concentration_ratio=" + ratio);
+    try {
+      HeavyGasDispersion model = new HeavyGasDispersion(rate, sourceDensity, airDensity, wind);
+      System.out.println("reduced_gravity_m_per_s2=" + model.reducedGravity());
+      System.out.println("britter_parameter=" + model.britterParameter());
+      System.out.println(
+          "distance_to_concentration_ratio_m=" + model.distanceToConcentrationRatio(ratio));
+      System.out.println("refusal=none");
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void hazardousAreaRows() {
+    // The class's own documentation-example state.
+    hazardousAreaRow("methane_default", 0.1, 6.0, 340.0, 0.044, 0.01604, Double.NaN, Double.NaN,
+        null);
+    hazardousAreaRow("methane_safety_025", 0.1, 6.0, 340.0, 0.044, 0.01604, Double.NaN, 0.25,
+        null);
+    hazardousAreaRow("methane_flow_1", 1.0, 6.0, 340.0, 0.044, 0.01604, Double.NaN, Double.NaN,
+        null);
+    hazardousAreaRow("methane_ambient_1", 0.1, 6.0, 340.0, 0.044, 0.01604, 1.0, Double.NaN, null);
+    hazardousAreaRow("primary_zone", 0.1, 6.0, 340.0, 0.044, 0.01604, Double.NaN, Double.NaN,
+        ReleaseGrade.PRIMARY);
+    hazardousAreaRow("continuous_zone", 0.1, 6.0, 340.0, 0.044, 0.01604, Double.NaN, Double.NaN,
+        ReleaseGrade.CONTINUOUS);
+    System.out.println();
+    hazardousAreaRow("zero_flow_evidence", 0.0, 6.0, 340.0, 0.044, 0.01604, Double.NaN, Double.NaN,
+        null);
+    hazardousAreaRow("zero_exit_density_evidence", 0.1, 0.0, 340.0, 0.044, 0.01604, Double.NaN,
+        Double.NaN, null);
+    hazardousAreaRow("zero_exit_velocity_evidence", 0.1, 6.0, 0.0, 0.044, 0.01604, Double.NaN,
+        Double.NaN, null);
+    hazardousAreaRow("lfl_zero_evidence", 0.1, 6.0, 340.0, 0.0, 0.01604, Double.NaN, Double.NaN,
+        null);
+    hazardousAreaRow("lfl_one_evidence", 0.1, 6.0, 340.0, 1.0, 0.01604, Double.NaN, Double.NaN,
+        null);
+    hazardousAreaRow("zero_molar_mass_evidence", 0.1, 6.0, 340.0, 0.044, 0.0, Double.NaN,
+        Double.NaN, null);
+    hazardousAreaRow("safety_zero_evidence", 0.1, 6.0, 340.0, 0.044, 0.01604, Double.NaN, 0.0,
+        null);
+    hazardousAreaRow("safety_above_one_evidence", 0.1, 6.0, 340.0, 0.044, 0.01604, Double.NaN,
+        1.1, null);
+    hazardousAreaRow("ambient_zero_evidence", 0.1, 6.0, 340.0, 0.044, 0.01604, 0.0, Double.NaN,
+        null);
+  }
+
+  static void hazardousAreaRow(String label, double massFlow, double exitDensity,
+      double exitVelocity, double lfl, double molarMass, double ambientDensity,
+      double safetyFactor, ReleaseGrade grade) {
+    System.out.println(label);
+    System.out.println("mass_flow_kg_s=" + massFlow);
+    System.out.println("exit_density_kg_m3=" + exitDensity);
+    System.out.println("exit_velocity_m_s=" + exitVelocity);
+    System.out.println("lfl_volume_fraction=" + lfl);
+    System.out.println("gas_molar_mass_kg_mol=" + molarMass);
+    System.out.println(
+        "ambient_density_kg_m3=" + (Double.isNaN(ambientDensity) ? "default_1.225" : ambientDensity));
+    System.out.println(
+        "safety_factor=" + (Double.isNaN(safetyFactor) ? "default_0.5" : safetyFactor));
+    System.out.println("release_grade_stated=" + (grade == null ? "default_SECONDARY" : grade.name()));
+    try {
+      HazardousAreaCalculator model =
+          new HazardousAreaCalculator(massFlow, exitDensity, exitVelocity, lfl, molarMass);
+      if (!Double.isNaN(ambientDensity)) {
+        model.setAmbientDensityKgPerM3(ambientDensity);
+      }
+      if (!Double.isNaN(safetyFactor)) {
+        model.setSafetyFactor(safetyFactor);
+      }
+      if (grade != null) {
+        model.setReleaseGrade(grade);
+      }
+      System.out.println("effective_diameter_m=" + model.effectiveDiameterM());
+      System.out.println("lfl_mass_fraction=" + model.lflMassFraction());
+      System.out.println("hazardous_distance_m=" + model.hazardousDistanceM());
+      System.out.println("release_grade=" + model.getReleaseGrade().name());
+      System.out.println("zone_classification=" + model.zoneClassification());
+      System.out.println("refusal=none");
+    } catch (RuntimeException ex) {
+      System.out.println("refusal=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void toxicLibraryRows() {
+    for (String chemical : new String[] {"H2S", "hydrogen sulfide", "CO", "carbon monoxide", "Cl2",
+        "chlorine", "NH3", "ammonia", "SO2", "sulfur dioxide", "HCN", "HF", "HCl", "methanol",
+        "benzene"}) {
+      toxicThresholdRow("threshold_" + chemical.replace(' ', '_'), chemical);
+    }
+    System.out.println();
+    // The class's claimed case-insensitivity, measured: the eight formula keys are
+    // exact-case only; the five aliases and the two lowercase names are not.
+    toxicThresholdRow("case_h2s_lower", "h2s");
+    toxicThresholdRow("case_H2s_mixed", "H2s");
+    toxicThresholdRow("case_co_lower", "co");
+    toxicThresholdRow("case_cl2_lower", "cl2");
+    toxicThresholdRow("case_nh3_lower", "nh3");
+    toxicThresholdRow("case_so2_lower", "so2");
+    toxicThresholdRow("case_hcn_lower", "hcn");
+    toxicThresholdRow("case_Hcn_mixed", "Hcn");
+    toxicThresholdRow("case_hf_lower", "hf");
+    toxicThresholdRow("case_hcl_lower", "hcl");
+    toxicThresholdRow("case_methanol_upper", "METHANOL");
+    toxicThresholdRow("case_benzene_title", "Benzene");
+    toxicThresholdRow("unknown_argon", "argon");
+    toxicThresholdRow("unknown_blank", "");
+    toxicThresholdRow("unknown_null", null);
+    System.out.println();
+    toxicConversionRow("h2s_100ppm_288K", 100.0, 0.0340819, 288.15, 1.01325);
+    toxicConversionRow("h2s_100ppm_1bar_300K", 100.0, 0.0340819, 300.0, 1.0);
+    // The class's unguarded states, printed as evidence.
+    toxicConversionRow("negative_ppm_evidence", -100.0, 0.0340819, 288.15, 1.01325);
+    toxicConversionRow("zero_temperature_evidence", 100.0, 0.0340819, 0.0, 1.01325);
+    toxicConversionRow("zero_pressure_evidence", 100.0, 0.0340819, 288.15, 0.0);
+    toxicConversionRow("zero_molar_mass_evidence", 100.0, 0.0, 288.15, 1.01325);
+  }
+
+  static void toxicThresholdRow(String label, String chemical) {
+    System.out.println(label);
+    System.out.println("chemical=" + (chemical == null ? "null" : chemical));
+    ToxicLibrary.Thresholds thresholds = ToxicLibrary.get(chemical);
+    if (thresholds == null) {
+      System.out.println("known=false");
+    } else {
+      System.out.println("known=true");
+      System.out.println("name=" + thresholds.name);
+      System.out.println("idlh_ppm=" + thresholds.idlhPpm);
+      System.out.println("erpg2_ppm=" + thresholds.erpg2Ppm);
+      System.out.println("aegl2_ppm=" + thresholds.aegl2Ppm);
+    }
+    System.out.println();
+  }
+
+  static void toxicConversionRow(String label, double ppm, double molarMass, double temperature,
+      double pressure) {
+    System.out.println(label);
+    System.out.println("concentration_ppm=" + ppm);
+    System.out.println("molar_mass_kg_mol=" + molarMass);
+    System.out.println("temperature_k=" + temperature);
+    System.out.println("pressure_bara=" + pressure);
+    System.out.println("mass_concentration_kg_m3="
+        + ToxicLibrary.ppmToKgPerM3(ppm, molarMass, temperature, pressure));
+    System.out.println("refusal=none");
     System.out.println();
   }
 

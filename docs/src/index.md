@@ -352,8 +352,10 @@ Five sections, and the difference between them is the point:
 - [`process.gas_scrubber`](./process/gas_scrubber.md) — Gas scrubber
 - [`process.gaussian_plume`](./process/gaussian_plume.md) — Gaussian plume dispersion
 - [`process.gibbs_reactor`](./process/gibbs_reactor.md) — Gibbs reactor
+- [`process.hazardous_area`](./process/hazardous_area.md) — Hazardous-area classification
 - [`process.heat_exchanger`](./process/heat_exchanger.md) — Heat exchanger
 - [`process.heater`](./process/heater.md) — Heater
+- [`process.heavy_gas_dispersion`](./process/heavy_gas_dispersion.md) — Heavy-gas dispersion
 - [`process.hem_release`](./process/hem_release.md) — Homogeneous-equilibrium orifice release
 - [`process.jet_fire`](./process/jet_fire.md) — Jet fire radiation
 - [`process.leak_blowdown`](./process/leak_blowdown.md) — Vessel leak blowdown
@@ -388,6 +390,7 @@ Five sections, and the difference between them is the point:
 - [`process.tank`](./process/tank.md) — Tank
 - [`process.three_phase_separator`](./process/three_phase_separator.md) — Three-phase separator
 - [`process.throttling_valve`](./process/throttling_valve.md) — Throttling valve
+- [`process.toxic_library`](./process/toxic_library.md) — Toxic-exposure thresholds
 - [`process.tr3001_compliance`](./process/tr3001_compliance.md) — TR3001 compliance
 - [`process.turbo_expander_compressor`](./process/turbo_expander_compressor.md) — Turbo-expander compressor
 - [`process.vce`](./process/vce.md) — Vapour-cloud explosion overpressure

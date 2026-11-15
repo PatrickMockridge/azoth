@@ -809,7 +809,7 @@ a claim nothing holds.
   JSON envelope if byte-compatible output is ever required. The package's `ReleaseInventory`,
   `ReleaseModelEvidence`, `ReleaseSolidRiskAssessment` and `CoupledReleaseSource` are named here
   as neither ported nor refused: they are a later scoping, not silently dropped.
-- **The dispersion family** — `process/safety/dispersion/` is three ids.
+- **The dispersion family** — `process/safety/dispersion/` is six ids.
   **`process.gas_dispersion` is `GasDispersionAnalyzer.analyze`**: the ambient TP flash of the
   released composition, the gas phase's Le Chatelier LFL and fuel data, the density-ratio model
   selection, and the flammable and toxic endpoints over the passive Briggs plume or the dense
@@ -819,14 +819,19 @@ a claim nothing holds.
   threshold**, its own id because `ConsequenceAnalysisEngine` in `src/main` calls it, and its
   arithmetic is the analyzer's Gaussian arm. **`process.probit` is `ProbitModel`**: the probit,
   the standard normal CDF over the class's Abramowitz-Stegun `erf`, and the five factory
-  triples, the other direct `ConsequenceAnalysisEngine` caller. **`HazardousAreaCalculator` is
-  a measured non-port**: `git grep` over the pin's `src/main` answers one file for it, the class
-  itself, so only its own test and a documentation example read it - and it is IEC 60079-10-1
-  area classification rather than plume dispersion. **`ToxicLibrary`'s threshold table is not
-  read by the analyze path** (the threshold is an input), and its `ppmToKgPerM3` is internal
-  arithmetic. The DTO's scenario name, `toJson` and the `analyzeStream`/`sourceTerm`
-  conveniences are session surface; the unported callers are named with their classes: QRA
-  `ConsequenceAnalysisEngine`, `ReleaseDispersionScenarioGenerator` and `CfdSourceTermCase`.
+  triples, the other direct `ConsequenceAnalysisEngine` caller.
+  **`process.heavy_gas_dispersion` is `HeavyGasDispersion`**: the signed reduced gravity, the
+  unfloored Britter parameter and the fit's `0.01`-floored distance, held to the two distances
+  the analyzer's dense arm publishes. **`process.hazardous_area` is `HazardousAreaCalculator`**:
+  the notional source diameter, the ideal mole-to-mass LFL, the de-rated jet distance and the
+  grade-to-zone mapping; its only `src/main` readers are its own test and a documentation
+  example, and the criterion is the pure public surface. **`process.toxic_library` is
+  `ToxicLibrary`**: the ten-row IDLH/ERPG-2/AEGL-2 table, its exact-then-lowercase lookup and
+  the `R = 8.314` conversion. **The javadoc's case-insensitivity is narrower than the code**:
+  the eight formula keys are exact-case only, and the capture pins both spellings.
+  The DTO's scenario name and `toJson` are session surface; the analyzer's callers are the QRA
+  `ConsequenceAnalysisEngine` (ported as `process.consequence_analysis`),
+  `ReleaseDispersionScenarioGenerator` and `CfdSourceTermCase`.
 - **The fire and explosion family** — `process/safety/fire/`'s four pure consequence models.
   **`process.jet_fire` is `JetFireModel`**: the API 521 / Mudan-Croce point source, Wayne's
   transmissivity, and its 25-iteration fixed-point inverse. **`process.pool_fire` is
@@ -918,13 +923,14 @@ a claim nothing holds.
   `DynamicRiskSimulator`, `PortfolioRiskAnalyzer`, `RealTimeRiskMonitor`,
   `PhysicsBasedRiskMonitor`, `ConditionBasedReliability`, `OREDADataImporter`, `RiskMLInterface`
   and `BowTieAnalyzer.autoGenerateFromProcess`; `BowTieSvgExporter` is presentation. The safety
-  tree still carries **224 further classes** across `barrier/`, `alarp/`, `hazid/`, `inherent/`,
+  tree still carries **229 top-level public types** across `barrier/`, `alarp/`, `hazid/`, `inherent/`,
   `escalation/`, `selfheating/`, `vibration/`, `compliance/`, `processsafetysystem/`,
   `overpressure/`, `rupture/`, `depressurization/`, `release/`, `esd/`, `sif/`, `api14c/`,
   `opendrain/`, `blowby/`, `vacuum/`, `settleout/`, `pump/`, `reaction/`, `inventory/`,
   `mdmt/`, `leakdetection/`, `cfd/`, `envelope/`, `scenario/` and `dto/`, plus the risk
-  subpackages — the five overpressure calculators below are the exception; the rest are not
-  ported, each with its class.
+  subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
+  own classes - the risk core, the two release models, the five overpressure calculators and
+  the six dispersion ids; the types no bullet names remain unported, each with its class.
 - **The relief and overpressure arithmetic** — seven ids. **`process.psv_sizing` is
   `ReliefValveSizing`'s three area methods and the API 520 D to T ladder**: gas with the
   conventional/balanced-bellows `Kb` and the rupture-disk `Kc`, liquid with `Kw`, the
@@ -945,6 +951,13 @@ a claim nothing holds.
   `CheckValveLeakRelief`, `TubeRuptureRelief`, `ReliefFluidState`), the package-private
   `NozzleFlow`, `OverpressureProtectionStudy` and `ReliefSizingCalculation`'s explicit-SI
   kernel remain owed.
+- **The dispersion remainder** — three ids. **`process.heavy_gas_dispersion`** is
+  Britter-McQuaid's signed reduced gravity, unfloored parameter and floored distance, with the
+  two methane rows holding it to the analyzer's dense arm. **`process.hazardous_area`** is
+  IEC 60079-10-1's notional diameter, ideal mole-to-mass LFL, de-rated distance and zone.
+  **`process.toxic_library`** is the ten-row IDLH/ERPG-2/AEGL-2 table and the `8.314` ppm
+  conversion. **The table's javadoc says case-insensitive and the code is not**: the eight
+  formula keys are exact-case only, measured in the capture and stated rather than fixed.
 - **The reactions family's**: the **ionic branch** of `reactions.reactive_tp_flash` and
   `reactions.reactive_ph_flash`, which is why a charged substance is refused at all;
   `reactions.reactive_ph_flash`'s **entropy-specified variant** and its `NR = 0` delegation to

@@ -37,8 +37,10 @@ use crate::models::gas_dispersion::GasDispersionResult;
 use crate::models::gas_scrubber::GasScrubberResult;
 use crate::models::gaussian_plume::GaussianPlumeResult;
 use crate::models::gibbs_reactor::GibbsReactorResult;
+use crate::models::hazardous_area::HazardousAreaResult;
 use crate::models::heat_exchanger::HeatExchangerResult;
 use crate::models::heater::HeaterResult;
+use crate::models::heavy_gas_dispersion::HeavyGasDispersionResult;
 use crate::models::hem_release::HemReleaseResult;
 use crate::models::jet_fire::JetFireResult;
 use crate::models::leak_blowdown::LeakBlowdownResult;
@@ -73,6 +75,7 @@ use crate::models::stripping_column::StrippingColumnResult;
 use crate::models::tank::TankResult;
 use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
+use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vce::VceResult;
@@ -829,6 +832,22 @@ impl CalcResult for GibbsReactorResult {
     }
 }
 
+impl CalcResult for HazardousAreaResult {
+    const CALC_ID: &'static str = "process.hazardous_area";
+    const FIELDS: &'static [&'static str] = &[
+        "effective_diameter",
+        "lfl_mass_fraction",
+        "hazardous_distance",
+        "release_grade",
+        "zone_classification",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for HeatExchangerResult {
     const CALC_ID: &'static str = "process.heat_exchanger";
     const FIELDS: &'static [&'static str] = &[
@@ -962,6 +981,20 @@ impl CalcResult for HeaterResult {
         "used_overall_heat_transfer_coefficient",
         "calculated_ua",
         "mechanical_types",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for HeavyGasDispersionResult {
+    const CALC_ID: &'static str = "process.heavy_gas_dispersion";
+    const FIELDS: &'static [&'static str] = &[
+        "reduced_gravity",
+        "britter_parameter",
+        "distance_to_concentration_ratio",
         "warnings",
     ];
 
@@ -1871,6 +1904,23 @@ impl CalcResult for ThrottlingValveResult {
         "choked",
         "gas_valve",
         "calculated_molar_flow",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ToxicLibraryResult {
+    const CALC_ID: &'static str = "process.toxic_library";
+    const FIELDS: &'static [&'static str] = &[
+        "known",
+        "name",
+        "idlh_ppm",
+        "erpg2_ppm",
+        "aegl2_ppm",
+        "mass_concentration",
         "warnings",
     ];
 

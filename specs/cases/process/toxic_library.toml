@@ -1,0 +1,182 @@
+model = "process.toxic_library"
+
+[[cases]]
+id = "threshold_h2s"
+tolerance = 1.0e-12
+source = "The hydrogen-sulfide row. From `validation/neqsim/captures/process_toxic_library.tsv` (`threshold_H2S`)."
+[cases.inputs]
+chemical = "H2S"
+[cases.expected]
+known = true
+name = "Hydrogen sulfide"
+idlh_ppm = 100.0
+erpg2_ppm = 30.0
+aegl2_ppm = 27.0
+
+[[cases]]
+id = "threshold_co"
+tolerance = 1.0e-12
+source = "The carbon-monoxide row. From (`threshold_CO`)."
+[cases.inputs]
+chemical = "CO"
+[cases.expected]
+known = true
+name = "Carbon monoxide"
+idlh_ppm = 1200.0
+erpg2_ppm = 350.0
+aegl2_ppm = 83.0
+
+[[cases]]
+id = "threshold_cl2"
+tolerance = 1.0e-12
+source = "The chlorine row. From (`threshold_Cl2`)."
+[cases.inputs]
+chemical = "Cl2"
+[cases.expected]
+known = true
+name = "Chlorine"
+idlh_ppm = 10.0
+erpg2_ppm = 3.0
+aegl2_ppm = 2.0
+
+[[cases]]
+id = "threshold_nh3"
+tolerance = 1.0e-12
+source = "The ammonia row. From (`threshold_NH3`)."
+[cases.inputs]
+chemical = "NH3"
+[cases.expected]
+known = true
+name = "Ammonia"
+idlh_ppm = 300.0
+erpg2_ppm = 150.0
+aegl2_ppm = 160.0
+
+[[cases]]
+id = "threshold_so2"
+tolerance = 1.0e-12
+source = "The sulfur-dioxide row. From (`threshold_SO2`)."
+[cases.inputs]
+chemical = "SO2"
+[cases.expected]
+known = true
+name = "Sulfur dioxide"
+idlh_ppm = 100.0
+erpg2_ppm = 3.0
+aegl2_ppm = 0.75
+
+[[cases]]
+id = "threshold_hcn"
+tolerance = 1.0e-12
+source = "The hydrogen-cyanide row, a formula key with no lowercase alias. From (`threshold_HCN`)."
+[cases.inputs]
+chemical = "HCN"
+[cases.expected]
+known = true
+name = "Hydrogen cyanide"
+idlh_ppm = 50.0
+erpg2_ppm = 10.0
+aegl2_ppm = 7.1
+
+[[cases]]
+id = "threshold_hf"
+tolerance = 1.0e-12
+source = "The hydrogen-fluoride row. From (`threshold_HF`)."
+[cases.inputs]
+chemical = "HF"
+[cases.expected]
+known = true
+name = "Hydrogen fluoride"
+idlh_ppm = 30.0
+erpg2_ppm = 20.0
+aegl2_ppm = 24.0
+
+[[cases]]
+id = "threshold_hcl"
+tolerance = 1.0e-12
+source = "The hydrogen-chloride row. From (`threshold_HCl`)."
+[cases.inputs]
+chemical = "HCl"
+[cases.expected]
+known = true
+name = "Hydrogen chloride"
+idlh_ppm = 50.0
+erpg2_ppm = 20.0
+aegl2_ppm = 22.0
+
+[[cases]]
+id = "threshold_methanol"
+tolerance = 1.0e-12
+source = "The methanol row, a lowercase key. From (`threshold_methanol`)."
+[cases.inputs]
+chemical = "methanol"
+[cases.expected]
+known = true
+name = "Methanol"
+idlh_ppm = 6000.0
+erpg2_ppm = 1000.0
+aegl2_ppm = 530.0
+
+[[cases]]
+id = "threshold_benzene"
+tolerance = 1.0e-12
+source = "The benzene row, a lowercase key. From (`threshold_benzene`)."
+[cases.inputs]
+chemical = "benzene"
+[cases.expected]
+known = true
+name = "Benzene"
+idlh_ppm = 500.0
+erpg2_ppm = 150.0
+aegl2_ppm = 800.0
+
+[[cases]]
+id = "h2s_100ppm_288k"
+tolerance = 1.0e-12
+source = "H2S at 100 ppm, 0.0340819 kg/mol, 288.15 K and 101325 Pa, through the class's `R = 8.314` and bara conversion. From (`h2s_100ppm_288K`)."
+[cases.inputs]
+concentration_ppm = 100.0
+molar_mass = 0.0340819
+temperature = 288.15
+pressure = 101325.0
+[cases.expected]
+mass_concentration = 1.441490438974068e-4
+
+[[cases]]
+id = "h2s_100ppm_1bar_300k"
+tolerance = 1.0e-12
+source = "The same concentration at 1 bar and 300 K. From (`h2s_100ppm_1bar_300K`)."
+[cases.inputs]
+concentration_ppm = 100.0
+molar_mass = 0.0340819
+temperature = 300.0
+pressure = 100000.0
+[cases.expected]
+mass_concentration = 1.3664461550797852e-4
+
+[[cases]]
+id = "case_hcn_lower"
+tolerance = 1.0e-12
+source = "The class's claimed case-insensitivity, measured: the lowercase formula key misses. From (`case_hcn_lower`)."
+[cases.inputs]
+chemical = "hcn"
+[cases.expected]
+known = false
+
+[[cases]]
+id = "unknown_blank"
+tolerance = 1.0e-12
+source = "A blank name is an unknown name, not an absent lookup. From (`unknown_blank`)."
+[cases.inputs]
+chemical = ""
+[cases.expected]
+known = false
+
+[[cases]]
+id = "unknown_argon"
+tolerance = 1.0e-12
+source = "A chemical outside the table. From (`unknown_argon`)."
+[cases.inputs]
+chemical = "argon"
+[cases.expected]
+known = false

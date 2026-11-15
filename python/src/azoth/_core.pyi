@@ -3534,6 +3534,15 @@ class GibbsReactorResult:
     warnings: list[Warning]
 
 @final
+class HazardousAreaResult:
+    effective_diameter: Qty
+    lfl_mass_fraction: float
+    hazardous_distance: Qty
+    release_grade: str
+    zone_classification: str
+    warnings: list[Warning]
+
+@final
 class HeatExchangerResult:
     hot_out_n: Qty
     hot_out_z: list[float]
@@ -3658,6 +3667,13 @@ class HeaterResult:
     used_overall_heat_transfer_coefficient: Qty | None
     calculated_ua: Qty | None
     mechanical_types: list[HeaterMechanicalType]
+    warnings: list[Warning]
+
+@final
+class HeavyGasDispersionResult:
+    reduced_gravity: float
+    britter_parameter: float
+    distance_to_concentration_ratio: Qty | None
     warnings: list[Warning]
 
 @final
@@ -4346,6 +4362,16 @@ class ThrottlingValveResult:
     choked: bool
     gas_valve: bool
     calculated_molar_flow: Qty
+    warnings: list[Warning]
+
+@final
+class ToxicLibraryResult:
+    known: bool | None
+    name: str | None
+    idlh_ppm: float | None
+    erpg2_ppm: float | None
+    aegl2_ppm: float | None
+    mass_concentration: Qty | None
     warnings: list[Warning]
 
 @final
@@ -7123,6 +7149,16 @@ def gibbs_reactor(
     regularization_threshold: float | None = None,
     regularization_tau: float | None = None,
 ) -> GibbsReactorResult: ...
+def hazardous_area(
+    mass_flow: float,
+    exit_density: float,
+    exit_velocity: float,
+    lfl_volume_fraction: float,
+    gas_molar_mass: float,
+    ambient_density: float | None = None,
+    safety_factor: float | None = None,
+    release_grade: str | None = None,
+) -> HazardousAreaResult: ...
 def heat_exchanger(
     hot_components: list[str],
     cold_components: list[str],
@@ -7220,6 +7256,13 @@ def heater(
     mechanical_type: str | None = None,
     mechanical_selection: str | None = None,
 ) -> HeaterResult: ...
+def heavy_gas_dispersion(
+    volumetric_rate: float,
+    source_density: float,
+    air_density: float,
+    wind_speed: float,
+    concentration_ratio: float | None = None,
+) -> HeavyGasDispersionResult: ...
 def hem_release(
     components: list[str],
     upstream_z: list[float],
@@ -7793,6 +7836,13 @@ def throttling_valve(
     is_isothermal: bool | None = None,
     sizing_standard: str | None = None,
 ) -> ThrottlingValveResult: ...
+def toxic_library(
+    chemical: str | None = None,
+    concentration_ppm: float | None = None,
+    molar_mass: float | None = None,
+    temperature: float | None = None,
+    pressure: float | None = None,
+) -> ToxicLibraryResult: ...
 def tr3001_compliance(
     scenarios: list[Tr3001Scenario],
     capacity_adequate: bool,

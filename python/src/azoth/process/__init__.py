@@ -45,8 +45,10 @@ from azoth.core.result import (
     GasScrubberResult,
     GaussianPlumeResult,
     GibbsReactorResult,
+    HazardousAreaResult,
     HeaterResult,
     HeatExchangerResult,
+    HeavyGasDispersionResult,
     HemReleaseResult,
     JetFireResult,
     LeakBlowdownResult,
@@ -81,6 +83,7 @@ from azoth.core.result import (
     TankResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
+    ToxicLibraryResult,
     Tr3001ComplianceResult,
     TurboExpanderResult,
     VceResult,
@@ -134,8 +137,10 @@ __all__ = [
     "gas_scrubber",
     "gaussian_plume",
     "gibbs_reactor",
+    "hazardous_area",
     "heat_exchanger",
     "heater",
+    "heavy_gas_dispersion",
     "hem_release",
     "jet_fire",
     "leak_blowdown",
@@ -172,6 +177,7 @@ __all__ = [
     "three_phase_separator",
     "throttling_valve",
     "tools",
+    "toxic_library",
     "tr3001_compliance",
     "validate",
     "vce",
@@ -221,6 +227,8 @@ _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
 _GAS_DISPERSION = "process.gas_dispersion"
 _GAUSSIAN_PLUME = "process.gaussian_plume"
+_HAZARDOUS_AREA = "process.hazardous_area"
+_HEAVY_GAS_DISPERSION = "process.heavy_gas_dispersion"
 _PROBIT = "process.probit"
 _PSV_FIRE_SIZING = "process.psv_fire_sizing"
 _PSV_SIZING = "process.psv_sizing"
@@ -230,6 +238,7 @@ _SEPARATOR_PERFORMANCE = "process.separator_performance"
 _SHORTCUT_DISTILLATION_COLUMN = "process.shortcut_distillation_column"
 _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
+_TOXIC_LIBRARY = "process.toxic_library"
 _TR3001_COMPLIANCE = "process.tr3001_compliance"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
@@ -2868,6 +2877,96 @@ def gaussian_plume(
         crosswind=crosswind,
         height=height,
         threshold=threshold,
+    )
+
+
+def heavy_gas_dispersion(
+    volumetric_rate: Q,
+    source_density: Q,
+    air_density: Q,
+    wind_speed: Q,
+    concentration_ratio: float | None = None,
+) -> HeavyGasDispersionResult:
+    """The Britter-McQuaid dense-gas distance to a concentration ratio.
+
+    The signed reduced gravity, the unfloored characteristic parameter and the fitted
+    downwind distance; ``reduced_gravity`` is in m/s2, and the distance is absent when no
+    ratio is stated.
+
+    Raises:
+        InvalidInputError: for a non-positive rate, density or wind speed, a ratio
+            outside ``(0, 1)``, or a non-finite value.
+
+    See :func:`azoth.process.reference.heavy_gas_dispersion`.
+    """
+    return resolve(_HEAVY_GAS_DISPERSION)(  # type: ignore[no-any-return]
+        volumetric_rate=volumetric_rate,
+        source_density=source_density,
+        air_density=air_density,
+        wind_speed=wind_speed,
+        concentration_ratio=concentration_ratio,
+    )
+
+
+def hazardous_area(
+    mass_flow: Q,
+    exit_density: Q,
+    exit_velocity: Q,
+    lfl_volume_fraction: float,
+    gas_molar_mass: Q,
+    ambient_density: Q | None = None,
+    safety_factor: float | None = None,
+    release_grade: str | None = None,
+) -> HazardousAreaResult:
+    """The hazardous distance and IEC 60079-10-1 zone for a continuous gas jet.
+
+    The notional source diameter, the class's ideal mole-to-mass LFL, the de-rated
+    downwind distance and the zone the grade of release selects.
+
+    Raises:
+        InvalidInputError: for a non-positive flow, density, velocity, molar mass or
+            ambient density, an LFL outside ``(0, 1)``, a safety factor outside
+            ``(0, 1]``, or an unknown grade.
+
+    See :func:`azoth.process.reference.hazardous_area`.
+    """
+    return resolve(_HAZARDOUS_AREA)(  # type: ignore[no-any-return]
+        mass_flow=mass_flow,
+        exit_density=exit_density,
+        exit_velocity=exit_velocity,
+        lfl_volume_fraction=lfl_volume_fraction,
+        gas_molar_mass=gas_molar_mass,
+        ambient_density=ambient_density,
+        safety_factor=safety_factor,
+        release_grade=release_grade,
+    )
+
+
+def toxic_library(
+    chemical: str | None = None,
+    concentration_ppm: float | None = None,
+    molar_mass: Q | None = None,
+    temperature: Q | None = None,
+    pressure: Q | None = None,
+) -> ToxicLibraryResult:
+    """The toxic-exposure thresholds for a chemical, and the ppm-to-kg/m3 conversion.
+
+    The class's static table of IDLH, ERPG-2 and AEGL-2 values, its exact-then-lowercase
+    lookup, and ``(ppm/1e6) M (P_bara 1e5) / (8.314 T)``. **An unknown or blank chemical is
+    a stated false**, not a refusal; the measured case-sensitivity asymmetry is reproduced.
+
+    Raises:
+        InvalidInputError: when neither a chemical nor the conversion group is stated,
+            when the group is incomplete, or when its values are out of range.
+
+    See :func:`azoth.process.reference.toxic_library`.
+    """
+    return resolve(_TOXIC_LIBRARY)(  # type: ignore[no-any-return]
+        chemical=chemical,
+        concentration_ppm=concentration_ppm,
+        molar_mass=molar_mass,
+        temperature=temperature,
+        pressure=pressure,
     )
 
 

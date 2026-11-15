@@ -129,12 +129,14 @@ from azoth.core.result import (
     GtSurfaceTensionSimpleResult,
     HaalandResult,
     HaydukMinhasDiffusivityResult,
+    HazardousAreaResult,
     HeaterInstrument,
     HeaterMechanicalType,
     HeaterResult,
     HeatExchangerMechanicalType,
     HeatExchangerResult,
     HeatOfVaporizationResult,
+    HeavyGasDispersionResult,
     HeliumPhaseResult,
     HemReleaseDiagnostic,
     HemReleaseResult,
@@ -327,6 +329,7 @@ from azoth.core.result import (
     ThFlashResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
+    ToxicLibraryResult,
     TpFlashSaftResult,
     TpMultiflashResult,
     TpMultiflashWaxResult,
@@ -510,9 +513,11 @@ __all__ = [
     "gt_surface_tension",
     "gt_surface_tension_simple",
     "hayduk_minhas_diffusivity",
+    "hazardous_area",
     "heat_exchanger",
     "heat_of_vaporization",
     "heater",
+    "heavy_gas_dispersion",
     "helium_phase",
     "hem_release",
     "hybrid_eos_ge_flash",
@@ -676,6 +681,7 @@ __all__ = [
     "thermal_conductivity",
     "three_phase_separator",
     "throttling_valve",
+    "toxic_library",
     "tp_flash_saft",
     "tp_multiflash",
     "tp_multiflash_wax",
@@ -6671,6 +6677,29 @@ def gibbs_reactor(components: list[str], feed_n: Q, feed_z: list[float], feed_p:
     )
 
 
+def hazardous_area(mass_flow: Q, exit_density: Q, exit_velocity: Q, lfl_volume_fraction: float, gas_molar_mass: Q, ambient_density: Q | None=None, safety_factor: float | None=None, release_grade: str | None=None) -> HazardousAreaResult:
+    """``process.hazardous_area``, computed in Rust."""
+    spec = _models_gen.model("process.hazardous_area")
+    result = _core.hazardous_area(
+        input_to_si(spec, "mass_flow", mass_flow),
+        input_to_si(spec, "exit_density", exit_density),
+        input_to_si(spec, "exit_velocity", exit_velocity),
+        lfl_volume_fraction,
+        input_to_si(spec, "gas_molar_mass", gas_molar_mass),
+        None if ambient_density is None else input_to_si(spec, "ambient_density", ambient_density),
+        None if safety_factor is None else safety_factor,
+        release_grade,
+    )
+    return HazardousAreaResult(
+        effective_diameter=from_si(result.effective_diameter.magnitude_si, result.effective_diameter.unit),
+        lfl_mass_fraction=result.lfl_mass_fraction,
+        hazardous_distance=from_si(result.hazardous_distance.magnitude_si, result.hazardous_distance.unit),
+        release_grade=result.release_grade,
+        zone_classification=result.zone_classification,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def heat_exchanger(hot_components: list[str], hot_in_n: Q, hot_in_z: list[float], hot_in_p: Q, hot_in_t: Q, cold_components: list[str], cold_in_n: Q, cold_in_z: list[float], cold_in_p: Q, cold_in_t: Q, ua: Q | None=None, flow_arrangement: str='counterflow', hot_outlet_temperature: Q | None=None, cold_outlet_temperature: Q | None=None, use_delta_t: bool | None=None, delta_t: Q | None=None, guess_out_temperature: Q | None=None, mechanical_design: bool | None=None, mechanical_type: str | None=None, mechanical_selection: str | None=None, use_rating_pressure_drop: bool | None=None, rating_area: Q | None=None, rating_tube_side: str | None=None, rating_tube_outside_diameter: Q | None=None, rating_tube_inside_diameter: Q | None=None, rating_tube_length: Q | None=None, rating_tube_count: float | None=None, rating_tube_passes: float | None=None, rating_tube_pitch: Q | None=None, rating_triangular_pitch: bool | None=None, rating_shell_inside_diameter: Q | None=None, rating_baffle_spacing: Q | None=None, rating_baffle_count: float | None=None, rating_baffle_cut: float | None=None, rating_tube_wall_conductivity: Q | None=None, rating_fouling_tube: float | None=None, rating_fouling_shell: float | None=None, rating_tube_fouling_layer_thickness: Q | None=None, rating_tube_fouling_layer_conductivity: Q | None=None, rating_shell_side_method: str | None=None, rating_shell_viscosity_wall: Q | None=None, rating_has_sealing: bool | None=None, rating_sealing_pairs: float | None=None, rating_tube_to_baffle_clearance: Q | None=None, rating_shell_to_baffle_clearance: Q | None=None, rating_bypass_area: Q | None=None, time_step: Q | None=None, dynamic_model_enabled: bool | None=None, transient_tube_side: str | None=None, wall_mass: Q | None=None, wall_cp: Q | None=None, wall_temperature: Q | None=None, shell_holdup_volume: Q | None=None, tube_holdup_volume: Q | None=None, shell_side_htc: Q | None=None, tube_side_htc: Q | None=None, heat_transfer_area: Q | None=None, shell_fluid_temperature: Q | None=None, tube_fluid_temperature: Q | None=None) -> HeatExchangerResult:
     """``process.heat_exchanger``, computed in Rust."""
     spec = _models_gen.model("process.heat_exchanger")
@@ -6899,6 +6928,24 @@ def heater(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
         used_overall_heat_transfer_coefficient=None if result.used_overall_heat_transfer_coefficient is None else from_si(result.used_overall_heat_transfer_coefficient.magnitude_si, result.used_overall_heat_transfer_coefficient.unit),
         calculated_ua=None if result.calculated_ua is None else from_si(result.calculated_ua.magnitude_si, result.calculated_ua.unit),
         mechanical_types=tuple(HeaterMechanicalType(mechanical_type=c.mechanical_type, required_area=from_si(c.required_area.magnitude_si, c.required_area.unit), required_ua=from_si(c.required_ua.magnitude_si, c.required_ua.unit), overall_heat_transfer_coefficient=from_si(c.overall_heat_transfer_coefficient.magnitude_si, c.overall_heat_transfer_coefficient.unit), approach_temperature=from_si(c.approach_temperature.magnitude_si, c.approach_temperature.unit), estimated_length=from_si(c.estimated_length.magnitude_si, c.estimated_length.unit), inner_diameter=from_si(c.inner_diameter.magnitude_si, c.inner_diameter.unit), outer_diameter=from_si(c.outer_diameter.magnitude_si, c.outer_diameter.unit), wall_thickness=from_si(c.wall_thickness.magnitude_si, c.wall_thickness.unit), tube_count=c.tube_count, tube_passes=c.tube_passes, fin_surface_area=from_si(c.fin_surface_area.magnitude_si, c.fin_surface_area.unit), estimated_pressure_drop=c.estimated_pressure_drop, estimated_weight=from_si(c.estimated_weight.magnitude_si, c.estimated_weight.unit), module_length=from_si(c.module_length.magnitude_si, c.module_length.unit), module_width=from_si(c.module_width.magnitude_si, c.module_width.unit), module_height=from_si(c.module_height.magnitude_si, c.module_height.unit)) for c in result.mechanical_types),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def heavy_gas_dispersion(volumetric_rate: Q, source_density: Q, air_density: Q, wind_speed: Q, concentration_ratio: float | None=None) -> HeavyGasDispersionResult:
+    """``process.heavy_gas_dispersion``, computed in Rust."""
+    spec = _models_gen.model("process.heavy_gas_dispersion")
+    result = _core.heavy_gas_dispersion(
+        input_to_si(spec, "volumetric_rate", volumetric_rate),
+        input_to_si(spec, "source_density", source_density),
+        input_to_si(spec, "air_density", air_density),
+        input_to_si(spec, "wind_speed", wind_speed),
+        None if concentration_ratio is None else concentration_ratio,
+    )
+    return HeavyGasDispersionResult(
+        reduced_gravity=result.reduced_gravity,
+        britter_parameter=result.britter_parameter,
+        distance_to_concentration_ratio=None if result.distance_to_concentration_ratio is None else from_si(result.distance_to_concentration_ratio.magnitude_si, result.distance_to_concentration_ratio.unit),
         warnings=_warnings(result.warnings),
     )
 
@@ -8293,6 +8340,27 @@ def throttling_valve(components: list[str], inlet_n: Q, inlet_z: list[float], in
         choked=result.choked,
         gas_valve=result.gas_valve,
         calculated_molar_flow=from_si(result.calculated_molar_flow.magnitude_si, result.calculated_molar_flow.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def toxic_library(chemical: str | None=None, concentration_ppm: float | None=None, molar_mass: Q | None=None, temperature: Q | None=None, pressure: Q | None=None) -> ToxicLibraryResult:
+    """``process.toxic_library``, computed in Rust."""
+    spec = _models_gen.model("process.toxic_library")
+    result = _core.toxic_library(
+        chemical,
+        None if concentration_ppm is None else concentration_ppm,
+        None if molar_mass is None else input_to_si(spec, "molar_mass", molar_mass),
+        None if temperature is None else input_to_si(spec, "temperature", temperature),
+        None if pressure is None else input_to_si(spec, "pressure", pressure),
+    )
+    return ToxicLibraryResult(
+        known=result.known,
+        name=result.name,
+        idlh_ppm=result.idlh_ppm,
+        erpg2_ppm=result.erpg2_ppm,
+        aegl2_ppm=result.aegl2_ppm,
+        mass_concentration=None if result.mass_concentration is None else from_si(result.mass_concentration.magnitude_si, result.mass_concentration.unit),
         warnings=_warnings(result.warnings),
     )
 

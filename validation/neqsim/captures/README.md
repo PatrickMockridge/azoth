@@ -2391,3 +2391,61 @@ for FIRE or blocked outlet. `isCompliant` ignores needs-review. The fire-basis n
 branch is reachable only through a directly constructed acceptance (the class's study
 emits 1.10 / 1.16 / 1.21, all at or above 0.20), and the INFO status is never emitted. The
 requirement ids, titles and details are prose and are not carried.
+
+## The dense-gas dispersion
+
+`process_heavy_gas_dispersion.tsv` is `HeavyGasDispersion`'s reduced gravity, Britter
+parameter and downwind distance to a concentration ratio, over the identical state behind
+`process_gas_dispersion.tsv`'s `pr_methane_forced_heavy`, the alpha floor, equal densities,
+a source lighter than air, and the constructor and ratio guards.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe heavy_gas_dispersion \
+  > captures/process_heavy_gas_dispersion.tsv
+```
+
+**The published `britterParameter` is unfloored while the distance floors it at 0.01**:
+`alpha_floor` has `alpha = 0.007985206924768607` and `b = 0.5`. `reducedGravity` is signed
+and the fit uses `|g0|`, so `buoyant_source` (lighter than air) still gives a finite
+distance. `equal_density` has `g0 = alpha = 0` and the floor carries the 10.011865 m
+answer. The two methane rows are the cross-check against the analyzer's dense arm:
+0.044 → 9.76535507728693 m and 0.022 → 17.602061561927734 m, the analyzer's
+`distance_to_lfl_m` and `distance_to_half_lfl_m`.
+
+## The hazardous-area classification
+
+`process_hazardous_area.tsv` is `HazardousAreaCalculator`'s effective source diameter, LFL
+mass fraction, de-rated hazardous distance and zone over the class's documentation state,
+the safety-factor and ambient-density overrides, a tenfold flow, both other release grades,
+and the constructor and setter guards.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe hazardous_area \
+  > captures/process_hazardous_area.tsv
+```
+
+The defaults are `ambient_density = 1.225 kg/m3`, `safety_factor = 0.5` and
+`release_grade = SECONDARY`; the grade maps continuous → Zone 0, primary → Zone 1 and
+secondary → Zone 2. The LFL is converted mole to mass with `M_air = 0.028964`, and the
+target is the de-rated `k Y_LFL`. `summary()` is prose and is not captured.
+
+## The toxic-threshold library
+
+`process_toxic_library.tsv` is `ToxicLibrary`'s ten chemicals, five aliases, the measured
+case-sensitivity states, three unknown names and the ppm → kg/m³ conversion at two
+pressures plus the class's unguarded negative-ppm, zero-temperature, zero-pressure and
+zero-molar-mass states.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe toxic_library \
+  > captures/process_toxic_library.tsv
+```
+
+**The javadoc's case-insensitive lookup is narrower than the code**: `get` tries the exact
+map key then `toLowerCase()`, so the eight formula keys and their mixed forms are
+exact-case only — `h2s`, `H2s`, `hcn`, `Hcn`, `hf`, `hcl` answer unknown while `H2S` and
+`HCN` answer their row — and only the five spelled-out aliases and the two lowercase names
+are case-insensitive. The threshold outputs are ppm by mole. `ppmToKgPerM3` takes
+**bara**, uses the class's own `R = 8.314` rather than the analyzer's `8.314462618`, and
+does not guard a negative ppm or zero temperature, pressure or molar mass; those rows are
+evidence and the port refuses them.

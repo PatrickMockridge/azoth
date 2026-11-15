@@ -56,8 +56,10 @@ pub mod gas_dispersion;
 pub mod gas_scrubber;
 pub mod gaussian_plume;
 pub mod gibbs_reactor;
+pub mod hazardous_area;
 pub mod heat_exchanger;
 pub mod heater;
+pub mod heavy_gas_dispersion;
 pub mod hem_release;
 pub mod jet_fire;
 pub mod leak_blowdown;
@@ -92,6 +94,7 @@ pub mod stripping_column;
 pub mod tank;
 pub mod three_phase_separator;
 pub mod throttling_valve;
+pub mod toxic_library;
 pub mod tr3001_compliance;
 pub mod turbo_expander_compressor;
 pub mod vce;
@@ -133,8 +136,10 @@ pub use gas_dispersion::{GasDispersionResult, gas_dispersion};
 pub use gas_scrubber::{GasScrubberResult, gas_scrubber};
 pub use gaussian_plume::{GaussianPlumeResult, gaussian_plume};
 pub use gibbs_reactor::{GibbsReactorResult, gibbs_reactor};
+pub use hazardous_area::{HazardousAreaResult, hazardous_area};
 pub use heat_exchanger::{HeatExchangerResult, heat_exchanger};
 pub use heater::{HeaterResult, heater};
+pub use heavy_gas_dispersion::{HeavyGasDispersionResult, heavy_gas_dispersion};
 pub use hem_release::{HemReleaseResult, hem_release};
 pub use jet_fire::{JetFireResult, jet_fire};
 pub use leak_blowdown::{LeakBlowdownResult, leak_blowdown};
@@ -187,6 +192,7 @@ pub use stripping_column::{StrippingColumnResult, stripping_column};
 pub use tank::{TankResult, tank};
 pub use three_phase_separator::{ThreePhaseSeparatorResult, three_phase_separator};
 pub use throttling_valve::{ThrottlingValveResult, throttling_valve};
+pub use toxic_library::{ToxicLibraryResult, toxic_library};
 pub use tr3001_compliance::{
     Tr3001Check, Tr3001ComplianceResult, Tr3001Finding, Tr3001Scenario, Tr3001Status,
     tr3001_compliance,

@@ -1,0 +1,76 @@
+model = "process.heavy_gas_dispersion"
+
+[[cases]]
+id = "methane_forced_heavy_lfl"
+tolerance = 1.0e-12
+source = "The identical-input state behind `process_gas_dispersion.tsv`'s `pr_methane_forced_heavy`: 1 kg/s of methane at the analyzer's source density over 5 m/s, at the LFL ratio. From `validation/neqsim/captures/process_heavy_gas_dispersion.tsv` (`methane_forced_heavy_lfl`)."
+[cases.inputs]
+volumetric_rate = 1.4704613275596858
+source_density = 0.6800586872009459
+air_density = 1.2250122659906946
+wind_speed = 5.0
+concentration_ratio = 0.044
+[cases.expected]
+reduced_gravity = -4.364033533659363
+britter_parameter = 0.3894717381427939
+distance_to_concentration_ratio = 9.76535507728693
+
+[[cases]]
+id = "methane_forced_heavy_half_lfl"
+tolerance = 1.0e-12
+source = "The same state at half the LFL ratio; the distance is the analyzer's `distance_to_half_lfl_m`. From (`methane_forced_heavy_half_lfl`)."
+[cases.inputs]
+volumetric_rate = 1.4704613275596858
+source_density = 0.6800586872009459
+air_density = 1.2250122659906946
+wind_speed = 5.0
+concentration_ratio = 0.022
+[cases.expected]
+reduced_gravity = -4.364033533659363
+britter_parameter = 0.3894717381427939
+distance_to_concentration_ratio = 17.602061561927734
+
+[[cases]]
+id = "alpha_floor"
+tolerance = 1.0e-12
+source = "A characteristic parameter below the fit's floor: `alpha` is published unfloored at 0.007985, while the distance uses 0.01. From (`alpha_floor`)."
+[cases.inputs]
+volumetric_rate = 1.0e-6
+source_density = 1.0
+air_density = 1.225
+wind_speed = 10.0
+concentration_ratio = 0.5
+[cases.expected]
+reduced_gravity = -1.8018367346938782
+britter_parameter = 0.007985206924768607
+distance_to_concentration_ratio = 0.0018025009252216604
+
+[[cases]]
+id = "equal_density"
+tolerance = 1.0e-12
+source = "An equal-density source: `g0 = alpha = 0`, and the fit's floor carries the distance. From (`equal_density`)."
+[cases.inputs]
+volumetric_rate = 1.0
+source_density = 1.225
+air_density = 1.225
+wind_speed = 5.0
+concentration_ratio = 0.1
+[cases.expected]
+reduced_gravity = 0.0
+britter_parameter = 0.0
+distance_to_concentration_ratio = 10.011865297009068
+
+[[cases]]
+id = "buoyant_source"
+tolerance = 1.0e-12
+source = "A source lighter than air: the class accepts it, the reduced gravity is negative and the fit's `|g0|` keeps the distance finite. From (`buoyant_source`)."
+[cases.inputs]
+volumetric_rate = 1.0
+source_density = 0.5
+air_density = 1.225
+wind_speed = 5.0
+concentration_ratio = 0.1
+[cases.expected]
+reduced_gravity = -5.80591836734694
+britter_parameter = 0.40418330032068284
+distance_to_concentration_ratio = 3.970730450687776
