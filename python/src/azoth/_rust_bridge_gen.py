@@ -302,6 +302,7 @@ from azoth.core.result import (
     StreamScaleAnalyzerResult,
     StreamScaleMineralRow,
     StrippingColumnResult,
+    Sts0131PressureCategory,
     SubFraction,
     SupplyVerdict,
     SurfCooldownResult,

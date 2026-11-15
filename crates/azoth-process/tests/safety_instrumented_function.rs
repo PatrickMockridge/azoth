@@ -11,6 +11,7 @@ fn close(actual: f64, expected: f64, what: &str) {
     );
 }
 
+#[allow(clippy::too_many_arguments)]
 fn call(
     pfd: f64,
     sil: f64,

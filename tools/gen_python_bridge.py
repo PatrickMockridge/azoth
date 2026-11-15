@@ -974,7 +974,12 @@ def emit_function(calc_id: str, used: set[str], external: set[str]) -> str:
     # Read from the same decision `return_expr` made rather than from the emitted text: a scan for
     # `Name(` would import `Phase` for a `_Phase(` the module never declares.
     for field, kind in fields.items():
-        if kind != "String" or (outputs.get(field) or {}).get("type") != "enum":
+        # **An optional enum crosses as `Option<String>`**, and it is still the enum in the
+        # body's `None if ... is None else Enum(...)`; reading only `String` left the name out
+        # of the import block, which is what `lopa`'s STS0131 category measured.
+        if kind not in ("String", "Option<String>") or (outputs.get(field) or {}).get(
+            "type"
+        ) != "enum":
             continue
         if rust.get(field) not in ENUMS_THAT_STAY_STRINGS:
             used.add(_enum_class(rust.get(field)))

@@ -348,7 +348,7 @@ fn top_event_probability(index: usize, nodes: &[Node]) -> f64 {
         .map(|child| top_event_probability(*child, nodes))
         .collect();
     match node.gate {
-        Gate::Basic => unreachable!("handled above"),
+        Gate::Basic => node.probability,
         Gate::And => {
             let mut p = 1.0;
             for child in &child_probs {
@@ -391,7 +391,7 @@ fn evaluates_true(index: usize, nodes: &[Node], failed: &HashSet<&str>) -> bool 
         Gate::And => true_count == node.children.len(),
         Gate::Or => true_count >= 1,
         Gate::Voting => true_count >= node.k,
-        Gate::Basic => unreachable!("handled above"),
+        Gate::Basic => failed.contains(node.name.as_str()),
     }
 }
 
