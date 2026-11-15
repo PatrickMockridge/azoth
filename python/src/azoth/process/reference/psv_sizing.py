@@ -366,7 +366,10 @@ def psv_sizing(
         if orifice_area_si is None:
             capacity_value = None
         else:
-            assert capacity_discharge_coefficient is not None
+            if capacity_discharge_coefficient is None:
+                raise InvalidInputError(
+                    "capacity_discharge_coefficient", "is required with orifice_area"
+                )
             capacity_value = _capacity(
                 orifice_area_si,
                 set_pressure_si,
