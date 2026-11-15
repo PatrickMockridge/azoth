@@ -1211,6 +1211,34 @@ def _hem_release(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _heavy_gas_dispersion(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.heavy_gas_dispersion`'s layers, from the reference's own arithmetic.
+
+    **The distance is dumped only when a ratio is stated.** The published Britter parameter
+    is the unfloored one; the fit's 0.01 floor lives inside the distance.
+    """
+    from azoth.process.reference.heavy_gas_dispersion import (
+        _britter_parameter,
+        _distance,
+        _reduced_gravity,
+    )
+
+    rate = float(inputs["volumetric_rate"])
+    source = float(inputs["source_density"])
+    air = float(inputs["air_density"])
+    wind = float(inputs["wind_speed"])
+    reduced = _reduced_gravity(source, air)
+    alpha = _britter_parameter(reduced, rate, wind)
+    dumped: dict[str, float] = {
+        "reduced_gravity_m_per_s2": reduced,
+        "britter_parameter": alpha,
+    }
+    ratio = inputs.get("concentration_ratio")
+    if ratio is not None:
+        dumped["distance_to_concentration_ratio_m"] = _distance(rate, wind, alpha, float(ratio))
+    return dumped
+
+
 def _gaussian_plume(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.gaussian_plume`'s layers, from the reference's own arithmetic.
 
@@ -2560,6 +2588,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
     "process.leak_blowdown": _leak_blowdown,
+    "process.heavy_gas_dispersion": _heavy_gas_dispersion,
     "process.gaussian_plume": _gaussian_plume,
     "process.gas_dispersion": _gas_dispersion,
     "process.bleve": _bleve,
@@ -2983,6 +3012,43 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_leak_blowdown.tsv",
         block=0,
         identified_by=("#label", "pr_methane_50bara_10s_1s"),
+    ),
+    # The dense gas's five: the analyzer's two distances, the alpha floor, equal
+    # densities and a buoyant source; the six guards are uncased.
+    LayerCase(
+        model="process.heavy_gas_dispersion",
+        case="methane_forced_heavy_lfl",
+        capture="process_heavy_gas_dispersion.tsv",
+        block=0,
+        identified_by=("#label", "methane_forced_heavy_lfl"),
+    ),
+    LayerCase(
+        model="process.heavy_gas_dispersion",
+        case="methane_forced_heavy_half_lfl",
+        capture="process_heavy_gas_dispersion.tsv",
+        block=1,
+        identified_by=("#label", "methane_forced_heavy_half_lfl"),
+    ),
+    LayerCase(
+        model="process.heavy_gas_dispersion",
+        case="alpha_floor",
+        capture="process_heavy_gas_dispersion.tsv",
+        block=2,
+        identified_by=("#label", "alpha_floor"),
+    ),
+    LayerCase(
+        model="process.heavy_gas_dispersion",
+        case="equal_density",
+        capture="process_heavy_gas_dispersion.tsv",
+        block=3,
+        identified_by=("#label", "equal_density"),
+    ),
+    LayerCase(
+        model="process.heavy_gas_dispersion",
+        case="buoyant_source",
+        capture="process_heavy_gas_dispersion.tsv",
+        block=4,
+        identified_by=("#label", "buoyant_source"),
     ),
     # The plume's nine: every block is a state the port reproduces, so all nine are cased.
     LayerCase(
@@ -5376,6 +5442,8 @@ UNCASED_ROWS: dict[str, int] = {
     # evidence beside the PR oracle, and the zero-rate refusal the port raises rather than
     # reproduces.
     "process_gas_dispersion.tsv": 5,
+    # The dense gas's six: the constructor's four guards and the ratio's two.
+    "process_heavy_gas_dispersion.tsv": 6,
     # The event tree's four: the no-branch tree, the two refusals and the shift count, which
     # cannot be cased (an empty record value is not a case).
     "process_event_tree.tsv": 4,

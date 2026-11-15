@@ -7078,6 +7078,25 @@ class GaussianPlumeResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class HeavyGasDispersionResult(_HasWarnings):
+    """Result of ``process.heavy_gas_dispersion``."""
+
+    CALC_ID: ClassVar[str] = "process.heavy_gas_dispersion"
+
+    #: `g0 = 9.81 (rho_s - rho_a) / rho_a`, signed; the value is in m/s2.
+    reduced_gravity: float
+
+    #: `alpha = (|g0|^2 q / U^5)^0.2`, unfloored.
+    britter_parameter: float
+
+    #: the downwind distance at which the centerline falls to the stated ratio; absent without a ratio.
+    distance_to_concentration_ratio: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class GibbsReactorResult(_HasWarnings):
     """Result of ``process.gibbs_reactor``."""
 

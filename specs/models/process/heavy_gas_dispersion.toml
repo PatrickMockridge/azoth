@@ -1,0 +1,89 @@
+id = "process.heavy_gas_dispersion"
+name = "Heavy-gas dispersion"
+kind = "procedure"
+assumptions = [
+    "**the fit is the class's Britter-McQuaid continuous line**: `log10(D/L) = -0.85 log10(C/Co) + b`, with `L = sqrt(q/U)` and `b = -0.25 log10(max(alpha, 0.01))`.",
+    "**the characteristic parameter is `alpha = (|g0|^2 q / U^5)^0.2`**, over the signed reduced gravity `g0 = 9.81 (rho_s - rho_a) / rho_a`.",
+    "**a source lighter than air is accepted**: the class does not require `g0 > 0`, and the fit's `|g0|` keeps the distance finite.",
+    "**the published `britter_parameter` is unfloored** while the fit floors it at `0.01`; an equal-density source publishes `alpha = 0` and the floor carries the distance.",
+    "**`9.81` is the class's gravity**, not 9.80665; there is no terrain, jet, buoyancy or averaging correction, and the release is steady and ground level on flat terrain.",
+    "**`reduced_gravity` has no vocabulary dimension** and is declared dimensionless, with its m/s2 value in the description.",
+    "**the constructor refuses a non-positive rate, density or wind speed**, and the distance refuses a ratio outside `(0, 1)`; the port also refuses non-finite values.",
+]
+references = [
+    "Britter, R. E.; McQuaid, J. (1988). Workbook on the Dispersion of Dense Gases. HSE 17/1988.",
+    "CCPS (1996). Guidelines for Vapor Cloud Dispersion Models, 2nd Edition.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/dispersion/HeavyGasDispersion.java` is the port source.",
+    "`validation/neqsim/captures/process_heavy_gas_dispersion.tsv` - the state behind `process_gas_dispersion.tsv`'s dense arm, the alpha floor, equal densities, a buoyant source and the guards.",
+]
+[source]
+standard = "NeqSim process/safety/dispersion/HeavyGasDispersion.java"
+edition = "Its `reducedGravity`, `britterParameter` and `distanceToConcentrationRatio`."
+[algorithm]
+scheme = "britter_mcquaid_continuous_dense_gas"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.volumetric_rate]
+unit = "m**3/s"
+description = "the continuous source volumetric rate `q`, above zero.\n"
+[inputs.source_density]
+unit = "kg/m**3"
+description = "the source gas density at release conditions, `rho_s`, above zero.\n"
+[inputs.air_density]
+unit = "kg/m**3"
+description = "the ambient air density, `rho_a`, about 1.20 kg/m3 at 20 C and sea level; above zero.\n"
+[inputs.wind_speed]
+unit = "m/s"
+description = "the reference wind speed at 10 m, `U`, above zero.\n"
+[inputs.concentration_ratio]
+unit = "dimensionless"
+optional = true
+description = "the target centerline concentration ratio `C/Co`, in `(0, 1)`; absent makes the distance absent.\n"
+[outputs]
+[outputs.reduced_gravity]
+unit = "dimensionless"
+description = "`g0 = 9.81 (rho_s - rho_a) / rho_a`, signed; its value is in m/s2.\n"
+[outputs.britter_parameter]
+unit = "dimensionless"
+description = "`alpha = (|g0|^2 q / U^5)^0.2`, published unfloored.\n"
+[outputs.distance_to_concentration_ratio]
+unit = "m"
+optional = true
+description = "the downwind distance at which the centerline falls to the stated ratio; absent without a ratio.\n"
+[[valid_range]]
+quantity = "volumetric_rate"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive rate"
+[[valid_range]]
+quantity = "source_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive density"
+[[valid_range]]
+quantity = "air_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive density"
+[[valid_range]]
+quantity = "wind_speed"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive wind speed"
+[[valid_range]]
+quantity = "concentration_ratio"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = false
+severity = "error"
+rationale = "the class's distance refuses a ratio outside (0, 1)"
+[implementations]
+python = "azoth.process.heavy_gas_dispersion"
+rust = "azoth_process::heavy_gas_dispersion"

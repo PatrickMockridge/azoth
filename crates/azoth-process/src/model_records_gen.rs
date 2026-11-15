@@ -39,6 +39,7 @@ use crate::models::gaussian_plume::GaussianPlumeResult;
 use crate::models::gibbs_reactor::GibbsReactorResult;
 use crate::models::heat_exchanger::HeatExchangerResult;
 use crate::models::heater::HeaterResult;
+use crate::models::heavy_gas_dispersion::HeavyGasDispersionResult;
 use crate::models::hem_release::HemReleaseResult;
 use crate::models::jet_fire::JetFireResult;
 use crate::models::leak_blowdown::LeakBlowdownResult;
@@ -962,6 +963,20 @@ impl CalcResult for HeaterResult {
         "used_overall_heat_transfer_coefficient",
         "calculated_ua",
         "mechanical_types",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for HeavyGasDispersionResult {
+    const CALC_ID: &'static str = "process.heavy_gas_dispersion";
+    const FIELDS: &'static [&'static str] = &[
+        "reduced_gravity",
+        "britter_parameter",
+        "distance_to_concentration_ratio",
         "warnings",
     ];
 

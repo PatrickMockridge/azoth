@@ -47,6 +47,7 @@ from azoth.core.result import (
     GibbsReactorResult,
     HeaterResult,
     HeatExchangerResult,
+    HeavyGasDispersionResult,
     HemReleaseResult,
     JetFireResult,
     LeakBlowdownResult,
@@ -136,6 +137,7 @@ __all__ = [
     "gibbs_reactor",
     "heat_exchanger",
     "heater",
+    "heavy_gas_dispersion",
     "hem_release",
     "jet_fire",
     "leak_blowdown",
@@ -221,6 +223,7 @@ _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
 _GAS_DISPERSION = "process.gas_dispersion"
 _GAUSSIAN_PLUME = "process.gaussian_plume"
+_HEAVY_GAS_DISPERSION = "process.heavy_gas_dispersion"
 _PROBIT = "process.probit"
 _PSV_FIRE_SIZING = "process.psv_fire_sizing"
 _PSV_SIZING = "process.psv_sizing"
@@ -2868,6 +2871,34 @@ def gaussian_plume(
         crosswind=crosswind,
         height=height,
         threshold=threshold,
+    )
+
+
+def heavy_gas_dispersion(
+    volumetric_rate: Q,
+    source_density: Q,
+    air_density: Q,
+    wind_speed: Q,
+    concentration_ratio: float | None = None,
+) -> HeavyGasDispersionResult:
+    """The Britter-McQuaid dense-gas distance to a concentration ratio.
+
+    The signed reduced gravity, the unfloored characteristic parameter and the fitted
+    downwind distance; ``reduced_gravity`` is in m/s2, and the distance is absent when no
+    ratio is stated.
+
+    Raises:
+        InvalidInputError: for a non-positive rate, density or wind speed, a ratio
+            outside ``(0, 1)``, or a non-finite value.
+
+    See :func:`azoth.process.reference.heavy_gas_dispersion`.
+    """
+    return resolve(_HEAVY_GAS_DISPERSION)(  # type: ignore[no-any-return]
+        volumetric_rate=volumetric_rate,
+        source_density=source_density,
+        air_density=air_density,
+        wind_speed=wind_speed,
+        concentration_ratio=concentration_ratio,
     )
 
 
