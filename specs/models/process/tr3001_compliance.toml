@@ -1,0 +1,134 @@
+id = "process.tr3001_compliance"
+name = "TR3001 compliance"
+kind = "procedure"
+assumptions = [
+    "**the governing case is the first credible scenario with the largest relief rate**, the class's own `governingScenario` rule.",
+    "**the six checks run in the class's order**: credible scenarios, governing case, capacity, acceptance, the fire basis and dynamic determination.",
+    "**the capacity check is skipped only when no governing case exists**, and answers needs-review when the required area is absent (the class's NaN); otherwise it is the study's capacity verdict.",
+    "**the acceptance check is skipped when no acceptance is stated**, and the fire-basis check is skipped unless the governing cause is fire.",
+    "**the fire-basis check answers pass at an accumulation fraction of at least 0.20 and needs-review below it**, including when no acceptance is stated.",
+    "**the dynamic check is skipped unless the governing cause is fire or blocked outlet**, and answers pass only when that scenario is dynamically determined.",
+    "**compliance is no failing check**: needs-review does not fail it. The class's INFO status is in the enum but no check emits it.",
+    "**the requirement ids, titles and detail strings are presentation** and are not carried; the rows carry the check and its status.",
+    "**the class validates nothing**: the port refuses negative or non-finite rates, a negative required area, and an accumulation fraction outside `[0, 1]`.",
+]
+references = [
+    "TR3001. Overpressure protection, relief philosophy and SR-26500 to SR-26565.",
+    "API STD 521 (7th edition, 2020). Pressure-relieving and depressuring systems.",
+    "ASME Boiler and Pressure Vessel Code, Section VIII, Division 1, UG-125.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/overpressure/TR3001ComplianceChecker.java` is the port source.",
+    "`validation/neqsim/captures/process_tr3001_compliance.tsv` - the compliant, no-credible, unsized, capacity-fail, acceptance-fail, fire-basis review, other-cause, null-acceptance and empty states.",
+]
+[source]
+standard = "NeqSim process/safety/overpressure/TR3001ComplianceChecker.java"
+edition = "Its `check` over an `OverpressureStudyResult` and `isCompliant`."
+[algorithm]
+scheme = "closed_form_tr3001_compliance"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.scenarios]
+type = "record_list"
+row_type = "Tr3001Scenario"
+description = "the study's documented scenarios in caller order.\n"
+[inputs.scenarios.fields.cause]
+type = "enum"
+values = [
+    "blocked_outlet",
+    "check_valve_leakage",
+    "gas_blow_by",
+    "liquid_blow_by",
+    "volatile_liquid_ingress",
+    "inadvertent_valve_opening",
+    "control_valve_failure",
+    "fire",
+    "thermal_expansion",
+    "choke_collapse",
+    "tube_rupture",
+    "vacuum",
+    "other",
+]
+description = "the overpressure cause.\n"
+[inputs.scenarios.fields.relief_rate]
+unit = "kg/s"
+description = "the scenario's relief rate, at least zero.\n"
+[inputs.scenarios.fields.dynamically_determined]
+type = "boolean"
+description = "whether the load was determined by a dynamic simulation.\n"
+[inputs.scenarios.fields.credible]
+type = "boolean"
+description = "whether the scenario is credible.\n"
+[inputs.capacity_adequate]
+type = "boolean"
+description = "the study's capacity verdict for the governing case, read only when the area is stated.\n"
+[inputs.required_area_in2]
+unit = "dimensionless"
+optional = true
+description = "the study's required orifice area in in2. **Absent is the class's NaN**, an unsized governing case.\n"
+[inputs.acceptance_accepted]
+type = "boolean"
+optional = true
+description = "the study's accumulated-pressure verdict. Present with `accumulation_fraction` or not at all.\n"
+[inputs.accumulation_fraction]
+unit = "dimensionless"
+optional = true
+description = "the accumulation fraction the acceptance used, in `[0, 1]`. Present with `acceptance_accepted` or not at all.\n"
+[outputs]
+[outputs.findings]
+type = "record_list"
+description = "one row per check the class raised, in its order.\n"
+[outputs.findings.fields.check]
+type = "enum"
+values = [
+    "credible_scenarios",
+    "governing_case",
+    "capacity",
+    "acceptance",
+    "fire_basis",
+    "dynamic_determination",
+]
+description = "which check the row is.\n"
+[outputs.findings.fields.status]
+type = "enum"
+values = ["pass", "fail", "info", "needs_review"]
+description = "the check's status; the checker emits pass, fail and needs-review, never info.\n"
+[outputs.pass_count]
+unit = "dimensionless"
+description = "the number of passing checks.\n"
+[outputs.review_count]
+unit = "dimensionless"
+description = "the number of needs-review checks.\n"
+[outputs.fail_count]
+unit = "dimensionless"
+description = "the number of failing checks.\n"
+[outputs.compliant]
+type = "boolean"
+description = "whether no check failed.\n"
+[[valid_range]]
+quantity = "scenarios.relief_rate"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class reasons over any rate; a negative relief rate is not a load"
+[[valid_range]]
+quantity = "required_area_in2"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative area is not a sizing result"
+[[valid_range]]
+quantity = "accumulation_fraction"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a fraction below zero is not an accumulation basis"
+[[valid_range]]
+quantity = "accumulation_fraction"
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "a fraction above one is not an accumulation basis"
+[implementations]
+python = "azoth.process.tr3001_compliance"
+rust = "azoth_process::tr3001_compliance"

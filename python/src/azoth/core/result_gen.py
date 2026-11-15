@@ -46,6 +46,7 @@ from azoth.core.record_outputs_gen import (
     MineralEquilibriumRow,
     MinimalCutSet,
     NaceIssueRow,
+    ReliefDisposalRow,
     RemediationOptionRow,
     RiskAssessmentRow,
     ScaleControlRiskRow,
@@ -56,6 +57,7 @@ from azoth.core.record_outputs_gen import (
     SterileRadius,
     StreamScaleMineralRow,
     SubFraction,
+    Tr3001Finding,
     WaterMixingResult,
     ZoneRatingRow,
 )
@@ -8039,6 +8041,37 @@ class PipeResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PipelinePressureProtectionResult(_HasWarnings):
+    """Result of ``process.pipeline_pressure_protection``."""
+
+    CALC_ID: ClassVar[str] = "process.pipeline_pressure_protection"
+
+    #: `incidental_factor design_pressure`.
+    max_incidental_pressure: Q
+
+    #: `design_pressure - max_source_pressure`, negative when under-rated.
+    design_margin: Q
+
+    #: whether the maximum source pressure is at or below the design pressure.
+    fully_rated: bool
+
+    #: whether barrier 1's set point is at or below the design pressure.
+    barrier1_adequate: bool
+
+    #: whether barrier 2's set point is at or below the maximum incidental pressure.
+    barrier2_adequate: bool
+
+    #: whether the segment is fully rated or both barriers are adequate.
+    protection_adequate: bool
+
+    #: `FULLY_RATED`, `TWO_BARRIERS_REQUIRED` or `INSUFFICIENT`, the class's own spellings.
+    verdict: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PlugFlowReactorResult(_HasWarnings):
     """Result of ``process.plug_flow_reactor``."""
 
@@ -8565,6 +8598,31 @@ class RateBasedPackedColumnResult(_HasWarnings):
 
     #: the segment's own enthalpy closure, `out - in`.
     segment_enthalpy_balance_residual: tuple[Q, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ReliefDisposalNetworkResult(_HasWarnings):
+    """Result of ``process.relief_disposal_network``."""
+
+    CALC_ID: ClassVar[str] = "process.relief_disposal_network"
+
+    #: the sum of the simultaneous rates.
+    total_simultaneous: Q
+
+    #: the simultaneous total times 3600.
+    total_simultaneous_kg_hr: Q
+
+    #: the largest single rate, over every row.
+    peak_single: Q
+
+    #: the item name of the first peak, absent when no rate is positive.
+    governing_contributor: str | None
+
+    #: one row per input row, in caller order.
+    contributions: tuple[ReliefDisposalRow, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -9472,6 +9530,31 @@ class ThrottlingValveResult(_HasWarnings):
 
     #: `calculateMolarFlow()`: the mole flow the adjusted `Kv` and the drop give - the inverse of the sizing, and the class's own consistency check.
     calculated_molar_flow: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class Tr3001ComplianceResult(_HasWarnings):
+    """Result of ``process.tr3001_compliance``."""
+
+    CALC_ID: ClassVar[str] = "process.tr3001_compliance"
+
+    #: one row per check the class raised, in its order.
+    findings: tuple[Tr3001Finding, ...]
+
+    #: the number of passing checks.
+    pass_count: float
+
+    #: the number of needs-review checks.
+    review_count: float
+
+    #: the number of failing checks.
+    fail_count: float
+
+    #: whether no check failed.
+    compliant: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]

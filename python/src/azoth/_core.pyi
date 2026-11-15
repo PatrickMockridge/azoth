@@ -526,6 +526,15 @@ class PumpCurvePoint(TypedDict):
     efficiency: float
     npsh_required: float | None
 
+class ReliefContribution(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    item_name: str
+    cause: str
+    phase: str
+    mass_flow: float
+    simultaneous: bool
+
 class RiskEquipment(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -540,6 +549,14 @@ class EfficiencyPoint(TypedDict):
 
     diameter: float
     efficiency: float
+
+class Tr3001Scenario(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    cause: str
+    relief_rate: float
+    dynamically_determined: bool
+    credible: bool
 
 class TurboUcPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -945,6 +962,17 @@ class LopaLayerContribution:
     rrf: float | None
 
 @final
+class ReliefDisposalRow:
+    """one row per input row, in caller order."""
+
+    item_name: str
+    cause: str
+    phase: str
+    mass_flow: Qty
+    mass_flow_kg_hr: Qty
+    simultaneous: bool
+
+@final
 class RiskAssessmentRow:
     """one row per input row, in caller order."""
 
@@ -970,6 +998,13 @@ class SilIssue:
 
     severity: str
     category: str
+
+@final
+class Tr3001Finding:
+    """one row per check the class raised, in its order."""
+
+    check: str
+    status: str
 
 # --- results --------------------------------------------------------------
 # Generated from the result dataclasses, so the stub and `azoth.core.result`
@@ -3801,6 +3836,17 @@ class PipeResult:
     warnings: list[Warning]
 
 @final
+class PipelinePressureProtectionResult:
+    max_incidental_pressure: Qty
+    design_margin: Qty
+    fully_rated: bool
+    barrier1_adequate: bool
+    barrier2_adequate: bool
+    protection_adequate: bool
+    verdict: str
+    warnings: list[Warning]
+
+@final
 class PlugFlowReactorResult:
     product_n: Qty
     product_z: list[float]
@@ -3980,6 +4026,15 @@ class RateBasedPackedColumnResult:
     segment_percent_flood: list[float]
     segment_net_molar_transfer: list[Qty]
     segment_enthalpy_balance_residual: list[Qty]
+    warnings: list[Warning]
+
+@final
+class ReliefDisposalNetworkResult:
+    total_simultaneous: Qty
+    total_simultaneous_kg_hr: Qty
+    peak_single: Qty
+    governing_contributor: str | None
+    contributions: list[ReliefDisposalRow]
     warnings: list[Warning]
 
 @final
@@ -4291,6 +4346,15 @@ class ThrottlingValveResult:
     choked: bool
     gas_valve: bool
     calculated_molar_flow: Qty
+    warnings: list[Warning]
+
+@final
+class Tr3001ComplianceResult:
+    findings: list[Tr3001Finding]
+    pass_count: float
+    review_count: float
+    fail_count: float
+    compliant: bool
     warnings: list[Warning]
 
 @final
@@ -7323,6 +7387,13 @@ def pipe(
     number_of_increments: float | None = None,
     elevation: float | None = None,
 ) -> PipeResult: ...
+def pipeline_pressure_protection(
+    max_source_pressure: float,
+    design_pressure: float,
+    incidental_factor: float,
+    barrier1_setpoint: float,
+    barrier2_setpoint: float,
+) -> PipelinePressureProtectionResult: ...
 def plug_flow_reactor(
     components: list[str],
     feed_n: float,
@@ -7459,6 +7530,9 @@ def rate_based_packed_column(
     segment_solver: str | None = None,
     column_solver: str | None = None,
 ) -> RateBasedPackedColumnResult: ...
+def relief_disposal_network(
+    contributions: list[ReliefContribution],
+) -> ReliefDisposalNetworkResult: ...
 def risk_matrix(
     equipment: list[RiskEquipment],
     product_price_per_kg: float | None = None,
@@ -7719,6 +7793,13 @@ def throttling_valve(
     is_isothermal: bool | None = None,
     sizing_standard: str | None = None,
 ) -> ThrottlingValveResult: ...
+def tr3001_compliance(
+    scenarios: list[Tr3001Scenario],
+    capacity_adequate: bool,
+    required_area_in2: float | None = None,
+    acceptance_accepted: bool | None = None,
+    accumulation_fraction: float | None = None,
+) -> Tr3001ComplianceResult: ...
 def turbo_expander_compressor(
     expander_components: list[str],
     compressor_components: list[str],

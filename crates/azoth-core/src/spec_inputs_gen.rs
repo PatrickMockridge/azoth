@@ -262,6 +262,7 @@
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
+//!   - specs/models/process/pipeline_pressure_protection.toml
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/probit.toml
@@ -269,6 +270,7 @@
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/separator.toml
@@ -282,6 +284,7 @@
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml
+//!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
@@ -3983,6 +3986,31 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.pipe", "outlet_pressure", "pressure"),
     ("process.pipe", "number_of_increments", "dimensionless"),
     ("process.pipe", "elevation", "length"),
+    (
+        "process.pipeline_pressure_protection",
+        "max_source_pressure",
+        "pressure",
+    ),
+    (
+        "process.pipeline_pressure_protection",
+        "design_pressure",
+        "pressure",
+    ),
+    (
+        "process.pipeline_pressure_protection",
+        "incidental_factor",
+        "dimensionless",
+    ),
+    (
+        "process.pipeline_pressure_protection",
+        "barrier1_setpoint",
+        "pressure",
+    ),
+    (
+        "process.pipeline_pressure_protection",
+        "barrier2_setpoint",
+        "pressure",
+    ),
     ("process.plug_flow_reactor", "feed_n", "molar_flow"),
     ("process.plug_flow_reactor", "feed_z", "dimensionless"),
     ("process.plug_flow_reactor", "feed_p", "pressure"),
@@ -4872,6 +4900,16 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "dimensionless",
     ),
     ("process.throttling_valve", "xt", "dimensionless"),
+    (
+        "process.tr3001_compliance",
+        "required_area_in2",
+        "dimensionless",
+    ),
+    (
+        "process.tr3001_compliance",
+        "accumulation_fraction",
+        "dimensionless",
+    ),
     (
         "process.turbo_expander_compressor",
         "expander_n",

@@ -1,0 +1,201 @@
+model = "process.tr3001_compliance"
+
+[[cases]]
+id = "tr_all_pass"
+tolerance = 1.0e-12
+source = "Two credible scenarios with a fire governing, sized and accepted at 21 %: all six checks pass. From `validation/neqsim/captures/process_tr3001_compliance.tsv` (`tr_all_pass`)."
+[cases.inputs]
+scenarios = [
+  { cause = "fire", relief_rate = 1.0, dynamically_determined = true, credible = true },
+  { cause = "blocked_outlet", relief_rate = 0.5, dynamically_determined = true, credible = true },
+]
+capacity_adequate = true
+required_area_in2 = 0.5
+acceptance_accepted = true
+accumulation_fraction = 0.21
+[cases.expected]
+findings = [
+  { check = "credible_scenarios", status = "pass" },
+  { check = "governing_case", status = "pass" },
+  { check = "capacity", status = "pass" },
+  { check = "acceptance", status = "pass" },
+  { check = "fire_basis", status = "pass" },
+  { check = "dynamic_determination", status = "pass" },
+]
+pass_count = 6.0
+review_count = 0.0
+fail_count = 0.0
+compliant = true
+
+[[cases]]
+id = "tr_no_credible"
+tolerance = 1.0e-12
+source = "No credible scenario: the credible and governing checks fail, and the capacity check is skipped. From (`tr_no_credible`)."
+[cases.inputs]
+scenarios = [
+  { cause = "fire", relief_rate = 1.0, dynamically_determined = true, credible = false },
+  { cause = "blocked_outlet", relief_rate = 0.5, dynamically_determined = true, credible = false },
+]
+capacity_adequate = true
+required_area_in2 = 0.5
+acceptance_accepted = true
+accumulation_fraction = 0.21
+[cases.expected]
+findings = [
+  { check = "credible_scenarios", status = "fail" },
+  { check = "governing_case", status = "fail" },
+  { check = "acceptance", status = "pass" },
+]
+pass_count = 1.0
+review_count = 0.0
+fail_count = 2.0
+compliant = false
+
+[[cases]]
+id = "tr_unsized"
+tolerance = 1.0e-12
+source = "A governing case with no required area: capacity and the steady fire load need review. From (`tr_unsized`)."
+[cases.inputs]
+scenarios = [
+  { cause = "fire", relief_rate = 1.0, dynamically_determined = false, credible = true },
+]
+capacity_adequate = false
+acceptance_accepted = true
+accumulation_fraction = 0.21
+[cases.expected]
+findings = [
+  { check = "credible_scenarios", status = "pass" },
+  { check = "governing_case", status = "pass" },
+  { check = "capacity", status = "needs_review" },
+  { check = "acceptance", status = "pass" },
+  { check = "fire_basis", status = "pass" },
+  { check = "dynamic_determination", status = "needs_review" },
+]
+pass_count = 4.0
+review_count = 2.0
+fail_count = 0.0
+compliant = true
+
+[[cases]]
+id = "tr_capacity_fail"
+tolerance = 1.0e-12
+source = "A governing case whose selected orifice is undersized. From (`tr_capacity_fail`)."
+[cases.inputs]
+scenarios = [
+  { cause = "fire", relief_rate = 1.0, dynamically_determined = true, credible = true },
+]
+capacity_adequate = false
+required_area_in2 = 30.0
+acceptance_accepted = true
+accumulation_fraction = 0.21
+[cases.expected]
+findings = [
+  { check = "credible_scenarios", status = "pass" },
+  { check = "governing_case", status = "pass" },
+  { check = "capacity", status = "fail" },
+  { check = "acceptance", status = "pass" },
+  { check = "fire_basis", status = "pass" },
+  { check = "dynamic_determination", status = "pass" },
+]
+pass_count = 5.0
+review_count = 0.0
+fail_count = 1.0
+compliant = false
+
+[[cases]]
+id = "tr_acceptance_fail"
+tolerance = 1.0e-12
+source = "An accumulated pressure outside its limit. From (`tr_acceptance_fail`)."
+[cases.inputs]
+scenarios = [
+  { cause = "fire", relief_rate = 1.0, dynamically_determined = true, credible = true },
+]
+capacity_adequate = true
+required_area_in2 = 0.5
+acceptance_accepted = false
+accumulation_fraction = 0.21
+[cases.expected]
+findings = [
+  { check = "credible_scenarios", status = "pass" },
+  { check = "governing_case", status = "pass" },
+  { check = "capacity", status = "pass" },
+  { check = "acceptance", status = "fail" },
+  { check = "fire_basis", status = "pass" },
+  { check = "dynamic_determination", status = "pass" },
+]
+pass_count = 5.0
+review_count = 0.0
+fail_count = 1.0
+compliant = false
+
+[[cases]]
+id = "tr_fire_basis_review"
+tolerance = 1.0e-12
+source = "A fire accepted on a 10 % basis: the fire-basis check needs review, and no check fails. From (`tr_fire_basis_review`)."
+[cases.inputs]
+scenarios = [
+  { cause = "fire", relief_rate = 1.0, dynamically_determined = true, credible = true },
+]
+capacity_adequate = true
+required_area_in2 = 0.5
+acceptance_accepted = true
+accumulation_fraction = 0.10
+[cases.expected]
+findings = [
+  { check = "credible_scenarios", status = "pass" },
+  { check = "governing_case", status = "pass" },
+  { check = "capacity", status = "pass" },
+  { check = "acceptance", status = "pass" },
+  { check = "fire_basis", status = "needs_review" },
+  { check = "dynamic_determination", status = "pass" },
+]
+pass_count = 5.0
+review_count = 1.0
+fail_count = 0.0
+compliant = true
+
+[[cases]]
+id = "tr_other_cause"
+tolerance = 1.0e-12
+source = "A control-valve failure: the fire-basis and dynamic checks are skipped. From (`tr_other_cause`)."
+[cases.inputs]
+scenarios = [
+  { cause = "control_valve_failure", relief_rate = 1.0, dynamically_determined = false, credible = true },
+]
+capacity_adequate = true
+required_area_in2 = 0.5
+acceptance_accepted = true
+accumulation_fraction = 0.10
+[cases.expected]
+findings = [
+  { check = "credible_scenarios", status = "pass" },
+  { check = "governing_case", status = "pass" },
+  { check = "capacity", status = "pass" },
+  { check = "acceptance", status = "pass" },
+]
+pass_count = 4.0
+review_count = 0.0
+fail_count = 0.0
+compliant = true
+
+[[cases]]
+id = "tr_null_acceptance"
+tolerance = 1.0e-12
+source = "A blocked-outlet governing case with no acceptance: the acceptance check is skipped and the dynamic check needs review. From (`tr_null_acceptance`)."
+[cases.inputs]
+scenarios = [
+  { cause = "blocked_outlet", relief_rate = 1.0, dynamically_determined = false, credible = true },
+]
+capacity_adequate = true
+required_area_in2 = 0.5
+[cases.expected]
+findings = [
+  { check = "credible_scenarios", status = "pass" },
+  { check = "governing_case", status = "pass" },
+  { check = "capacity", status = "pass" },
+  { check = "dynamic_determination", status = "needs_review" },
+]
+pass_count = 3.0
+review_count = 1.0
+fail_count = 0.0
+compliant = true

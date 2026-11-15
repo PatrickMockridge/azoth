@@ -1,0 +1,95 @@
+id = "process.pipeline_pressure_protection"
+name = "Pipeline pressure protection"
+kind = "procedure"
+assumptions = [
+    "**the maximum incidental pressure is `incidental_factor design_pressure`**, and the design margin is `design_pressure - max_source_pressure`.",
+    "**the segment is fully rated when the maximum source pressure is at or below the design pressure.**",
+    "**barrier 1 is adequate when its set point is at or below the design pressure**, and barrier 2 when it is at or below the maximum incidental pressure.",
+    "**protection is adequate when the segment is fully rated or both barriers are adequate**; the verdict is fully-rated first, then two barriers, else insufficient.",
+    "**the class validates nothing**: its setters accept non-positive pressures and a factor below one. The port refuses both.",
+]
+references = [
+    "ASME B31.3. Process piping, design pressure and incidental pressure.",
+    "TR3001. Pipeline overpressure protection and the two-barrier philosophy.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/overpressure/PipelinePressureProtectionCalculator.java` is the port source.",
+    "`validation/neqsim/captures/process_pipeline_pressure_protection.tsv` - the three verdicts, the equality boundaries and a barrier above its limit.",
+]
+[source]
+standard = "NeqSim process/safety/overpressure/PipelinePressureProtectionCalculator.java"
+edition = "Its `calcProtection`, `getMaxIncidentalPressure`, `getDesignMargin` and the three verdict getters."
+[algorithm]
+scheme = "closed_form_pipeline_pressure_protection"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.max_source_pressure]
+unit = "bar"
+description = "the maximum credible source pressure, above zero.\n"
+[inputs.design_pressure]
+unit = "bar"
+description = "the segment design pressure, above zero.\n"
+[inputs.incidental_factor]
+unit = "dimensionless"
+description = "the incidental factor, at least one; typically 1.1.\n"
+[inputs.barrier1_setpoint]
+unit = "bar"
+description = "the first barrier's set point, above zero.\n"
+[inputs.barrier2_setpoint]
+unit = "bar"
+description = "the second barrier's set point, above zero.\n"
+[outputs]
+[outputs.max_incidental_pressure]
+unit = "bar"
+description = "`incidental_factor design_pressure`.\n"
+[outputs.design_margin]
+unit = "bar"
+description = "`design_pressure - max_source_pressure`, negative when under-rated.\n"
+[outputs.fully_rated]
+type = "boolean"
+description = "whether the maximum source pressure is at or below the design pressure.\n"
+[outputs.barrier1_adequate]
+type = "boolean"
+description = "whether barrier 1's set point is at or below the design pressure.\n"
+[outputs.barrier2_adequate]
+type = "boolean"
+description = "whether barrier 2's set point is at or below the maximum incidental pressure.\n"
+[outputs.protection_adequate]
+type = "boolean"
+description = "whether the segment is fully rated or both barriers are adequate.\n"
+[outputs.verdict]
+type = "string"
+description = "`FULLY_RATED`, `TWO_BARRIERS_REQUIRED` or `INSUFFICIENT`, the class's own spellings.\n"
+[[valid_range]]
+quantity = "max_source_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class accepts a non-positive source pressure; it is not a pressure"
+[[valid_range]]
+quantity = "design_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class accepts a non-positive design pressure; it is not a pressure"
+[[valid_range]]
+quantity = "incidental_factor"
+min = 1
+min_inclusive = true
+severity = "error"
+rationale = "the class's javadoc calls for at least one and its setter does not check"
+[[valid_range]]
+quantity = "barrier1_setpoint"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class accepts a non-positive set point; it is not a pressure"
+[[valid_range]]
+quantity = "barrier2_setpoint"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class accepts a non-positive set point; it is not a pressure"
+[implementations]
+python = "azoth.process.pipeline_pressure_protection"
+rust = "azoth_process::pipeline_pressure_protection"

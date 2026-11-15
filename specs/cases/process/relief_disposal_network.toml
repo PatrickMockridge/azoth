@@ -1,0 +1,80 @@
+model = "process.relief_disposal_network"
+
+[[cases]]
+id = "dn_all_simultaneous"
+tolerance = 1.0e-12
+source = "Three concurrent loads: total 3.5 kg/s, peak 2.0 kg/s at C. From `validation/neqsim/captures/process_relief_disposal_network.tsv` (`dn_all_simultaneous`)."
+[cases.inputs]
+contributions = [
+  { item_name = "A", cause = "fire", phase = "vapour", mass_flow = 1.0, simultaneous = true },
+  { item_name = "B", cause = "blocked_outlet", phase = "liquid", mass_flow = 0.5, simultaneous = true },
+  { item_name = "C", cause = "control_valve_failure", phase = "vapour", mass_flow = 2.0, simultaneous = true },
+]
+[cases.expected]
+total_simultaneous = 3.5
+total_simultaneous_kg_hr = 12600.0
+peak_single = 2.0
+governing_contributor = "C"
+contributions = [
+  { item_name = "A", cause = "fire", phase = "vapour", mass_flow = 1.0, mass_flow_kg_hr = 3600.0, simultaneous = true },
+  { item_name = "B", cause = "blocked_outlet", phase = "liquid", mass_flow = 0.5, mass_flow_kg_hr = 1800.0, simultaneous = true },
+  { item_name = "C", cause = "control_valve_failure", phase = "vapour", mass_flow = 2.0, mass_flow_kg_hr = 7200.0, simultaneous = true },
+]
+
+[[cases]]
+id = "dn_mixed"
+tolerance = 1.0e-12
+source = "A non-simultaneous 2.0 kg/s load governs the peak but not the total. From (`dn_mixed`)."
+[cases.inputs]
+contributions = [
+  { item_name = "A", cause = "fire", phase = "vapour", mass_flow = 1.0, simultaneous = true },
+  { item_name = "B", cause = "blocked_outlet", phase = "liquid", mass_flow = 2.0, simultaneous = false },
+  { item_name = "C", cause = "tube_rupture", phase = "two_phase", mass_flow = 0.5, simultaneous = true },
+]
+[cases.expected]
+total_simultaneous = 1.5
+total_simultaneous_kg_hr = 5400.0
+peak_single = 2.0
+governing_contributor = "B"
+contributions = [
+  { item_name = "A", cause = "fire", phase = "vapour", mass_flow = 1.0, mass_flow_kg_hr = 3600.0, simultaneous = true },
+  { item_name = "B", cause = "blocked_outlet", phase = "liquid", mass_flow = 2.0, mass_flow_kg_hr = 7200.0, simultaneous = false },
+  { item_name = "C", cause = "tube_rupture", phase = "two_phase", mass_flow = 0.5, mass_flow_kg_hr = 1800.0, simultaneous = true },
+]
+
+[[cases]]
+id = "dn_tie_first_wins"
+tolerance = 1.0e-12
+source = "Two equal loads: the strict comparison keeps the first, A. From (`dn_tie_first_wins`)."
+[cases.inputs]
+contributions = [
+  { item_name = "A", cause = "fire", phase = "vapour", mass_flow = 1.0, simultaneous = true },
+  { item_name = "B", cause = "fire", phase = "vapour", mass_flow = 1.0, simultaneous = true },
+]
+[cases.expected]
+total_simultaneous = 2.0
+total_simultaneous_kg_hr = 7200.0
+peak_single = 1.0
+governing_contributor = "A"
+contributions = [
+  { item_name = "A", cause = "fire", phase = "vapour", mass_flow = 1.0, mass_flow_kg_hr = 3600.0, simultaneous = true },
+  { item_name = "B", cause = "fire", phase = "vapour", mass_flow = 1.0, mass_flow_kg_hr = 3600.0, simultaneous = true },
+]
+
+[[cases]]
+id = "dn_all_zero"
+tolerance = 1.0e-12
+source = "Zero rates: zero totals and no governing contributor. From (`dn_all_zero`)."
+[cases.inputs]
+contributions = [
+  { item_name = "A", cause = "other", phase = "vapour", mass_flow = 0.0, simultaneous = true },
+  { item_name = "B", cause = "other", phase = "vapour", mass_flow = 0.0, simultaneous = false },
+]
+[cases.expected]
+total_simultaneous = 0.0
+total_simultaneous_kg_hr = 0.0
+peak_single = 0.0
+contributions = [
+  { item_name = "A", cause = "other", phase = "vapour", mass_flow = 0.0, mass_flow_kg_hr = 0.0, simultaneous = true },
+  { item_name = "B", cause = "other", phase = "vapour", mass_flow = 0.0, mass_flow_kg_hr = 0.0, simultaneous = false },
+]

@@ -209,6 +209,7 @@ from azoth.core.result import (
     PhFlashResult,
     PipeBeggsAndBrillsResult,
     PipelineCooldownResult,
+    PipelinePressureProtectionResult,
     PipeResult,
     PitzerHydrateFormationPressureResult,
     PitzerHydrateFormationTemperatureResult,
@@ -253,6 +254,8 @@ from azoth.core.result import (
     ReactivePhFlashResult,
     ReactiveTpFlashResult,
     ReferencePotentialsResult,
+    ReliefDisposalNetworkResult,
+    ReliefDisposalRow,
     RemediationOptionRow,
     ReynoldsNumberResult,
     RiskAssessmentRow,
@@ -328,6 +331,8 @@ from azoth.core.result import (
     TpMultiflashResult,
     TpMultiflashWaxResult,
     TpSolidFlashResult,
+    Tr3001ComplianceResult,
+    Tr3001Finding,
     TransferBinaryInteractionParametersResult,
     TrayHydraulicsResult,
     TsFlashResult,
@@ -569,6 +574,7 @@ __all__ = [
     "pipe",
     "pipe_beggs_and_brills",
     "pipeline_cooldown",
+    "pipeline_pressure_protection",
     "pitzer_hydrate_formation_pressure",
     "pitzer_hydrate_formation_temperature",
     "pitzer_phase",
@@ -612,6 +618,7 @@ __all__ = [
     "reactive_phase_equilibrium",
     "reactive_tp_flash",
     "reference_potentials",
+    "relief_disposal_network",
     "reynolds_number",
     "risk_matrix",
     "rk_alpha_ab",
@@ -673,6 +680,7 @@ __all__ = [
     "tp_multiflash",
     "tp_multiflash_wax",
     "tp_solid_flash",
+    "tr3001_compliance",
     "transfer_binary_interaction_parameters",
     "tray_hydraulics",
     "ts_flash",
@@ -7284,6 +7292,28 @@ def pipe(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, in
     )
 
 
+def pipeline_pressure_protection(max_source_pressure: Q, design_pressure: Q, incidental_factor: float, barrier1_setpoint: Q, barrier2_setpoint: Q) -> PipelinePressureProtectionResult:
+    """``process.pipeline_pressure_protection``, computed in Rust."""
+    spec = _models_gen.model("process.pipeline_pressure_protection")
+    result = _core.pipeline_pressure_protection(
+        input_to_si(spec, "max_source_pressure", max_source_pressure),
+        input_to_si(spec, "design_pressure", design_pressure),
+        incidental_factor,
+        input_to_si(spec, "barrier1_setpoint", barrier1_setpoint),
+        input_to_si(spec, "barrier2_setpoint", barrier2_setpoint),
+    )
+    return PipelinePressureProtectionResult(
+        max_incidental_pressure=from_si(result.max_incidental_pressure.magnitude_si, result.max_incidental_pressure.unit),
+        design_margin=from_si(result.design_margin.magnitude_si, result.design_margin.unit),
+        fully_rated=result.fully_rated,
+        barrier1_adequate=result.barrier1_adequate,
+        barrier2_adequate=result.barrier2_adequate,
+        protection_adequate=result.protection_adequate,
+        verdict=result.verdict,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def plug_flow_reactor(components: list[str], feed_n: Q, feed_z: list[float], feed_p: Q, feed_t: Q, length: float, diameter: float, number_of_tubes: float, energy_mode: str, coolant_temperature: Q, overall_heat_transfer_coefficient: Q, number_of_steps: float, integration_method: str, property_update_frequency: float, thermodynamic_coupling: str, reaction: str, reaction_orders: list[float], rate_type: str, pre_exponential_factor: float, activation_energy: float, temperature_exponent: float, heat_of_reaction: float, catalyst_bulk_density: Q | None=None, catalyst_activity_factor: float | None=None, catalyst_particle_diameter: float | None=None, catalyst_void_fraction: float | None=None, catalyst_molecular_diffusivity: Q | None=None, catalyst_effectiveness_enabled: bool | None=None, key_component: str | None=None) -> PlugFlowReactorResult:
     """``process.plug_flow_reactor``, computed in Rust."""
     spec = _models_gen.model("process.plug_flow_reactor")
@@ -7626,6 +7656,22 @@ def rate_based_packed_column(gas_components: list[str], gas_n: Q, gas_z: list[fl
         segment_percent_flood=tuple(result.segment_percent_flood),
         segment_net_molar_transfer=tuple(from_si(q.magnitude_si, q.unit) for q in result.segment_net_molar_transfer),
         segment_enthalpy_balance_residual=tuple(from_si(q.magnitude_si, q.unit) for q in result.segment_enthalpy_balance_residual),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def relief_disposal_network(contributions: list[dict[str, object]]) -> ReliefDisposalNetworkResult:
+    """``process.relief_disposal_network``, computed in Rust."""
+    spec = _models_gen.model("process.relief_disposal_network")
+    result = _core.relief_disposal_network(
+        input_records_to_si(spec, "contributions", contributions),
+    )
+    return ReliefDisposalNetworkResult(
+        total_simultaneous=from_si(result.total_simultaneous.magnitude_si, result.total_simultaneous.unit),
+        total_simultaneous_kg_hr=from_si(result.total_simultaneous_kg_hr.magnitude_si, result.total_simultaneous_kg_hr.unit),
+        peak_single=from_si(result.peak_single.magnitude_si, result.peak_single.unit),
+        governing_contributor=result.governing_contributor,
+        contributions=tuple(ReliefDisposalRow(item_name=c.item_name, cause=c.cause, phase=c.phase, mass_flow=from_si(c.mass_flow.magnitude_si, c.mass_flow.unit), mass_flow_kg_hr=from_si(c.mass_flow_kg_hr.magnitude_si, c.mass_flow_kg_hr.unit), simultaneous=c.simultaneous) for c in result.contributions),
         warnings=_warnings(result.warnings),
     )
 
@@ -8247,6 +8293,26 @@ def throttling_valve(components: list[str], inlet_n: Q, inlet_z: list[float], in
         choked=result.choked,
         gas_valve=result.gas_valve,
         calculated_molar_flow=from_si(result.calculated_molar_flow.magnitude_si, result.calculated_molar_flow.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def tr3001_compliance(scenarios: list[dict[str, object]], capacity_adequate: bool, required_area_in2: float | None=None, acceptance_accepted: bool | None=None, accumulation_fraction: float | None=None) -> Tr3001ComplianceResult:
+    """``process.tr3001_compliance``, computed in Rust."""
+    spec = _models_gen.model("process.tr3001_compliance")
+    result = _core.tr3001_compliance(
+        input_records_to_si(spec, "scenarios", scenarios),
+        capacity_adequate,
+        None if required_area_in2 is None else required_area_in2,
+        acceptance_accepted,
+        None if accumulation_fraction is None else accumulation_fraction,
+    )
+    return Tr3001ComplianceResult(
+        findings=tuple(Tr3001Finding(check=c.check, status=c.status) for c in result.findings),
+        pass_count=result.pass_count,
+        review_count=result.review_count,
+        fail_count=result.fail_count,
+        compliant=result.compliant,
         warnings=_warnings(result.warnings),
     )
 

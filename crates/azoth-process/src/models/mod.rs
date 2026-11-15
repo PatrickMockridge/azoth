@@ -70,6 +70,7 @@ pub mod overpressure_acceptance;
 pub mod packed_column;
 pub mod pfp_demand;
 pub mod pipe;
+pub mod pipeline_pressure_protection;
 pub mod plug_flow_reactor;
 pub mod pool_fire;
 pub mod probit;
@@ -77,6 +78,7 @@ pub mod psv_fire_sizing;
 pub mod psv_sizing;
 pub mod pump;
 pub mod rate_based_packed_column;
+pub mod relief_disposal_network;
 pub mod risk_matrix;
 pub mod safety_instrumented_function;
 pub mod separator;
@@ -90,6 +92,7 @@ pub mod stripping_column;
 pub mod tank;
 pub mod three_phase_separator;
 pub mod throttling_valve;
+pub mod tr3001_compliance;
 pub mod turbo_expander_compressor;
 pub mod vce;
 
@@ -148,6 +151,9 @@ pub use overpressure_acceptance::{
 pub use packed_column::{PackedColumnResult, packed_column};
 pub use pfp_demand::{PfpDemandResult, pfp_demand};
 pub use pipe::{PipeResult, pipe};
+pub use pipeline_pressure_protection::{
+    PipelinePressureProtectionResult, pipeline_pressure_protection,
+};
 pub use plug_flow_reactor::{PlugFlowReactorResult, plug_flow_reactor};
 pub use pool_fire::{PoolFireResult, pool_fire};
 pub use probit::{ProbitResult, probit};
@@ -155,6 +161,10 @@ pub use psv_fire_sizing::{PsvFireSizingResult, psv_fire_sizing};
 pub use psv_sizing::{PsvSizingResult, psv_sizing};
 pub use pump::{PumpResult, pump};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};
+pub use relief_disposal_network::{
+    ReliefCause, ReliefContribution, ReliefDisposalNetworkResult, ReliefDisposalRow, ReliefPhase,
+    relief_disposal_network,
+};
 pub use risk_matrix::{
     RiskAssessmentRow, RiskConsequenceCategory, RiskEquipment, RiskLevel, RiskMatrixResult,
     RiskProbabilityCategory, risk_matrix,
@@ -179,5 +189,9 @@ pub use stripping_column::{StrippingColumnResult, stripping_column};
 pub use tank::{TankResult, tank};
 pub use three_phase_separator::{ThreePhaseSeparatorResult, three_phase_separator};
 pub use throttling_valve::{ThrottlingValveResult, throttling_valve};
+pub use tr3001_compliance::{
+    Tr3001Check, Tr3001ComplianceResult, Tr3001Finding, Tr3001Scenario, Tr3001Status,
+    tr3001_compliance,
+};
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};
 pub use vce::{VceResult, vce};

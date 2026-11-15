@@ -1,0 +1,115 @@
+model = "process.pipeline_pressure_protection"
+
+[[cases]]
+id = "pp_fully_rated"
+tolerance = 1.0e-12
+source = "A 5 bar source under a 10 bar design: the segment is fully rated. From `validation/neqsim/captures/process_pipeline_pressure_protection.tsv` (`pp_fully_rated`)."
+[cases.inputs]
+max_source_pressure = 5.0
+design_pressure = 10.0
+incidental_factor = 1.1
+barrier1_setpoint = 8.0
+barrier2_setpoint = 10.0
+[cases.expected]
+max_incidental_pressure = 11.0
+design_margin = 5.0
+fully_rated = true
+barrier1_adequate = true
+barrier2_adequate = true
+protection_adequate = true
+verdict = "FULLY_RATED"
+
+[[cases]]
+id = "pp_two_barriers"
+tolerance = 1.0e-12
+source = "A 12 bar source over a 10 bar design with both barriers inside their limits. From (`pp_two_barriers`)."
+[cases.inputs]
+max_source_pressure = 12.0
+design_pressure = 10.0
+incidental_factor = 1.1
+barrier1_setpoint = 8.0
+barrier2_setpoint = 10.0
+[cases.expected]
+max_incidental_pressure = 11.0
+design_margin = -2.0
+fully_rated = false
+barrier1_adequate = true
+barrier2_adequate = true
+protection_adequate = true
+verdict = "TWO_BARRIERS_REQUIRED"
+
+[[cases]]
+id = "pp_insufficient"
+tolerance = 1.0e-12
+source = "Barrier 1 above the design pressure: insufficient. From (`pp_insufficient`)."
+[cases.inputs]
+max_source_pressure = 12.0
+design_pressure = 10.0
+incidental_factor = 1.1
+barrier1_setpoint = 11.0
+barrier2_setpoint = 10.0
+[cases.expected]
+max_incidental_pressure = 11.0
+design_margin = -2.0
+fully_rated = false
+barrier1_adequate = false
+barrier2_adequate = true
+protection_adequate = false
+verdict = "INSUFFICIENT"
+
+[[cases]]
+id = "pp_source_at_design"
+tolerance = 1.0e-12
+source = "A source at exactly the design pressure is fully rated. From (`pp_source_at_design`)."
+[cases.inputs]
+max_source_pressure = 10.0
+design_pressure = 10.0
+incidental_factor = 1.1
+barrier1_setpoint = 8.0
+barrier2_setpoint = 10.0
+[cases.expected]
+max_incidental_pressure = 11.0
+design_margin = 0.0
+fully_rated = true
+barrier1_adequate = true
+barrier2_adequate = true
+protection_adequate = true
+verdict = "FULLY_RATED"
+
+[[cases]]
+id = "pp_barrier2_at_mip"
+tolerance = 1.0e-12
+source = "Barrier 2 at exactly the maximum incidental pressure is adequate. From (`pp_barrier2_at_mip`)."
+[cases.inputs]
+max_source_pressure = 12.0
+design_pressure = 10.0
+incidental_factor = 1.1
+barrier1_setpoint = 8.0
+barrier2_setpoint = 11.0
+[cases.expected]
+max_incidental_pressure = 11.0
+design_margin = -2.0
+fully_rated = false
+barrier1_adequate = true
+barrier2_adequate = true
+protection_adequate = true
+verdict = "TWO_BARRIERS_REQUIRED"
+
+[[cases]]
+id = "pp_barrier1_above_design"
+tolerance = 1.0e-12
+source = "A 1.2 incidental factor with barrier 1 above the design pressure: insufficient. From (`pp_barrier1_above_design`)."
+[cases.inputs]
+max_source_pressure = 12.0
+design_pressure = 10.0
+incidental_factor = 1.2
+barrier1_setpoint = 10.5
+barrier2_setpoint = 11.5
+[cases.expected]
+max_incidental_pressure = 12.0
+design_margin = -2.0
+fully_rated = false
+barrier1_adequate = false
+barrier2_adequate = true
+protection_adequate = false
+verdict = "INSUFFICIENT"

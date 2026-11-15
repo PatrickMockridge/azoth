@@ -21,9 +21,9 @@ use crate::record_outputs_gen::{
     PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
     PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow,
-    PyRemediationOptionRow, PyRiskAssessmentRow, PyScaleControlRiskRow, PyScaleControlRow,
-    PyScenarioChangeRow, PyScenarioIndexRow, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
-    PySubFraction, PyWaterMixingResult, PyZoneRatingRow,
+    PyReliefDisposalRow, PyRemediationOptionRow, PyRiskAssessmentRow, PyScaleControlRiskRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySilIssue, PySterileRadius,
+    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -19986,6 +19986,82 @@ impl From<&azoth_process::models::pipe::PipeResult> for PyPipeResult {
         }
     }
 }
+/// Result of `process.pipeline_pressure_protection`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipelinePressureProtectionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipelinePressureProtectionResult {
+    /// `incidental_factor design_pressure`.
+    #[pyo3(get)]
+    pub max_incidental_pressure: PyQty,
+    /// `design_pressure - max_source_pressure`, negative when under-rated.
+    #[pyo3(get)]
+    pub design_margin: PyQty,
+    /// whether the maximum source pressure is at or below the design pressure.
+    #[pyo3(get)]
+    pub fully_rated: bool,
+    /// whether barrier 1's set point is at or below the design pressure.
+    #[pyo3(get)]
+    pub barrier1_adequate: bool,
+    /// whether barrier 2's set point is at or below the maximum incidental pressure.
+    #[pyo3(get)]
+    pub barrier2_adequate: bool,
+    /// whether the segment is fully rated or both barriers are adequate.
+    #[pyo3(get)]
+    pub protection_adequate: bool,
+    /// `FULLY_RATED`, `TWO_BARRIERS_REQUIRED` or `INSUFFICIENT`, the class's own spellings.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPipelinePressureProtectionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipelinePressureProtectionResult(max_incidental_pressure={:?}, design_margin={:?}, fully_rated={:?}, barrier1_adequate={:?}, barrier2_adequate={:?}, protection_adequate={:?}, verdict={:?}, {} warning(s))",
+            self.max_incidental_pressure,
+            self.design_margin,
+            self.fully_rated,
+            self.barrier1_adequate,
+            self.barrier2_adequate,
+            self.protection_adequate,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::pipeline_pressure_protection::PipelinePressureProtectionResult>
+    for PyPipelinePressureProtectionResult
+{
+    fn from(
+        r: &azoth_process::models::pipeline_pressure_protection::PipelinePressureProtectionResult,
+    ) -> Self {
+        Self {
+            max_incidental_pressure: PyQty {
+                magnitude_si: r.max_incidental_pressure.value,
+                unit: "bar".to_string(),
+            },
+            design_margin: PyQty {
+                magnitude_si: r.design_margin.value,
+                unit: "bar".to_string(),
+            },
+            fully_rated: r.fully_rated,
+            barrier1_adequate: r.barrier1_adequate,
+            barrier2_adequate: r.barrier2_adequate,
+            protection_adequate: r.protection_adequate,
+            verdict: r.verdict.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.plug_flow_reactor`, transported.
 #[pyclass(
     frozen,
@@ -21376,6 +21452,79 @@ impl From<&azoth_process::models::rate_based_packed_column::RateBasedPackedColum
                     magnitude_si: v.value,
                     unit: "W".to_string(),
                 })
+                .collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.relief_disposal_network`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ReliefDisposalNetworkResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyReliefDisposalNetworkResult {
+    /// the sum of the simultaneous rates.
+    #[pyo3(get)]
+    pub total_simultaneous: PyQty,
+    /// the simultaneous total times 3600.
+    #[pyo3(get)]
+    pub total_simultaneous_kg_hr: PyQty,
+    /// the largest single rate, over every row.
+    #[pyo3(get)]
+    pub peak_single: PyQty,
+    /// the item name of the first peak, absent when no rate is positive.
+    #[pyo3(get)]
+    pub governing_contributor: Option<String>,
+    /// one row per input row, in caller order.
+    #[pyo3(get)]
+    pub contributions: Vec<PyReliefDisposalRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyReliefDisposalNetworkResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "ReliefDisposalNetworkResult(total_simultaneous={:?}, total_simultaneous_kg_hr={:?}, peak_single={:?}, governing_contributor={:?}, contributions={:?}, {} warning(s))",
+            self.total_simultaneous,
+            self.total_simultaneous_kg_hr,
+            self.peak_single,
+            self.governing_contributor,
+            self.contributions,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::relief_disposal_network::ReliefDisposalNetworkResult>
+    for PyReliefDisposalNetworkResult
+{
+    fn from(
+        r: &azoth_process::models::relief_disposal_network::ReliefDisposalNetworkResult,
+    ) -> Self {
+        Self {
+            total_simultaneous: PyQty {
+                magnitude_si: r.total_simultaneous.value,
+                unit: "kg/s".to_string(),
+            },
+            total_simultaneous_kg_hr: PyQty {
+                magnitude_si: r.total_simultaneous_kg_hr.value,
+                unit: "kg/h".to_string(),
+            },
+            peak_single: PyQty {
+                magnitude_si: r.peak_single.value,
+                unit: "kg/s".to_string(),
+            },
+            governing_contributor: r.governing_contributor.clone(),
+            contributions: r
+                .contributions
+                .iter()
+                .map(PyReliefDisposalRow::from)
                 .collect(),
             warnings: transport(&r.warnings),
         }
@@ -23626,6 +23775,64 @@ impl From<&azoth_process::models::throttling_valve::ThrottlingValveResult>
                 magnitude_si: r.calculated_molar_flow,
                 unit: "mol/s".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.tr3001_compliance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Tr3001ComplianceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTr3001ComplianceResult {
+    /// one row per check the class raised, in its order.
+    #[pyo3(get)]
+    pub findings: Vec<PyTr3001Finding>,
+    /// the number of passing checks.
+    #[pyo3(get)]
+    pub pass_count: f64,
+    /// the number of needs-review checks.
+    #[pyo3(get)]
+    pub review_count: f64,
+    /// the number of failing checks.
+    #[pyo3(get)]
+    pub fail_count: f64,
+    /// whether no check failed.
+    #[pyo3(get)]
+    pub compliant: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyTr3001ComplianceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Tr3001ComplianceResult(findings={:?}, pass_count={:?}, review_count={:?}, fail_count={:?}, compliant={:?}, {} warning(s))",
+            self.findings,
+            self.pass_count,
+            self.review_count,
+            self.fail_count,
+            self.compliant,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::tr3001_compliance::Tr3001ComplianceResult>
+    for PyTr3001ComplianceResult
+{
+    fn from(r: &azoth_process::models::tr3001_compliance::Tr3001ComplianceResult) -> Self {
+        Self {
+            findings: r.findings.iter().map(PyTr3001Finding::from).collect(),
+            pass_count: r.pass_count,
+            review_count: r.review_count,
+            fail_count: r.fail_count,
+            compliant: r.compliant,
             warnings: transport(&r.warnings),
         }
     }

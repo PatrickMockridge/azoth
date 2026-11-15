@@ -6898,6 +6898,33 @@ pub fn pfp_demand(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Pipeline pressure protection.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (max_source_pressure, design_pressure, incidental_factor, barrier1_setpoint, barrier2_setpoint))]
+#[pyo3(
+    text_signature = "(max_source_pressure, design_pressure, incidental_factor, barrier1_setpoint, barrier2_setpoint)"
+)]
+pub fn pipeline_pressure_protection(
+    py: Python<'_>,
+    max_source_pressure: f64,
+    design_pressure: f64,
+    incidental_factor: f64,
+    barrier1_setpoint: f64,
+    barrier2_setpoint: f64,
+) -> PyResult<crate::transport_gen::PyPipelinePressureProtectionResult> {
+    azoth_process::models::pipeline_pressure_protection::pipeline_pressure_protection(
+        pascals(max_source_pressure),
+        pascals(design_pressure),
+        incidental_factor,
+        pascals(barrier1_setpoint),
+        pascals(barrier2_setpoint),
+    )
+    .map(|r| crate::transport_gen::PyPipelinePressureProtectionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Pool fire radiation.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -7044,6 +7071,35 @@ pub fn psv_sizing(
     )
     .map(|r| crate::transport_gen::PyPsvSizingResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
+}
+
+/// Relief disposal network.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (contributions))]
+#[pyo3(text_signature = "(contributions)")]
+pub fn relief_disposal_network(
+    py: Python<'_>,
+    contributions: Vec<crate::records_gen::ReliefContribution>,
+) -> PyResult<crate::transport_gen::PyReliefDisposalNetworkResult> {
+    let contributions_records: Vec<
+        azoth_process::models::relief_disposal_network::ReliefContribution,
+    > = contributions
+        .into_iter()
+        .map(
+            |row| azoth_process::models::relief_disposal_network::ReliefContribution {
+                item_name: row.item_name,
+                cause: row.cause,
+                phase: row.phase,
+                mass_flow: kilograms_per_second(row.mass_flow),
+                simultaneous: row.simultaneous,
+            },
+        )
+        .collect();
+    azoth_process::models::relief_disposal_network::relief_disposal_network(&contributions_records)
+        .map(|r| crate::transport_gen::PyReliefDisposalNetworkResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
 }
 
 /// Risk matrix.
@@ -7472,6 +7528,45 @@ pub fn throttling_valve(
         sizing_standard,
     )
     .map(|r| crate::transport_gen::PyThrottlingValveResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// TR3001 compliance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (scenarios, capacity_adequate, required_area_in2, acceptance_accepted, accumulation_fraction))]
+#[pyo3(
+    text_signature = "(scenarios, capacity_adequate, required_area_in2, acceptance_accepted, accumulation_fraction)"
+)]
+pub fn tr3001_compliance(
+    py: Python<'_>,
+    scenarios: Vec<crate::records_gen::Tr3001Scenario>,
+    capacity_adequate: bool,
+    required_area_in2: Option<f64>,
+    acceptance_accepted: Option<bool>,
+    accumulation_fraction: Option<f64>,
+) -> PyResult<crate::transport_gen::PyTr3001ComplianceResult> {
+    let scenarios_records: Vec<azoth_process::models::tr3001_compliance::Tr3001Scenario> =
+        scenarios
+            .into_iter()
+            .map(
+                |row| azoth_process::models::tr3001_compliance::Tr3001Scenario {
+                    cause: row.cause,
+                    relief_rate: kilograms_per_second(row.relief_rate),
+                    dynamically_determined: row.dynamically_determined,
+                    credible: row.credible,
+                },
+            )
+            .collect();
+    azoth_process::models::tr3001_compliance::tr3001_compliance(
+        &scenarios_records,
+        required_area_in2,
+        capacity_adequate,
+        acceptance_accepted,
+        accumulation_fraction,
+    )
+    .map(|r| crate::transport_gen::PyTr3001ComplianceResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

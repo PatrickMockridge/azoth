@@ -58,6 +58,7 @@ from azoth.core.result import (
     OverpressureAcceptanceResult,
     PackedColumnResult,
     PfpDemandResult,
+    PipelinePressureProtectionResult,
     PipeResult,
     PlugFlowReactorResult,
     PoolFireResult,
@@ -66,6 +67,7 @@ from azoth.core.result import (
     PsvSizingResult,
     PumpResult,
     RateBasedPackedColumnResult,
+    ReliefDisposalNetworkResult,
     RiskMatrixResult,
     SafetyInstrumentedFunctionResult,
     SeparatorCapacityAssessmentResult,
@@ -79,6 +81,7 @@ from azoth.core.result import (
     TankResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
+    Tr3001ComplianceResult,
     TurboExpanderResult,
     VceResult,
 )
@@ -146,6 +149,7 @@ __all__ = [
     "packed_column",
     "pfp_demand",
     "pipe",
+    "pipeline_pressure_protection",
     "plug_flow_reactor",
     "pool_fire",
     "probit",
@@ -153,6 +157,7 @@ __all__ = [
     "psv_sizing",
     "pump",
     "rate_based_packed_column",
+    "relief_disposal_network",
     "risk_matrix",
     "run_flowsheet",
     "safety_instrumented_function",
@@ -167,6 +172,7 @@ __all__ = [
     "three_phase_separator",
     "throttling_valve",
     "tools",
+    "tr3001_compliance",
     "validate",
     "vce",
 ]
@@ -180,7 +186,9 @@ _NOG070_SIL_DETERMINATION = "process.nog070_sil_determination"
 _OVERPRESSURE_ACCEPTANCE = "process.overpressure_acceptance"
 _PACKED_COLUMN = "process.packed_column"
 _PFP_DEMAND = "process.pfp_demand"
+_PIPELINE_PRESSURE_PROTECTION = "process.pipeline_pressure_protection"
 _RATE_BASED_PACKED_COLUMN = "process.rate_based_packed_column"
+_RELIEF_DISPOSAL_NETWORK = "process.relief_disposal_network"
 _RISK_MATRIX = "process.risk_matrix"
 _SAFETY_INSTRUMENTED_FUNCTION = "process.safety_instrumented_function"
 _PIPE = "process.pipe"
@@ -222,6 +230,7 @@ _SEPARATOR_PERFORMANCE = "process.separator_performance"
 _SHORTCUT_DISTILLATION_COLUMN = "process.shortcut_distillation_column"
 _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
+_TR3001_COMPLIANCE = "process.tr3001_compliance"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
 _POOL_FIRE = "process.pool_fire"
@@ -2390,6 +2399,58 @@ def overpressure_acceptance(
         mawp=mawp,
         cause=cause,
         multiple_devices=multiple_devices,
+    )
+
+
+def pipeline_pressure_protection(
+    max_source_pressure: Q,
+    design_pressure: Q,
+    incidental_factor: float,
+    barrier1_setpoint: Q,
+    barrier2_setpoint: Q,
+) -> PipelinePressureProtectionResult:
+    """The maximum incidental pressure, the design margin and the three verdicts.
+
+    See :func:`azoth.process.reference.pipeline_pressure_protection`.
+    """
+    return resolve(_PIPELINE_PRESSURE_PROTECTION)(  # type: ignore[no-any-return]
+        max_source_pressure=max_source_pressure,
+        design_pressure=design_pressure,
+        incidental_factor=incidental_factor,
+        barrier1_setpoint=barrier1_setpoint,
+        barrier2_setpoint=barrier2_setpoint,
+    )
+
+
+def relief_disposal_network(
+    contributions: list[dict[str, object]],
+) -> ReliefDisposalNetworkResult:
+    """The simultaneous total, the peak single load and the echoed rows.
+
+    See :func:`azoth.process.reference.relief_disposal_network`.
+    """
+    return resolve(_RELIEF_DISPOSAL_NETWORK)(  # type: ignore[no-any-return]
+        contributions=contributions,
+    )
+
+
+def tr3001_compliance(
+    scenarios: list[dict[str, object]],
+    capacity_adequate: bool,
+    required_area_in2: float | None = None,
+    acceptance_accepted: bool | None = None,
+    accumulation_fraction: float | None = None,
+) -> Tr3001ComplianceResult:
+    """The six TR3001 checks over a study's scenario rows and sizing verdict.
+
+    See :func:`azoth.process.reference.tr3001_compliance`.
+    """
+    return resolve(_TR3001_COMPLIANCE)(  # type: ignore[no-any-return]
+        scenarios=scenarios,
+        capacity_adequate=capacity_adequate,
+        required_area_in2=required_area_in2,
+        acceptance_accepted=acceptance_accepted,
+        accumulation_fraction=accumulation_fraction,
     )
 
 

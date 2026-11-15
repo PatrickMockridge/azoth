@@ -1719,6 +1719,71 @@ impl From<&azoth_thermal::results::NaceIssueRow> for PyNaceIssueRow {
     }
 }
 
+/// one row per input row, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ReliefDisposalRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyReliefDisposalRow {
+    /// the protected item's name.
+    #[pyo3(get)]
+    pub item_name: String,
+    /// the overpressure cause.
+    #[pyo3(get)]
+    pub cause: String,
+    /// the relieving phase.
+    #[pyo3(get)]
+    pub phase: String,
+    /// the rate, echoed.
+    #[pyo3(get)]
+    pub mass_flow: PyQty,
+    /// the rate times 3600.
+    #[pyo3(get)]
+    pub mass_flow_kg_hr: PyQty,
+    /// whether the load is concurrent.
+    #[pyo3(get)]
+    pub simultaneous: bool,
+}
+
+#[pymethods]
+impl PyReliefDisposalRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "ReliefDisposalRow(item_name={}, cause={}, phase={}, mass_flow={:?}, mass_flow_kg_hr={:?}, simultaneous={:?})",
+            self.item_name,
+            self.cause,
+            self.phase,
+            self.mass_flow,
+            self.mass_flow_kg_hr,
+            self.simultaneous
+        )
+    }
+}
+
+impl From<&azoth_process::models::relief_disposal_network::ReliefDisposalRow>
+    for PyReliefDisposalRow
+{
+    fn from(row: &azoth_process::models::relief_disposal_network::ReliefDisposalRow) -> Self {
+        Self {
+            item_name: row.item_name.clone(),
+            cause: row.cause.as_str().to_string(),
+            phase: row.phase.as_str().to_string(),
+            mass_flow: PyQty {
+                magnitude_si: row.mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            mass_flow_kg_hr: PyQty {
+                magnitude_si: row.mass_flow_kg_hr.value,
+                unit: "kg/h".to_string(),
+            },
+            simultaneous: row.simultaneous,
+        }
+    }
+}
+
 /// The candidate remedies, ordered by descending effectiveness.
 #[pyclass(
     frozen,
@@ -2234,6 +2299,42 @@ impl From<&azoth_characterization::results::SubFraction> for PySubFraction {
                 magnitude_si: v,
                 unit: "K".to_string(),
             }),
+        }
+    }
+}
+
+/// one row per check the class raised, in its order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Tr3001Finding"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTr3001Finding {
+    /// which check the row is.
+    #[pyo3(get)]
+    pub check: String,
+    /// the check's status; the checker emits pass, fail and needs-review, never info.
+    #[pyo3(get)]
+    pub status: String,
+}
+
+#[pymethods]
+impl PyTr3001Finding {
+    fn __repr__(&self) -> String {
+        format!(
+            "Tr3001Finding(check={}, status={})",
+            self.check, self.status
+        )
+    }
+}
+
+impl From<&azoth_process::models::tr3001_compliance::Tr3001Finding> for PyTr3001Finding {
+    fn from(row: &azoth_process::models::tr3001_compliance::Tr3001Finding) -> Self {
+        Self {
+            check: row.check.as_str().to_string(),
+            status: row.status.as_str().to_string(),
         }
     }
 }
