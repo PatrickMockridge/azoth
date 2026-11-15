@@ -251,6 +251,7 @@ from azoth.core.result import (
     RkAlphaAbResult,
     RkDepartureResult,
     RootStructure,
+    SafetyInstrumentedFunctionResult,
     SaftVrMiePhaseResult,
     SaltPrecipitationResult,
     SaturateWithWaterResult,
@@ -596,6 +597,7 @@ __all__ = [
     "reynolds_number",
     "rk_alpha_ab",
     "rk_departure",
+    "safety_instrumented_function",
     "saft_vr_mie_phase",
     "salt_precipitation",
     "saturate_with_water",
@@ -7446,6 +7448,35 @@ def rate_based_packed_column(gas_components: list[str], gas_n: Q, gas_z: list[fl
         segment_percent_flood=tuple(result.segment_percent_flood),
         segment_net_molar_transfer=tuple(from_si(q.magnitude_si, q.unit) for q in result.segment_net_molar_transfer),
         segment_enthalpy_balance_residual=tuple(from_si(q.magnitude_si, q.unit) for q in result.segment_enthalpy_balance_residual),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def safety_instrumented_function(pfd_average: float, claimed_sil: float, unmitigated_frequency_per_year: float, target_frequency_per_year: float, test_interval_hours: float, lambda_du_per_hour: float | None=None, spurious_trip_rate_per_year: float | None=None, mttr_hours: float | None=None, base_availability: float | None=None) -> SafetyInstrumentedFunctionResult:
+    """``process.safety_instrumented_function``, computed in Rust."""
+    result = _core.safety_instrumented_function(
+        pfd_average,
+        claimed_sil,
+        unmitigated_frequency_per_year,
+        target_frequency_per_year,
+        test_interval_hours,
+        None if lambda_du_per_hour is None else lambda_du_per_hour,
+        None if spurious_trip_rate_per_year is None else spurious_trip_rate_per_year,
+        None if mttr_hours is None else mttr_hours,
+        None if base_availability is None else base_availability,
+    )
+    return SafetyInstrumentedFunctionResult(
+        risk_reduction_factor=result.risk_reduction_factor,
+        mitigated_frequency_per_year=result.mitigated_frequency_per_year,
+        required_pfd=result.required_pfd,
+        required_sil=result.required_sil,
+        max_pfd_for_claimed_sil=result.max_pfd_for_claimed_sil,
+        proof_test_interval_years=result.proof_test_interval_years,
+        pfd_within_claimed_sil=result.pfd_within_claimed_sil,
+        pfd_1oo1=result.pfd_1oo1,
+        pfd_1oo2=result.pfd_1oo2,
+        pfd_2oo3=result.pfd_2oo3,
+        availability_with_spurious_trips=result.availability_with_spurious_trips,
         warnings=_warnings(result.warnings),
     )
 

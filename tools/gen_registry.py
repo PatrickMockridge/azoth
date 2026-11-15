@@ -225,6 +225,10 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # against the capture, and `test_cross_impl` compares them on both results.
         "meets_density_still_air",
         "meets_density_in_wind",
+        # `safety_instrumented_function`'s PFD-band flag, a boolean with no slot in
+        # `TestCase`. `crates/azoth-process/tests/safety_instrumented_function.rs` asserts
+        # it against the capture, and `test_cross_impl` compares it on both results.
+        "pfd_within_claimed_sil",
         # `fire_water_coverage_assessment`'s two feasibility flags, booleans with no slot in
         # `TestCase`. `crates/azoth-process/tests/fire_water_coverage_assessment.rs` asserts
         # them against the capture, and `test_cross_impl` compares them on both results.

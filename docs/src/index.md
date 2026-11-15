@@ -367,6 +367,7 @@ Five sections, and the difference between them is the point:
 - [`process.probit`](./process/probit.md) — Probit dose-response
 - [`process.pump`](./process/pump.md) — Pump
 - [`process.rate_based_packed_column`](./process/rate_based_packed_column.md) — Rate-based packed column
+- [`process.safety_instrumented_function`](./process/safety_instrumented_function.md) — Safety instrumented function
 - [`process.separator`](./process/separator.md) — Separator
 - [`process.separator_capacity_assessment`](./process/separator_capacity_assessment.md) — Separator capacity assessment
 - [`process.separator_performance`](./process/separator_performance.md) — Separator performance calculator

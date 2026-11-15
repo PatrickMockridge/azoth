@@ -71,6 +71,7 @@ pub mod pool_fire;
 pub mod probit;
 pub mod pump;
 pub mod rate_based_packed_column;
+pub mod safety_instrumented_function;
 pub mod separator;
 pub mod separator_capacity_assessment;
 pub mod separator_performance;
@@ -140,6 +141,9 @@ pub use pool_fire::{PoolFireResult, pool_fire};
 pub use probit::{ProbitResult, probit};
 pub use pump::{PumpResult, pump};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};
+pub use safety_instrumented_function::{
+    SafetyInstrumentedFunctionResult, safety_instrumented_function,
+};
 pub use separator::{SeparatorResult, separator};
 pub use separator_capacity_assessment::{
     SeparatorCapacityAssessmentResult, separator_capacity_assessment,

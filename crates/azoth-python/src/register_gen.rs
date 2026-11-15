@@ -281,6 +281,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyProbitResult>()?;
     m.add_class::<crate::transport_gen::PyPumpResult>()?;
     m.add_class::<crate::transport_gen::PyRateBasedPackedColumnResult>()?;
+    m.add_class::<crate::transport_gen::PySafetyInstrumentedFunctionResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorCapacityAssessmentResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorPerformanceResult>()?;
@@ -957,6 +958,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::process::pump, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::process::rate_based_packed_column,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::safety_instrumented_function,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator, m)?)?;

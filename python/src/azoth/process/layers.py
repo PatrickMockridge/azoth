@@ -2143,6 +2143,51 @@ def _bow_tie(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _safety_instrumented_function(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.safety_instrumented_function`'s layers, from the reference's arithmetic.
+
+    An optional output the class answers with `+Infinity` is absent from the dump, so the
+    capture's `Infinity` row is not compared against it.
+    """
+    from azoth.process.reference.safety_instrumented_function import (
+        safety_instrumented_function as evaluate,
+    )
+
+    result = evaluate(
+        float(inputs["pfd_average"]),
+        float(inputs["claimed_sil"]),
+        float(inputs["unmitigated_frequency_per_year"]),
+        float(inputs["target_frequency_per_year"]),
+        float(inputs["test_interval_hours"]),
+        None if inputs.get("lambda_du_per_hour") is None else float(inputs["lambda_du_per_hour"]),
+        (
+            None
+            if inputs.get("spurious_trip_rate_per_year") is None
+            else float(inputs["spurious_trip_rate_per_year"])
+        ),
+        None if inputs.get("mttr_hours") is None else float(inputs["mttr_hours"]),
+        (None if inputs.get("base_availability") is None else float(inputs["base_availability"])),
+    )
+    layers = {
+        "mitigated_frequency_per_year": result.mitigated_frequency_per_year,
+        "required_pfd": result.required_pfd,
+        "required_sil": result.required_sil,
+        "max_pfd_for_claimed_sil": result.max_pfd_for_claimed_sil,
+        "proof_test_interval_years": result.proof_test_interval_years,
+    }
+    for name in (
+        "risk_reduction_factor",
+        "pfd_1oo1",
+        "pfd_1oo2",
+        "pfd_2oo3",
+        "availability_with_spurious_trips",
+    ):
+        value = getattr(result, name)
+        if value is not None:
+            layers[name] = float(value)
+    return layers
+
+
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
@@ -2161,6 +2206,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.fault_tree": _fault_tree,
     "process.bow_tie": _bow_tie,
+    "process.safety_instrumented_function": _safety_instrumented_function,
     "process.pool_fire": _pool_fire,
     "process.probit": _probit,
     "process.vce": _vce,
@@ -3232,6 +3278,43 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_bow_tie.tsv",
         block=5,
         identified_by=("#label", "bt_nonfunctional"),
+    ),
+    # The SIF's five caseable states. The five blocks after them (a negative PFD, a NaN,
+    # the two SIL refusals and the static max-PFD table) are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.safety_instrumented_function",
+        case="sif_class_test",
+        capture="process_safety_instrumented_function.tsv",
+        block=0,
+        identified_by=("#label", "sif_class_test"),
+    ),
+    LayerCase(
+        model="process.safety_instrumented_function",
+        case="sif_required_pfd_at_zero",
+        capture="process_safety_instrumented_function.tsv",
+        block=1,
+        identified_by=("#label", "sif_required_pfd_at_zero"),
+    ),
+    LayerCase(
+        model="process.safety_instrumented_function",
+        case="sif_pfd_zero",
+        capture="process_safety_instrumented_function.tsv",
+        block=2,
+        identified_by=("#label", "sif_pfd_zero"),
+    ),
+    LayerCase(
+        model="process.safety_instrumented_function",
+        case="sif_spurious_trips",
+        capture="process_safety_instrumented_function.tsv",
+        block=3,
+        identified_by=("#label", "sif_spurious_trips"),
+    ),
+    LayerCase(
+        model="process.safety_instrumented_function",
+        case="sif_out_of_band",
+        capture="process_safety_instrumented_function.tsv",
+        block=4,
+        identified_by=("#label", "sif_out_of_band"),
     ),
     # The VCE's thirteen reachable states: the test state at two distances, the 5 kPa
     # contour and all ten plateaus. The 20.7 kPa target that exceeds the class-4 plateau,
@@ -4472,6 +4555,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The bow-tie's eight: the empty bow-tie, no barriers, no consequences, all threats
     # inactive, a negative frequency, a PFD above one, a negative PFD and a NaN.
     "process_bow_tie.tsv": 8,
+    # The SIF's five: a negative PFD, a NaN, the SIL 0 and SIL 5 refusals, and the static
+    # max-PFD table for a SIL it does not know.
+    "process_safety_instrumented_function.tsv": 5,
     # The VCE's three: two unreachable targets the class answers with its near bound, and
     # the zero-target refusal.
     "process_vce.tsv": 3,

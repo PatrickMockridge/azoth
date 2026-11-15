@@ -52,6 +52,7 @@ use crate::models::pool_fire::PoolFireResult;
 use crate::models::probit::ProbitResult;
 use crate::models::pump::PumpResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
+use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
 use crate::models::separator::SeparatorResult;
 use crate::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult;
 use crate::models::separator_performance::SeparatorPerformanceResult;
@@ -1326,6 +1327,28 @@ impl CalcResult for RateBasedPackedColumnResult {
         "segment_percent_flood",
         "segment_net_molar_transfer",
         "segment_enthalpy_balance_residual",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SafetyInstrumentedFunctionResult {
+    const CALC_ID: &'static str = "process.safety_instrumented_function";
+    const FIELDS: &'static [&'static str] = &[
+        "risk_reduction_factor",
+        "mitigated_frequency_per_year",
+        "required_pfd",
+        "required_sil",
+        "max_pfd_for_claimed_sil",
+        "proof_test_interval_years",
+        "pfd_within_claimed_sil",
+        "pfd_1oo1",
+        "pfd_1oo2",
+        "pfd_2oo3",
+        "availability_with_spurious_trips",
         "warnings",
     ];
 

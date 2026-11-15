@@ -60,6 +60,7 @@ from azoth.core.result import (
     ProbitResult,
     PumpResult,
     RateBasedPackedColumnResult,
+    SafetyInstrumentedFunctionResult,
     SeparatorCapacityAssessmentResult,
     SeparatorPerformanceResult,
     SeparatorResult,
@@ -139,6 +140,7 @@ __all__ = [
     "pump",
     "rate_based_packed_column",
     "run_flowsheet",
+    "safety_instrumented_function",
     "separator",
     "separator_capacity_assessment",
     "shortcut_distillation_column",
@@ -161,6 +163,7 @@ _MIXER = "process.mixer"
 _PACKED_COLUMN = "process.packed_column"
 _PFP_DEMAND = "process.pfp_demand"
 _RATE_BASED_PACKED_COLUMN = "process.rate_based_packed_column"
+_SAFETY_INSTRUMENTED_FUNCTION = "process.safety_instrumented_function"
 _PIPE = "process.pipe"
 _GAS_SCRUBBER = "process.gas_scrubber"
 _HEAT_EXCHANGER = "process.heat_exchanger"
@@ -2239,6 +2242,39 @@ def bow_tie(
         threats=threats,
         consequences=consequences,
         barriers=barriers,
+    )
+
+
+def safety_instrumented_function(
+    pfd_average: float,
+    claimed_sil: float,
+    unmitigated_frequency_per_year: float,
+    target_frequency_per_year: float,
+    test_interval_hours: float,
+    lambda_du_per_hour: float | None = None,
+    spurious_trip_rate_per_year: float | None = None,
+    mttr_hours: float | None = None,
+    base_availability: float | None = None,
+) -> SafetyInstrumentedFunctionResult:
+    """The SIF's RRF, required PFD and SIL, architecture PFDs and availability.
+
+    ``risk_reduction_factor`` is absent at a PFD of zero, where the class answers
+    ``+Infinity``. **A PFD outside the claimed SIL's band is published, not refused**:
+    the class prints a warning, so the result carries ``pfd_within_claimed_sil`` and an
+    ``OUT_OF_VALID_RANGE`` warning.
+
+    See :func:`azoth.process.reference.safety_instrumented_function`.
+    """
+    return resolve(_SAFETY_INSTRUMENTED_FUNCTION)(  # type: ignore[no-any-return]
+        pfd_average=pfd_average,
+        claimed_sil=claimed_sil,
+        unmitigated_frequency_per_year=unmitigated_frequency_per_year,
+        target_frequency_per_year=target_frequency_per_year,
+        test_interval_hours=test_interval_hours,
+        lambda_du_per_hour=lambda_du_per_hour,
+        spurious_trip_rate_per_year=spurious_trip_rate_per_year,
+        mttr_hours=mttr_hours,
+        base_availability=base_availability,
     )
 
 

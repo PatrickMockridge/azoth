@@ -6825,6 +6825,42 @@ pub fn probit(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Safety instrumented function.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (pfd_average, claimed_sil, unmitigated_frequency_per_year, target_frequency_per_year, test_interval_hours, lambda_du_per_hour, spurious_trip_rate_per_year, mttr_hours, base_availability))]
+#[pyo3(
+    text_signature = "(pfd_average, claimed_sil, unmitigated_frequency_per_year, target_frequency_per_year, test_interval_hours, lambda_du_per_hour, spurious_trip_rate_per_year, mttr_hours, base_availability)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn safety_instrumented_function(
+    py: Python<'_>,
+    pfd_average: f64,
+    claimed_sil: f64,
+    unmitigated_frequency_per_year: f64,
+    target_frequency_per_year: f64,
+    test_interval_hours: f64,
+    lambda_du_per_hour: Option<f64>,
+    spurious_trip_rate_per_year: Option<f64>,
+    mttr_hours: Option<f64>,
+    base_availability: Option<f64>,
+) -> PyResult<crate::transport_gen::PySafetyInstrumentedFunctionResult> {
+    azoth_process::models::safety_instrumented_function::safety_instrumented_function(
+        pfd_average,
+        claimed_sil,
+        unmitigated_frequency_per_year,
+        target_frequency_per_year,
+        test_interval_hours,
+        lambda_du_per_hour,
+        spurious_trip_rate_per_year,
+        mttr_hours,
+        base_availability,
+    )
+    .map(|r| crate::transport_gen::PySafetyInstrumentedFunctionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Separator.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

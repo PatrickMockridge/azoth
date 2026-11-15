@@ -263,6 +263,7 @@
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml
@@ -4097,6 +4098,51 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.rate_based_packed_column",
         "mass_transfer_correction",
+        "dimensionless",
+    ),
+    (
+        "process.safety_instrumented_function",
+        "pfd_average",
+        "dimensionless",
+    ),
+    (
+        "process.safety_instrumented_function",
+        "claimed_sil",
+        "dimensionless",
+    ),
+    (
+        "process.safety_instrumented_function",
+        "unmitigated_frequency_per_year",
+        "dimensionless",
+    ),
+    (
+        "process.safety_instrumented_function",
+        "target_frequency_per_year",
+        "dimensionless",
+    ),
+    (
+        "process.safety_instrumented_function",
+        "test_interval_hours",
+        "dimensionless",
+    ),
+    (
+        "process.safety_instrumented_function",
+        "lambda_du_per_hour",
+        "dimensionless",
+    ),
+    (
+        "process.safety_instrumented_function",
+        "spurious_trip_rate_per_year",
+        "dimensionless",
+    ),
+    (
+        "process.safety_instrumented_function",
+        "mttr_hours",
+        "dimensionless",
+    ),
+    (
+        "process.safety_instrumented_function",
+        "base_availability",
         "dimensionless",
     ),
     ("process.separator", "feed_n", "molar_flow"),

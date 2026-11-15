@@ -20927,6 +20927,96 @@ impl From<&azoth_process::models::rate_based_packed_column::RateBasedPackedColum
         }
     }
 }
+/// Result of `process.safety_instrumented_function`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SafetyInstrumentedFunctionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySafetyInstrumentedFunctionResult {
+    /// `1 / PFD`; absent at a PFD of zero, where the class answers `+Infinity`.
+    #[pyo3(get)]
+    pub risk_reduction_factor: Option<f64>,
+    /// `unmitigated_frequency PFD`, in 1/year.
+    #[pyo3(get)]
+    pub mitigated_frequency_per_year: f64,
+    /// `target_frequency / unmitigated_frequency`; `1.0` at a zero unmitigated frequency.
+    #[pyo3(get)]
+    pub required_pfd: f64,
+    /// the SIL the required PFD maps to, by the class's thresholds.
+    #[pyo3(get)]
+    pub required_sil: f64,
+    /// the largest PFD the claimed SIL allows.
+    #[pyo3(get)]
+    pub max_pfd_for_claimed_sil: f64,
+    /// the proof-test interval in years, `hours / 8760`.
+    #[pyo3(get)]
+    pub proof_test_interval_years: f64,
+    /// whether the PFD lies inside the claimed SIL's two-sided band; the class only prints a warning when it does not.
+    #[pyo3(get)]
+    pub pfd_within_claimed_sil: bool,
+    /// `lambda test_interval / 2`; absent when the failure rate is absent.
+    #[pyo3(get)]
+    pub pfd_1oo1: Option<f64>,
+    /// `(lambda test_interval)^2 / 3`; absent when the failure rate is absent.
+    #[pyo3(get)]
+    pub pfd_1oo2: Option<f64>,
+    /// `(lambda test_interval)^2`; absent when the failure rate is absent.
+    #[pyo3(get)]
+    pub pfd_2oo3: Option<f64>,
+    /// `base (1 - rate mttr / 8760)`; absent when the base availability or the MTTR is absent.
+    #[pyo3(get)]
+    pub availability_with_spurious_trips: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySafetyInstrumentedFunctionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SafetyInstrumentedFunctionResult(risk_reduction_factor={:?}, mitigated_frequency_per_year={:?}, required_pfd={:?}, required_sil={:?}, max_pfd_for_claimed_sil={:?}, proof_test_interval_years={:?}, pfd_within_claimed_sil={:?}, pfd_1oo1={:?}, pfd_1oo2={:?}, pfd_2oo3={:?}, availability_with_spurious_trips={:?}, {} warning(s))",
+            self.risk_reduction_factor,
+            self.mitigated_frequency_per_year,
+            self.required_pfd,
+            self.required_sil,
+            self.max_pfd_for_claimed_sil,
+            self.proof_test_interval_years,
+            self.pfd_within_claimed_sil,
+            self.pfd_1oo1,
+            self.pfd_1oo2,
+            self.pfd_2oo3,
+            self.availability_with_spurious_trips,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_instrumented_function::SafetyInstrumentedFunctionResult>
+    for PySafetyInstrumentedFunctionResult
+{
+    fn from(
+        r: &azoth_process::models::safety_instrumented_function::SafetyInstrumentedFunctionResult,
+    ) -> Self {
+        Self {
+            risk_reduction_factor: r.risk_reduction_factor,
+            mitigated_frequency_per_year: r.mitigated_frequency_per_year,
+            required_pfd: r.required_pfd,
+            required_sil: r.required_sil,
+            max_pfd_for_claimed_sil: r.max_pfd_for_claimed_sil,
+            proof_test_interval_years: r.proof_test_interval_years,
+            pfd_within_claimed_sil: r.pfd_within_claimed_sil,
+            pfd_1oo1: r.pfd_1oo1,
+            pfd_1oo2: r.pfd_1oo2,
+            pfd_2oo3: r.pfd_2oo3,
+            availability_with_spurious_trips: r.availability_with_spurious_trips,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.separator`, transported.
 #[pyclass(
     frozen,

@@ -54,6 +54,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.probit`](./probit.md) | `closed_form_probit` | NeqSim process/safety/dispersion/ProbitModel.java |
 | [`process.pump`](./pump.md) | `direct composition` | NeqSim process/equipment/pump/Pump.java and process/equipment/pump/PumpChart.java |
 | [`process.rate_based_packed_column`](./rate_based_packed_column.md) | `counter_current_fixed_point_profile` | NeqSim process/equipment/distillation/RateBasedPackedColumn.java |
+| [`process.safety_instrumented_function`](./safety_instrumented_function.md) | `closed_form_safety_instrumented_function` | NeqSim process/safety/risk/sis/SafetyInstrumentedFunction.java |
 | [`process.separator`](./separator.md) | `direct composition` | NeqSim process/equipment/separator/Separator.java |
 | [`process.separator_capacity_assessment`](./separator_capacity_assessment.md) | `direct composition` | NeqSim process/equipment/separator/SeparatorCapacityAssessment.java |
 | [`process.separator_performance`](./separator_performance.md) | `direct composition` | NeqSim process/equipment/separator/entrainment/SeparatorPerformanceCalculator.java |

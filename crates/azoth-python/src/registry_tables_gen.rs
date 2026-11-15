@@ -282,6 +282,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.probit" => azoth_process::models::probit::ProbitResult::FIELDS.to_vec(),
         "process.pump" => azoth_process::models::pump::PumpResult::FIELDS.to_vec(),
         "process.rate_based_packed_column" => azoth_process::models::rate_based_packed_column::RateBasedPackedColumnResult::FIELDS.to_vec(),
+        "process.safety_instrumented_function" => azoth_process::models::safety_instrumented_function::SafetyInstrumentedFunctionResult::FIELDS.to_vec(),
         "process.separator" => azoth_process::models::separator::SeparatorResult::FIELDS.to_vec(),
         "process.separator_capacity_assessment" => azoth_process::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult::FIELDS.to_vec(),
         "process.separator_performance" => azoth_process::models::separator_performance::SeparatorPerformanceResult::FIELDS.to_vec(),

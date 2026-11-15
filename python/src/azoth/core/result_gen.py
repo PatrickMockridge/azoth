@@ -8375,6 +8375,49 @@ class RateBasedPackedColumnResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SafetyInstrumentedFunctionResult(_HasWarnings):
+    """Result of ``process.safety_instrumented_function``."""
+
+    CALC_ID: ClassVar[str] = "process.safety_instrumented_function"
+
+    #: `1 / PFD`; absent at a PFD of zero, where the class answers `+Infinity`.
+    risk_reduction_factor: float | None
+
+    #: `unmitigated_frequency PFD`, in 1/year.
+    mitigated_frequency_per_year: float
+
+    #: `target_frequency / unmitigated_frequency`; `1.0` at a zero unmitigated frequency.
+    required_pfd: float
+
+    #: the SIL the required PFD maps to, by the class's thresholds.
+    required_sil: float
+
+    #: the largest PFD the claimed SIL allows.
+    max_pfd_for_claimed_sil: float
+
+    #: the proof-test interval in years, `hours / 8760`.
+    proof_test_interval_years: float
+
+    #: whether the PFD lies inside the claimed SIL's two-sided band; the class only prints a warning when it does not.
+    pfd_within_claimed_sil: bool
+
+    #: `lambda test_interval / 2`; absent when the failure rate is absent.
+    pfd_1oo1: float | None
+
+    #: `(lambda test_interval)^2 / 3`; absent when the failure rate is absent.
+    pfd_1oo2: float | None
+
+    #: `(lambda test_interval)^2`; absent when the failure rate is absent.
+    pfd_2oo3: float | None
+
+    #: `base (1 - rate mttr / 8760)`; absent when the base availability or the MTTR is absent.
+    availability_with_spurious_trips: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SeparatorResult(_HasWarnings):
     """Result of ``process.separator``."""
 

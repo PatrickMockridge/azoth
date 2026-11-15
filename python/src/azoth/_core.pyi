@@ -3860,6 +3860,21 @@ class RateBasedPackedColumnResult:
     warnings: list[Warning]
 
 @final
+class SafetyInstrumentedFunctionResult:
+    risk_reduction_factor: float | None
+    mitigated_frequency_per_year: float
+    required_pfd: float
+    required_sil: float
+    max_pfd_for_claimed_sil: float
+    proof_test_interval_years: float
+    pfd_within_claimed_sil: bool
+    pfd_1oo1: float | None
+    pfd_1oo2: float | None
+    pfd_2oo3: float | None
+    availability_with_spurious_trips: float | None
+    warnings: list[Warning]
+
+@final
 class SeparatorResult:
     vapour_n: Qty
     vapour_z: list[float]
@@ -7231,6 +7246,17 @@ def rate_based_packed_column(
     segment_solver: str | None = None,
     column_solver: str | None = None,
 ) -> RateBasedPackedColumnResult: ...
+def safety_instrumented_function(
+    pfd_average: float,
+    claimed_sil: float,
+    unmitigated_frequency_per_year: float,
+    target_frequency_per_year: float,
+    test_interval_hours: float,
+    lambda_du_per_hour: float | None = None,
+    spurious_trip_rate_per_year: float | None = None,
+    mttr_hours: float | None = None,
+    base_availability: float | None = None,
+) -> SafetyInstrumentedFunctionResult: ...
 def separator(
     components: list[str],
     feed_n: float,

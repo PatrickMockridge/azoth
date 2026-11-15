@@ -434,6 +434,7 @@ NON_UNIT_MODELS = {
     "process.event_tree": "the event-tree enumeration over scalars, not a unit",
     "process.fault_tree": "the fault-tree evaluation over scalars and rows, not a unit",
     "process.bow_tie": "the bow-tie risk sum over rows, not a unit",
+    "process.safety_instrumented_function": "the SIF arithmetic over scalars, not a unit",
     "process.hem_release": "a release source term is a calculation over a fluid, not a unit",
     "process.pfp_demand": "the PFP demand screen over scalars, not a unit",
     "process.fire_water_demand": "the fire-water demand screen over scalars and rows, not a unit",
