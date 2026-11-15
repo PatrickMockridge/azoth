@@ -161,8 +161,9 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # analysis; 301: the SIL verification; 302: the NOG 070 SIL determination; 303: the
     # risk matrix; 304: the PSV sizing; 305: the dynamic fire sizing; 306: the fire-case
     # relief; 307: the overpressure acceptance; 308: the pipeline pressure protection;
-    # 309: the relief disposal network; 310: the TR3001 compliance.
-    assert len(registered) == 310
+    # 309: the relief disposal network; 310: the TR3001 compliance; 311: the dense-gas
+    # dispersion; 312: the hazardous area; 313: the toxic thresholds.
+    assert len(registered) == 313
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:
