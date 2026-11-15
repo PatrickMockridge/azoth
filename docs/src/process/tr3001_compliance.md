@@ -59,7 +59,7 @@ not an equation, and both implementations read it from here.
 - **the fire-basis check answers pass at an accumulation fraction of at least 0.20 and needs-review below it**, including when no acceptance is stated.
 - **the dynamic check is skipped unless the governing cause is fire or blocked outlet**, and answers pass only when that scenario is dynamically determined.
 - **compliance is no failing check**: needs-review does not fail it. The class's INFO status is in the enum but no check emits it.
-- **the requirement ids, titles and detail strings are presentation** and are not carried; the rows carry the check and its status.
+- **the requirement ids, titles and detail strings are presentation** and sit outside this id; the rows carry the check and its status.
 - **the class validates nothing**: the port refuses negative or non-finite rates, a negative required area, and an accumulation fraction outside `[0, 1]`.
 
 ## Cases

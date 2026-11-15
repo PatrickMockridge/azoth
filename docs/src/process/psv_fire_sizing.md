@@ -84,8 +84,8 @@ not an equation, and both implementations read it from here.
 - **the area is the gas branch at 21 % overpressure**, conventional PSV, no rupture disk and atmospheric back pressure 101325 Pa; the class's own `relievingPressure` is computed and read by no formula.
 - **`initial_pressure` and `vessel_volume` are read by no formula**: two states differing only in them answer the same area, which the capture pins.
 - **the blowdown pressure is `set_pressure (1 - blowdown_percent / 100)`**, and the flow coefficient is `24.6 cv_discharge_coefficient A_in2`.
-- **`getNextLargerOrifice` is a ladder lookup and is not carried**: the ladder is published by `process.psv_sizing`, and a misspelling and an exhausted ladder are indistinguishable in the class's answer.
-- **`validateSizing` is a message builder**: its four clauses are visible in the published corrections and areas, and the concatenated string is not carried.
+- **`getNextLargerOrifice` is a ladder lookup and sits outside this id**: the ladder is published by `process.psv_sizing`, and a misspelling and an exhausted ladder are indistinguishable in the class's answer.
+- **`validateSizing` is a message builder**: its four clauses are visible in the published corrections and areas, and the concatenated string sits outside this id.
 
 ## Cases
 
