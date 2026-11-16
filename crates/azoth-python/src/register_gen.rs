@@ -245,6 +245,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyAntiSurgeRecycleResult>()?;
     m.add_class::<crate::transport_gen::PyApi537FlareFlameModelResult>()?;
     m.add_class::<crate::transport_gen::PyBleveResult>()?;
+    m.add_class::<crate::transport_gen::PyBlockedOutletReliefResult>()?;
     m.add_class::<crate::transport_gen::PyBlowdownPressureProfileResult>()?;
     m.add_class::<crate::transport_gen::PyBowTieResult>()?;
     m.add_class::<crate::transport_gen::PyComponentSplitterResult>()?;
@@ -925,6 +926,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::bleve, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::blocked_outlet_relief,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::blowdown_pressure_profile,
         m

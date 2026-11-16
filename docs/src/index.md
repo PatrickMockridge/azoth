@@ -332,6 +332,7 @@ Five sections, and the difference between them is the point:
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
 - [`process.api537_flare_flame_model`](./process/api537_flare_flame_model.md) — API 537 flare flame model
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation
+- [`process.blocked_outlet_relief`](./process/blocked_outlet_relief.md) — Blocked outlet relief
 - [`process.blowdown_pressure_profile`](./process/blowdown_pressure_profile.md) — Blowdown pressure profile
 - [`process.bow_tie`](./process/bow_tie.md) — Bow-tie risk
 - [`process.component_splitter`](./process/component_splitter.md) — Component splitter

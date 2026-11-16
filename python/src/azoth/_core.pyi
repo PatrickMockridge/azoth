@@ -3092,6 +3092,18 @@ class BleveResult:
     warnings: list[Warning]
 
 @final
+class BlockedOutletReliefResult:
+    name: str
+    relief_rate: Qty
+    phase: str
+    relief_temperature: Qty
+    molar_mass: Qty
+    compressibility: float
+    specific_heat_ratio: float
+    assumptions: list[str]
+    warnings: list[Warning]
+
+@final
 class BlowdownPressureProfileResult:
     pressure_absolute: Qty
     pressure_gauge: Qty
@@ -6877,6 +6889,14 @@ def bleve(
     distance: float | None = None,
     target_flux: float | None = None,
 ) -> BleveResult: ...
+def blocked_outlet_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    inflow_rate: float,
+    relief_pressure: float,
+    relief_temperature: float,
+    scenario_name: str | None = None,
+) -> BlockedOutletReliefResult: ...
 def blowdown_pressure_profile(
     points: list[BlowdownProfilePoint],
     time: float,

@@ -24,6 +24,7 @@ from azoth.core.result import (
     AntiSurgeRecycleResult,
     Api537FlareFlameModelResult,
     BleveResult,
+    BlockedOutletReliefResult,
     BlowdownPressureProfileResult,
     BowTieResult,
     ComponentSplitterResult,
@@ -259,6 +260,7 @@ _THREE_PHASE_SEPARATOR = "process.three_phase_separator"
 _ANTI_SURGE_RECYCLE = "process.anti_surge_recycle"
 _API537_FLARE_FLAME_MODEL = "process.api537_flare_flame_model"
 _BLEVE = "process.bleve"
+_BLOCKED_OUTLET_RELIEF = "process.blocked_outlet_relief"
 _BLOWDOWN_PRESSURE_PROFILE = "process.blowdown_pressure_profile"
 _PIPE_FIRE_RUPTURE = "process.pipe_fire_rupture"
 _PIPE_FIRE_RUPTURE_MATERIAL = "process.pipe_fire_rupture_material"
@@ -1360,6 +1362,33 @@ def bleve(
         relative_humidity=relative_humidity,
         distance=distance,
         target_flux=target_flux,
+    )
+
+
+def blocked_outlet_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    inflow_rate: Q,
+    relief_pressure: Q,
+    relief_temperature: Q,
+    scenario_name: str | None = None,
+) -> BlockedOutletReliefResult:
+    """The full-inflow relief rate and the relieving-fluid state at it.
+
+    **The relief rate is the maximum credible inflow**, TR3001 SR-26460's basis, and the
+    fluid is flashed at the relieving pressure and temperature for its ``getKappa``, molar
+    mass, ``Z`` and phase. ``specific_heat_ratio`` is that isentropic exponent, not the
+    plain ``Cp/Cv``.
+
+    See :func:`azoth.process.reference.blocked_outlet_relief`.
+    """
+    return resolve(_BLOCKED_OUTLET_RELIEF)(  # type: ignore[no-any-return]
+        components=components,
+        mole_fractions=mole_fractions,
+        inflow_rate=inflow_rate,
+        relief_pressure=relief_pressure,
+        relief_temperature=relief_temperature,
+        scenario_name=scenario_name,
     )
 
 

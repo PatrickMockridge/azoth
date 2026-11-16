@@ -1,0 +1,104 @@
+model = "process.blocked_outlet_relief"
+
+[[cases]]
+id = "bo_gas"
+tolerance = 1.0e-7
+source = "A methane/ethane gas at 320 K and 20 bara, 2 kg/s inflow. From `validation/neqsim/captures/process_blocked_outlet_relief.tsv` (`bo_gas`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+inflow_rate = 2.0
+relief_pressure = 2000000.0
+relief_temperature = 320.0
+[cases.expected]
+name = "Blocked outlet gas"
+relief_rate = 2.0
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = ["Relief rate set equal to full inflow per TR3001 SR-26460"]
+
+[[cases]]
+id = "bo_liquid"
+tolerance = 1.0e-7
+source = "A butane liquid at 250 K and 5 bara, 1.5 kg/s inflow; the liquid row's `getKappa` is thousands, not `getGamma`'s 1.26. From (`bo_liquid`)."
+[cases.inputs]
+components = ["n-butane"]
+mole_fractions = [1.0]
+inflow_rate = 1.5
+relief_pressure = 500000.0
+relief_temperature = 250.0
+[cases.expected]
+name = "Blocked outlet liquid"
+relief_rate = 1.5
+phase = "liquid"
+relief_temperature = 250.0
+molar_mass = 0.058122999999999994
+compressibility = 0.02121213854587085
+specific_heat_ratio = 1255.2723788393464
+assumptions = ["Relief rate set equal to full inflow per TR3001 SR-26460"]
+
+[[cases]]
+id = "bo_two_phase"
+tolerance = 1.0e-7
+source = "An equimolar methane/n-butane feed at 300 K and 20 bara, which splits two ways. From (`bo_two_phase`)."
+[cases.inputs]
+components = ["methane", "n-butane"]
+mole_fractions = [0.5, 0.5]
+inflow_rate = 1.0
+relief_pressure = 2000000.0
+relief_temperature = 300.0
+[cases.expected]
+name = "Blocked outlet two phase"
+relief_rate = 1.0
+phase = "two_phase"
+relief_temperature = 300.0
+molar_mass = 0.037083
+compressibility = 0.5325677942129939
+specific_heat_ratio = 1965.173645351309
+assumptions = ["Relief rate set equal to full inflow per TR3001 SR-26460"]
+
+[[cases]]
+id = "bo_zero_inflow"
+tolerance = 1.0e-7
+source = "The gas state with a zero inflow: the class warns and answers zero. From (`bo_zero_inflow`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+inflow_rate = 0.0
+relief_pressure = 2000000.0
+relief_temperature = 320.0
+[cases.expected]
+name = "Blocked outlet zero"
+relief_rate = 0.0
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Relief rate set equal to full inflow per TR3001 SR-26460",
+    "Inflow rate not set or non-positive; relief rate is zero",
+]
+
+[[cases]]
+id = "bo_default_name"
+tolerance = 1.0e-7
+source = "The gas state with no scenario name: the class's own `Blocked outlet` is carried. From (`bo_gas`) with the name omitted."
+[cases.inputs]
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+inflow_rate = 2.0
+relief_pressure = 2000000.0
+relief_temperature = 320.0
+[cases.expected]
+name = "Blocked outlet"
+relief_rate = 2.0
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = ["Relief rate set equal to full inflow per TR3001 SR-26460"]

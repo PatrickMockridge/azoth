@@ -240,6 +240,7 @@
   - [Anti-surge recycle calculator](./process/anti_surge_recycle.md)
   - [API 537 flare flame model](./process/api537_flare_flame_model.md)
   - [BLEVE fireball radiation](./process/bleve.md)
+  - [Blocked outlet relief](./process/blocked_outlet_relief.md)
   - [Blowdown pressure profile](./process/blowdown_pressure_profile.md)
   - [Bow-tie risk](./process/bow_tie.md)
   - [Component splitter](./process/component_splitter.md)

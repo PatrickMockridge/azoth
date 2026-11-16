@@ -22021,6 +22021,15 @@
       "sub_interface": "fire"
     },
     {
+      "family": "overpressure",
+      "id": "process.blocked_outlet_relief",
+      "name": "Blocked outlet relief",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "overpressure"
+    },
+    {
       "family": "rupture",
       "id": "process.blowdown_pressure_profile",
       "name": "Blowdown pressure profile",
@@ -23293,7 +23302,7 @@
       "name": "Gas dispersion screening",
       "native": false,
       "purpose": "",
-      "refusal": "this calculation takes a table of rows as input, which a scenario does not yet provide",
+      "refusal": "this calculation takes a fluid as input, which a scenario does not yet provide",
       "sub_interface": "dispersion"
     },
     {

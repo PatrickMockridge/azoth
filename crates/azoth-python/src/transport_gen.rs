@@ -14343,6 +14343,88 @@ impl From<&azoth_process::models::bleve::BleveResult> for PyBleveResult {
         }
     }
 }
+/// Result of `process.blocked_outlet_relief`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BlockedOutletReliefResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBlockedOutletReliefResult {
+    /// the scenario name, echoed.
+    #[pyo3(get)]
+    pub name: String,
+    /// the inflow rate, which is the relief rate.
+    #[pyo3(get)]
+    pub relief_rate: PyQty,
+    /// the relieving phase the flash classified.
+    #[pyo3(get)]
+    pub phase: String,
+    /// the relieving temperature, echoed.
+    #[pyo3(get)]
+    pub relief_temperature: PyQty,
+    /// the relieving fluid's molar mass.
+    #[pyo3(get)]
+    pub molar_mass: PyQty,
+    /// the relieving fluid's `Z`.
+    #[pyo3(get)]
+    pub compressibility: f64,
+    /// the relieving fluid's `getKappa`, the isentropic exponent.
+    #[pyo3(get)]
+    pub specific_heat_ratio: f64,
+    /// the class's assumption strings in order, with its warning strings appended.
+    #[pyo3(get)]
+    pub assumptions: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBlockedOutletReliefResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BlockedOutletReliefResult(name={:?}, relief_rate={:?}, phase={:?}, relief_temperature={:?}, molar_mass={:?}, compressibility={:?}, specific_heat_ratio={:?}, assumptions={:?}, {} warning(s))",
+            self.name,
+            self.relief_rate,
+            self.phase,
+            self.relief_temperature,
+            self.molar_mass,
+            self.compressibility,
+            self.specific_heat_ratio,
+            self.assumptions,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::blocked_outlet_relief::BlockedOutletReliefResult>
+    for PyBlockedOutletReliefResult
+{
+    fn from(r: &azoth_process::models::blocked_outlet_relief::BlockedOutletReliefResult) -> Self {
+        Self {
+            name: r.name.clone(),
+            relief_rate: PyQty {
+                magnitude_si: r.relief_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            phase: r.phase.as_str().to_string(),
+            relief_temperature: PyQty {
+                magnitude_si: r.relief_temperature.value,
+                unit: "K".to_string(),
+            },
+            molar_mass: PyQty {
+                magnitude_si: r.molar_mass.value,
+                unit: "kg/mol".to_string(),
+            },
+            compressibility: r.compressibility,
+            specific_heat_ratio: r.specific_heat_ratio,
+            assumptions: r.assumptions.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.blowdown_pressure_profile`, transported.
 #[pyclass(
     frozen,

@@ -16,6 +16,7 @@ use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeni
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
 use crate::models::bleve::BleveResult;
+use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
 use crate::models::blowdown_pressure_profile::BlowdownPressureProfileResult;
 use crate::models::bow_tie::BowTieResult;
 use crate::models::component_splitter::ComponentSplitterResult;
@@ -199,6 +200,25 @@ impl CalcResult for BleveResult {
         "transmissivity",
         "incident_heat_flux",
         "distance_to_flux",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for BlockedOutletReliefResult {
+    const CALC_ID: &'static str = "process.blocked_outlet_relief";
+    const FIELDS: &'static [&'static str] = &[
+        "name",
+        "relief_rate",
+        "phase",
+        "relief_temperature",
+        "molar_mass",
+        "compressibility",
+        "specific_heat_ratio",
+        "assumptions",
         "warnings",
     ];
 

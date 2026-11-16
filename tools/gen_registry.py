@@ -214,6 +214,11 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `crates/azoth-process/tests/pfp_demand.rs` asserts it against the capture, and
         # `test_cross_impl` compares it on both results.
         "pfp_required",
+        # The relief loads' assumption strings, a `vector_string` with no slot in
+        # `TestCase`. `crates/azoth-process/tests/blocked_outlet_relief.rs` asserts the
+        # fallback rows' strings against the capture, and `test_cross_impl` compares the
+        # tuple on both results.
+        "assumptions",
         # `deluge_nozzle_layout`'s three flags, booleans with no slot in `TestCase`.
         # `crates/azoth-process/tests/deluge_nozzle_layout.rs` asserts them against the
         # capture, and `test_cross_impl` compares them on both results.

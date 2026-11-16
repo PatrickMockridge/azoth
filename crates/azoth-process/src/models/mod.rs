@@ -35,6 +35,7 @@ pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
 pub mod api537_flare_flame_model;
 pub mod bleve;
+pub mod blocked_outlet_relief;
 pub mod blowdown_pressure_profile;
 pub mod bow_tie;
 pub mod component_splitter;
@@ -69,6 +70,7 @@ pub mod manifold;
 pub mod map_turbo_expander_compressor;
 pub mod mixer;
 pub mod nog070_sil_determination;
+pub mod overpressure;
 pub mod overpressure_acceptance;
 pub mod packed_column;
 pub mod pfp_demand;
@@ -112,6 +114,7 @@ pub use api537_flare_flame_model::{
     Api537FlareFlameModelResult, FlareTargetFlux, SterileRadius, api537_flare_flame_model,
 };
 pub use bleve::{BleveResult, bleve};
+pub use blocked_outlet_relief::{BlockedOutletReliefResult, blocked_outlet_relief};
 pub use blowdown_pressure_profile::{
     BlowdownPressureProfileResult, BlowdownProfilePoint, blowdown_pressure_profile,
 };

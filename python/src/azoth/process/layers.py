@@ -2508,6 +2508,30 @@ def _psv_fire_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _blocked_outlet_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.blocked_outlet_relief`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.blocked_outlet_relief import (
+        blocked_outlet_relief as evaluate,
+    )
+
+    result = evaluate(
+        list(inputs["components"]),
+        [float(value) for value in inputs["mole_fractions"]],
+        quantity(float(inputs["inflow_rate"]), "kg/s"),
+        quantity(float(inputs["relief_pressure"]), "Pa"),
+        quantity(float(inputs["relief_temperature"]), "K"),
+        None if inputs.get("scenario_name") is None else str(inputs["scenario_name"]),
+    )
+    return {
+        "relief_rate_kg_per_s": result.relief_rate.to("kg/s").magnitude,
+        "relief_temperature_k": result.relief_temperature.to("K").magnitude,
+        "molar_mass_kg_per_mol": result.molar_mass.to("kg/mol").magnitude,
+        "compressibility": result.compressibility,
+        "specific_heat_ratio": result.specific_heat_ratio,
+    }
+
+
 def _fire_case_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.fire_case_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -2876,6 +2900,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.consequence_analysis": _consequence_analysis,
     "process.jet_fire": _jet_fire,
     "process.pfp_demand": _pfp_demand,
+    "process.blocked_outlet_relief": _blocked_outlet_relief,
     "process.fire_case_relief": _fire_case_relief,
     "process.overpressure_acceptance": _overpressure_acceptance,
     "process.pipeline_pressure_protection": _pipeline_pressure_protection,
@@ -4442,6 +4467,37 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     # The fire relief's six cased blocks: both drainage branches, the geometry, the
     # no-area state, the latent default and the unread firefighting flag. The negative
     # latent heat the class silently defaults sits outside them.
+    # The blocked-outlet loads are every other block, because each row prints the raw
+    # `ReliefFluidState` readings beside it. The three state blocks, the no-fluid branch
+    # and the refused negative inflow are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.blocked_outlet_relief",
+        case="bo_gas",
+        capture="process_blocked_outlet_relief.tsv",
+        block=1,
+        identified_by=("#label", "bo_gas"),
+    ),
+    LayerCase(
+        model="process.blocked_outlet_relief",
+        case="bo_liquid",
+        capture="process_blocked_outlet_relief.tsv",
+        block=3,
+        identified_by=("#label", "bo_liquid"),
+    ),
+    LayerCase(
+        model="process.blocked_outlet_relief",
+        case="bo_two_phase",
+        capture="process_blocked_outlet_relief.tsv",
+        block=5,
+        identified_by=("#label", "bo_two_phase"),
+    ),
+    LayerCase(
+        model="process.blocked_outlet_relief",
+        case="bo_zero_inflow",
+        capture="process_blocked_outlet_relief.tsv",
+        block=7,
+        identified_by=("#label", "bo_zero_inflow"),
+    ),
     LayerCase(
         model="process.fire_case_relief",
         case="fc_area_drainage",
@@ -6133,6 +6189,9 @@ UNCASED_ROWS: dict[str, int] = {
     # evidence beside the PR oracle, and the zero-rate refusal the port raises rather than
     # reproduces.
     "process_gas_dispersion.tsv": 5,
+    # The blocked-outlet capture's five: three raw `ReliefFluidState` blocks, the class's
+    # no-fluid branch, and the negative inflow the port refuses.
+    "process_blocked_outlet_relief.tsv": 5,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

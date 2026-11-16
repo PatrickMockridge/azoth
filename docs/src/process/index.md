@@ -18,6 +18,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.anti_surge_recycle`](./anti_surge_recycle.md) | `damped_fixed_point_recycle` | NeqSim process/equipment/compressor/AntiSurgeRecycleCalculator.java |
 | [`process.api537_flare_flame_model`](./api537_flare_flame_model.md) | `closed_form_flare_flame_and_radiation` | NeqSim process/safety/fire/Api537FlareFlameModel.java |
 | [`process.bleve`](./bleve.md) | `ccps_fireball_point_source` | NeqSim process/safety/fire/BLEVECalculator.java |
+| [`process.blocked_outlet_relief`](./blocked_outlet_relief.md) | `blocked_outlet_full_inflow` | NeqSim process/safety/overpressure/BlockedOutletRelief.java |
 | [`process.blowdown_pressure_profile`](./blowdown_pressure_profile.md) | `piecewise_step_or_linear_pressure_profile` | NeqSim process/safety/rupture/BlowdownPressureProfile.java |
 | [`process.bow_tie`](./bow_tie.md) | `closed_form_bow_tie` | NeqSim process/safety/risk/bowtie/BowTieModel.java |
 | [`process.component_splitter`](./component_splitter.md) | `direct composition` | NeqSim process/equipment/splitter/ComponentSplitter.java |

@@ -126,7 +126,7 @@ impl ReliefPhase {
         }
     }
 
-    fn parse(value: &str) -> Result<Self> {
+    pub(crate) fn parse(value: &str) -> Result<Self> {
         Ok(match value {
             "vapour" => Self::Vapour,
             "liquid" => Self::Liquid,

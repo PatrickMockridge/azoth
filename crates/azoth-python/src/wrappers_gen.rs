@@ -5606,6 +5606,35 @@ pub fn bleve(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Blocked outlet relief.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mole_fractions, inflow_rate, relief_pressure, relief_temperature, scenario_name))]
+#[pyo3(
+    text_signature = "(components, mole_fractions, inflow_rate, relief_pressure, relief_temperature, scenario_name)"
+)]
+pub fn blocked_outlet_relief(
+    py: Python<'_>,
+    components: Vec<String>,
+    mole_fractions: Vec<f64>,
+    inflow_rate: f64,
+    relief_pressure: f64,
+    relief_temperature: f64,
+    scenario_name: Option<&str>,
+) -> PyResult<crate::transport_gen::PyBlockedOutletReliefResult> {
+    azoth_process::models::blocked_outlet_relief::blocked_outlet_relief(
+        &components,
+        &mole_fractions,
+        kilograms_per_second(inflow_rate),
+        pascals(relief_pressure),
+        kelvins(relief_temperature),
+        scenario_name,
+    )
+    .map(|r| crate::transport_gen::PyBlockedOutletReliefResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Blowdown pressure profile.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

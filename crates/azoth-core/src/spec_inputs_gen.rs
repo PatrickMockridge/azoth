@@ -227,6 +227,7 @@
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/blocked_outlet_relief.toml
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
 //!   - specs/models/process/component_splitter.toml
@@ -2788,6 +2789,22 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.bleve", "relative_humidity", "dimensionless"),
     ("process.bleve", "distance", "length"),
     ("process.bleve", "target_flux", "heat_flux_density"),
+    (
+        "process.blocked_outlet_relief",
+        "mole_fractions",
+        "dimensionless",
+    ),
+    ("process.blocked_outlet_relief", "inflow_rate", "mass_rate"),
+    (
+        "process.blocked_outlet_relief",
+        "relief_pressure",
+        "pressure",
+    ),
+    (
+        "process.blocked_outlet_relief",
+        "relief_temperature",
+        "thermodynamic_temperature",
+    ),
     ("process.blowdown_pressure_profile", "time", "time"),
     (
         "process.blowdown_pressure_profile",

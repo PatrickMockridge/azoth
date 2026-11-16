@@ -79,6 +79,7 @@ from azoth.core.result_base import (
     MultiflashSeedPath,
     Phase,
     PlusModel,
+    ReliefPhase,
     RootStructure,
     RuptureStatus,
     StabilityVerdict,
@@ -5739,6 +5740,40 @@ class BleveResult(_HasWarnings):
 
     #: the distance at which the flux falls to the target. **Absent when the flux at `D/2 + 0.1` is already below the target**, where the class answers that near bound.
     distance_to_flux: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class BlockedOutletReliefResult(_HasWarnings):
+    """Result of ``process.blocked_outlet_relief``."""
+
+    CALC_ID: ClassVar[str] = "process.blocked_outlet_relief"
+
+    #: the scenario name, echoed.
+    name: str
+
+    #: the inflow rate, which is the relief rate.
+    relief_rate: Q
+
+    #: the relieving phase the flash classified.
+    phase: ReliefPhase
+
+    #: the relieving temperature, echoed.
+    relief_temperature: Q
+
+    #: the relieving fluid's molar mass.
+    molar_mass: Q
+
+    #: the relieving fluid's `Z`.
+    compressibility: float
+
+    #: the relieving fluid's `getKappa`, the isentropic exponent.
+    specific_heat_ratio: float
+
+    #: the class's assumption strings in order, with its warning strings appended.
+    assumptions: tuple[str, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

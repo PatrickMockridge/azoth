@@ -31,6 +31,7 @@ from azoth.core.result import (
     BeggsBrillRegime,
     BeggsBrillSegmentResult,
     BleveResult,
+    BlockedOutletReliefResult,
     BlowdownPressureProfileResult,
     BoilingHeatTransferResult,
     BowTieResult,
@@ -263,6 +264,7 @@ from azoth.core.result import (
     ReferencePotentialsResult,
     ReliefDisposalNetworkResult,
     ReliefDisposalRow,
+    ReliefPhase,
     RemediationOptionRow,
     ReynoldsNumberResult,
     RiskAssessmentRow,
@@ -436,6 +438,7 @@ __all__ = [
     "barite_celestite_solid_solution",
     "beggs_brill_segment",
     "bleve",
+    "blocked_outlet_relief",
     "blowdown_pressure_profile",
     "boiling_heat_transfer",
     "bow_tie",
@@ -5740,6 +5743,30 @@ def bleve(fuel_mass: Q, heat_of_combustion: float, radiative_fraction: float, re
         transmissivity=result.transmissivity,
         incident_heat_flux=None if result.incident_heat_flux is None else from_si(result.incident_heat_flux.magnitude_si, result.incident_heat_flux.unit),
         distance_to_flux=None if result.distance_to_flux is None else from_si(result.distance_to_flux.magnitude_si, result.distance_to_flux.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def blocked_outlet_relief(components: list[str], mole_fractions: list[float], inflow_rate: Q, relief_pressure: Q, relief_temperature: Q, scenario_name: str | None=None) -> BlockedOutletReliefResult:
+    """``process.blocked_outlet_relief``, computed in Rust."""
+    spec = _models_gen.model("process.blocked_outlet_relief")
+    result = _core.blocked_outlet_relief(
+        list(components),
+        list(mole_fractions),
+        input_to_si(spec, "inflow_rate", inflow_rate),
+        input_to_si(spec, "relief_pressure", relief_pressure),
+        input_to_si(spec, "relief_temperature", relief_temperature),
+        scenario_name,
+    )
+    return BlockedOutletReliefResult(
+        name=result.name,
+        relief_rate=from_si(result.relief_rate.magnitude_si, result.relief_rate.unit),
+        phase=ReliefPhase(result.phase),
+        relief_temperature=from_si(result.relief_temperature.magnitude_si, result.relief_temperature.unit),
+        molar_mass=from_si(result.molar_mass.magnitude_si, result.molar_mass.unit),
+        compressibility=result.compressibility,
+        specific_heat_ratio=result.specific_heat_ratio,
+        assumptions=tuple(result.assumptions),
         warnings=_warnings(result.warnings),
     )
 

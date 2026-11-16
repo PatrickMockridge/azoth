@@ -424,6 +424,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.blocked_outlet_relief",
+        name: "Blocked outlet relief",
+        family: "overpressure",
+        sub_interface: Some("overpressure"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.blowdown_pressure_profile",
         name: "Blowdown pressure profile",
         family: "rupture",
@@ -1625,7 +1637,7 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         purpose: "",
         native: false,
         refusal: Some(
-            "this calculation takes a table of rows as input, which a scenario does not yet provide",
+            "this calculation takes a fluid as input, which a scenario does not yet provide",
         ),
         form: None,
     },
