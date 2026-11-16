@@ -252,7 +252,7 @@ fn the_fire_monitor_case_runs_through_the_dispatch() {
     );
     let outputs = ok(&outcome);
     assert!((number(outputs, "total_flow") - 0.04).abs() < 1e-15);
-    assert!((number(outputs, "swept_area") - 2513.274_122_871_834_6).abs() < 1e-9);
+    assert!((number(outputs, "swept_area") - 2_513.274_122_871_834_6).abs() < 1e-9);
     assert!((number(outputs, "nominal_density") - 800.0).abs() < 1e-12);
     assert!((number(outputs, "flow_needed_for_compliance") - 0.1).abs() < 1e-15);
     assert_eq!(

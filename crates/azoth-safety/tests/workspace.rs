@@ -102,7 +102,10 @@ fn the_demo_calculates_every_stale_item() {
         deluge["result"]["outputs"]["nozzle_count"].as_f64(),
         Some(57.0)
     );
-    assert_eq!(deluge["result"]["outputs"]["governing_criterion"], "coverage");
+    assert_eq!(
+        deluge["result"]["outputs"]["governing_criterion"],
+        "coverage"
+    );
     let deluge_flow = deluge["result"]["outputs"]["required_flow"]["magnitude_si"]
         .as_f64()
         .expect("the deluge flow");
