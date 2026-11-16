@@ -5,6 +5,7 @@ id = "cvl_default"
 tolerance = 1.0e-7
 source = "A 6-inch check valve on a methane/ethane gas at 20 bara and 320 K, the default 1% leak fraction into 1.01325 bara. From `validation/neqsim/captures/process_check_valve_leak_relief.tsv` (`cvl_default`)."
 [cases.inputs]
+scenario_name = "Check valve default"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 nominal_diameter = 0.1524
@@ -30,6 +31,7 @@ id = "cvl_clamped"
 tolerance = 1.0e-7
 source = "A 0.0005 fraction, clamped to 0.001: the rate is a tenth of the default and the warning is appended. From (`cvl_clamped`)."
 [cases.inputs]
+scenario_name = "Check valve clamped"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 nominal_diameter = 0.1524
@@ -57,6 +59,7 @@ id = "cvl_subcritical"
 tolerance = 1.0e-7
 source = "The default fraction discharging into 15 bara: the subcritical branch. From (`cvl_subcritical`)."
 [cases.inputs]
+scenario_name = "Check valve subcritical"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 nominal_diameter = 0.1524
@@ -82,6 +85,7 @@ id = "cvl_zero_diameter"
 tolerance = 1.0e-7
 source = "A zero diameter: the class warns and answers zero. From (`cvl_zero_diameter`)."
 [cases.inputs]
+scenario_name = "Check valve zero"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 nominal_diameter = 0.0

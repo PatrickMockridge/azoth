@@ -5,6 +5,7 @@ id = "cvf_area"
 tolerance = 1.0e-7
 source = "A methane/ethane gas at 20 bara and 320 K through a 0.001 m2 fail-open area into 1.01325 bara. From `validation/neqsim/captures/process_control_valve_failure_relief.tsv` (`cvf_area`)."
 [cases.inputs]
+scenario_name = "CV fail area"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 upstream_pressure = 2000000.0
@@ -29,6 +30,7 @@ id = "cvf_area_default_downstream"
 tolerance = 1.0e-7
 source = "The same area with no downstream pressure: the class's 1.01325 bara default answers identically. From (`cvf_area_default_downstream`)."
 [cases.inputs]
+scenario_name = "CV fail default downstream"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 upstream_pressure = 2000000.0
@@ -52,6 +54,7 @@ id = "cvf_cv"
 tolerance = 1.0e-7
 source = "A Cv of 150 with no explicit area: the screening relation derives the area and says so. From (`cvf_cv`)."
 [cases.inputs]
+scenario_name = "CV fail cv"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 upstream_pressure = 2000000.0
@@ -77,6 +80,7 @@ id = "cvf_cv_margin"
 tolerance = 1.0e-7
 source = "The same Cv with a 1.25 erosion margin: the rate grows by the margin and the class warns. From (`cvf_cv_margin`)."
 [cases.inputs]
+scenario_name = "CV fail margin"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 upstream_pressure = 2000000.0
@@ -104,6 +108,7 @@ id = "cvf_subcritical"
 tolerance = 1.0e-7
 source = "The area row discharging into 15 bara: the subcritical branch. From (`cvf_subcritical`)."
 [cases.inputs]
+scenario_name = "CV fail subcritical"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 upstream_pressure = 2000000.0
@@ -128,6 +133,7 @@ id = "cvf_no_area"
 tolerance = 1.0e-7
 source = "Neither an area nor a Cv: a zero rate and the class's warning. From (`cvf_no_area`)."
 [cases.inputs]
+scenario_name = "CV fail no area"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 upstream_pressure = 2000000.0

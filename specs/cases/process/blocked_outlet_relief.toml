@@ -5,6 +5,7 @@ id = "bo_gas"
 tolerance = 1.0e-7
 source = "A methane/ethane gas at 320 K and 20 bara, 2 kg/s inflow. From `validation/neqsim/captures/process_blocked_outlet_relief.tsv` (`bo_gas`)."
 [cases.inputs]
+scenario_name = "Blocked outlet gas"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 inflow_rate = 2.0
@@ -25,6 +26,7 @@ id = "bo_liquid"
 tolerance = 1.0e-7
 source = "A butane liquid at 250 K and 5 bara, 1.5 kg/s inflow; the liquid row's `getKappa` is thousands, not `getGamma`'s 1.26. From (`bo_liquid`)."
 [cases.inputs]
+scenario_name = "Blocked outlet liquid"
 components = ["n-butane"]
 mole_fractions = [1.0]
 inflow_rate = 1.5
@@ -45,6 +47,7 @@ id = "bo_two_phase"
 tolerance = 1.0e-7
 source = "An equimolar methane/n-butane feed at 300 K and 20 bara, which splits two ways. From (`bo_two_phase`)."
 [cases.inputs]
+scenario_name = "Blocked outlet two phase"
 components = ["methane", "n-butane"]
 mole_fractions = [0.5, 0.5]
 inflow_rate = 1.0
@@ -65,6 +68,7 @@ id = "bo_zero_inflow"
 tolerance = 1.0e-7
 source = "The gas state with a zero inflow: the class warns and answers zero. From (`bo_zero_inflow`)."
 [cases.inputs]
+scenario_name = "Blocked outlet zero"
 components = ["methane", "ethane"]
 mole_fractions = [0.9, 0.1]
 inflow_rate = 0.0

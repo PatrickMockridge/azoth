@@ -5611,7 +5611,7 @@ static BLOCKED_OUTLET_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Blocked outlet gas")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -5640,7 +5640,7 @@ static BLOCKED_OUTLET_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["n-butane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Blocked outlet liquid")],
         vectors: &[("mole_fractions", &[1.0])],
         matrices: &[],
         expected: &[
@@ -5669,7 +5669,7 @@ static BLOCKED_OUTLET_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "n-butane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Blocked outlet two phase")],
         vectors: &[("mole_fractions", &[0.5, 0.5])],
         matrices: &[],
         expected: &[
@@ -5698,7 +5698,7 @@ static BLOCKED_OUTLET_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Blocked outlet zero")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -8014,7 +8014,7 @@ static CHECK_VALVE_LEAK_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Check valve default")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -8045,7 +8045,7 @@ static CHECK_VALVE_LEAK_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Check valve clamped")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -8075,7 +8075,7 @@ static CHECK_VALVE_LEAK_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Check valve subcritical")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -8105,7 +8105,7 @@ static CHECK_VALVE_LEAK_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Check valve zero")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -23821,7 +23821,7 @@ static CONTROL_VALVE_FAILURE_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "CV fail area")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -23850,7 +23850,7 @@ static CONTROL_VALVE_FAILURE_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "CV fail default downstream")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -23880,7 +23880,7 @@ static CONTROL_VALVE_FAILURE_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "CV fail cv")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -23911,7 +23911,7 @@ static CONTROL_VALVE_FAILURE_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "CV fail margin")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -23941,7 +23941,7 @@ static CONTROL_VALVE_FAILURE_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "CV fail subcritical")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -23970,7 +23970,7 @@ static CONTROL_VALVE_FAILURE_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "CV fail no area")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -71734,7 +71734,7 @@ static TUBE_RUPTURE_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Tube rupture two ends")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -71765,7 +71765,7 @@ static TUBE_RUPTURE_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Tube rupture one end")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
@@ -71795,7 +71795,7 @@ static TUBE_RUPTURE_RELIEF_CASES: &[TestCase] = &[
         ],
         flags: &[],
         lists: &[("components", &["methane", "ethane"])],
-        strings: &[],
+        strings: &[("scenario_name", "Tube rupture subcritical")],
         vectors: &[("mole_fractions", &[0.9, 0.1])],
         matrices: &[],
         expected: &[
