@@ -4503,6 +4503,18 @@ class Tr3001ComplianceResult:
     warnings: list[Warning]
 
 @final
+class TubeRuptureReliefResult:
+    name: str
+    relief_rate: Qty
+    phase: str
+    relief_temperature: Qty
+    molar_mass: Qty
+    compressibility: float
+    specific_heat_ratio: float
+    assumptions: list[str]
+    warnings: list[Warning]
+
+@final
 class TurboExpanderResult:
     expander_outlet_n: Qty
     expander_outlet_z: list[float]
@@ -8061,6 +8073,17 @@ def tr3001_compliance(
     acceptance_accepted: bool | None = None,
     accumulation_fraction: float | None = None,
 ) -> Tr3001ComplianceResult: ...
+def tube_rupture_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    tube_inner_diameter: float,
+    high_pressure: float,
+    number_of_open_ends: float | None = None,
+    high_temperature: float | None = None,
+    low_pressure: float | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> TubeRuptureReliefResult: ...
 def turbo_expander_compressor(
     expander_components: list[str],
     compressor_components: list[str],

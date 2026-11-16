@@ -312,6 +312,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyThrottlingValveResult>()?;
     m.add_class::<crate::transport_gen::PyToxicLibraryResult>()?;
     m.add_class::<crate::transport_gen::PyTr3001ComplianceResult>()?;
+    m.add_class::<crate::transport_gen::PyTubeRuptureReliefResult>()?;
     m.add_class::<crate::transport_gen::PyTurboExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyVceResult>()?;
     m.add_class::<crate::transport_gen::PyVesselRuptureResult>()?;
@@ -1061,6 +1062,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::throttling_valve, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::toxic_library, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::tr3001_compliance, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::tube_rupture_relief,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::process::turbo_expander_compressor,
         m

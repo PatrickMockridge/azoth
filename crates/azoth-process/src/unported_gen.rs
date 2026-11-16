@@ -73,6 +73,7 @@
 //!   - specs/models/process/throttling_valve.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
+//!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
 //!   - specs/models/process/vessel_rupture.toml

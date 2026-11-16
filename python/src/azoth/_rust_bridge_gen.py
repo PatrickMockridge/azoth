@@ -350,6 +350,7 @@ from azoth.core.result import (
     TrayHydraulicsResult,
     TsFlashResult,
     TubeInsertModelResult,
+    TubeRuptureReliefResult,
     TuFlashResult,
     TurboExpanderResult,
     TvFlashResult,
@@ -710,6 +711,7 @@ __all__ = [
     "ts_flash",
     "tu_flash",
     "tube_insert_model",
+    "tube_rupture_relief",
     "turbo_expander_compressor",
     "tv_flash",
     "tv_fraction_flash",
@@ -8574,6 +8576,33 @@ def tr3001_compliance(scenarios: list[dict[str, object]], capacity_adequate: boo
         review_count=result.review_count,
         fail_count=result.fail_count,
         compliant=result.compliant,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def tube_rupture_relief(components: list[str], mole_fractions: list[float], tube_inner_diameter: Q, high_pressure: Q, number_of_open_ends: float | None=None, high_temperature: Q | None=None, low_pressure: Q | None=None, discharge_coefficient: float | None=None, scenario_name: str | None=None) -> TubeRuptureReliefResult:
+    """``process.tube_rupture_relief``, computed in Rust."""
+    spec = _models_gen.model("process.tube_rupture_relief")
+    result = _core.tube_rupture_relief(
+        list(components),
+        list(mole_fractions),
+        input_to_si(spec, "tube_inner_diameter", tube_inner_diameter),
+        input_to_si(spec, "high_pressure", high_pressure),
+        None if number_of_open_ends is None else number_of_open_ends,
+        None if high_temperature is None else input_to_si(spec, "high_temperature", high_temperature),
+        None if low_pressure is None else input_to_si(spec, "low_pressure", low_pressure),
+        None if discharge_coefficient is None else discharge_coefficient,
+        scenario_name,
+    )
+    return TubeRuptureReliefResult(
+        name=result.name,
+        relief_rate=from_si(result.relief_rate.magnitude_si, result.relief_rate.unit),
+        phase=ReliefPhase(result.phase),
+        relief_temperature=from_si(result.relief_temperature.magnitude_si, result.relief_temperature.unit),
+        molar_mass=from_si(result.molar_mass.magnitude_si, result.molar_mass.unit),
+        compressibility=result.compressibility,
+        specific_heat_ratio=result.specific_heat_ratio,
+        assumptions=tuple(result.assumptions),
         warnings=_warnings(result.warnings),
     )
 

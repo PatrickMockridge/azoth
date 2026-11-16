@@ -7872,6 +7872,42 @@ pub fn tr3001_compliance(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Tube rupture relief.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mole_fractions, tube_inner_diameter, high_pressure, number_of_open_ends, high_temperature, low_pressure, discharge_coefficient, scenario_name))]
+#[pyo3(
+    text_signature = "(components, mole_fractions, tube_inner_diameter, high_pressure, number_of_open_ends, high_temperature, low_pressure, discharge_coefficient, scenario_name)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn tube_rupture_relief(
+    py: Python<'_>,
+    components: Vec<String>,
+    mole_fractions: Vec<f64>,
+    tube_inner_diameter: f64,
+    high_pressure: f64,
+    number_of_open_ends: Option<f64>,
+    high_temperature: Option<f64>,
+    low_pressure: Option<f64>,
+    discharge_coefficient: Option<f64>,
+    scenario_name: Option<&str>,
+) -> PyResult<crate::transport_gen::PyTubeRuptureReliefResult> {
+    azoth_process::models::tube_rupture_relief::tube_rupture_relief(
+        &components,
+        &mole_fractions,
+        meters(tube_inner_diameter),
+        pascals(high_pressure),
+        number_of_open_ends,
+        high_temperature.map(kelvins),
+        low_pressure.map(pascals),
+        discharge_coefficient,
+        scenario_name,
+    )
+    .map(|r| crate::transport_gen::PyTubeRuptureReliefResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Vapour-cloud explosion overpressure.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

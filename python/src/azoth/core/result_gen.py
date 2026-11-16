@@ -9845,6 +9845,40 @@ class Tr3001ComplianceResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class TubeRuptureReliefResult(_HasWarnings):
+    """Result of ``process.tube_rupture_relief``."""
+
+    CALC_ID: ClassVar[str] = "process.tube_rupture_relief"
+
+    #: the scenario name, echoed.
+    name: str
+
+    #: the isentropic nozzle flow through the rupture area.
+    relief_rate: Q
+
+    #: the relieving phase, which this cause hardcodes to `vapour`.
+    phase: ReliefPhase
+
+    #: the high-pressure side's temperature, echoed.
+    relief_temperature: Q
+
+    #: the relieving fluid's molar mass.
+    molar_mass: Q
+
+    #: the relieving fluid's `Z`.
+    compressibility: float
+
+    #: the relieving fluid's `getKappa`, the isentropic exponent.
+    specific_heat_ratio: float
+
+    #: the class's assumption strings in order, with its warning strings appended.
+    assumptions: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class TurboExpanderResult(_HasWarnings):
     """Result of ``process.turbo_expander_compressor``."""
 

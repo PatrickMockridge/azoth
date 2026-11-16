@@ -313,6 +313,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.throttling_valve" => azoth_process::models::throttling_valve::ThrottlingValveResult::FIELDS.to_vec(),
         "process.toxic_library" => azoth_process::models::toxic_library::ToxicLibraryResult::FIELDS.to_vec(),
         "process.tr3001_compliance" => azoth_process::models::tr3001_compliance::Tr3001ComplianceResult::FIELDS.to_vec(),
+        "process.tube_rupture_relief" => azoth_process::models::tube_rupture_relief::TubeRuptureReliefResult::FIELDS.to_vec(),
         "process.turbo_expander_compressor" => azoth_process::models::turbo_expander_compressor::TurboExpanderResult::FIELDS.to_vec(),
         "process.vce" => azoth_process::models::vce::VceResult::FIELDS.to_vec(),
         "process.vessel_rupture" => azoth_process::models::vessel_rupture::VesselRuptureResult::FIELDS.to_vec(),

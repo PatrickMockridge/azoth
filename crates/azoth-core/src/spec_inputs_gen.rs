@@ -294,6 +294,7 @@
 //!   - specs/models/process/throttling_valve.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
+//!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
 //!   - specs/models/process/vessel_rupture.toml
@@ -5172,6 +5173,33 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.tr3001_compliance",
         "accumulation_fraction",
+        "dimensionless",
+    ),
+    (
+        "process.tube_rupture_relief",
+        "mole_fractions",
+        "dimensionless",
+    ),
+    (
+        "process.tube_rupture_relief",
+        "tube_inner_diameter",
+        "length",
+    ),
+    ("process.tube_rupture_relief", "high_pressure", "pressure"),
+    (
+        "process.tube_rupture_relief",
+        "number_of_open_ends",
+        "dimensionless",
+    ),
+    (
+        "process.tube_rupture_relief",
+        "high_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.tube_rupture_relief", "low_pressure", "pressure"),
+    (
+        "process.tube_rupture_relief",
+        "discharge_coefficient",
         "dimensionless",
     ),
     (

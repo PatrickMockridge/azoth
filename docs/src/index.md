@@ -399,6 +399,7 @@ Five sections, and the difference between them is the point:
 - [`process.throttling_valve`](./process/throttling_valve.md) — Throttling valve
 - [`process.toxic_library`](./process/toxic_library.md) — Toxic-exposure thresholds
 - [`process.tr3001_compliance`](./process/tr3001_compliance.md) — TR3001 compliance
+- [`process.tube_rupture_relief`](./process/tube_rupture_relief.md) — Tube rupture relief
 - [`process.turbo_expander_compressor`](./process/turbo_expander_compressor.md) — Turbo-expander compressor
 - [`process.vce`](./process/vce.md) — Vapour-cloud explosion overpressure
 - [`process.vessel_rupture`](./process/vessel_rupture.md) — Vessel rupture

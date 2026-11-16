@@ -3238,6 +3238,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 8,
         "tests_skipped": 0,
     },
+    'process.tube_rupture_relief': {
+        "calc_id": 'process.tube_rupture_relief',
+        "name": 'Tube rupture relief',
+        "spec": {'path': 'specs/models/process/tube_rupture_relief.toml', 'sha256': '31a2ca24f498515d2a2d9ee78b7ddb153517873221b21c8918cccba9dbfe38ff'},
+        "code": [{'path': 'python/src/azoth/process/reference/tube_rupture_relief.py', 'sha256': 'c9c2a522b10044e1e84eadf02dc8a8ce8de3ec87b73c9240bb84bbf4c15579af'}, {'path': 'crates/azoth-process/src/models/tube_rupture_relief.rs', 'sha256': '7c94ba9a6769dad6af31a39df417a2d17b3d8a13baffe024b9b67b50beeee69a'}],
+        "source": 'NeqSim process/safety/overpressure/TubeRuptureRelief.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 3,
+        "tests_skipped": 0,
+    },
     'process.turbo_expander_compressor': {
         "calc_id": 'process.turbo_expander_compressor',
         "name": 'Turbo-expander compressor',

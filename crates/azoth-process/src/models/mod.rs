@@ -103,6 +103,7 @@ pub mod three_phase_separator;
 pub mod throttling_valve;
 pub mod toxic_library;
 pub mod tr3001_compliance;
+pub mod tube_rupture_relief;
 pub mod turbo_expander_compressor;
 pub mod vce;
 pub mod vessel_rupture;
@@ -219,6 +220,7 @@ pub use tr3001_compliance::{
     Tr3001Check, Tr3001ComplianceResult, Tr3001Finding, Tr3001Scenario, Tr3001Status,
     tr3001_compliance,
 };
+pub use tube_rupture_relief::{TubeRuptureReliefResult, tube_rupture_relief};
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};
 pub use vce::{VceResult, vce};
 pub use vessel_rupture::{

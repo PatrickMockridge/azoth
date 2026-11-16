@@ -24541,6 +24541,88 @@ impl From<&azoth_process::models::tr3001_compliance::Tr3001ComplianceResult>
         }
     }
 }
+/// Result of `process.tube_rupture_relief`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TubeRuptureReliefResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTubeRuptureReliefResult {
+    /// the scenario name, echoed.
+    #[pyo3(get)]
+    pub name: String,
+    /// the isentropic nozzle flow through the rupture area.
+    #[pyo3(get)]
+    pub relief_rate: PyQty,
+    /// the relieving phase, which this cause hardcodes to `vapour`.
+    #[pyo3(get)]
+    pub phase: String,
+    /// the high-pressure side's temperature, echoed.
+    #[pyo3(get)]
+    pub relief_temperature: PyQty,
+    /// the relieving fluid's molar mass.
+    #[pyo3(get)]
+    pub molar_mass: PyQty,
+    /// the relieving fluid's `Z`.
+    #[pyo3(get)]
+    pub compressibility: f64,
+    /// the relieving fluid's `getKappa`, the isentropic exponent.
+    #[pyo3(get)]
+    pub specific_heat_ratio: f64,
+    /// the class's assumption strings in order, with its warning strings appended.
+    #[pyo3(get)]
+    pub assumptions: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyTubeRuptureReliefResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "TubeRuptureReliefResult(name={:?}, relief_rate={:?}, phase={:?}, relief_temperature={:?}, molar_mass={:?}, compressibility={:?}, specific_heat_ratio={:?}, assumptions={:?}, {} warning(s))",
+            self.name,
+            self.relief_rate,
+            self.phase,
+            self.relief_temperature,
+            self.molar_mass,
+            self.compressibility,
+            self.specific_heat_ratio,
+            self.assumptions,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::tube_rupture_relief::TubeRuptureReliefResult>
+    for PyTubeRuptureReliefResult
+{
+    fn from(r: &azoth_process::models::tube_rupture_relief::TubeRuptureReliefResult) -> Self {
+        Self {
+            name: r.name.clone(),
+            relief_rate: PyQty {
+                magnitude_si: r.relief_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            phase: r.phase.as_str().to_string(),
+            relief_temperature: PyQty {
+                magnitude_si: r.relief_temperature.value,
+                unit: "K".to_string(),
+            },
+            molar_mass: PyQty {
+                magnitude_si: r.molar_mass.value,
+                unit: "kg/mol".to_string(),
+            },
+            compressibility: r.compressibility,
+            specific_heat_ratio: r.specific_heat_ratio,
+            assumptions: r.assumptions.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.turbo_expander_compressor`, transported.
 #[pyclass(
     frozen,

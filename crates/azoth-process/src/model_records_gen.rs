@@ -83,6 +83,7 @@ use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
 use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
+use crate::models::tube_rupture_relief::TubeRuptureReliefResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vce::VceResult;
 use crate::models::vessel_rupture::VesselRuptureResult;
@@ -2055,6 +2056,25 @@ impl CalcResult for Tr3001ComplianceResult {
         "review_count",
         "fail_count",
         "compliant",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for TubeRuptureReliefResult {
+    const CALC_ID: &'static str = "process.tube_rupture_relief";
+    const FIELDS: &'static [&'static str] = &[
+        "name",
+        "relief_rate",
+        "phase",
+        "relief_temperature",
+        "molar_mass",
+        "compressibility",
+        "specific_heat_ratio",
+        "assumptions",
         "warnings",
     ];
 

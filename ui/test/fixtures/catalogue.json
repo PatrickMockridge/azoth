@@ -27171,6 +27171,15 @@
       "sub_interface": "overpressure"
     },
     {
+      "family": "overpressure",
+      "id": "process.tube_rupture_relief",
+      "name": "Tube rupture relief",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "overpressure"
+    },
+    {
       "family": "fire",
       "form": {
         "assumptions": [

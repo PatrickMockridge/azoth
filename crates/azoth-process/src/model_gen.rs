@@ -73,6 +73,7 @@
 //!   - specs/models/process/throttling_valve.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
+//!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
 //!   - specs/models/process/vessel_rupture.toml
@@ -70943,6 +70944,214 @@ pub static TR3001_COMPLIANCE_SPEC: ModelSpec = ModelSpec {
     cases: TR3001_COMPLIANCE_CASES,
 };
 
+static TUBE_RUPTURE_RELIEF_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "tube_inner_diameter",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a zero diameter is the class's defined zero-rate state",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "high_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure must be positive",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "number_of_open_ends",
+            min: Some(1.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a count below one is silently reset to two by the class, and the area moves by a factor",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "high_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature must be positive",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "low_pressure",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a low-pressure side is non-negative",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "discharge_coefficient",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a discharge coefficient is in (0, 1]",
+        },
+    },
+];
+
+static TUBE_RUPTURE_RELIEF_CASES: &[TestCase] = &[
+    TestCase {
+        id: "tr_two_ends",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[
+            ("tube_inner_diameter", 0.016),
+            ("high_pressure", 2000000.0),
+            ("high_temperature", 320.0),
+            ("low_pressure", 101325.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane"])],
+        strings: &[],
+        vectors: &[("mole_fractions", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[
+            ("relief_rate", 1.1615326673908402),
+            ("relief_temperature", 320.0),
+            ("molar_mass", 0.017445699999999998),
+            ("compressibility", 0.9591602013460842),
+            ("specific_heat_ratio", 1.2795798973843786),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("name", "Tube rupture two ends"), ("phase", "vapour")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "tr_one_end",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[
+            ("tube_inner_diameter", 0.016),
+            ("high_pressure", 2000000.0),
+            ("high_temperature", 320.0),
+            ("low_pressure", 101325.0),
+            ("number_of_open_ends", 1.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane"])],
+        strings: &[],
+        vectors: &[("mole_fractions", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[
+            ("relief_rate", 0.5807663336954201),
+            ("relief_temperature", 320.0),
+            ("molar_mass", 0.017445699999999998),
+            ("compressibility", 0.9591602013460842),
+            ("specific_heat_ratio", 1.2795798973843786),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("name", "Tube rupture one end"), ("phase", "vapour")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "tr_subcritical",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[
+            ("tube_inner_diameter", 0.016),
+            ("high_pressure", 2000000.0),
+            ("high_temperature", 320.0),
+            ("low_pressure", 1500000.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane"])],
+        strings: &[],
+        vectors: &[("mole_fractions", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[
+            ("relief_rate", 1.044006051031602),
+            ("relief_temperature", 320.0),
+            ("molar_mass", 0.017445699999999998),
+            ("compressibility", 0.9591602013460842),
+            ("specific_heat_ratio", 1.2795798973843786),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("name", "Tube rupture subcritical"), ("phase", "vapour")],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static TUBE_RUPTURE_RELIEF_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "tube_rupture_nozzle",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.tube_rupture_relief`.
+pub static TUBE_RUPTURE_RELIEF_SPEC: ModelSpec = ModelSpec {
+    id: "process.tube_rupture_relief",
+    kind: "procedure",
+    algorithm: Some(&TUBE_RUPTURE_RELIEF_ALGORITHM),
+    checks: TUBE_RUPTURE_RELIEF_CHECKS,
+    cases: TUBE_RUPTURE_RELIEF_CASES,
+};
+
 static TURBO_EXPANDER_COMPRESSOR_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -74574,6 +74783,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &THROTTLING_VALVE_SPEC,
     &TOXIC_LIBRARY_SPEC,
     &TR3001_COMPLIANCE_SPEC,
+    &TUBE_RUPTURE_RELIEF_SPEC,
     &TURBO_EXPANDER_COMPRESSOR_SPEC,
     &VCE_SPEC,
     &VESSEL_RUPTURE_SPEC,

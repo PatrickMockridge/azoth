@@ -91,6 +91,7 @@ from azoth.core.result import (
     ThrottlingValveResult,
     ToxicLibraryResult,
     Tr3001ComplianceResult,
+    TubeRuptureReliefResult,
     TurboExpanderResult,
     VceResult,
     VesselRuptureResult,
@@ -252,6 +253,7 @@ _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
 _TOXIC_LIBRARY = "process.toxic_library"
 _TR3001_COMPLIANCE = "process.tr3001_compliance"
+_TUBE_RUPTURE_RELIEF = "process.tube_rupture_relief"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
 _POOL_FIRE = "process.pool_fire"
@@ -1674,6 +1676,38 @@ def map_turbo_expander_compressor(
         chart_type=chart_type,
         chart_conditions=chart_conditions,
         impeller_diameter=impeller_diameter,
+    )
+
+
+def tube_rupture_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    tube_inner_diameter: Q,
+    high_pressure: Q,
+    number_of_open_ends: float | None = None,
+    high_temperature: Q | None = None,
+    low_pressure: Q | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> TubeRuptureReliefResult:
+    """The full-bore tube-rupture rate through one or two open ends.
+
+    **A full-bore single-tube rupture presents two open ends**, the class's default, and
+    the flow is the isentropic nozzle through their combined bore. A count below one is
+    refused rather than reset. Vaporization on the low-pressure side is not modelled.
+
+    See :func:`azoth.process.reference.tube_rupture_relief`.
+    """
+    return resolve(_TUBE_RUPTURE_RELIEF)(  # type: ignore[no-any-return]
+        components=components,
+        mole_fractions=mole_fractions,
+        tube_inner_diameter=tube_inner_diameter,
+        high_pressure=high_pressure,
+        number_of_open_ends=number_of_open_ends,
+        high_temperature=high_temperature,
+        low_pressure=low_pressure,
+        discharge_coefficient=discharge_coefficient,
+        scenario_name=scenario_name,
     )
 
 
