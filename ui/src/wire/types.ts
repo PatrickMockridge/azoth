@@ -592,6 +592,8 @@ export interface SafetyDerived {
 
 /** One plate on the bow-tie canvas. The data a rank carries is the rank's own. */
 export interface SafetyNodeData {
+  /** xyflow's own constraint on node data, which the projection satisfies. */
+  [key: string]: unknown;
   label: string;
   frequency?: number;
   active?: boolean;

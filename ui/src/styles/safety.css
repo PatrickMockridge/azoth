@@ -1,0 +1,291 @@
+/*
+ * The safety workspace: an overview, a bow-tie canvas and an inspector, and the fire cards.
+ *
+ * The shell is the calculation book's; only the three surfaces are new. A colour or a duration
+ * written here would be a value no other surface can reach, so every tone is a token.
+ */
+
+.safety-workspace {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+}
+
+.safety-views {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.safety-views button {
+  border: 1px solid var(--line);
+  border-bottom: none;
+  background: var(--tab-face);
+  color: var(--tab-text);
+  padding: 0.35rem 0.9rem;
+  border-radius: 4px 4px 0 0;
+  cursor: pointer;
+}
+
+.safety-views button.active {
+  background: var(--tab-face-active);
+  color: var(--tab-text-active);
+  font-weight: 600;
+}
+
+.safety-overview {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  overflow: auto;
+  align-content: start;
+}
+
+.safety-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1rem;
+}
+
+.safety-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  padding: 1rem;
+}
+
+.safety-card h2 {
+  margin: 0;
+}
+
+.safety-count {
+  font-size: 2rem;
+  margin: 0.25rem 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.safety-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.safety-list {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.safety-list button {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  text-align: left;
+  cursor: pointer;
+}
+
+.safety-meta {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.safety-diagnostics .error {
+  color: var(--error);
+}
+
+.safety-diagnostics .warning {
+  color: var(--warn);
+}
+
+.safety-families {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.safety-family ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+}
+
+.safety-native {
+  margin-left: 0.5rem;
+  color: var(--ok);
+  font-size: 0.8rem;
+}
+
+.safety-bowtie,
+.safety-fire {
+  display: grid;
+  grid-template-columns: var(--calc-side-min) 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  min-height: 0;
+  flex: 1;
+}
+
+.safety-side {
+  overflow: auto;
+  min-height: 0;
+}
+
+.safety-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.safety-bowtie-grid {
+  display: grid;
+  grid-template-columns: 1fr 22rem;
+  gap: 1rem;
+  min-height: 0;
+  flex: 1;
+  padding-top: 0.75rem;
+}
+
+.safety-canvas {
+  height: 32rem;
+  border: 1px solid var(--line);
+  background: var(--bg-canvas);
+}
+
+.safety-inspector {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  padding: 1rem;
+  overflow: auto;
+}
+
+.safety-inspector h2 {
+  margin-top: 0;
+}
+
+.safety-node {
+  width: 12rem;
+  padding: 0.5rem 0.6rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  font-size: 0.8rem;
+}
+
+.safety-node.threat {
+  border-left-color: var(--error);
+}
+
+.safety-node.top_event {
+  border-left-color: var(--warn);
+}
+
+.safety-node.consequence {
+  border-left-color: var(--ok);
+}
+
+.safety-node.inactive {
+  opacity: 0.55;
+}
+
+.safety-node.selected {
+  outline: 2px solid var(--focus);
+}
+
+.safety-node-kind {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.safety-node strong {
+  display: block;
+}
+
+.safety-node-value,
+.safety-node-note {
+  display: block;
+  color: var(--text-dim);
+}
+
+.safety-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+}
+
+.safety-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.safety-summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+}
+
+.safety-summary dt {
+  color: var(--text-dim);
+}
+
+.safety-summary dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.safety-profile {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.safety-profile th,
+.safety-profile td {
+  text-align: left;
+  padding: 0.25rem 0.5rem;
+  border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+
+.safety-scenario-panel {
+  padding-top: 0.75rem;
+}
+
+.safety-scenario-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.safety-scenario-head h2 {
+  margin: 0;
+}
+
+.safety-remove,
+.safety-add {
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 1100px) {
+  .safety-bowtie,
+  .safety-fire,
+  .safety-bowtie-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .safety-canvas {
+    height: 24rem;
+  }
+}

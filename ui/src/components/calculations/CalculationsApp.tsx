@@ -403,6 +403,13 @@ export function CalculationsApp({
       enabled: true,
     },
     {
+      id: "workspace-safety",
+      label: "Safety",
+      menu: "view",
+      run: () => onWorkspace("safety"),
+      enabled: true,
+    },
+    {
       id: "reset-windows",
       label: "Reset window positions",
       menu: "view",
