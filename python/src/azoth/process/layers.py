@@ -2647,7 +2647,7 @@ def _blowdown_pressure_profile(inputs: Mapping[str, Any]) -> dict[str, float]:
     from azoth.core.units import quantity
     from azoth.process.reference.blowdown_pressure_profile import _evaluate
 
-    points = [
+    points: list[dict[str, object]] = [
         {
             "time": quantity(float(row["time"]), "s"),
             "pressure": quantity(float(row["pressure"]), "bar"),
@@ -2673,7 +2673,7 @@ def _pipe_fire_rupture_material(inputs: Mapping[str, Any]) -> dict[str, float]:
     from azoth.process.reference.pipe_fire_rupture_material import _evaluate
 
     curve = inputs.get("curve")
-    points = None
+    points: list[dict[str, object]] | None = None
     if curve is not None:
         points = [
             {
@@ -2729,7 +2729,7 @@ def _pipe_fire_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
         value = inputs.get(name)
         return None if value is None else quantity(float(value), unit)
 
-    profile = [
+    profile: list[dict[str, object]] = [
         {
             "time": quantity(float(row["time"]), "s"),
             "pressure": quantity(float(row["pressure"]), "bar"),
@@ -2810,7 +2810,7 @@ def _vessel_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
     from azoth.core.units import quantity
     from azoth.process.reference.vessel_rupture import _evaluate
 
-    history = [
+    history: list[dict[str, object]] = [
         {
             "time": quantity(float(row["time"]), "s"),
             "internal_pressure": quantity(float(row["internal_pressure"]), "Pa"),

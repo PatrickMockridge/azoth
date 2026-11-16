@@ -3905,8 +3905,8 @@ class PipeResult:
 
 @final
 class PipeFireRuptureResult:
-    status: RuptureStatus
-    fluid_basis: FluidBasis
+    status: str
+    fluid_basis: str
     rupture_time: Qty | None
     rupture_pressure: Qty | None
     rupture_mean_wall_temperature: Qty | None

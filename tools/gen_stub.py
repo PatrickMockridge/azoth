@@ -469,6 +469,8 @@ ENUMS = {
     "SupplyVerdict",
     "HydrateRiskLevel",
     "HydrateStructure",
+    "RuptureStatus",
+    "FluidBasis",
 }
 
 
