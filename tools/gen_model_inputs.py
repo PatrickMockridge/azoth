@@ -443,7 +443,7 @@ NON_UNIT_MODELS = {
     "process.pfp_demand": "the PFP demand screen over scalars, not a unit",
     "process.fire_case_relief": "the fire-case relief load over scalars, not a unit",
     "process.blocked_outlet_relief": "the blocked-outlet relief load over a fluid, not a unit",
-    "process.control_valve_failure_relief": "the fail-open valve relief load over a fluid, not a unit",
+    "process.control_valve_failure_relief": "the fail-open relief load over a fluid, not a unit",
     "process.overpressure_acceptance": "the accumulated-pressure gate over scalars, not a unit",
     "process.pipeline_pressure_protection": "the two-barrier pipeline screen, not a unit",
     "process.relief_disposal_network": "the disposal-load summation over rows, not a unit",
