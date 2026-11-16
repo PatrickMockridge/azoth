@@ -69,7 +69,24 @@ import type {
   RecycleSettings,
   Residuals,
   Role,
+  SafetyBarrierView,
+  SafetyBowtieLayout,
+  SafetyBowtieView,
+  SafetyCalculation,
+  SafetyConsequenceView,
+  SafetyCounts,
+  SafetyDerived,
+  SafetyDiagnostic,
+  SafetyEnvelope,
   SafetyFunction,
+  SafetyGraph,
+  SafetyGraphEdge,
+  SafetyGraphNode,
+  SafetyLayout,
+  SafetyNodeData,
+  SafetyProfileRow,
+  SafetyScenarioView,
+  SafetyThreatView,
   SessionReport,
   Severity,
   Sheet,
@@ -768,17 +785,7 @@ function sheet(value: unknown, path: string): Sheet {
     missing: list(raw.missing, `${path}.missing`, str),
     stale: bool(raw.stale, `${path}.stale`),
     result: nullable(raw.result, `${path}.result`, sheetResult),
-    error:
-      raw.error === null || raw.error === undefined
-        ? null
-        : {
-            message: str(obj(raw.error, `${path}.error`).message, `${path}.error.message`),
-            field: nullable(
-              obj(raw.error, `${path}.error`).field,
-              `${path}.error.field`,
-              str,
-            ),
-          },
+    error: nullable(raw.error, `${path}.error`, calcError),
     diagnostics: list(raw.diagnostics, `${path}.diagnostics`, sheetDiagnostic),
   };
 }
@@ -801,6 +808,269 @@ export function decodeSheetEnvelope(value: unknown): SheetEnvelope {
     ok: bool(raw.ok, `${path}.ok`),
     dirty: bool(raw.dirty, `${path}.dirty`),
     book: sheetBook(raw.book, `${path}.book`),
+  };
+}
+
+function safetyCalculation(value: unknown, path: string): SafetyCalculation {
+  const raw = obj(value, path);
+  const calculation: SafetyCalculation = {
+    id: str(raw.id, `${path}.id`),
+    name: str(raw.name, `${path}.name`),
+    family: str(raw.family, `${path}.family`),
+    sub_interface: nullable(raw.sub_interface, `${path}.sub_interface`, str),
+    purpose: str(raw.purpose, `${path}.purpose`),
+    native: bool(raw.native, `${path}.native`),
+    refusal: nullable(raw.refusal, `${path}.refusal`, str),
+  };
+  // The form is the calculation book's own shape, and absent on entries a scenario cannot run.
+  if (raw.form !== undefined && raw.form !== null) {
+    calculation.form = calcForm(raw.form, `${path}.form`);
+  }
+  return calculation;
+}
+
+function safetyDiagnostic(value: unknown, path: string): SafetyDiagnostic {
+  const raw = obj(value, path);
+  return {
+    code: str(raw.code, `${path}.code`),
+    severity: oneOf(raw.severity, `${path}.severity`, ["error", "warning"] as const),
+    message: str(raw.message, `${path}.message`),
+    field: nullable(raw.field, `${path}.field`, str),
+  };
+}
+
+function calcError(value: unknown, path: string): { message: string; field: string | null } {
+  const raw = obj(value, path);
+  return {
+    message: str(raw.message, `${path}.message`),
+    field: nullable(raw.field, `${path}.field`, str),
+  };
+}
+
+function safetyProfileRow(value: unknown, path: string): SafetyProfileRow {
+  const raw = obj(value, path);
+  return {
+    target: quantity(raw.target, `${path}.target`),
+    distance: nullable(raw.distance, `${path}.distance`, quantity),
+    reached: bool(raw.reached, `${path}.reached`),
+  };
+}
+
+function safetyScenario(value: unknown, path: string): SafetyScenarioView {
+  const raw = obj(value, path);
+  return {
+    id: str(raw.id, `${path}.id`),
+    name: str(raw.name, `${path}.name`),
+    calculation: str(raw.calculation, `${path}.calculation`),
+    family: nullable(raw.family, `${path}.family`, str),
+    purpose: nullable(raw.purpose, `${path}.purpose`, str),
+    inputs: mapOf(raw.inputs, `${path}.inputs`, exampleValue),
+    ready: bool(raw.ready, `${path}.ready`),
+    missing: list(raw.missing, `${path}.missing`, str),
+    stale: bool(raw.stale, `${path}.stale`),
+    result: nullable(raw.result, `${path}.result`, sheetResult),
+    error: nullable(raw.error, `${path}.error`, calcError),
+    diagnostics: list(raw.diagnostics, `${path}.diagnostics`, safetyDiagnostic),
+    profile: list(raw.profile, `${path}.profile`, safetyProfileRow),
+  };
+}
+
+function safetyThreat(value: unknown, path: string): SafetyThreatView {
+  const raw = obj(value, path);
+  return {
+    id: str(raw.id, `${path}.id`),
+    label: str(raw.label, `${path}.label`),
+    frequency: num(raw.frequency, `${path}.frequency`),
+    active: bool(raw.active, `${path}.active`),
+  };
+}
+
+function safetyBarrier(value: unknown, path: string): SafetyBarrierView {
+  const raw = obj(value, path);
+  return {
+    id: str(raw.id, `${path}.id`),
+    label: str(raw.label, `${path}.label`),
+    pfd: num(raw.pfd, `${path}.pfd`),
+    barrier_type: str(raw.barrier_type, `${path}.barrier_type`),
+    functional: bool(raw.functional, `${path}.functional`),
+    side: oneOf(raw.side, `${path}.side`, ["prevention", "mitigation"] as const),
+  };
+}
+
+function safetyConsequence(value: unknown, path: string): SafetyConsequenceView {
+  const raw = obj(value, path);
+  return {
+    id: str(raw.id, `${path}.id`),
+    label: str(raw.label, `${path}.label`),
+    severity: num(raw.severity, `${path}.severity`),
+    scenario: nullable(raw.scenario, `${path}.scenario`, str),
+    scenario_name: nullable(raw.scenario_name, `${path}.scenario_name`, str),
+    scenario_ready: nullable(raw.scenario_ready, `${path}.scenario_ready`, bool),
+  };
+}
+
+function safetyCounts(value: unknown, path: string): SafetyCounts {
+  const raw = obj(value, path);
+  return {
+    threats: num(raw.threats, `${path}.threats`),
+    prevention_barriers: num(raw.prevention_barriers, `${path}.prevention_barriers`),
+    mitigation_barriers: num(raw.mitigation_barriers, `${path}.mitigation_barriers`),
+    consequences: num(raw.consequences, `${path}.consequences`),
+  };
+}
+
+function safetyDerived(value: unknown, path: string): SafetyDerived {
+  const raw = obj(value, path);
+  return {
+    unmitigated_frequency_per_year: nullable(
+      raw.unmitigated_frequency_per_year,
+      `${path}.unmitigated_frequency_per_year`,
+      num,
+    ),
+    mitigated_frequency_per_year: nullable(
+      raw.mitigated_frequency_per_year,
+      `${path}.mitigated_frequency_per_year`,
+      num,
+    ),
+    total_rrf: nullable(raw.total_rrf, `${path}.total_rrf`, num),
+    max_severity: nullable(raw.max_severity, `${path}.max_severity`, num),
+  };
+}
+
+function safetyNodeData(value: unknown, path: string): SafetyNodeData {
+  const raw = obj(value, path);
+  const data: SafetyNodeData = { label: str(raw.label, `${path}.label`) };
+  if (raw.frequency !== undefined) {
+    data.frequency = num(raw.frequency, `${path}.frequency`);
+  }
+  if (raw.active !== undefined) {
+    data.active = bool(raw.active, `${path}.active`);
+  }
+  if (raw.pfd !== undefined) {
+    data.pfd = num(raw.pfd, `${path}.pfd`);
+  }
+  if (raw.barrier_type !== undefined) {
+    data.barrier_type = str(raw.barrier_type, `${path}.barrier_type`);
+  }
+  if (raw.functional !== undefined) {
+    data.functional = bool(raw.functional, `${path}.functional`);
+  }
+  if (raw.side !== undefined) {
+    data.side = str(raw.side, `${path}.side`);
+  }
+  if (raw.severity !== undefined) {
+    data.severity = num(raw.severity, `${path}.severity`);
+  }
+  if (raw.scenario !== undefined) {
+    data.scenario = nullable(raw.scenario, `${path}.scenario`, str);
+  }
+  return data;
+}
+
+function safetyNode(value: unknown, path: string): SafetyGraphNode {
+  const raw = obj(value, path);
+  return {
+    id: str(raw.id, `${path}.id`),
+    type: oneOf(raw.type, `${path}.type`, [
+      "threat",
+      "barrier",
+      "top_event",
+      "consequence",
+    ] as const),
+    role: str(raw.role, `${path}.role`),
+    position: position(raw.position, `${path}.position`),
+    data: safetyNodeData(raw.data, `${path}.data`),
+  };
+}
+
+function safetyEdge(value: unknown, path: string): SafetyGraphEdge {
+  const raw = obj(value, path);
+  return {
+    id: str(raw.id, `${path}.id`),
+    source: str(raw.source, `${path}.source`),
+    target: str(raw.target, `${path}.target`),
+  };
+}
+
+function safetyGraph(value: unknown, path: string): SafetyGraph {
+  const raw = obj(value, path);
+  return {
+    id: str(raw.id, `${path}.id`),
+    nodes: list(raw.nodes, `${path}.nodes`, safetyNode),
+    edges: list(raw.edges, `${path}.edges`, safetyEdge),
+  };
+}
+
+function safetyBowtie(value: unknown, path: string): SafetyBowtieView {
+  const raw = obj(value, path);
+  return {
+    id: str(raw.id, `${path}.id`),
+    name: str(raw.name, `${path}.name`),
+    top_event: str(raw.top_event, `${path}.top_event`),
+    threats: list(raw.threats, `${path}.threats`, safetyThreat),
+    barriers: list(raw.barriers, `${path}.barriers`, safetyBarrier),
+    consequences: list(raw.consequences, `${path}.consequences`, safetyConsequence),
+    counts: safetyCounts(raw.counts, `${path}.counts`),
+    derived: nullable(raw.derived, `${path}.derived`, safetyDerived),
+    graph: safetyGraph(raw.graph, `${path}.graph`),
+    ready: bool(raw.ready, `${path}.ready`),
+    stale: bool(raw.stale, `${path}.stale`),
+    result: nullable(raw.result, `${path}.result`, sheetResult),
+    error: nullable(raw.error, `${path}.error`, calcError),
+    diagnostics: list(raw.diagnostics, `${path}.diagnostics`, safetyDiagnostic),
+  };
+}
+
+/** One node position, as the document's layout states it. */
+function pair(value: unknown, path: string): [number, number] {
+  const values = list(value, path, num);
+  if (values.length !== 2) {
+    return fail(path, "a pair of numbers", value);
+  }
+  return [values[0]!, values[1]!];
+}
+
+function safetyBowtieLayout(value: unknown, path: string): SafetyBowtieLayout {
+  const raw = obj(value, path);
+  const layout: SafetyBowtieLayout = {};
+  if (raw.top_event !== undefined) {
+    layout.top_event = pair(raw.top_event, `${path}.top_event`);
+  }
+  if (raw.threats !== undefined) {
+    layout.threats = mapOf(raw.threats, `${path}.threats`, pair);
+  }
+  if (raw.barriers !== undefined) {
+    layout.barriers = mapOf(raw.barriers, `${path}.barriers`, pair);
+  }
+  if (raw.consequences !== undefined) {
+    layout.consequences = mapOf(raw.consequences, `${path}.consequences`, pair);
+  }
+  return layout;
+}
+
+function safetyLayout(value: unknown, path: string): SafetyLayout {
+  const raw = obj(value, path);
+  return {
+    bowties: mapOf(raw.bowties ?? {}, `${path}.bowties`, safetyBowtieLayout),
+  };
+}
+
+/** One call's answer from the safety-study workspace. */
+export function decodeSafetyEnvelope(value: unknown): SafetyEnvelope {
+  const path = "the safety envelope";
+  const raw = obj(value, path);
+  const study = obj(raw.study, `${path}.study`);
+  return {
+    ok: bool(raw.ok, `${path}.ok`),
+    dirty: bool(raw.dirty, `${path}.dirty`),
+    study: {
+      id: str(study.id, `${path}.study.id`),
+      name: str(study.name, `${path}.study.name`),
+      document: str(study.document, `${path}.study.document`),
+      scenarios: list(study.scenarios, `${path}.study.scenarios`, safetyScenario),
+      bowties: list(study.bowties, `${path}.study.bowties`, safetyBowtie),
+      layout: nullable(study.layout, `${path}.study.layout`, safetyLayout),
+    },
   };
 }
 
@@ -851,11 +1121,17 @@ export function decodeCatalogue(value: unknown): Catalogue {
   const calcs = nullable(raw.calcs, `${path}.calcs`, (entry, at) =>
     list(entry, at, calcForm),
   );
+  const safety = nullable(raw.safety, `${path}.safety`, (entry, at) =>
+    list(entry, at, safetyCalculation),
+  );
   const catalogue: Catalogue = {
     unit_ops: list(raw.unit_ops, `${path}.unit_ops`, form),
   };
   if (calcs !== null) {
     catalogue.calcs = calcs;
+  }
+  if (safety !== null) {
+    catalogue.safety = safety;
   }
   if (units !== null) {
     catalogue.units = units;
@@ -895,6 +1171,8 @@ export const parseEnvelope = (json: string): Envelope => parse(json, decodeEnvel
 export const parseCatalogue = (json: string): Catalogue => parse(json, decodeCatalogue);
 export const parseSheetEnvelope = (json: string): SheetEnvelope =>
   parse(json, decodeSheetEnvelope);
+export const parseSafetyEnvelope = (json: string): SafetyEnvelope =>
+  parse(json, decodeSafetyEnvelope);
 export const parseDexpiView = (json: string): DexpiViewResponse =>
   parse(json, decodeDexpiView);
 export const parseDexpiExport = (json: string): DexpiExport =>

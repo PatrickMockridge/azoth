@@ -6,7 +6,8 @@ read its page, and call it. The **agentic entry point** is
 `AGENTS.md`.
 
 **Use it in the browser:** [the editor](https://patrickmockridge.github.io/azoth/) for the
-flowsheet and its calculation book, then [calculation sheets](./using/calculations.md) and
+flowsheet, its calculation book and its safety study, then
+[calculation sheets](./using/calculations.md), [safety studies](./using/safety.md) and
 [reading a calculation page](./using/reading-a-calculation.md) for the guide.
 
 Start here: [install it](https://github.com/PatrickMockridge/azoth#install) - `azoth-engine`

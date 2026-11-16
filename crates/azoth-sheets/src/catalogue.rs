@@ -24,7 +24,7 @@ pub fn forms() -> &'static [CalcForm] {
 pub fn to_value() -> Result<Value> {
     let calcs = CALCS
         .iter()
-        .map(form_json)
+        .map(form_value)
         .collect::<Result<Vec<Value>>>()?;
     Ok(Value::Array(calcs))
 }
@@ -43,7 +43,13 @@ pub fn to_json() -> Result<String> {
 }
 
 /// One calculation, with its worked example and provenance attached.
-fn form_json(form: &CalcForm) -> Result<Value> {
+///
+/// Public because the safety catalogue carries the same form shape for the model ids it can
+/// run, and a form joined one way is the only way two catalogues can agree about it.
+///
+/// # Errors
+/// A projection that cannot be written, which for this shape it cannot.
+pub fn form_value(form: &CalcForm) -> Result<Value> {
     let mut object = serde_json::to_value(form)
         .map_err(|error| {
             AzothError::invalid_input(

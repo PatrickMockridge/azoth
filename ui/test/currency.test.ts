@@ -36,7 +36,13 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import proteus from "../../crates/azoth-dexpi/tests/fixtures/proteus_simple.xml?raw";
 import demo from "../../specs/flowsheets/demo.toml?raw";
-import init, { Editor, Exchange, palette_json } from "../src/wasm/pkg/azoth_wasm.js";
+import study from "../../specs/safety/demo.toml?raw";
+import init, {
+  Editor,
+  Exchange,
+  SafetyEditor,
+  palette_json,
+} from "../src/wasm/pkg/azoth_wasm.js";
 
 beforeAll(async () => {
   const wasm = readFileSync(resolve("src/wasm/pkg/azoth_wasm_bg.wasm"));
@@ -127,6 +133,13 @@ describe("the fixtures", () => {
     const editor = new Editor(demo);
     editor.apply('{"command":"remove_instance","id":"hx1"}');
     agree(editor.envelope(), "broken.json");
+  });
+
+  it("are the safety envelope this tree's study editor answers with", () => {
+    // `azoth safety --study specs/safety/demo.toml --calculate all`, through the module's editor.
+    const editor = new SafetyEditor(study);
+    editor.calculate(undefined);
+    agree(editor.envelope(), "safety-envelope.json");
   });
 
   it("and the drawing view is the module's answer for the same file", () => {

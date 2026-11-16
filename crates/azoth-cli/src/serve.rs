@@ -65,6 +65,8 @@ use std::net::{TcpListener, TcpStream};
 use std::path::Path;
 
 use azoth_core::{AzothError, Result};
+use azoth_safety::command::Command as SafetyCommand;
+use azoth_safety::workspace::{SafetyWorkspace, Target as SafetyTarget};
 use azoth_sheets::workspace::{Command as SheetCommand, SheetWorkspace};
 use serde_json::{Value, json};
 
@@ -75,6 +77,9 @@ const ROUTE: &str = "/rpc";
 
 /// The calculation book's route: a second document, with its own commands and envelope.
 const SHEETS_ROUTE: &str = "/sheets";
+
+/// The safety study's route: a third document, with its own commands and envelope.
+const SAFETY_ROUTE: &str = "/safety";
 
 /// The request path an agent's calls go to — the same session, the same envelope, a second door.
 ///
@@ -111,6 +116,7 @@ pub fn serve(
     flowsheet: &Path,
     palette_dir: &Path,
     calc_book: Option<&Path>,
+    safety_study: Option<&Path>,
     port: u16,
     allow_origins: &[String],
 ) -> Result<()> {
@@ -122,6 +128,13 @@ pub fn serve(
         None => String::new(),
     };
     let mut sheets = SheetWorkspace::open(&book)?;
+    let study = match safety_study {
+        Some(path) => std::fs::read_to_string(path).map_err(|error| {
+            AzothError::invalid_input("safety-study", format!("{}: {error}", path.display()))
+        })?,
+        None => String::new(),
+    };
+    let mut safety = SafetyWorkspace::open(&study)?;
 
     let listener = TcpListener::bind(("127.0.0.1", port))
         .map_err(|error| AzothError::invalid_input("port", format!("127.0.0.1:{port}: {error}")))?;
@@ -139,7 +152,13 @@ pub fn serve(
     for stream in listener.incoming() {
         let stream =
             stream.map_err(|error| AzothError::invalid_input("socket", error.to_string()))?;
-        if let Err(error) = handle(stream, &mut session, &mut sheets, allow_origins) {
+        if let Err(error) = handle(
+            stream,
+            &mut session,
+            &mut sheets,
+            &mut safety,
+            allow_origins,
+        ) {
             // A connection that fails is a client's problem and not this process's: it is written
             // to stderr and the next one is accepted.
             eprintln!("azoth: {error}");
@@ -153,6 +172,7 @@ fn handle(
     stream: TcpStream,
     session: &mut Session,
     sheets: &mut SheetWorkspace,
+    safety: &mut SafetyWorkspace,
     allow_origins: &[String],
 ) -> std::result::Result<(), String> {
     let mut reader = BufReader::new(stream.try_clone().map_err(|e| e.to_string())?);
@@ -227,11 +247,13 @@ fn handle(
         };
     }
 
-    if request.method != "POST" || (request.path != ROUTE && request.path != SHEETS_ROUTE) {
+    if request.method != "POST"
+        || (request.path != ROUTE && request.path != SHEETS_ROUTE && request.path != SAFETY_ROUTE)
+    {
         return write_json(
             &mut writer,
             404,
-            &json!({ "error": format!("no route; every call is a POST to {ROUTE}, {SHEETS_ROUTE}, {DEXPI_ROUTE} or {MCP_ROUTE}") }),
+            &json!({ "error": format!("no route; every call is a POST to {ROUTE}, {SHEETS_ROUTE}, {SAFETY_ROUTE}, {DEXPI_ROUTE} or {MCP_ROUTE}") }),
             cors.as_deref(),
         );
     }
@@ -250,6 +272,8 @@ fn handle(
 
     let answer = if request.path == SHEETS_ROUTE {
         sheet_dispatch(sheets, &body)
+    } else if request.path == SAFETY_ROUTE {
+        safety_dispatch(safety, &body)
     } else {
         dispatch(session, &body)
     };
@@ -399,6 +423,60 @@ fn sheet_dispatch(sheets: &mut SheetWorkspace, body: &Value) -> std::result::Res
         }
     }
     let text = sheets.to_json().map_err(|error| error.to_string())?;
+    serde_json::from_str(&text).map_err(|error| error.to_string())
+}
+
+/// One request body, as a safety-study call.
+///
+/// `{"command": {…}}` is an edit, `{"calculate": null | {"scenario": id} | {"bowtie": id}}` runs
+/// one item or every stale one, and `{"command": null}` asks for the envelope as it stands. A
+/// study is a third document, so it is a third route rather than a key on either of the others.
+fn safety_dispatch(
+    study: &mut SafetyWorkspace,
+    body: &Value,
+) -> std::result::Result<Value, String> {
+    let object = body
+        .as_object()
+        .ok_or_else(|| "the request body is not an object".to_string())?;
+    if object.len() != 1 {
+        return Err("a safety request carries one of `command` or `calculate`".to_string());
+    }
+    if let Some(calculate) = object.get("calculate") {
+        let target = match calculate {
+            Value::Null => None,
+            Value::Object(one) if one.len() == 1 => {
+                if let Some(id) = one.get("scenario").and_then(Value::as_str) {
+                    Some(SafetyTarget::Scenario(id.to_string()))
+                } else if let Some(id) = one.get("bowtie").and_then(Value::as_str) {
+                    Some(SafetyTarget::Bowtie(id.to_string()))
+                } else {
+                    return Err(
+                        "`calculate` takes `null`, `{\"scenario\": id}` or `{\"bowtie\": id}`"
+                            .to_string(),
+                    );
+                }
+            }
+            _ => {
+                return Err(
+                    "`calculate` takes `null`, `{\"scenario\": id}` or `{\"bowtie\": id}`"
+                        .to_string(),
+                );
+            }
+        };
+        study
+            .calculate(target.as_ref())
+            .map_err(|error| error.to_string())?;
+    } else {
+        match object.get("command") {
+            Some(Value::Null) | None => {}
+            Some(command) => {
+                let command: SafetyCommand =
+                    serde_json::from_value(command.clone()).map_err(|error| error.to_string())?;
+                study.apply(&command).map_err(|error| error.to_string())?;
+            }
+        }
+    }
+    let text = study.to_json().map_err(|error| error.to_string())?;
     serde_json::from_str(&text).map_err(|error| error.to_string())
 }
 

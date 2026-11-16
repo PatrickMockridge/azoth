@@ -1,5 +1,5 @@
 /** The documents a reader can move between; the flowsheet stays loaded either way. */
-export type Workspace = "flowsheet" | "drawing" | "calculations";
+export type Workspace = "flowsheet" | "drawing" | "calculations" | "safety";
 
 export function WorkspaceSwitch({
   workspace,
@@ -33,6 +33,14 @@ export function WorkspaceSwitch({
         onClick={() => onWorkspace("calculations")}
       >
         Calculations
+      </button>
+      <button
+        type="button"
+        className={workspace === "safety" ? "active" : ""}
+        aria-pressed={workspace === "safety"}
+        onClick={() => onWorkspace("safety")}
+      >
+        Safety
       </button>
     </div>
   );

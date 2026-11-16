@@ -417,7 +417,13 @@ fn form_of(calculation: &str) -> Option<&'static CalcForm> {
 }
 
 /// A value shaped by the declaration, or a refusal.
-fn stored_value(declaration: &CalcInput, name: &str, value: &Value) -> Result<toml::Value> {
+///
+/// Public because a second document that draws the same form stores its inputs the same way;
+/// one reader is the only way two documents agree about what an enum field may hold.
+///
+/// # Errors
+/// A value of the wrong kind for the declaration.
+pub fn stored_value(declaration: &CalcInput, name: &str, value: &Value) -> Result<toml::Value> {
     match declaration.kind {
         "quantity" => {
             let Some(number) = value.as_f64() else {
@@ -455,7 +461,12 @@ fn stored_value(declaration: &CalcInput, name: &str, value: &Value) -> Result<to
 }
 
 /// Why a stored value is the wrong kind for its input, if it is.
-fn kind_of(declaration: &CalcInput, value: &toml::Value) -> std::result::Result<(), &'static str> {
+///
+/// Public for the same reason [`stored_value`] is: the safety study stores the same form.
+pub fn kind_of(
+    declaration: &CalcInput,
+    value: &toml::Value,
+) -> std::result::Result<(), &'static str> {
     match (declaration.kind, value) {
         ("quantity", toml::Value::Float(number)) if number.is_finite() => Ok(()),
         // A TOML author writes `rho = 998`, and TOML keeps that an integer. Refusing it would

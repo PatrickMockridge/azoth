@@ -6,12 +6,19 @@
  * is `./http.ts`, and the interface both implement is `./session.ts`.
  */
 
-import init, { Editor, Exchange, SheetEditor, palette_json } from "../wasm/pkg/azoth_wasm.js";
+import init, {
+  Editor,
+  Exchange,
+  SafetyEditor,
+  SheetEditor,
+  palette_json,
+} from "../wasm/pkg/azoth_wasm.js";
 import {
   parseCatalogue,
   parseDexpiExport,
   parseDexpiView,
   parseEnvelope,
+  parseSafetyEnvelope,
   parseSheetEnvelope,
 } from "./decode";
 import type {
@@ -19,10 +26,14 @@ import type {
   ExchangeDoor,
   Opened,
   OpenableDoor,
+  SafetyOpened,
+  SafetySession,
+  SafetyTarget,
   Session,
   SheetOpened,
   SheetSession,
 } from "./session";
+import type { SafetyCommand } from "./safetyCommands";
 import type { SheetCommand } from "./sheetCommands";
 import type {
   Catalogue,
@@ -32,6 +43,7 @@ import type {
   Envelope,
   ExecutionOrder,
   ExchangeOptions,
+  SafetyEnvelope,
   SheetEnvelope,
 } from "./types";
 
@@ -109,6 +121,37 @@ class WasmSheetDoor {
   }
 }
 
+/** The safety study behind the same module. */
+class WasmSafetySession implements SafetySession {
+  readonly #editor: SafetyEditor;
+
+  constructor(editor: SafetyEditor) {
+    this.#editor = editor;
+  }
+
+  async apply(command: SafetyCommand): Promise<SafetyEnvelope> {
+    return parseSafetyEnvelope(this.#editor.apply(JSON.stringify(command)));
+  }
+
+  async calculate(target: SafetyTarget | null): Promise<SafetyEnvelope> {
+    return parseSafetyEnvelope(
+      this.#editor.calculate(target === null ? undefined : JSON.stringify(target)),
+    );
+  }
+}
+
+class WasmSafetyDoor {
+  readonly kind = "openable" as const;
+
+  async open(document: string): Promise<SafetyOpened> {
+    const editor = new SafetyEditor(document);
+    return {
+      session: new WasmSafetySession(editor),
+      envelope: parseSafetyEnvelope(editor.envelope()),
+    };
+  }
+}
+
 /** The drawing exchange behind the module. **Stateless**: it holds no document. */
 class WasmExchange implements ExchangeDoor {
   async inspect(xml: string): Promise<DexpiViewResponse> {
@@ -138,6 +181,7 @@ export async function moduleDoors(): Promise<Doors> {
   return {
     flowsheet: new WasmDoor(),
     sheets: new WasmSheetDoor(),
+    safety: new WasmSafetyDoor(),
     exchange: new WasmExchange(),
   };
 }

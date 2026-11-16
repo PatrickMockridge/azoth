@@ -1,0 +1,82 @@
+id = "safety_study_1"
+name = "Demo safety study"
+
+[[scenarios]]
+id = "jet_fire_1"
+name = "HP separator jet fire"
+calculation = "process.jet_fire"
+
+[scenarios.inputs]
+mass_flow = 2.0
+heat_of_combustion = 50000000.0
+radiative_fraction = 0.2
+distance = 20.0
+target_flux = 12500.0
+
+[[scenarios]]
+id = "pool_fire_1"
+name = "Diesel spill pool fire"
+calculation = "process.pool_fire"
+
+[scenarios.inputs]
+pool_diameter = 10.0
+burn_rate = 0.06
+distance = 10.0
+
+[[bowties]]
+id = "bt_separator_release"
+name = "Separator loss of containment"
+top_event = "Loss of containment from the HP separator"
+
+[[bowties.threats]]
+id = "th_corrosion"
+label = "Corrosion under insulation"
+frequency = 0.1
+active = true
+
+[[bowties.threats]]
+id = "th_overpressure"
+label = "Upstream overpressure"
+frequency = 0.05
+active = true
+
+[[bowties.barriers]]
+id = "pb_inspection"
+label = "Inspection and corrosion monitoring"
+pfd = 0.01
+barrier_type = "prevention"
+functional = true
+
+[[bowties.barriers]]
+id = "mb_emergency_response"
+label = "Emergency response and muster"
+pfd = 0.5
+barrier_type = "mitigation"
+functional = true
+
+[[bowties.consequences]]
+id = "co_jet_fire"
+label = "Jet fire impinging on the separator"
+severity = 5.0
+scenario = "jet_fire_1"
+
+[[bowties.consequences]]
+id = "co_pool_fire"
+label = "Pool fire in the bund"
+severity = 4.0
+scenario = "pool_fire_1"
+
+[layout.bowties.bt_separator_release]
+top_event = [480.0, 120.0]
+
+[layout.bowties.bt_separator_release.threats]
+th_corrosion = [0.0, 60.0]
+th_overpressure = [0.0, 180.0]
+
+[layout.bowties.bt_separator_release.barriers]
+pb_inspection = [240.0, 120.0]
+mb_emergency_response = [720.0, 120.0]
+
+[layout.bowties.bt_separator_release.consequences]
+co_jet_fire = [960.0, 60.0]
+co_pool_fire = [960.0, 180.0]

@@ -32,7 +32,7 @@ use wasm_bindgen::prelude::*;
 use azoth_process::load_palette_text;
 use azoth_process::middleware::command::Command;
 use azoth_process::middleware::session::Workspace;
-use azoth_process::middleware::{catalogue, envelope};
+use azoth_process::middleware::{catalogue_with, envelope};
 use azoth_process::palette_gen::PALETTE;
 use azoth_process::{ExecutionOrder, UnitOpSpec};
 use azoth_sheets::workspace::{Command as SheetCommand, SheetWorkspace};
@@ -51,7 +51,8 @@ fn palette() -> Vec<UnitOpSpec> {
 /// A JS exception if the document cannot be written, which the embedded palette cannot cause.
 #[wasm_bindgen]
 pub fn palette_json(with_tools: bool) -> Result<String, JsValue> {
-    catalogue(&palette(), with_tools).map_err(failed)
+    let safety = azoth_safety::catalogue::to_value().map_err(failed)?;
+    catalogue_with(&palette(), with_tools, Some(safety)).map_err(failed)
 }
 
 /// A live document: the session, as the browser holds it.
@@ -220,6 +221,72 @@ impl SheetEditor {
     ///
     /// # Errors
     /// A JS exception if the book cannot be written.
+    pub fn document(&self) -> Result<String, JsValue> {
+        self.workspace.document().map_err(failed)
+    }
+}
+
+/// A safety study: scenarios, bow-ties, and their results.
+///
+/// **A third document, not a third editor.** It has its own envelope and its own commands, and
+/// its native dispatch calls the process models directly because the sheet dispatcher is
+/// generated from `specs/calcs` and these ids are models.
+#[wasm_bindgen]
+pub struct SafetyEditor {
+    workspace: azoth_safety::workspace::SafetyWorkspace,
+}
+
+#[wasm_bindgen]
+impl SafetyEditor {
+    /// Open a study from its TOML. An empty document is a blank study.
+    ///
+    /// # Errors
+    /// A JS exception on a document the schema does not read.
+    #[wasm_bindgen(constructor)]
+    pub fn new(document: &str) -> Result<SafetyEditor, JsValue> {
+        azoth_safety::workspace::SafetyWorkspace::open(document)
+            .map(|workspace| SafetyEditor { workspace })
+            .map_err(failed)
+    }
+
+    /// Apply one command and answer with the study envelope.
+    ///
+    /// # Errors
+    /// A JS exception for a command that is not one or cannot take effect.
+    pub fn apply(&mut self, command: &str) -> Result<String, JsValue> {
+        let command: azoth_safety::command::Command =
+            serde_json::from_str(command).map_err(failed)?;
+        self.workspace.apply(&command).map_err(failed)?;
+        self.envelope()
+    }
+
+    /// Calculate one item, or every stale item when `target` is absent.
+    ///
+    /// `target` is `{"scenario": "id"}` or `{"bowtie": "id"}`.
+    ///
+    /// # Errors
+    /// A JS exception for a target the study does not carry or one that is not a target.
+    pub fn calculate(&mut self, target: Option<String>) -> Result<String, JsValue> {
+        let target: Option<azoth_safety::workspace::Target> = match target {
+            None => None,
+            Some(text) => Some(serde_json::from_str(&text).map_err(failed)?),
+        };
+        self.workspace.calculate(target.as_ref()).map_err(failed)?;
+        self.envelope()
+    }
+
+    /// The envelope as it stands.
+    ///
+    /// # Errors
+    /// A JS exception if the study cannot be written.
+    pub fn envelope(&self) -> Result<String, JsValue> {
+        self.workspace.to_json().map_err(failed)
+    }
+
+    /// The study as TOML, which is what a save writes.
+    ///
+    /// # Errors
+    /// A JS exception if the study cannot be written.
     pub fn document(&self) -> Result<String, JsValue> {
         self.workspace.document().map_err(failed)
     }

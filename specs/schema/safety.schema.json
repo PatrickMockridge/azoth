@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/PatrickMockridge/Azoth/main/specs/schema/safety.schema.json",
+  "title": "Safety study",
+  "description": "A saved safety study: fire scenarios naming one registered model and its inputs, and bow-ties whose labelled threats, barriers and consequences are document data. Inputs are SI magnitudes for quantities; an absent optional input is an absent key. Results are not saved.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/scenario"
+      }
+    },
+    "bowties": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/bowtie"
+      }
+    },
+    "layout": {
+      "$ref": "#/$defs/layout"
+    }
+  },
+  "$defs": {
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "calculation"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "calculation": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$"
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["number", "boolean", "string"]
+          }
+        }
+      }
+    },
+    "bowtie": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "top_event"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "top_event": {
+          "type": "string",
+          "minLength": 1
+        },
+        "threats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/threat"
+          }
+        },
+        "barriers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/barrier"
+          }
+        },
+        "consequences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consequence"
+          }
+        }
+      }
+    },
+    "threat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "frequency"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frequency": {
+          "type": "number",
+          "minimum": 0
+        },
+        "active": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "barrier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "pfd", "barrier_type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pfd": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "barrier_type": {
+          "type": "string",
+          "enum": ["prevention", "mitigation", "both"]
+        },
+        "functional": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "consequence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "severity"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "type": "number",
+          "minimum": 0,
+          "multipleOf": 1
+        },
+        "scenario": {
+          "type": "string"
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bowties": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/bowtie_layout"
+          }
+        }
+      }
+    },
+    "bowtie_layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "top_event": {
+          "$ref": "#/$defs/point"
+        },
+        "threats": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/point"
+          }
+        },
+        "barriers": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/point"
+          }
+        },
+        "consequences": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/point"
+          }
+        }
+      }
+    },
+    "point": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number"
+      }
+    }
+  }
+}

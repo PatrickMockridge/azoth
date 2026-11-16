@@ -2,7 +2,7 @@
 
 The editor's **Calculations** workspace runs one registered calculation at a time. A sheet holds
 the calculation's inputs and its last answer; a **calculation book** holds several sheets and is
-saved as one TOML file. The flowsheet stays loaded when you switch between the two workspaces.
+saved as one TOML file. The flowsheet stays loaded when you switch between the workspaces.
 
 ## Choose a calculation
 

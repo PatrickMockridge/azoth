@@ -25,6 +25,7 @@ import { CalculationsApp } from "./components/calculations/CalculationsApp";
 import type { Workspace } from "./components/calculations/WorkspaceSwitch";
 import { DiagnosticsPanel } from "./components/DiagnosticsPanel";
 import { DexpiWorkspace } from "./components/dexpi/DexpiWorkspace";
+import { SafetyApp } from "./components/safety/SafetyApp";
 import { Dock } from "./components/dock/Dock";
 import { Flowsheet } from "./components/Flowsheet";
 import { NodeOverview } from "./components/NodeOverview";
@@ -54,7 +55,14 @@ import {
 import { readUnitSet, rememberUnitSet, unitsOf } from "./state/units";
 import { readWelcome, rememberWelcome } from "./state/welcome";
 import { door } from "./wire/door";
-import type { Door, ExchangeDoor, Opened, Session, SheetDoor } from "./wire/session";
+import type {
+  Door,
+  ExchangeDoor,
+  Opened,
+  SafetyDoor,
+  Session,
+  SheetDoor,
+} from "./wire/session";
 import type { Catalogue, Command, Envelope, ExecutionOrder } from "./wire/types";
 
 /**
@@ -95,7 +103,10 @@ export function App() {
   const [calculationsSeen, setCalculationsSeen] = useState(false);
   /** The drawing viewer is mounted on first visit and kept, like the calculation book. */
   const [drawingSeen, setDrawingSeen] = useState(false);
+  /** The safety study is the third document, mounted on first visit and kept. */
+  const [safetySeen, setSafetySeen] = useState(false);
   const [sheetDoor, setSheetDoor] = useState<SheetDoor | null>(null);
+  const [safetyDoor, setSafetyDoor] = useState<SafetyDoor | null>(null);
   const [exchange, setExchange] = useState<ExchangeDoor | null>(null);
 
   /**
@@ -401,6 +412,9 @@ export function App() {
     if (next === "drawing") {
       setDrawingSeen(true);
     }
+    if (next === "safety") {
+      setSafetySeen(true);
+    }
   }, []);
 
   /** The card has been dealt with: gone for this visit, and not shown again here. */
@@ -441,6 +455,7 @@ export function App() {
         }
         middleware.current = loaded.flowsheet;
         setSheetDoor(loaded.sheets);
+        setSafetyDoor(loaded.safety);
         setExchange(loaded.exchange);
         setOpenable(loaded.flowsheet.kind === "openable");
         void loaded.flowsheet.catalogue(true).then(
@@ -650,6 +665,13 @@ export function App() {
       label: "Calculations",
       menu: "view",
       run: () => chooseWorkspace("calculations"),
+      enabled: true,
+    },
+    {
+      id: "workspace-safety",
+      label: "Safety",
+      menu: "view",
+      run: () => chooseWorkspace("safety"),
       enabled: true,
     },
     {
@@ -1053,6 +1075,20 @@ export function App() {
         hidden={workspace !== "drawing"}
         onOpenFlowsheet={open}
         onWorkspace={chooseWorkspace}
+      />
+    ) : null}
+    {safetySeen ? (
+      <SafetyApp
+        door={safetyDoor}
+        catalogue={catalogue}
+        units={units}
+        appearance={appearance}
+        version={envelope?.provenance.version ?? "—"}
+        workspace={workspace}
+        hidden={workspace !== "safety"}
+        onWorkspace={chooseWorkspace}
+        onAppearance={setAppearance}
+        onUnits={chooseUnits}
       />
     ) : null}
     </>

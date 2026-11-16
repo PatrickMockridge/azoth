@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Capture the documents the front end's mirrors are held to.
 
-`ui/test/fixtures/` holds three documents the library wrote, and every shape
+`ui/test/fixtures/` holds four documents the library wrote, and every shape
 `ui/src/wire/types.ts` declares is checked against them. **They are a *copy* of the library's
 output, and a copy goes stale**: the envelope gained a `provenance` record, a spec moved a
 parameter, and the fixtures went on describing a library that no longer existed until
@@ -56,6 +56,10 @@ CASES: tuple[tuple[str, list[str]], ...] = (
             "crates/azoth-dexpi/tests/fixtures/proteus_simple.xml",
             "--json",
         ],
+    ),
+    (
+        "safety-envelope.json",
+        ["safety", "--study", "specs/safety/demo.toml", "--calculate", "all"],
     ),
 )
 

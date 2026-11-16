@@ -410,6 +410,7 @@ SPEC_GENERATORS = frozenset(
         "gen_python_wrappers",
         "gen_reaction_data",
         "gen_registry",
+        "gen_safety",
         "gen_sheets",
         "gen_rust_model_records",
         "gen_stub",
@@ -561,6 +562,23 @@ SPEC_TREES: tuple[tuple[str, Claim], ...] = (
             crates=("azoth-sheets",),
             jobs=("ui",),
             files=(f"{TESTS}/test_gen_ui_fixtures.py",),
+        ),
+    ),
+    (
+        "specs/safety/",
+        Claim(
+            # The studies are documents the safety workspace opens and its tests run; the
+            # `ui` job is what proves the wire and the screen.
+            crates=("azoth-safety",),
+            jobs=("ui",),
+            commands=(
+                Command(
+                    "the safety catalogue the specs generate",
+                    SCRIPT,
+                    "python tools/gen_safety.py --check",
+                ),
+            ),
+            files=(f"{TESTS}/test_gen_safety.py",),
         ),
     ),
     (
@@ -721,6 +739,7 @@ NAMELESS_CRATES = (
     "azoth-core",
     "azoth-dexpi",
     "azoth-python",
+    "azoth-safety",
     "azoth-sheets",
     "azoth-test-support",
     "azoth-wasm",
@@ -761,6 +780,10 @@ def crate_claim(crate: str) -> Claim:
     if crate == "azoth-sheets":
         # The calculation catalogue and the sheet book are the UI's second document; its own
         # Rust tests cover the worked examples, and the UI job covers the wire and the screen.
+        return Claim(jobs=("ui",))
+    if crate == "azoth-safety":
+        # The safety study is the UI's third document; its own Rust tests cover the document
+        # and its native dispatch, and the UI job covers the wire and the screen.
         return Claim(jobs=("ui",))
     if crate == "azoth-wasm":
         return Claim(jobs=("ui",))

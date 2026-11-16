@@ -45,10 +45,15 @@ CASE_DIR = ROOT / "specs" / "cases"
 #: thousand characters with nothing reading them. `docs/src/architecture/spec-files.md`
 #: states the format for every spec; this is what makes that true of the palette too.
 PALETTE_DIR = ROOT / "specs" / "unit_ops"
+#: The study documents the editor opens. Their schema says the shape; the semantic checks
+#: below say the facts a schema cannot: a scenario names a safety model, its inputs exist, and
+#: a consequence's scenario reference resolves.
+SAFETY_DIR = ROOT / "specs" / "safety"
 SCHEMA_PATH = ROOT / "specs" / "schema" / "calc.schema.json"
 MODEL_SCHEMA_PATH = ROOT / "specs" / "schema" / "model.schema.json"
 CASE_SCHEMA_PATH = ROOT / "specs" / "schema" / "case.schema.json"
 PALETTE_SCHEMA_PATH = ROOT / "specs" / "schema" / "unit_ops.schema.json"
+SAFETY_SCHEMA_PATH = ROOT / "specs" / "schema" / "safety.schema.json"
 
 # Quantities that name a state rather than a number. These have no units and are
 # not function parameters, so they are allowed in range checks without appearing
@@ -558,6 +563,95 @@ def check_palette(report: Report, rel: Path, spec: dict[str, Any]) -> None:
             f"with the implementation - so the fact belongs there and stating it here "
             f"is the second place it can go stale",
         )
+
+
+def check_safety(
+    report: Report,
+    rel: Path,
+    study: dict[str, Any],
+    models: dict[str, dict[str, Any]],
+) -> None:
+    """The semantic checks a safety study needs beyond schema validation.
+
+    A scenario names a model, not an arbitrary id: the family the editor groups it under is
+    the source path `NeqSim process/safety/<family>/`, so a scenario whose model is elsewhere
+    is a study that would open and run a calculation the safety surface does not own. The
+    inputs are held to the model's own declaration, because a key the kernel does not read is
+    a value the reader typed and nothing used.
+    """
+    scenarios = study.get("scenarios", [])
+    _unique_ids(report, rel, "scenario", scenarios)
+    _unique_ids(report, rel, "bow-tie", study.get("bowties", []))
+    scenario_ids = {row["id"] for row in scenarios}
+
+    for bowtie in study.get("bowties", []):
+        _unique_ids(report, rel, "threat", bowtie.get("threats", []))
+        _unique_ids(report, rel, "barrier", bowtie.get("barriers", []))
+        _unique_ids(report, rel, "consequence", bowtie.get("consequences", []))
+        for consequence in bowtie.get("consequences", []):
+            target = consequence.get("scenario")
+            if target is not None and target not in scenario_ids:
+                report.error(
+                    str(rel),
+                    f"consequence '{consequence['id']}' names scenario '{target}', "
+                    "which the study does not carry",
+                )
+
+    for scenario in scenarios:
+        calculation = scenario["calculation"]
+        model = models.get(calculation)
+        if model is None:
+            report.error(
+                str(rel),
+                f"scenario '{scenario['id']}' names '{calculation}', which is not a "
+                "model in this build",
+            )
+            continue
+        source = (model.get("source") or {}).get("standard", "")
+        if not source.startswith(SAFETY_SOURCE) and calculation not in SAFETY_EXTRAS:
+            report.error(
+                str(rel),
+                f"scenario '{scenario['id']}' names '{calculation}', whose source is "
+                f"'{source}' rather than a class under {SAFETY_SOURCE}",
+            )
+            continue
+        declared = model.get("inputs") or {}
+        given = scenario.get("inputs") or {}
+        for name in given:
+            if name not in declared:
+                report.error(
+                    str(rel),
+                    f"scenario '{scenario['id']}' sets '{name}', which '{calculation}' "
+                    "does not declare",
+                )
+        for name, declaration in declared.items():
+            if declaration.get("type") == "record_list":
+                report.error(
+                    str(rel),
+                    f"scenario '{scenario['id']}' names '{calculation}', whose input "
+                    f"'{name}' is a record list; a scenario stores scalar inputs only",
+                )
+            elif not declaration.get("optional") and name not in given:
+                report.warning(
+                    str(rel),
+                    f"scenario '{scenario['id']}' is missing the required input '{name}'",
+                )
+
+
+#: The source-path prefix every ported safety class carries.
+SAFETY_SOURCE = "NeqSim process/safety/"
+
+#: The same two relief ids `tools/gen_safety.py` names: upstream files their class outside
+#: `process/safety/`, and both are overpressure screens on this surface.
+SAFETY_EXTRAS = {"process.psv_sizing", "process.psv_fire_sizing"}
+
+
+def _unique_ids(report: Report, rel: Path, what: str, rows: list[dict[str, Any]]) -> None:
+    seen: set[str] = set()
+    for row in rows:
+        if row["id"] in seen:
+            report.error(str(rel), f"the {what} id '{row['id']}' appears twice")
+        seen.add(row["id"])
 
 
 #: Every dimension id the vocabulary declares, read once.
@@ -1214,6 +1308,7 @@ def main() -> int:
     # Models, against their own schema. The model schema `$ref`s the calc schema for
     # units and quantities, so the two share one definition of what a unit is - and
     # the reference has to be resolvable locally rather than fetched.
+    models_by_id: dict[str, dict[str, Any]] = {}
     if MODEL_SCHEMA_PATH.exists():
         model_schema = schema_registry.load("model.schema.json")
         Draft202012Validator.check_schema(model_schema)
@@ -1229,6 +1324,7 @@ def main() -> int:
             instances.setdefault(document["model"], []).extend(document["cases"])
 
         for rel, spec in check_schema(report, model_validator, MODEL_DIR):
+            models_by_id[spec["id"]] = spec
             spec["cases"] = instances.get(spec["id"], [])
             if not spec["cases"]:
                 report.error(
@@ -1250,6 +1346,16 @@ def main() -> int:
         for rel, spec in check_schema(report, palette_validator, args.palette_dir):
             check_prose_length(report, rel, spec)
             check_palette(report, rel, spec)
+
+    # The study documents, against their own schema and the model facts only the tree can
+    # answer. They are user data the editor opens, so the schema is the contract an editor
+    # implements and these checks are what the shipped examples are held to.
+    if SAFETY_SCHEMA_PATH.exists() and SAFETY_DIR.exists():
+        safety_schema = schema_registry.load("safety.schema.json")
+        Draft202012Validator.check_schema(safety_schema)
+        safety_validator = Draft202012Validator(safety_schema, registry=schema_registry.registry())
+        for rel, study in check_schema(report, safety_validator, SAFETY_DIR):
+            check_safety(report, rel, study, models_by_id)
 
     if not args.quiet:
         print(f"spec_lint: {len(parsed)} spec(s) checked against {SCHEMA_PATH.name}")

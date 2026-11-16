@@ -21,6 +21,7 @@ import {
   decodeDexpiExport,
   decodeDexpiView,
   decodeEnvelope,
+  decodeSafetyEnvelope,
   decodeSheetEnvelope,
   fieldOf,
 } from "./decode";
@@ -28,10 +29,14 @@ import type {
   ExchangeDoor,
   HostedDoor,
   Opened,
+  SafetyOpened,
+  SafetySession,
+  SafetyTarget,
   Session,
   SheetOpened,
   SheetSession,
 } from "./session";
+import type { SafetyCommand } from "./safetyCommands";
 import type { SheetCommand } from "./sheetCommands";
 import type {
   Catalogue,
@@ -41,6 +46,7 @@ import type {
   Envelope,
   ExecutionOrder,
   ExchangeOptions,
+  SafetyEnvelope,
   SheetEnvelope,
 } from "./types";
 
@@ -156,6 +162,40 @@ export class HttpExchange implements ExchangeDoor {
     return decodeDexpiExport(
       await post(this.#base, "/dexpi", { export: { document, profile, options } }),
     );
+  }
+}
+
+class HttpSafetySession implements SafetySession {
+  readonly #base: string;
+
+  constructor(base: string) {
+    this.#base = base;
+  }
+
+  async apply(command: SafetyCommand): Promise<SafetyEnvelope> {
+    return decodeSafetyEnvelope(await post(this.#base, "/safety", { command }));
+  }
+
+  async calculate(target: SafetyTarget | null): Promise<SafetyEnvelope> {
+    return decodeSafetyEnvelope(await post(this.#base, "/safety", { calculate: target }));
+  }
+}
+
+/** The safety-study half of the served door. */
+export class HttpSafetyDoor {
+  readonly kind = "hosted" as const;
+
+  readonly #base: string;
+
+  constructor(base: string) {
+    this.#base = base;
+  }
+
+  async attach(): Promise<SafetyOpened> {
+    const envelope = decodeSafetyEnvelope(
+      await post(this.#base, "/safety", { command: null }),
+    );
+    return { session: new HttpSafetySession(this.#base), envelope };
   }
 }
 

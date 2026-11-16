@@ -24,6 +24,7 @@ pub mod mcp_http;
 pub mod pipe;
 pub mod report;
 pub mod run;
+pub mod safety;
 pub mod serve;
 pub mod session;
 pub mod sheets;

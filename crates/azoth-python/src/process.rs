@@ -1452,7 +1452,9 @@ fn palette_from(palette_dir: Option<&str>) -> Result<Vec<azoth_process::UnitOpSp
 #[pyo3(text_signature = "(palette_dir=None, with_tools=False)")]
 pub fn catalogue(palette_dir: Option<&str>, with_tools: bool) -> PyResult<String> {
     let palette = palette_from(palette_dir).map_err(PyValueError::new_err)?;
-    azoth_process::middleware::catalogue(&palette, with_tools)
+    let safety = azoth_safety::catalogue::to_value()
+        .map_err(|error| PyValueError::new_err(error.to_string()))?;
+    azoth_process::middleware::catalogue_with(&palette, with_tools, Some(safety))
         .map_err(|error| PyValueError::new_err(error.to_string()))
 }
 
