@@ -19,10 +19,11 @@ A book holds several sheets, is saved in TOML, and prints as a report. Start wit
 
 ## The safety study
 
-The **Safety** switch opens a study of fire scenarios and bow-ties: a third TOML document, with
-its own diagram and its own forms. A bow-tie computes its frequency and RRF with
-`process.bow_tie`; a fire scenario runs one of the five fire models and shows the distance to
-each threshold. Start with [safety studies](./safety.md).
+The **Safety** switch opens a study of safety scenarios and bow-ties: a third TOML document,
+with its own diagram and its own forms. A bow-tie computes its frequency and RRF with
+`process.bow_tie`; a scenario runs one of the twenty-one scalar safety models in five families,
+and a fire-style model also shows the distance to each threshold. Start with
+[safety studies](./safety.md).
 
 ## Reading the reference
 
