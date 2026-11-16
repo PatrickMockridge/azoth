@@ -80,9 +80,11 @@ class PhaseProperties:
 
 
 def _molar_mass(mixture: Any, composition: list[float]) -> float:
-    return sum(
-        component.molar_mass.to("kg/mol").magnitude * fraction
-        for component, fraction in zip(mixture.components, composition, strict=True)
+    return float(
+        sum(
+            component.molar_mass.to("kg/mol").magnitude * fraction
+            for component, fraction in zip(mixture.components, composition, strict=True)
+        )
     )
 
 
@@ -162,16 +164,16 @@ def relief_fluid_state(
         compressibility = beta * vapour.root + (1.0 - beta) * liquid.root
         phase = ReliefPhase.TWO_PHASE
     elif flash.phase in (Phase.ALL_VAPOUR, Phase.ALL_LIQUID):
-        liquid = flash.phase == Phase.ALL_LIQUID
+        is_liquid = flash.phase == Phase.ALL_LIQUID
         try:
-            root = phase_state(reduced, kij, list(z), liquid=liquid).z
+            root = phase_state(reduced, kij, list(z), liquid=is_liquid).z
             state = _phase_properties(mixture, ideal_gas, reduced, kij, t, p, list(z), root)
         except Exception:
             return _failed()
         kappa = _single_phase_kappa(state, t, p)
         molar_mass = state.molar_mass
         compressibility = state.root
-        phase = ReliefPhase.LIQUID if liquid else ReliefPhase.VAPOUR
+        phase = ReliefPhase.LIQUID if is_liquid else ReliefPhase.VAPOUR
     else:
         return _failed()
 
@@ -200,7 +202,7 @@ def relief_fluid_state(
 
 def critical_pressure_ratio(k: float) -> float:
     """``NozzleFlow.criticalPressureRatio``: the choked ratio ``(2/(k+1))^(k/(k-1))``."""
-    return (2.0 / (k + 1.0)) ** (k / (k - 1.0))
+    return float((2.0 / (k + 1.0)) ** (k / (k - 1.0)))
 
 
 def gas_mass_rate(
