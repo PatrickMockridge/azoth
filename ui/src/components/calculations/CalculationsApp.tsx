@@ -12,7 +12,7 @@ import blankBook from "../../../../specs/calcbooks/blank.toml?raw";
 import demoBook from "../../../../specs/calcbooks/demo.toml?raw";
 import { CommandIcon } from "../CommandIcon";
 import { CommandPalette } from "../CommandPalette";
-import { menusOf, type CommandSpec, type MenuSpec } from "../../commands/model";
+import { standardMenus, type CommandSpec, type MenuSpec } from "../../commands/model";
 import { manualHome } from "../../manual";
 import { saveText } from "../../save";
 import { useWindowManager } from "../../hooks/useWindowManager";
@@ -27,7 +27,7 @@ import { CalcReportView } from "./CalcReportView";
 import { blockedReason } from "./CalcSheet";
 import { CalcTitleStrip } from "./CalcTitleStrip";
 import { CalcsWorkspace } from "./CalcsWorkspace";
-import type { Workspace } from "./WorkspaceSwitch";
+import { caseMenuCommands, interfaceCommands, type InterfaceId } from "../../interfaces";
 
 /** One book the workspace has stood at, for undo and redo. */
 interface Snapshot {
@@ -46,9 +46,9 @@ export function CalculationsApp({
   units,
   appearance,
   version,
-  workspace,
+  interfaceId,
   hidden,
-  onWorkspace,
+  onInterface,
   onAppearance,
   onUnits,
 }: {
@@ -57,9 +57,9 @@ export function CalculationsApp({
   units: Units;
   appearance: Appearance;
   version: string;
-  workspace: Workspace;
+  interfaceId: InterfaceId;
   hidden: boolean;
-  onWorkspace: (workspace: Workspace) => void;
+  onInterface: (id: InterfaceId) => void;
   onAppearance: (appearance: Appearance) => void;
   onUnits: (id: string) => void;
 }) {
@@ -344,23 +344,25 @@ export function CalculationsApp({
     active: appearance.layout === "mac" && !hidden,
   });
 
-  const commands: CommandSpec[] = [
+  const caseDocumentCommands: CommandSpec[] = [
     {
       id: "new",
       label: "New",
-      menu: "book",
+      menu: "case",
       run: () => open(blankBook),
       enabled: openable,
     },
     {
       id: "open",
       label: "Open…",
-      menu: "book",
+      menu: "case",
       run: () => openInput.current?.click(),
       enabled: openable,
     },
-    { id: "demo", label: "Demo", menu: "book", run: () => open(demoBook), enabled: openable },
-    { id: "save", label: "Save…", menu: "book", run: save, enabled: session !== null },
+    { id: "demo", label: "Demo", menu: "case", run: () => open(demoBook), enabled: openable },
+    { id: "save", label: "Save…", menu: "case", run: save, enabled: session !== null },
+  ];
+  const otherCommands: CommandSpec[] = [
     { id: "undo", label: "Undo", menu: "edit", run: undo, enabled: canUndo, shortcut: "Ctrl+Z" },
     { id: "redo", label: "Redo", menu: "edit", run: redo, enabled: canRedo, shortcut: "Ctrl+Y" },
     {
@@ -389,27 +391,6 @@ export function CalculationsApp({
       enabled: canReport,
     },
     {
-      id: "workspace-flowsheet",
-      label: "Flowsheet",
-      menu: "view",
-      run: () => onWorkspace("flowsheet"),
-      enabled: true,
-    },
-    {
-      id: "workspace-calculations",
-      label: "Calculations",
-      menu: "view",
-      run: () => onWorkspace("calculations"),
-      enabled: true,
-    },
-    {
-      id: "workspace-safety",
-      label: "Safety",
-      menu: "view",
-      run: () => onWorkspace("safety"),
-      enabled: true,
-    },
-    {
       id: "reset-windows",
       label: "Reset window positions",
       menu: "view",
@@ -426,11 +407,12 @@ export function CalculationsApp({
       enabled: true,
     },
   ];
-  const menus: MenuSpec[] = menusOf(
-    commands,
-    { case: "Case", book: "Book", edit: "Edit", run: "Run", view: "View", help: "Help" },
-    ["book", "edit", "run", "view", "help"],
-  );
+  const interfaceMenu = interfaceCommands({ active: interfaceId, onChoose: onInterface });
+  const commands: CommandSpec[] = [...interfaceMenu, ...caseDocumentCommands, ...otherCommands];
+  const menus: MenuSpec[] = standardMenus([
+    ...caseMenuCommands(caseDocumentCommands, { active: interfaceId, onChoose: onInterface }),
+    ...otherCommands,
+  ]);
 
   useEffect(() => {
     if (appearance.layout !== "cyberpunk") {
@@ -478,14 +460,12 @@ export function CalculationsApp({
       />
       <CalcTitleStrip
         envelope={envelope}
-        workspace={workspace}
         menus={menus}
         appearance={appearance}
         units={units}
         unsaved={unsaved}
         version={version}
         onName={(name) => send({ command: "set_book_name", name })}
-        onWorkspace={onWorkspace}
         onAppearance={onAppearance}
         onUnits={onUnits}
         hud={{

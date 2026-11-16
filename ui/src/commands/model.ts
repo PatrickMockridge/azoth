@@ -7,9 +7,7 @@
  * surfaces cannot disagree.
  */
 
-// `book` stays until the calculation and safety apps stop spelling their first menu with it;
-// the Case model is complete once every app uses `case`.
-export type MenuId = "case" | "book" | "edit" | "run" | "view" | "help";
+export type MenuId = "case" | "edit" | "run" | "view" | "help";
 
 export interface CommandSpec {
   id: string;
@@ -53,7 +51,6 @@ export function menusOf(
 /** The label and order every interface's menu bar shares. */
 export const MENU_LABELS: Record<MenuId, string> = {
   case: "Case",
-  book: "Book",
   edit: "Edit",
   run: "Run",
   view: "View",

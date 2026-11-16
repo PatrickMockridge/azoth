@@ -4,7 +4,6 @@ import { AppearanceMenu } from "./AppearanceMenu";
 import { DraftField } from "./DraftField";
 import { HudControls, type HudControl } from "./HudControls";
 import { MenuBar } from "./MenuBar";
-import { WorkspaceSwitch, type Workspace } from "./calculations/WorkspaceSwitch";
 import { statusClass as classOf, statusWord } from "../state/status";
 import type { MenuSpec } from "../commands/model";
 import type { Appearance } from "../state/appearance";
@@ -31,8 +30,6 @@ export function TitleStrip({
   appearance,
   units,
   unsaved,
-  workspace,
-  onWorkspace,
   onName,
   onOrder,
   onAppearance,
@@ -54,8 +51,6 @@ export function TitleStrip({
   units: Units;
   /** The document differs from the one last opened or saved. */
   unsaved: boolean;
-  workspace: Workspace;
-  onWorkspace: (workspace: Workspace) => void;
   onName: (name: string) => void;
   onOrder: (order: ExecutionOrder) => void;
   onAppearance: (appearance: Appearance) => void;
@@ -109,7 +104,6 @@ export function TitleStrip({
         )}
       </div>
       <div className="bar-tools">
-        <WorkspaceSwitch workspace={workspace} onWorkspace={onWorkspace} />
         <span className="spacer" />
         {envelope === null ? null : (
           <select

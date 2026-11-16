@@ -3,9 +3,11 @@
  *
  * **The regression this exists for.** The Macintosh workspace switch was hidden to make the menu
  * bar fit; jsdom applies no stylesheet, so every existing test still found the button and the
- * loss was invisible. This reads the layout CSS as text and refuses a `display: none` on anything
- * a reader acts through. The allowlist is deliberately small and each entry is decoration, a
- * caption, or a user-controlled panel toggle - not a control the reader needs to reach a command.
+ * loss was invisible. The switch is gone, and the Case menu now carries every interface, so the
+ * menu bar itself is the control this rule protects: no layout may hide it. This reads the
+ * layout CSS as text and refuses a `display: none` on anything a reader acts through. The
+ * allowlist is deliberately small and each entry is decoration, a caption, or a user-controlled
+ * panel toggle - not a control the reader needs to reach a command.
  */
 
 import { describe, expect, it } from "vitest";
@@ -16,7 +18,7 @@ const LAYOUTS = ["xp", "mac", "cyberpunk"] as const;
 
 /** The parts of a control's selector that a hide must never name. */
 const CONTROLS = [
-  ".workspace-switch",
+  ".menubar",
   ".splitter",
   ".hud-toggle",
   ".hud-controls",
@@ -43,7 +45,6 @@ const DECORATION = [
   ".window-title",
   ".window-grip",
   ".spacer",
-  ".menubar",
   '.ribbon-label',
   '[data-hud-',
 ];
@@ -76,10 +77,9 @@ describe("the layouts' hidden selectors", () => {
     });
   }
 
-  it("keeps every command surface reachable", () => {
-    // The menus stay in the Macintosh bar and the XP frame; Cyberpunk replaces them with the
-    // palette and the ribbon, and the palette's button is visible in the strip.
-    for (const layout of ["xp", "mac"] as const) {
+  it("keeps the Case menu and the command surfaces reachable", () => {
+    // The menu bar carries every interface in all three layouts; no shell may hide it.
+    for (const layout of LAYOUTS) {
       expect(hidden(read(`layouts/${layout}.css`)).some((s) => s.includes(".menubar"))).toBe(
         false,
       );
@@ -88,9 +88,6 @@ describe("the layouts' hidden selectors", () => {
     // Cyberpunk; no layout file may hide them.
     expect(read("commands.css")).toContain('[data-layout="cyberpunk"] .hud-controls');
     expect(read("layouts/cyberpunk.css")).not.toMatch(/\.splitter[^{]*\{[^}]*display:\s*none/);
-    expect(read("layouts/cyberpunk.css")).not.toMatch(
-      /\.workspace-switch[^{]*\{[^}]*display:\s*none/,
-    );
   });
 
   it("draws no close or zoom box that does nothing", () => {

@@ -6,9 +6,10 @@
  * second; this test is that the browser asks the second route and reads the envelope it answers.
  */
 
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
+import { chooseInterface } from "./interfaceMenu";
 import { stubXyflowEnvironment } from "./xyflow-env";
 import catalogueJson from "./fixtures/catalogue.json";
 import envelopeJson from "./fixtures/envelope.json";
@@ -59,7 +60,7 @@ describe("the calculation book on a served door", () => {
       expect(rendered.container.querySelectorAll(".react-flow__node")).not.toHaveLength(0);
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "Calculations" }));
+    chooseInterface("Calculation");
     await waitFor(() => {
       expect(screen.getByText("Calculation sheets")).toBeDefined();
     });

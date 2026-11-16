@@ -14,6 +14,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-li
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { only, stubDownload, textOf, unstubDownload } from "./download";
+import { chooseInterface } from "./interfaceMenu";
 import { nodeIds, stubXyflowEnvironment } from "./xyflow-env";
 
 beforeAll(stubXyflowEnvironment);
@@ -41,7 +42,7 @@ async function open(stored: Record<string, string> = {}) {
   await waitFor(() => {
     expect(rendered.container.querySelectorAll(".react-flow__node")).not.toHaveLength(0);
   });
-  fireEvent.click(screen.getByRole("button", { name: "Calculations" }));
+  chooseInterface("Calculation");
   await waitFor(() => {
     expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
       "Pump shaft power",
@@ -199,7 +200,7 @@ describe("the calculations workspace", () => {
     await waitFor(() => expect(screen.getAllByRole("tab")).toHaveLength(3));
   });
 
-  it("saves the book under its name, and the flowsheet survives a workspace switch", async () => {
+  it("saves the book under its name, and the flowsheet survives an interface switch", async () => {
     stubFetch();
     const downloads = stubDownload();
     const rendered = await open();
@@ -210,9 +211,9 @@ describe("the calculations workspace", () => {
     expect(downloads.names[0]).toBe("Worked_examples.toml");
     expect(await textOf(only(downloads.blobs))).toContain('calculation = "hydraulics.pump_power"');
 
-    fireEvent.click(screen.getByRole("button", { name: "Flowsheet" }));
+    chooseInterface("Process simulation");
     await waitFor(() => expect(nodeIds(rendered.container).sort()).toEqual(before));
-    fireEvent.click(screen.getByRole("button", { name: "Calculations" }));
+    chooseInterface("Calculation");
     expect(screen.getAllByRole("tab")).toHaveLength(2);
   });
 });

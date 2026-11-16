@@ -9,6 +9,9 @@
 import { useRef, useState } from "react";
 
 import { saveText } from "../../save";
+import { standardMenus, type CommandSpec, type MenuSpec } from "../../commands/model";
+import { caseMenuCommands, type InterfaceId } from "../../interfaces";
+import { manualHome } from "../../manual";
 import type { ExchangeDoor } from "../../wire/session";
 import type {
   CoverageStatus,
@@ -17,7 +20,7 @@ import type {
   DexpiView,
   ExchangeOptions,
 } from "../../wire/types";
-import { WorkspaceSwitch, type Workspace } from "../calculations/WorkspaceSwitch";
+import { MenuBar } from "../MenuBar";
 import { CoveragePanel } from "./CoveragePanel";
 import { DrawingSvg } from "./DrawingSvg";
 
@@ -34,14 +37,14 @@ export function DexpiWorkspace({
   openable,
   hidden,
   onOpenFlowsheet,
-  onWorkspace,
+  onInterface,
 }: {
   exchange: ExchangeDoor | null;
   document: string;
   openable: boolean;
   hidden: boolean;
   onOpenFlowsheet: (toml: string) => boolean;
-  onWorkspace: (workspace: Workspace) => void;
+  onInterface: (id: InterfaceId) => void;
 }) {
   const [sourceName, setSourceName] = useState<string | null>(null);
   // ui-ok: the DEXPI view is a second document, not part of the flowsheet envelope.
@@ -128,9 +131,43 @@ export function DexpiWorkspace({
       return;
     }
     if (onOpenFlowsheet(view.scaffold.toml)) {
-      onWorkspace("flowsheet");
+      onInterface("flowsheet");
     }
   };
+
+  const caseDocumentCommands: CommandSpec[] = [
+    {
+      id: "import",
+      label: "Import…",
+      menu: "case",
+      run: () => fileInput.current?.click(),
+      enabled: true,
+      hint: "read a DEXPI 2.0 or Proteus drawing",
+    },
+    {
+      id: "open-as-flowsheet",
+      label: "Open as flowsheet",
+      menu: "case",
+      run: openFlowsheet,
+      enabled: openable && view !== null && view.scaffold !== null,
+      hint: "load the scaffold into the process simulation",
+    },
+  ];
+  const otherCommands: CommandSpec[] = [
+    {
+      id: "manual",
+      label: "User manual",
+      menu: "help",
+      run: () => {
+        window.open(manualHome(), "_blank", "noopener");
+      },
+      enabled: true,
+    },
+  ];
+  const menus: MenuSpec[] = standardMenus([
+    ...caseMenuCommands(caseDocumentCommands, { active: "drawing", onChoose: onInterface }),
+    ...otherCommands,
+  ]);
 
   return (
     <div
@@ -159,7 +196,7 @@ export function DexpiWorkspace({
             </span>
           </div>
         </div>
-        <WorkspaceSwitch workspace="drawing" onWorkspace={onWorkspace} />
+        <MenuBar menus={menus} />
         <div className="dexpi-actions">
           <input
             ref={fileInput}

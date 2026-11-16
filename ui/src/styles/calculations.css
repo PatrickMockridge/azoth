@@ -15,28 +15,6 @@
   grid-template-rows: auto auto 1fr;
 }
 
-.workspace-switch {
-  display: inline-flex;
-  gap: var(--s1);
-  padding: var(--s1);
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-}
-
-.workspace-switch button {
-  padding: var(--s1) var(--s4);
-  border: 0;
-  border-radius: var(--r-pill);
-  background: transparent;
-  color: var(--text-dim);
-  cursor: pointer;
-}
-
-.workspace-switch button.active {
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-
 .calc-body {
   display: flex;
   flex-direction: column;

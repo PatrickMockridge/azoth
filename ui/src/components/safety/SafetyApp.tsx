@@ -11,7 +11,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import blankStudy from "../../../../specs/safety/blank.toml?raw";
 import demoStudy from "../../../../specs/safety/demo.toml?raw";
 import { CommandIcon } from "../CommandIcon";
-import { menusOf, type CommandSpec, type MenuSpec } from "../../commands/model";
+import { standardMenus, type CommandSpec, type MenuSpec } from "../../commands/model";
 import { manualHome } from "../../manual";
 import { saveText } from "../../save";
 import { RibbonGroup } from "../RibbonGroup";
@@ -33,7 +33,7 @@ import type {
 import { SafetyTitleStrip } from "./SafetyTitleStrip";
 import { SafetyWorkspace } from "./SafetyWorkspace";
 import { isScenarioView, type SafetyView } from "./views";
-import type { Workspace } from "../calculations/WorkspaceSwitch";
+import { caseMenuCommands, type InterfaceId } from "../../interfaces";
 
 /** One study the workspace has stood at, for undo and redo. */
 interface Snapshot {
@@ -54,9 +54,9 @@ export function SafetyApp({
   units,
   appearance,
   version,
-  workspace,
+  interfaceId,
   hidden,
-  onWorkspace,
+  onInterface,
   onAppearance,
   onUnits,
 }: {
@@ -65,9 +65,9 @@ export function SafetyApp({
   units: Units;
   appearance: Appearance;
   version: string;
-  workspace: Workspace;
+  interfaceId: InterfaceId;
   hidden: boolean;
-  onWorkspace: (workspace: Workspace) => void;
+  onInterface: (id: InterfaceId) => void;
   onAppearance: (appearance: Appearance) => void;
   onUnits: (id: string) => void;
 }) {
@@ -353,17 +353,19 @@ export function SafetyApp({
     void file.text().then(open);
   };
 
-  const commands: CommandSpec[] = [
-    { id: "new", label: "New", menu: "book", run: () => open(blankStudy), enabled: openable },
+  const caseDocumentCommands: CommandSpec[] = [
+    { id: "new", label: "New", menu: "case", run: () => open(blankStudy), enabled: openable },
     {
       id: "open",
       label: "Open…",
-      menu: "book",
+      menu: "case",
       run: () => openInput.current?.click(),
       enabled: openable,
     },
-    { id: "demo", label: "Demo", menu: "book", run: () => open(demoStudy), enabled: openable },
-    { id: "save", label: "Save…", menu: "book", run: save, enabled: session !== null },
+    { id: "demo", label: "Demo", menu: "case", run: () => open(demoStudy), enabled: openable },
+    { id: "save", label: "Save…", menu: "case", run: save, enabled: session !== null },
+  ];
+  const otherCommands: CommandSpec[] = [
     { id: "undo", label: "Undo", menu: "edit", run: undo, enabled: canUndo, shortcut: "Ctrl+Z" },
     { id: "redo", label: "Redo", menu: "edit", run: redo, enabled: canRedo, shortcut: "Ctrl+Y" },
     {
@@ -372,27 +374,6 @@ export function SafetyApp({
       menu: "run",
       run: () => calculate(null),
       enabled: envelope?.dirty === true,
-    },
-    {
-      id: "workspace-flowsheet",
-      label: "Flowsheet",
-      menu: "view",
-      run: () => onWorkspace("flowsheet"),
-      enabled: true,
-    },
-    {
-      id: "workspace-calculations",
-      label: "Calculations",
-      menu: "view",
-      run: () => onWorkspace("calculations"),
-      enabled: true,
-    },
-    {
-      id: "workspace-safety",
-      label: "Safety",
-      menu: "view",
-      run: () => onWorkspace("safety"),
-      enabled: true,
     },
     {
       id: "manual",
@@ -404,11 +385,10 @@ export function SafetyApp({
       enabled: true,
     },
   ];
-  const menus: MenuSpec[] = menusOf(
-    commands,
-    { case: "Case", book: "Study", edit: "Edit", run: "Run", view: "View", help: "Help" },
-    ["book", "edit", "run", "view", "help"],
-  );
+  const menus: MenuSpec[] = standardMenus([
+    ...caseMenuCommands(caseDocumentCommands, { active: interfaceId, onChoose: onInterface }),
+    ...otherCommands,
+  ]);
 
   return (
     <div className={`app safety${hidden ? " off" : ""}`} hidden={hidden}>
@@ -429,14 +409,12 @@ export function SafetyApp({
       />
       <SafetyTitleStrip
         envelope={envelope}
-        workspace={workspace}
         menus={menus}
         appearance={appearance}
         units={units}
         unsaved={unsaved}
         version={version}
         onName={(name) => send({ command: "set_study_name", name })}
-        onWorkspace={onWorkspace}
         onAppearance={onAppearance}
         onUnits={onUnits}
       />

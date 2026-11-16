@@ -325,26 +325,6 @@
   color: var(--text);
 }
 
-[data-layout="mac"] .workspace-switch {
-  border: var(--bevel-w) solid var(--frame);
-  border-radius: 0;
-  background: var(--bg-panel);
-}
-
-[data-layout="mac"] .workspace-switch button {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  color: var(--text-dim);
-  font-weight: 400;
-}
-
-[data-layout="mac"] .workspace-switch button.active {
-  background: var(--bg-selected);
-  color: var(--selected-text);
-}
-
 [data-layout="mac"] .primary {
   border-color: var(--accent);
   background: var(--accent);

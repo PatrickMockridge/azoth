@@ -75,10 +75,6 @@
   text-shadow: 0 0 8px var(--glow-accent);
 }
 
-[data-layout="cyberpunk"] .menubar {
-  display: none;
-}
-
 [data-layout="cyberpunk"] .bar-tools .build,
 [data-layout="cyberpunk"] .bar-tools .units-label {
   color: var(--titlebar-muted);
@@ -343,23 +339,6 @@
   color: var(--text);
   letter-spacing: 0;
   text-transform: none;
-}
-
-[data-layout="cyberpunk"] .workspace-switch {
-  border-color: var(--accent);
-  border-radius: 0;
-}
-
-[data-layout="cyberpunk"] .workspace-switch button {
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  color: var(--text-dim);
-}
-
-[data-layout="cyberpunk"] .workspace-switch button.active {
-  background: var(--accent);
-  color: var(--accent-ink);
 }
 
 [data-layout="cyberpunk"] .primary {

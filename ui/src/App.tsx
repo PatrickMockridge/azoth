@@ -20,9 +20,14 @@ import demoDocument from "../../specs/flowsheets/examples/two_feed_mixer.toml?ra
 import { BoundaryPanel } from "./components/BoundaryPanel";
 import { CommandIcon } from "./components/CommandIcon";
 import { CommandPalette } from "./components/CommandPalette";
-import { menusOf, type CommandSpec, type MenuSpec } from "./commands/model";
+import { standardMenus, type CommandSpec, type MenuSpec } from "./commands/model";
 import { CalculationsApp } from "./components/calculations/CalculationsApp";
-import type { Workspace } from "./components/calculations/WorkspaceSwitch";
+import {
+  caseMenuCommands,
+  interfaceCommands,
+  interfaceOf,
+  type InterfaceId,
+} from "./interfaces";
 import { DiagnosticsPanel } from "./components/DiagnosticsPanel";
 import { DexpiWorkspace } from "./components/dexpi/DexpiWorkspace";
 import { SafetyApp } from "./components/safety/SafetyApp";
@@ -97,14 +102,10 @@ export function App() {
   const [initialAppearance] = useState(readAppearance);
   const [previewed] = useState(isPreview);
   const [appearance, setAppearance] = useState<Appearance>(initialAppearance);
-  /** Which of the two documents is in front; both stay mounted. */
-  const [workspace, setWorkspace] = useState<Workspace>("flowsheet");
-  /** The calculation book is loaded on first visit and then kept, so switching back keeps it. */
-  const [calculationsSeen, setCalculationsSeen] = useState(false);
-  /** The drawing viewer is mounted on first visit and kept, like the calculation book. */
-  const [drawingSeen, setDrawingSeen] = useState(false);
-  /** The safety study is the third document, mounted on first visit and kept. */
-  const [safetySeen, setSafetySeen] = useState(false);
+  /** Which interface is in front; every one chosen before stays mounted. */
+  const [interfaceId, setInterfaceId] = useState<InterfaceId>("flowsheet");
+  /** The interfaces mounted on first visit; the flowsheet is always mounted. */
+  const [visited, setVisited] = useState<ReadonlySet<InterfaceId>>(() => new Set());
   const [sheetDoor, setSheetDoor] = useState<SheetDoor | null>(null);
   const [safetyDoor, setSafetyDoor] = useState<SafetyDoor | null>(null);
   const [exchange, setExchange] = useState<ExchangeDoor | null>(null);
@@ -403,19 +404,22 @@ export function App() {
     [land, unsaved],
   );
 
-  /** Move between the flowsheet and the calculation book, loading the book on first visit. */
-  const chooseWorkspace = useCallback((next: Workspace) => {
-    setWorkspace(next);
-    if (next === "calculations") {
-      setCalculationsSeen(true);
-    }
-    if (next === "drawing") {
-      setDrawingSeen(true);
-    }
-    if (next === "safety") {
-      setSafetySeen(true);
-    }
+  /** Put an interface in front, mounting it on first visit. */
+  const chooseInterface = useCallback((next: InterfaceId) => {
+    setInterfaceId(next);
+    setVisited((current) => {
+      if (current.has(next)) {
+        return current;
+      }
+      const grown = new Set(current);
+      grown.add(next);
+      return grown;
+    });
   }, []);
+
+  /** Whether an interface's component is in the tree. */
+  const isMounted = (id: InterfaceId): boolean =>
+    interfaceOf(id).mount === "always" || visited.has(id);
 
   /** The card has been dealt with: gone for this visit, and not shown again here. */
   const dismissWelcome = useCallback(() => {
@@ -580,9 +584,9 @@ export function App() {
   const edge = envelope === null ? null : selectedEdge(envelope, selected);
   const overviewNode = envelope === null ? null : selectedNode(envelope, overview);
 
-  /** The Macintosh windows are live only while this workspace is front and the layout is Mac. */
+  /** The Macintosh windows are live only while the flowsheet is front and the layout is Mac. */
   const { reset: resetWindows } = useWindowManager(appRoot, {
-    active: appearance.layout === "mac" && workspace === "flowsheet",
+    active: appearance.layout === "mac" && interfaceId === "flowsheet",
   });
 
   /** Open the file picker the ribbon's Open button and the Case menu share. */
@@ -654,27 +658,6 @@ export function App() {
       enabled: canReport,
     },
     {
-      id: "workspace-flowsheet",
-      label: "Flowsheet",
-      menu: "view",
-      run: () => chooseWorkspace("flowsheet"),
-      enabled: true,
-    },
-    {
-      id: "workspace-calculations",
-      label: "Calculations",
-      menu: "view",
-      run: () => chooseWorkspace("calculations"),
-      enabled: true,
-    },
-    {
-      id: "workspace-safety",
-      label: "Safety",
-      menu: "view",
-      run: () => chooseWorkspace("safety"),
-      enabled: true,
-    },
-    {
       id: "reset-windows",
       label: "Reset window positions",
       menu: "view",
@@ -694,8 +677,10 @@ export function App() {
   ];
 
   // The palette searches the examples flat; the menu nests them under one heading, so the
-  // `Case` menu stays one line per row.
+  // Case menu stays one line per row. The interface choices are first in both, because the
+  // Case menu is how a reader picks the case to work on.
   const commands: CommandSpec[] = [
+    ...interfaceCommands({ active: interfaceId, onChoose: chooseInterface }),
     ...caseCommands,
     ...exampleCommands.map((command) => ({
       ...command,
@@ -705,11 +690,13 @@ export function App() {
     saveCommand,
     ...remainingCommands,
   ];
-  const menus: MenuSpec[] = menusOf(
-    [...caseCommands, examplesSubmenu, saveCommand, ...remainingCommands],
-    { case: "Case", book: "Book", edit: "Edit", run: "Run", view: "View", help: "Help" },
-    ["case", "edit", "run", "view", "help"],
-  );
+  const menus: MenuSpec[] = standardMenus([
+    ...caseMenuCommands([...caseCommands, examplesSubmenu, saveCommand], {
+      active: interfaceId,
+      onChoose: chooseInterface,
+    }),
+    ...remainingCommands,
+  ]);
 
   useEffect(() => {
     if (appearance.layout !== "cyberpunk") {
@@ -722,7 +709,7 @@ export function App() {
       if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "k") {
         return;
       }
-      if (appearance.layout !== "cyberpunk" || workspace !== "flowsheet") {
+      if (appearance.layout !== "cyberpunk" || interfaceId !== "flowsheet") {
         return;
       }
       if (overview !== null || reporting) {
@@ -733,13 +720,13 @@ export function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [appearance.layout, overview, reporting, workspace]);
+  }, [appearance.layout, overview, reporting, interfaceId]);
 
   return (
     <>
     <div
-      className={`app${workspace === "flowsheet" ? "" : " off"}`}
-      hidden={workspace !== "flowsheet"}
+      className={`app${interfaceId === "flowsheet" ? "" : " off"}`}
+      hidden={interfaceId !== "flowsheet"}
       ref={appRoot}
       data-hud-palette={hudState.palette ? "on" : "off"}
       data-hud-inspector={hudState.inspector ? "on" : "off"}
@@ -768,8 +755,6 @@ export function App() {
         appearance={appearance}
         units={units}
         unsaved={unsaved}
-        workspace={workspace}
-        onWorkspace={chooseWorkspace}
         onName={setCaseName}
         onOrder={setOrder}
         onAppearance={setAppearance}
@@ -1053,40 +1038,40 @@ export function App() {
         />
       ) : null}
     </div>
-    {calculationsSeen ? (
+    {isMounted("calculations") ? (
       <CalculationsApp
         door={sheetDoor}
         catalogue={catalogue}
         units={units}
         appearance={appearance}
         version={envelope?.provenance.version ?? "—"}
-        workspace={workspace}
-        hidden={workspace !== "calculations"}
-        onWorkspace={chooseWorkspace}
+        interfaceId={interfaceId}
+        hidden={interfaceId !== "calculations"}
+        onInterface={chooseInterface}
         onAppearance={setAppearance}
         onUnits={chooseUnits}
       />
     ) : null}
-    {drawingSeen ? (
+    {isMounted("drawing") ? (
       <DexpiWorkspace
         exchange={exchange}
         document={envelope?.flowsheet.document ?? ""}
         openable={openable}
-        hidden={workspace !== "drawing"}
+        hidden={interfaceId !== "drawing"}
         onOpenFlowsheet={open}
-        onWorkspace={chooseWorkspace}
+        onInterface={chooseInterface}
       />
     ) : null}
-    {safetySeen ? (
+    {isMounted("safety") ? (
       <SafetyApp
         door={safetyDoor}
         catalogue={catalogue}
         units={units}
         appearance={appearance}
         version={envelope?.provenance.version ?? "—"}
-        workspace={workspace}
-        hidden={workspace !== "safety"}
-        onWorkspace={chooseWorkspace}
+        interfaceId={interfaceId}
+        hidden={interfaceId !== "safety"}
+        onInterface={chooseInterface}
         onAppearance={setAppearance}
         onUnits={chooseUnits}
       />

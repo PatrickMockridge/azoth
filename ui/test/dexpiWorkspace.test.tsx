@@ -73,7 +73,7 @@ describe("the Drawing workspace", () => {
         openable
         hidden={false}
         onOpenFlowsheet={() => true}
-        onWorkspace={() => {}}
+        onInterface={() => {}}
       />,
     );
     await importFile(container);
@@ -85,7 +85,7 @@ describe("the Drawing workspace", () => {
 
   it("hands the scaffold to the editor", async () => {
     const open = vi.fn((_toml: string) => true);
-    const workspace = vi.fn();
+    const choose = vi.fn();
     const { container } = render(
       <DexpiWorkspace
         exchange={door()}
@@ -93,7 +93,7 @@ describe("the Drawing workspace", () => {
         openable
         hidden={false}
         onOpenFlowsheet={open}
-        onWorkspace={workspace}
+        onInterface={choose}
       />,
     );
     await importFile(container);
@@ -101,7 +101,27 @@ describe("the Drawing workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Open as flowsheet" }));
     await waitFor(() => expect(open).toHaveBeenCalled());
     expect(open.mock.calls[0]?.[0]).toBe(view.scaffold?.toml);
-    expect(workspace).toHaveBeenCalledWith("flowsheet");
+    expect(choose).toHaveBeenCalledWith("flowsheet");
+  });
+
+  it("marks the drawing current in the Case menu and can leave for the flowsheet", () => {
+    const choose = vi.fn();
+    render(
+      <DexpiWorkspace
+        exchange={door()}
+        document="id = 'flowsheets.x'"
+        openable
+        hidden={false}
+        onOpenFlowsheet={() => true}
+        onInterface={choose}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Case" }));
+    expect(screen.getByRole("menuitem", { name: "Drawing" }).getAttribute("aria-current")).toBe(
+      "true",
+    );
+    fireEvent.click(screen.getByRole("menuitem", { name: "Process simulation" }));
+    expect(choose).toHaveBeenCalledWith("flowsheet");
   });
 
   it("renders an export refusal's diagnostics", async () => {
@@ -112,7 +132,7 @@ describe("the Drawing workspace", () => {
         openable
         hidden={false}
         onOpenFlowsheet={() => true}
-        onWorkspace={() => {}}
+        onInterface={() => {}}
       />,
     );
     await importFile(container);
