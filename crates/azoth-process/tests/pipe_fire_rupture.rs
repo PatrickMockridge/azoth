@@ -83,7 +83,7 @@ fn run(
         Some(meters(1.0)),
         Some(megapascals(0.0)),
         Some(kilograms_per_cubic_meter(density)),
-        Some(joules_per_kilogram_kelvin(2283.354_699_059_34)),
+        Some(joules_per_kilogram_kelvin(2_283.354_699_059_34)),
         Some(kilograms_per_mole(0.0182)),
         Some(kelvins(293.15)),
         explicit.map(|value| kelvins(value.0)),
@@ -138,7 +138,7 @@ fn the_workbook_benchmark_ruptures_at_115_seconds() {
             .rupture_mean_wall_temperature
             .expect("a rupture has a mean wall temperature")
             .value,
-        1363.995_650_233_863_4,
+        1_363.995_650_233_863,
         "the mean wall temperature",
     );
     close(
@@ -146,7 +146,7 @@ fn the_workbook_benchmark_ruptures_at_115_seconds() {
             .rupture_outer_surface_temperature
             .expect("a rupture has an outer surface temperature")
             .value,
-        1365.901_405_217_304_9,
+        1_365.901_405_217_305,
         "the outer surface temperature",
     );
     close(
