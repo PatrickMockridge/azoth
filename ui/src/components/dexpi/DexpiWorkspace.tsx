@@ -1,5 +1,5 @@
 /**
- * The Drawing workspace: a DEXPI file in, its coverage and a simulation scaffold out.
+ * The Drawing interface: a DEXPI file in, its coverage and a simulation scaffold out.
  *
  * **A viewer, not a CAD.** It imports a drawing, shows it, and says what azoth would model and
  * what it would not. It does not move a symbol, author one, or edit the file; the drawing is

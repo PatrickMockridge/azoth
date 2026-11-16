@@ -102,7 +102,8 @@ export function Help() {
 
       <h2>Calculation sheets</h2>
       <p>
-        The <strong>Calculations</strong> switch opens a calculation book beside the flowsheet.
+        The <strong>Case</strong> menu's <strong>Calculation</strong> interface opens a calculation
+        book beside the flowsheet.
         Pick a calculation from the list, fill its inputs and press <strong>Calculate</strong>;
         <strong>Load worked example</strong> fills the calculation&apos;s own published example.
         A book holds several sheets, is saved in TOML, and can be printed as a report. The four

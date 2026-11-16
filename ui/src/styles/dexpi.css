@@ -1,5 +1,5 @@
 /*
- * The Drawing workspace: a read-only viewer with a coverage panel.
+ * The Drawing interface: a read-only viewer with a coverage panel.
  *
  * **The drawing is the canvas's counterpart, not a second canvas.** The file's primitives are
  * drawn as they came, the panel states what would be modelled, and the only colour the figure

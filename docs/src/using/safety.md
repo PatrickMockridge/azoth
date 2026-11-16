@@ -1,8 +1,8 @@
 # Safety studies
 
-The **Safety** switch opens a safety study: one TOML document holding safety scenarios and
-bow-ties, beside the flowsheet and the calculation book. It is its own document, with its own
-commands and its own envelope; switching workspaces never throws it away.
+Choose **Safety study** from the **Case** menu to open a safety study: one TOML document holding
+safety scenarios and bow-ties, beside the flowsheet and the calculation book. It is its own
+document, with its own commands and its own envelope; switching interfaces never throws it away.
 
 ## The study
 
@@ -13,7 +13,7 @@ inputs changed says its answer is out of date.
 The **Overview** lists the study's bow-ties and scenarios, every diagnostic the study carries,
 and the whole safety surface grouped by family. Twenty-one scenario models across five
 families — fire, dispersion, firewater, overpressure and risk — and the bow-tie run inside
-this workspace. The rest — the models that take or return a table of rows, and the rupture,
+this interface. The rest — the models that take or return a table of rows, and the rupture,
 release and QRA families — are listed with links to their manual pages; they are not runnable
 here yet.
 

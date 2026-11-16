@@ -7,7 +7,8 @@
  * `role="menuitem"`, live only while the menu is open, and call the same handlers.
  *
  * **The bar is inside the title strip**, after the wordmark. Macintosh keeps it on the title row;
- * XP gives it a full-width row under the title; Cyberpunk hides it and uses the palette.
+ * XP gives it a full-width row under the title; Cyberpunk keeps it visible because the Case menu
+ * is the one interface picker, while the palette carries the other commands.
  */
 
 import { Fragment, useEffect, useRef, useState } from "react";

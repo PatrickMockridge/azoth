@@ -291,7 +291,7 @@ the primitives are generic Core shapes, and a CAD tool replaces them with its ow
 Routing is one orthogonal step, with a return lane for a backward edge; `DexpiLayoutEngine`
 and its 3,572 lines are not ported, and the drawing places what the canvas places.
 
-### The Drawing workspace
+### The Drawing interface
 
 `azoth-dexpi`'s `view::inspect` answers one question about a file: **what would azoth
 model?** It reads the document and its drawing, runs the same import the CLI runs, and marks
@@ -301,7 +301,7 @@ come from the same mapping tables the importers read - there is no second mappin
 also carries the drawing, the scaffold TOML the file would become, and the positions the
 import wrote into `[layout]`.
 
-The editor's **Drawing workspace** is a read-only viewer over that answer: it imports a file,
+The editor's **Drawing interface** is a read-only viewer over that answer: it imports a file,
 draws it, lists what would be modelled and what would not, and offers "Open as flowsheet"
 (the scaffold into the editor) and "Export PFD"/"Export P&ID" (the open document back out).
 It is **not a CAD editor**: no symbol is moved or authored, and the figure is not saved back

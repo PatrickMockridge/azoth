@@ -126,6 +126,12 @@ of a HYSYS/UniSim-style editor are these layers viewed one way:
 | the objects in the document | the graph, selected through the same call the canvas uses | graph |
 | unit set | the vocabulary's named sets, and the factor of the unit each names | catalogue |
 | top-bar menu | new / open / save / solve | command model + quote/drop |
+| interface switch | one row per interface: label, noun, document-or-viewer, route, save format, mount policy | `ui/src/interfaces.ts` + command model |
+
+**The interface choices are one registry, not four headers.** `ui/src/interfaces.ts` holds one
+row per surface; every first menu builds its `case-*` commands from `interfaceCommands`, the
+active row is marked current, and the mount policy decides which surfaces are in the tree. A new
+interface is a row and a render case in `App.tsx`; the title strips do not learn its name.
 
 **It holds no copy of the flowsheet.** Every gesture goes out as a command and comes back as the
 whole envelope, so the canvas, the form and the diagnostics are three readings of one object —

@@ -19,7 +19,7 @@
   overflow: hidden;
 }
 
-/* The HUD's `display:block` must not outrank the workspace switch. */
+/* The HUD's `display:block` must not outrank the hidden interface. */
 [data-layout="cyberpunk"] .app.off,
 [data-layout="cyberpunk"] .app[hidden] {
   display: none;
