@@ -88,13 +88,9 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
     assert module.sub_interface_of(by_id[module.BOWTIE], "risk") == "bowtie"
     assert module.sub_interface_of(by_id["process.jet_fire"], "fire") == "fire"
     assert module.sub_interface_of(by_id["process.gas_dispersion"], "dispersion") == "dispersion"
-    assert (
-        module.sub_interface_of(by_id["process.fire_water_demand"], "firewater") == "firewater"
-    )
+    assert module.sub_interface_of(by_id["process.fire_water_demand"], "firewater") == "firewater"
     assert module.sub_interface_of(by_id["process.psv_sizing"], "overpressure") == "overpressure"
-    assert (
-        module.sub_interface_of(by_id["process.safety_instrumented_function"], "risk") == "risk"
-    )
+    assert module.sub_interface_of(by_id["process.safety_instrumented_function"], "risk") == "risk"
     assert module.sub_interface_of(by_id["process.hem_release"], "release") is None
 
 
@@ -108,7 +104,6 @@ def test_every_non_native_entry_has_a_refusal_and_no_form() -> None:
             assert module.refusal_of(spec) is None, spec["id"]
         else:
             assert module.refusal_of(spec) is not None, spec["id"]
-
 
 
 def test_every_native_id_says_what_it_is_for() -> None:

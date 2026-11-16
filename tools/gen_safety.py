@@ -111,9 +111,7 @@ PURPOSES = {
 INPUT_REFUSAL = (
     "this calculation takes a table of rows as input, which a scenario does not yet provide"
 )
-OUTPUT_REFUSAL = (
-    "this calculation returns a table of rows, which this workspace does not yet draw"
-)
+OUTPUT_REFUSAL = "this calculation returns a table of rows, which this workspace does not yet draw"
 BOTH_REFUSAL = (
     "this calculation takes a table of rows as input and returns one as output, "
     "which a scenario does not yet provide or draw"
