@@ -7,6 +7,8 @@
  * surfaces cannot disagree.
  */
 
+// `book` stays until the calculation and safety apps stop spelling their first menu with it;
+// the Case model is complete once every app uses `case`.
 export type MenuId = "case" | "book" | "edit" | "run" | "view" | "help";
 
 export interface CommandSpec {
@@ -21,6 +23,10 @@ export interface CommandSpec {
   keywords?: string;
   /** A submenu: the parent is a heading, and these are its entries. */
   children?: readonly CommandSpec[];
+  /** The interface this command would put in front is already in front. */
+  current?: boolean;
+  /** A rule above this row, dividing the case kinds from the case's own commands. */
+  divider?: boolean;
 }
 
 export interface MenuSpec {
@@ -42,4 +48,21 @@ export function menusOf(
       commands: commands.filter((command) => command.menu === id),
     }))
     .filter((menu) => menu.commands.length > 0);
+}
+
+/** The label and order every interface's menu bar shares. */
+export const MENU_LABELS: Record<MenuId, string> = {
+  case: "Case",
+  book: "Book",
+  edit: "Edit",
+  run: "Run",
+  view: "View",
+  help: "Help",
+};
+
+export const MENU_ORDER: readonly MenuId[] = ["case", "edit", "run", "view", "help"];
+
+/** The standard menu bar, so four apps cannot spell the same labels differently. */
+export function standardMenus(commands: readonly CommandSpec[]): MenuSpec[] {
+  return menusOf(commands, MENU_LABELS, MENU_ORDER);
 }

@@ -12,16 +12,7 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 
-import type { CommandSpec } from "../commands/model";
-
-const MENU_LABEL: Record<string, string> = {
-  case: "Case",
-  book: "Book",
-  edit: "Edit",
-  run: "Run",
-  view: "View",
-  help: "Help",
-};
+import { MENU_LABELS, type CommandSpec } from "../commands/model";
 
 export function CommandPalette({
   commands,
@@ -147,7 +138,8 @@ export function CommandPalette({
               >
                 <span>{command.label}</span>
                 <span className="command-meta">
-                  {MENU_LABEL[command.menu] ?? command.menu}
+                  {MENU_LABELS[command.menu]}
+                  {command.current === true ? " · current" : ""}
                   {command.shortcut === undefined ? "" : ` · ${command.shortcut}`}
                 </span>
               </li>
