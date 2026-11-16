@@ -12,7 +12,7 @@
  */
 
 import { moduleDoors } from "./client";
-import { HttpDoor, HttpExchange, HttpSheetDoor } from "./http";
+import { HttpDoor, HttpExchange, HttpSafetyDoor, HttpSheetDoor } from "./http";
 import type { Doors } from "./session";
 
 /**
@@ -38,6 +38,7 @@ export async function door(search: string): Promise<Doors> {
     : {
         flowsheet: new HttpDoor(base),
         sheets: new HttpSheetDoor(base),
+        safety: new HttpSafetyDoor(base),
         exchange: new HttpExchange(base),
       };
 }

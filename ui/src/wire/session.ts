@@ -16,6 +16,7 @@
  * envelope, which is why a save needs no call of its own.
  */
 
+import type { SafetyCommand } from "./safetyCommands";
 import type { SheetCommand } from "./sheetCommands";
 import type {
   Catalogue,
@@ -25,6 +26,7 @@ import type {
   Envelope,
   ExecutionOrder,
   ExchangeOptions,
+  SafetyEnvelope,
   SheetEnvelope,
 } from "./types";
 
@@ -105,6 +107,34 @@ export type SheetDoor =
       attach(): Promise<SheetOpened>;
     };
 
+/** Which item a safety calculate asks for. */
+export type SafetyTarget = { scenario: string } | { bowtie: string };
+
+/** A live safety study. */
+export interface SafetySession {
+  /** Apply one edit, and answer with the study envelope. */
+  apply(command: SafetyCommand): Promise<SafetyEnvelope>;
+  /** Calculate one item, or every stale item when `target` is `null`. */
+  calculate(target: SafetyTarget | null): Promise<SafetyEnvelope>;
+}
+
+/** A safety session, and the envelope it was opened with. */
+export interface SafetyOpened {
+  session: SafetySession;
+  envelope: SafetyEnvelope;
+}
+
+/** The safety half of a door: the module can open a study, a server hosts one. */
+export type SafetyDoor =
+  | {
+      readonly kind: "openable";
+      open(document: string): Promise<SafetyOpened>;
+    }
+  | {
+      readonly kind: "hosted";
+      attach(): Promise<SafetyOpened>;
+    };
+
 /**
  * The drawing exchange: a DEXPI file in, or the open flowsheet out.
  *
@@ -121,9 +151,10 @@ export interface ExchangeDoor {
   ): Promise<DexpiExport>;
 }
 
-/** Both documents a page talks to: the flowsheet, the calculation book, and the exchange. */
+/** Every document a page talks to: the flowsheet, the book, the study and the exchange. */
 export interface Doors {
   flowsheet: Door;
   sheets: SheetDoor;
+  safety: SafetyDoor;
   exchange: ExchangeDoor;
 }

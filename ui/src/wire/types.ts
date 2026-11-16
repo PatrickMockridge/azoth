@@ -496,6 +496,181 @@ export interface SheetEnvelope {
   book: SheetBook;
 }
 
+/** One safety calculation: a model id, its family, and the form a scenario draws. */
+export interface SafetyCalculation {
+  id: string;
+  name: string;
+  /** The `process/safety/<family>/` segment of the spec's source path. */
+  family: string;
+  /** `"bowtie"` or `"fire"` where the first tranche gives it a native view. */
+  sub_interface: string | null;
+  /** What the calculation is for; empty for an entry the overview only lists. */
+  purpose: string;
+  /** Whether a scenario can run it in this workspace. */
+  native: boolean;
+  refusal: string | null;
+  /** The form a scenario draws; absent for the bow-tie and for ids not run natively. */
+  form?: CalcForm;
+}
+
+/** Why a scenario or a bow-tie cannot run, or a warning that does not stop it. */
+export interface SafetyDiagnostic {
+  code: string;
+  severity: Severity;
+  message: string;
+  field: string | null;
+}
+
+/** One row of a fire scenario's distance-to-threshold table. */
+export interface SafetyProfileRow {
+  target: Quantity;
+  distance: Quantity | null;
+  reached: boolean;
+}
+
+/** One fire scenario, with its form's state and its last answer. */
+export interface SafetyScenarioView {
+  id: string;
+  name: string;
+  calculation: string;
+  family: string | null;
+  purpose: string | null;
+  inputs: Record<string, number | boolean | string>;
+  ready: boolean;
+  missing: string[];
+  stale: boolean;
+  result: SheetResult | null;
+  error: { message: string; field: string | null } | null;
+  diagnostics: SafetyDiagnostic[];
+  /** The distance-to-threshold table, derived by the scenario's own kernel. */
+  profile: SafetyProfileRow[];
+}
+
+/** One threat, as the bow-tie document carries it. */
+export interface SafetyThreatView {
+  id: string;
+  label: string;
+  frequency: number;
+  active: boolean;
+}
+
+/** One barrier, with the side the diagram draws it on. */
+export interface SafetyBarrierView {
+  id: string;
+  label: string;
+  pfd: number;
+  barrier_type: string;
+  functional: boolean;
+  side: "prevention" | "mitigation";
+}
+
+/** One consequence, and the scenario that models it where one does. */
+export interface SafetyConsequenceView {
+  id: string;
+  label: string;
+  severity: number;
+  scenario: string | null;
+  scenario_name: string | null;
+  scenario_ready: boolean | null;
+}
+
+/** How many of each rank a bow-tie carries. */
+export interface SafetyCounts {
+  threats: number;
+  prevention_barriers: number;
+  mitigation_barriers: number;
+  consequences: number;
+}
+
+/** The bow-tie model's answer, or `null` when it has not run. */
+export interface SafetyDerived {
+  unmitigated_frequency_per_year: number | null;
+  mitigated_frequency_per_year: number | null;
+  total_rrf: number | null;
+  max_severity: number | null;
+}
+
+/** One plate on the bow-tie canvas. The data a rank carries is the rank's own. */
+export interface SafetyNodeData {
+  label: string;
+  frequency?: number;
+  active?: boolean;
+  pfd?: number;
+  barrier_type?: string;
+  functional?: boolean;
+  side?: string;
+  severity?: number;
+  scenario?: string | null;
+}
+
+export interface SafetyGraphNode {
+  id: string;
+  type: "threat" | "barrier" | "top_event" | "consequence";
+  role: string;
+  position: Position;
+  data: SafetyNodeData;
+}
+
+export interface SafetyGraphEdge {
+  id: string;
+  source: string;
+  target: string;
+}
+
+export interface SafetyGraph {
+  id: string;
+  nodes: SafetyGraphNode[];
+  edges: SafetyGraphEdge[];
+}
+
+/** One bow-tie, as the envelope carries it. */
+export interface SafetyBowtieView {
+  id: string;
+  name: string;
+  top_event: string;
+  threats: SafetyThreatView[];
+  barriers: SafetyBarrierView[];
+  consequences: SafetyConsequenceView[];
+  counts: SafetyCounts;
+  derived: SafetyDerived | null;
+  graph: SafetyGraph;
+  ready: boolean;
+  stale: boolean;
+  result: SheetResult | null;
+  error: { message: string; field: string | null } | null;
+  diagnostics: SafetyDiagnostic[];
+}
+
+/** One bow-tie's node positions, as the document's `[layout]` states them. */
+export interface SafetyBowtieLayout {
+  top_event?: [number, number];
+  threats?: Record<string, [number, number]>;
+  barriers?: Record<string, [number, number]>;
+  consequences?: Record<string, [number, number]>;
+}
+
+export interface SafetyLayout {
+  bowties: Record<string, SafetyBowtieLayout>;
+}
+
+/** The safety study, as the middleware owns it. */
+export interface SafetyStudyView {
+  id: string;
+  name: string;
+  /** The TOML a save writes; it rides every envelope, so a save is no call. */
+  document: string;
+  scenarios: SafetyScenarioView[];
+  bowties: SafetyBowtieView[];
+  layout: SafetyLayout | null;
+}
+
+/** One call's answer from the safety workspace. */
+export interface SafetyEnvelope {
+  ok: boolean;
+  dirty: boolean;
+  study: SafetyStudyView;
+}
+
 export interface Catalogue {
   unit_ops: Form[];
   /**
@@ -506,6 +681,14 @@ export interface Catalogue {
    * is carried with `available: false` and a refusal rather than omitted.
    */
   calcs?: CalcForm[];
+  /**
+   * The safety calculations, grouped by the source path's family.
+   *
+   * Every model whose spec is under `process/safety/`, plus the two relief ids the upstream tree
+   * files elsewhere. The five scenarios this workspace can run carry a form; the rest are listed
+   * so their manual pages are reachable.
+   */
+  safety?: SafetyCalculation[];
   /**
    * Every canonical unit, keyed by the string a quantity carries: what it measures, and what one
    * of it is worth in SI.

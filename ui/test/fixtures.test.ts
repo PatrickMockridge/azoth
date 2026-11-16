@@ -37,11 +37,17 @@
 
 import { describe, expect, it } from "vitest";
 
-import { decodeCatalogue, decodeDexpiView, decodeEnvelope } from "../src/wire/decode";
+import {
+  decodeCatalogue,
+  decodeDexpiView,
+  decodeEnvelope,
+  decodeSafetyEnvelope,
+} from "../src/wire/decode";
 import brokenJson from "./fixtures/broken.json";
 import catalogueJson from "./fixtures/catalogue.json";
 import dexpiViewJson from "./fixtures/dexpi-view.json";
 import envelopeJson from "./fixtures/envelope.json";
+import safetyJson from "./fixtures/safety-envelope.json";
 import { controlFor } from "../src/wire/field";
 
 // **Imported, not read, and decoded rather than asserted.** `vite` resolves a JSON import and
@@ -52,6 +58,7 @@ import { controlFor } from "../src/wire/field";
 const catalogue = decodeCatalogue(catalogueJson);
 const solved = decodeEnvelope(envelopeJson);
 const refused = decodeEnvelope(brokenJson);
+const safety = decodeSafetyEnvelope(safetyJson);
 
 describe("the catalogue", () => {
   it("is the palette, with a model for all but one and a kernel for all but one", () => {
@@ -105,6 +112,42 @@ describe("the catalogue", () => {
     // **The UI projection, not the library record.** No visible string may name the upstream
     // implementation; the model id, verification and hashes are the citation the UI keeps.
     expect(JSON.stringify(calcs).toLowerCase()).not.toContain("neqsim");
+  });
+
+  it("carries the safety calculations, with five scenario forms", () => {
+    // **The source path is the family.** Every model whose spec is under `process/safety/` is
+    // listed, plus the two relief ids upstream files elsewhere; five can run as a scenario, and
+    // the bow-tie has its own view.
+    const safetyCalcs = catalogue.safety ?? [];
+    expect(safetyCalcs).toHaveLength(39);
+    expect(new Set(safetyCalcs.map((entry) => entry.family))).toEqual(
+      new Set([
+        "dispersion",
+        "fire",
+        "firewater",
+        "overpressure",
+        "qra",
+        "release",
+        "risk",
+        "rupture",
+      ]),
+    );
+    const native = safetyCalcs.filter((entry) => entry.native);
+    expect(native.map((entry) => entry.id)).toEqual([
+      "process.bleve",
+      "process.bow_tie",
+      "process.jet_fire",
+      "process.pfp_demand",
+      "process.pool_fire",
+      "process.vce",
+    ]);
+    expect(native.filter((entry) => entry.form !== undefined)).toHaveLength(5);
+    expect(safetyCalcs.find((entry) => entry.id === "process.bow_tie")?.form).toBeUndefined();
+    for (const entry of native) {
+      expect(entry.purpose.trim(), `${entry.id} has no purpose`).not.toBe("");
+      expect(entry.purpose.length).toBeLessThanOrEqual(300);
+    }
+    expect(JSON.stringify(safetyCalcs).toLowerCase()).not.toContain("neqsim");
   });
 
   it("carries the kind a field needs, which is nowhere in the palette", () => {
@@ -379,5 +422,55 @@ describe("the DEXPI view", () => {
     const kinds = new Set(view.drawing.groups.flatMap((group) => group.primitives.map((p) => p.kind)));
     expect(kinds.has("polyline")).toBe(true);
     expect(kinds.has("text")).toBe(true);
+  });
+});
+
+describe("the safety study", () => {
+  it("is the demo's two scenarios and one bow-tie, calculated", () => {
+    expect(safety.ok).toBe(true);
+    expect(safety.dirty).toBe(false);
+    expect(safety.study.scenarios).toHaveLength(2);
+    expect(safety.study.bowties).toHaveLength(1);
+
+    const jet = safety.study.scenarios.find((row) => row.id === "jet_fire_1");
+    if (jet === null || jet === undefined) {
+      throw new Error("the fixture carries the jet fire");
+    }
+    expect(jet.family).toBe("fire");
+    expect(jet.ready).toBe(true);
+    expect(jet.stale).toBe(false);
+    expect(jet.profile).toHaveLength(6);
+    const row = jet.profile.find((entry) => entry.target.magnitude_si === 12_500);
+    expect(row?.reached).toBe(true);
+    expect(row?.distance?.unit).toBe("m");
+  });
+
+  it("carries the bow-tie's derived RRF and its projection", () => {
+    const bowtie = safety.study.bowties[0];
+    if (bowtie === undefined) {
+      throw new Error("the fixture carries the bow-tie");
+    }
+    expect(bowtie.id).toBe("bt_separator_release");
+    expect(bowtie.counts).toEqual({
+      threats: 2,
+      prevention_barriers: 1,
+      mitigation_barriers: 1,
+      consequences: 2,
+    });
+    expect(bowtie.derived?.total_rrf).toBeCloseTo(100, 9);
+    expect(bowtie.derived?.max_severity).toBe(5);
+    expect(bowtie.graph.nodes).toHaveLength(7);
+    expect(bowtie.graph.edges).toHaveLength(6);
+    expect(bowtie.barriers.find((barrier) => barrier.id === "mb_emergency_response")?.side).toBe(
+      "mitigation",
+    );
+    expect(
+      safety.study.layout?.bowties["bt_separator_release"]?.top_event,
+    ).toEqual([480, 120]);
+  });
+
+  it("says where each field sits, in a document a save writes", () => {
+    expect(safety.study.document).toContain('id = "safety_study_1"');
+    expect(safety.study.document).toContain("[[bowties]]");
   });
 });
