@@ -60,7 +60,7 @@ not an equation, and both implementations read it from here.
 - **`has_fire_fighting` is read by no formula**: the environment factor is 1.0 on both branches, so only drainage selects the coefficient and two rows differing only in the flag answer identically.
 - **the latent heat defaults to 350000 J/kg when absent**, the class's light-hydrocarbon value; the port treats a zero as the default and refuses a negative value.
 - **the relief rate is `Q / latent_heat`**, and the hourly rate is that times 3600.
-- **the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and density, and this id carries the no-fluid path only.
+- **the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and phase, and `process.blocked_outlet_relief` and its three siblings carry it; this id carries the no-fluid path only.
 
 ## Cases
 

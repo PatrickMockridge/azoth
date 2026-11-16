@@ -13,9 +13,10 @@ inputs changed says its answer is out of date.
 The **Overview** lists the study's bow-ties and scenarios, every diagnostic the study carries,
 and the whole safety surface grouped by family. Twenty-one scenario models across five
 families — fire, dispersion, firewater, overpressure and risk — and the bow-tie run inside
-this interface. The rest — the models that take or return a table of rows, and the rupture,
+this interface. The rest — the models that take a fluid or a table of rows, and the rupture,
 release and QRA families — are listed with links to their manual pages; they are not runnable
-here yet.
+here yet. The four thermo-bound relief loads and the overpressure protection study are in that
+list: they take a fluid or a scenario table, and the library reaches them.
 
 ## Bow-ties
 

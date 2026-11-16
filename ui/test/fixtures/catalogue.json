@@ -22476,7 +22476,7 @@
           "**`has_fire_fighting` is read by no formula**: the environment factor is 1.0 on both branches, so only drainage selects the coefficient and two rows differing only in the flag answer identically.",
           "**the latent heat defaults to 350000 J/kg when absent**, the class's light-hydrocarbon value; the port treats a zero as the default and refuses a negative value.",
           "**the relief rate is `Q / latent_heat`**, and the hourly rate is that times 3600.",
-          "**the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and density, and this id carries the no-fluid path only."
+          "**the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and phase, and `process.blocked_outlet_relief` and its three siblings carry it; this id carries the no-fluid path only."
         ],
         "available": true,
         "equation": null,
@@ -22663,7 +22663,7 @@
         "provenance": {
           "python_sha256": "33d785cf877b180dbc1e81e3b534ce2524feebe60bebaecee268a5d23f37c0dc",
           "rust_sha256": "68a3380586e219d31235d83476dc5fd01b573aa243620ae2f8e39c0f0d943d82",
-          "spec_sha256": "4127990df842cd1977b00395a76a7700ebed5364a7838c406a412efadbf9f9cf",
+          "spec_sha256": "091b2671e6080300d3d4176958e04e4c7622807ee198088107e8987086a28ede",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,

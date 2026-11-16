@@ -948,10 +948,22 @@ a claim nothing holds.
   fully-rated / two-barrier / insufficient verdict. **`process.relief_disposal_network`**
   sums the simultaneous loads and names the first peak. **`process.tr3001_compliance`** runs
   the six checks, with a fire-basis needs-review that the class's own study cannot reach.
-  The thermo-bound relief loads (`BlockedOutletRelief`, `ControlValveFailureRelief`,
-  `CheckValveLeakRelief`, `TubeRuptureRelief`, `ReliefFluidState`), the package-private
-  `NozzleFlow`, `OverpressureProtectionStudy` and `ReliefSizingCalculation`'s explicit-SI
-  kernel remain owed.
+  **The thermo-bound relief loads landed too, as four ids and the study that composes them.**
+  `process.blocked_outlet_relief`, `process.control_valve_failure_relief`,
+  `process.check_valve_leak_relief` and `process.tube_rupture_relief` evaluate a fluid at the
+  relieving conditions through a shared `ReliefFluidState` and the package-private
+  `NozzleFlow`'s isentropic gas form. **The DTO's `specificHeatRatio` is `getKappa`, the
+  isentropic exponent, not `getGamma`'s `Cp/Cv`** - 1.27958 against 1.33194 on the gas
+  capture row, and thousands on a liquid - and **no load publishes the density the state
+  computes**, so a liquid study row states its own. `process.overpressure_protection_study`
+  is `OverpressureProtectionStudy.evaluate`: the governing case, the gas/liquid/omega sizing
+  over the ported API 520 arithmetic, the selected capacity as the class's area ratio, and
+  the accumulated-pressure check. **A zero-rate credible row still governs and still runs
+  acceptance**, and the class's silent reset of a tube-rupture count below one is refused
+  rather than reproduced. **`ReliefSizingCalculation`'s explicit-SI kernel remains owed**
+  because it is published only inside the `process/engineering/calculation` readiness
+  envelope this tree does not carry; its equations are `process.psv_sizing`'s API 520 set
+  with a candidate ladder.
 - **The dispersion remainder** — three ids. **`process.heavy_gas_dispersion`** is
   Britter-McQuaid's signed reduced gravity, unfloored parameter and floored distance, with the
   two methane rows holding it to the analyzer's dense arm. **`process.hazardous_area`** is

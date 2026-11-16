@@ -3648,7 +3648,7 @@ pub static ALL_PROVENANCE: &[ProvenanceStatic] = &[
         calc_id: "process.fire_case_relief",
         name: "Fire case relief",
         spec_path: "specs/models/process/fire_case_relief.toml",
-        spec_sha256: "4127990df842cd1977b00395a76a7700ebed5364a7838c406a412efadbf9f9cf",
+        spec_sha256: "091b2671e6080300d3d4176958e04e4c7622807ee198088107e8987086a28ede",
         python_path: "python/src/azoth/process/reference/fire_case_relief.py",
         python_sha256: "33d785cf877b180dbc1e81e3b534ce2524feebe60bebaecee268a5d23f37c0dc",
         rust_path: "crates/azoth-process/src/models/fire_case_relief.rs",
