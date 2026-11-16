@@ -41,6 +41,7 @@ pub mod bow_tie;
 pub mod component_splitter;
 pub mod compressor;
 pub mod consequence_analysis;
+pub mod control_valve_failure_relief;
 pub mod cooler;
 pub mod deluge_nozzle_layout;
 pub mod distillation_column;
@@ -124,6 +125,9 @@ pub use compressor::{CompressorResult, compressor};
 pub use consequence_analysis::{
     ConsequenceAnalysisResult, ConsequenceOutcomeResult, ConsequenceOutcomeSpec,
     consequence_analysis,
+};
+pub use control_valve_failure_relief::{
+    ControlValveFailureReliefResult, control_valve_failure_relief,
 };
 pub use cooler::{CoolerResult, cooler};
 pub use deluge_nozzle_layout::{

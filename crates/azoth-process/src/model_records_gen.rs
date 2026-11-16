@@ -22,6 +22,7 @@ use crate::models::bow_tie::BowTieResult;
 use crate::models::component_splitter::ComponentSplitterResult;
 use crate::models::compressor::CompressorResult;
 use crate::models::consequence_analysis::ConsequenceAnalysisResult;
+use crate::models::control_valve_failure_relief::ControlValveFailureReliefResult;
 use crate::models::cooler::CoolerResult;
 use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::distillation_column::DistillationColumnResult;
@@ -350,6 +351,25 @@ impl CalcResult for ConsequenceAnalysisResult {
     const CALC_ID: &'static str = "process.consequence_analysis";
     const FIELDS: &'static [&'static str] =
         &["outcomes", "individual_fatality_risk_per_year", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ControlValveFailureReliefResult {
+    const CALC_ID: &'static str = "process.control_valve_failure_relief";
+    const FIELDS: &'static [&'static str] = &[
+        "name",
+        "relief_rate",
+        "phase",
+        "relief_temperature",
+        "molar_mass",
+        "compressibility",
+        "specific_heat_ratio",
+        "assumptions",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

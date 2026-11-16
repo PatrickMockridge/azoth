@@ -233,6 +233,7 @@
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
+//!   - specs/models/process/control_valve_failure_relief.toml
 //!   - specs/models/process/cooler.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/distillation_column.toml
@@ -2873,6 +2874,46 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.consequence_analysis",
         "receiver_distance",
         "length",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "mole_fractions",
+        "dimensionless",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "upstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "upstream_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "downstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "effective_area",
+        "area",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "cv",
+        "dimensionless",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "cv_erosion_margin",
+        "dimensionless",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "discharge_coefficient",
+        "dimensionless",
     ),
     ("process.cooler", "inlet_n", "molar_flow"),
     ("process.cooler", "inlet_z", "dimensionless"),

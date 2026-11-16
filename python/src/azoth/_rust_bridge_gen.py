@@ -65,6 +65,7 @@ from azoth.core.result import (
     ConsequenceAnalysisResult,
     ConsequenceOutcomeResult,
     ControlValveCvResult,
+    ControlValveFailureReliefResult,
     CooldownVerdict,
     CoolerResult,
     CorrosionSeverity,
@@ -467,6 +468,7 @@ __all__ = [
     "conduction_plane_wall",
     "consequence_analysis",
     "control_valve_cv",
+    "control_valve_failure_relief",
     "cooler",
     "costald_molar_volume",
     "crane_k_factors",
@@ -5945,6 +5947,34 @@ def consequence_analysis(release_frequency_per_year: float, receiver_distance: Q
     return ConsequenceAnalysisResult(
         outcomes=tuple(ConsequenceOutcomeResult(outcome=c.outcome, outcome_type=c.outcome_type, frequency_per_year=c.frequency_per_year, fatality_probability=c.fatality_probability, fatality_frequency_per_year=c.fatality_frequency_per_year) for c in result.outcomes),
         individual_fatality_risk_per_year=result.individual_fatality_risk_per_year,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def control_valve_failure_relief(components: list[str], mole_fractions: list[float], upstream_pressure: Q, upstream_temperature: Q | None=None, downstream_pressure: Q | None=None, effective_area: Q | None=None, cv: float | None=None, cv_erosion_margin: float | None=None, discharge_coefficient: float | None=None, scenario_name: str | None=None) -> ControlValveFailureReliefResult:
+    """``process.control_valve_failure_relief``, computed in Rust."""
+    spec = _models_gen.model("process.control_valve_failure_relief")
+    result = _core.control_valve_failure_relief(
+        list(components),
+        list(mole_fractions),
+        input_to_si(spec, "upstream_pressure", upstream_pressure),
+        None if upstream_temperature is None else input_to_si(spec, "upstream_temperature", upstream_temperature),
+        None if downstream_pressure is None else input_to_si(spec, "downstream_pressure", downstream_pressure),
+        None if effective_area is None else input_to_si(spec, "effective_area", effective_area),
+        None if cv is None else cv,
+        None if cv_erosion_margin is None else cv_erosion_margin,
+        None if discharge_coefficient is None else discharge_coefficient,
+        scenario_name,
+    )
+    return ControlValveFailureReliefResult(
+        name=result.name,
+        relief_rate=from_si(result.relief_rate.magnitude_si, result.relief_rate.unit),
+        phase=ReliefPhase(result.phase),
+        relief_temperature=from_si(result.relief_temperature.magnitude_si, result.relief_temperature.unit),
+        molar_mass=from_si(result.molar_mass.magnitude_si, result.molar_mass.unit),
+        compressibility=result.compressibility,
+        specific_heat_ratio=result.specific_heat_ratio,
+        assumptions=tuple(result.assumptions),
         warnings=_warnings(result.warnings),
     )
 

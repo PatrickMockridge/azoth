@@ -251,6 +251,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyComponentSplitterResult>()?;
     m.add_class::<crate::transport_gen::PyCompressorResult>()?;
     m.add_class::<crate::transport_gen::PyConsequenceAnalysisResult>()?;
+    m.add_class::<crate::transport_gen::PyControlValveFailureReliefResult>()?;
     m.add_class::<crate::transport_gen::PyCoolerResult>()?;
     m.add_class::<crate::transport_gen::PyDelugeNozzleLayoutResult>()?;
     m.add_class::<crate::transport_gen::PyDistillationColumnResult>()?;
@@ -942,6 +943,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::process::compressor, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::consequence_analysis,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::control_valve_failure_relief,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::cooler, m)?)?;

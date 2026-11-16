@@ -2567,6 +2567,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 7,
         "tests_skipped": 0,
     },
+    'process.control_valve_failure_relief': {
+        "calc_id": 'process.control_valve_failure_relief',
+        "name": 'Control valve failure relief',
+        "spec": {'path': 'specs/models/process/control_valve_failure_relief.toml', 'sha256': 'd64ec729b274dcb185e0ae381351b7e0429fe70653c69045c488451e7124464e'},
+        "code": [{'path': 'python/src/azoth/process/reference/control_valve_failure_relief.py', 'sha256': '6d5ee2bdbedd72975b58eb9a411a1cca75e9a832dea41df01f382fce2688d103'}, {'path': 'crates/azoth-process/src/models/control_valve_failure_relief.rs', 'sha256': 'be74de3cc4b65a617cab7389456dd31f29ba684220556815ecaaa9cb18b1faa5'}],
+        "source": 'NeqSim process/safety/overpressure/ControlValveFailureRelief.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'process.cooler': {
         "calc_id": 'process.cooler',
         "name": 'Cooler',

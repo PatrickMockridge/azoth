@@ -246,6 +246,7 @@
   - [Component splitter](./process/component_splitter.md)
   - [Compressor](./process/compressor.md)
   - [Consequence analysis](./process/consequence_analysis.md)
+  - [Control valve failure relief](./process/control_valve_failure_relief.md)
   - [Cooler](./process/cooler.md)
   - [Deluge nozzle layout](./process/deluge_nozzle_layout.md)
   - [Distillation column](./process/distillation_column.md)

@@ -12,6 +12,7 @@
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
+//!   - specs/models/process/control_valve_failure_relief.toml
 //!   - specs/models/process/cooler.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/distillation_column.toml

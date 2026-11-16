@@ -338,6 +338,7 @@ Five sections, and the difference between them is the point:
 - [`process.component_splitter`](./process/component_splitter.md) — Component splitter
 - [`process.compressor`](./process/compressor.md) — Compressor
 - [`process.consequence_analysis`](./process/consequence_analysis.md) — Consequence analysis
+- [`process.control_valve_failure_relief`](./process/control_valve_failure_relief.md) — Control valve failure relief
 - [`process.cooler`](./process/cooler.md) — Cooler
 - [`process.deluge_nozzle_layout`](./process/deluge_nozzle_layout.md) — Deluge nozzle layout
 - [`process.distillation_column`](./process/distillation_column.md) — Distillation column

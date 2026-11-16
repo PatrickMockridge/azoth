@@ -2532,6 +2532,40 @@ def _blocked_outlet_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _control_valve_failure_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.control_valve_failure_relief`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.control_valve_failure_relief import (
+        control_valve_failure_relief as evaluate,
+    )
+
+    def optional(name: str, unit: str) -> object | None:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    result = evaluate(
+        list(inputs["components"]),
+        [float(value) for value in inputs["mole_fractions"]],
+        quantity(float(inputs["upstream_pressure"]), "Pa"),
+        optional("upstream_temperature", "K"),
+        optional("downstream_pressure", "Pa"),
+        optional("effective_area", "m**2"),
+        None if inputs.get("cv") is None else float(inputs["cv"]),
+        None if inputs.get("cv_erosion_margin") is None else float(inputs["cv_erosion_margin"]),
+        None
+        if inputs.get("discharge_coefficient") is None
+        else float(inputs["discharge_coefficient"]),
+        None if inputs.get("scenario_name") is None else str(inputs["scenario_name"]),
+    )
+    return {
+        "relief_rate_kg_per_s": result.relief_rate.to("kg/s").magnitude,
+        "relief_temperature_k": result.relief_temperature.to("K").magnitude,
+        "molar_mass_kg_per_mol": result.molar_mass.to("kg/mol").magnitude,
+        "compressibility": result.compressibility,
+        "specific_heat_ratio": result.specific_heat_ratio,
+    }
+
+
 def _fire_case_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.fire_case_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -2901,6 +2935,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.jet_fire": _jet_fire,
     "process.pfp_demand": _pfp_demand,
     "process.blocked_outlet_relief": _blocked_outlet_relief,
+    "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.fire_case_relief": _fire_case_relief,
     "process.overpressure_acceptance": _overpressure_acceptance,
     "process.pipeline_pressure_protection": _pipeline_pressure_protection,
@@ -4497,6 +4532,49 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_blocked_outlet_relief.tsv",
         block=7,
         identified_by=("#label", "bo_zero_inflow"),
+    ),
+    # The control-valve loads: one state block and one no-fluid block are uncased.
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_area",
+        capture="process_control_valve_failure_relief.tsv",
+        block=1,
+        identified_by=("#label", "cvf_area"),
+    ),
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_area_default_downstream",
+        capture="process_control_valve_failure_relief.tsv",
+        block=2,
+        identified_by=("#label", "cvf_area_default_downstream"),
+    ),
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_cv",
+        capture="process_control_valve_failure_relief.tsv",
+        block=3,
+        identified_by=("#label", "cvf_cv"),
+    ),
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_cv_margin",
+        capture="process_control_valve_failure_relief.tsv",
+        block=4,
+        identified_by=("#label", "cvf_cv_margin"),
+    ),
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_subcritical",
+        capture="process_control_valve_failure_relief.tsv",
+        block=5,
+        identified_by=("#label", "cvf_subcritical"),
+    ),
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_no_area",
+        capture="process_control_valve_failure_relief.tsv",
+        block=6,
+        identified_by=("#label", "cvf_no_area"),
     ),
     LayerCase(
         model="process.fire_case_relief",
@@ -6192,6 +6270,8 @@ UNCASED_ROWS: dict[str, int] = {
     # The blocked-outlet capture's five: three raw `ReliefFluidState` blocks, the class's
     # no-fluid branch, and the negative inflow the port refuses.
     "process_blocked_outlet_relief.tsv": 5,
+    # The control-valve capture's two: the raw state block and the no-fluid branch.
+    "process_control_valve_failure_relief.tsv": 2,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

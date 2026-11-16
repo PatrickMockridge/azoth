@@ -5791,6 +5791,44 @@ pub fn consequence_analysis(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Control valve failure relief.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mole_fractions, upstream_pressure, upstream_temperature, downstream_pressure, effective_area, cv, cv_erosion_margin, discharge_coefficient, scenario_name))]
+#[pyo3(
+    text_signature = "(components, mole_fractions, upstream_pressure, upstream_temperature, downstream_pressure, effective_area, cv, cv_erosion_margin, discharge_coefficient, scenario_name)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn control_valve_failure_relief(
+    py: Python<'_>,
+    components: Vec<String>,
+    mole_fractions: Vec<f64>,
+    upstream_pressure: f64,
+    upstream_temperature: Option<f64>,
+    downstream_pressure: Option<f64>,
+    effective_area: Option<f64>,
+    cv: Option<f64>,
+    cv_erosion_margin: Option<f64>,
+    discharge_coefficient: Option<f64>,
+    scenario_name: Option<&str>,
+) -> PyResult<crate::transport_gen::PyControlValveFailureReliefResult> {
+    azoth_process::models::control_valve_failure_relief::control_valve_failure_relief(
+        &components,
+        &mole_fractions,
+        pascals(upstream_pressure),
+        upstream_temperature.map(kelvins),
+        downstream_pressure.map(pascals),
+        effective_area.map(square_meters),
+        cv,
+        cv_erosion_margin,
+        discharge_coefficient,
+        scenario_name,
+    )
+    .map(|r| crate::transport_gen::PyControlValveFailureReliefResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Cooler.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

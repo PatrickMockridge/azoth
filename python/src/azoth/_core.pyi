@@ -3205,6 +3205,18 @@ class ConsequenceAnalysisResult:
     warnings: list[Warning]
 
 @final
+class ControlValveFailureReliefResult:
+    name: str
+    relief_rate: Qty
+    phase: str
+    relief_temperature: Qty
+    molar_mass: Qty
+    compressibility: float
+    specific_heat_ratio: float
+    assumptions: list[str]
+    warnings: list[Warning]
+
+@final
 class CoolerResult:
     outlet_n: Qty
     outlet_z: list[float]
@@ -6954,6 +6966,18 @@ def consequence_analysis(
     receiver_distance: float,
     outcomes: list[ConsequenceOutcomeSpec],
 ) -> ConsequenceAnalysisResult: ...
+def control_valve_failure_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    upstream_pressure: float,
+    upstream_temperature: float | None = None,
+    downstream_pressure: float | None = None,
+    effective_area: float | None = None,
+    cv: float | None = None,
+    cv_erosion_margin: float | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> ControlValveFailureReliefResult: ...
 def cooler(
     components: list[str],
     inlet_n: float,

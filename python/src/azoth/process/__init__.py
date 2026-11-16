@@ -30,6 +30,7 @@ from azoth.core.result import (
     ComponentSplitterResult,
     CompressorResult,
     ConsequenceAnalysisResult,
+    ControlValveFailureReliefResult,
     CoolerResult,
     DelugeNozzleLayoutResult,
     DistillationColumnResult,
@@ -212,6 +213,7 @@ _HEAT_EXCHANGER = "process.heat_exchanger"
 _COMPONENT_SPLITTER = "process.component_splitter"
 _COMPRESSOR = "process.compressor"
 _CONSEQUENCE_ANALYSIS = "process.consequence_analysis"
+_CONTROL_VALVE_FAILURE_RELIEF = "process.control_valve_failure_relief"
 _ABSORPTION_COLUMN = "process.absorption_column"
 _ACTIVE_FIRE_PROTECTION_SCREENING = "process.active_fire_protection_screening"
 _STRIPPING_COLUMN = "process.stripping_column"
@@ -1744,6 +1746,41 @@ def consequence_analysis(
         release_frequency_per_year=release_frequency_per_year,
         receiver_distance=receiver_distance,
         outcomes=outcomes,
+    )
+
+
+def control_valve_failure_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    upstream_pressure: Q,
+    upstream_temperature: Q | None = None,
+    downstream_pressure: Q | None = None,
+    effective_area: Q | None = None,
+    cv: float | None = None,
+    cv_erosion_margin: float | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> ControlValveFailureReliefResult:
+    """The fail-open rate from an explicit area or a Cv with an erosion margin.
+
+    **The area is the explicit one when it is positive, else the Cv through the class's
+    screening relation.** The fluid is flashed at the upstream pressure and temperature for
+    its ``getKappa``, molar mass and ``Z``, and the downstream pressure defaults to
+    1.01325 bara.
+
+    See :func:`azoth.process.reference.control_valve_failure_relief`.
+    """
+    return resolve(_CONTROL_VALVE_FAILURE_RELIEF)(  # type: ignore[no-any-return]
+        components=components,
+        mole_fractions=mole_fractions,
+        upstream_pressure=upstream_pressure,
+        upstream_temperature=upstream_temperature,
+        downstream_pressure=downstream_pressure,
+        effective_area=effective_area,
+        cv=cv,
+        cv_erosion_margin=cv_erosion_margin,
+        discharge_coefficient=discharge_coefficient,
+        scenario_name=scenario_name,
     )
 
 

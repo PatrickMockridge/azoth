@@ -1,0 +1,148 @@
+model = "process.control_valve_failure_relief"
+
+[[cases]]
+id = "cvf_area"
+tolerance = 1.0e-7
+source = "A methane/ethane gas at 20 bara and 320 K through a 0.001 m2 fail-open area into 1.01325 bara. From `validation/neqsim/captures/process_control_valve_failure_relief.tsv` (`cvf_area`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+upstream_pressure = 2000000.0
+upstream_temperature = 320.0
+downstream_pressure = 101325.0
+effective_area = 0.001
+[cases.expected]
+name = "CV fail area"
+relief_rate = 2.8884947746557277
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501",
+    "Discharge coefficient Cd = 0.85",
+]
+
+[[cases]]
+id = "cvf_area_default_downstream"
+tolerance = 1.0e-7
+source = "The same area with no downstream pressure: the class's 1.01325 bara default answers identically. From (`cvf_area_default_downstream`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+upstream_pressure = 2000000.0
+upstream_temperature = 320.0
+effective_area = 0.001
+[cases.expected]
+name = "CV fail default downstream"
+relief_rate = 2.8884947746557277
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501",
+    "Discharge coefficient Cd = 0.85",
+]
+
+[[cases]]
+id = "cvf_cv"
+tolerance = 1.0e-7
+source = "A Cv of 150 with no explicit area: the screening relation derives the area and says so. From (`cvf_cv`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+upstream_pressure = 2000000.0
+upstream_temperature = 320.0
+downstream_pressure = 101325.0
+cv = 150.0
+[cases.expected]
+name = "CV fail cv"
+relief_rate = 13.36830192843862
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501",
+    "Discharge coefficient Cd = 0.85",
+    "Effective area derived from Cv with screening relation Cv = 24.6 Cd A_in2",
+]
+
+[[cases]]
+id = "cvf_cv_margin"
+tolerance = 1.0e-7
+source = "The same Cv with a 1.25 erosion margin: the rate grows by the margin and the class warns. From (`cvf_cv_margin`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+upstream_pressure = 2000000.0
+upstream_temperature = 320.0
+downstream_pressure = 101325.0
+cv = 150.0
+cv_erosion_margin = 1.25
+[cases.expected]
+name = "CV fail margin"
+relief_rate = 16.710377410548272
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501",
+    "Discharge coefficient Cd = 0.85",
+    "Cv increased by erosion/vibration margin 1.25 per TR3001 SR-26501",
+    "Effective area derived from Cv with screening relation Cv = 24.6 Cd A_in2",
+]
+
+[[cases]]
+id = "cvf_subcritical"
+tolerance = 1.0e-7
+source = "The area row discharging into 15 bara: the subcritical branch. From (`cvf_subcritical`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+upstream_pressure = 2000000.0
+upstream_temperature = 320.0
+downstream_pressure = 1500000.0
+effective_area = 0.001
+[cases.expected]
+name = "CV fail subcritical"
+relief_rate = 2.596230056867641
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501",
+    "Discharge coefficient Cd = 0.85",
+]
+
+[[cases]]
+id = "cvf_no_area"
+tolerance = 1.0e-7
+source = "Neither an area nor a Cv: a zero rate and the class's warning. From (`cvf_no_area`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+upstream_pressure = 2000000.0
+upstream_temperature = 320.0
+downstream_pressure = 101325.0
+[cases.expected]
+name = "CV fail no area"
+relief_rate = 0.0
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501",
+    "Discharge coefficient Cd = 0.85",
+    "Neither effective area nor Cv set; relief rate is zero",
+]
