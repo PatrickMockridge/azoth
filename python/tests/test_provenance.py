@@ -164,8 +164,10 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # 309: the relief disposal network; 310: the TR3001 compliance; 311: the dense-gas
     # dispersion; 312: the hazardous area; 313: the toxic thresholds; 314: the
     # blowdown pressure profile; 315: the pipe material curves; 316: the pipe fire
-    # rupture; 317: the vessel rupture.
-    assert len(registered) == 317
+    # rupture; 317: the vessel rupture; 318: the blocked-outlet relief load; 319: the
+    # control-valve failure load; 320: the check-valve leak load; 321: the tube-rupture
+    # load; 322: the overpressure protection study.
+    assert len(registered) == 322
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:
