@@ -4,6 +4,7 @@
 - [Using azoth](./using/index.md)
   - [The editor](./using/editor.md)
   - [Calculation sheets](./using/calculations.md)
+  - [Safety studies](./using/safety.md)
   - [Reading a calculation page](./using/reading-a-calculation.md)
   - [Python scripting and Jupyter](./using/python.md)
   - [Exchanging a DEXPI drawing](./using/dexpi.md)

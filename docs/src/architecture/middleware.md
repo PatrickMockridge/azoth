@@ -14,6 +14,17 @@ all do to the same data. The middleware is that operator made concrete.
 — each a thin wrapper over the same calls, each answering with the same document. What is not built
 is named at the foot of this page.
 
+**Two more documents ride beside the flowsheet.** A *calculation book* (`azoth-sheets`) holds
+standalone calculations, one sheet per registered calc id, and a *safety study*
+(`azoth-safety`) holds fire scenarios and bow-ties, one scenario per registered fire model and
+one bow-tie per `process.bow_tie` record. Each has its own command model, its own envelope and
+its own route — `/sheets` and `/safety` — so a front end draws one document at a time, and a
+save is no call because the document rides every answer. **Their dispatch is the library's own
+kernels**, not a second executor: the sheet dispatcher is generated from `specs/calcs` and the
+safety study's native ids are the five fire models plus `process.bow_tie`, called as the typed
+model kernels they are. The safety catalogue is attached to the one catalogue call by the
+bindings that own it, because `azoth-process` cannot depend on a crate that depends on it.
+
 ## The gap
 
 | a front-end needs | exists |
@@ -79,11 +90,11 @@ only.
 
 | door | what it is | what covers it |
 |---|---|---|
-| a browser | `crates/azoth-wasm`, compiled with `wasm-bindgen` and carrying its own palette and databank — no fetch, no filesystem | a Node driver over the built module, in the crate |
+| a browser | `crates/azoth-wasm`, compiled with `wasm-bindgen` and carrying its own palette and databank — no fetch, no filesystem. `Editor` is the flowsheet, `SheetEditor` the calculation book and `SafetyEditor` the safety study | a Node driver over the built module, in the crate |
 | a notebook | `azoth.process.Session`, which is the same `Workspace` as a Python object, with `forms()` and `tools()` beside it | `python/tests/test_process.py` |
-| a shell | `azoth forms` and `azoth edit --flowsheet F --command JSON [--run] [--json]` | `crates/azoth-cli/tests/wire.rs` |
+| a shell | `azoth forms`, `azoth edit --flowsheet F --command JSON [--run] [--json]`, `azoth sheets` and `azoth safety` | `crates/azoth-cli/tests/wire.rs`, `crates/azoth-cli/tests/serve.rs` |
 | an agent | `azoth mcp --flowsheet F [--no-run]`: the same tools over stdio, one session held across calls, every answer the envelope — and the same messages again at `POST /mcp` on `azoth serve`, for a client that cannot start a process | `crates/azoth-cli/tests/mcp.rs`, which asserts the served tools equal `middleware::tools` field by field, and `crates/azoth-cli/tests/mcp_http.rs` for the HTTP lane |
-| a client that cannot run the kernels | `azoth serve --flowsheet F [--port N] [--allow-origin ORIGIN]`: one document over HTTP, the same calls, the same envelope — it hosts the editor's `POST /rpc` and the agent's `POST /mcp` over **one** `Session` | `crates/azoth-cli/tests/serve.rs`, and `crates/azoth-cli/tests/mcp_http.rs` for the MCP endpoint |
+| a client that cannot run the kernels | `azoth serve --flowsheet F [--calc-book B] [--safety-study S] [--port N] [--allow-origin ORIGIN]`: three documents over HTTP, the same calls, the same envelopes — the editor's `POST /rpc`, the agent's `POST /mcp`, the book's `POST /sheets` and the study's `POST /safety` over **one** process | `crates/azoth-cli/tests/serve.rs`, and `crates/azoth-cli/tests/mcp_http.rs` for the MCP endpoint |
 
 `--json` prints the envelope, which is byte for byte the object a browser is handed — so the CLI
 is a way to look at the wire without a front-end, and a way to capture a fixture for one.

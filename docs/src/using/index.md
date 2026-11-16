@@ -1,7 +1,7 @@
 # Using azoth
 
 The editor runs in the browser: the engine is compiled to WebAssembly, so nothing is installed
-and no case is uploaded. It has two workspaces, and the one you are in never throws the other
+and no case is uploaded. It has four workspaces, and the one you are in never throws another
 away.
 
 ## The flowsheet
@@ -16,6 +16,13 @@ The **Calculations** switch opens a separate book of standalone calculations. Ea
 the calculation is for, what every input means, what it will return, and when the answer applies.
 A book holds several sheets, is saved in TOML, and prints as a report. Start with
 [calculation sheets](./calculations.md).
+
+## The safety study
+
+The **Safety** switch opens a study of fire scenarios and bow-ties: a third TOML document, with
+its own diagram and its own forms. A bow-tie computes its frequency and RRF with
+`process.bow_tie`; a fire scenario runs one of the five fire models and shows the distance to
+each threshold. Start with [safety studies](./safety.md).
 
 ## Reading the reference
 
