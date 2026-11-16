@@ -69,7 +69,8 @@ resize it, and use **View → Reset window positions** to put them back. **Cyber
 full-bleed drawing with translucent HUD rails; the switches at the right of the top strip hide
 the navigator, inspector, workbook or command deck, and **Commands** in the strip — or
 **Ctrl/Cmd+K** anywhere in that layout — opens a command palette over the same commands as the
-toolbar and menus. The workbook rail's top edge resizes it.
+toolbar and menus. The **Case** menu stays in the top strip in every layout, because it is the
+one way to change interface. The workbook rail's top edge resizes it.
 
 ![The Macintosh desktop](../images/editor-mac.png)
 
@@ -117,7 +118,8 @@ and **Report** prints or saves a case file with the drawing, the streams, the re
 caveats and the source record. The report also downloads the run as JSON, which is the
 machine-readable form of the same run.
 
-The **Calculations** switch opens a separate workspace for the library's standalone calculations;
-the **View** menu carries the same two commands. See [calculation sheets](./calculations.md) for
-the workspace and [reading a calculation page](./reading-a-calculation.md) for the reference page
-a sheet links to.
+The **Case** menu lists the interfaces — **Process simulation**, **Calculation**, **Safety study**
+and **Drawing** — and marks the one in front. Choosing **Calculation** opens the library's
+standalone calculations; the View menu no longer carries navigation. See
+[calculation sheets](./calculations.md) for the interface and
+[reading a calculation page](./reading-a-calculation.md) for the reference page a sheet links to.

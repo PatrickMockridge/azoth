@@ -13,7 +13,6 @@ import { DraftField } from "../DraftField";
 import { HudControls, type HudControl } from "../HudControls";
 import { MenuBar } from "../MenuBar";
 import { manualHome } from "../../manual";
-import { WorkspaceSwitch, type Workspace } from "./WorkspaceSwitch";
 import type { MenuSpec } from "../../commands/model";
 import type { Appearance } from "../../state/appearance";
 import type { Units } from "../../state/units";
@@ -21,20 +20,17 @@ import type { SheetEnvelope } from "../../wire/types";
 
 export function CalcTitleStrip({
   envelope,
-  workspace,
   menus,
   appearance,
   units,
   unsaved,
   version,
   onName,
-  onWorkspace,
   onAppearance,
   onUnits,
   hud,
 }: {
   envelope: SheetEnvelope | null;
-  workspace: Workspace;
   menus: readonly MenuSpec[];
   hud?: {
     controls: readonly HudControl[];
@@ -48,7 +44,6 @@ export function CalcTitleStrip({
   /** The library version, from the flowsheet's provenance record. */
   version: string;
   onName: (name: string) => void;
-  onWorkspace: (workspace: Workspace) => void;
   onAppearance: (appearance: Appearance) => void;
   onUnits: (id: string) => void;
 }) {
@@ -98,7 +93,6 @@ export function CalcTitleStrip({
         )}
       </div>
       <div className="bar-tools">
-        <WorkspaceSwitch workspace={workspace} onWorkspace={onWorkspace} />
         <span className="spacer" />
         {units.sets.length === 0 ? null : (
           <label className="units-choice">

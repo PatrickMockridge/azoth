@@ -83,12 +83,14 @@ print(imported["layout_positions"])
 take `layout=False` to drop the arrangement. Every call returns the text and its report as
 JSON, the same two documents the CLI prints.
 
-## The Drawing workspace
+## The Drawing interface
 
-The editor's **Drawing** tab is the same view as `azoth dexpi view`, in the browser. Import a
-DEXPI 2.0 P&ID/PFD or a Proteus file; the workspace draws it, lists every object's coverage -
-modelled, lossy, ambiguous, unmapped, topology, control, drawing-only - and says what the file
-would become: instances, connections, instruments, and the check errors still owed.
+The editor's **Drawing** interface, chosen from the **Case** menu, is the same view as
+`azoth dexpi view`, in the browser. Import a DEXPI 2.0 P&ID/PFD or a Proteus file; the interface
+draws it, lists every object's coverage - modelled, lossy, ambiguous, unmapped, topology,
+control, drawing-only - and says what the file would become: instances, connections, instruments,
+and the check errors still owed. The drawing's own **Case** menu is the way back to the other
+interfaces, and **Open as flowsheet** remains the route into the process simulation.
 
 - **Open as flowsheet** loads the scaffold into the editor, where `azoth check`'s diagnostics
   mark the feeds and parameters still to declare.

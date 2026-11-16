@@ -44,11 +44,12 @@ The committed fixtures in `test/fixtures/` are the library's output. Regenerate 
 the palette or a shipped flowsheet; `test/currency.test.ts` recomputes them from the built wasm
 and fails when they are stale.
 
-## The Drawing workspace
+## The Drawing interface
 
-The third workspace is a read-only DEXPI viewer. Import a DEXPI 2.0 or Proteus file and it
-draws the file's own geometry, lists every conceptual object's coverage — modelled, lossy,
-ambiguous, unmapped, topology, control, drawing-only — and states what the file would become.
+The third interface, chosen from the **Case** menu, is a read-only DEXPI viewer. Import a DEXPI
+2.0 or Proteus file and it draws the file's own geometry, lists every conceptual object's
+coverage — modelled, lossy, ambiguous, unmapped, topology, control, drawing-only — and states
+what the file would become.
 "Open as flowsheet" loads the scaffold into the editor; "Export PFD" / "Export P&ID" write the
 open simulation back out, and "Download SVG" saves the figure.
 
@@ -58,15 +59,24 @@ It is **not a CAD editor**: no symbol is moved or authored, and the arrangement 
 `POST /dexpi`. `test/fixtures/dexpi-view.json` is the CLI's `azoth dexpi view --json` output and
 `test/currency.test.ts` recomputes it from the built module.
 
-## The Safety workspace
+The drawing's own **Case** menu is the way back to the other interfaces.
 
-The fourth workspace is a safety study: an overview of the study's bow-ties and scenarios, a
-bow-tie canvas with an inspector, and scenario cards for five native families — fire,
-dispersion, firewater, overpressure and risk. The document is
+## The Safety interface
+
+The fourth interface, chosen from the **Case** menu, is a safety study: an overview of the
+study's bow-ties and scenarios, a bow-tie canvas with an inspector, and scenario cards for five
+native families — fire, dispersion, firewater, overpressure and risk. The document is
 TOML and rides every envelope; the door is `SafetyDoor` in `src/wire/session.ts`; the module
 implements it (`SafetyEditor`) and `azoth serve` offers the same calls at `POST /safety`.
 `test/fixtures/safety-envelope.json` is the CLI's `azoth safety --study specs/safety/demo.toml
 --calculate all` output and `test/currency.test.ts` recomputes it from the built module.
+
+## The interface model
+
+`src/interfaces.ts` is one row per interface: the Case-menu label, the strip word, the document
+noun, the route, the save format and the mount policy. Every Case menu is built from
+`interfaceCommands`/`caseMenuCommands`, and the interface in front is marked `aria-current`. A new
+interface is a row and a render case in `App.tsx`; the four title strips do not learn its name.
 
 ## Appearance
 
@@ -130,9 +140,9 @@ session, provenance, diagnostics — and `state/verification.ts` is the one plac
 verification statuses are explained; they are provenance, not a badge on an answer.
 
 **A layout hides decoration, never a control.** `test/layoutVisibility.test.ts` scans the layout
-stylesheets and refuses a `display: none` that names a switch, splitter, tab, menu trigger or any
-other control; the Cyberpunk workbook's splitter and the Macintosh workspace switch are the two
-regressions the rule exists for. The Macintosh title bar draws no close or zoom box, because a
+stylesheets and refuses a `display: none` that names a menu bar, splitter, tab, menu trigger or any
+other control; the Cyberpunk workbook's splitter and the Case menu that now carries every
+interface are the two regressions the rule exists for. The Macintosh title bar draws no close or zoom box, because a
 control that does nothing is worse than none.
 
 **Connectors are routed, not guessed.** `src/pfd/route.ts` treats each node plate as an obstacle

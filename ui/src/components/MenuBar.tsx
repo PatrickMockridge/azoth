@@ -7,10 +7,11 @@
  * `role="menuitem"`, live only while the menu is open, and call the same handlers.
  *
  * **The bar is inside the title strip**, after the wordmark. Macintosh keeps it on the title row;
- * XP gives it a full-width row under the title; Cyberpunk hides it and uses the palette.
+ * XP gives it a full-width row under the title; Cyberpunk keeps it visible because the Case menu
+ * is the one interface picker, while the palette carries the other commands.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 import type { MenuSpec } from "../commands/model";
 
@@ -85,71 +86,84 @@ export function MenuBar({ menus }: { menus: readonly MenuSpec[] }) {
               onMouseDown={(event) => event.stopPropagation()}
             >
               {menu.commands.map((command) => (
-                <div className="menu-subwrap" key={command.id}>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    aria-disabled={!command.enabled}
-                    aria-haspopup={command.children === undefined ? undefined : "menu"}
-                    aria-expanded={command.children === undefined ? undefined : submenu === command.id}
-                    className={`menu-item${command.enabled ? "" : " off"}${command.children === undefined ? "" : " has-submenu"}`}
-                    title={command.hint}
-                    onMouseEnter={() => {
-                      if (command.children !== undefined) {
-                        setSubmenu(command.id);
-                      }
-                    }}
-                    onClick={() => {
-                      if (!command.enabled) {
-                        return;
-                      }
-                      if (command.children !== undefined) {
-                        setSubmenu(submenu === command.id ? null : command.id);
-                        return;
-                      }
-                      setOpen(null);
-                      setSubmenu(null);
-                      command.run();
-                    }}
-                  >
-                    <span>{command.label}</span>
-                    {command.shortcut === undefined ? (
-                      command.children === undefined ? null : (
-                        <span className="menu-shortcut" aria-hidden="true">
-                          ▸
-                        </span>
-                      )
-                    ) : (
-                      <span className="menu-shortcut" aria-hidden="true">
-                        {command.shortcut}
-                      </span>
-                    )}
-                  </button>
-                  {command.children !== undefined && submenu === command.id ? (
-                    <div className="menu submenu" role="menu" aria-label={command.label}>
-                      {command.children.map((child) => (
-                        <button
-                          key={child.id}
-                          type="button"
-                          role="menuitem"
-                          aria-disabled={!child.enabled}
-                          className={`menu-item${child.enabled ? "" : " off"}`}
-                          title={child.hint}
-                          onClick={() => {
-                            if (!child.enabled) {
-                              return;
-                            }
-                            setOpen(null);
-                            setSubmenu(null);
-                            child.run();
-                          }}
-                        >
-                          <span>{child.label}</span>
-                        </button>
-                      ))}
-                    </div>
+                <Fragment key={command.id}>
+                  {command.divider === true ? (
+                    <div className="menu-rule" role="separator" aria-orientation="horizontal" />
                   ) : null}
-                </div>
+                  <div className="menu-subwrap">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      aria-disabled={!command.enabled}
+                      aria-current={command.current === true ? "true" : undefined}
+                      aria-haspopup={command.children === undefined ? undefined : "menu"}
+                      aria-expanded={
+                        command.children === undefined ? undefined : submenu === command.id
+                      }
+                      className={`menu-item${command.enabled ? "" : " off"}${command.children === undefined ? "" : " has-submenu"}${command.current === true ? " current" : ""}`}
+                      title={command.hint}
+                      onMouseEnter={() => {
+                        if (command.children !== undefined) {
+                          setSubmenu(command.id);
+                        }
+                      }}
+                      onClick={() => {
+                        if (!command.enabled) {
+                          return;
+                        }
+                        if (command.children !== undefined) {
+                          setSubmenu(submenu === command.id ? null : command.id);
+                          return;
+                        }
+                        setOpen(null);
+                        setSubmenu(null);
+                        command.run();
+                      }}
+                    >
+                      <span>{command.label}</span>
+                      {command.current === true ? (
+                        <span className="menu-check" aria-hidden="true">
+                          ✓
+                        </span>
+                      ) : null}
+                      {command.shortcut === undefined ? (
+                        command.children === undefined ? null : (
+                          <span className="menu-shortcut" aria-hidden="true">
+                            ▸
+                          </span>
+                        )
+                      ) : (
+                        <span className="menu-shortcut" aria-hidden="true">
+                          {command.shortcut}
+                        </span>
+                      )}
+                    </button>
+                    {command.children !== undefined && submenu === command.id ? (
+                      <div className="menu submenu" role="menu" aria-label={command.label}>
+                        {command.children.map((child) => (
+                          <button
+                            key={child.id}
+                            type="button"
+                            role="menuitem"
+                            aria-disabled={!child.enabled}
+                            className={`menu-item${child.enabled ? "" : " off"}`}
+                            title={child.hint}
+                            onClick={() => {
+                              if (!child.enabled) {
+                                return;
+                              }
+                              setOpen(null);
+                              setSubmenu(null);
+                              child.run();
+                            }}
+                          >
+                            <span>{child.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </Fragment>
               ))}
             </div>
           ) : null}

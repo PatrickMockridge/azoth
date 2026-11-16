@@ -16,6 +16,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import catalogueJson from "./fixtures/catalogue.json";
 import envelopeJson from "./fixtures/envelope.json";
 import safetyJson from "./fixtures/safety-envelope.json";
+import { chooseInterface } from "./interfaceMenu";
 import { stubXyflowEnvironment } from "./xyflow-env";
 
 beforeAll(stubXyflowEnvironment);
@@ -43,7 +44,7 @@ async function openSafety(stored: Record<string, string> = {}): Promise<HTMLElem
   await waitFor(() => {
     expect(rendered.container.querySelectorAll(".react-flow__node")).not.toHaveLength(0);
   });
-  fireEvent.click(screen.getByRole("button", { name: "Safety" }));
+  chooseInterface("Safety study");
   await waitFor(() => {
     expect(screen.getByRole("heading", { name: "Bow-ties" })).toBeDefined();
   });
@@ -157,7 +158,7 @@ describe("the safety workspace", () => {
     await waitFor(() => {
       expect(rendered.container.querySelectorAll(".react-flow__node")).not.toHaveLength(0);
     });
-    fireEvent.click(screen.getByRole("button", { name: "Safety" }));
+    chooseInterface("Safety study");
     await waitFor(() => {
       expect(screen.getByDisplayValue("Demo safety study")).toBeDefined();
     });

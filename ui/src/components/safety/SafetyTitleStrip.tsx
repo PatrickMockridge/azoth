@@ -10,7 +10,6 @@ import { AppearanceMenu } from "../AppearanceMenu";
 import { DraftField } from "../DraftField";
 import { MenuBar } from "../MenuBar";
 import { manualHome } from "../../manual";
-import { WorkspaceSwitch, type Workspace } from "../calculations/WorkspaceSwitch";
 import type { MenuSpec } from "../../commands/model";
 import type { Appearance } from "../../state/appearance";
 import type { Units } from "../../state/units";
@@ -18,19 +17,16 @@ import type { SafetyEnvelope } from "../../wire/types";
 
 export function SafetyTitleStrip({
   envelope,
-  workspace,
   menus,
   appearance,
   units,
   unsaved,
   version,
   onName,
-  onWorkspace,
   onAppearance,
   onUnits,
 }: {
   envelope: SafetyEnvelope | null;
-  workspace: Workspace;
   menus: readonly MenuSpec[];
   appearance: Appearance;
   units: Units;
@@ -38,7 +34,6 @@ export function SafetyTitleStrip({
   /** The library version, from the flowsheet's provenance record. */
   version: string;
   onName: (name: string) => void;
-  onWorkspace: (workspace: Workspace) => void;
   onAppearance: (appearance: Appearance) => void;
   onUnits: (id: string) => void;
 }) {
@@ -88,7 +83,6 @@ export function SafetyTitleStrip({
         )}
       </div>
       <div className="bar-tools">
-        <WorkspaceSwitch workspace={workspace} onWorkspace={onWorkspace} />
         <span className="spacer" />
         {units.sets.length === 0 ? null : (
           <label className="units-choice">

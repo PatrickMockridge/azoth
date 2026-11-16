@@ -101,6 +101,21 @@
   font-size: var(--fs-2xs);
 }
 
+.menu-rule {
+  height: 1px;
+  margin: var(--s1) 0;
+  background: var(--line);
+}
+
+.menubar .menu-item.current {
+  color: var(--accent);
+}
+
+.menu-check {
+  color: var(--accent);
+  font-size: var(--fs-sm);
+}
+
 .command-icon {
   width: var(--command-icon-size);
   height: var(--command-icon-size);

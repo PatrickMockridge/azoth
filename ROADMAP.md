@@ -1151,15 +1151,17 @@ three bindings of it — `azoth-wasm` for a browser, `azoth.process.Session` for
 [The middleware](docs/src/architecture/middleware.md), and **what is still not built is named
 there** rather than counted here. The editor it feeds is `ui/`.
 
-**The editor hosts two documents beside the flowsheet.** `azoth-sheets` owns a calculation book
-of the 98 standalone calculations, and `azoth-safety` owns a safety study: safety scenarios,
-one registered model each, and bow-ties whose frequency and RRF are `process.bow_tie`'s. Each
-has its own command model, envelope and route — `/sheets` and `/safety` — and its own bindings
-(`SheetEditor`/`SafetyEditor` in wasm, `azoth sheets`/`azoth safety` in the shell). The safety
-workspace runs the twenty-one scalar safety models across five families, and the bow-tie,
-natively; the record-shaped models and the rupture, release and QRA families are listed with
-their manual pages and no native view yet. A HAZOP worksheet, a printable safety report,
-a flux-versus-distance chart and scenario bundles remain unbuilt.
+**The editor hosts two documents and a drawing viewer beside the flowsheet.** `azoth-sheets`
+owns a calculation book of the 98 standalone calculations, and `azoth-safety` owns a safety
+study: safety scenarios, one registered model each, and bow-ties whose frequency and RRF are
+`process.bow_tie`'s. Each has its own command model, envelope and route — `/sheets` and
+`/safety` — and its own bindings (`SheetEditor`/`SafetyEditor` in wasm, `azoth sheets`/`azoth
+safety` in the shell); the read-only drawing rides `/dexpi`. The **Case** menu switches the four
+interfaces from one registry in `ui/src/interfaces.ts`. The safety interface runs the twenty-one
+scalar safety models across five families, and the bow-tie, natively; the record-shaped models
+and the rupture, release and QRA families are listed with their manual pages and no native view
+yet. A HAZOP worksheet, a printable safety report, a flux-versus-distance chart and scenario
+bundles remain unbuilt.
 
 **Three holes in the checker closed on the way, and each was the same shape.** The checker
 verified units, ports, names and connections, and never that a value was *there*, was of the

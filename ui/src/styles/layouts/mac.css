@@ -25,7 +25,7 @@
   color: var(--text);
 }
 
-/* The desktop's `display:block` must not outrank the workspace switch. */
+/* The desktop's `display:block` must not outrank the hidden interface. */
 [data-layout="mac"] .app.off,
 [data-layout="mac"] .app[hidden] {
   display: none;
@@ -83,9 +83,8 @@
 }
 
 /*
- * The workspace switch stays visible: the View menu carries the same two commands, but a reader
- * should not have to open a menu to find the other half of the editor. The build stamp is not a
- * Macintosh control and is hidden to leave it room.
+ * The build stamp is not a Macintosh control and is hidden to leave the menu bar room; the Case
+ * menu carries every interface and stays visible in this shell.
  */
 [data-layout="mac"] .bar-tools .build {
   display: none;
@@ -323,26 +322,6 @@
   background: transparent;
   box-shadow: none;
   color: var(--text);
-}
-
-[data-layout="mac"] .workspace-switch {
-  border: var(--bevel-w) solid var(--frame);
-  border-radius: 0;
-  background: var(--bg-panel);
-}
-
-[data-layout="mac"] .workspace-switch button {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  color: var(--text-dim);
-  font-weight: 400;
-}
-
-[data-layout="mac"] .workspace-switch button.active {
-  background: var(--bg-selected);
-  color: var(--selected-text);
 }
 
 [data-layout="mac"] .primary {

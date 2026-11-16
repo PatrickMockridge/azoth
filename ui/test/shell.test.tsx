@@ -14,6 +14,7 @@ import { resolve } from "node:path";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeAll, expect, it, vi } from "vitest";
 
+import { chooseInterface, currentInterface } from "./interfaceMenu";
 import { stubXyflowEnvironment } from "./xyflow-env";
 
 beforeAll(stubXyflowEnvironment);
@@ -171,13 +172,7 @@ it("shows the Drawing workspace instead of the flowsheet", async () => {
   if (flowsheet === null) {
     throw new Error("the flowsheet should be mounted");
   }
-  const drawingButton = Array.from(
-    container.querySelectorAll<HTMLButtonElement>(".workspace-switch button"),
-  ).find((button) => button.textContent === "Drawing");
-  if (drawingButton === undefined) {
-    throw new Error("the workspace switch has no Drawing button");
-  }
-  fireEvent.click(drawingButton);
+  chooseInterface("Drawing");
   await waitFor(() => {
     expect(container.querySelector(".app.dexpi-workspace")).not.toBeNull();
   });
@@ -186,39 +181,34 @@ it("shows the Drawing workspace instead of the flowsheet", async () => {
   expect(flowsheet.hidden).toBe(true);
 });
 
-it("keeps the workspace switch reachable in the Macintosh and Cyberpunk shells", async () => {
-  for (const layout of ["mac", "cyberpunk"] as const) {
+it("reaches every interface through the Case menu in every shell", async () => {
+  for (const layout of ["xp", "mac", "cyberpunk"] as const) {
     stubFetch();
     const container = await openLayout(layout);
-    const flowsheet = container.querySelector<HTMLElement>(".app:not(.calculations)");
+    const flowsheet = container.querySelector<HTMLElement>(
+      ".app:not(.calculations):not(.safety):not(.dexpi-workspace)",
+    );
     if (flowsheet === null) {
       throw new Error("the flowsheet should be mounted");
     }
-    const toCalculations = [...flowsheet.querySelectorAll<HTMLButtonElement>(
-      ".workspace-switch button",
-    )].find((button) => button.textContent === "Calculations");
-    if (toCalculations === undefined) {
-      throw new Error("the workspace switch has no Calculations button");
+    for (const [label, selector] of [
+      ["Drawing", ".app.dexpi-workspace"],
+      ["Calculation", ".app.calculations"],
+      ["Safety study", ".app.safety"],
+    ] as const) {
+      chooseInterface(label);
+      await waitFor(() => {
+        const target = container.querySelector<HTMLElement>(selector);
+        expect(target).not.toBeNull();
+        expect(target?.hidden).toBe(false);
+      });
+      expect(currentInterface()).toBe(label);
+      expect(flowsheet.hidden).toBe(true);
     }
-    // The switch is the visible path; the View menu is the same commands, not a substitute.
-    expect(toCalculations.textContent).toBe("Calculations");
-    fireEvent.click(toCalculations);
-    const calculations = container.querySelector<HTMLElement>(".app.calculations");
-    if (calculations === null) {
-      throw new Error("the calculation workspace should open");
-    }
-    expect(calculations.hidden).toBe(false);
-    expect(flowsheet.hidden).toBe(true);
-
-    const back = calculations.querySelectorAll<HTMLButtonElement>(
-      ".workspace-switch button",
-    )[0];
-    if (back === undefined) {
-      throw new Error("the switch has no Flowsheet button");
-    }
-    fireEvent.click(back);
-    expect(flowsheet.hidden).toBe(false);
-    expect(calculations.hidden).toBe(true);
+    // The way back is the same Case menu, on the interface that is in front.
+    chooseInterface("Process simulation");
+    await waitFor(() => expect(flowsheet.hidden).toBe(false));
+    expect(currentInterface()).toBe("Process simulation");
     cleanup();
   }
-});
+}, 30000);

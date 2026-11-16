@@ -133,25 +133,6 @@
   color: var(--text);
 }
 
-[data-layout="xp"] .workspace-switch {
-  border: 0;
-  border-radius: var(--r-pill);
-  background: transparent;
-}
-
-[data-layout="xp"] .workspace-switch button {
-  border: 0;
-  border-radius: var(--r-pill);
-  background: transparent;
-  box-shadow: none;
-  color: var(--text-dim);
-}
-
-[data-layout="xp"] .workspace-switch button.active {
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-
 [data-layout="xp"] .primary {
   border-color: var(--accent);
   background: var(--accent);

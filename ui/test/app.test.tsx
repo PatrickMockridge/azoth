@@ -24,6 +24,7 @@ import { PFD_EDGE, connectable } from "../src/components/Flowsheet";
 
 import { only, stubDownload, textOf, unstubDownload } from "./download";
 import { drag, drawnPosition } from "./drag";
+import { chooseInterface, currentInterface } from "./interfaceMenu";
 import { idPill, nodeIds, pill, stubXyflowEnvironment } from "./xyflow-env";
 
 beforeAll(stubXyflowEnvironment);
@@ -461,6 +462,37 @@ describe("the editor", () => {
     fireEvent.click(screen.getByRole("menuitem", { name: "Solve" }));
     await waitFor(() => expect(pill(container)).toBe("solved"));
     expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("offers every interface from the Case menu and marks the one in front", async () => {
+    stubFetch();
+    const { container } = await open();
+
+    fireEvent.click(screen.getByRole("button", { name: "Case" }));
+    for (const label of ["Process simulation", "Calculation", "Safety study", "Drawing"]) {
+      expect(screen.getByRole("menuitem", { name: label })).toBeDefined();
+    }
+    expect(
+      screen.getByRole("menuitem", { name: "Process simulation" }).getAttribute("aria-current"),
+    ).toBe("true");
+    expect(screen.getByRole("menu", { name: "Case" }).querySelector('[role="separator"]')).not.toBeNull();
+    fireEvent.keyDown(window, { key: "Escape" });
+
+    chooseInterface("Calculation");
+    await waitFor(() => {
+      expect(container.querySelector<HTMLElement>(".app.calculations")?.hidden).toBe(false);
+    });
+    expect(currentInterface()).toBe("Calculation");
+
+    chooseInterface("Process simulation");
+    await waitFor(() => {
+      expect(
+        container.querySelector<HTMLElement>(
+          ".app:not(.calculations):not(.safety):not(.dexpi-workspace)",
+        )?.hidden,
+      ).toBe(false);
+    });
+    expect(currentInterface()).toBe("Process simulation");
   });
 
   it("nests the worked cases under one Demo cases submenu", async () => {
