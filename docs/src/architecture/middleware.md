@@ -16,13 +16,14 @@ is named at the foot of this page.
 
 **Two more documents ride beside the flowsheet.** A *calculation book* (`azoth-sheets`) holds
 standalone calculations, one sheet per registered calc id, and a *safety study*
-(`azoth-safety`) holds fire scenarios and bow-ties, one scenario per registered fire model and
-one bow-tie per `process.bow_tie` record. Each has its own command model, its own envelope and
-its own route — `/sheets` and `/safety` — so a front end draws one document at a time, and a
-save is no call because the document rides every answer. **Their dispatch is the library's own
-kernels**, not a second executor: the sheet dispatcher is generated from `specs/calcs` and the
-safety study's native ids are the five fire models plus `process.bow_tie`, called as the typed
-model kernels they are. The safety catalogue is attached to the one catalogue call by the
+(`azoth-safety`) holds safety scenarios and bow-ties, one scenario per registered safety model
+whose inputs and outputs are scalar and one bow-tie per `process.bow_tie` record. Each has its
+own command model, its own envelope and its own route — `/sheets` and `/safety` — so a front
+end draws one document at a time, and a save is no call because the document rides every
+answer. **Their dispatch is the library's own kernels**, not a second executor: the sheet
+dispatcher is generated from `specs/calcs` and the safety study's native ids are the
+twenty-one scalar safety models plus `process.bow_tie`, called as the typed model kernels they
+are. The safety catalogue is attached to the one catalogue call by the
 bindings that own it, because `azoth-process` cannot depend on a crate that depends on it.
 
 ## The gap

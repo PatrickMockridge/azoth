@@ -8,7 +8,7 @@
 
 import { calcManualUrl } from "../../manual";
 import type { Catalogue, SafetyEnvelope } from "../../wire/types";
-import type { SafetyView } from "./SafetyWorkspace";
+import type { SafetyView, ScenarioView } from "./views";
 
 const FAMILIES: { id: string; label: string }[] = [
   { id: "dispersion", label: "Dispersion" },
@@ -19,6 +19,34 @@ const FAMILIES: { id: string; label: string }[] = [
   { id: "release", label: "Release" },
   { id: "risk", label: "Risk and SIL" },
   { id: "rupture", label: "Rupture" },
+];
+
+const SCENARIO_CARDS: { id: ScenarioView; label: string; blurb: string }[] = [
+  {
+    id: "fire",
+    label: "Fire scenarios",
+    blurb: "Jet fire, pool fire, BLEVE, vapour-cloud explosion and passive fire protection.",
+  },
+  {
+    id: "dispersion",
+    label: "Dispersion scenarios",
+    blurb: "Gaussian plume, hazardous area, dense gas, probit and toxic thresholds.",
+  },
+  {
+    id: "firewater",
+    label: "Firewater scenarios",
+    blurb: "Protection screening, deluge layout, monitor coverage and supply gates.",
+  },
+  {
+    id: "overpressure",
+    label: "Relief scenarios",
+    blurb: "Fire-case relief, relief-valve sizing, acceptance and pipeline protection.",
+  },
+  {
+    id: "risk",
+    label: "Risk scenarios",
+    blurb: "NOG 070 minimum SIL and the instrumented function's PFD arithmetic.",
+  },
 ];
 
 export function SafetyOverview({
@@ -48,6 +76,9 @@ export function SafetyOverview({
   const errors = diagnostics.filter((entry) => entry.severity === "error");
   const warnings = diagnostics.filter((entry) => entry.severity === "warning");
   const entries = catalogue?.safety ?? [];
+  const nativeScenarios = entries.filter(
+    (entry) => entry.native && entry.form !== undefined,
+  ).length;
 
   return (
     <div className="safety-overview">
@@ -68,19 +99,23 @@ export function SafetyOverview({
             </button>
           </div>
         </article>
-        <article className="safety-card">
-          <h2>Fire scenarios</h2>
-          <p className="safety-count">{study.scenarios.length}</p>
-          <p>
-            Jet fire, pool fire, BLEVE, vapour-cloud explosion and passive fire protection, each
-            one a registered model with its own inputs and a distance-to-threshold table.
-          </p>
-          <div className="safety-actions">
-            <button type="button" onClick={() => onView("fire")}>
-              Open the fire view
-            </button>
-          </div>
-        </article>
+        {SCENARIO_CARDS.map((card) => {
+          const count = study.scenarios.filter(
+            (scenario) => scenario.family === card.id,
+          ).length;
+          return (
+            <article className="safety-card" key={card.id}>
+              <h2>{card.label}</h2>
+              <p className="safety-count">{count}</p>
+              <p>{card.blurb}</p>
+              <div className="safety-actions">
+                <button type="button" onClick={() => onView(card.id)}>
+                  Open the {card.label.toLowerCase()} view
+                </button>
+              </div>
+            </article>
+          );
+        })}
       </section>
 
       {study.bowties.length === 0 ? null : (
@@ -130,9 +165,9 @@ export function SafetyOverview({
       <section className="safety-families">
         <h2>The safety surface</h2>
         <p className="note">
-          Every calculation whose source is under <code>process/safety/</code>. The five fire
-          models and the bow-tie run here; the rest are not runnable in this workspace yet, and
-          their manual pages state the inputs, the valid range and the worked example.
+          Every calculation whose source is under <code>process/safety/</code>. {nativeScenarios}{" "}
+          scenario models and the bow-tie run here; the rest are not runnable in this workspace
+          yet, and their manual pages state the inputs, the valid range and the worked example.
         </p>
         {FAMILIES.map((family) => {
           const rows = entries.filter((entry) => entry.family === family.id);

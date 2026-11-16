@@ -56,22 +56,54 @@ def test_the_catalogue_is_every_safety_model_and_nothing_else() -> None:
     assert families.count("qra") == 1
 
 
-def test_the_native_scenarios_are_five_and_the_bow_tie_is_its_own_view() -> None:
+def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
     module: Any = tool()
     by_id = {spec["id"]: spec for _, spec in module.documents()}
     native = sorted(module.NATIVE_SCENARIOS)
     assert native == [
+        "process.active_fire_protection_screening",
         "process.bleve",
+        "process.deluge_nozzle_layout",
+        "process.fire_case_relief",
+        "process.fire_monitor_coverage",
+        "process.fire_water_coverage_assessment",
+        "process.gaussian_plume",
+        "process.hazardous_area",
+        "process.heavy_gas_dispersion",
         "process.jet_fire",
+        "process.nog070_sil_determination",
+        "process.overpressure_acceptance",
         "process.pfp_demand",
+        "process.pipeline_pressure_protection",
         "process.pool_fire",
+        "process.probit",
+        "process.psv_fire_sizing",
+        "process.psv_sizing",
+        "process.safety_instrumented_function",
+        "process.toxic_library",
         "process.vce",
     ]
     for wanted in native:
         assert module.emit_form(by_id[wanted]).startswith("Some(&CalcForm {")
     assert module.sub_interface_of(by_id[module.BOWTIE], "risk") == "bowtie"
     assert module.sub_interface_of(by_id["process.jet_fire"], "fire") == "fire"
-    assert module.sub_interface_of(by_id["process.gas_dispersion"], "dispersion") is None
+    assert module.sub_interface_of(by_id["process.gas_dispersion"], "dispersion") == "dispersion"
+    assert module.sub_interface_of(by_id["process.fire_water_demand"], "firewater") == "firewater"
+    assert module.sub_interface_of(by_id["process.psv_sizing"], "overpressure") == "overpressure"
+    assert module.sub_interface_of(by_id["process.safety_instrumented_function"], "risk") == "risk"
+    assert module.sub_interface_of(by_id["process.hem_release"], "release") is None
+
+
+def test_every_non_native_entry_has_a_refusal_and_no_form() -> None:
+    module: Any = tool()
+    entries = module.render()
+    assert entries.count("native: false") == 17
+    assert entries.count("refusal: Some(") == 17
+    for _, spec in module.documents():
+        if module.native_of(spec):
+            assert module.refusal_of(spec) is None, spec["id"]
+        else:
+            assert module.refusal_of(spec) is not None, spec["id"]
 
 
 def test_every_native_id_says_what_it_is_for() -> None:

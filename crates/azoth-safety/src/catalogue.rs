@@ -2,7 +2,7 @@
 //!
 //! **The family is the source path, not a second table.** Every entry is a model whose
 //! `[source] standard` is under `NeqSim process/safety/<family>/`, and `tools/gen_safety.py`
-//! takes that segment as the family. The five scenarios this tranche can run carry the same
+//! takes that segment as the family. The scenario models this workspace can run carry the same
 //! `CalcForm` the calculation book reads, joined the same way; the rest are listed so a reader
 //! can find their manual page.
 

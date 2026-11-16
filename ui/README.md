@@ -60,8 +60,9 @@ It is **not a CAD editor**: no symbol is moved or authored, and the arrangement 
 
 ## The Safety workspace
 
-The fourth workspace is a safety study: an overview of the study's bow-ties and fire scenarios,
-a bow-tie canvas with an inspector, and the five fire models as scenario cards. The document is
+The fourth workspace is a safety study: an overview of the study's bow-ties and scenarios, a
+bow-tie canvas with an inspector, and scenario cards for five native families — fire,
+dispersion, firewater, overpressure and risk. The document is
 TOML and rides every envelope; the door is `SafetyDoor` in `src/wire/session.ts`; the module
 implements it (`SafetyEditor`) and `azoth serve` offers the same calls at `POST /safety`.
 `test/fixtures/safety-envelope.json` is the CLI's `azoth safety --study specs/safety/demo.toml

@@ -44,7 +44,7 @@ const available = catalogue.calcs.filter((entry) => entry.available).length;
 check("94 a sheet can draw", available === 94, `${available}`);
 check("39 safety calculations", catalogue.safety.length === 39, `${catalogue.safety.length}`);
 const nativeSafety = catalogue.safety.filter((entry) => entry.native).length;
-check("6 native safety ids", nativeSafety === 6, `${nativeSafety}`);
+check("22 native safety ids", nativeSafety === 22, `${nativeSafety}`);
 
 // 2. Opening the shipped document.
 const document = readFileSync("specs/flowsheets/demo.toml", "utf8");
@@ -128,12 +128,18 @@ check("its inputs are empty", Object.keys(added.book.sheets[2].inputs).length ==
 const study = readFileSync("specs/safety/demo.toml", "utf8");
 const safety = new azoth.SafetyEditor(study);
 const openedStudy = JSON.parse(safety.envelope());
-check("two safety scenarios", openedStudy.study.scenarios.length === 2);
+check("six safety scenarios", openedStudy.study.scenarios.length === 6);
 check("and one bow-tie", openedStudy.study.bowties.length === 1);
 const ranStudy = JSON.parse(safety.calculate(undefined));
 check("the jet fire ran", ranStudy.study.scenarios[0].stale === false);
 const studyFlux = ranStudy.study.scenarios[0].result.outputs.incident_heat_flux.magnitude_si;
 check("with the spec's flux", Math.abs(studyFlux - 2119.417169158887) < 1e-6, `${studyFlux}`);
+const studySif = ranStudy.study.scenarios.find((row) => row.id === "sif_1");
+check(
+  "and the SIF's RRF",
+  Math.abs(studySif.result.outputs.risk_reduction_factor - 200) < 1e-9,
+  `${studySif.result.outputs.risk_reduction_factor}`,
+);
 const studyRrf = ranStudy.study.bowties[0].derived.total_rrf;
 check("the bow-tie has RRF 100", Math.abs(studyRrf - 100) < 1e-9, `${studyRrf}`);
 const moved = JSON.parse(
@@ -153,5 +159,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.log(
-  "wasm smoke: OK (31 palette entries, 16 tools, 98 calculations, 39 safety ids, 6 nodes, 43 values)",
+  "wasm smoke: OK (31 palette entries, 16 tools, 98 calculations, 39 safety ids, 22 native, 6 nodes, 43 values)",
 );

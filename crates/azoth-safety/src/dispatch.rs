@@ -8,22 +8,43 @@ use std::collections::BTreeMap;
 
 use azoth_core::Warning;
 use azoth_core::units::{
-    kelvins, kilograms, kilograms_per_second, kilograms_per_square_meter_second, meters, pascals,
-    seconds, watts_per_meter_kelvin, watts_per_square_meter,
+    bars, cubic_meters, cubic_meters_per_second, joules_per_kilogram_kelvin, kelvins, kilograms,
+    kilograms_per_cubic_meter, kilograms_per_mole, kilograms_per_second,
+    kilograms_per_square_meter_second, liters_per_minute, meters, meters_per_second,
+    pascal_seconds, pascals, seconds, square_meters, watts, watts_per_meter_kelvin,
+    watts_per_square_meter,
 };
 use azoth_process::models::bow_tie::{BowTieBarrier, BowTieConsequence, BowTieThreat};
 pub use azoth_sheets::dispatch::Outcome;
-use azoth_sheets::dispatch_support::{number, optional_number, optional_text, refused, warnings};
+use azoth_sheets::dispatch_support::{
+    flag, number, optional_flag, optional_number, optional_text, refused, text, warnings,
+};
 use azoth_sheets::workspace::CalcOutcome;
 use serde_json::{Map, Value, json};
 
 /// Every id this workspace can run natively.
 pub const NATIVE: &[&str] = &[
+    "process.active_fire_protection_screening",
     "process.bleve",
     "process.bow_tie",
+    "process.deluge_nozzle_layout",
+    "process.fire_case_relief",
+    "process.fire_monitor_coverage",
+    "process.fire_water_coverage_assessment",
+    "process.gaussian_plume",
+    "process.hazardous_area",
+    "process.heavy_gas_dispersion",
     "process.jet_fire",
+    "process.nog070_sil_determination",
+    "process.overpressure_acceptance",
     "process.pfp_demand",
+    "process.pipeline_pressure_protection",
     "process.pool_fire",
+    "process.probit",
+    "process.psv_fire_sizing",
+    "process.psv_sizing",
+    "process.safety_instrumented_function",
+    "process.toxic_library",
     "process.vce",
 ];
 
@@ -40,15 +61,102 @@ pub fn is_native(id: &str) -> bool {
 #[must_use]
 pub fn required(id: &str) -> Option<&'static [&'static str]> {
     Some(match id {
+        "process.active_fire_protection_screening" => &[
+            "scenario",
+            "blowdown_time_to_target",
+            "bare_steel_time_to_critical",
+            "dedicated_object_demand",
+            "general_area_demand",
+        ],
         "process.bleve" => &["fuel_mass", "heat_of_combustion", "radiative_fraction"],
         "process.bow_tie" => &["threats", "consequences", "barriers"],
+        "process.deluge_nozzle_layout" => &[
+            "protected_area",
+            "required_density",
+            "nozzle_k",
+            "nozzle_min_pressure",
+            "nozzle_max_spacing",
+            "nozzle_clearance",
+            "available_clearance",
+        ],
+        "process.fire_case_relief" => &["has_drainage", "has_fire_fighting"],
+        "process.fire_monitor_coverage" => &["target_area", "required_density"],
+        "process.fire_water_coverage_assessment" => &[
+            "protected_area",
+            "required_flow",
+            "spare_supply_flow",
+            "worst_case_pressure_margin",
+        ],
+        "process.gaussian_plume" => &[
+            "emission_rate",
+            "effective_stack_height",
+            "wind_speed",
+            "stability",
+            "terrain",
+            "distance",
+            "crosswind",
+            "height",
+            "threshold",
+        ],
+        "process.hazardous_area" => &[
+            "mass_flow",
+            "exit_density",
+            "exit_velocity",
+            "lfl_volume_fraction",
+            "gas_molar_mass",
+        ],
+        "process.heavy_gas_dispersion" => &[
+            "volumetric_rate",
+            "source_density",
+            "air_density",
+            "wind_speed",
+        ],
         "process.jet_fire" => &["mass_flow", "heat_of_combustion", "radiative_fraction"],
+        "process.nog070_sil_determination" => &["sif_type", "pfd_average"],
+        "process.overpressure_acceptance" => {
+            &["peak_pressure", "mawp", "cause", "multiple_devices"]
+        }
         "process.pfp_demand" => &[
             "incident_heat_flux",
             "steel_thickness",
             "required_survival_time",
         ],
+        "process.pipeline_pressure_protection" => &[
+            "max_source_pressure",
+            "design_pressure",
+            "incidental_factor",
+            "barrier1_setpoint",
+            "barrier2_setpoint",
+        ],
         "process.pool_fire" => &["pool_diameter", "burn_rate"],
+        "process.probit" => &["a", "b", "n"],
+        "process.psv_fire_sizing" => &[
+            "initial_mass",
+            "initial_pressure",
+            "set_pressure",
+            "initial_temperature",
+            "fire_heat_input",
+            "vessel_volume",
+            "molar_mass",
+            "specific_heat_ratio",
+            "compressibility",
+            "heat_capacity",
+            "blowdown_time",
+        ],
+        "process.psv_sizing" => &[
+            "service",
+            "set_pressure",
+            "overpressure_fraction",
+            "back_pressure",
+        ],
+        "process.safety_instrumented_function" => &[
+            "pfd_average",
+            "claimed_sil",
+            "unmitigated_frequency_per_year",
+            "target_frequency_per_year",
+            "test_interval_hours",
+        ],
+        "process.toxic_library" => &[],
         "process.vce" => &["cloud_fuel_mass", "heat_of_combustion", "strength_class"],
         _ => return None,
     })
@@ -67,12 +175,28 @@ pub fn run(id: &str, inputs: &Value) -> Outcome {
 
 fn arm(id: &str, inputs: &Value) -> Result<Outcome, Outcome> {
     match id {
+        "process.active_fire_protection_screening" => active_fire_protection_screening(inputs),
         "process.bow_tie" => bow_tie(inputs),
+        "process.deluge_nozzle_layout" => deluge_nozzle_layout(inputs),
+        "process.fire_case_relief" => fire_case_relief(inputs),
+        "process.fire_monitor_coverage" => fire_monitor_coverage(inputs),
+        "process.fire_water_coverage_assessment" => fire_water_coverage_assessment(inputs),
+        "process.gaussian_plume" => gaussian_plume(inputs),
+        "process.hazardous_area" => hazardous_area(inputs),
+        "process.heavy_gas_dispersion" => heavy_gas_dispersion(inputs),
         "process.jet_fire" => jet_fire(inputs),
+        "process.nog070_sil_determination" => nog070_sil_determination(inputs),
+        "process.overpressure_acceptance" => overpressure_acceptance(inputs),
+        "process.pipeline_pressure_protection" => pipeline_pressure_protection(inputs),
         "process.pool_fire" => pool_fire(inputs),
         "process.bleve" => bleve(inputs),
         "process.vce" => vce(inputs),
         "process.pfp_demand" => pfp_demand(inputs),
+        "process.probit" => probit(inputs),
+        "process.psv_fire_sizing" => psv_fire_sizing(inputs),
+        "process.psv_sizing" => psv_sizing(inputs),
+        "process.safety_instrumented_function" => safety_instrumented_function(inputs),
+        "process.toxic_library" => toxic_library(inputs),
         other => Err(Outcome::Error {
             message: format!("`{other}` is not a safety calculation this workspace can run"),
             field: None,
@@ -385,6 +509,842 @@ fn bow_tie(inputs: &Value) -> Result<Outcome, Outcome> {
                 );
                 scalar(&mut outputs, "total_rrf", result.total_rrf);
                 scalar(&mut outputs, "max_severity", result.max_severity);
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn gaussian_plume(inputs: &Value) -> Result<Outcome, Outcome> {
+    let emission_rate = kilograms_per_second(number(inputs, "emission_rate")?);
+    let effective_stack_height = meters(number(inputs, "effective_stack_height")?);
+    let wind_speed = meters_per_second(number(inputs, "wind_speed")?);
+    let stability = text(inputs, "stability")?;
+    let terrain = text(inputs, "terrain")?;
+    let distance = meters(number(inputs, "distance")?);
+    let crosswind = meters(number(inputs, "crosswind")?);
+    let height = meters(number(inputs, "height")?);
+    let threshold = kilograms_per_cubic_meter(number(inputs, "threshold")?);
+    Ok(
+        match azoth_process::gaussian_plume(
+            emission_rate,
+            effective_stack_height,
+            wind_speed,
+            stability,
+            terrain,
+            distance,
+            crosswind,
+            height,
+            threshold,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                quantity(&mut outputs, "sigma_y", result.sigma_y.value, "m");
+                quantity(&mut outputs, "sigma_z", result.sigma_z.value, "m");
+                quantity(
+                    &mut outputs,
+                    "concentration",
+                    result.concentration.value,
+                    "kg/m**3",
+                );
+                quantity(
+                    &mut outputs,
+                    "centerline_ground_concentration",
+                    result.centerline_ground_concentration.value,
+                    "kg/m**3",
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "distance_to_threshold",
+                    result.distance_to_threshold.map(|value| value.value),
+                    "m",
+                );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn hazardous_area(inputs: &Value) -> Result<Outcome, Outcome> {
+    let mass_flow = kilograms_per_second(number(inputs, "mass_flow")?);
+    let exit_density = kilograms_per_cubic_meter(number(inputs, "exit_density")?);
+    let exit_velocity = meters_per_second(number(inputs, "exit_velocity")?);
+    let lfl_volume_fraction = number(inputs, "lfl_volume_fraction")?;
+    let gas_molar_mass = kilograms_per_mole(number(inputs, "gas_molar_mass")?);
+    let ambient_density =
+        optional_number(inputs, "ambient_density")?.map(kilograms_per_cubic_meter);
+    let safety_factor = optional_number(inputs, "safety_factor")?;
+    let release_grade = optional_text(inputs, "release_grade")?;
+    Ok(
+        match azoth_process::hazardous_area(
+            mass_flow,
+            exit_density,
+            exit_velocity,
+            lfl_volume_fraction,
+            gas_molar_mass,
+            ambient_density,
+            safety_factor,
+            release_grade,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                quantity(
+                    &mut outputs,
+                    "effective_diameter",
+                    result.effective_diameter.value,
+                    "m",
+                );
+                scalar(&mut outputs, "lfl_mass_fraction", result.lfl_mass_fraction);
+                quantity(
+                    &mut outputs,
+                    "hazardous_distance",
+                    result.hazardous_distance.value,
+                    "m",
+                );
+                outputs.insert("release_grade".to_string(), json!(result.release_grade));
+                outputs.insert(
+                    "zone_classification".to_string(),
+                    json!(result.zone_classification),
+                );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn heavy_gas_dispersion(inputs: &Value) -> Result<Outcome, Outcome> {
+    let volumetric_rate = cubic_meters_per_second(number(inputs, "volumetric_rate")?);
+    let source_density = kilograms_per_cubic_meter(number(inputs, "source_density")?);
+    let air_density = kilograms_per_cubic_meter(number(inputs, "air_density")?);
+    let wind_speed = meters_per_second(number(inputs, "wind_speed")?);
+    let concentration_ratio = optional_number(inputs, "concentration_ratio")?;
+    Ok(
+        match azoth_process::heavy_gas_dispersion(
+            volumetric_rate,
+            source_density,
+            air_density,
+            wind_speed,
+            concentration_ratio,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                scalar(&mut outputs, "reduced_gravity", result.reduced_gravity);
+                scalar(&mut outputs, "britter_parameter", result.britter_parameter);
+                quantity_optional(
+                    &mut outputs,
+                    "distance_to_concentration_ratio",
+                    result
+                        .distance_to_concentration_ratio
+                        .map(|value| value.value),
+                    "m",
+                );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn probit(inputs: &Value) -> Result<Outcome, Outcome> {
+    let a = number(inputs, "a")?;
+    let b = number(inputs, "b")?;
+    let n = number(inputs, "n")?;
+    let dose = optional_number(inputs, "dose")?;
+    let probit_value = optional_number(inputs, "probit_value")?;
+    Ok(match azoth_process::probit(a, b, n, dose, probit_value) {
+        Ok(result) => {
+            let mut outputs = BTreeMap::new();
+            scalar_optional(&mut outputs, "probit", result.probit);
+            scalar(&mut outputs, "probability", result.probability);
+            done(outputs, &result.warnings)
+        }
+        Err(error) => refused(error),
+    })
+}
+
+fn toxic_library(inputs: &Value) -> Result<Outcome, Outcome> {
+    let chemical = optional_text(inputs, "chemical")?;
+    let concentration_ppm = optional_number(inputs, "concentration_ppm")?;
+    let molar_mass = optional_number(inputs, "molar_mass")?.map(kilograms_per_mole);
+    let temperature = optional_number(inputs, "temperature")?.map(kelvins);
+    let pressure = optional_number(inputs, "pressure")?.map(pascals);
+    Ok(
+        match azoth_process::toxic_library(
+            chemical,
+            concentration_ppm,
+            molar_mass,
+            temperature,
+            pressure,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                if let Some(known) = result.known {
+                    outputs.insert("known".to_string(), json!(known));
+                }
+                if let Some(name) = result.name {
+                    outputs.insert("name".to_string(), json!(name));
+                }
+                scalar_optional(&mut outputs, "idlh_ppm", result.idlh_ppm);
+                scalar_optional(&mut outputs, "erpg2_ppm", result.erpg2_ppm);
+                scalar_optional(&mut outputs, "aegl2_ppm", result.aegl2_ppm);
+                quantity_optional(
+                    &mut outputs,
+                    "mass_concentration",
+                    result.mass_concentration.map(|value| value.value),
+                    "kg/m**3",
+                );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn active_fire_protection_screening(inputs: &Value) -> Result<Outcome, Outcome> {
+    let scenario = text(inputs, "scenario")?;
+    let blowdown_time_to_target = seconds(number(inputs, "blowdown_time_to_target")?);
+    let bare_steel_time_to_critical = seconds(number(inputs, "bare_steel_time_to_critical")?);
+    let dedicated_object_demand = liters_per_minute(number(inputs, "dedicated_object_demand")?);
+    let general_area_demand = liters_per_minute(number(inputs, "general_area_demand")?);
+    Ok(
+        match azoth_process::active_fire_protection_screening(
+            scenario,
+            blowdown_time_to_target,
+            bare_steel_time_to_critical,
+            dedicated_object_demand,
+            general_area_demand,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                outputs.insert(
+                    "water_extinguishing".to_string(),
+                    json!(result.water_extinguishing),
+                );
+                outputs.insert(
+                    "blowdown_faster_than_failure".to_string(),
+                    json!(result.blowdown_faster_than_failure),
+                );
+                quantity(
+                    &mut outputs,
+                    "blowdown_margin",
+                    result.blowdown_margin.value,
+                    "s",
+                );
+                scalar(
+                    &mut outputs,
+                    "selective_protection_saving_fraction",
+                    result.selective_protection_saving_fraction,
+                );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn deluge_nozzle_layout(inputs: &Value) -> Result<Outcome, Outcome> {
+    let protected_area = square_meters(number(inputs, "protected_area")?);
+    let required_density = number(inputs, "required_density")?;
+    let nozzle_k = number(inputs, "nozzle_k")?;
+    let nozzle_min_pressure = bars(number(inputs, "nozzle_min_pressure")?);
+    let nozzle_max_spacing = meters(number(inputs, "nozzle_max_spacing")?);
+    let nozzle_clearance = meters(number(inputs, "nozzle_clearance")?);
+    let available_clearance = meters(number(inputs, "available_clearance")?);
+    let operating_pressure = optional_number(inputs, "operating_pressure")?.map(bars);
+    let coverage_efficiency = optional_number(inputs, "coverage_efficiency")?;
+    Ok(
+        match azoth_process::deluge_nozzle_layout(
+            protected_area,
+            required_density,
+            nozzle_k,
+            nozzle_min_pressure,
+            nozzle_max_spacing,
+            nozzle_clearance,
+            available_clearance,
+            operating_pressure,
+            coverage_efficiency,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                quantity(
+                    &mut outputs,
+                    "required_flow",
+                    result.required_flow.value,
+                    "L/min",
+                );
+                quantity(
+                    &mut outputs,
+                    "flow_per_nozzle",
+                    result.flow_per_nozzle.value,
+                    "L/min",
+                );
+                quantity(
+                    &mut outputs,
+                    "coverage_per_nozzle",
+                    result.coverage_per_nozzle.value,
+                    "m**2",
+                );
+                scalar(
+                    &mut outputs,
+                    "nozzle_count_from_flow",
+                    result.nozzle_count_from_flow,
+                );
+                scalar(
+                    &mut outputs,
+                    "nozzle_count_from_coverage",
+                    result.nozzle_count_from_coverage,
+                );
+                scalar(&mut outputs, "nozzle_count", result.nozzle_count);
+                outputs.insert(
+                    "governing_criterion".to_string(),
+                    json!(result.governing_criterion.as_str()),
+                );
+                quantity(&mut outputs, "grid_spacing", result.grid_spacing.value, "m");
+                quantity(
+                    &mut outputs,
+                    "delivered_flow",
+                    result.delivered_flow.value,
+                    "L/min",
+                );
+                scalar(&mut outputs, "delivered_density", result.delivered_density);
+                outputs.insert(
+                    "pressure_adequate".to_string(),
+                    json!(result.pressure_adequate),
+                );
+                outputs.insert("density_met".to_string(), json!(result.density_met));
+                outputs.insert(
+                    "clearance_adequate".to_string(),
+                    json!(result.clearance_adequate),
+                );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn fire_monitor_coverage(inputs: &Value) -> Result<Outcome, Outcome> {
+    let target_area = square_meters(number(inputs, "target_area")?);
+    let required_density = number(inputs, "required_density")?;
+    let monitor_count = optional_number(inputs, "monitor_count")?;
+    let monitor_flow = optional_number(inputs, "monitor_flow")?.map(liters_per_minute);
+    let effective_throw = optional_number(inputs, "effective_throw")?.map(meters);
+    let sweep_angle = optional_number(inputs, "sweep_angle")?;
+    let wind_speed = optional_number(inputs, "wind_speed")?.map(meters_per_second);
+    let fall_height = optional_number(inputs, "fall_height")?.map(meters);
+    let droplet_terminal_velocity =
+        optional_number(inputs, "droplet_terminal_velocity")?.map(meters_per_second);
+    let characteristic_dimension = optional_number(inputs, "characteristic_dimension")?.map(meters);
+    let line_of_sight_obstructed = optional_flag(inputs, "line_of_sight_obstructed")?;
+    Ok(
+        match azoth_process::fire_monitor_coverage(
+            target_area,
+            required_density,
+            monitor_count,
+            monitor_flow,
+            effective_throw,
+            sweep_angle,
+            wind_speed,
+            fall_height,
+            droplet_terminal_velocity,
+            characteristic_dimension,
+            line_of_sight_obstructed,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                quantity(&mut outputs, "total_flow", result.total_flow.value, "L/min");
+                quantity(&mut outputs, "swept_area", result.swept_area.value, "m**2");
+                scalar(&mut outputs, "nominal_density", result.nominal_density);
+                quantity(
+                    &mut outputs,
+                    "drift_displacement",
+                    result.drift_displacement.value,
+                    "m",
+                );
+                scalar(
+                    &mut outputs,
+                    "wind_coverage_fraction",
+                    result.wind_coverage_fraction,
+                );
+                scalar(&mut outputs, "effective_density", result.effective_density);
+                outputs.insert(
+                    "meets_density_still_air".to_string(),
+                    json!(result.meets_density_still_air),
+                );
+                outputs.insert(
+                    "meets_density_in_wind".to_string(),
+                    json!(result.meets_density_in_wind),
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "flow_needed_for_compliance",
+                    result.flow_needed_for_compliance.map(|value| value.value),
+                    "L/min",
+                );
+                outputs.insert("verdict".to_string(), json!(result.verdict));
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn fire_water_coverage_assessment(inputs: &Value) -> Result<Outcome, Outcome> {
+    let protected_area = square_meters(number(inputs, "protected_area")?);
+    let required_flow = liters_per_minute(number(inputs, "required_flow")?);
+    let spare_supply_flow = liters_per_minute(number(inputs, "spare_supply_flow")?);
+    let worst_case_pressure_margin = bars(number(inputs, "worst_case_pressure_margin")?);
+    let covered_area = optional_number(inputs, "covered_area")?.map(square_meters);
+    let existing_delivered_flow =
+        optional_number(inputs, "existing_delivered_flow")?.map(liters_per_minute);
+    let required_pressure_margin = optional_number(inputs, "required_pressure_margin")?.map(bars);
+    Ok(
+        match azoth_process::fire_water_coverage_assessment(
+            protected_area,
+            required_flow,
+            spare_supply_flow,
+            worst_case_pressure_margin,
+            covered_area,
+            existing_delivered_flow,
+            required_pressure_margin,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                quantity(
+                    &mut outputs,
+                    "coverage_gap",
+                    result.coverage_gap.value,
+                    "m**2",
+                );
+                scalar(&mut outputs, "coverage_fraction", result.coverage_fraction);
+                quantity(
+                    &mut outputs,
+                    "flow_deficit",
+                    result.flow_deficit.value,
+                    "L/min",
+                );
+                outputs.insert("flow_feasible".to_string(), json!(result.flow_feasible));
+                outputs.insert(
+                    "pressure_feasible".to_string(),
+                    json!(result.pressure_feasible),
+                );
+                outputs.insert("verdict".to_string(), json!(result.verdict.as_str()));
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn fire_case_relief(inputs: &Value) -> Result<Outcome, Outcome> {
+    let wetted_area = optional_number(inputs, "wetted_area")?.map(square_meters);
+    let vessel_diameter = optional_number(inputs, "vessel_diameter")?.map(meters);
+    let wetted_height = optional_number(inputs, "wetted_height")?.map(meters);
+    let has_drainage = flag(inputs, "has_drainage")?;
+    let has_fire_fighting = flag(inputs, "has_fire_fighting")?;
+    // J/kg, dimensionless because the vocabulary has no specific-energy unit.
+    let latent_heat = optional_number(inputs, "latent_heat")?;
+    let relieving_temperature = optional_number(inputs, "relieving_temperature")?.map(kelvins);
+    Ok(
+        match azoth_process::fire_case_relief(
+            wetted_area,
+            vessel_diameter,
+            wetted_height,
+            has_drainage,
+            has_fire_fighting,
+            latent_heat,
+            relieving_temperature,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                scalar(&mut outputs, "latent_heat", result.latent_heat);
+                quantity(
+                    &mut outputs,
+                    "relief_rate",
+                    result.relief_rate.value,
+                    "kg/s",
+                );
+                quantity(
+                    &mut outputs,
+                    "relief_rate_kg_per_hr",
+                    result.relief_rate_kg_per_hr.value,
+                    "kg/h",
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "relieving_temperature",
+                    result.relieving_temperature.map(|value| value.value),
+                    "K",
+                );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn overpressure_acceptance(inputs: &Value) -> Result<Outcome, Outcome> {
+    let peak_pressure = pascals(number(inputs, "peak_pressure")?);
+    let mawp = pascals(number(inputs, "mawp")?);
+    let cause = text(inputs, "cause")?;
+    let multiple_devices = flag(inputs, "multiple_devices")?;
+    Ok(
+        match azoth_process::overpressure_acceptance(peak_pressure, mawp, cause, multiple_devices) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                scalar(
+                    &mut outputs,
+                    "accumulation_factor",
+                    result.accumulation_factor,
+                );
+                quantity(
+                    &mut outputs,
+                    "allowable_pressure",
+                    result.allowable_pressure.value,
+                    "Pa",
+                );
+                quantity(&mut outputs, "margin", result.margin.value, "Pa");
+                outputs.insert("accepted".to_string(), json!(result.accepted));
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn pipeline_pressure_protection(inputs: &Value) -> Result<Outcome, Outcome> {
+    let max_source_pressure = bars(number(inputs, "max_source_pressure")?);
+    let design_pressure = bars(number(inputs, "design_pressure")?);
+    let incidental_factor = number(inputs, "incidental_factor")?;
+    let barrier1_setpoint = bars(number(inputs, "barrier1_setpoint")?);
+    let barrier2_setpoint = bars(number(inputs, "barrier2_setpoint")?);
+    Ok(
+        match azoth_process::pipeline_pressure_protection(
+            max_source_pressure,
+            design_pressure,
+            incidental_factor,
+            barrier1_setpoint,
+            barrier2_setpoint,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                quantity(
+                    &mut outputs,
+                    "max_incidental_pressure",
+                    result.max_incidental_pressure.value,
+                    "bar",
+                );
+                quantity(
+                    &mut outputs,
+                    "design_margin",
+                    result.design_margin.value,
+                    "bar",
+                );
+                outputs.insert("fully_rated".to_string(), json!(result.fully_rated));
+                outputs.insert(
+                    "barrier1_adequate".to_string(),
+                    json!(result.barrier1_adequate),
+                );
+                outputs.insert(
+                    "barrier2_adequate".to_string(),
+                    json!(result.barrier2_adequate),
+                );
+                outputs.insert(
+                    "protection_adequate".to_string(),
+                    json!(result.protection_adequate),
+                );
+                outputs.insert("verdict".to_string(), json!(result.verdict));
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+/// The signature's order is not the spec's: the two flags precede the branch quantities.
+fn psv_sizing(inputs: &Value) -> Result<Outcome, Outcome> {
+    let service = text(inputs, "service")?;
+    let set_pressure = pascals(number(inputs, "set_pressure")?);
+    let overpressure_fraction = number(inputs, "overpressure_fraction")?;
+    let back_pressure = pascals(number(inputs, "back_pressure")?);
+    let is_balanced_bellows = optional_flag(inputs, "is_balanced_bellows")?;
+    let has_rupture_disk = optional_flag(inputs, "has_rupture_disk")?;
+    let mass_flow = optional_number(inputs, "mass_flow")?.map(kilograms_per_second);
+    let temperature = optional_number(inputs, "temperature")?.map(kelvins);
+    let molar_mass = optional_number(inputs, "molar_mass")?.map(kilograms_per_mole);
+    let compressibility = optional_number(inputs, "compressibility")?;
+    let specific_heat_ratio = optional_number(inputs, "specific_heat_ratio")?;
+    let volume_flow = optional_number(inputs, "volume_flow")?.map(cubic_meters_per_second);
+    let liquid_density = optional_number(inputs, "liquid_density")?.map(kilograms_per_cubic_meter);
+    let viscosity = optional_number(inputs, "viscosity")?.map(pascal_seconds);
+    let gas_fraction = optional_number(inputs, "gas_fraction")?;
+    let gas_density = optional_number(inputs, "gas_density")?.map(kilograms_per_cubic_meter);
+    // J/kg, dimensionless because the vocabulary has no specific-energy unit.
+    let latent_heat = optional_number(inputs, "latent_heat")?;
+    let liquid_heat_capacity =
+        optional_number(inputs, "liquid_heat_capacity")?.map(joules_per_kilogram_kelvin);
+    let orifice_area = optional_number(inputs, "orifice_area")?.map(square_meters);
+    let capacity_discharge_coefficient = optional_number(inputs, "capacity_discharge_coefficient")?;
+    Ok(
+        match azoth_process::psv_sizing(
+            service,
+            set_pressure,
+            overpressure_fraction,
+            back_pressure,
+            is_balanced_bellows,
+            has_rupture_disk,
+            mass_flow,
+            temperature,
+            molar_mass,
+            compressibility,
+            specific_heat_ratio,
+            volume_flow,
+            liquid_density,
+            viscosity,
+            gas_fraction,
+            gas_density,
+            latent_heat,
+            liquid_heat_capacity,
+            orifice_area,
+            capacity_discharge_coefficient,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                quantity(
+                    &mut outputs,
+                    "relieving_pressure",
+                    result.relieving_pressure.value,
+                    "Pa",
+                );
+                scalar(
+                    &mut outputs,
+                    "back_pressure_fraction",
+                    result.back_pressure_fraction,
+                );
+                scalar(
+                    &mut outputs,
+                    "discharge_coefficient",
+                    result.discharge_coefficient,
+                );
+                quantity(
+                    &mut outputs,
+                    "required_area",
+                    result.required_area.value,
+                    "m**2",
+                );
+                scalar_optional(&mut outputs, "required_area_in2", result.required_area_in2);
+                if let Some(orifice) = result.recommended_orifice {
+                    outputs.insert("recommended_orifice".to_string(), json!(orifice));
+                }
+                scalar_optional(&mut outputs, "selected_area_in2", result.selected_area_in2);
+                scalar_optional(
+                    &mut outputs,
+                    "back_pressure_correction",
+                    result.back_pressure_correction,
+                );
+                scalar_optional(
+                    &mut outputs,
+                    "combination_correction",
+                    result.combination_correction,
+                );
+                scalar_optional(
+                    &mut outputs,
+                    "viscosity_correction",
+                    result.viscosity_correction,
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "mass_flow_rate",
+                    result.mass_flow_rate.map(|value| value.value),
+                    "kg/s",
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "mass_flow_capacity",
+                    result.mass_flow_capacity.map(|value| value.value),
+                    "kg/s",
+                );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn psv_fire_sizing(inputs: &Value) -> Result<Outcome, Outcome> {
+    let initial_mass = kilograms(number(inputs, "initial_mass")?);
+    let initial_pressure = pascals(number(inputs, "initial_pressure")?);
+    let set_pressure = pascals(number(inputs, "set_pressure")?);
+    let initial_temperature = kelvins(number(inputs, "initial_temperature")?);
+    let fire_heat_input = watts(number(inputs, "fire_heat_input")?);
+    let vessel_volume = cubic_meters(number(inputs, "vessel_volume")?);
+    let molar_mass = kilograms_per_mole(number(inputs, "molar_mass")?);
+    let specific_heat_ratio = number(inputs, "specific_heat_ratio")?;
+    let compressibility = number(inputs, "compressibility")?;
+    let heat_capacity = joules_per_kilogram_kelvin(number(inputs, "heat_capacity")?);
+    let blowdown_time = seconds(number(inputs, "blowdown_time")?);
+    let blowdown_percent = optional_number(inputs, "blowdown_percent")?;
+    let orifice_area = optional_number(inputs, "orifice_area")?.map(square_meters);
+    let cv_discharge_coefficient = optional_number(inputs, "cv_discharge_coefficient")?;
+    Ok(
+        match azoth_process::psv_fire_sizing(
+            initial_mass,
+            initial_pressure,
+            set_pressure,
+            initial_temperature,
+            fire_heat_input,
+            vessel_volume,
+            molar_mass,
+            specific_heat_ratio,
+            compressibility,
+            heat_capacity,
+            blowdown_time,
+            blowdown_percent,
+            orifice_area,
+            cv_discharge_coefficient,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                scalar(
+                    &mut outputs,
+                    "overpressure_fraction",
+                    result.overpressure_fraction,
+                );
+                quantity(
+                    &mut outputs,
+                    "required_area",
+                    result.required_area.value,
+                    "m**2",
+                );
+                scalar(&mut outputs, "required_area_in2", result.required_area_in2);
+                outputs.insert(
+                    "recommended_orifice".to_string(),
+                    json!(result.recommended_orifice),
+                );
+                scalar(&mut outputs, "selected_area_in2", result.selected_area_in2);
+                scalar(
+                    &mut outputs,
+                    "back_pressure_fraction",
+                    result.back_pressure_fraction,
+                );
+                scalar(
+                    &mut outputs,
+                    "discharge_coefficient",
+                    result.discharge_coefficient,
+                );
+                scalar(
+                    &mut outputs,
+                    "back_pressure_correction",
+                    result.back_pressure_correction,
+                );
+                scalar(
+                    &mut outputs,
+                    "combination_correction",
+                    result.combination_correction,
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "blowdown_pressure",
+                    result.blowdown_pressure.map(|value| value.value),
+                    "Pa",
+                );
+                scalar_optional(&mut outputs, "flow_coefficient", result.flow_coefficient);
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn nog070_sil_determination(inputs: &Value) -> Result<Outcome, Outcome> {
+    let sif_type = text(inputs, "sif_type")?;
+    let pfd_average = number(inputs, "pfd_average")?;
+    let minimum_sil = optional_number(inputs, "minimum_sil")?;
+    Ok(
+        match azoth_process::nog070_sil_determination(sif_type, pfd_average, minimum_sil) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                scalar(
+                    &mut outputs,
+                    "catalogue_minimum_sil",
+                    result.catalogue_minimum_sil,
+                );
+                scalar(&mut outputs, "minimum_sil", result.minimum_sil);
+                scalar(&mut outputs, "achieved_sil", result.achieved_sil);
+                outputs.insert("compliant".to_string(), json!(result.compliant));
+                scalar_optional(
+                    &mut outputs,
+                    "required_pfd_reduction_factor",
+                    result.required_pfd_reduction_factor,
+                );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn safety_instrumented_function(inputs: &Value) -> Result<Outcome, Outcome> {
+    let pfd_average = number(inputs, "pfd_average")?;
+    let claimed_sil = number(inputs, "claimed_sil")?;
+    let unmitigated_frequency_per_year = number(inputs, "unmitigated_frequency_per_year")?;
+    let target_frequency_per_year = number(inputs, "target_frequency_per_year")?;
+    let test_interval_hours = number(inputs, "test_interval_hours")?;
+    let lambda_du_per_hour = optional_number(inputs, "lambda_du_per_hour")?;
+    let spurious_trip_rate_per_year = optional_number(inputs, "spurious_trip_rate_per_year")?;
+    let mttr_hours = optional_number(inputs, "mttr_hours")?;
+    let base_availability = optional_number(inputs, "base_availability")?;
+    Ok(
+        match azoth_process::safety_instrumented_function(
+            pfd_average,
+            claimed_sil,
+            unmitigated_frequency_per_year,
+            target_frequency_per_year,
+            test_interval_hours,
+            lambda_du_per_hour,
+            spurious_trip_rate_per_year,
+            mttr_hours,
+            base_availability,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                scalar_optional(
+                    &mut outputs,
+                    "risk_reduction_factor",
+                    result.risk_reduction_factor,
+                );
+                scalar(
+                    &mut outputs,
+                    "mitigated_frequency_per_year",
+                    result.mitigated_frequency_per_year,
+                );
+                scalar(&mut outputs, "required_pfd", result.required_pfd);
+                scalar(&mut outputs, "required_sil", result.required_sil);
+                scalar(
+                    &mut outputs,
+                    "max_pfd_for_claimed_sil",
+                    result.max_pfd_for_claimed_sil,
+                );
+                scalar(
+                    &mut outputs,
+                    "proof_test_interval_years",
+                    result.proof_test_interval_years,
+                );
+                outputs.insert(
+                    "pfd_within_claimed_sil".to_string(),
+                    json!(result.pfd_within_claimed_sil),
+                );
+                scalar_optional(&mut outputs, "pfd_1oo1", result.pfd_1oo1);
+                scalar_optional(&mut outputs, "pfd_1oo2", result.pfd_1oo2);
+                scalar_optional(&mut outputs, "pfd_2oo3", result.pfd_2oo3);
+                scalar_optional(
+                    &mut outputs,
+                    "availability_with_spurious_trips",
+                    result.availability_with_spurious_trips,
+                );
                 done(outputs, &result.warnings)
             }
             Err(error) => refused(error),

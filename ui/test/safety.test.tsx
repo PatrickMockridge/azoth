@@ -115,6 +115,25 @@ describe("the safety workspace", () => {
     });
   });
 
+  it("draws the dispersion deck from the same study, and calculates its scenario", async () => {
+    stubFetch();
+    const app = await openSafety();
+    fireEvent.click(within(app).getByRole("button", { name: "Dispersion" }));
+    // **The deck filters the study by family.** The study holds six scenarios; this view holds
+    // the one dispersion scenario, which is what keeps the fire view's two tabs two.
+    await waitFor(() => {
+      expect(within(app).getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
+        "Urban plume at 500 m",
+      ]);
+    });
+
+    fireEvent.click(within(app).getByRole("button", { name: "Calculate" }));
+    await waitFor(() => {
+      expect(within(app).getByRole("heading", { name: "Results" })).toBeDefined();
+    });
+    expect(within(app).getByText("Concentration")).toBeDefined();
+  });
+
   it("reads a served study from /safety", async () => {
     globalThis.fetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
       const url = String(input);

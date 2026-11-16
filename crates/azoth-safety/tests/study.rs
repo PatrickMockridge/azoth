@@ -27,9 +27,9 @@ fn a_blank_document_is_a_blank_study() {
 }
 
 #[test]
-fn the_demo_is_two_scenarios_and_one_bowtie() {
+fn the_demo_is_six_scenarios_and_one_bowtie() {
     let study = SafetyStudy::parse(DEMO).expect("the demo reads");
-    assert_eq!(study.scenarios.len(), 2);
+    assert_eq!(study.scenarios.len(), 6);
     assert_eq!(study.bowties.len(), 1);
     assert_eq!(
         study
