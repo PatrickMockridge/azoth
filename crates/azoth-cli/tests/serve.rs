@@ -172,6 +172,13 @@ impl Server {
         assert_eq!(status, 200, "the sheet call is served: {answer}");
         answer
     }
+
+    fn safety(&self, body: Value) -> Value {
+        let text = body.to_string();
+        let (status, answer) = self.request_to("/safety", "POST", Some(&text), None);
+        assert_eq!(status, 200, "the safety call is served: {answer}");
+        answer
+    }
 }
 
 impl Drop for Server {
@@ -500,6 +507,71 @@ fn the_calculation_book_is_a_second_route() {
     let power = power.as_f64().expect("a quantity");
     assert!((power - 3914.81468).abs() < 1e-6, "{power}");
     assert_eq!(calculated["book"]["sheets"][0]["stale"], false);
+}
+
+#[test]
+fn the_safety_study_is_a_third_route() {
+    let server = Server::start(&[]);
+    let opened = server.safety(json!({ "command": null }));
+    assert_eq!(
+        opened["study"]["scenarios"].as_array().map(Vec::len),
+        Some(0),
+        "a server started without --safety-study serves a blank study"
+    );
+
+    server.safety(json!({
+        "command": {
+            "command": "add_scenario",
+            "id": "jet_1",
+            "calculation": "process.jet_fire"
+        }
+    }));
+    for (name, value) in [
+        ("mass_flow", 2.0),
+        ("heat_of_combustion", 50_000_000.0),
+        ("radiative_fraction", 0.2),
+        ("distance", 20.0),
+    ] {
+        server.safety(json!({
+            "command": {
+                "command": "set_scenario_input",
+                "scenario": "jet_1",
+                "input": name,
+                "value": value
+            }
+        }));
+    }
+    let calculated = server.safety(json!({ "calculate": { "scenario": "jet_1" } }));
+    let flux = calculated["study"]["scenarios"][0]["result"]["outputs"]["incident_heat_flux"]
+        ["magnitude_si"]
+        .as_f64()
+        .expect("a quantity");
+    assert!((flux - 2_119.417_169_158_887).abs() < 1e-6, "{flux}");
+    assert_eq!(calculated["study"]["scenarios"][0]["stale"], false);
+
+    server.safety(json!({
+        "command": {
+            "command": "set_bowtie",
+            "bowtie": {
+                "id": "bt_1",
+                "name": "One",
+                "top_event": "Loss of containment",
+                "threats": [{"id": "th_1", "label": "Corrosion", "frequency": 0.1, "active": true}],
+                "barriers": [{"id": "pb_1", "label": "Inspection", "pfd": 0.01, "barrier_type": "prevention", "functional": true}],
+                "consequences": [{"id": "co_1", "label": "Fire", "severity": 4.0}]
+            }
+        }
+    }));
+    let calculated = server.safety(json!({ "calculate": { "bowtie": "bt_1" } }));
+    let rrf = calculated["study"]["bowties"][0]["derived"]["total_rrf"]
+        .as_f64()
+        .expect("a number");
+    assert!((rrf - 100.0).abs() < 1e-9, "{rrf}");
+
+    let text = json!({ "calculate": { "nope": "x" } }).to_string();
+    let (status, answer) = server.request_to("/safety", "POST", Some(&text), None);
+    assert_eq!(status, 400);
+    assert!(answer["error"].as_str().unwrap_or_default().contains("scenario"));
 }
 
 #[test]

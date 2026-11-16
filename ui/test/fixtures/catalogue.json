@@ -21581,6 +21581,1530 @@
       "name": "water"
     }
   ],
+  "safety": [
+    {
+      "family": "firewater",
+      "id": "process.active_fire_protection_screening",
+      "name": "Active fire protection screening",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "fire",
+      "id": "process.api537_flare_flame_model",
+      "name": "API 537 flare flame model",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input, which a scenario does not yet provide",
+      "sub_interface": "fire"
+    },
+    {
+      "family": "fire",
+      "form": {
+        "assumptions": [
+          "**the fireball is the CCPS/TNO correlations**: `D = 5.8 M^(1/3)` m and `t = 0.45 M^(1/3)` s over the vaporising fuel mass `M`.",
+          "**the surface emissive power is `eta M dHc / (pi D^2 t)`**, the radiated fraction of the combustion energy over the fireball's area and lifetime.",
+          "**the view factor is the point source's, `D^2 / (4 d^2)` capped at one**, and the transmissivity is the jet fire's Wayne correlation; the helper is shared, not copied.",
+          "**the inverse is 60 halvings between `D/2 + 0.1` and 5000 m, with no early break.**",
+          "**a target above the near-field flux is absent.** The class returns its near bound, `D/2 + 0.1`; the port publishes no `distance_to_flux`. A non-positive target is refused: the class answers 2217.8 m for zero.",
+          "**the class's constructor validates the fuel mass and the heating value but not the radiative fraction**; a negative fraction answers a negative SEP and flux. The port refuses a fraction outside `[0, 1]`, as the jet fire does.",
+          "**relative humidity is the jet fire's setter, clamped to `[0, 1]` there.** The port refuses a stated value outside `(0, 1]`: the clamp's zero makes the shared correlation `NaN`. Absent is `0.5`.",
+          "**a non-positive distance is refused**: the class answers an infinite flux at zero. **Heat of combustion is in J/kg and crosses unconverted**, declared dimensionless for want of a vocabulary unit."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.bleve",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the mass of vaporising fuel, above zero.\n",
+            "dimension": "mass",
+            "kind": "quantity",
+            "name": "fuel_mass",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's constructor refuses a non-positive mass",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "kg",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the lower heating value in J/kg, above zero. Declared dimensionless because no vocabulary unit expresses a mass-specific energy.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "heat_of_combustion",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's constructor refuses a non-positive heating value",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the fraction of the combustion energy radiated, in `[0, 1]`; 0.25 to 0.40 is the class's range. **The class's constructor does not validate it; the port does.**\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "radiative_fraction",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 1.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class does not validate it, and a negative fraction answers a negative SEP and flux",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the ambient relative humidity in `(0, 1]`, which the shared transmissivity reads. **Absent is `0.5`.** A stated zero is refused: the class answers `NaN`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "relative_humidity",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 1.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class clamps to [0, 1] and answers NaN at zero, so the port refuses both",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the distance from the fireball centre at which the flux is asked, above zero. **Absent leaves `transmissivity` and `incident_heat_flux` absent.**\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "distance",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class answers an infinite flux at zero distance",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the flux whose distance is solved for, above zero. **Absent leaves `distance_to_flux` absent.**\n",
+            "dimension": "heat_flux_density",
+            "kind": "quantity",
+            "name": "target_flux",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "a non-positive target is not a contour; the class answers the far end of its numerical search for zero",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "W/m**2",
+            "values": []
+          }
+        ],
+        "name": "BLEVE fireball radiation",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "`5.8 M^(1/3)`, the fireball's diameter.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "fireball_diameter",
+            "optional": false,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "description": "`0.45 M^(1/3)`, the fireball's lifetime.\n",
+            "dimension": "time",
+            "kind": "quantity",
+            "name": "fireball_duration",
+            "optional": false,
+            "unit": "s",
+            "values": []
+          },
+          {
+            "description": "`eta M dHc / (pi D^2 t)`, the surface emissive power.\n",
+            "dimension": "heat_flux_density",
+            "kind": "quantity",
+            "name": "surface_emissive_power",
+            "optional": false,
+            "unit": "W/m**2",
+            "values": []
+          },
+          {
+            "description": "Wayne's `tau` at `distance`. Present only with `distance`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "transmissivity",
+            "optional": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "`SEP` times the capped point-source view factor and `tau`. Present only with `distance`.\n",
+            "dimension": "heat_flux_density",
+            "kind": "quantity",
+            "name": "incident_heat_flux",
+            "optional": true,
+            "unit": "W/m**2",
+            "values": []
+          },
+          {
+            "description": "the distance at which the flux falls to the target. **Absent when the flux at `D/2 + 0.1` is already below the target**, where the class answers that near bound.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "distance_to_flux",
+            "optional": true,
+            "unit": "m",
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "f5ab4605527c3490d2efabc1f7d7fa6ee216fae6ed4e02d5c23bddbf419203ac",
+          "rust_sha256": "f28297e01c032609d0a33f47e8fd3cb8eb59526072e160e85ee4563097a53b1a",
+          "spec_sha256": "52a393332d453a33cd1615e300f618f24ca47dc0d52e3cb96c5e8e12d4bfbb87",
+          "tests_active": 5,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "CCPS (2010). Guidelines for Vapor Cloud Explosion, Pressure Vessel Burst, BLEVE and Flash Fire Hazards, 2nd Ed.",
+          "TNO (2005). Yellow Book, 3rd Ed., CPR 14E, section 6, BLEVE and fireball.",
+          "API STD 521 (2021). Pressure-relieving and Depressurating Systems, section 4.6.4, fireballs and BLEVEs.",
+          "Wayne, F. D. (1991). \"An Economical Formula for Calculating Atmospheric Infrared Transmissivities.\" Journal of Loss Prevention in the Process Industries 4, 86-89."
+        ],
+        "refusal": null,
+        "summary": "The BLEVE fireball's size, duration and the distance to a target flux.",
+        "worked_example": {}
+      },
+      "id": "process.bleve",
+      "name": "BLEVE fireball radiation",
+      "native": true,
+      "purpose": "The BLEVE fireball's size, duration and the distance to a target flux.",
+      "refusal": null,
+      "sub_interface": "fire"
+    },
+    {
+      "family": "rupture",
+      "id": "process.blowdown_pressure_profile",
+      "name": "Blowdown pressure profile",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "risk",
+      "id": "process.bow_tie",
+      "name": "Bow-tie risk",
+      "native": true,
+      "purpose": "Threat frequencies, prevention-barrier PFDs and the resulting mitigated frequency and RRF.",
+      "refusal": null,
+      "sub_interface": "bowtie"
+    },
+    {
+      "family": "qra",
+      "id": "process.consequence_analysis",
+      "name": "Consequence analysis",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "firewater",
+      "id": "process.deluge_nozzle_layout",
+      "name": "Deluge nozzle layout",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "risk",
+      "id": "process.event_tree",
+      "name": "Event tree",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "risk",
+      "id": "process.fault_tree",
+      "name": "Fault tree",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "overpressure",
+      "id": "process.fire_case_relief",
+      "name": "Fire case relief",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "firewater",
+      "id": "process.fire_monitor_coverage",
+      "name": "Fire monitor coverage",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "firewater",
+      "id": "process.fire_water_coverage_assessment",
+      "name": "Fire-water coverage assessment",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "firewater",
+      "id": "process.fire_water_demand",
+      "name": "Fire-water demand",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "dispersion",
+      "id": "process.gas_dispersion",
+      "name": "Gas dispersion screening",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "dispersion",
+      "id": "process.gaussian_plume",
+      "name": "Gaussian plume dispersion",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "dispersion",
+      "id": "process.hazardous_area",
+      "name": "Hazardous-area classification",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "dispersion",
+      "id": "process.heavy_gas_dispersion",
+      "name": "Heavy-gas dispersion",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "release",
+      "id": "process.hem_release",
+      "name": "Homogeneous-equilibrium orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "fire",
+      "form": {
+        "assumptions": [
+          "**the source is a point at the flame centre**: `Q = eta m_dot dHc` and the incident flux is `Q tau / (4 pi d^2)`, the class's API 521 / Mudan-Croce model. Flame length, tilt and shape do not enter.",
+          "**the transmissivity is Wayne's simplified correlation**: `pw = rh 1700`, `xpw = pw max(d, 1)`, `tau = 1.006 - 0.01171 log10(xpw) - 0.02368 log10(xpw)^2`, clamped to `[0, 1]`.",
+          "**the inverse is a fixed point, not a closed form**: an inverse-square first guess, then at most 25 iterations of `r = sqrt(Q tau(r) / (4 pi target))` with a `0.01` m break. The class's 25th iterate is published when the break is not reached.",
+          "**a distance below one metre evaluates the transmissivity at one metre**, the correlation's own `max(d, 1)`; the flux's `1/d^2` still applies at the stated distance.",
+          "**heat of combustion is in J/kg and crosses unconverted.** Neither the vocabulary nor `uom` carries a mass-specific energy unit, so it is declared dimensionless here, as the thermal calculations declare latent heat.",
+          "**a non-positive distance is refused**: the class answers `Infinity` there. **A non-positive target flux is refused**: the class throws `IllegalArgumentException`.",
+          "**relative humidity is the class's setter, which clamps to `[0, 1]`.** The port refuses a stated value outside `(0, 1]`: the clamp's zero makes the correlation `NaN`, which the class admits and the port does not publish. Absent is `0.5`.",
+          "**the constructor's guards are the ranges**: mass flow at least zero, heat of combustion above zero, and the radiative fraction in `[0, 1]`."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.jet_fire",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the fuel mass flow burning at the jet, at least zero.\n",
+            "dimension": "mass_rate",
+            "kind": "quantity",
+            "name": "mass_flow",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class's constructor refuses a negative mass flow; a zero flow radiates nothing",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "kg/s",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the lower heating value in J/kg, above zero. Declared dimensionless because no vocabulary unit expresses a mass-specific energy.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "heat_of_combustion",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's constructor refuses a non-positive heating value",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the fraction of the combustion heat radiated, in `[0, 1]`; 0.20 is the class's natural-gas example.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "radiative_fraction",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 1.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class's constructor refuses a fraction outside [0, 1]",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the ambient relative humidity in `(0, 1]`, which the transmissivity reads. **Absent is `0.5`.** A stated zero is refused: the class clamps it to zero and answers `NaN`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "relative_humidity",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 1.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class clamps to [0, 1] and answers NaN at zero, so the port refuses both the clamp and the NaN",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the distance from the flame centre at which the flux is asked. **Absent leaves `transmissivity` and `incident_heat_flux` absent**; a non-positive value is refused.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "distance",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class answers an infinite flux at zero distance, which is not a published number",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the flux whose distance is solved for, e.g. 4000, 12500 or 37500. **Absent leaves `distance_to_flux` absent**; a non-positive target is refused.\n",
+            "dimension": "heat_flux_density",
+            "kind": "quantity",
+            "name": "target_flux",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class throws IllegalArgumentException for a non-positive target",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "W/m**2",
+            "values": []
+          }
+        ],
+        "name": "Jet fire radiation",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "`eta m_dot dHc`, the total heat the jet radiates.\n",
+            "dimension": "power",
+            "kind": "quantity",
+            "name": "total_radiative_power",
+            "optional": false,
+            "unit": "W",
+            "values": []
+          },
+          {
+            "description": "Wayne's `tau` at `distance`. Present only with `distance`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "transmissivity",
+            "optional": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "`Q tau / (4 pi d^2)` at `distance`. Present only with `distance`.\n",
+            "dimension": "heat_flux_density",
+            "kind": "quantity",
+            "name": "incident_heat_flux",
+            "optional": true,
+            "unit": "W/m**2",
+            "values": []
+          },
+          {
+            "description": "the fixed point of `Q tau(r) / (4 pi r^2) = target`, at the class's 25-iteration cap. Present only with `target_flux`.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "distance_to_flux",
+            "optional": true,
+            "unit": "m",
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "4c56da6bb4f32af92213633de9deed38e63159342e1d0ab15d4d62c16b148a65",
+          "rust_sha256": "850ae3e53bd0793164827180aa61cc852b336a1c9fbd8cbccc1e6ab16f655aa9",
+          "spec_sha256": "a4bd2b0451ce5b67615cfc94884bcc722f70bd795f0df38753349160487f8697",
+          "tests_active": 7,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "API STD 521 (2021). Pressure-relieving and Depressuring Systems, section 4.6, radiation.",
+          "Mudan, K. S.; Croce, P. A. (1988). \"Fire Hazard Calculations for Large Open Hydrocarbon Fires.\" SFPE Handbook of Fire Protection Engineering.",
+          "Wayne, F. D. (1991). \"An Economical Formula for Calculating Atmospheric Infrared Transmissivities.\" Journal of Loss Prevention in the Process Industries 4, 86-89."
+        ],
+        "refusal": null,
+        "summary": "Radiant flux at a distance, and the distance to a target flux, from a jet fire.",
+        "worked_example": {}
+      },
+      "id": "process.jet_fire",
+      "name": "Jet fire radiation",
+      "native": true,
+      "purpose": "Radiant flux at a distance, and the distance to a target flux, from a jet fire.",
+      "refusal": null,
+      "sub_interface": "fire"
+    },
+    {
+      "family": "release",
+      "id": "process.leak_blowdown",
+      "name": "Vessel leak blowdown",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "risk",
+      "id": "process.lopa",
+      "name": "Layer of protection analysis",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "risk",
+      "id": "process.nog070_sil_determination",
+      "name": "NOG 070 SIL determination",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "overpressure",
+      "id": "process.overpressure_acceptance",
+      "name": "Overpressure acceptance",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "fire",
+      "form": {
+        "assumptions": [
+          "**the wall is a lumped capacitance**: `t_bare = m'' c (T_crit - T_0) / (alpha q)`, `m'' = rho t` with `rho = 7850 kg/m3` and `c = 490 J/(kg K)`. Conduction, reradiation and temperature-dependent properties do not enter.",
+          "**the protection is conduction-limited and steady**: `thickness = k (T_fire - T_steel,avg) / q_allow`, `q_allow = m'' c (T_crit - T_0) / t_req` and `T_steel,avg = (T_0 + T_crit) / 2`. The slab's own heat capacity does not enter.",
+          "**the demand test is strict**: `t_bare < t_req`. An equal survival time needs no protection, and the thickness is then exactly zero with the rating `none`.",
+          "**the rating is the class's mapping**: a `pool` wall is `h60` or `h120`, a `jet` wall `j60` or `j120`; long duration is `t_req > 3600 + 1e-6` s, so exactly 3600 s is short.",
+          "**the class's defaults are carried**: absorptivity 0.9, initial 288.15 K, critical 673.15 K, fire 1173.15 K, PFP conductivity 0.2 W/(m K) and fire type `pool`.",
+          "**the incident flux is the caller's**: it is not computed here. `process.jet_fire` and `process.pool_fire` produce it; the class's examples are about 100 kW/m2 for a pool and up to about 350 kW/m2 for a jet.",
+          "**steel mass per area is dimensionless `kg/m2`**, because the vocabulary carries no areal mass unit. The thickness is published in metres and in millimetres, the class's two getters.",
+          "**the required survival time is echoed**: the class's result carries it, and it is the stated input unaltered."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.pfp_demand",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the incident heat flux on the exposed steel, above zero. It is the caller's value, from `process.jet_fire` or `process.pool_fire` or a stated design flux.\n",
+            "dimension": "heat_flux_density",
+            "kind": "quantity",
+            "name": "incident_heat_flux",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's constructor refuses a non-positive flux",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "W/m**2",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the exposed steel wall thickness, above zero.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "steel_thickness",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's constructor refuses a non-positive thickness",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the time the wall must survive the fire, above zero; the class tests `t_bare < t_req` against it.\n",
+            "dimension": "time",
+            "kind": "quantity",
+            "name": "required_survival_time",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's evaluate refuses a non-positive survival time",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "s",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the steel surface absorptivity in `(0, 1]`. **Absent is 0.9.**\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "absorptivity",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 1.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's setter refuses a value outside (0, 1]",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the wall's initial temperature, above zero. **Absent is 288.15 K.** It must be below `critical_temperature`.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "initial_temperature",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "a non-positive absolute temperature is not a wall state",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the critical steel temperature, above zero. **Absent is 673.15 K**, about 400 C. It must be above `initial_temperature`.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "critical_temperature",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "a non-positive absolute temperature is not a wall state",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the effective fire temperature, above zero. **Absent is 1173.15 K**, about 900 C; a value below the steel mean is floored to a 1 K driving difference.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "fire_temperature",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "a non-positive absolute temperature is not a fire",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the passive protection's thermal conductivity, above zero. **Absent is 0.2 W/(m K)**, a representative intumescent epoxy.\n",
+            "dimension": "thermal_conductivity",
+            "kind": "quantity",
+            "name": "pfp_conductivity",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's setter refuses a non-positive conductivity",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "W/(m*K)",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "which rating family applies: `pool` is H-class (UL 1709), `jet` is J-class (ISO 22899). **Absent is `pool`.**\n",
+            "dimension": null,
+            "kind": "enum",
+            "name": "fire_type",
+            "range": [],
+            "required": false,
+            "unit": null,
+            "values": [
+              "pool",
+              "jet"
+            ]
+          }
+        ],
+        "name": "Passive fire protection demand",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "the steel mass per exposed area, `7850 t` kg/m2; declared dimensionless because the vocabulary has no areal mass unit.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "steel_mass_per_area",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "`m'' c (T_crit - T_0) / (alpha q)`, the lumped time to the critical temperature.\n",
+            "dimension": "time",
+            "kind": "quantity",
+            "name": "bare_steel_time_to_critical",
+            "optional": false,
+            "unit": "s",
+            "values": []
+          },
+          {
+            "description": "the stated survival time, echoed as the class's result carries it.\n",
+            "dimension": "time",
+            "kind": "quantity",
+            "name": "required_survival_time",
+            "optional": false,
+            "unit": "s",
+            "values": []
+          },
+          {
+            "description": "whether `t_bare < t_req`. Strict: an equal time is false.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "pfp_required",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "the conduction-limited protection thickness; exactly zero when no protection is required.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "required_pfp_thickness",
+            "optional": false,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "description": "the same thickness in millimetres, the class's `getRequiredPfpThicknessMm`.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "required_pfp_thickness_mm",
+            "optional": false,
+            "unit": "mm",
+            "values": []
+          },
+          {
+            "description": "`none`, `h60`, `h120`, `j60` or `j120`, the class's `PfpRating` in the port's words.\n",
+            "dimension": null,
+            "kind": "string",
+            "name": "rating",
+            "optional": false,
+            "unit": null,
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "03a2f103f2eb3c4ae109055144b54acb6b2e50ffdcf1049164601f0081e79b9b",
+          "rust_sha256": "46af83fd9b0b97e7fa15e7f24b2173b85ddaac57b0c4e933bfb08e15e677aef0",
+          "spec_sha256": "ce1a86503bcf8f04dba7b8e5f4becca0f7a2df7552bb0e5430972cba03a06a47",
+          "tests_active": 9,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "API STD 521 (2021). Pressure-relieving and Depressuring Systems, fire exposure and passive fire protection.",
+          "NORSOK S-001 (2018). Technical safety, passive fire protection and jet fire.",
+          "UL 1709 (2017). Rapid Rise Fire Tests of Protection Materials for Structural Steel.",
+          "ISO 22899-1 (2007). Determination of the Resistance to Jet Fires of Passive Fire Protection Materials."
+        ],
+        "refusal": null,
+        "summary": "The time a steel member survives a fire unprotected, and the protection a required survival time demands.",
+        "worked_example": {}
+      },
+      "id": "process.pfp_demand",
+      "name": "Passive fire protection demand",
+      "native": true,
+      "purpose": "The time a steel member survives a fire unprotected, and the protection a required survival time demands.",
+      "refusal": null,
+      "sub_interface": "fire"
+    },
+    {
+      "family": "rupture",
+      "id": "process.pipe_fire_rupture",
+      "name": "Pipe fire rupture",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "rupture",
+      "id": "process.pipe_fire_rupture_material",
+      "name": "Pipe fire-rupture material",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "overpressure",
+      "id": "process.pipeline_pressure_protection",
+      "name": "Pipeline pressure protection",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "fire",
+      "form": {
+        "assumptions": [
+          "**the pool is circular and steady**: `m_dot = m'' pi D^2 / 4` over the stated diameter and mass-burning rate.",
+          "**the flame height is Thomas's no-wind correlation**: `H = D 42 (m'' / (rho_a sqrt(g D)))^0.61`, with `g = 9.81` m/s2.",
+          "**the surface emissive power is Mudan's smoke-corrected correlation**: `140000 exp(-0.12 D) + 20000 (1 - exp(-0.12 D))` W/m2. It is a function of the diameter alone.",
+          "**the constructor also takes the heat of combustion, the liquid density and a radiative fraction, and the arithmetic reads none of them.** The port declares only the diameter and the burn rate.",
+          "**the view factor is Mudan's vertical cylinder at a ground receiver**: `s = max(d, R + 0.001)/R`, `A = (h^2 + s^2 + 1)/(2s)`, `F = (atan(h / sqrt(s^2 - 1)) - (A - (s^2 + 1)/(2s)) / sqrt(A^2 - 1)) / pi`, clamped to `[0, 1]`, with `h = H/R`. Inside the pool it is evaluated at `R + 0.001`.",
+          "**the inverse is 60 halvings between `R + 0.1` and 1000 m, with no early break.**",
+          "**a target the fire cannot produce is absent, not a distance.** The class returns its near bound, `R + 0.1`, when the flux there is below the target; the port publishes no `distance_to_flux`. A non-positive target is refused: the class answers 1000 m for zero.",
+          "**the air density is the class's setter**, 1.2 kg/m3 when absent; a non-positive value is refused."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.pool_fire",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the equivalent circular pool diameter, above zero.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "pool_diameter",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's constructor refuses a non-positive diameter, and the view factor divides by the radius",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the mass-burning rate per unit area, above zero; typical values are 0.04 for LNG, 0.055 for gasoline and 0.078 for crude oil.\n",
+            "dimension": "mass_flux",
+            "kind": "quantity",
+            "name": "burn_rate",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's constructor refuses a non-positive burning rate",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "kg/(m**2*s)",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the ambient air density the flame height divides, above zero. **Absent is `1.2`.**\n",
+            "dimension": "mass_density",
+            "kind": "quantity",
+            "name": "air_density",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the flame height divides by it",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "kg/m**3",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the horizontal distance from the pool centre at which the flux is asked, at least zero. **Absent leaves `view_factor` and `incident_heat_flux` absent.**\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "distance",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "a horizontal distance from the pool centre; the class's view factor is defined at zero",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the flux whose distance is solved for. **Absent leaves `distance_to_flux` absent**; a non-positive target is refused.\n",
+            "dimension": "heat_flux_density",
+            "kind": "quantity",
+            "name": "target_flux",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "a non-positive target is not a contour; the class answers the search's far bound for zero",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "W/m**2",
+            "values": []
+          }
+        ],
+        "name": "Pool fire radiation",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "`m'' pi D^2 / 4`, the mass the pool burns per second.\n",
+            "dimension": "mass_rate",
+            "kind": "quantity",
+            "name": "total_burn_rate",
+            "optional": false,
+            "unit": "kg/s",
+            "values": []
+          },
+          {
+            "description": "Thomas's flame height above the pool.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "flame_height",
+            "optional": false,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "description": "Mudan's smoke-corrected SEP, a function of the diameter alone.\n",
+            "dimension": "heat_flux_density",
+            "kind": "quantity",
+            "name": "surface_emissive_power",
+            "optional": false,
+            "unit": "W/m**2",
+            "values": []
+          },
+          {
+            "description": "Mudan's vertical-cylinder view factor at `distance`. Present only with `distance`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "view_factor",
+            "optional": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "`SEP` times the view factor at `distance`. Present only with `distance`.\n",
+            "dimension": "heat_flux_density",
+            "kind": "quantity",
+            "name": "incident_heat_flux",
+            "optional": true,
+            "unit": "W/m**2",
+            "values": []
+          },
+          {
+            "description": "the distance at which the flux falls to `target_flux`. **Absent when the flux at `R + 0.1` is already below the target**, where the class answers that near bound.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "distance_to_flux",
+            "optional": true,
+            "unit": "m",
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "041fcc9a17b414993d51604eb3fea44488e8f6e6cdcb76b8132fb4e0cbce11ee",
+          "rust_sha256": "330282bc4874c25cd2a395daf1775ee1677c1e103965641dcd386f037f78d1cd",
+          "spec_sha256": "96d9af7b8770bb25ec6821b0599f7593296c73be02cc8212c7815b96244acf09",
+          "tests_active": 6,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "API STD 521 (2021). Pressure-relieving and Depressurating Systems, section 4.6, pool fires.",
+          "Mudan, K. S. (1984). \"Thermal radiation hazards from hydrocarbon pool fires.\" Progress in Energy and Combustion Science 10, 59-80.",
+          "Thomas, P. H. (1963). \"The size of flames from natural fires.\" Ninth Symposium (International) on Combustion, 844-859."
+        ],
+        "refusal": null,
+        "summary": "Pool-fire flame height, surface emissive power and the distance to a target flux.",
+        "worked_example": {}
+      },
+      "id": "process.pool_fire",
+      "name": "Pool fire radiation",
+      "native": true,
+      "purpose": "Pool-fire flame height, surface emissive power and the distance to a target flux.",
+      "refusal": null,
+      "sub_interface": "fire"
+    },
+    {
+      "family": "dispersion",
+      "id": "process.probit",
+      "name": "Probit dose-response",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "overpressure",
+      "id": "process.psv_fire_sizing",
+      "name": "PSV fire sizing",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "overpressure",
+      "id": "process.psv_sizing",
+      "name": "PSV sizing",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "overpressure",
+      "id": "process.relief_disposal_network",
+      "name": "Relief disposal network",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "risk",
+      "id": "process.risk_matrix",
+      "name": "Risk matrix",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "risk",
+      "id": "process.safety_instrumented_function",
+      "name": "Safety instrumented function",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "risk",
+      "id": "process.sil_verification",
+      "name": "SIL verification",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "dispersion",
+      "id": "process.toxic_library",
+      "name": "Toxic-exposure thresholds",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "overpressure",
+      "id": "process.tr3001_compliance",
+      "name": "TR3001 compliance",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    },
+    {
+      "family": "fire",
+      "form": {
+        "assumptions": [
+          "**the energy is `E = m dHc`** and the Sachs-scaled distance is `Rbar = d / cbrt(E / p0)`, with `p0` the ambient pressure.",
+          "**the dimensionless overpressure is the class's power-law fit, not the TNO figure's curves**: a plateau per strength class at `Rbar <= 1`, the ten values `0.01, 0.02, 0.05, 0.10, 0.20, 0.50, 1.00, 2.00, 5.00, 10.0`.",
+          "**beyond `Rbar = 1` it decays as `plateau Rbar^-beta`**, with `beta = 1.0` for classes 1-5 and `1.2` for classes 6-10. The side-on overpressure is `dPbar p0`.",
+          "**the strength class is the class's `int`, 1 to 10.** It is declared dimensionless with a range, and a non-integral value is refused because the class's constructor would truncate it.",
+          "**the inverse is 80 halvings between 0.1 and 50000 m, with no early break.**",
+          "**a target above the near-field overpressure is absent.** The class returns its near bound, 0.1 m, where the overpressure is already below the target; the port publishes no `distance_to_overpressure`. A non-positive target is refused: the class throws.",
+          "**a non-positive distance is refused**: the class answers an infinite overpressure at zero. **The ambient pressure is the class's setter**, 101325 Pa when absent.",
+          "**heat of combustion is in J/kg and crosses unconverted**, declared dimensionless because no vocabulary unit expresses a mass-specific energy."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.vce",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the mass of fuel in the flammable portion of the cloud, at least zero.\n",
+            "dimension": "mass",
+            "kind": "quantity",
+            "name": "cloud_fuel_mass",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class's constructor refuses a negative mass; a zero mass gives zero energy and no scaled distance",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "kg",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the lower heating value in J/kg, above zero. Declared dimensionless because no vocabulary unit expresses a mass-specific energy.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "heat_of_combustion",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's constructor refuses a non-positive heating value",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the TNO strength class, a whole number from 1 (very weak, open) to 10 (detonation); 4 is the class's petrochemical example.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "strength_class",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 10.0,
+                "max_inclusive": true,
+                "min": 1.0,
+                "min_inclusive": true,
+                "rationale": "the class's constructor refuses a class outside [1, 10]",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the ambient pressure the scaled distance and the overpressure both read, above zero. **Absent is `101325`.**\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "ambient_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the scaled distance and overpressure both divide or multiply by it",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the distance from the cloud centre at which the overpressure is asked, above zero. **Absent leaves `scaled_distance`, `dimensionless_overpressure` and `overpressure` absent.**\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "distance",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class answers an infinite overpressure at zero distance, which is not a published number",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the side-on overpressure whose distance is solved for, above zero. **Absent leaves `distance_to_overpressure` absent.**\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "target_overpressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class throws IllegalArgumentException for a non-positive target",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "Pa",
+            "values": []
+          }
+        ],
+        "name": "Vapour-cloud explosion overpressure",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "`m dHc`, the cloud's combustion energy.\n",
+            "dimension": "energy",
+            "kind": "quantity",
+            "name": "combustion_energy",
+            "optional": false,
+            "unit": "J",
+            "values": []
+          },
+          {
+            "description": "`d / cbrt(E / p0)`, the Sachs-scaled distance. Present only with `distance`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "scaled_distance",
+            "optional": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the class's plateau or power-law value at `distance`. Present only with `distance`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "dimensionless_overpressure",
+            "optional": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the dimensionless overpressure times `p0`. Present only with `distance`.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "overpressure",
+            "optional": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "description": "the distance at which the overpressure falls to the target. **Absent when the overpressure at 0.1 m is already below the target**, where the class answers that near bound.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "distance_to_overpressure",
+            "optional": true,
+            "unit": "m",
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "6dad0574b0f2471f03d7b014e673f87a6ef37237dcddbb07db3187aedb39c444",
+          "rust_sha256": "911fba12daa965ba40d6ed3a82b74f5558281d11e8647dbb797995a95d8ebd87",
+          "spec_sha256": "43db2d8891aa291c598f4c7923f6c3cb2ace2f9f42f2dd2ae007112ebc633b7d",
+          "tests_active": 13,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "Berg, A. C. (1985). \"The multi-energy method: a framework for vapour cloud explosion blast prediction.\" Journal of Hazardous Materials 12, 1-10.",
+          "TNO (2005). Yellow Book, 3rd Ed., CPR 14E, chapter 5.",
+          "CCPS (2010). Guidelines for Vapor Cloud Explosion, Pressure Vessel Burst, BLEVE and Flash Fire Hazards, 2nd Ed."
+        ],
+        "refusal": null,
+        "summary": "The TNO multi-energy overpressure and the distance to a target overpressure.",
+        "worked_example": {}
+      },
+      "id": "process.vce",
+      "name": "Vapour-cloud explosion overpressure",
+      "native": true,
+      "purpose": "The TNO multi-energy overpressure and the distance to a target overpressure.",
+      "refusal": null,
+      "sub_interface": "fire"
+    },
+    {
+      "family": "rupture",
+      "id": "process.vessel_rupture",
+      "name": "Vessel rupture",
+      "native": false,
+      "purpose": "",
+      "refusal": null,
+      "sub_interface": null
+    }
+  ],
   "tools": [
     {
       "description": "Add a unit operation. An id that already exists is replaced, so the call is retryable.",

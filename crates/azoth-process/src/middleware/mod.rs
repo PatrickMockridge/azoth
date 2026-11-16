@@ -42,6 +42,23 @@ use crate::unit_op::UnitOpSpec;
 /// # Errors
 /// A write that fails, which for this shape it cannot.
 pub fn catalogue(palette: &[UnitOpSpec], with_tools: bool) -> Result<String> {
+    catalogue_with(palette, with_tools, None)
+}
+
+/// The catalogue, with the safety projection a caller may attach.
+///
+/// **The projection is passed in because this crate cannot depend on `azoth-safety`.** The
+/// dependency runs `azoth-process -> azoth-safety -> azoth-process` the other way; the callers
+/// that own both (the CLI, the browser and the Python binding) attach it, so every front door
+/// still reads one catalogue.
+///
+/// # Errors
+/// A write that fails, or a safety projection that cannot be written.
+pub fn catalogue_with(
+    palette: &[UnitOpSpec],
+    with_tools: bool,
+    safety: Option<serde_json::Value>,
+) -> Result<String> {
     let mut document = serde_json::json!({
         "unit_ops": form::forms(palette),
         "calcs": azoth_sheets::catalogue::to_value()?,
@@ -49,6 +66,12 @@ pub fn catalogue(palette: &[UnitOpSpec], with_tools: bool) -> Result<String> {
         "unit_sets": unit_sets(),
         "components": components(),
     });
+    if let Some(safety) = safety {
+        document
+            .as_object_mut()
+            .expect("the object this function just built")
+            .insert("safety".to_string(), safety);
+    }
     if with_tools {
         let object = document
             .as_object_mut()

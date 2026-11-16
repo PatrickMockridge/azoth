@@ -49,6 +49,9 @@ pub enum Command {
     /// Apply one command to a calculation book, calculate, and print the sheet envelope.
     Sheets(SheetsArgs),
 
+    /// Apply one command to a safety study, calculate, and print the study envelope.
+    Safety(SafetyArgs),
+
     /// Cross-check a NeqSim flash request: one `runFlash` document per line in, one verdict per
     /// line out.
     Crosscheck(CrosscheckArgs),
@@ -220,6 +223,10 @@ pub struct ServeArgs {
     #[arg(long)]
     pub calc_book: Option<std::path::PathBuf>,
 
+    /// The safety study to serve at `/safety`. A blank study when absent.
+    #[arg(long)]
+    pub safety_study: Option<std::path::PathBuf>,
+
     /// The port to listen on, on 127.0.0.1. `0` asks the operating system for a free one, which is
     /// printed either way.
     #[arg(long, default_value_t = 7373)]
@@ -300,6 +307,21 @@ pub struct SheetsArgs {
     pub command: Option<String>,
 
     /// Calculate one sheet, or `all` for every ready stale sheet.
+    #[arg(long)]
+    pub calculate: Option<String>,
+}
+
+#[derive(Debug, clap::Args)]
+pub struct SafetyArgs {
+    /// The safety study to open.
+    #[arg(long)]
+    pub study: std::path::PathBuf,
+
+    /// One command, as the JSON object the safety command model reads.
+    #[arg(long)]
+    pub command: Option<String>,
+
+    /// `all`, `scenario:<id>` or `bowtie:<id>`.
     #[arg(long)]
     pub calculate: Option<String>,
 }

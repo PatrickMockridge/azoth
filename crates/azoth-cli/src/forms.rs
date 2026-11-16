@@ -11,7 +11,7 @@
 use std::path::Path;
 
 use azoth_process::load_palette;
-use azoth_process::middleware::catalogue;
+use azoth_process::middleware::catalogue_with;
 
 /// The palette's forms, as JSON.
 ///
@@ -19,5 +19,7 @@ use azoth_process::middleware::catalogue;
 /// an agent may send rather than as the fields a person fills.
 pub fn forms_json(palette_dir: &Path, with_tools: bool) -> Result<String, String> {
     let palette = load_palette(palette_dir)?;
-    catalogue(&palette, with_tools).map_err(|error| error.to_string())
+    let safety =
+        azoth_safety::catalogue::to_value().map_err(|error| error.to_string())?;
+    catalogue_with(&palette, with_tools, Some(safety)).map_err(|error| error.to_string())
 }
