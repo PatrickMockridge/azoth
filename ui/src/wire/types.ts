@@ -687,7 +687,7 @@ export interface Catalogue {
    * The safety calculations, grouped by the source path's family.
    *
    * Every model whose spec is under `process/safety/`, plus the two relief ids the upstream tree
-   * files elsewhere. The five scenarios this workspace can run carry a form; the rest are listed
+   * files elsewhere. The scalar-shaped safety models carry a form; the rest are listed
    * so their manual pages are reachable.
    */
   safety?: SafetyCalculation[];

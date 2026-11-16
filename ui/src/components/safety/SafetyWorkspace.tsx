@@ -2,7 +2,7 @@
  * The Safety workspace's sub-interfaces.
  *
  * **Three readings of one document.** Overview lists what the study holds and what this tranche
- * can run; Bowtie draws the causes and outcomes; Fire runs the five fire models. A tab is a view
+ * can run; Bowtie draws the causes and outcomes; a scenario deck runs its family's models. A tab is a view
  * and never a second document, so switching one cannot lose an edit.
  */
 

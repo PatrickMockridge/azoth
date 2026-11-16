@@ -130,7 +130,7 @@ export function SafetyOverview({
       <section className="safety-families">
         <h2>The safety surface</h2>
         <p className="note">
-          Every calculation whose source is under <code>process/safety/</code>. The five fire
+          Every calculation whose source is under <code>process/safety/</code>. The native
           models and the bow-tie run here; the rest are not runnable in this workspace yet, and
           their manual pages state the inputs, the valid range and the worked example.
         </p>

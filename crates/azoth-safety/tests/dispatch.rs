@@ -469,15 +469,52 @@ fn the_bow_tie_case_runs_through_the_dispatch() {
 }
 
 #[test]
-fn every_native_id_declares_its_required_inputs() {
+fn every_native_id_declares_the_inputs_its_form_requires() {
     for id in dispatch::NATIVE {
-        dispatch::required(id).unwrap_or_else(|| panic!("`{id}` has no table"));
-        assert!(dispatch::is_native(id), "{id}");
+        let required = dispatch::required(id).unwrap_or_else(|| panic!("`{id}` has no table"));
+        let entry = azoth_safety::catalogue::calculation_of(id)
+            .unwrap_or_else(|| panic!("`{id}` is dispatched but not in the catalogue"));
+        assert!(entry.native, "{id}");
+        match entry.form {
+            Some(form) => {
+                let mut declared: Vec<&str> = form
+                    .inputs
+                    .iter()
+                    .filter(|input| input.required)
+                    .map(|input| input.name)
+                    .collect();
+                let mut listed: Vec<&str> = required.to_vec();
+                declared.sort_unstable();
+                listed.sort_unstable();
+                assert_eq!(listed, declared, "{id}");
+            }
+            None => {
+                assert_eq!(*id, "process.bow_tie");
+                assert!(!required.is_empty());
+            }
+        }
     }
-    // An id whose every declared input is optional has an empty list; S2's form-equality
-    // invariant is what holds this to the generated form.
-    assert_eq!(dispatch::required("process.toxic_library"), Some(&[][..]));
     assert!(dispatch::required("process.gas_dispersion").is_none());
+}
+
+#[test]
+fn every_form_has_an_arm_and_every_listed_entry_a_refusal() {
+    for entry in azoth_safety::catalogue::calculations() {
+        if entry.form.is_some() {
+            assert!(
+                dispatch::NATIVE.contains(&entry.id),
+                "`{}` has a form but no arm",
+                entry.id
+            );
+        }
+        if !entry.native {
+            assert!(
+                entry.refusal.is_some(),
+                "`{}` is listed without a refusal",
+                entry.id
+            );
+        }
+    }
 }
 
 #[test]

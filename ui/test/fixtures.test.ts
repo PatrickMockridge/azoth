@@ -114,10 +114,10 @@ describe("the catalogue", () => {
     expect(JSON.stringify(calcs).toLowerCase()).not.toContain("neqsim");
   });
 
-  it("carries the safety calculations, with five scenario forms", () => {
+  it("carries the safety calculations, with a form for every scalar model", () => {
     // **The source path is the family.** Every model whose spec is under `process/safety/` is
-    // listed, plus the two relief ids upstream files elsewhere; five can run as a scenario, and
-    // the bow-tie has its own view.
+    // listed, plus the two relief ids upstream files elsewhere; every scalar-shaped one can run
+    // as a scenario, and the bow-tie has its own view.
     const safetyCalcs = catalogue.safety ?? [];
     expect(safetyCalcs).toHaveLength(39);
     expect(new Set(safetyCalcs.map((entry) => entry.family))).toEqual(
@@ -134,18 +134,40 @@ describe("the catalogue", () => {
     );
     const native = safetyCalcs.filter((entry) => entry.native);
     expect(native.map((entry) => entry.id)).toEqual([
+      "process.active_fire_protection_screening",
       "process.bleve",
       "process.bow_tie",
+      "process.deluge_nozzle_layout",
+      "process.fire_case_relief",
+      "process.fire_monitor_coverage",
+      "process.fire_water_coverage_assessment",
+      "process.gaussian_plume",
+      "process.hazardous_area",
+      "process.heavy_gas_dispersion",
       "process.jet_fire",
+      "process.nog070_sil_determination",
+      "process.overpressure_acceptance",
       "process.pfp_demand",
+      "process.pipeline_pressure_protection",
       "process.pool_fire",
+      "process.probit",
+      "process.psv_fire_sizing",
+      "process.psv_sizing",
+      "process.safety_instrumented_function",
+      "process.toxic_library",
       "process.vce",
     ]);
-    expect(native.filter((entry) => entry.form !== undefined)).toHaveLength(5);
+    expect(native.filter((entry) => entry.form !== undefined)).toHaveLength(21);
     expect(safetyCalcs.find((entry) => entry.id === "process.bow_tie")?.form).toBeUndefined();
     for (const entry of native) {
       expect(entry.purpose.trim(), `${entry.id} has no purpose`).not.toBe("");
       expect(entry.purpose.length).toBeLessThanOrEqual(300);
+    }
+    const listed = safetyCalcs.filter((entry) => !entry.native);
+    expect(listed).toHaveLength(17);
+    for (const entry of listed) {
+      expect(entry.refusal, `${entry.id} has no refusal`).toBeTruthy();
+      expect(entry.form, `${entry.id} has a form but no arm`).toBeUndefined();
     }
     expect(JSON.stringify(safetyCalcs).toLowerCase()).not.toContain("neqsim");
   });
