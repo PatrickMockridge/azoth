@@ -293,8 +293,8 @@ mod tests {
 
     #[test]
     fn the_critical_ratio_is_the_classes() {
-        // (2/(1.3+1))^(1.3/0.3) = 0.545727...
-        assert!((critical_pressure_ratio(1.3) - 0.545_727_157_7).abs() < 1e-9);
+        // (2/(1.3+1))^(1.3/0.3) = 0.545727733814065
+        assert!((critical_pressure_ratio(1.3) - 0.545_727_733_814_065).abs() < 1e-12);
     }
 
     #[test]
