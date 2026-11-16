@@ -623,7 +623,7 @@ def pipe_fire_rupture(
             profile, a non-positive step or maximum time, a step count over the cap, an
             unknown mode, or a non-finite value.
     """
-    solution, _ = _evaluate(
+    solution, warnings = _evaluate(
         outside_diameter,
         nominal_wall_thickness,
         material_name,
@@ -657,11 +657,11 @@ def pipe_fire_rupture(
     history = [
         PipeFireRupturePoint(
             time=from_si(row[0], "s"),
-            pressure=from_si(row[1], "bar"),
+            pressure=from_si(row[1] * _PA_PER_BAR, "bar"),
             mean_wall_temperature=from_si(row[2], "K"),
             outer_surface_temperature=from_si(row[3], "K"),
             heat_flux=from_si(row[4], "W/m**2"),
-            von_mises_stress=from_si(row[5], "MPa"),
+            von_mises_stress=from_si(row[5] * 1.0e6, "MPa"),
             strain_rate=from_si(row[6] / 60.0, "1/s"),
             accumulated_strain=row[7],
             rupture_strain_limit=row[8],
@@ -675,7 +675,9 @@ def pipe_fire_rupture(
             None if solution.rupture_time is None else from_si(solution.rupture_time, "s")
         ),
         rupture_pressure=(
-            None if solution.rupture_pressure is None else from_si(solution.rupture_pressure, "bar")
+            None
+            if solution.rupture_pressure is None
+            else from_si(solution.rupture_pressure * _PA_PER_BAR, "bar")
         ),
         rupture_mean_wall_temperature=(
             None
@@ -714,5 +716,6 @@ def pipe_fire_rupture(
             if solution.release_gas_temperature is None
             else from_si(solution.release_gas_temperature, "K")
         ),
-        history=history,
+        history=tuple(history),
+        warnings=tuple(warnings),
     )

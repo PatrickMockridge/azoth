@@ -35,6 +35,7 @@ pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
 pub mod api537_flare_flame_model;
 pub mod bleve;
+pub mod blowdown_pressure_profile;
 pub mod bow_tie;
 pub mod component_splitter;
 pub mod compressor;
@@ -72,6 +73,8 @@ pub mod overpressure_acceptance;
 pub mod packed_column;
 pub mod pfp_demand;
 pub mod pipe;
+pub mod pipe_fire_rupture;
+pub mod pipe_fire_rupture_material;
 pub mod pipeline_pressure_protection;
 pub mod plug_flow_reactor;
 pub mod pool_fire;
@@ -98,6 +101,7 @@ pub mod toxic_library;
 pub mod tr3001_compliance;
 pub mod turbo_expander_compressor;
 pub mod vce;
+pub mod vessel_rupture;
 
 pub use absorption_column::{AbsorptionColumnResult, absorption_column};
 pub use active_fire_protection_screening::{
@@ -108,6 +112,9 @@ pub use api537_flare_flame_model::{
     Api537FlareFlameModelResult, FlareTargetFlux, SterileRadius, api537_flare_flame_model,
 };
 pub use bleve::{BleveResult, bleve};
+pub use blowdown_pressure_profile::{
+    BlowdownPressureProfileResult, BlowdownProfilePoint, blowdown_pressure_profile,
+};
 pub use bow_tie::{BowTieBarrier, BowTieConsequence, BowTieResult, BowTieThreat, bow_tie};
 pub use component_splitter::{ComponentSplitterResult, component_splitter};
 pub use compressor::{CompressorResult, compressor};
@@ -154,6 +161,12 @@ pub use overpressure_acceptance::{OverpressureAcceptanceResult, overpressure_acc
 pub use packed_column::{PackedColumnResult, packed_column};
 pub use pfp_demand::{PfpDemandResult, pfp_demand};
 pub use pipe::{PipeResult, pipe};
+pub use pipe_fire_rupture::{
+    FluidBasis, PipeFireRupturePoint, PipeFireRuptureResult, RuptureStatus, pipe_fire_rupture,
+};
+pub use pipe_fire_rupture_material::{
+    PipeFireRuptureMaterialPoint, PipeFireRuptureMaterialResult, pipe_fire_rupture_material,
+};
 pub use pipeline_pressure_protection::{
     PipelinePressureProtectionResult, pipeline_pressure_protection,
 };
@@ -199,3 +212,6 @@ pub use tr3001_compliance::{
 };
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};
 pub use vce::{VceResult, vce};
+pub use vessel_rupture::{
+    VesselRuptureResult, VesselRuptureState, VesselRuptureStep, vessel_rupture,
+};

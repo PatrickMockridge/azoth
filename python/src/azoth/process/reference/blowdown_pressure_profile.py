@@ -72,10 +72,10 @@ def _evaluate(
     )
 
     _require_finite("time", query)
-    offset = (
-        _DEFAULT_GAUGE_OFFSET_BAR if stated_offset is None else stated_offset / _PA_PER_BAR
+    offset_pa = (
+        _DEFAULT_GAUGE_OFFSET_BAR * _PA_PER_BAR if stated_offset is None else stated_offset
     )
-    _require_finite("gauge_offset", offset)
+    _require_finite("gauge_offset", offset_pa)
     mode = "step_previous" if interpolation_mode is None else interpolation_mode
     if mode not in ("step_previous", "linear"):
         raise InvalidInputError(
@@ -105,8 +105,8 @@ def _evaluate(
             )
         previous = row_time
 
-    absolute = _lookup(rows, query, linear)
-    return _Solution(absolute, absolute - offset), warnings
+    absolute_pa = _lookup(rows, query, linear) * _PA_PER_BAR
+    return _Solution(absolute_pa, absolute_pa - offset_pa), warnings
 
 
 def _lookup(rows: list[dict[str, object]], query: float, linear: bool) -> float:
@@ -156,8 +156,9 @@ def blowdown_pressure_profile(
             negative query time, a negative gauge offset, an unknown mode, or a non-finite
             value.
     """
-    solution, _ = _evaluate(points, time, interpolation_mode, gauge_offset)
+    solution, warnings = _evaluate(points, time, interpolation_mode, gauge_offset)
     return BlowdownPressureProfileResult(
         pressure_absolute=from_si(solution.pressure_absolute, "bar"),
         pressure_gauge=from_si(solution.pressure_gauge, "bar"),
+        warnings=tuple(warnings),
     )

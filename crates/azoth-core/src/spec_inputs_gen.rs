@@ -227,6 +227,7 @@
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
@@ -264,6 +265,8 @@
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
+//!   - specs/models/process/pipe_fire_rupture.toml
+//!   - specs/models/process/pipe_fire_rupture_material.toml
 //!   - specs/models/process/pipeline_pressure_protection.toml
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
@@ -290,6 +293,7 @@
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
+//!   - specs/models/process/vessel_rupture.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
 //!   - specs/models/reactions/kinetic_rate_law.toml
@@ -2784,6 +2788,12 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.bleve", "relative_humidity", "dimensionless"),
     ("process.bleve", "distance", "length"),
     ("process.bleve", "target_flux", "heat_flux_density"),
+    ("process.blowdown_pressure_profile", "time", "time"),
+    (
+        "process.blowdown_pressure_profile",
+        "gauge_offset",
+        "pressure",
+    ),
     ("process.component_splitter", "feed_n", "molar_flow"),
     ("process.component_splitter", "feed_z", "dimensionless"),
     ("process.component_splitter", "feed_p", "pressure"),
@@ -4021,6 +4031,119 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.pipe", "outlet_pressure", "pressure"),
     ("process.pipe", "number_of_increments", "dimensionless"),
     ("process.pipe", "elevation", "length"),
+    ("process.pipe_fire_rupture", "outside_diameter", "length"),
+    (
+        "process.pipe_fire_rupture",
+        "nominal_wall_thickness",
+        "length",
+    ),
+    ("process.pipe_fire_rupture", "corrosion_allowance", "length"),
+    (
+        "process.pipe_fire_rupture",
+        "wall_thickness_undertolerance",
+        "dimensionless",
+    ),
+    ("process.pipe_fire_rupture", "exposed_length", "length"),
+    ("process.pipe_fire_rupture", "weight_stress", "pressure"),
+    ("process.pipe_fire_rupture", "fluid_density", "mass_density"),
+    (
+        "process.pipe_fire_rupture",
+        "fluid_heat_capacity",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.pipe_fire_rupture",
+        "gas_molecular_weight",
+        "molar_mass",
+    ),
+    (
+        "process.pipe_fire_rupture",
+        "initial_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.pipe_fire_rupture",
+        "fire_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.pipe_fire_rupture",
+        "gas_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.pipe_fire_rupture",
+        "convective_heat_transfer_coefficient",
+        "heat_transfer",
+    ),
+    (
+        "process.pipe_fire_rupture",
+        "fire_emissivity",
+        "dimensionless",
+    ),
+    (
+        "process.pipe_fire_rupture",
+        "metal_emissivity",
+        "dimensionless",
+    ),
+    (
+        "process.pipe_fire_rupture",
+        "metal_absorptivity",
+        "dimensionless",
+    ),
+    (
+        "process.pipe_fire_rupture",
+        "passive_protection_heat_flux_factor",
+        "dimensionless",
+    ),
+    ("process.pipe_fire_rupture", "gauge_offset", "pressure"),
+    ("process.pipe_fire_rupture", "time_step", "time"),
+    ("process.pipe_fire_rupture", "max_time", "time"),
+    (
+        "process.pipe_fire_rupture_material",
+        "evaluation_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.pipe_fire_rupture_material",
+        "evaluation_stress",
+        "pressure",
+    ),
+    (
+        "process.pipe_fire_rupture_material",
+        "density",
+        "mass_density",
+    ),
+    (
+        "process.pipe_fire_rupture_material",
+        "sellars_tegart_a",
+        "dimensionless",
+    ),
+    (
+        "process.pipe_fire_rupture_material",
+        "sellars_tegart_alpha",
+        "dimensionless",
+    ),
+    (
+        "process.pipe_fire_rupture_material",
+        "sellars_tegart_n",
+        "dimensionless",
+    ),
+    (
+        "process.pipe_fire_rupture_material",
+        "activation_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.pipe_fire_rupture_material",
+        "correction_strain_rate",
+        "per_time",
+    ),
+    (
+        "process.pipe_fire_rupture_material",
+        "correction_limit_temperature",
+        "thermodynamic_temperature",
+    ),
     (
         "process.pipeline_pressure_protection",
         "max_source_pressure",
@@ -5064,6 +5187,15 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.vce", "ambient_pressure", "pressure"),
     ("process.vce", "distance", "length"),
     ("process.vce", "target_overpressure", "pressure"),
+    ("process.vessel_rupture", "inner_radius", "length"),
+    ("process.vessel_rupture", "wall_thickness", "length"),
+    ("process.vessel_rupture", "yield_strength", "pressure"),
+    ("process.vessel_rupture", "tensile_strength", "pressure"),
+    (
+        "process.vessel_rupture",
+        "tensile_strength_factor",
+        "dimensionless",
+    ),
     (
         "reactions.chemical_equilibrium",
         "a_matrix",

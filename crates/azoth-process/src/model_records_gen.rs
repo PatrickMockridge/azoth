@@ -16,6 +16,7 @@ use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeni
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
 use crate::models::bleve::BleveResult;
+use crate::models::blowdown_pressure_profile::BlowdownPressureProfileResult;
 use crate::models::bow_tie::BowTieResult;
 use crate::models::component_splitter::ComponentSplitterResult;
 use crate::models::compressor::CompressorResult;
@@ -53,6 +54,8 @@ use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
 use crate::models::packed_column::PackedColumnResult;
 use crate::models::pfp_demand::PfpDemandResult;
 use crate::models::pipe::PipeResult;
+use crate::models::pipe_fire_rupture::PipeFireRuptureResult;
+use crate::models::pipe_fire_rupture_material::PipeFireRuptureMaterialResult;
 use crate::models::pipeline_pressure_protection::PipelinePressureProtectionResult;
 use crate::models::plug_flow_reactor::PlugFlowReactorResult;
 use crate::models::pool_fire::PoolFireResult;
@@ -79,6 +82,7 @@ use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vce::VceResult;
+use crate::models::vessel_rupture::VesselRuptureResult;
 
 impl CalcResult for AbsorptionColumnResult {
     const CALC_ID: &'static str = "process.absorption_column";
@@ -197,6 +201,15 @@ impl CalcResult for BleveResult {
         "distance_to_flux",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for BlowdownPressureProfileResult {
+    const CALC_ID: &'static str = "process.blowdown_pressure_profile";
+    const FIELDS: &'static [&'static str] = &["pressure_absolute", "pressure_gauge", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -1262,6 +1275,51 @@ impl CalcResult for PipeResult {
     }
 }
 
+impl CalcResult for PipeFireRuptureResult {
+    const CALC_ID: &'static str = "process.pipe_fire_rupture";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "fluid_basis",
+        "rupture_time",
+        "rupture_pressure",
+        "rupture_mean_wall_temperature",
+        "rupture_outer_surface_temperature",
+        "rupture_accumulated_strain",
+        "rupture_strain_limit",
+        "long_pipe_gas_two_sides",
+        "long_pipe_gas_one_side",
+        "short_pipe_gas_one_side",
+        "liquid_one_side",
+        "release_gas_temperature",
+        "history",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PipeFireRuptureMaterialResult {
+    const CALC_ID: &'static str = "process.pipe_fire_rupture_material";
+    const FIELDS: &'static [&'static str] = &[
+        "resolved_material_name",
+        "density",
+        "heat_capacity",
+        "thermal_conductivity",
+        "ultimate_tensile_strength",
+        "strain_effect_factor",
+        "rupture_strain_limit",
+        "temperature_correction_factor",
+        "strain_rate",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for PipelinePressureProtectionResult {
     const CALC_ID: &'static str = "process.pipeline_pressure_protection";
     const FIELDS: &'static [&'static str] = &[
@@ -2035,6 +2093,28 @@ impl CalcResult for VceResult {
         "dimensionless_overpressure",
         "overpressure",
         "distance_to_overpressure",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for VesselRuptureResult {
+    const CALC_ID: &'static str = "process.vessel_rupture";
+    const FIELDS: &'static [&'static str] = &[
+        "ruptured",
+        "rupture_time",
+        "rupture_stress",
+        "rupture_allowable_stress",
+        "rupture_metal_temperature",
+        "min_margin",
+        "min_margin_time",
+        "material_name",
+        "ambient_yield_strength",
+        "ambient_tensile_strength",
+        "history",
         "warnings",
     ];
 

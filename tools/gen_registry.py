@@ -229,6 +229,10 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `TestCase`. `crates/azoth-process/tests/safety_instrumented_function.rs` asserts
         # it against the capture, and `test_cross_impl` compares it on both results.
         "pfd_within_claimed_sil",
+        # `vessel_rupture`'s verdict, a boolean with no slot in `TestCase`.
+        # `crates/azoth-process/tests/vessel_rupture.rs` asserts it against the capture, and
+        # `test_cross_impl` compares it on both results.
+        "ruptured",
         # `lopa`'s target verdict, a boolean with no slot in `TestCase`.
         # `crates/azoth-process/tests/lopa.rs` asserts it against the capture, and
         # `test_cross_impl` compares it on both results.

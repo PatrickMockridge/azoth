@@ -108,6 +108,20 @@ class GoverningCriterion(StrEnum):
     COVERAGE = "coverage"
 
 
+class RuptureStatus(StrEnum):
+    """Whether the accumulated strain crossed its limit."""
+
+    NO_RUPTURE = "no_rupture"
+    RUPTURE = "rupture"
+
+
+class FluidBasis(StrEnum):
+    """The release branch the density switch selected."""
+
+    GAS = "gas"
+    LIQUID = "liquid"
+
+
 class Sts0131PressureCategory(StrEnum):
     """The STS0131 overpressure band a LOPA scenario falls in."""
 

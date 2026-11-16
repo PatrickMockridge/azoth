@@ -7,12 +7,12 @@
 //! crossover.
 
 use azoth_core::units::{
-    Length, Pressure, ThermodynamicTemperature, Time, kelvins, megapascals, pascals, seconds,
+    Length, Pressure, ThermodynamicTemperature, Time, megapascals, pascals, seconds,
 };
 use azoth_core::{AzothError, Result, Warning, apply_checks};
 use serde::Serialize;
 
-use crate::executor::json::{scalar, warnings as wire_warnings};
+use crate::executor::json::{optional_scalar, scalar, warnings as wire_warnings};
 use crate::model_gen;
 
 /// The class's psi-to-pascal factor.
@@ -58,16 +58,16 @@ pub struct VesselRuptureResult {
     /// Whether any step's margin is at or below zero.
     pub ruptured: bool,
     /// The interpolated first crossover time.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub rupture_time: Option<Time>,
     /// The von Mises stress at the rupture step.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub rupture_stress: Option<Pressure>,
     /// The allowable stress at the rupture step.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub rupture_allowable_stress: Option<Pressure>,
     /// The metal temperature at the rupture step.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub rupture_metal_temperature: Option<ThermodynamicTemperature>,
     /// The smallest margin over the history.
     #[serde(serialize_with = "scalar")]
@@ -377,3 +377,4 @@ pub fn vessel_rupture(
         warnings,
     })
 }
+

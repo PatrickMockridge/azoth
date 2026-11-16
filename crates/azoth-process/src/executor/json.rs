@@ -23,9 +23,10 @@
 //! take the whole envelope with it, which is the failure `run_error` exists to prevent.
 
 use azoth_core::units::{
-    Area, DiffusionCoefficient, DynamicViscosity, Energy, Force, HeatFluxDensity, HeatTransfer,
-    Length, Mass, MassDensity, MassFlux, MassRate, MolarEnergy, MolarHeatCapacity, Power, Pressure,
-    ThermalConductance, ThermodynamicTemperature, Time, Velocity, Volume, VolumeRate,
+    Area, DiffusionCoefficient, DynamicViscosity, Energy, Force, Frequency, HeatFluxDensity,
+    HeatTransfer, Length, Mass, MassDensity, MassFlux, MassRate, MolarEnergy, MolarHeatCapacity,
+    MolarMass, Power, Pressure, SpecificHeatCapacity, ThermalConductance, ThermalConductivity,
+    ThermodynamicTemperature, Time, Velocity, Volume, VolumeRate,
 };
 use azoth_core::{AzothError, Result, Warning};
 use serde::ser::SerializeSeq;
@@ -227,6 +228,34 @@ impl WireScalar for DynamicViscosity {
 
 impl WireScalar for DiffusionCoefficient {
     const UNIT: &'static str = "m**2/s";
+    fn magnitude(&self) -> f64 {
+        self.value
+    }
+}
+
+impl WireScalar for Frequency {
+    const UNIT: &'static str = "1/s";
+    fn magnitude(&self) -> f64 {
+        self.value
+    }
+}
+
+impl WireScalar for SpecificHeatCapacity {
+    const UNIT: &'static str = "J/(kg*K)";
+    fn magnitude(&self) -> f64 {
+        self.value
+    }
+}
+
+impl WireScalar for ThermalConductivity {
+    const UNIT: &'static str = "W/(m*K)";
+    fn magnitude(&self) -> f64 {
+        self.value
+    }
+}
+
+impl WireScalar for MolarMass {
+    const UNIT: &'static str = "kg/mol";
     fn magnitude(&self) -> f64 {
         self.value
     }

@@ -8,14 +8,14 @@
 use azoth_core::units::{
     Frequency, HeatFluxDensity, HeatTransfer, Length, MassDensity, MassRate, MolarMass, Pressure,
     SpecificHeatCapacity, ThermodynamicTemperature, Time, bars, kelvins,
-    kilograms_per_cubic_meter, kilograms_per_second, megapascals, per_second, seconds,
+    kilograms_per_second, megapascals, per_second, seconds,
     watts_per_square_meter,
 };
 use azoth_core::{AzothError, Result, Warning, apply_checks};
 use serde::Serialize;
 use std::f64::consts::PI;
 
-use crate::executor::json::{scalar, warnings as wire_warnings};
+use crate::executor::json::{optional_scalar, scalar, warnings as wire_warnings};
 use crate::model_gen;
 use crate::models::blowdown_pressure_profile::{BlowdownProfilePoint, blowdown_pressure_profile};
 use crate::models::pipe_fire_rupture_material::{
@@ -131,35 +131,35 @@ pub struct PipeFireRuptureResult {
     /// The branch the density switch selected.
     pub fluid_basis: FluidBasis,
     /// The first step's time whose accumulated strain exceeded the limit.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub rupture_time: Option<Time>,
     /// The gauge pressure at the rupture step.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub rupture_pressure: Option<Pressure>,
     /// The mean wall temperature at the rupture step.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub rupture_mean_wall_temperature: Option<ThermodynamicTemperature>,
     /// The outer surface temperature at the rupture step.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub rupture_outer_surface_temperature: Option<ThermodynamicTemperature>,
     /// The accumulated strain at the rupture step.
     pub rupture_accumulated_strain: Option<f64>,
     /// The temperature-dependent limit at the rupture step.
     pub rupture_strain_limit: Option<f64>,
     /// The two-sided long-pipe gas release.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub long_pipe_gas_two_sides: Option<MassRate>,
     /// The one-sided long-pipe gas release.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub long_pipe_gas_one_side: Option<MassRate>,
     /// The one-sided short-pipe gas release.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub short_pipe_gas_one_side: Option<MassRate>,
     /// The one-sided liquid release.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub liquid_one_side: Option<MassRate>,
     /// The initial temperature the gas release was evaluated at.
-    #[serde(serialize_with = "scalar")]
+    #[serde(serialize_with = "optional_scalar")]
     pub release_gas_temperature: Option<ThermodynamicTemperature>,
     /// One row per marching step, ending at the rupture step when one is found.
     pub history: Vec<PipeFireRupturePoint>,
@@ -558,7 +558,7 @@ pub fn pipe_fire_rupture(
     let mut mean_c = initial_c;
     let mut outer_c = initial_c;
     let mut heat_flux_kw = scenario.heat_flux_kw(outer_c);
-    let mut accumulated = 0.0;
+    let mut accumulated: f64 = 0.0;
     let mut history = Vec::new();
     let mut rupture: Option<(f64, f64, f64, f64, f64, f64)> = None;
     let steps = step_count as usize;
@@ -701,3 +701,4 @@ pub fn pipe_fire_rupture(
         warnings,
     })
 }
+

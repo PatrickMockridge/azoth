@@ -520,7 +520,7 @@ def pipe_fire_rupture_material(
             non-finite grid, a non-positive density or constitutive constant, a non-positive
             temperature, or a non-finite value.
     """
-    solution, _ = _evaluate(
+    solution, warnings = _evaluate(
         material_name,
         evaluation_temperature,
         evaluation_stress,
@@ -543,4 +543,5 @@ def pipe_fire_rupture_material(
         rupture_strain_limit=solution.rupture_strain_limit,
         temperature_correction_factor=solution.temperature_correction_factor,
         strain_rate=from_si(solution.strain_rate, "1/s"),
+        warnings=tuple(warnings),
     )

@@ -192,7 +192,11 @@ fn the_workbook_benchmark_ruptures_at_115_seconds() {
         66.892_718_196_875_08,
         "the first stress",
     );
-    close(first.strain_rate.value, 2.142_168_794_355_876_4e-18, "the first rate");
+    close(
+        first.strain_rate.value,
+        2.142_168_794_355_876_4e-18 / 60.0,
+        "the first rate",
+    );
 }
 
 #[test]

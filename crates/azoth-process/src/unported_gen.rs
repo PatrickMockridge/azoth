@@ -6,6 +6,7 @@
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
@@ -43,6 +44,8 @@
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
+//!   - specs/models/process/pipe_fire_rupture.toml
+//!   - specs/models/process/pipe_fire_rupture_material.toml
 //!   - specs/models/process/pipeline_pressure_protection.toml
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
@@ -69,6 +72,7 @@
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
+//!   - specs/models/process/vessel_rupture.toml
 //!
 //! Regenerate with `python tools/gen_models.py`; CI runs `--check` and fails
 //! on any difference.

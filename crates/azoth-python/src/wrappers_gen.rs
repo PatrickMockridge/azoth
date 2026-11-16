@@ -5606,6 +5606,40 @@ pub fn bleve(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Blowdown pressure profile.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (points, time, interpolation_mode, gauge_offset))]
+#[pyo3(text_signature = "(points, time, interpolation_mode, gauge_offset)")]
+pub fn blowdown_pressure_profile(
+    py: Python<'_>,
+    points: Vec<crate::records_gen::BlowdownProfilePoint>,
+    time: f64,
+    interpolation_mode: Option<&str>,
+    gauge_offset: Option<f64>,
+) -> PyResult<crate::transport_gen::PyBlowdownPressureProfileResult> {
+    let points_records: Vec<
+        azoth_process::models::blowdown_pressure_profile::BlowdownProfilePoint,
+    > = points
+        .into_iter()
+        .map(
+            |row| azoth_process::models::blowdown_pressure_profile::BlowdownProfilePoint {
+                time: seconds(row.time),
+                pressure: pascals(row.pressure),
+            },
+        )
+        .collect();
+    azoth_process::models::blowdown_pressure_profile::blowdown_pressure_profile(
+        &points_records,
+        seconds(time),
+        interpolation_mode,
+        gauge_offset.map(pascals),
+    )
+    .map(|r| crate::transport_gen::PyBlowdownPressureProfileResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Bow-tie risk.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6959,6 +6993,85 @@ pub fn pfp_demand(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Pipe fire rupture.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (outside_diameter, nominal_wall_thickness, material_name, fire_scenario, pressure_profile, corrosion_allowance, wall_thickness_undertolerance, exposed_length, weight_stress, fluid_density, fluid_heat_capacity, gas_molecular_weight, initial_temperature, fire_temperature, gas_temperature, convective_heat_transfer_coefficient, fire_emissivity, metal_emissivity, metal_absorptivity, passive_protection_heat_flux_factor, gauge_offset, interpolation_mode, time_step, max_time, spreadsheet_gas_thermal_mass))]
+#[pyo3(
+    text_signature = "(outside_diameter, nominal_wall_thickness, material_name, fire_scenario, pressure_profile, corrosion_allowance, wall_thickness_undertolerance, exposed_length, weight_stress, fluid_density, fluid_heat_capacity, gas_molecular_weight, initial_temperature, fire_temperature, gas_temperature, convective_heat_transfer_coefficient, fire_emissivity, metal_emissivity, metal_absorptivity, passive_protection_heat_flux_factor, gauge_offset, interpolation_mode, time_step, max_time, spreadsheet_gas_thermal_mass)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn pipe_fire_rupture(
+    py: Python<'_>,
+    outside_diameter: f64,
+    nominal_wall_thickness: f64,
+    material_name: &str,
+    fire_scenario: &str,
+    pressure_profile: Vec<crate::records_gen::BlowdownProfilePoint>,
+    corrosion_allowance: Option<f64>,
+    wall_thickness_undertolerance: Option<f64>,
+    exposed_length: Option<f64>,
+    weight_stress: Option<f64>,
+    fluid_density: Option<f64>,
+    fluid_heat_capacity: Option<f64>,
+    gas_molecular_weight: Option<f64>,
+    initial_temperature: Option<f64>,
+    fire_temperature: Option<f64>,
+    gas_temperature: Option<f64>,
+    convective_heat_transfer_coefficient: Option<f64>,
+    fire_emissivity: Option<f64>,
+    metal_emissivity: Option<f64>,
+    metal_absorptivity: Option<f64>,
+    passive_protection_heat_flux_factor: Option<f64>,
+    gauge_offset: Option<f64>,
+    interpolation_mode: Option<&str>,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+    spreadsheet_gas_thermal_mass: Option<bool>,
+) -> PyResult<crate::transport_gen::PyPipeFireRuptureResult> {
+    let pressure_profile_records: Vec<
+        azoth_process::models::blowdown_pressure_profile::BlowdownProfilePoint,
+    > = pressure_profile
+        .into_iter()
+        .map(
+            |row| azoth_process::models::blowdown_pressure_profile::BlowdownProfilePoint {
+                time: seconds(row.time),
+                pressure: pascals(row.pressure),
+            },
+        )
+        .collect();
+    azoth_process::models::pipe_fire_rupture::pipe_fire_rupture(
+        meters(outside_diameter),
+        meters(nominal_wall_thickness),
+        material_name,
+        fire_scenario,
+        &pressure_profile_records,
+        corrosion_allowance.map(meters),
+        wall_thickness_undertolerance,
+        exposed_length.map(meters),
+        weight_stress.map(pascals),
+        fluid_density.map(kilograms_per_cubic_meter),
+        fluid_heat_capacity.map(joules_per_kilogram_kelvin),
+        gas_molecular_weight.map(kilograms_per_mole),
+        initial_temperature.map(kelvins),
+        fire_temperature.map(kelvins),
+        gas_temperature.map(kelvins),
+        convective_heat_transfer_coefficient.map(watts_per_square_meter_kelvin),
+        fire_emissivity,
+        metal_emissivity,
+        metal_absorptivity,
+        passive_protection_heat_flux_factor,
+        gauge_offset.map(pascals),
+        interpolation_mode,
+        time_step.map(seconds),
+        max_time.map(seconds),
+        spreadsheet_gas_thermal_mass,
+    )
+    .map(|r| crate::transport_gen::PyPipeFireRuptureResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Pipeline pressure protection.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -7682,6 +7795,50 @@ pub fn vce(
         target_overpressure.map(pascals),
     )
     .map(|r| crate::transport_gen::PyVceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Vessel rupture.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (inner_radius, wall_thickness, material, history, yield_strength, tensile_strength, grade, tensile_strength_factor))]
+#[pyo3(
+    text_signature = "(inner_radius, wall_thickness, material, history, yield_strength, tensile_strength, grade, tensile_strength_factor)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn vessel_rupture(
+    py: Python<'_>,
+    inner_radius: f64,
+    wall_thickness: f64,
+    material: &str,
+    history: Vec<crate::records_gen::VesselRuptureState>,
+    yield_strength: Option<f64>,
+    tensile_strength: Option<f64>,
+    grade: Option<&str>,
+    tensile_strength_factor: Option<f64>,
+) -> PyResult<crate::transport_gen::PyVesselRuptureResult> {
+    let history_records: Vec<azoth_process::models::vessel_rupture::VesselRuptureState> = history
+        .into_iter()
+        .map(
+            |row| azoth_process::models::vessel_rupture::VesselRuptureState {
+                time: seconds(row.time),
+                internal_pressure: pascals(row.internal_pressure),
+                metal_temperature: kelvins(row.metal_temperature),
+            },
+        )
+        .collect();
+    azoth_process::models::vessel_rupture::vessel_rupture(
+        meters(inner_radius),
+        meters(wall_thickness),
+        material,
+        &history_records,
+        yield_strength.map(pascals),
+        tensile_strength.map(pascals),
+        grade,
+        tensile_strength_factor,
+    )
+    .map(|r| crate::transport_gen::PyVesselRuptureResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

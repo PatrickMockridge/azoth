@@ -31,6 +31,7 @@ from azoth.core.result import (
     BeggsBrillRegime,
     BeggsBrillSegmentResult,
     BleveResult,
+    BlowdownPressureProfileResult,
     BoilingHeatTransferResult,
     BowTieResult,
     BrineMixingPointRow,
@@ -105,6 +106,7 @@ from azoth.core.result import (
     FlowlineScaleProfileResult,
     FlowlineScaleSegment,
     FlowRegime,
+    FluidBasis,
     FoulingModelResult,
     FreezingPointResult,
     FrictionTheoryConductivityResult,
@@ -210,6 +212,9 @@ from azoth.core.result import (
     PhaseTransportResult,
     PhFlashResult,
     PipeBeggsAndBrillsResult,
+    PipeFireRuptureMaterialResult,
+    PipeFireRupturePoint,
+    PipeFireRuptureResult,
     PipelineCooldownResult,
     PipelinePressureProtectionResult,
     PipeResult,
@@ -265,6 +270,7 @@ from azoth.core.result import (
     RkAlphaAbResult,
     RkDepartureResult,
     RootStructure,
+    RuptureStatus,
     SafetyInstrumentedFunctionResult,
     SaftVrMiePhaseResult,
     SaltPrecipitationResult,
@@ -360,6 +366,8 @@ from azoth.core.result import (
     VanLaarAcidActivityCoefficientsResult,
     VceResult,
     Vdw1fMixBinaryResult,
+    VesselRuptureResult,
+    VesselRuptureStep,
     VhFlashResult,
     ViscosityResult,
     VsFlashResult,
@@ -428,6 +436,7 @@ __all__ = [
     "barite_celestite_solid_solution",
     "beggs_brill_segment",
     "bleve",
+    "blowdown_pressure_profile",
     "boiling_heat_transfer",
     "bow_tie",
     "brine_mixing_scale_evaluator",
@@ -578,6 +587,8 @@ __all__ = [
     "phase_transport",
     "pipe",
     "pipe_beggs_and_brills",
+    "pipe_fire_rupture",
+    "pipe_fire_rupture_material",
     "pipeline_cooldown",
     "pipeline_pressure_protection",
     "pitzer_hydrate_formation_pressure",
@@ -711,6 +722,7 @@ __all__ = [
     "van_laar_acid_activity_coefficients",
     "vce",
     "vdw1f_mix_binary",
+    "vessel_rupture",
     "vh_flash",
     "viscosity",
     "vs_flash",
@@ -5732,6 +5744,22 @@ def bleve(fuel_mass: Q, heat_of_combustion: float, radiative_fraction: float, re
     )
 
 
+def blowdown_pressure_profile(points: list[dict[str, object]], time: Q, interpolation_mode: str | None=None, gauge_offset: Q | None=None) -> BlowdownPressureProfileResult:
+    """``process.blowdown_pressure_profile``, computed in Rust."""
+    spec = _models_gen.model("process.blowdown_pressure_profile")
+    result = _core.blowdown_pressure_profile(
+        input_records_to_si(spec, "points", points),
+        input_to_si(spec, "time", time),
+        interpolation_mode,
+        None if gauge_offset is None else input_to_si(spec, "gauge_offset", gauge_offset),
+    )
+    return BlowdownPressureProfileResult(
+        pressure_absolute=from_si(result.pressure_absolute.magnitude_si, result.pressure_absolute.unit),
+        pressure_gauge=from_si(result.pressure_gauge.magnitude_si, result.pressure_gauge.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def bow_tie(threats: list[dict[str, object]], consequences: list[dict[str, object]], barriers: list[dict[str, object]]) -> BowTieResult:
     """``process.bow_tie``, computed in Rust."""
     spec = _models_gen.model("process.bow_tie")
@@ -7339,6 +7367,85 @@ def pipe(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, in
     )
 
 
+def pipe_fire_rupture(outside_diameter: Q, nominal_wall_thickness: Q, material_name: str, fire_scenario: str, pressure_profile: list[dict[str, object]], corrosion_allowance: Q | None=None, wall_thickness_undertolerance: float | None=None, exposed_length: Q | None=None, weight_stress: Q | None=None, fluid_density: Q | None=None, fluid_heat_capacity: Q | None=None, gas_molecular_weight: Q | None=None, initial_temperature: Q | None=None, fire_temperature: Q | None=None, gas_temperature: Q | None=None, convective_heat_transfer_coefficient: Q | None=None, fire_emissivity: float | None=None, metal_emissivity: float | None=None, metal_absorptivity: float | None=None, passive_protection_heat_flux_factor: float | None=None, gauge_offset: Q | None=None, interpolation_mode: str | None=None, time_step: Q | None=None, max_time: Q | None=None, spreadsheet_gas_thermal_mass: bool | None=None) -> PipeFireRuptureResult:
+    """``process.pipe_fire_rupture``, computed in Rust."""
+    spec = _models_gen.model("process.pipe_fire_rupture")
+    result = _core.pipe_fire_rupture(
+        input_to_si(spec, "outside_diameter", outside_diameter),
+        input_to_si(spec, "nominal_wall_thickness", nominal_wall_thickness),
+        material_name,
+        fire_scenario,
+        input_records_to_si(spec, "pressure_profile", pressure_profile),
+        None if corrosion_allowance is None else input_to_si(spec, "corrosion_allowance", corrosion_allowance),
+        None if wall_thickness_undertolerance is None else wall_thickness_undertolerance,
+        None if exposed_length is None else input_to_si(spec, "exposed_length", exposed_length),
+        None if weight_stress is None else input_to_si(spec, "weight_stress", weight_stress),
+        None if fluid_density is None else input_to_si(spec, "fluid_density", fluid_density),
+        None if fluid_heat_capacity is None else input_to_si(spec, "fluid_heat_capacity", fluid_heat_capacity),
+        None if gas_molecular_weight is None else input_to_si(spec, "gas_molecular_weight", gas_molecular_weight),
+        None if initial_temperature is None else input_to_si(spec, "initial_temperature", initial_temperature),
+        None if fire_temperature is None else input_to_si(spec, "fire_temperature", fire_temperature),
+        None if gas_temperature is None else input_to_si(spec, "gas_temperature", gas_temperature),
+        None if convective_heat_transfer_coefficient is None else input_to_si(spec, "convective_heat_transfer_coefficient", convective_heat_transfer_coefficient),
+        None if fire_emissivity is None else fire_emissivity,
+        None if metal_emissivity is None else metal_emissivity,
+        None if metal_absorptivity is None else metal_absorptivity,
+        None if passive_protection_heat_flux_factor is None else passive_protection_heat_flux_factor,
+        None if gauge_offset is None else input_to_si(spec, "gauge_offset", gauge_offset),
+        interpolation_mode,
+        None if time_step is None else input_to_si(spec, "time_step", time_step),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+        spreadsheet_gas_thermal_mass,
+    )
+    return PipeFireRuptureResult(
+        status=RuptureStatus(result.status),
+        fluid_basis=FluidBasis(result.fluid_basis),
+        rupture_time=None if result.rupture_time is None else from_si(result.rupture_time.magnitude_si, result.rupture_time.unit),
+        rupture_pressure=None if result.rupture_pressure is None else from_si(result.rupture_pressure.magnitude_si, result.rupture_pressure.unit),
+        rupture_mean_wall_temperature=None if result.rupture_mean_wall_temperature is None else from_si(result.rupture_mean_wall_temperature.magnitude_si, result.rupture_mean_wall_temperature.unit),
+        rupture_outer_surface_temperature=None if result.rupture_outer_surface_temperature is None else from_si(result.rupture_outer_surface_temperature.magnitude_si, result.rupture_outer_surface_temperature.unit),
+        rupture_accumulated_strain=result.rupture_accumulated_strain,
+        rupture_strain_limit=result.rupture_strain_limit,
+        long_pipe_gas_two_sides=None if result.long_pipe_gas_two_sides is None else from_si(result.long_pipe_gas_two_sides.magnitude_si, result.long_pipe_gas_two_sides.unit),
+        long_pipe_gas_one_side=None if result.long_pipe_gas_one_side is None else from_si(result.long_pipe_gas_one_side.magnitude_si, result.long_pipe_gas_one_side.unit),
+        short_pipe_gas_one_side=None if result.short_pipe_gas_one_side is None else from_si(result.short_pipe_gas_one_side.magnitude_si, result.short_pipe_gas_one_side.unit),
+        liquid_one_side=None if result.liquid_one_side is None else from_si(result.liquid_one_side.magnitude_si, result.liquid_one_side.unit),
+        release_gas_temperature=None if result.release_gas_temperature is None else from_si(result.release_gas_temperature.magnitude_si, result.release_gas_temperature.unit),
+        history=tuple(PipeFireRupturePoint(time=from_si(c.time.magnitude_si, c.time.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), mean_wall_temperature=from_si(c.mean_wall_temperature.magnitude_si, c.mean_wall_temperature.unit), outer_surface_temperature=from_si(c.outer_surface_temperature.magnitude_si, c.outer_surface_temperature.unit), heat_flux=from_si(c.heat_flux.magnitude_si, c.heat_flux.unit), von_mises_stress=from_si(c.von_mises_stress.magnitude_si, c.von_mises_stress.unit), strain_rate=from_si(c.strain_rate.magnitude_si, c.strain_rate.unit), accumulated_strain=c.accumulated_strain, rupture_strain_limit=c.rupture_strain_limit) for c in result.history),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def pipe_fire_rupture_material(material_name: str, evaluation_temperature: Q, evaluation_stress: Q, curve: list[dict[str, object]] | None=None, density: Q | None=None, sellars_tegart_a: float | None=None, sellars_tegart_alpha: float | None=None, sellars_tegart_n: float | None=None, activation_temperature: Q | None=None, correction_strain_rate: Q | None=None, correction_limit_temperature: Q | None=None) -> PipeFireRuptureMaterialResult:
+    """``process.pipe_fire_rupture_material``, computed in Rust."""
+    spec = _models_gen.model("process.pipe_fire_rupture_material")
+    result = _core.pipe_fire_rupture_material(
+        material_name,
+        input_to_si(spec, "evaluation_temperature", evaluation_temperature),
+        input_to_si(spec, "evaluation_stress", evaluation_stress),
+        None if curve is None else input_records_to_si(spec, "curve", curve),
+        None if density is None else input_to_si(spec, "density", density),
+        None if sellars_tegart_a is None else sellars_tegart_a,
+        None if sellars_tegart_alpha is None else sellars_tegart_alpha,
+        None if sellars_tegart_n is None else sellars_tegart_n,
+        None if activation_temperature is None else input_to_si(spec, "activation_temperature", activation_temperature),
+        None if correction_strain_rate is None else input_to_si(spec, "correction_strain_rate", correction_strain_rate),
+        None if correction_limit_temperature is None else input_to_si(spec, "correction_limit_temperature", correction_limit_temperature),
+    )
+    return PipeFireRuptureMaterialResult(
+        resolved_material_name=result.resolved_material_name,
+        density=from_si(result.density.magnitude_si, result.density.unit),
+        heat_capacity=from_si(result.heat_capacity.magnitude_si, result.heat_capacity.unit),
+        thermal_conductivity=from_si(result.thermal_conductivity.magnitude_si, result.thermal_conductivity.unit),
+        ultimate_tensile_strength=from_si(result.ultimate_tensile_strength.magnitude_si, result.ultimate_tensile_strength.unit),
+        strain_effect_factor=result.strain_effect_factor,
+        rupture_strain_limit=result.rupture_strain_limit,
+        temperature_correction_factor=result.temperature_correction_factor,
+        strain_rate=from_si(result.strain_rate.magnitude_si, result.strain_rate.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def pipeline_pressure_protection(max_source_pressure: Q, design_pressure: Q, incidental_factor: float, barrier1_setpoint: Q, barrier2_setpoint: Q) -> PipelinePressureProtectionResult:
     """``process.pipeline_pressure_protection``, computed in Rust."""
     spec = _models_gen.model("process.pipeline_pressure_protection")
@@ -8513,6 +8620,35 @@ def vce(cloud_fuel_mass: Q, heat_of_combustion: float, strength_class: float, am
         dimensionless_overpressure=result.dimensionless_overpressure,
         overpressure=None if result.overpressure is None else from_si(result.overpressure.magnitude_si, result.overpressure.unit),
         distance_to_overpressure=None if result.distance_to_overpressure is None else from_si(result.distance_to_overpressure.magnitude_si, result.distance_to_overpressure.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def vessel_rupture(inner_radius: Q, wall_thickness: Q, material: str, history: list[dict[str, object]], yield_strength: Q | None=None, tensile_strength: Q | None=None, grade: str | None=None, tensile_strength_factor: float | None=None) -> VesselRuptureResult:
+    """``process.vessel_rupture``, computed in Rust."""
+    spec = _models_gen.model("process.vessel_rupture")
+    result = _core.vessel_rupture(
+        input_to_si(spec, "inner_radius", inner_radius),
+        input_to_si(spec, "wall_thickness", wall_thickness),
+        material,
+        input_records_to_si(spec, "history", history),
+        None if yield_strength is None else input_to_si(spec, "yield_strength", yield_strength),
+        None if tensile_strength is None else input_to_si(spec, "tensile_strength", tensile_strength),
+        grade,
+        None if tensile_strength_factor is None else tensile_strength_factor,
+    )
+    return VesselRuptureResult(
+        ruptured=result.ruptured,
+        rupture_time=None if result.rupture_time is None else from_si(result.rupture_time.magnitude_si, result.rupture_time.unit),
+        rupture_stress=None if result.rupture_stress is None else from_si(result.rupture_stress.magnitude_si, result.rupture_stress.unit),
+        rupture_allowable_stress=None if result.rupture_allowable_stress is None else from_si(result.rupture_allowable_stress.magnitude_si, result.rupture_allowable_stress.unit),
+        rupture_metal_temperature=None if result.rupture_metal_temperature is None else from_si(result.rupture_metal_temperature.magnitude_si, result.rupture_metal_temperature.unit),
+        min_margin=from_si(result.min_margin.magnitude_si, result.min_margin.unit),
+        min_margin_time=from_si(result.min_margin_time.magnitude_si, result.min_margin_time.unit),
+        material_name=result.material_name,
+        ambient_yield_strength=from_si(result.ambient_yield_strength.magnitude_si, result.ambient_yield_strength.unit),
+        ambient_tensile_strength=from_si(result.ambient_tensile_strength.magnitude_si, result.ambient_tensile_strength.unit),
+        history=tuple(VesselRuptureStep(time=from_si(c.time.magnitude_si, c.time.unit), von_mises_stress=from_si(c.von_mises_stress.magnitude_si, c.von_mises_stress.unit), allowable_stress=from_si(c.allowable_stress.magnitude_si, c.allowable_stress.unit), margin=from_si(c.margin.magnitude_si, c.margin.unit)) for c in result.history),
         warnings=_warnings(result.warnings),
     )
 

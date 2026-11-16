@@ -95,21 +95,25 @@ def field_doc(name: str, declaration: dict[str, Any]) -> str:
     return "\n".join(f"    #: {line}".rstrip() for line in text.splitlines())
 
 
-def python_name(calc_id: str) -> str:
+def python_name(result: rust_index.ResultType) -> str:
     """The class name this result carries in Python, which is not always the Rust struct's.
 
     `eos.tp_flash_saft` answers a `SaftFlashResult` in Rust and a `TpFlashSaftResult` here, so
     the name is read from where the Python side is written down: `_core.pyi`'s return annotation
-    for the id, which is the same reader `gen_python_bridge` uses to find it.
+    for the id, which is the same reader `gen_python_bridge` uses to find it. **A new id has no
+    stub line until `gen_stub` runs**, and the Rust struct's own name is the other place it is
+    written down; the fallback is what breaks the stub/result cycle for a bootstrap.
     """
-    return core_signatures()[calc_id.rpartition(".")[2]][1]
+    stem = result.calc_id.rpartition(".")[2]
+    signature = core_signatures().get(stem)
+    return signature[1] if signature is not None else result.rust_name
 
 
 def emit_class(result: rust_index.ResultType, spec: dict[str, Any]) -> tuple[str, set[str]]:
     """One dataclass, and the names it needs imported."""
     fields = list(zip([name for name, _ in result.fields], result.rust_field_types, strict=True))
     outputs = spec.get("outputs") or {}
-    name = python_name(result.calc_id)
+    name = python_name(result)
     eq = "True" if name in COMPARABLE else "False"
     lines = [
         f"@dataclass(frozen=True, slots=True, eq={eq})",

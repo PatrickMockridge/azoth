@@ -350,7 +350,7 @@ def vessel_rupture(
             non-increasing history, a negative pressure, a factor outside ``(0, 1]``, or a
             non-finite value.
     """
-    solution, _ = _evaluate(
+    solution, warnings = _evaluate(
         inner_radius,
         wall_thickness,
         material,
@@ -381,9 +381,9 @@ def vessel_rupture(
         min_margin=from_si(solution.min_margin, "Pa"),
         min_margin_time=from_si(solution.min_margin_time, "s"),
         material_name=solution.material_name,
-        ambient_yield_strength=from_si(solution.ambient_yield_strength / 1.0e6, "MPa"),
-        ambient_tensile_strength=from_si(solution.ambient_tensile_strength / 1.0e6, "MPa"),
-        history=[
+        ambient_yield_strength=from_si(solution.ambient_yield_strength, "MPa"),
+        ambient_tensile_strength=from_si(solution.ambient_tensile_strength, "MPa"),
+        history=tuple(
             VesselRuptureStep(
                 time=from_si(row[0], "s"),
                 von_mises_stress=from_si(row[1], "Pa"),
@@ -391,5 +391,6 @@ def vessel_rupture(
                 margin=from_si(row[3], "Pa"),
             )
             for row in solution.history
-        ],
+        ),
+        warnings=tuple(warnings),
     )

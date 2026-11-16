@@ -18,6 +18,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.anti_surge_recycle`](./anti_surge_recycle.md) | `damped_fixed_point_recycle` | NeqSim process/equipment/compressor/AntiSurgeRecycleCalculator.java |
 | [`process.api537_flare_flame_model`](./api537_flare_flame_model.md) | `closed_form_flare_flame_and_radiation` | NeqSim process/safety/fire/Api537FlareFlameModel.java |
 | [`process.bleve`](./bleve.md) | `ccps_fireball_point_source` | NeqSim process/safety/fire/BLEVECalculator.java |
+| [`process.blowdown_pressure_profile`](./blowdown_pressure_profile.md) | `piecewise_step_or_linear_pressure_profile` | NeqSim process/safety/rupture/BlowdownPressureProfile.java |
 | [`process.bow_tie`](./bow_tie.md) | `closed_form_bow_tie` | NeqSim process/safety/risk/bowtie/BowTieModel.java |
 | [`process.component_splitter`](./component_splitter.md) | `direct composition` | NeqSim process/equipment/splitter/ComponentSplitter.java |
 | [`process.compressor`](./compressor.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
@@ -55,6 +56,8 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.packed_column`](./packed_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/PackedColumn.java |
 | [`process.pfp_demand`](./pfp_demand.md) | `closed_form_steel_time_to_critical` | NeqSim process/safety/fire/PfpDemandCalculator.java |
 | [`process.pipe`](./pipe.md) | `direct composition` | NeqSim process/equipment/pipeline/AdiabaticPipe.java |
+| [`process.pipe_fire_rupture`](./pipe_fire_rupture.md) | `strain_rate_pipe_fire_rupture` | NeqSim process/safety/rupture/PipeFireRuptureStudy.java |
+| [`process.pipe_fire_rupture_material`](./pipe_fire_rupture_material.md) | `sellars_tegart_pipe_material_curves` | NeqSim process/safety/rupture/PipeFireRuptureMaterial.java |
 | [`process.pipeline_pressure_protection`](./pipeline_pressure_protection.md) | `closed_form_pipeline_pressure_protection` | NeqSim process/safety/overpressure/PipelinePressureProtectionCalculator.java |
 | [`process.plug_flow_reactor`](./plug_flow_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/PlugFlowReactor.java |
 | [`process.pool_fire`](./pool_fire.md) | `api521_mudan_pool_fire` | NeqSim process/safety/fire/PoolFireModel.java |
@@ -81,3 +84,4 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.tr3001_compliance`](./tr3001_compliance.md) | `closed_form_tr3001_compliance` | NeqSim process/safety/overpressure/TR3001ComplianceChecker.java |
 | [`process.turbo_expander_compressor`](./turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/TurboExpanderCompressor.java |
 | [`process.vce`](./vce.md) | `tno_multi_energy_scaled_overpressure` | NeqSim process/safety/fire/VCEModel.java |
+| [`process.vessel_rupture`](./vessel_rupture.md) | `thin_wall_vessel_rupture_crossover` | NeqSim process/safety/rupture/VesselRuptureAnalyzer.java |
