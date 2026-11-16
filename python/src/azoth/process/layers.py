@@ -2679,9 +2679,7 @@ def _pipe_fire_rupture_material(inputs: Mapping[str, Any]) -> dict[str, float]:
             {
                 "temperature": quantity(float(row["temperature"]), "K"),
                 "heat_capacity": quantity(float(row["heat_capacity"]), "J/(kg*K)"),
-                "thermal_conductivity": quantity(
-                    float(row["thermal_conductivity"]), "W/(m*K)"
-                ),
+                "thermal_conductivity": quantity(float(row["thermal_conductivity"]), "W/(m*K)"),
                 "ultimate_tensile_strength": quantity(
                     float(row["ultimate_tensile_strength"]), "MPa"
                 ),
@@ -2701,15 +2699,11 @@ def _pipe_fire_rupture_material(inputs: Mapping[str, Any]) -> dict[str, float]:
         quantity(float(inputs["evaluation_stress"]), "MPa"),
         points,
         optional("density", "kg/m**3"),
-        None
-        if inputs.get("sellars_tegart_a") is None
-        else float(inputs["sellars_tegart_a"]),
+        None if inputs.get("sellars_tegart_a") is None else float(inputs["sellars_tegart_a"]),
         None
         if inputs.get("sellars_tegart_alpha") is None
         else float(inputs["sellars_tegart_alpha"]),
-        None
-        if inputs.get("sellars_tegart_n") is None
-        else float(inputs["sellars_tegart_n"]),
+        None if inputs.get("sellars_tegart_n") is None else float(inputs["sellars_tegart_n"]),
         optional("activation_temperature", "K"),
         optional("correction_strain_rate", "1/s"),
         optional("correction_limit_temperature", "K"),
@@ -2763,9 +2757,7 @@ def _pipe_fire_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
         optional("convective_heat_transfer_coefficient", "W/(m**2*K)"),
         None if inputs.get("fire_emissivity") is None else float(inputs["fire_emissivity"]),
         None if inputs.get("metal_emissivity") is None else float(inputs["metal_emissivity"]),
-        None
-        if inputs.get("metal_absorptivity") is None
-        else float(inputs["metal_absorptivity"]),
+        None if inputs.get("metal_absorptivity") is None else float(inputs["metal_absorptivity"]),
         None
         if inputs.get("passive_protection_heat_flux_factor") is None
         else float(inputs["passive_protection_heat_flux_factor"]),
@@ -2785,9 +2777,7 @@ def _pipe_fire_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
             {
                 "rupture_time_s": solution.rupture_time,
                 "rupture_pressure_barg": solution.rupture_pressure or 0.0,
-                "rupture_mean_wall_temperature_c": (
-                    solution.rupture_mean_wall_temperature or 0.0
-                )
+                "rupture_mean_wall_temperature_c": (solution.rupture_mean_wall_temperature or 0.0)
                 - 273.15,
                 "rupture_outer_surface_temperature_c": (
                     solution.rupture_outer_surface_temperature or 0.0
@@ -2799,8 +2789,7 @@ def _pipe_fire_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
                 "long_pipe_gas_one_side_kg_s": solution.long_pipe_gas_one_side or 0.0,
                 "short_pipe_gas_one_side_kg_s": solution.short_pipe_gas_one_side or 0.0,
                 "liquid_one_side_kg_s": solution.liquid_one_side or 0.0,
-                "release_gas_temperature_c": (solution.release_gas_temperature or 0.0)
-                - 273.15,
+                "release_gas_temperature_c": (solution.release_gas_temperature or 0.0) - 273.15,
             }
         )
     for index, row in enumerate(solution.history):
