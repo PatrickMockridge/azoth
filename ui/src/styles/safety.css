@@ -122,7 +122,7 @@
 }
 
 .safety-bowtie,
-.safety-fire {
+.safety-deck {
   display: grid;
   grid-template-columns: var(--calc-side-min) 1fr;
   gap: 1rem;
@@ -280,7 +280,7 @@
 
 @media (max-width: 1100px) {
   .safety-bowtie,
-  .safety-fire,
+  .safety-deck,
   .safety-bowtie-grid {
     grid-template-columns: 1fr;
   }

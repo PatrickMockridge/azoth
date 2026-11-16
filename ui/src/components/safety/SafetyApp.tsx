@@ -31,7 +31,8 @@ import type {
   SafetyEnvelope,
 } from "../../wire/types";
 import { SafetyTitleStrip } from "./SafetyTitleStrip";
-import { SafetyWorkspace, type SafetyView } from "./SafetyWorkspace";
+import { SafetyWorkspace } from "./SafetyWorkspace";
+import { isScenarioView, type SafetyView } from "./views";
 import type { Workspace } from "../calculations/WorkspaceSwitch";
 
 /** One study the workspace has stood at, for undo and redo. */
@@ -186,7 +187,7 @@ export function SafetyApp({
     (entry: SafetyCalculation) => {
       const id = nextScenarioId(entry, envelope);
       setActiveScenario(id);
-      setView("fire");
+      setView(isScenarioView(entry.sub_interface) ? entry.sub_interface : "fire");
       send({ command: "add_scenario", id, calculation: entry.id, name: entry.name });
     },
     [envelope, send],

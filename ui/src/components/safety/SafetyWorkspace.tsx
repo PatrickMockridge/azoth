@@ -1,9 +1,9 @@
 /**
  * The Safety workspace's sub-interfaces.
  *
- * **Three readings of one document.** Overview lists what the study holds and what this tranche
- * can run; Bowtie draws the causes and outcomes; a scenario deck runs its family's models. A tab is a view
- * and never a second document, so switching one cannot lose an edit.
+ * **One document, six readings.** Overview lists what the study holds; Bow-tie draws the causes
+ * and outcomes; the five scenario decks run their family's models. A tab is a view and never a
+ * second document, so switching one cannot lose an edit.
  */
 
 import type { Units } from "../../state/units";
@@ -15,16 +15,18 @@ import type {
   SafetyEnvelope,
 } from "../../wire/types";
 import { BowtieView } from "./BowtieView";
-import { FireView } from "./FireView";
+import { ScenarioDeck } from "./ScenarioDeck";
 import { SafetyOverview } from "./SafetyOverview";
-
-/** Which sub-interface is in front. */
-export type SafetyView = "overview" | "bowtie" | "fire";
+import { isScenarioView, type SafetyView } from "./views";
 
 const VIEWS: { id: SafetyView; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "bowtie", label: "Bow-tie" },
   { id: "fire", label: "Fire" },
+  { id: "dispersion", label: "Dispersion" },
+  { id: "firewater", label: "Firewater" },
+  { id: "overpressure", label: "Relief" },
+  { id: "risk", label: "Risk" },
 ];
 
 export function SafetyWorkspace({
@@ -63,8 +65,13 @@ export function SafetyWorkspace({
   onMoveNode: (bowtie: string, node: string, x: number, y: number) => void;
 }) {
   const selectScenario = (id: string) => {
+    const row = envelope?.study.scenarios.find((scenario) => scenario.id === id);
+    const entry = catalogue?.safety?.find((model) => model.id === row?.calculation);
+    // A scenario whose calculation has no deck (a hand-written release or rupture id) is listed
+    // with its unsupported diagnostic on the overview, never silently dropped.
+    const target = entry?.sub_interface ?? row?.family ?? null;
     onActiveScenario(id);
-    onView("fire");
+    onView(isScenarioView(target) ? target : "overview");
   };
 
   return (
@@ -107,7 +114,9 @@ export function SafetyWorkspace({
           onScenario={selectScenario}
         />
       ) : (
-        <FireView
+        <ScenarioDeck
+          key={view}
+          view={view}
           envelope={envelope}
           catalogue={catalogue}
           units={units}
