@@ -284,6 +284,168 @@ fn the_fire_water_coverage_case_runs_through_the_dispatch() {
 }
 
 #[test]
+fn the_fire_case_relief_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.fire_case_relief",
+        &json!({
+            "wetted_area": 100.0,
+            "has_drainage": false,
+            "has_fire_fighting": true,
+            "latent_heat": 300_000.0,
+            "relieving_temperature": 350.0,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "latent_heat") - 300_000.0).abs() < 1e-9);
+    assert!((number(outputs, "relief_rate") - 10.324_901_255_486_964).abs() < 1e-9);
+    // kg/h is the display unit; the magnitude is SI, as every quantity here is.
+    assert!((number(outputs, "relief_rate_kg_per_hr") - 10.324_901_255_486_964).abs() < 1e-9);
+    assert!((number(outputs, "relieving_temperature") - 350.0).abs() < 1e-12);
+}
+
+#[test]
+fn the_overpressure_acceptance_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.overpressure_acceptance",
+        &json!({
+            "peak_pressure": 1_100_000.0,
+            "mawp": 1_000_000.0,
+            "cause": "blocked_outlet",
+            "multiple_devices": false,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "accumulation_factor") - 1.1).abs() < 1e-12);
+    assert!((number(outputs, "allowable_pressure") - 1_100_000.0).abs() < 1e-6);
+    assert!((number(outputs, "margin") - 0.0).abs() < 1e-6);
+    assert_eq!(outputs.outputs["accepted"], json!(true));
+}
+
+#[test]
+fn the_pipeline_protection_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.pipeline_pressure_protection",
+        &json!({
+            "max_source_pressure": 12.0,
+            "design_pressure": 10.0,
+            "incidental_factor": 1.1,
+            "barrier1_setpoint": 8.0,
+            "barrier2_setpoint": 10.0,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "max_incidental_pressure") - 1_100_000.0).abs() < 1e-6);
+    assert!((number(outputs, "design_margin") + 200_000.0).abs() < 1e-6);
+    assert_eq!(outputs.outputs["fully_rated"], json!(false));
+    assert_eq!(outputs.outputs["protection_adequate"], json!(true));
+    assert_eq!(outputs.outputs["verdict"], json!("TWO_BARRIERS_REQUIRED"));
+}
+
+#[test]
+fn the_psv_sizing_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.psv_sizing",
+        &json!({
+            "service": "gas",
+            "mass_flow": 1.0,
+            "set_pressure": 1_000_000.0,
+            "overpressure_fraction": 0.1,
+            "back_pressure": 800_000.0,
+            "temperature": 300.0,
+            "molar_mass": 0.02,
+            "compressibility": 0.9,
+            "specific_heat_ratio": 1.3,
+            "is_balanced_bellows": true,
+            "has_rupture_disk": false,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "relieving_pressure") - 1_100_000.0).abs() < 1e-6);
+    assert!((number(outputs, "required_area") - 7.267_430_890_193_706e-4).abs() < 1e-15);
+    assert!((number(outputs, "required_area_in2") - 1.126_454_040_888_106_3).abs() < 1e-12);
+    assert_eq!(outputs.outputs["recommended_orifice"], json!("J"));
+    assert!((number(outputs, "back_pressure_correction") - 0.643_499_521_697_216_9).abs() < 1e-12);
+}
+
+#[test]
+fn the_psv_sizing_liquid_branch_names_the_missing_flow() {
+    match dispatch::run(
+        "process.psv_sizing",
+        &json!({
+            "service": "liquid",
+            "set_pressure": 1_000_000.0,
+            "overpressure_fraction": 0.1,
+            "back_pressure": 101_325.0,
+        }),
+    ) {
+        Outcome::Error { field, .. } => assert_eq!(field.as_deref(), Some("volume_flow")),
+        Outcome::Ok(_) => panic!("a liquid service with no flow ran"),
+    }
+}
+
+#[test]
+fn the_psv_fire_sizing_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.psv_fire_sizing",
+        &json!({
+            "initial_mass": 5000.0,
+            "initial_pressure": 2_000_000.0,
+            "set_pressure": 1_000_000.0,
+            "initial_temperature": 300.0,
+            "fire_heat_input": 100_000.0,
+            "vessel_volume": 10.0,
+            "molar_mass": 0.02,
+            "specific_heat_ratio": 1.3,
+            "compressibility": 0.9,
+            "heat_capacity": 2000.0,
+            "blowdown_time": 900.0,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "overpressure_fraction") - 0.21).abs() < 1e-12);
+    assert!((number(outputs, "required_area") - 0.002_364_274_017_247_606_5).abs() < 1e-15);
+    assert!((number(outputs, "required_area_in2") - 3.664_632_055_997_902_4).abs() < 1e-12);
+    assert_eq!(outputs.outputs["recommended_orifice"], json!("N"));
+}
+
+#[test]
+fn the_nog070_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.nog070_sil_determination",
+        &json!({"sif_type": "hipps_pipeline", "pfd_average": 0.005}),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "catalogue_minimum_sil") - 3.0).abs() < 1e-12);
+    assert!((number(outputs, "achieved_sil") - 2.0).abs() < 1e-12);
+    assert_eq!(outputs.outputs["compliant"], json!(false));
+    assert!((number(outputs, "required_pfd_reduction_factor") - 10.0).abs() < 1e-12);
+}
+
+#[test]
+fn the_sif_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.safety_instrumented_function",
+        &json!({
+            "pfd_average": 0.005,
+            "claimed_sil": 2.0,
+            "unmitigated_frequency_per_year": 0.1,
+            "target_frequency_per_year": 1.0e-5,
+            "test_interval_hours": 8760.0,
+            "lambda_du_per_hour": 1.0e-6,
+            "spurious_trip_rate_per_year": 0.0,
+            "mttr_hours": 0.0,
+            "base_availability": 0.99,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "risk_reduction_factor") - 200.0).abs() < 1e-9);
+    assert!((number(outputs, "mitigated_frequency_per_year") - 5.0e-4).abs() < 1e-15);
+    assert!((number(outputs, "required_pfd") - 1.0e-4).abs() < 1e-15);
+    assert!((number(outputs, "required_sil") - 3.0).abs() < 1e-12);
+    assert_eq!(outputs.outputs["pfd_within_claimed_sil"], json!(true));
+}
+
+#[test]
 fn the_bow_tie_case_runs_through_the_dispatch() {
     let outcome = dispatch::run(
         "process.bow_tie",
