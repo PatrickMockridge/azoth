@@ -35,7 +35,7 @@ describe("the safety study on a served door", () => {
     const opened = await door.attach();
     expect(calls[0]?.url).toBe("http://127.0.0.1:4000/safety");
     expect(calls[0]?.body).toEqual({ command: null });
-    expect(opened.envelope.study.scenarios).toHaveLength(2);
+    expect(opened.envelope.study.scenarios).toHaveLength(6);
     expect(opened.envelope.study.bowties).toHaveLength(1);
 
     await opened.session.calculate({ scenario: "jet_fire_1" });

@@ -87,6 +87,49 @@ fn the_demo_calculates_every_stale_item() {
         .expect("the pool flux");
     assert!((pool_flux - 6_784.823_922_879_632).abs() < 1e-6);
 
+    let plume = scenario(&value, "gaussian_plume_1");
+    let concentration = plume["result"]["outputs"]["concentration"]["magnitude_si"]
+        .as_f64()
+        .expect("the plume concentration");
+    assert!((concentration - 7.404_545_545_613_47e-6).abs() < 1e-15);
+    let plume_distance = plume["result"]["outputs"]["distance_to_threshold"]["magnitude_si"]
+        .as_f64()
+        .expect("the plume distance");
+    assert!((plume_distance - 121.271_019_705_978_8).abs() < 1e-9);
+
+    let deluge = scenario(&value, "deluge_1");
+    assert_eq!(
+        deluge["result"]["outputs"]["nozzle_count"].as_f64(),
+        Some(57.0)
+    );
+    assert_eq!(deluge["result"]["outputs"]["governing_criterion"], "coverage");
+    let deluge_flow = deluge["result"]["outputs"]["required_flow"]["magnitude_si"]
+        .as_f64()
+        .expect("the deluge flow");
+    assert!((deluge_flow - 0.085).abs() < 1e-15);
+
+    let psv = scenario(&value, "psv_1");
+    let area_in2 = psv["result"]["outputs"]["required_area_in2"]
+        .as_f64()
+        .expect("the required area");
+    assert!((area_in2 - 0.724_872_636_525_393_7).abs() < 1e-12);
+    assert_eq!(psv["result"]["outputs"]["recommended_orifice"], "H");
+    let relieving = psv["result"]["outputs"]["relieving_pressure"]["magnitude_si"]
+        .as_f64()
+        .expect("the relieving pressure");
+    assert!((relieving - 1_100_000.0).abs() < 1e-6);
+
+    let sif = scenario(&value, "sif_1");
+    let rrf = sif["result"]["outputs"]["risk_reduction_factor"]
+        .as_f64()
+        .expect("the SIF RRF");
+    assert!((rrf - 200.0).abs() < 1e-9);
+    assert_eq!(sif["result"]["outputs"]["required_sil"].as_f64(), Some(3.0));
+    assert_eq!(
+        sif["result"]["outputs"]["pfd_within_claimed_sil"].as_bool(),
+        Some(true)
+    );
+
     let diagram = bowtie(&value, "bt_separator_release");
     assert_eq!(diagram["stale"], false);
     assert_eq!(diagram["counts"]["threats"], 2);

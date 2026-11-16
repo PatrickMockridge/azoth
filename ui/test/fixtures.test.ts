@@ -448,10 +448,10 @@ describe("the DEXPI view", () => {
 });
 
 describe("the safety study", () => {
-  it("is the demo's two scenarios and one bow-tie, calculated", () => {
+  it("is the demo's six scenarios and one bow-tie, calculated", () => {
     expect(safety.ok).toBe(true);
     expect(safety.dirty).toBe(false);
-    expect(safety.study.scenarios).toHaveLength(2);
+    expect(safety.study.scenarios).toHaveLength(6);
     expect(safety.study.bowties).toHaveLength(1);
 
     const jet = safety.study.scenarios.find((row) => row.id === "jet_fire_1");
@@ -465,6 +465,31 @@ describe("the safety study", () => {
     const row = jet.profile.find((entry) => entry.target.magnitude_si === 12_500);
     expect(row?.reached).toBe(true);
     expect(row?.distance?.unit).toBe("m");
+
+    // **One scenario per native family.** Each is the capture state its model's own test uses,
+    // so the fixture proves the deck's four new views have a calculated answer to draw.
+    const plume = safety.study.scenarios.find((entry) => entry.id === "gaussian_plume_1");
+    expect(plume?.family).toBe("dispersion");
+    expect(plume?.stale).toBe(false);
+    expect(plume?.result?.outputs.concentration).toEqual({
+      magnitude_si: 7.40454554561347e-6,
+      unit: "kg/m**3",
+    });
+
+    const deluge = safety.study.scenarios.find((entry) => entry.id === "deluge_1");
+    expect(deluge?.family).toBe("firewater");
+    expect(deluge?.result?.outputs.nozzle_count).toBe(57);
+    expect(deluge?.result?.outputs.governing_criterion).toBe("coverage");
+
+    const psv = safety.study.scenarios.find((entry) => entry.id === "psv_1");
+    expect(psv?.family).toBe("overpressure");
+    expect(psv?.result?.outputs.recommended_orifice).toBe("H");
+    expect(psv?.result?.outputs.required_area_in2).toBeCloseTo(0.7248726365253937, 12);
+
+    const sif = safety.study.scenarios.find((entry) => entry.id === "sif_1");
+    expect(sif?.family).toBe("risk");
+    expect(sif?.result?.outputs.risk_reduction_factor).toBe(200);
+    expect(sif?.result?.outputs.required_sil).toBe(3);
   });
 
   it("carries the bow-tie's derived RRF and its projection", () => {
