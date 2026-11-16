@@ -564,6 +564,15 @@ SPEC_TREES: tuple[tuple[str, Claim], ...] = (
         ),
     ),
     (
+        "specs/safety/",
+        Claim(
+            # The studies are documents the safety workspace opens and its tests run; the
+            # `ui` job is what proves the wire and the screen.
+            crates=("azoth-safety",),
+            jobs=("ui",),
+        ),
+    ),
+    (
         "specs/unit_ops/",
         Claim(
             commands=(
@@ -721,6 +730,7 @@ NAMELESS_CRATES = (
     "azoth-core",
     "azoth-dexpi",
     "azoth-python",
+    "azoth-safety",
     "azoth-sheets",
     "azoth-test-support",
     "azoth-wasm",
@@ -761,6 +771,10 @@ def crate_claim(crate: str) -> Claim:
     if crate == "azoth-sheets":
         # The calculation catalogue and the sheet book are the UI's second document; its own
         # Rust tests cover the worked examples, and the UI job covers the wire and the screen.
+        return Claim(jobs=("ui",))
+    if crate == "azoth-safety":
+        # The safety study is the UI's third document; its own Rust tests cover the document
+        # and its native dispatch, and the UI job covers the wire and the screen.
         return Claim(jobs=("ui",))
     if crate == "azoth-wasm":
         return Claim(jobs=("ui",))
