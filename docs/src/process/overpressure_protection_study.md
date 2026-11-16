@@ -69,7 +69,7 @@ not an equation, and both implementations read it from here.
 - **a liquid case with no stated density falls back to 700 kg/m3** with the class's message, and its viscosity to 5e-4; the four relief loads publish no density, so a caller composing a liquid study states one.
 - **a two-phase case missing any omega input skips the sizing** with the class's message and still runs the accumulated-pressure acceptance.
 - **a gas governing case with no molar mass is refused** rather than passed as a NaN into the sizing; the two-phase omega method does not read one.
-- **the accumulated-pressure check is the ported `process.overpressure_acceptance`**, and its failure message carries the basis prose the class formats; the item name is read only by logging and is not carried.
+- **the accumulated-pressure check is the ported `process.overpressure_acceptance`**, and its failure message carries the basis prose the class formats; the item name is read only by logging and sits outside this id.
 
 ## Cases
 

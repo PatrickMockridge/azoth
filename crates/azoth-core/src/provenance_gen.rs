@@ -3978,7 +3978,7 @@ pub static ALL_PROVENANCE: &[ProvenanceStatic] = &[
         calc_id: "process.overpressure_protection_study",
         name: "Overpressure protection study",
         spec_path: "specs/models/process/overpressure_protection_study.toml",
-        spec_sha256: "fa9b52406a17dcac631bd07660f58907ed121a62ce22b0934bc097767f2ad42a",
+        spec_sha256: "8a269f9e315a4875d2e258434abb8d8928beef8f4827234eb1ac70bc3e059c2a",
         python_path: "python/src/azoth/process/reference/overpressure_protection_study.py",
         python_sha256: "4541b692624de2533d03596a6f84984fcdb10ae0a67c6aa2b80256e29bee3025",
         rust_path: "crates/azoth-process/src/models/overpressure_protection_study.rs",
