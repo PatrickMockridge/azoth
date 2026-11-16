@@ -3,7 +3,7 @@
 
 use azoth_core::units::{
     bars, joules_per_kilogram_kelvin, kelvins, kilograms_per_cubic_meter, kilograms_per_mole,
-    meters, megapascals, seconds,
+    megapascals, meters, seconds,
 };
 use azoth_process::models::blowdown_pressure_profile::BlowdownProfilePoint;
 use azoth_process::models::pipe_fire_rupture::{
@@ -20,15 +20,36 @@ fn close(actual: f64, expected: f64, what: &str) {
 
 fn workbook() -> Vec<BlowdownProfilePoint> {
     let minutes = [
-        0.0, 0.083_333_333, 0.166_666_667, 0.25, 0.333_333_333, 0.416_666_667, 0.5, 0.583_333_333,
-        0.666_666_667, 0.75, 0.833_333_333, 0.916_666_667, 1.0, 1.083_333_333, 1.166_666_667, 1.25,
-        1.333_333_333, 1.416_666_667, 1.5, 1.583_333_333, 1.666_666_667, 1.75, 1.833_333_333,
-        1.916_666_667, 2.0,
+        0.0,
+        0.083_333_333,
+        0.166_666_667,
+        0.25,
+        0.333_333_333,
+        0.416_666_667,
+        0.5,
+        0.583_333_333,
+        0.666_666_667,
+        0.75,
+        0.833_333_333,
+        0.916_666_667,
+        1.0,
+        1.083_333_333,
+        1.166_666_667,
+        1.25,
+        1.333_333_333,
+        1.416_666_667,
+        1.5,
+        1.583_333_333,
+        1.666_666_667,
+        1.75,
+        1.833_333_333,
+        1.916_666_667,
+        2.0,
     ];
     let bara = [
         61.3, 59.7053, 58.6349, 57.3483, 55.9731, 54.5583, 53.1249, 51.6842, 50.2472, 48.8145,
-        47.3977, 46.004, 44.6383, 43.3046, 42.0058, 40.7442, 39.5206, 38.3367, 37.1941,
-        36.0922, 35.0302, 34.0082, 33.0255, 32.0817, 31.1758,
+        47.3977, 46.004, 44.6383, 43.3046, 42.0058, 40.7442, 39.5206, 38.3367, 37.1941, 36.0922,
+        35.0302, 34.0082, 33.0255, 32.0817, 31.1758,
     ];
     minutes
         .iter()
@@ -68,9 +89,9 @@ fn run(
         explicit.map(|value| kelvins(value.0)),
         explicit.map(|value| kelvins(value.1)),
         explicit.map(|value| {
-            azoth_core::units::HeatTransfer::new::<
-                azoth_core::units::watt_per_square_meter_kelvin,
-            >(value.2)
+            azoth_core::units::HeatTransfer::new::<azoth_core::units::watt_per_square_meter_kelvin>(
+                value.2,
+            )
         }),
         explicit.map(|value| value.3),
         explicit.map(|value| value.4),
@@ -104,7 +125,11 @@ fn the_workbook_benchmark_ruptures_at_115_seconds() {
         "the rupture time",
     );
     close(
-        result.rupture_pressure.expect("a rupture has a pressure").value / 1.0e5,
+        result
+            .rupture_pressure
+            .expect("a rupture has a pressure")
+            .value
+            / 1.0e5,
         32.0255,
         "the rupture pressure",
     );
@@ -132,9 +157,7 @@ fn the_workbook_benchmark_ruptures_at_115_seconds() {
         "the accumulated strain",
     );
     close(
-        result
-            .rupture_strain_limit
-            .expect("a rupture has a limit"),
+        result.rupture_strain_limit.expect("a rupture has a limit"),
         0.484_437_605_397_567_7,
         "the strain limit",
     );
@@ -243,7 +266,12 @@ fn the_built_in_and_explicit_small_jet_agree() {
     assert_eq!(explicit.status, RuptureStatus::NoRupture);
     assert_eq!(built_in.history.len(), 41);
     close(
-        built_in.history.last().expect("a history").mean_wall_temperature.value,
+        built_in
+            .history
+            .last()
+            .expect("a history")
+            .mean_wall_temperature
+            .value,
         explicit
             .history
             .last()
@@ -273,7 +301,11 @@ fn the_stainless_and_pool_fire_states() {
         "the SS 316 rupture time",
     );
     close(
-        stainless.rupture_pressure.expect("a rupture has a pressure").value / 1.0e5,
+        stainless
+            .rupture_pressure
+            .expect("a rupture has a pressure")
+            .value
+            / 1.0e5,
         30.1758,
         "the SS 316 rupture pressure",
     );
@@ -303,7 +335,10 @@ fn the_stainless_and_pool_fire_states() {
         "the pool-fire rupture time",
     );
     close(
-        pool.rupture_pressure.expect("a rupture has a pressure").value / 1.0e5,
+        pool.rupture_pressure
+            .expect("a rupture has a pressure")
+            .value
+            / 1.0e5,
         30.1758,
         "the pool-fire rupture pressure",
     );
@@ -348,8 +383,16 @@ fn the_liquid_branch_and_the_thermal_mass_pair() {
     assert_eq!(on.status, RuptureStatus::NoRupture);
     assert_eq!(off.history.len(), 13);
     assert!(
-        off.history.last().expect("a history").mean_wall_temperature.value
-            > on.history.last().expect("a history").mean_wall_temperature.value,
+        off.history
+            .last()
+            .expect("a history")
+            .mean_wall_temperature
+            .value
+            > on.history
+                .last()
+                .expect("a history")
+                .mean_wall_temperature
+                .value,
         "without the gas mass the wall runs hotter"
     );
 }
@@ -373,22 +416,23 @@ fn the_pfp_factor_prevents_the_rupture() {
 #[test]
 fn the_class_refusals_are_the_ports() {
     assert!(
-        run("unobtainium", "large_jet_fire", 200.0, 23.748, true, None, None).is_err(),
+        run(
+            "unobtainium",
+            "large_jet_fire",
+            200.0,
+            23.748,
+            true,
+            None,
+            None
+        )
+        .is_err(),
         "an unknown material is refused"
     );
     assert!(
         run("22Cr duplex", "jet_fire", 200.0, 23.748, true, None, None).is_err(),
         "an unknown scenario is refused"
     );
-    let missing = run(
-        "22Cr duplex",
-        "explicit",
-        200.0,
-        23.748,
-        true,
-        None,
-        None,
-    );
+    let missing = run("22Cr duplex", "explicit", 200.0, 23.748, true, None, None);
     assert!(missing.is_err(), "an incomplete explicit group is refused");
 
     let profile = workbook();

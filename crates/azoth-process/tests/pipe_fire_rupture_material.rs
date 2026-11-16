@@ -2,7 +2,7 @@
 //! `validation/neqsim/captures/process_pipe_fire_rupture_material.tsv`.
 
 use azoth_core::units::{
-    kilograms_per_cubic_meter, joules_per_kilogram_kelvin, kelvins, megapascals, per_second,
+    joules_per_kilogram_kelvin, kelvins, kilograms_per_cubic_meter, megapascals, per_second,
     watts_per_meter_kelvin,
 };
 use azoth_process::models::pipe_fire_rupture_material::{
@@ -62,7 +62,11 @@ fn the_six_tables_at_600_degrees() {
     close(duplex.density.value, 7850.0, "22Cr density");
     close(duplex.heat_capacity.value, 670.0, "22Cr cp");
     close(duplex.thermal_conductivity.value, 28.0, "22Cr k");
-    close(duplex.ultimate_tensile_strength.value / 1.0e6, 371.0, "22Cr UTS");
+    close(
+        duplex.ultimate_tensile_strength.value / 1.0e6,
+        371.0,
+        "22Cr UTS",
+    );
     close(duplex.strain_effect_factor, 1.0, "22Cr effect");
     close(duplex.rupture_strain_limit, 0.22, "22Cr limit");
     close(
@@ -100,12 +104,12 @@ fn the_six_tables_at_600_degrees() {
     );
 
     let six_mo = evaluate("6Mo", 873.15, 100.0).expect("the capture state is valid");
+    close(six_mo.heat_capacity.value, 549.959_235_668_789_8, "6Mo cp");
     close(
-        six_mo.heat_capacity.value,
-        549.959_235_668_789_8,
-        "6Mo cp",
+        six_mo.ultimate_tensile_strength.value / 1.0e6,
+        480.0,
+        "6Mo UTS",
     );
-    close(six_mo.ultimate_tensile_strength.value / 1.0e6, 480.0, "6Mo UTS");
     close(
         six_mo.strain_rate.value,
         1.682_558_825_117_445_7e-11,
@@ -117,7 +121,11 @@ fn the_six_tables_at_600_degrees() {
 fn the_temperature_clamps_and_the_800_degree_state() {
     let hot = evaluate("22Cr duplex", 1073.15, 100.0).expect("the capture state is valid");
     close(hot.heat_capacity.value, 750.0, "800 C cp");
-    close(hot.ultimate_tensile_strength.value / 1.0e6, 157.0, "800 C UTS");
+    close(
+        hot.ultimate_tensile_strength.value / 1.0e6,
+        157.0,
+        "800 C UTS",
+    );
     close(hot.strain_effect_factor, 0.7, "800 C effect");
     close(hot.rupture_strain_limit, 0.23, "800 C limit");
     close(
@@ -129,7 +137,11 @@ fn the_temperature_clamps_and_the_800_degree_state() {
     let cold = evaluate("22Cr duplex", 173.15, 100.0).expect("a low clamp is a state");
     close(cold.heat_capacity.value, 480.0, "low clamp cp");
     close(cold.thermal_conductivity.value, 15.0, "low clamp k");
-    close(cold.ultimate_tensile_strength.value / 1.0e6, 650.0, "low clamp UTS");
+    close(
+        cold.ultimate_tensile_strength.value / 1.0e6,
+        650.0,
+        "low clamp UTS",
+    );
     close(
         cold.strain_rate.value,
         1.756_844_949_575_397e-19,
@@ -138,7 +150,11 @@ fn the_temperature_clamps_and_the_800_degree_state() {
 
     let high = evaluate("22Cr duplex", 1673.15, 100.0).expect("a high clamp is a state");
     close(high.heat_capacity.value, 900.0, "high clamp cp");
-    close(high.ultimate_tensile_strength.value / 1.0e6, 0.0, "high clamp UTS");
+    close(
+        high.ultimate_tensile_strength.value / 1.0e6,
+        0.0,
+        "high clamp UTS",
+    );
     close(high.strain_effect_factor, 2.3, "high clamp effect");
     close(
         high.temperature_correction_factor,
@@ -237,7 +253,10 @@ fn the_class_selector_aliases() {
 
 #[test]
 fn the_class_refusals_are_the_ports() {
-    assert!(evaluate("", 873.15, 100.0).is_err(), "an empty name is refused");
+    assert!(
+        evaluate("", 873.15, 100.0).is_err(),
+        "an empty name is refused"
+    );
     assert!(
         evaluate("unobtainium", 873.15, 100.0).is_err(),
         "an unknown name is refused"

@@ -24,15 +24,36 @@ fn point(time: f64, pressure: f64) -> BlowdownProfilePoint {
 fn workbook() -> Vec<BlowdownProfilePoint> {
     // The class's `fromMinutesAndBara` grid: the nine-decimal minutes times 60.
     let minutes = [
-        0.0, 0.083_333_333, 0.166_666_667, 0.25, 0.333_333_333, 0.416_666_667, 0.5, 0.583_333_333,
-        0.666_666_667, 0.75, 0.833_333_333, 0.916_666_667, 1.0, 1.083_333_333, 1.166_666_667, 1.25,
-        1.333_333_333, 1.416_666_667, 1.5, 1.583_333_333, 1.666_666_667, 1.75, 1.833_333_333,
-        1.916_666_667, 2.0,
+        0.0,
+        0.083_333_333,
+        0.166_666_667,
+        0.25,
+        0.333_333_333,
+        0.416_666_667,
+        0.5,
+        0.583_333_333,
+        0.666_666_667,
+        0.75,
+        0.833_333_333,
+        0.916_666_667,
+        1.0,
+        1.083_333_333,
+        1.166_666_667,
+        1.25,
+        1.333_333_333,
+        1.416_666_667,
+        1.5,
+        1.583_333_333,
+        1.666_666_667,
+        1.75,
+        1.833_333_333,
+        1.916_666_667,
+        2.0,
     ];
     let bara = [
         61.3, 59.7053, 58.6349, 57.3483, 55.9731, 54.5583, 53.1249, 51.6842, 50.2472, 48.8145,
-        47.3977, 46.004, 44.6383, 43.3046, 42.0058, 40.7442, 39.5206, 38.3367, 37.1941,
-        36.0922, 35.0302, 34.0082, 33.0255, 32.0817, 31.1758,
+        47.3977, 46.004, 44.6383, 43.3046, 42.0058, 40.7442, 39.5206, 38.3367, 37.1941, 36.0922,
+        35.0302, 34.0082, 33.0255, 32.0817, 31.1758,
     ];
     minutes
         .iter()
@@ -71,13 +92,9 @@ fn the_workbook_exact_and_between_states() {
         "107 s bara",
     );
 
-    let linear = blowdown_pressure_profile(
-        &profile,
-        seconds(107.5),
-        Some("linear"),
-        Some(bars(1.0)),
-    )
-    .expect("the capture state is valid");
+    let linear =
+        blowdown_pressure_profile(&profile, seconds(107.5), Some("linear"), Some(bars(1.0)))
+            .expect("the capture state is valid");
     close(
         linear.pressure_absolute.value / 1.0e5,
         33.516_849_998_034_6,
@@ -95,7 +112,11 @@ fn the_absolute_near_equal_window_is_both_sided() {
         Some(bars(1.0)),
     )
     .expect("the capture state is valid");
-    close(upper.pressure_absolute.value / 1.0e5, 80.0, "inside the window");
+    close(
+        upper.pressure_absolute.value / 1.0e5,
+        80.0,
+        "inside the window",
+    );
 
     let lower = blowdown_pressure_profile(
         &profile,
@@ -104,7 +125,11 @@ fn the_absolute_near_equal_window_is_both_sided() {
         Some(bars(1.0)),
     )
     .expect("the capture state is valid");
-    close(lower.pressure_absolute.value / 1.0e5, 87.0, "outside the window");
+    close(
+        lower.pressure_absolute.value / 1.0e5,
+        87.0,
+        "outside the window",
+    );
 
     let interpolated = blowdown_pressure_profile(
         &profile,
@@ -130,7 +155,11 @@ fn the_endpoints_clamp_and_the_offset_is_subtracted() {
         Some(bars(1.0)),
     )
     .expect("the capture state is valid");
-    close(before.pressure_absolute.value / 1.0e5, 61.3, "before the first");
+    close(
+        before.pressure_absolute.value / 1.0e5,
+        61.3,
+        "before the first",
+    );
     let after = blowdown_pressure_profile(
         &profile,
         seconds(130.0),
@@ -138,7 +167,11 @@ fn the_endpoints_clamp_and_the_offset_is_subtracted() {
         Some(bars(1.0)),
     )
     .expect("the capture state is valid");
-    close(after.pressure_absolute.value / 1.0e5, 31.1758, "after the last");
+    close(
+        after.pressure_absolute.value / 1.0e5,
+        31.1758,
+        "after the last",
+    );
 
     let two = blowdown_pressure_profile(
         &exact(),
@@ -187,12 +220,10 @@ fn the_class_refusals_are_the_ports() {
     );
     assert!(zero_pressure.is_err(), "a zero pressure is refused");
 
-    let negative_query =
-        blowdown_pressure_profile(&exact(), seconds(-1.0), None, None);
+    let negative_query = blowdown_pressure_profile(&exact(), seconds(-1.0), None, None);
     assert!(negative_query.is_err(), "a negative query is refused");
 
-    let negative_offset =
-        blowdown_pressure_profile(&exact(), seconds(0.0), None, Some(bars(-1.0)));
+    let negative_offset = blowdown_pressure_profile(&exact(), seconds(0.0), None, Some(bars(-1.0)));
     assert!(negative_offset.is_err(), "a negative offset is refused");
 
     let mode = blowdown_pressure_profile(&exact(), seconds(0.0), Some("cubic"), None);

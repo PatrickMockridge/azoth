@@ -7,8 +7,8 @@
 
 use azoth_core::units::{
     Frequency, MassDensity, Pressure, SpecificHeatCapacity, ThermalConductivity,
-    ThermodynamicTemperature, kilograms_per_cubic_meter, joules_per_kilogram_kelvin,
-    megapascals, per_second, watts_per_meter_kelvin,
+    ThermodynamicTemperature, joules_per_kilogram_kelvin, kilograms_per_cubic_meter, megapascals,
+    per_second, watts_per_meter_kelvin,
 };
 use azoth_core::{AzothError, Result, Warning, apply_checks};
 use serde::Serialize;
@@ -83,16 +83,15 @@ struct MaterialTable {
 const DUPLEX_22CR: MaterialTable = MaterialTable {
     name: "22Cr duplex",
     heat_capacity: &[
-        480.0, 500.0, 530.0, 550.0, 590.0, 635.0, 670.0, 710.0, 730.0, 750.0, 790.0, 840.0,
-        870.0, 879.9, 900.0,
+        480.0, 500.0, 530.0, 550.0, 590.0, 635.0, 670.0, 710.0, 730.0, 750.0, 790.0, 840.0, 870.0,
+        879.9, 900.0,
     ],
     thermal_conductivity: &[
-        15.0, 16.0, 17.0, 18.0, 20.0, 24.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0,
-        28.0,
+        15.0, 16.0, 17.0, 18.0, 20.0, 24.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0,
     ],
     ultimate_tensile_strength: &[
-        650.0, 605.0, 553.0, 540.0, 533.0, 462.0, 371.0, 247.0, 202.0, 157.0, 78.0, 28.0,
-        12.0, 4.0, 0.0,
+        650.0, 605.0, 553.0, 540.0, 533.0, 462.0, 371.0, 247.0, 202.0, 157.0, 78.0, 28.0, 12.0,
+        4.0, 0.0,
     ],
     strain_effect: &[
         1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.7, 1.0, 1.4, 2.3, 2.3, 2.3,
@@ -135,16 +134,16 @@ const SS_316: MaterialTable = MaterialTable {
 const CS_235: MaterialTable = MaterialTable {
     name: "CS 235 ASME A106-B",
     heat_capacity: &[
-        450.0, 480.0, 510.0, 550.0, 600.0, 660.0, 750.0, 900.0, 1450.0, 820.0, 540.0, 540.0,
-        540.0, 540.0, 540.0,
+        450.0, 480.0, 510.0, 550.0, 600.0, 660.0, 750.0, 900.0, 1450.0, 820.0, 540.0, 540.0, 540.0,
+        540.0, 540.0,
     ],
     thermal_conductivity: &[
-        54.2, 50.95, 47.45, 43.7, 40.45, 37.2, 33.95, 30.7, 28.0, 27.4, 27.4, 27.4, 27.4,
-        27.4, 27.4,
+        54.2, 50.95, 47.45, 43.7, 40.45, 37.2, 33.95, 30.7, 28.0, 27.4, 27.4, 27.4, 27.4, 27.4,
+        27.4,
     ],
     ultimate_tensile_strength: &[
-        420.0, 407.0, 397.0, 382.0, 370.0, 308.0, 189.0, 92.0, 81.5, 71.0, 53.0, 29.0, 17.0,
-        4.0, 0.0,
+        420.0, 407.0, 397.0, 382.0, 370.0, 308.0, 189.0, 92.0, 81.5, 71.0, 53.0, 29.0, 17.0, 4.0,
+        0.0,
     ],
     strain_effect: &[
         1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.7, 0.5, 0.5, 0.4, 0.4, 0.3, 0.3,
@@ -164,16 +163,16 @@ const CS_235: MaterialTable = MaterialTable {
 const CS_360_X52: MaterialTable = MaterialTable {
     name: "CS 360 API 5L-X52",
     heat_capacity: &[
-        450.0, 480.0, 510.0, 550.0, 600.0, 660.0, 750.0, 900.0, 1450.0, 820.0, 540.0, 540.0,
-        540.0, 540.0, 540.0,
+        450.0, 480.0, 510.0, 550.0, 600.0, 660.0, 750.0, 900.0, 1450.0, 820.0, 540.0, 540.0, 540.0,
+        540.0, 540.0,
     ],
     thermal_conductivity: &[
-        54.2, 50.95, 47.45, 43.7, 40.45, 37.2, 33.95, 30.7, 28.0, 27.4, 27.4, 27.4, 27.4,
-        27.4, 27.4,
+        54.2, 50.95, 47.45, 43.7, 40.45, 37.2, 33.95, 30.7, 28.0, 27.4, 27.4, 27.4, 27.4, 27.4,
+        27.4,
     ],
     ultimate_tensile_strength: &[
-        545.0, 529.0, 515.0, 496.0, 480.0, 400.0, 245.0, 120.0, 99.0, 78.0, 60.0, 38.0, 22.0,
-        5.0, 0.0,
+        545.0, 529.0, 515.0, 496.0, 480.0, 400.0, 245.0, 120.0, 99.0, 78.0, 60.0, 38.0, 22.0, 5.0,
+        0.0,
     ],
     strain_effect: &[
         1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.4, 0.6, 0.8, 0.9, 1.0, 1.0,
@@ -193,16 +192,15 @@ const CS_360_X52: MaterialTable = MaterialTable {
 const SUPERDUPLEX: MaterialTable = MaterialTable {
     name: "Superduplex",
     heat_capacity: &[
-        480.0, 500.0, 530.0, 550.0, 590.0, 635.0, 670.0, 710.0, 730.0, 750.0, 790.0, 840.0,
-        870.0, 879.9, 900.0,
+        480.0, 500.0, 530.0, 550.0, 590.0, 635.0, 670.0, 710.0, 730.0, 750.0, 790.0, 840.0, 870.0,
+        879.9, 900.0,
     ],
     thermal_conductivity: &[
-        15.0, 16.0, 17.0, 18.0, 20.0, 24.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0,
-        28.0,
+        15.0, 16.0, 17.0, 18.0, 20.0, 24.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0,
     ],
     ultimate_tensile_strength: &[
-        750.0, 698.0, 638.0, 638.0, 613.0, 531.0, 427.0, 284.0, 234.5, 185.0, 100.0, 31.0,
-        13.0, 5.0, 0.0,
+        750.0, 698.0, 638.0, 638.0, 613.0, 531.0, 427.0, 284.0, 234.5, 185.0, 100.0, 31.0, 13.0,
+        5.0, 0.0,
     ],
     strain_effect: &[
         1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.7, 1.0, 1.2, 2.2, 2.3, 2.2,
@@ -224,8 +222,8 @@ const MO_6: MaterialTable = MaterialTable {
     heat_capacity: &STAINLESS_CP,
     thermal_conductivity: &STAINLESS_K,
     ultimate_tensile_strength: &[
-        650.0, 646.0, 589.0, 557.0, 546.0, 528.0, 480.0, 380.0, 315.0, 250.0, 135.0, 90.0,
-        40.0, 20.0, 0.0,
+        650.0, 646.0, 589.0, 557.0, 546.0, 528.0, 480.0, 380.0, 315.0, 250.0, 135.0, 90.0, 40.0,
+        20.0, 0.0,
     ],
     strain_effect: &[
         1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.7, 0.5, 0.3, 0.3, 0.3, 0.25, 0.3,
@@ -387,9 +385,7 @@ pub fn pipe_fire_rupture_material(
             "sellars_tegart_n" => sellars_tegart_n,
             "activation_temperature" => activation_temperature.map(|value| value.value),
             "correction_strain_rate" => correction_strain_rate.map(|value| value.value),
-            "correction_limit_temperature" => {
-                correction_limit_temperature.map(|value| value.value)
-            }
+            "correction_limit_temperature" => correction_limit_temperature.map(|value| value.value),
             _ => None,
         },
         &mut warnings,
@@ -454,7 +450,9 @@ pub fn pipe_fire_rupture_material(
         correction_rate_per_minute,
         correction_limit_c,
     ) = if let Some(points) = curve {
-        let capacity = spec.algorithm.map_or(0, |algorithm| algorithm.max_iterations) as usize;
+        let capacity = spec
+            .algorithm
+            .map_or(0, |algorithm| algorithm.max_iterations) as usize;
         if points.len() < 2 {
             return Err(AzothError::invalid_input(
                 "curve",
@@ -464,7 +462,10 @@ pub fn pipe_fire_rupture_material(
         if points.len() > capacity {
             return Err(AzothError::invalid_input(
                 "curve",
-                format!("{} points exceeds the {capacity} this procedure carries", points.len()),
+                format!(
+                    "{} points exceeds the {capacity} this procedure carries",
+                    points.len()
+                ),
             ));
         }
         let mut grid = Vec::with_capacity(points.len());
@@ -491,7 +492,10 @@ pub fn pipe_fire_rupture_material(
             }
             previous = temperature_c;
             require_finite("curve.heat_capacity", point.heat_capacity.value)?;
-            require_finite("curve.thermal_conductivity", point.thermal_conductivity.value)?;
+            require_finite(
+                "curve.thermal_conductivity",
+                point.thermal_conductivity.value,
+            )?;
             require_finite(
                 "curve.ultimate_tensile_strength",
                 point.ultimate_tensile_strength.value,
@@ -593,4 +597,3 @@ pub fn pipe_fire_rupture_material(
         warnings,
     })
 }
-

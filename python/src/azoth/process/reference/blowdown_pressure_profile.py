@@ -62,9 +62,11 @@ def _evaluate(
     checks = checks_for(spec)
     warnings: list[Warning] = []
 
-    rows = input_records_to_si(spec, "points", points)
+    rows: list[dict[str, float]] = input_records_to_si(spec, "points", points)
     query = input_to_si(spec, "time", time)
-    stated_offset = None if gauge_offset is None else input_to_si(spec, "gauge_offset", gauge_offset)
+    stated_offset = (
+        None if gauge_offset is None else input_to_si(spec, "gauge_offset", gauge_offset)
+    )
     apply_checks(
         checks.on_input,
         {"time": query, "gauge_offset": stated_offset}.get,
@@ -72,9 +74,7 @@ def _evaluate(
     )
 
     _require_finite("time", query)
-    offset_pa = (
-        _DEFAULT_GAUGE_OFFSET_BAR * _PA_PER_BAR if stated_offset is None else stated_offset
-    )
+    offset_pa = _DEFAULT_GAUGE_OFFSET_BAR * _PA_PER_BAR if stated_offset is None else stated_offset
     _require_finite("gauge_offset", offset_pa)
     mode = "step_previous" if interpolation_mode is None else interpolation_mode
     if mode not in ("step_previous", "linear"):
@@ -109,10 +109,10 @@ def _evaluate(
     return _Solution(absolute_pa, absolute_pa - offset_pa), warnings
 
 
-def _lookup(rows: list[dict[str, object]], query: float, linear: bool) -> float:
+def _lookup(rows: list[dict[str, float]], query: float, linear: bool) -> float:
     """The class's piecewise lookup, in bara, from the SI rows."""
-    bara = [float(row["pressure"]) / _PA_PER_BAR for row in rows]
-    times = [float(row["time"]) for row in rows]
+    bara = [row["pressure"] / _PA_PER_BAR for row in rows]
+    times = [row["time"] for row in rows]
     last = len(times) - 1
     if query <= times[0]:
         return bara[0]

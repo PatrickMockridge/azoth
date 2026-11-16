@@ -11,7 +11,7 @@ class's temperature-correction factor.
 from __future__ import annotations
 
 import math
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, cast
 
 from azoth.core.errors import InvalidInputError
 from azoth.core.range import apply_checks, checks_for
@@ -106,9 +106,41 @@ class _Table(NamedTuple):
 
 _DUPLEX_22CR = _Table(
     "22Cr duplex",
-    (480.0, 500.0, 530.0, 550.0, 590.0, 635.0, 670.0, 710.0, 730.0, 750.0, 790.0, 840.0, 870.0, 879.9, 900.0),
+    (
+        480.0,
+        500.0,
+        530.0,
+        550.0,
+        590.0,
+        635.0,
+        670.0,
+        710.0,
+        730.0,
+        750.0,
+        790.0,
+        840.0,
+        870.0,
+        879.9,
+        900.0,
+    ),
     (15.0, 16.0, 17.0, 18.0, 20.0, 24.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0),
-    (650.0, 605.0, 553.0, 540.0, 533.0, 462.0, 371.0, 247.0, 202.0, 157.0, 78.0, 28.0, 12.0, 4.0, 0.0),
+    (
+        650.0,
+        605.0,
+        553.0,
+        540.0,
+        533.0,
+        462.0,
+        371.0,
+        247.0,
+        202.0,
+        157.0,
+        78.0,
+        28.0,
+        12.0,
+        4.0,
+        0.0,
+    ),
     (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.7, 1.0, 1.4, 2.3, 2.3, 2.3),
     (0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.23, 0.26, 0.33, 0.5, 0.5, 0.5),
     7850.0,
@@ -124,7 +156,23 @@ _SS_316 = _Table(
     "SS 316",
     _STAINLESS_CP,
     _STAINLESS_K,
-    (485.0, 467.0, 429.0, 426.0, 421.0, 398.0, 363.0, 277.0, 208.5, 140.0, 80.0, 45.0, 20.0, 10.0, 0.0),
+    (
+        485.0,
+        467.0,
+        429.0,
+        426.0,
+        421.0,
+        398.0,
+        363.0,
+        277.0,
+        208.5,
+        140.0,
+        80.0,
+        45.0,
+        20.0,
+        10.0,
+        0.0,
+    ),
     (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.7, 0.5, 0.3, 0.25, 0.3, 0.3, 0.3),
     (0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.16, 0.17, 0.18, 0.2, 0.23, 0.25, 0.3),
     7850.0,
@@ -138,7 +186,23 @@ _SS_316 = _Table(
 
 _CS_235 = _Table(
     "CS 235 ASME A106-B",
-    (450.0, 480.0, 510.0, 550.0, 600.0, 660.0, 750.0, 900.0, 1450.0, 820.0, 540.0, 540.0, 540.0, 540.0, 540.0),
+    (
+        450.0,
+        480.0,
+        510.0,
+        550.0,
+        600.0,
+        660.0,
+        750.0,
+        900.0,
+        1450.0,
+        820.0,
+        540.0,
+        540.0,
+        540.0,
+        540.0,
+        540.0,
+    ),
     (54.2, 50.95, 47.45, 43.7, 40.45, 37.2, 33.95, 30.7, 28.0, 27.4, 27.4, 27.4, 27.4, 27.4, 27.4),
     (420.0, 407.0, 397.0, 382.0, 370.0, 308.0, 189.0, 92.0, 81.5, 71.0, 53.0, 29.0, 17.0, 4.0, 0.0),
     (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.7, 0.5, 0.5, 0.4, 0.4, 0.3, 0.3),
@@ -154,9 +218,41 @@ _CS_235 = _Table(
 
 _CS_360_X52 = _Table(
     "CS 360 API 5L-X52",
-    (450.0, 480.0, 510.0, 550.0, 600.0, 660.0, 750.0, 900.0, 1450.0, 820.0, 540.0, 540.0, 540.0, 540.0, 540.0),
+    (
+        450.0,
+        480.0,
+        510.0,
+        550.0,
+        600.0,
+        660.0,
+        750.0,
+        900.0,
+        1450.0,
+        820.0,
+        540.0,
+        540.0,
+        540.0,
+        540.0,
+        540.0,
+    ),
     (54.2, 50.95, 47.45, 43.7, 40.45, 37.2, 33.95, 30.7, 28.0, 27.4, 27.4, 27.4, 27.4, 27.4, 27.4),
-    (545.0, 529.0, 515.0, 496.0, 480.0, 400.0, 245.0, 120.0, 99.0, 78.0, 60.0, 38.0, 22.0, 5.0, 0.0),
+    (
+        545.0,
+        529.0,
+        515.0,
+        496.0,
+        480.0,
+        400.0,
+        245.0,
+        120.0,
+        99.0,
+        78.0,
+        60.0,
+        38.0,
+        22.0,
+        5.0,
+        0.0,
+    ),
     (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.4, 0.6, 0.8, 0.9, 1.0, 1.0),
     (0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.2, 0.2, 0.2, 0.2, 0.3),
     7850.0,
@@ -170,9 +266,41 @@ _CS_360_X52 = _Table(
 
 _SUPERDUPLEX = _Table(
     "Superduplex",
-    (480.0, 500.0, 530.0, 550.0, 590.0, 635.0, 670.0, 710.0, 730.0, 750.0, 790.0, 840.0, 870.0, 879.9, 900.0),
+    (
+        480.0,
+        500.0,
+        530.0,
+        550.0,
+        590.0,
+        635.0,
+        670.0,
+        710.0,
+        730.0,
+        750.0,
+        790.0,
+        840.0,
+        870.0,
+        879.9,
+        900.0,
+    ),
     (15.0, 16.0, 17.0, 18.0, 20.0, 24.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0),
-    (750.0, 698.0, 638.0, 638.0, 613.0, 531.0, 427.0, 284.0, 234.5, 185.0, 100.0, 31.0, 13.0, 5.0, 0.0),
+    (
+        750.0,
+        698.0,
+        638.0,
+        638.0,
+        613.0,
+        531.0,
+        427.0,
+        284.0,
+        234.5,
+        185.0,
+        100.0,
+        31.0,
+        13.0,
+        5.0,
+        0.0,
+    ),
     (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.7, 1.0, 1.2, 2.2, 2.3, 2.2),
     (0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.23, 0.26, 0.33, 0.5, 0.5, 0.5),
     7850.0,
@@ -188,7 +316,23 @@ _MO_6 = _Table(
     "6Mo",
     _STAINLESS_CP,
     _STAINLESS_K,
-    (650.0, 646.0, 589.0, 557.0, 546.0, 528.0, 480.0, 380.0, 315.0, 250.0, 135.0, 90.0, 40.0, 20.0, 0.0),
+    (
+        650.0,
+        646.0,
+        589.0,
+        557.0,
+        546.0,
+        528.0,
+        480.0,
+        380.0,
+        315.0,
+        250.0,
+        135.0,
+        90.0,
+        40.0,
+        20.0,
+        0.0,
+    ),
     (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.7, 0.5, 0.3, 0.3, 0.3, 0.25, 0.3),
     (0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.2, 0.2, 0.2, 0.2, 0.3),
     7850.0,
@@ -356,7 +500,7 @@ def _evaluate(
     _require_finite("evaluation_temperature", evaluation_c)
 
     if curve is not None:
-        rows = input_records_to_si(spec, "curve", curve)
+        rows: list[dict[str, float]] = input_records_to_si(spec, "curve", curve)
         capacity = int(spec["algorithm"].get("max_iterations", 0))
         if len(rows) < 2:
             raise InvalidInputError("curve", "a material curve needs at least two points")
@@ -397,13 +541,13 @@ def _evaluate(
             uts.append(float(row["ultimate_tensile_strength"]) / 1.0e6)
             effect.append(float(row["strain_effect_factor"]))
             limit.append(float(row["rupture_strain_limit"]))
-        assert stated_density is not None
-        assert sellars_tegart_a is not None
-        assert sellars_tegart_alpha is not None
-        assert sellars_tegart_n is not None
-        assert stated_activation is not None
-        assert stated_correction is not None
-        assert stated_limit is not None
+        stated_density = cast(float, stated_density)
+        sellars_tegart_a = cast(float, sellars_tegart_a)
+        sellars_tegart_alpha = cast(float, sellars_tegart_alpha)
+        sellars_tegart_n = cast(float, sellars_tegart_n)
+        stated_activation = cast(float, stated_activation)
+        stated_correction = cast(float, stated_correction)
+        stated_limit = cast(float, stated_limit)
         _require_positive("density", stated_density)
         _require_positive("sellars_tegart_a", sellars_tegart_a)
         _require_positive("sellars_tegart_alpha", sellars_tegart_alpha)
@@ -450,10 +594,14 @@ def _evaluate(
         if hyperbolic_sine <= 0.0:
             correction = 1.0
         else:
-            correction = absolute_temperature / activation_k * (
-                math.log(hyperbolic_sine) * n
-                - math.log(correction_rate_per_minute)
-                + math.log(a)
+            correction = (
+                absolute_temperature
+                / activation_k
+                * (
+                    math.log(hyperbolic_sine) * n
+                    - math.log(correction_rate_per_minute)
+                    + math.log(a)
+                )
             )
     effective_stress = max(0.0, stress_mpa)
     strain_rate_per_minute = (

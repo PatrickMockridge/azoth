@@ -11,7 +11,7 @@ thermal mass and the spreadsheet-style release.
 from __future__ import annotations
 
 import math
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, cast
 
 from azoth.core.errors import InvalidInputError
 from azoth.core.range import apply_checks, checks_for
@@ -157,12 +157,9 @@ def _scenario(
             "the `explicit` scenario requires all six temperature and emissivity inputs",
         )
     if explicit:
-        assert fire_temperature is not None
-        assert gas_temperature is not None
-        assert convective is not None
-        fire_c = fire_temperature - _KELVIN_OFFSET
-        gas_c = gas_temperature - _KELVIN_OFFSET
-        h = convective
+        fire_c = cast(float, fire_temperature) - _KELVIN_OFFSET
+        gas_c = cast(float, gas_temperature) - _KELVIN_OFFSET
+        h = cast(float, convective)
     else:
         fire_c, gas_c, h = built_in[fire_scenario]
     fire_e = 1.0 if fire_emissivity is None else fire_emissivity
@@ -205,9 +202,7 @@ def _von_mises_mpa(
     pressure_mpa = 0.1 * max(0.0, pressure_barg)
     denominator = outside_diameter**2 - inside_diameter**2
     mean_diameter = (outside_diameter + inside_diameter) / 2.0
-    inner_outer_product = (
-        inside_diameter**2 * outside_diameter**2 / mean_diameter**2
-    )
+    inner_outer_product = inside_diameter**2 * outside_diameter**2 / mean_diameter**2
     radial = pressure_mpa * (inside_diameter**2 - inner_outer_product) / denominator
     hoop = pressure_mpa * (inside_diameter**2 + inner_outer_product) / denominator
     longitudinal = pressure_mpa * inside_diameter**2 / denominator + weight
@@ -326,9 +321,7 @@ def _evaluate(
         raise InvalidInputError(
             "corrosion_allowance", "a negative corrosion allowance is not a thickness"
         )
-    undertolerance = (
-        0.0 if wall_thickness_undertolerance is None else wall_thickness_undertolerance
-    )
+    undertolerance = 0.0 if wall_thickness_undertolerance is None else wall_thickness_undertolerance
     _require_finite("wall_thickness_undertolerance", undertolerance)
     if not 0.0 <= undertolerance < 1.0:
         raise InvalidInputError(
@@ -363,10 +356,8 @@ def _evaluate(
         )
     if not pressure_profile:
         raise InvalidInputError("pressure_profile", "the class's profile needs at least two points")
-    rows = input_records_to_si(spec, "pressure_profile", pressure_profile)
-    _profile_evaluate(
-        pressure_profile, quantity(0.0, "s"), mode, quantity(offset_bar, "bar")
-    )
+    rows: list[dict[str, float]] = input_records_to_si(spec, "pressure_profile", pressure_profile)
+    _profile_evaluate(pressure_profile, quantity(0.0, "s"), mode, quantity(offset_bar, "bar"))
 
     scenario = _scenario(
         fire_scenario,
@@ -443,10 +434,7 @@ def _evaluate(
                     current_barg
                     * _PA_PER_BAR
                     * mw
-                    / (
-                        _UNIVERSAL_GAS_CONSTANT_J_PER_KMOLK
-                        * (previous_mean + _CLASS_OFFSET)
-                    )
+                    / (_UNIVERSAL_GAS_CONSTANT_J_PER_KMOLK * (previous_mean + _CLASS_OFFSET))
                     * internal_volume
                 )
                 thermal_mass += gas_mass * heat_capacity_value
@@ -454,9 +442,7 @@ def _evaluate(
             outer_c = mean_c + 0.5 * previous_flux * 1000.0 * wall / conductivity
             heat_flux_kw = _heat_flux_kw(scenario, outer_c)
 
-        pressure_barg = max(
-            0.0, _profile_lookup(rows, time_seconds, mode == "linear") - offset_bar
-        )
+        pressure_barg = max(0.0, _profile_lookup(rows, time_seconds, mode == "linear") - offset_bar)
         stress_mpa = _von_mises_mpa(pressure_barg, outside, inside, weight_mpa)
         properties = _material_at(material_name, mean_c, stress_mpa)
         rate_per_minute = properties.strain_rate * 60.0
@@ -527,12 +513,16 @@ def _evaluate(
     else:
         specific_gravity = density_value / 1000.0
         liquid = (
-            area
-            * 1.0e6
-            * _LIQUID_DISCHARGE_COEFFICIENT
-            / _LIQUID_FLOW_CONSTANT
-            / math.sqrt(specific_gravity / (max(pressure_barg, 1.0) * 100.0))
-        ) / 60.0 * specific_gravity
+            (
+                area
+                * 1.0e6
+                * _LIQUID_DISCHARGE_COEFFICIENT
+                / _LIQUID_FLOW_CONSTANT
+                / math.sqrt(specific_gravity / (max(pressure_barg, 1.0) * 100.0))
+            )
+            / 60.0
+            * specific_gravity
+        )
         two_sides = 0.0
         one_side = 0.0
         short = 0.0
@@ -650,9 +640,7 @@ def pipe_fire_rupture(
         max_time,
         spreadsheet_gas_thermal_mass,
     )
-    status = (
-        RuptureStatus.RUPTURE if solution.status == "rupture" else RuptureStatus.NO_RUPTURE
-    )
+    status = RuptureStatus.RUPTURE if solution.status == "rupture" else RuptureStatus.NO_RUPTURE
     basis = FluidBasis.LIQUID if solution.fluid_basis == "liquid" else FluidBasis.GAS
     history = [
         PipeFireRupturePoint(
@@ -707,9 +695,7 @@ def pipe_fire_rupture(
             else from_si(solution.short_pipe_gas_one_side, "kg/s")
         ),
         liquid_one_side=(
-            None
-            if solution.liquid_one_side is None
-            else from_si(solution.liquid_one_side, "kg/s")
+            None if solution.liquid_one_side is None else from_si(solution.liquid_one_side, "kg/s")
         ),
         release_gas_temperature=(
             None

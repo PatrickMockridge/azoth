@@ -126,9 +126,7 @@ def _api5l_strengths(grade: str) -> tuple[float, float]:
         "X120": psi(120000.0, 130000.0),
     }
     if grade not in table:
-        raise InvalidInputError(
-            "grade", f"No API 5L material strength data for grade {grade}"
-        )
+        raise InvalidInputError("grade", f"No API 5L material strength data for grade {grade}")
     return table[grade]
 
 
@@ -179,7 +177,7 @@ def _evaluate(
         if tensile_strength is None
         else input_to_si(spec, "tensile_strength", tensile_strength)
     )
-    states = input_records_to_si(spec, "history", history)
+    states: list[dict[str, float]] = input_records_to_si(spec, "history", history)
     apply_checks(
         checks.on_input,
         {
@@ -262,9 +260,7 @@ def _evaluate(
         ambient_yield, ambient_tensile = _api5l_strengths(normalized)
         material_name = f"API 5L {normalized}"
     else:
-        raise InvalidInputError(
-            "material", f"`{material}` is not `carbon_steel` or `api_5l`"
-        )
+        raise InvalidInputError("material", f"`{material}` is not `carbon_steel` or `api_5l`")
 
     rows: list[tuple[float, float, float, float]] = []
     ruptured = False

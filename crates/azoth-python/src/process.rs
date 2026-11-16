@@ -1862,22 +1862,23 @@ pub fn pipe_fire_rupture_material(
     correction_strain_rate: Option<f64>,
     correction_limit_temperature: Option<f64>,
 ) -> PyResult<crate::transport_gen::PyPipeFireRuptureMaterialResult> {
-    let rows: Option<Vec<azoth_process::models::pipe_fire_rupture_material::PipeFireRuptureMaterialPoint>> =
-        curve.map(|points| {
-            points
-                .into_iter()
-                .map(
-                    |row| azoth_process::models::pipe_fire_rupture_material::PipeFireRuptureMaterialPoint {
-                        temperature: kelvins(row.temperature),
-                        heat_capacity: joules_per_kilogram_kelvin(row.heat_capacity),
-                        thermal_conductivity: watts_per_meter_kelvin(row.thermal_conductivity),
-                        ultimate_tensile_strength: pascals(row.ultimate_tensile_strength),
-                        strain_effect_factor: row.strain_effect_factor,
-                        rupture_strain_limit: row.rupture_strain_limit,
-                    },
-                )
-                .collect()
-        });
+    let rows: Option<
+        Vec<azoth_process::models::pipe_fire_rupture_material::PipeFireRuptureMaterialPoint>,
+    > = curve.map(|points| {
+        points
+            .into_iter()
+            .map(|row| {
+                azoth_process::models::pipe_fire_rupture_material::PipeFireRuptureMaterialPoint {
+                    temperature: kelvins(row.temperature),
+                    heat_capacity: joules_per_kilogram_kelvin(row.heat_capacity),
+                    thermal_conductivity: watts_per_meter_kelvin(row.thermal_conductivity),
+                    ultimate_tensile_strength: pascals(row.ultimate_tensile_strength),
+                    strain_effect_factor: row.strain_effect_factor,
+                    rupture_strain_limit: row.rupture_strain_limit,
+                }
+            })
+            .collect()
+    });
     azoth_process::models::pipe_fire_rupture_material::pipe_fire_rupture_material(
         material_name,
         kelvins(evaluation_temperature),

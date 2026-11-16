@@ -53,8 +53,8 @@ fn the_severe_x65_state_ruptures_at_zero() {
             )
         })
         .collect();
-    let result = run(0.01, "api_5l", &history, None, None, Some("X65"))
-        .expect("the capture state is valid");
+    let result =
+        run(0.01, "api_5l", &history, None, None, Some("X65")).expect("the capture state is valid");
     assert!(result.ruptured);
     close(
         result.rupture_time.expect("a rupture has a time").value,
@@ -108,9 +108,11 @@ fn the_severe_x65_state_ruptures_at_zero() {
 
 #[test]
 fn the_mild_x65_state_survives() {
-    let history: Vec<_> = (0..6).map(|index| state(index as f64 * 30.0, 20.0e5, 300.0)).collect();
-    let result = run(0.02, "api_5l", &history, None, None, Some("X65"))
-        .expect("the capture state is valid");
+    let history: Vec<_> = (0..6)
+        .map(|index| state(index as f64 * 30.0, 20.0e5, 300.0))
+        .collect();
+    let result =
+        run(0.02, "api_5l", &history, None, None, Some("X65")).expect("the capture state is valid");
     assert!(!result.ruptured);
     assert!(result.rupture_time.is_none());
     close(
@@ -138,7 +140,10 @@ fn the_bare_lpg_vessel_ruptures_and_the_insulated_one_does_not() {
         .expect("the capture state is valid");
     assert!(bare_result.ruptured);
     close(
-        bare_result.rupture_time.expect("a rupture has a time").value,
+        bare_result
+            .rupture_time
+            .expect("a rupture has a time")
+            .value,
         536.459_734_497_078_6,
         "the bare rupture time",
     );
@@ -197,11 +202,15 @@ fn the_bare_lpg_vessel_ruptures_and_the_insulated_one_does_not() {
 #[test]
 fn the_x90_literal_strengths_and_the_l450_alias() {
     let one = [state(0.0, 20.0e5, 973.15)];
-    let x90 = run(0.01, "api_5l", &one, None, None, Some("X90"))
-        .expect("the capture state is valid");
+    let x90 =
+        run(0.01, "api_5l", &one, None, None, Some("X90")).expect("the capture state is valid");
     assert_eq!(x90.material_name, "API 5L X90");
     close(x90.ambient_yield_strength.value / 1.0e6, 620.0, "X90 yield");
-    close(x90.ambient_tensile_strength.value / 1.0e6, 695.0, "X90 tensile");
+    close(
+        x90.ambient_tensile_strength.value / 1.0e6,
+        695.0,
+        "X90 tensile",
+    );
     assert!(x90.ruptured);
     close(
         x90.rupture_allowable_stress.expect("a rupture").value,
@@ -209,8 +218,8 @@ fn the_x90_literal_strengths_and_the_l450_alias() {
         "the X90 allowable",
     );
 
-    let l450 = run(0.01, "api_5l", &one, None, None, Some("L450"))
-        .expect("the capture state is valid");
+    let l450 =
+        run(0.01, "api_5l", &one, None, None, Some("L450")).expect("the capture state is valid");
     assert_eq!(l450.material_name, "API 5L X65");
     close(
         l450.ambient_yield_strength.value / 1.0e6,
@@ -228,7 +237,15 @@ fn the_x90_literal_strengths_and_the_l450_alias() {
 fn the_class_refusals_are_the_ports() {
     let one = [state(0.0, 20.0e5, 973.15)];
     assert!(
-        run(0.01, "carbon_steel", &one, Some(245.0), Some(415.0), Some("X65")).is_err(),
+        run(
+            0.01,
+            "carbon_steel",
+            &one,
+            Some(245.0),
+            Some(415.0),
+            Some("X65")
+        )
+        .is_err(),
         "a carbon-steel grade is refused"
     );
     assert!(
@@ -252,15 +269,35 @@ fn the_class_refusals_are_the_ports() {
         "an empty history is refused"
     );
 
-    let non_monotonic = [state(0.0, 20.0e5, 300.0), state(10.0, 20.0e5, 300.0), state(5.0, 20.0e5, 300.0)];
+    let non_monotonic = [
+        state(0.0, 20.0e5, 300.0),
+        state(10.0, 20.0e5, 300.0),
+        state(5.0, 20.0e5, 300.0),
+    ];
     assert!(
-        run(0.01, "carbon_steel", &non_monotonic, Some(245.0), Some(415.0), None).is_err(),
+        run(
+            0.01,
+            "carbon_steel",
+            &non_monotonic,
+            Some(245.0),
+            Some(415.0),
+            None
+        )
+        .is_err(),
         "a non-monotonic history is refused"
     );
 
     let negative = [state(0.0, -1.0, 300.0)];
     assert!(
-        run(0.01, "carbon_steel", &negative, Some(245.0), Some(415.0), None).is_err(),
+        run(
+            0.01,
+            "carbon_steel",
+            &negative,
+            Some(245.0),
+            Some(415.0),
+            None
+        )
+        .is_err(),
         "a negative pressure is refused"
     );
 

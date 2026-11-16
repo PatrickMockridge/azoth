@@ -303,11 +303,7 @@ pub fn vessel_rupture(
             })?;
             let normalized = normalize_grade(supplied)?;
             let (yield_value, tensile_value) = api5l_strengths(&normalized)?;
-            (
-                format!("API 5L {normalized}"),
-                yield_value,
-                tensile_value,
-            )
+            (format!("API 5L {normalized}"), yield_value, tensile_value)
         }
         other => {
             return Err(AzothError::invalid_input(
@@ -332,8 +328,7 @@ pub fn vessel_rupture(
 
     for state in history {
         let stress = von_mises_pa(state.internal_pressure.value, radius, wall);
-        let allowable =
-            ambient_tensile * retained_factor(state.metal_temperature.value) * factor;
+        let allowable = ambient_tensile * retained_factor(state.metal_temperature.value) * factor;
         let margin = allowable - stress;
         rows.push(VesselRuptureStep {
             time: state.time,
@@ -349,8 +344,9 @@ pub fn vessel_rupture(
             ruptured = true;
             if previous_margin > 0.0 && margin != previous_margin {
                 let fraction = previous_margin / (previous_margin - margin);
-                rupture_time =
-                    Some(seconds(previous_time + fraction * (state.time.value - previous_time)));
+                rupture_time = Some(seconds(
+                    previous_time + fraction * (state.time.value - previous_time),
+                ));
             } else {
                 rupture_time = Some(state.time);
             }
@@ -377,4 +373,3 @@ pub fn vessel_rupture(
         warnings,
     })
 }
-

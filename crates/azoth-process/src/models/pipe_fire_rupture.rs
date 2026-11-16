@@ -7,9 +7,8 @@
 
 use azoth_core::units::{
     Frequency, HeatFluxDensity, HeatTransfer, Length, MassDensity, MassRate, MolarMass, Pressure,
-    SpecificHeatCapacity, ThermodynamicTemperature, Time, bars, kelvins,
-    kilograms_per_second, megapascals, per_second, seconds,
-    watts_per_square_meter,
+    SpecificHeatCapacity, ThermodynamicTemperature, Time, bars, kelvins, kilograms_per_second,
+    megapascals, per_second, seconds, watts_per_square_meter,
 };
 use azoth_core::{AzothError, Result, Warning, apply_checks};
 use serde::Serialize;
@@ -183,7 +182,8 @@ impl Scenario {
     /// The class's heat flux into the outer surface, kW/m2.
     fn heat_flux_kw(&self, outer_c: f64) -> f64 {
         let radiative = STEFAN_BOLTZMANN_W_PER_M2K4
-            * (self.fire_emissivity * self.metal_absorptivity
+            * (self.fire_emissivity
+                * self.metal_absorptivity
                 * (self.fire_c + CLASS_OFFSET).powi(4)
                 - self.metal_emissivity * (outer_c + CLASS_OFFSET).powi(4));
         let convective = self.h * (self.gas_c - outer_c);
@@ -237,7 +237,9 @@ fn scenario(
         other => {
             return Err(AzothError::invalid_input(
                 "fire_scenario",
-                format!("`{other}` is not `large_jet_fire`, `small_jet_fire`, `pool_fire` or `explicit`"),
+                format!(
+                    "`{other}` is not `large_jet_fire`, `small_jet_fire`, `pool_fire` or `explicit`"
+                ),
             ));
         }
     };
@@ -316,18 +318,23 @@ fn scenario(
 }
 
 /// The class's thick-wall von Mises stress, MPa.
-fn von_mises_mpa(pressure_barg: f64, outside_diameter: f64, inside_diameter: f64, weight: f64) -> f64 {
+fn von_mises_mpa(
+    pressure_barg: f64,
+    outside_diameter: f64,
+    inside_diameter: f64,
+    weight: f64,
+) -> f64 {
     let pressure_mpa = 0.1 * pressure_barg.max(0.0);
     let denominator = outside_diameter * outside_diameter - inside_diameter * inside_diameter;
     let mean_diameter = (outside_diameter + inside_diameter) / 2.0;
-    let inner_outer_product = inside_diameter * inside_diameter * outside_diameter * outside_diameter
-        / (mean_diameter * mean_diameter);
+    let inner_outer_product =
+        inside_diameter * inside_diameter * outside_diameter * outside_diameter
+            / (mean_diameter * mean_diameter);
     let radial =
         pressure_mpa * (inside_diameter * inside_diameter - inner_outer_product) / denominator;
     let hoop =
         pressure_mpa * (inside_diameter * inside_diameter + inner_outer_product) / denominator;
-    let longitudinal =
-        pressure_mpa * inside_diameter * inside_diameter / denominator + weight;
+    let longitudinal = pressure_mpa * inside_diameter * inside_diameter / denominator + weight;
     (radial * radial + hoop * hoop + longitudinal * longitudinal
         - radial * hoop
         - radial * longitudinal
@@ -363,12 +370,8 @@ fn profile_bara(
     mode: &str,
     offset_bar: f64,
 ) -> Result<f64> {
-    let result = blowdown_pressure_profile(
-        points,
-        seconds(time_s),
-        Some(mode),
-        Some(bars(offset_bar)),
-    )?;
+    let result =
+        blowdown_pressure_profile(points, seconds(time_s), Some(mode), Some(bars(offset_bar)))?;
     Ok(result.pressure_absolute.value / PA_PER_BAR)
 }
 
@@ -527,8 +530,7 @@ pub fn pipe_fire_rupture(
     }
     let spreadsheet_gas = spreadsheet_gas_thermal_mass.unwrap_or(true);
 
-    let effective_wall =
-        nominal_wall_thickness.value * (1.0 - undertolerance) - corrosion;
+    let effective_wall = nominal_wall_thickness.value * (1.0 - undertolerance) - corrosion;
     if effective_wall <= 0.0 {
         return Err(AzothError::invalid_input(
             "nominal_wall_thickness",
@@ -544,8 +546,7 @@ pub fn pipe_fire_rupture(
         ));
     }
     let exposed_area = PI * outside_diameter_m * exposed;
-    let internal_volume =
-        PI / 4.0 * inside_diameter_m * inside_diameter_m * exposed;
+    let internal_volume = PI / 4.0 * inside_diameter_m * inside_diameter_m * exposed;
 
     let initial_material = material_at(material_name, initial_c, 0.0)?;
     let metal_density = initial_material.density.value;
@@ -570,9 +571,9 @@ pub fn pipe_fire_rupture(
         let wall = effective_wall / strain_factor;
         let inside = outside - 2.0 * wall;
         if step > 0 {
-            let current_barg =
-                (profile_bara(pressure_profile, time_seconds, mode, offset_bar)? - offset_bar)
-                    .max(0.0);
+            let current_barg = (profile_bara(pressure_profile, time_seconds, mode, offset_bar)?
+                - offset_bar)
+                .max(0.0);
             let previous_mean = mean_c;
             let previous_flux = heat_flux_kw;
             let previous_material = material_at(material_name, previous_mean, 0.0)?;
@@ -594,8 +595,7 @@ pub fn pipe_fire_rupture(
         }
 
         let pressure_barg =
-            (profile_bara(pressure_profile, time_seconds, mode, offset_bar)? - offset_bar)
-                .max(0.0);
+            (profile_bara(pressure_profile, time_seconds, mode, offset_bar)? - offset_bar).max(0.0);
         let stress_mpa = von_mises_mpa(pressure_barg, outside, inside, weight_mpa);
         let properties = material_at(material_name, mean_c, stress_mpa)?;
         let rate_per_minute = properties.strain_rate.value * 60.0;
@@ -627,8 +627,15 @@ pub fn pipe_fire_rupture(
         }
     }
 
-    let (status, rupture_time, rupture_pressure, rupture_mean, rupture_outer, rupture_strain,
-        rupture_limit) = match rupture {
+    let (
+        status,
+        rupture_time,
+        rupture_pressure,
+        rupture_mean,
+        rupture_outer,
+        rupture_strain,
+        rupture_limit,
+    ) = match rupture {
         Some((time, pressure, mean, outer, strain, limit)) => (
             RuptureStatus::Rupture,
             Some(seconds(time)),
@@ -638,15 +645,7 @@ pub fn pipe_fire_rupture(
             Some(strain),
             Some(limit),
         ),
-        None => (
-            RuptureStatus::NoRupture,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-        ),
+        None => (RuptureStatus::NoRupture, None, None, None, None, None, None),
     };
 
     let (two_sides, one_side, short, liquid) = match rupture {
@@ -701,4 +700,3 @@ pub fn pipe_fire_rupture(
         warnings,
     })
 }
-
