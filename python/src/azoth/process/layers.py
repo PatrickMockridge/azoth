@@ -2532,6 +2532,39 @@ def _blocked_outlet_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.check_valve_leak_relief import (
+        check_valve_leak_relief as evaluate,
+    )
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    result = evaluate(
+        list(inputs["components"]),
+        [float(value) for value in inputs["mole_fractions"]],
+        quantity(float(inputs["nominal_diameter"]), "m"),
+        quantity(float(inputs["upstream_pressure"]), "Pa"),
+        None if inputs.get("leak_area_fraction") is None else float(inputs["leak_area_fraction"]),
+        optional("upstream_temperature", "K"),
+        optional("downstream_pressure", "Pa"),
+        None
+        if inputs.get("discharge_coefficient") is None
+        else float(inputs["discharge_coefficient"]),
+        None if inputs.get("scenario_name") is None else str(inputs["scenario_name"]),
+    )
+    return {
+        "relief_rate_kg_per_s": result.relief_rate.to("kg/s").magnitude,
+        "relief_temperature_k": result.relief_temperature.to("K").magnitude,
+        "molar_mass_kg_per_mol": result.molar_mass.to("kg/mol").magnitude,
+        "compressibility": result.compressibility,
+        "specific_heat_ratio": result.specific_heat_ratio,
+    }
+
+
 def _control_valve_failure_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.control_valve_failure_relief`'s layers, from the reference's arithmetic."""
     from azoth.core.units import quantity
@@ -2935,6 +2968,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.jet_fire": _jet_fire,
     "process.pfp_demand": _pfp_demand,
     "process.blocked_outlet_relief": _blocked_outlet_relief,
+    "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.fire_case_relief": _fire_case_relief,
     "process.overpressure_acceptance": _overpressure_acceptance,
@@ -4502,6 +4536,35 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     # The fire relief's six cased blocks: both drainage branches, the geometry, the
     # no-area state, the latent default and the unread firefighting flag. The negative
     # latent heat the class silently defaults sits outside them.
+    # The check-valve leaks: the raw state block and the no-fluid branch are uncased.
+    LayerCase(
+        model="process.check_valve_leak_relief",
+        case="cvl_default",
+        capture="process_check_valve_leak_relief.tsv",
+        block=1,
+        identified_by=("#label", "cvl_default"),
+    ),
+    LayerCase(
+        model="process.check_valve_leak_relief",
+        case="cvl_clamped",
+        capture="process_check_valve_leak_relief.tsv",
+        block=2,
+        identified_by=("#label", "cvl_clamped"),
+    ),
+    LayerCase(
+        model="process.check_valve_leak_relief",
+        case="cvl_subcritical",
+        capture="process_check_valve_leak_relief.tsv",
+        block=3,
+        identified_by=("#label", "cvl_subcritical"),
+    ),
+    LayerCase(
+        model="process.check_valve_leak_relief",
+        case="cvl_zero_diameter",
+        capture="process_check_valve_leak_relief.tsv",
+        block=4,
+        identified_by=("#label", "cvl_zero_diameter"),
+    ),
     # The blocked-outlet loads are every other block, because each row prints the raw
     # `ReliefFluidState` readings beside it. The three state blocks, the no-fluid branch
     # and the refused negative inflow are declared in `UNCASED_ROWS`.
@@ -6272,6 +6335,8 @@ UNCASED_ROWS: dict[str, int] = {
     "process_blocked_outlet_relief.tsv": 5,
     # The control-valve capture's two: the raw state block and the no-fluid branch.
     "process_control_valve_failure_relief.tsv": 2,
+    # The check-valve capture's two: the raw state block and the no-fluid branch.
+    "process_check_valve_leak_relief.tsv": 2,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

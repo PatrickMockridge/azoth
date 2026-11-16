@@ -27,6 +27,7 @@ from azoth.core.result import (
     BlockedOutletReliefResult,
     BlowdownPressureProfileResult,
     BowTieResult,
+    CheckValveLeakReliefResult,
     ComponentSplitterResult,
     CompressorResult,
     ConsequenceAnalysisResult,
@@ -263,6 +264,7 @@ _ANTI_SURGE_RECYCLE = "process.anti_surge_recycle"
 _API537_FLARE_FLAME_MODEL = "process.api537_flare_flame_model"
 _BLEVE = "process.bleve"
 _BLOCKED_OUTLET_RELIEF = "process.blocked_outlet_relief"
+_CHECK_VALVE_LEAK_RELIEF = "process.check_valve_leak_relief"
 _BLOWDOWN_PRESSURE_PROFILE = "process.blowdown_pressure_profile"
 _PIPE_FIRE_RUPTURE = "process.pipe_fire_rupture"
 _PIPE_FIRE_RUPTURE_MATERIAL = "process.pipe_fire_rupture_material"
@@ -1390,6 +1392,38 @@ def blocked_outlet_relief(
         inflow_rate=inflow_rate,
         relief_pressure=relief_pressure,
         relief_temperature=relief_temperature,
+        scenario_name=scenario_name,
+    )
+
+
+def check_valve_leak_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    nominal_diameter: Q,
+    upstream_pressure: Q,
+    leak_area_fraction: float | None = None,
+    upstream_temperature: Q | None = None,
+    downstream_pressure: Q | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> CheckValveLeakReliefResult:
+    """The leakage rate through a fraction of the nominal check-valve area.
+
+    **The fraction defaults to 1% and is clamped up to 0.1%** with the class's warning,
+    and the flow is the isentropic nozzle through the leak area. A zero diameter answers
+    zero.
+
+    See :func:`azoth.process.reference.check_valve_leak_relief`.
+    """
+    return resolve(_CHECK_VALVE_LEAK_RELIEF)(  # type: ignore[no-any-return]
+        components=components,
+        mole_fractions=mole_fractions,
+        nominal_diameter=nominal_diameter,
+        upstream_pressure=upstream_pressure,
+        leak_area_fraction=leak_area_fraction,
+        upstream_temperature=upstream_temperature,
+        downstream_pressure=downstream_pressure,
+        discharge_coefficient=discharge_coefficient,
         scenario_name=scenario_name,
     )
 

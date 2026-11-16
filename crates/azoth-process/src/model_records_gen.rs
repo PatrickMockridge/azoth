@@ -19,6 +19,7 @@ use crate::models::bleve::BleveResult;
 use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
 use crate::models::blowdown_pressure_profile::BlowdownPressureProfileResult;
 use crate::models::bow_tie::BowTieResult;
+use crate::models::check_valve_leak_relief::CheckValveLeakReliefResult;
 use crate::models::component_splitter::ComponentSplitterResult;
 use crate::models::compressor::CompressorResult;
 use crate::models::consequence_analysis::ConsequenceAnalysisResult;
@@ -244,6 +245,25 @@ impl CalcResult for BowTieResult {
         "mitigated_frequency_per_year",
         "total_rrf",
         "max_severity",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for CheckValveLeakReliefResult {
+    const CALC_ID: &'static str = "process.check_valve_leak_relief";
+    const FIELDS: &'static [&'static str] = &[
+        "name",
+        "relief_rate",
+        "phase",
+        "relief_temperature",
+        "molar_mass",
+        "compressibility",
+        "specific_heat_ratio",
+        "assumptions",
         "warnings",
     ];
 

@@ -230,6 +230,7 @@
 //!   - specs/models/process/blocked_outlet_relief.toml
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
+//!   - specs/models/process/check_valve_leak_relief.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
@@ -2811,6 +2812,41 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.blowdown_pressure_profile",
         "gauge_offset",
         "pressure",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "mole_fractions",
+        "dimensionless",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "nominal_diameter",
+        "length",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "upstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "leak_area_fraction",
+        "dimensionless",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "upstream_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "downstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "discharge_coefficient",
+        "dimensionless",
     ),
     ("process.component_splitter", "feed_n", "molar_flow"),
     ("process.component_splitter", "feed_z", "dimensionless"),

@@ -5818,6 +5818,40 @@ class BowTieResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class CheckValveLeakReliefResult(_HasWarnings):
+    """Result of ``process.check_valve_leak_relief``."""
+
+    CALC_ID: ClassVar[str] = "process.check_valve_leak_relief"
+
+    #: the scenario name, echoed.
+    name: str
+
+    #: the isentropic nozzle flow through the leak area.
+    relief_rate: Q
+
+    #: the relieving phase, which this cause hardcodes to `vapour`.
+    phase: ReliefPhase
+
+    #: the upstream temperature, echoed.
+    relief_temperature: Q
+
+    #: the relieving fluid's molar mass.
+    molar_mass: Q
+
+    #: the relieving fluid's `Z`.
+    compressibility: float
+
+    #: the relieving fluid's `getKappa`, the isentropic exponent.
+    specific_heat_ratio: float
+
+    #: the class's assumption strings in order, with its warning strings appended.
+    assumptions: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ComponentSplitterResult(_HasWarnings):
     """Result of ``process.component_splitter``."""
 

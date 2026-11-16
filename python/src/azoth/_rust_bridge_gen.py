@@ -48,6 +48,7 @@ from azoth.core.result import (
     CharacterizationComponent,
     CharacterizeToCommonSlateResult,
     CharacterizeToReferenceResult,
+    CheckValveLeakReliefResult,
     ChemicalEquilibriumResult,
     ChemicalWarningRow,
     ChokedFlowAreaResult,
@@ -454,6 +455,7 @@ __all__ = [
     "characterise_plus_fraction",
     "characterize_to_common_slate",
     "characterize_to_reference",
+    "check_valve_leak_relief",
     "chemical_equilibrium",
     "choked_flow_area",
     "chung_conductivity",
@@ -5802,6 +5804,33 @@ def bow_tie(threats: list[dict[str, object]], consequences: list[dict[str, objec
         mitigated_frequency_per_year=result.mitigated_frequency_per_year,
         total_rrf=result.total_rrf,
         max_severity=result.max_severity,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def check_valve_leak_relief(components: list[str], mole_fractions: list[float], nominal_diameter: Q, upstream_pressure: Q, leak_area_fraction: float | None=None, upstream_temperature: Q | None=None, downstream_pressure: Q | None=None, discharge_coefficient: float | None=None, scenario_name: str | None=None) -> CheckValveLeakReliefResult:
+    """``process.check_valve_leak_relief``, computed in Rust."""
+    spec = _models_gen.model("process.check_valve_leak_relief")
+    result = _core.check_valve_leak_relief(
+        list(components),
+        list(mole_fractions),
+        input_to_si(spec, "nominal_diameter", nominal_diameter),
+        input_to_si(spec, "upstream_pressure", upstream_pressure),
+        None if leak_area_fraction is None else leak_area_fraction,
+        None if upstream_temperature is None else input_to_si(spec, "upstream_temperature", upstream_temperature),
+        None if downstream_pressure is None else input_to_si(spec, "downstream_pressure", downstream_pressure),
+        None if discharge_coefficient is None else discharge_coefficient,
+        scenario_name,
+    )
+    return CheckValveLeakReliefResult(
+        name=result.name,
+        relief_rate=from_si(result.relief_rate.magnitude_si, result.relief_rate.unit),
+        phase=ReliefPhase(result.phase),
+        relief_temperature=from_si(result.relief_temperature.magnitude_si, result.relief_temperature.unit),
+        molar_mass=from_si(result.molar_mass.magnitude_si, result.molar_mass.unit),
+        compressibility=result.compressibility,
+        specific_heat_ratio=result.specific_heat_ratio,
+        assumptions=tuple(result.assumptions),
         warnings=_warnings(result.warnings),
     )
 

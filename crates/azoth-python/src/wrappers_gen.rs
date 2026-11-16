@@ -5711,6 +5711,42 @@ pub fn bow_tie(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Check valve leak relief.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mole_fractions, nominal_diameter, upstream_pressure, leak_area_fraction, upstream_temperature, downstream_pressure, discharge_coefficient, scenario_name))]
+#[pyo3(
+    text_signature = "(components, mole_fractions, nominal_diameter, upstream_pressure, leak_area_fraction, upstream_temperature, downstream_pressure, discharge_coefficient, scenario_name)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn check_valve_leak_relief(
+    py: Python<'_>,
+    components: Vec<String>,
+    mole_fractions: Vec<f64>,
+    nominal_diameter: f64,
+    upstream_pressure: f64,
+    leak_area_fraction: Option<f64>,
+    upstream_temperature: Option<f64>,
+    downstream_pressure: Option<f64>,
+    discharge_coefficient: Option<f64>,
+    scenario_name: Option<&str>,
+) -> PyResult<crate::transport_gen::PyCheckValveLeakReliefResult> {
+    azoth_process::models::check_valve_leak_relief::check_valve_leak_relief(
+        &components,
+        &mole_fractions,
+        meters(nominal_diameter),
+        pascals(upstream_pressure),
+        leak_area_fraction,
+        upstream_temperature.map(kelvins),
+        downstream_pressure.map(pascals),
+        discharge_coefficient,
+        scenario_name,
+    )
+    .map(|r| crate::transport_gen::PyCheckValveLeakReliefResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Component splitter.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

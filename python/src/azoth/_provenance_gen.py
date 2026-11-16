@@ -2534,6 +2534,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'process.check_valve_leak_relief': {
+        "calc_id": 'process.check_valve_leak_relief',
+        "name": 'Check valve leak relief',
+        "spec": {'path': 'specs/models/process/check_valve_leak_relief.toml', 'sha256': 'bc4c965e4cd923f93ddbbf3b825f658015c044be1357f03a719046662e34b2fd'},
+        "code": [{'path': 'python/src/azoth/process/reference/check_valve_leak_relief.py', 'sha256': '919a5edbd8fd25f722fd73859041b3a968653dfed0e7f9865dfd719d21b3efdb'}, {'path': 'crates/azoth-process/src/models/check_valve_leak_relief.rs', 'sha256': '4c286a9d32a42452ec43c37b995c0fe3d2a84836f61fbded0c61d3b3a7f17ae3'}],
+        "source": 'NeqSim process/safety/overpressure/CheckValveLeakRelief.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 4,
+        "tests_skipped": 0,
+    },
     'process.component_splitter': {
         "calc_id": 'process.component_splitter',
         "name": 'Component splitter',

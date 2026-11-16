@@ -335,6 +335,7 @@ Five sections, and the difference between them is the point:
 - [`process.blocked_outlet_relief`](./process/blocked_outlet_relief.md) — Blocked outlet relief
 - [`process.blowdown_pressure_profile`](./process/blowdown_pressure_profile.md) — Blowdown pressure profile
 - [`process.bow_tie`](./process/bow_tie.md) — Bow-tie risk
+- [`process.check_valve_leak_relief`](./process/check_valve_leak_relief.md) — Check valve leak relief
 - [`process.component_splitter`](./process/component_splitter.md) — Component splitter
 - [`process.compressor`](./process/compressor.md) — Compressor
 - [`process.consequence_analysis`](./process/consequence_analysis.md) — Consequence analysis

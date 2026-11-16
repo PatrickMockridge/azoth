@@ -21,6 +21,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.blocked_outlet_relief`](./blocked_outlet_relief.md) | `blocked_outlet_full_inflow` | NeqSim process/safety/overpressure/BlockedOutletRelief.java |
 | [`process.blowdown_pressure_profile`](./blowdown_pressure_profile.md) | `piecewise_step_or_linear_pressure_profile` | NeqSim process/safety/rupture/BlowdownPressureProfile.java |
 | [`process.bow_tie`](./bow_tie.md) | `closed_form_bow_tie` | NeqSim process/safety/risk/bowtie/BowTieModel.java |
+| [`process.check_valve_leak_relief`](./check_valve_leak_relief.md) | `check_valve_leak_nozzle` | NeqSim process/safety/overpressure/CheckValveLeakRelief.java |
 | [`process.component_splitter`](./component_splitter.md) | `direct composition` | NeqSim process/equipment/splitter/ComponentSplitter.java |
 | [`process.compressor`](./compressor.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
 | [`process.consequence_analysis`](./consequence_analysis.md) | `outcome_frequency_composition` | NeqSim process/safety/qra/ConsequenceAnalysisEngine.java |

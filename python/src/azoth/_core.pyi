@@ -3118,6 +3118,18 @@ class BowTieResult:
     warnings: list[Warning]
 
 @final
+class CheckValveLeakReliefResult:
+    name: str
+    relief_rate: Qty
+    phase: str
+    relief_temperature: Qty
+    molar_mass: Qty
+    compressibility: float
+    specific_heat_ratio: float
+    assumptions: list[str]
+    warnings: list[Warning]
+
+@final
 class ComponentSplitterResult:
     overhead_n: Qty
     overhead_z: list[float]
@@ -6920,6 +6932,17 @@ def bow_tie(
     consequences: list[BowTieConsequence],
     barriers: list[BowTieBarrier],
 ) -> BowTieResult: ...
+def check_valve_leak_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    nominal_diameter: float,
+    upstream_pressure: float,
+    leak_area_fraction: float | None = None,
+    upstream_temperature: float | None = None,
+    downstream_pressure: float | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> CheckValveLeakReliefResult: ...
 def component_splitter(
     components: list[str],
     feed_n: float,
