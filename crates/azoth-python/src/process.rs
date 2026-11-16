@@ -10,9 +10,9 @@ use std::path::Path;
 use azoth_core::units::{
     cubic_meters, cubic_meters_per_second, hours, joules_per_kilogram_kelvin, joules_per_mole,
     kelvin_intervals, kelvins, kilograms, kilograms_per_cubic_meter, kilograms_per_second, meters,
-    meters_per_second, pascal_seconds, pascals, seconds, square_meters, square_meters_per_second,
-    watts, watts_per_cubic_meter, watts_per_kelvin, watts_per_meter_kelvin,
-    watts_per_square_meter_kelvin,
+    meters_per_second, pascal_seconds, pascals, per_second, seconds, square_meters,
+    square_meters_per_second, watts, watts_per_cubic_meter, watts_per_kelvin,
+    watts_per_meter_kelvin, watts_per_square_meter_kelvin,
 };
 use azoth_process::executor::Session;
 use azoth_process::{self, ExecutionOrder, Stream};
@@ -1834,5 +1834,64 @@ pub fn fire_water_demand(
         rows.as_deref(),
     )
     .map(|r| crate::transport_gen::PyFireWaterDemandResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// The pipe fire-rupture material curves.
+///
+/// All arguments are SI magnitudes. See the module documentation for why. **The
+/// optional `record_list` input is one the wrapper generator leaves hand-written**, so
+/// this binding sits here rather than in `wrappers_gen.rs`.
+#[pyfunction]
+#[pyo3(signature = (material_name, evaluation_temperature, evaluation_stress, curve, density, sellars_tegart_a, sellars_tegart_alpha, sellars_tegart_n, activation_temperature, correction_strain_rate, correction_limit_temperature))]
+#[pyo3(
+    text_signature = "(material_name, evaluation_temperature, evaluation_stress, curve, density, sellars_tegart_a, sellars_tegart_alpha, sellars_tegart_n, activation_temperature, correction_strain_rate, correction_limit_temperature)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn pipe_fire_rupture_material(
+    py: Python<'_>,
+    material_name: &str,
+    evaluation_temperature: f64,
+    evaluation_stress: f64,
+    curve: Option<Vec<crate::records_gen::PipeFireRuptureMaterialPoint>>,
+    density: Option<f64>,
+    sellars_tegart_a: Option<f64>,
+    sellars_tegart_alpha: Option<f64>,
+    sellars_tegart_n: Option<f64>,
+    activation_temperature: Option<f64>,
+    correction_strain_rate: Option<f64>,
+    correction_limit_temperature: Option<f64>,
+) -> PyResult<crate::transport_gen::PyPipeFireRuptureMaterialResult> {
+    let rows: Option<
+        Vec<azoth_process::models::pipe_fire_rupture_material::PipeFireRuptureMaterialPoint>,
+    > = curve.map(|points| {
+        points
+            .into_iter()
+            .map(|row| {
+                azoth_process::models::pipe_fire_rupture_material::PipeFireRuptureMaterialPoint {
+                    temperature: kelvins(row.temperature),
+                    heat_capacity: joules_per_kilogram_kelvin(row.heat_capacity),
+                    thermal_conductivity: watts_per_meter_kelvin(row.thermal_conductivity),
+                    ultimate_tensile_strength: pascals(row.ultimate_tensile_strength),
+                    strain_effect_factor: row.strain_effect_factor,
+                    rupture_strain_limit: row.rupture_strain_limit,
+                }
+            })
+            .collect()
+    });
+    azoth_process::models::pipe_fire_rupture_material::pipe_fire_rupture_material(
+        material_name,
+        kelvins(evaluation_temperature),
+        pascals(evaluation_stress),
+        rows.as_deref(),
+        density.map(kilograms_per_cubic_meter),
+        sellars_tegart_a,
+        sellars_tegart_alpha,
+        sellars_tegart_n,
+        activation_temperature.map(kelvins),
+        correction_strain_rate.map(per_second),
+        correction_limit_temperature.map(kelvins),
+    )
+    .map(|r| crate::transport_gen::PyPipeFireRuptureMaterialResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }

@@ -99,7 +99,9 @@ BINDING = REPO_ROOT / "crates" / "azoth-python" / "src"
 #: 66 -> 67 when `process.fire_water_demand` brought an optional `record_list`: the deriver
 #: handles a required record list (`event_tree.branches`) but leaves an optional one to a
 #: hand wrapper, which is the same reason every entry above is here.
-KNOWN_HAND_WRITTEN = 67
+#: 67 -> 68 when `process.pipe_fire_rupture_material` brought its optional `curve` for the
+#: same reason.
+KNOWN_HAND_WRITTEN = 68
 
 
 def _tools_module(name: str) -> ModuleType:

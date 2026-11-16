@@ -245,6 +245,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyAntiSurgeRecycleResult>()?;
     m.add_class::<crate::transport_gen::PyApi537FlareFlameModelResult>()?;
     m.add_class::<crate::transport_gen::PyBleveResult>()?;
+    m.add_class::<crate::transport_gen::PyBlowdownPressureProfileResult>()?;
     m.add_class::<crate::transport_gen::PyBowTieResult>()?;
     m.add_class::<crate::transport_gen::PyComponentSplitterResult>()?;
     m.add_class::<crate::transport_gen::PyCompressorResult>()?;
@@ -282,6 +283,8 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPackedColumnResult>()?;
     m.add_class::<crate::transport_gen::PyPfpDemandResult>()?;
     m.add_class::<crate::transport_gen::PyPipeResult>()?;
+    m.add_class::<crate::transport_gen::PyPipeFireRuptureResult>()?;
+    m.add_class::<crate::transport_gen::PyPipeFireRuptureMaterialResult>()?;
     m.add_class::<crate::transport_gen::PyPipelinePressureProtectionResult>()?;
     m.add_class::<crate::transport_gen::PyPlugFlowReactorResult>()?;
     m.add_class::<crate::transport_gen::PyPoolFireResult>()?;
@@ -308,6 +311,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyTr3001ComplianceResult>()?;
     m.add_class::<crate::transport_gen::PyTurboExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyVceResult>()?;
+    m.add_class::<crate::transport_gen::PyVesselRuptureResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
     m.add_class::<crate::transport_gen::PyEquilibriumConstantResult>()?;
     m.add_class::<crate::transport_gen::PyKineticRateLawResult>()?;
@@ -356,6 +360,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyMineralEquilibriumRow>()?;
     m.add_class::<crate::record_outputs_gen::PyMinimalCutSet>()?;
     m.add_class::<crate::record_outputs_gen::PyNaceIssueRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyPipeFireRupturePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyReliefDisposalRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRiskAssessmentRow>()?;
@@ -368,6 +373,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
     m.add_class::<crate::record_outputs_gen::PyTr3001Finding>()?;
+    m.add_class::<crate::record_outputs_gen::PyVesselRuptureStep>()?;
     m.add_class::<crate::record_outputs_gen::PyWaterMixingResult>()?;
     m.add_class::<crate::record_outputs_gen::PyZoneRatingRow>()?;
 
@@ -919,6 +925,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::bleve, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::blowdown_pressure_profile,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::bow_tie, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::component_splitter,
@@ -986,6 +996,11 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::packed_column, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::pfp_demand, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::pipe, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::pipe_fire_rupture, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::process::pipe_fire_rupture_material,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::pipeline_pressure_protection,
         m
@@ -1036,6 +1051,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vce, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::vessel_rupture, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::chemical_equilibrium,
         m

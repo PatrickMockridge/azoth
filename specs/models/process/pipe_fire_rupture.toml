@@ -1,0 +1,344 @@
+id = "process.pipe_fire_rupture"
+name = "Pipe fire rupture"
+kind = "procedure"
+assumptions = [
+    "**the class's workbook model is carried**: the thick-wall von Mises stress, the Sellars-Tegart strain rate, the accumulated-strain limit, the spreadsheet-style release and the two temperature bases.",
+    "**the state stretches with strain**: `OD (1 + eps)` and the effective wall `d_eff / (1 + eps)`, so the inside diameter follows.",
+    "**the mean wall temperature advances by the previous heat flux over the thermal mass**, and the outer surface is `T_mean + 0.5 q d_eff / lambda`; the flux is re-evaluated after that update.",
+    "**the class's absolute temperature is `C + 273.0`**, not `C + 273.15`: the kelvin input is converted with 273.15 and the class's own offset is then carried literally.",
+    "**`spreadsheet_gas_thermal_mass` is the class's builder default of true**: the gas's ideal-gas mass enters the thermal mass for a fluid under 500 kg/m3, using `max(0, barg) 1e5` as if it were absolute.",
+    "**the fluid-density switch is exactly 500 kg/m3**: below is the gas release arm and at or above is the liquid arm; the class warns, and this id publishes `fluid_basis` instead.",
+    "**the gas release uses the initial temperature** in `sqrt(MW / max(1, T0 + 273))`, not the rupture temperature, and the short-pipe factor 1.541 multiplies the one-side gas rate.",
+    "**a no-rupture result carries no release estimate**: the class's builder is handed null on that path and its zero-filled branch is dead.",
+    "**the class's `weldFactor`, `segmentId`, `pipeClass` and `nominalDiameterInches` are read by no formula**, so this id declares no such input; the class's exposed-length warning is unreachable because the input is refused when non-positive.",
+    "**the step count is `ceil(max_time / time_step)`**, and this id caps it at the algorithm's 100000 steps where the class has no cap; the class's recommendation prose is presentation and is not an output.",
+]
+references = [
+    "Fire rupture strain-rate workbook Rev4.02, the material tables and the Pipe 1 benchmark.",
+    "API STD 521 (2021). Pressure-relieving and Depressuring Systems, fire exposure and depressurization.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/rupture/PipeFireRuptureStudy.java`, `PipeFireRuptureInput.java`, `PipeFireRuptureMaterial.java` and `PipeFireRuptureScenario.java` are the port sources.",
+    "`validation/neqsim/captures/process_pipe_fire_rupture.tsv` - the workbook Pipe 1 state with its history, the no-rupture state, the small-jet pair, SS 316, the liquid arm, the gas-thermal-mass pair, the pool fire, a PFP factor and the refusals.",
+]
+[source]
+standard = "NeqSim process/safety/rupture/PipeFireRuptureStudy.java"
+edition = "Its `run`, over `PipeFireRuptureInput`'s geometry and fluid, `PipeFireRuptureMaterial`'s tables and `PipeFireRuptureScenario`'s three factories."
+[algorithm]
+scheme = "strain_rate_pipe_fire_rupture"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 100000
+[inputs]
+[inputs.outside_diameter]
+unit = "mm"
+description = "the pipe's outside diameter, above zero.\n"
+[inputs.nominal_wall_thickness]
+unit = "mm"
+description = "the nominal wall thickness, above zero.\n"
+[inputs.material_name]
+type = "string"
+description = "the material name, resolved by `process.pipe_fire_rupture_material`'s selector.\n"
+[inputs.fire_scenario]
+type = "enum"
+values = ["large_jet_fire", "small_jet_fire", "pool_fire", "explicit"]
+description = "the fire exposure: the class's three workbook scenarios or the caller's seven parameters.\n"
+[inputs.pressure_profile]
+type = "record_list"
+row_type = "BlowdownProfilePoint"
+description = "the blowdown trajectory's time and absolute-pressure points, in increasing time.\n"
+[inputs.pressure_profile.fields.time]
+unit = "s"
+description = "the point's time, at least zero.\n"
+[inputs.pressure_profile.fields.pressure]
+unit = "bar"
+description = "the point's absolute pressure, above zero.\n"
+[inputs.corrosion_allowance]
+unit = "mm"
+optional = true
+description = "the corrosion allowance, at least zero. **Absent is 0.**\n"
+[inputs.wall_thickness_undertolerance]
+unit = "dimensionless"
+optional = true
+description = "the wall's under-tolerance fraction, in `[0, 1)`. **Absent is 0.**\n"
+[inputs.exposed_length]
+unit = "m"
+optional = true
+description = "the fire-exposed pipe length, above zero. **Absent is 1 m.**\n"
+[inputs.weight_stress]
+unit = "MPa"
+optional = true
+description = "the axial weight stress added to the longitudinal stress. **Absent is 0.**\n"
+[inputs.fluid_density]
+unit = "kg/m**3"
+optional = true
+description = "the fluid density, above zero. **Absent is 1 kg/m3**, the class's builder default.\n"
+[inputs.fluid_heat_capacity]
+unit = "J/(kg*K)"
+optional = true
+description = "the fluid heat capacity, above zero. **Absent is 2000 J/(kg K).**\n"
+[inputs.gas_molecular_weight]
+unit = "kg/mol"
+optional = true
+description = "the gas molecular weight, above zero. **Absent is 0.018 kg/mol.**\n"
+[inputs.initial_temperature]
+unit = "K"
+optional = true
+description = "the initial metal and fluid temperature, above absolute zero. **Absent is 293.15 K**, the class's 20 degC.\n"
+[inputs.fire_temperature]
+unit = "K"
+optional = true
+description = "the radiating fire temperature; required by `explicit` and refused by the three built-ins.\n"
+[inputs.gas_temperature]
+unit = "K"
+optional = true
+description = "the convecting gas temperature; required by `explicit` and refused by the three built-ins.\n"
+[inputs.convective_heat_transfer_coefficient]
+unit = "W/(m**2*K)"
+optional = true
+description = "the convective coefficient, at least zero; required by `explicit`.\n"
+[inputs.fire_emissivity]
+unit = "dimensionless"
+optional = true
+description = "the fire emissivity, in `[0, 1]`; required by `explicit`.\n"
+[inputs.metal_emissivity]
+unit = "dimensionless"
+optional = true
+description = "the metal emissivity, in `[0, 1]`; required by `explicit`.\n"
+[inputs.metal_absorptivity]
+unit = "dimensionless"
+optional = true
+description = "the metal absorptivity, in `[0, 1]`; required by `explicit`.\n"
+[inputs.passive_protection_heat_flux_factor]
+unit = "dimensionless"
+optional = true
+description = "the heat-flux multiplier after PFP or insulation, in `[0, 1]`. **Absent is 1**; with `explicit` it is one of the seven.\n"
+[inputs.gauge_offset]
+unit = "bar"
+optional = true
+description = "the absolute-to-gauge offset for the profile, at least zero. **Absent is 1 bar.**\n"
+[inputs.interpolation_mode]
+type = "enum"
+values = ["step_previous", "linear"]
+optional = true
+description = "how the profile is sampled between points. **Absent is `step_previous`.**\n"
+[inputs.time_step]
+unit = "s"
+optional = true
+description = "the marching step, above zero. **Absent is 5 s.**\n"
+[inputs.max_time]
+unit = "s"
+optional = true
+description = "the simulated time, above zero. **Absent is 3600 s.**\n"
+[inputs.spreadsheet_gas_thermal_mass]
+type = "boolean"
+optional = true
+description = "whether the gas's ideal-gas mass enters the thermal mass. **Absent is true**, the class's builder default.\n"
+[outputs]
+[outputs.status]
+type = "enum"
+values = ["no_rupture", "rupture"]
+description = "the strict strain test: rupture when the accumulated strain exceeds the limit at the current step.\n"
+[outputs.fluid_basis]
+type = "enum"
+values = ["gas", "liquid"]
+description = "the branch the density switch selected: `gas` below 500 kg/m3 and `liquid` at or above it.\n"
+[outputs.rupture_time]
+unit = "s"
+optional = true
+description = "the time of the first step whose accumulated strain exceeds the limit; absent when none does.\n"
+[outputs.rupture_pressure]
+unit = "bar"
+optional = true
+description = "the gauge pressure at the rupture step; absent when none.\n"
+[outputs.rupture_mean_wall_temperature]
+unit = "K"
+optional = true
+description = "the mean wall temperature at the rupture step; absent when none.\n"
+[outputs.rupture_outer_surface_temperature]
+unit = "K"
+optional = true
+description = "the outer surface temperature at the rupture step; absent when none.\n"
+[outputs.rupture_accumulated_strain]
+unit = "dimensionless"
+optional = true
+description = "the accumulated strain at the rupture step; absent when none.\n"
+[outputs.rupture_strain_limit]
+unit = "dimensionless"
+optional = true
+description = "the temperature-dependent limit at the rupture step; absent when none.\n"
+[outputs.long_pipe_gas_two_sides]
+unit = "kg/s"
+optional = true
+description = "`0.00527 A P_barg 1e5 sqrt(MW 1000 / max(1, T0 + 273))` for both sides; absent when no rupture or on the liquid branch, and zero there.\n"
+[outputs.long_pipe_gas_one_side]
+unit = "kg/s"
+optional = true
+description = "half the two-sided gas release; absent when no rupture or on the liquid branch, and zero there.\n"
+[outputs.short_pipe_gas_one_side]
+unit = "kg/s"
+optional = true
+description = "the one-sided gas release times the class's 1.541; absent when no rupture or on the liquid branch, and zero there.\n"
+[outputs.liquid_one_side]
+unit = "kg/s"
+optional = true
+description = "`((A 1e6) 0.62 / 11.78 / sqrt(SG / (max(P_barg, 1) 100))) / 60 SG`; absent when no rupture or on the gas branch, and zero there.\n"
+[outputs.release_gas_temperature]
+unit = "K"
+optional = true
+description = "the initial temperature the gas release was evaluated at; absent when no rupture.\n"
+[outputs.history]
+type = "record_list"
+description = "one row per marching step, in time order, ending at the rupture step when one is found.\n"
+[outputs.history.fields.time]
+unit = "s"
+description = "the step's time.\n"
+[outputs.history.fields.pressure]
+unit = "bar"
+description = "the step's gauge pressure.\n"
+[outputs.history.fields.mean_wall_temperature]
+unit = "K"
+description = "the step's mean wall temperature.\n"
+[outputs.history.fields.outer_surface_temperature]
+unit = "K"
+description = "the step's outer surface temperature.\n"
+[outputs.history.fields.heat_flux]
+unit = "W/m**2"
+description = "the step's absorbed heat flux.\n"
+[outputs.history.fields.von_mises_stress]
+unit = "MPa"
+description = "the step's thick-wall von Mises stress.\n"
+[outputs.history.fields.strain_rate]
+unit = "1/s"
+description = "the step's Sellars-Tegart strain rate, the class's per-minute value divided by 60.\n"
+[outputs.history.fields.accumulated_strain]
+unit = "dimensionless"
+description = "the running accumulated strain, capped at 2 as the class caps it.\n"
+[outputs.history.fields.rupture_strain_limit]
+unit = "dimensionless"
+description = "the step's temperature-dependent rupture strain limit.\n"
+[[valid_range]]
+quantity = "outside_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's builder refuses a non-positive outside diameter"
+[[valid_range]]
+quantity = "nominal_wall_thickness"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's builder refuses a non-positive nominal wall"
+[[valid_range]]
+quantity = "corrosion_allowance"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative corrosion allowance is not a thickness"
+[[valid_range]]
+quantity = "wall_thickness_undertolerance"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a fraction outside [0, 1)"
+[[valid_range]]
+quantity = "exposed_length"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's builder refuses a non-positive exposed length"
+[[valid_range]]
+quantity = "fluid_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive density"
+[[valid_range]]
+quantity = "fluid_heat_capacity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive heat capacity"
+[[valid_range]]
+quantity = "gas_molecular_weight"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's setter refuses a non-positive molecular weight"
+[[valid_range]]
+quantity = "initial_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's Celsius value becomes an absolute temperature; a non-positive kelvin value is not one"
+[[valid_range]]
+quantity = "fire_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the explicit fire temperature is an absolute temperature"
+[[valid_range]]
+quantity = "gas_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the explicit gas temperature is an absolute temperature"
+[[valid_range]]
+quantity = "convective_heat_transfer_coefficient"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class's scenario constructor refuses a negative coefficient"
+[[valid_range]]
+quantity = "fire_emissivity"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class's scenario constructor refuses a fraction outside [0, 1]"
+[[valid_range]]
+quantity = "metal_emissivity"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class's scenario constructor refuses a fraction outside [0, 1]"
+[[valid_range]]
+quantity = "metal_absorptivity"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class's scenario constructor refuses a fraction outside [0, 1]"
+[[valid_range]]
+quantity = "passive_protection_heat_flux_factor"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class's scenario constructor refuses a factor outside [0, 1]"
+[[valid_range]]
+quantity = "gauge_offset"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the profile's gauge offset is non-negative"
+[[valid_range]]
+quantity = "time_step"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's builder refuses a non-positive step"
+[[valid_range]]
+quantity = "max_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's builder refuses a non-positive maximum time"
+[implementations]
+python = "azoth.process.pipe_fire_rupture"
+rust = "azoth_process::pipe_fire_rupture"

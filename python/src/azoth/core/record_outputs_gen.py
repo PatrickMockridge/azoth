@@ -628,6 +628,38 @@ class NaceIssueRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PipeFireRupturePoint:
+    """one row per marching step, in time order, ending at the rupture step when one is found."""
+
+    #: the step's time.
+    time: Q
+
+    #: the step's gauge pressure.
+    pressure: Q
+
+    #: the step's mean wall temperature.
+    mean_wall_temperature: Q
+
+    #: the step's outer surface temperature.
+    outer_surface_temperature: Q
+
+    #: the step's absorbed heat flux.
+    heat_flux: Q
+
+    #: the step's thick-wall von Mises stress.
+    von_mises_stress: Q
+
+    #: the step's Sellars-Tegart strain rate, the class's per-minute value divided by 60.
+    strain_rate: Q
+
+    #: the running accumulated strain, capped at 2 as the class caps it.
+    accumulated_strain: float
+
+    #: the step's temperature-dependent rupture strain limit.
+    rupture_strain_limit: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ReliefDisposalRow:
     """one row per input row, in caller order."""
 
@@ -850,6 +882,23 @@ class Tr3001Finding:
 
     #: the check's status; the checker emits pass, fail and needs-review, never info.
     status: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class VesselRuptureStep:
+    """one row per input state, in the caller's order."""
+
+    #: the state's time.
+    time: Q
+
+    #: the state's thin-wall von Mises stress.
+    von_mises_stress: Q
+
+    #: the state's derated allowable stress.
+    allowable_stress: Q
+
+    #: `allowable_stress - von_mises_stress`.
+    margin: Q
 
 
 @dataclass(frozen=True, slots=True, eq=False)

@@ -409,6 +409,12 @@ class FlareTargetFlux(TypedDict):
 
     flux: float
 
+class BlowdownProfilePoint(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    time: float
+    pressure: float
+
 class BowTieThreat(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -517,6 +523,16 @@ class PipeFitting(TypedDict):
     ld_ratio: float
     count: float
 
+class PipeFireRuptureMaterialPoint(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    temperature: float
+    heat_capacity: float
+    thermal_conductivity: float
+    ultimate_tensile_strength: float
+    strain_effect_factor: float
+    rupture_strain_limit: float
+
 class PumpCurvePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -582,6 +598,13 @@ class TurboIgvPenaltyPoint(TypedDict):
 
     igv: float
     factor: float
+
+class VesselRuptureState(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    time: float
+    internal_pressure: float
+    metal_temperature: float
 
 @final
 class KComponent:
@@ -962,6 +985,20 @@ class LopaLayerContribution:
     rrf: float | None
 
 @final
+class PipeFireRupturePoint:
+    """one row per marching step, in time order, ending at the rupture step when one is found."""
+
+    time: Qty
+    pressure: Qty
+    mean_wall_temperature: Qty
+    outer_surface_temperature: Qty
+    heat_flux: Qty
+    von_mises_stress: Qty
+    strain_rate: Qty
+    accumulated_strain: float
+    rupture_strain_limit: float
+
+@final
 class ReliefDisposalRow:
     """one row per input row, in caller order."""
 
@@ -1005,6 +1042,15 @@ class Tr3001Finding:
 
     check: str
     status: str
+
+@final
+class VesselRuptureStep:
+    """one row per input state, in the caller's order."""
+
+    time: Qty
+    von_mises_stress: Qty
+    allowable_stress: Qty
+    margin: Qty
 
 # --- results --------------------------------------------------------------
 # Generated from the result dataclasses, so the stub and `azoth.core.result`
@@ -3046,6 +3092,12 @@ class BleveResult:
     warnings: list[Warning]
 
 @final
+class BlowdownPressureProfileResult:
+    pressure_absolute: Qty
+    pressure_gauge: Qty
+    warnings: list[Warning]
+
+@final
 class BowTieResult:
     unmitigated_frequency_per_year: float
     mitigated_frequency_per_year: float
@@ -3852,6 +3904,37 @@ class PipeResult:
     warnings: list[Warning]
 
 @final
+class PipeFireRuptureResult:
+    status: str
+    fluid_basis: str
+    rupture_time: Qty | None
+    rupture_pressure: Qty | None
+    rupture_mean_wall_temperature: Qty | None
+    rupture_outer_surface_temperature: Qty | None
+    rupture_accumulated_strain: float | None
+    rupture_strain_limit: float | None
+    long_pipe_gas_two_sides: Qty | None
+    long_pipe_gas_one_side: Qty | None
+    short_pipe_gas_one_side: Qty | None
+    liquid_one_side: Qty | None
+    release_gas_temperature: Qty | None
+    history: list[PipeFireRupturePoint]
+    warnings: list[Warning]
+
+@final
+class PipeFireRuptureMaterialResult:
+    resolved_material_name: str
+    density: Qty
+    heat_capacity: Qty
+    thermal_conductivity: Qty
+    ultimate_tensile_strength: Qty
+    strain_effect_factor: float
+    rupture_strain_limit: float
+    temperature_correction_factor: float
+    strain_rate: Qty
+    warnings: list[Warning]
+
+@final
 class PipelinePressureProtectionResult:
     max_incidental_pressure: Qty
     design_margin: Qty
@@ -4465,6 +4548,21 @@ class VceResult:
     dimensionless_overpressure: float | None
     overpressure: Qty | None
     distance_to_overpressure: Qty | None
+    warnings: list[Warning]
+
+@final
+class VesselRuptureResult:
+    ruptured: bool
+    rupture_time: Qty | None
+    rupture_stress: Qty | None
+    rupture_allowable_stress: Qty | None
+    rupture_metal_temperature: Qty | None
+    min_margin: Qty
+    min_margin_time: Qty
+    material_name: str
+    ambient_yield_strength: Qty
+    ambient_tensile_strength: Qty
+    history: list[VesselRuptureStep]
     warnings: list[Warning]
 
 @final
@@ -6779,6 +6877,12 @@ def bleve(
     distance: float | None = None,
     target_flux: float | None = None,
 ) -> BleveResult: ...
+def blowdown_pressure_profile(
+    points: list[BlowdownProfilePoint],
+    time: float,
+    interpolation_mode: str | None = None,
+    gauge_offset: float | None = None,
+) -> BlowdownPressureProfileResult: ...
 def bow_tie(
     threats: list[BowTieThreat],
     consequences: list[BowTieConsequence],
@@ -7430,6 +7534,46 @@ def pipe(
     number_of_increments: float | None = None,
     elevation: float | None = None,
 ) -> PipeResult: ...
+def pipe_fire_rupture(
+    outside_diameter: float,
+    nominal_wall_thickness: float,
+    material_name: str,
+    fire_scenario: str,
+    pressure_profile: list[BlowdownProfilePoint],
+    corrosion_allowance: float | None = None,
+    wall_thickness_undertolerance: float | None = None,
+    exposed_length: float | None = None,
+    weight_stress: float | None = None,
+    fluid_density: float | None = None,
+    fluid_heat_capacity: float | None = None,
+    gas_molecular_weight: float | None = None,
+    initial_temperature: float | None = None,
+    fire_temperature: float | None = None,
+    gas_temperature: float | None = None,
+    convective_heat_transfer_coefficient: float | None = None,
+    fire_emissivity: float | None = None,
+    metal_emissivity: float | None = None,
+    metal_absorptivity: float | None = None,
+    passive_protection_heat_flux_factor: float | None = None,
+    gauge_offset: float | None = None,
+    interpolation_mode: str | None = None,
+    time_step: float | None = None,
+    max_time: float | None = None,
+    spreadsheet_gas_thermal_mass: bool | None = None,
+) -> PipeFireRuptureResult: ...
+def pipe_fire_rupture_material(
+    material_name: str,
+    evaluation_temperature: float,
+    evaluation_stress: float,
+    curve: list[PipeFireRuptureMaterialPoint] | None = None,
+    density: float | None = None,
+    sellars_tegart_a: float | None = None,
+    sellars_tegart_alpha: float | None = None,
+    sellars_tegart_n: float | None = None,
+    activation_temperature: float | None = None,
+    correction_strain_rate: float | None = None,
+    correction_limit_temperature: float | None = None,
+) -> PipeFireRuptureMaterialResult: ...
 def pipeline_pressure_protection(
     max_source_pressure: float,
     design_pressure: float,
@@ -7890,6 +8034,16 @@ def vce(
     distance: float | None = None,
     target_overpressure: float | None = None,
 ) -> VceResult: ...
+def vessel_rupture(
+    inner_radius: float,
+    wall_thickness: float,
+    material: str,
+    history: list[VesselRuptureState],
+    yield_strength: float | None = None,
+    tensile_strength: float | None = None,
+    grade: str | None = None,
+    tensile_strength_factor: float | None = None,
+) -> VesselRuptureResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],
     b: list[float],

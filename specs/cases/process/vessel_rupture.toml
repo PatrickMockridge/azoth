@@ -1,0 +1,194 @@
+model = "process.vessel_rupture"
+
+[[cases]]
+id = "severe_x65"
+tolerance = 1.0e-9
+source = "The `vessel_severe_x65` state. From `validation/neqsim/captures/process_vessel_rupture.tsv` (`vessel_severe_x65`)."
+[cases.inputs]
+inner_radius = 0.5
+wall_thickness = 0.01
+material = "api_5l"
+grade = "X65"
+history = [
+  { time = 0.0, internal_pressure = 1000000.0, metal_temperature = 973.15 },
+  { time = 30.0, internal_pressure = 1900000.0, metal_temperature = 973.15 },
+  { time = 60.0, internal_pressure = 2800000.0, metal_temperature = 973.15 },
+  { time = 90.0, internal_pressure = 3700000.0, metal_temperature = 973.15 },
+  { time = 120.0, internal_pressure = 4600000.0, metal_temperature = 973.15 },
+  { time = 150.0, internal_pressure = 5500000.0, metal_temperature = 973.15 },
+  { time = 180.0, internal_pressure = 6400000.0, metal_temperature = 973.15 },
+  { time = 210.0, internal_pressure = 7300000.0, metal_temperature = 973.15 },
+  { time = 240.0, internal_pressure = 8200000.0, metal_temperature = 973.15 },
+  { time = 270.0, internal_pressure = 9100000.0, metal_temperature = 973.15 },
+  { time = 300.0, internal_pressure = 10000000.0, metal_temperature = 973.15 },
+]
+[cases.expected]
+ruptured = true
+rupture_time = 0.0
+rupture_stress = 43301270.18922193
+rupture_allowable_stress = 37162756.400000006
+rupture_metal_temperature = 973.15
+min_margin = -395849945.4922193
+min_margin_time = 300.0
+material_name = "API 5L X65"
+ambient_yield_strength = 448.1594
+ambient_tensile_strength = 530.89652
+
+[[cases]]
+id = "mild_x65"
+tolerance = 1.0e-9
+source = "The `vessel_mild_x65` state. From `validation/neqsim/captures/process_vessel_rupture.tsv` (`vessel_mild_x65`)."
+[cases.inputs]
+inner_radius = 0.5
+wall_thickness = 0.02
+material = "api_5l"
+grade = "X65"
+history = [
+  { time = 0.0, internal_pressure = 2000000.0, metal_temperature = 300.0 },
+  { time = 30.0, internal_pressure = 2000000.0, metal_temperature = 300.0 },
+  { time = 60.0, internal_pressure = 2000000.0, metal_temperature = 300.0 },
+  { time = 90.0, internal_pressure = 2000000.0, metal_temperature = 300.0 },
+  { time = 120.0, internal_pressure = 2000000.0, metal_temperature = 300.0 },
+  { time = 150.0, internal_pressure = 2000000.0, metal_temperature = 300.0 },
+]
+[cases.expected]
+ruptured = false
+min_margin = 485322349.0845281
+min_margin_time = 0.0
+material_name = "API 5L X65"
+ambient_yield_strength = 448.1594
+ambient_tensile_strength = 530.89652
+
+[[cases]]
+id = "lpg_bare"
+tolerance = 1.0e-9
+source = "The `vessel_lpg_bare` state. From `validation/neqsim/captures/process_vessel_rupture.tsv` (`vessel_lpg_bare`)."
+[cases.inputs]
+inner_radius = 0.5
+wall_thickness = 0.012
+material = "carbon_steel"
+yield_strength = 245.0
+tensile_strength = 415.0
+history = [
+  { time = 0.0, internal_pressure = 1800000.0, metal_temperature = 300.0 },
+  { time = 30.0, internal_pressure = 1839999.9999999998, metal_temperature = 330.0 },
+  { time = 60.0, internal_pressure = 1880000.0, metal_temperature = 360.0 },
+  { time = 90.0, internal_pressure = 1920000.0, metal_temperature = 390.0 },
+  { time = 120.0, internal_pressure = 1960000.0000000002, metal_temperature = 420.0 },
+  { time = 150.0, internal_pressure = 2000000.0, metal_temperature = 450.0 },
+  { time = 180.0, internal_pressure = 2039999.9999999998, metal_temperature = 480.0 },
+  { time = 210.0, internal_pressure = 2080000.0, metal_temperature = 510.0 },
+  { time = 240.0, internal_pressure = 2120000.0, metal_temperature = 540.0 },
+  { time = 270.0, internal_pressure = 2160000.0, metal_temperature = 570.0 },
+  { time = 300.0, internal_pressure = 2200000.0, metal_temperature = 600.0 },
+  { time = 330.0, internal_pressure = 2240000.0, metal_temperature = 630.0 },
+  { time = 360.0, internal_pressure = 2280000.0, metal_temperature = 660.0 },
+  { time = 390.0, internal_pressure = 2320000.0, metal_temperature = 690.0 },
+  { time = 420.0, internal_pressure = 2360000.0, metal_temperature = 720.0 },
+  { time = 450.0, internal_pressure = 2400000.0, metal_temperature = 750.0 },
+  { time = 480.0, internal_pressure = 2440000.0, metal_temperature = 780.0 },
+  { time = 510.0, internal_pressure = 2480000.0, metal_temperature = 810.0 },
+  { time = 540.0, internal_pressure = 2520000.0, metal_temperature = 840.0 },
+  { time = 570.0, internal_pressure = 2560000.0, metal_temperature = 870.0 },
+  { time = 600.0, internal_pressure = 2600000.0, metal_temperature = 900.0 },
+]
+[cases.expected]
+ruptured = true
+rupture_time = 536.4597344970786
+rupture_stress = 90932667.39736606
+rupture_allowable_stress = 88411599.99999999
+rupture_metal_temperature = 840.0
+min_margin = -37447893.7433142
+min_margin_time = 600.0
+material_name = "CS"
+ambient_yield_strength = 245.0
+ambient_tensile_strength = 415.0
+
+[[cases]]
+id = "lpg_insulated"
+tolerance = 1.0e-9
+source = "The `vessel_lpg_insulated` state. From `validation/neqsim/captures/process_vessel_rupture.tsv` (`vessel_lpg_insulated`)."
+[cases.inputs]
+inner_radius = 0.5
+wall_thickness = 0.012
+material = "carbon_steel"
+yield_strength = 245.0
+tensile_strength = 415.0
+history = [
+  { time = 0.0, internal_pressure = 1800000.0, metal_temperature = 300.0 },
+  { time = 30.0, internal_pressure = 1825000.0, metal_temperature = 305.5 },
+  { time = 60.0, internal_pressure = 1850000.0, metal_temperature = 311.0 },
+  { time = 90.0, internal_pressure = 1875000.0, metal_temperature = 316.5 },
+  { time = 120.0, internal_pressure = 1900000.0, metal_temperature = 322.0 },
+  { time = 150.0, internal_pressure = 1925000.0, metal_temperature = 327.5 },
+  { time = 180.0, internal_pressure = 1950000.0, metal_temperature = 333.0 },
+  { time = 210.0, internal_pressure = 1975000.0, metal_temperature = 338.5 },
+  { time = 240.0, internal_pressure = 2000000.0, metal_temperature = 344.0 },
+  { time = 270.0, internal_pressure = 2025000.0, metal_temperature = 349.5 },
+  { time = 300.0, internal_pressure = 2050000.0, metal_temperature = 355.0 },
+  { time = 330.0, internal_pressure = 2075000.0, metal_temperature = 360.5 },
+  { time = 360.0, internal_pressure = 2100000.0, metal_temperature = 366.0 },
+  { time = 390.0, internal_pressure = 2125000.0, metal_temperature = 371.5 },
+  { time = 420.0, internal_pressure = 2150000.0, metal_temperature = 377.0 },
+  { time = 450.0, internal_pressure = 2175000.0, metal_temperature = 382.5 },
+  { time = 480.0, internal_pressure = 2200000.0, metal_temperature = 388.0 },
+  { time = 510.0, internal_pressure = 2225000.0, metal_temperature = 393.5 },
+  { time = 540.0, internal_pressure = 2250000.0, metal_temperature = 399.0 },
+  { time = 570.0, internal_pressure = 2275000.0, metal_temperature = 404.5 },
+  { time = 600.0, internal_pressure = 2300000.0, metal_temperature = 410.0 },
+]
+[cases.expected]
+ruptured = false
+min_margin = 295963148.80399126
+min_margin_time = 600.0
+material_name = "CS"
+ambient_yield_strength = 245.0
+ambient_tensile_strength = 415.0
+
+[[cases]]
+id = "x90_one_row"
+tolerance = 1.0e-9
+source = "The `vessel_x90_one_row` state. From `validation/neqsim/captures/process_vessel_rupture.tsv` (`vessel_x90_one_row`)."
+[cases.inputs]
+inner_radius = 0.5
+wall_thickness = 0.01
+material = "api_5l"
+grade = "X90"
+history = [
+  { time = 0.0, internal_pressure = 2000000.0, metal_temperature = 973.15 },
+]
+[cases.expected]
+ruptured = true
+rupture_time = 0.0
+rupture_stress = 86602540.37844387
+rupture_allowable_stress = 48650000.00000001
+rupture_metal_temperature = 973.15
+min_margin = -37952540.37844386
+min_margin_time = 0.0
+material_name = "API 5L X90"
+ambient_yield_strength = 620.0
+ambient_tensile_strength = 695.0
+
+[[cases]]
+id = "l450_alias"
+tolerance = 1.0e-9
+source = "The `vessel_l450_alias` state. From `validation/neqsim/captures/process_vessel_rupture.tsv` (`vessel_l450_alias`)."
+[cases.inputs]
+inner_radius = 0.5
+wall_thickness = 0.01
+material = "api_5l"
+grade = "L450"
+history = [
+  { time = 0.0, internal_pressure = 2000000.0, metal_temperature = 973.15 },
+]
+[cases.expected]
+ruptured = true
+rupture_time = 0.0
+rupture_stress = 86602540.37844387
+rupture_allowable_stress = 37162756.400000006
+rupture_metal_temperature = 973.15
+min_margin = -49439783.97844386
+min_margin_time = 0.0
+material_name = "API 5L X65"
+ambient_yield_strength = 448.1594
+ambient_tensile_strength = 530.89652

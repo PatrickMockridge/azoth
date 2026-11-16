@@ -41,6 +41,15 @@ pub struct AssayCutDerivation {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BlowdownProfilePoint {
+    #[pyo3(item)]
+    pub time: f64,
+    #[pyo3(item)]
+    pub pressure: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct BowTieBarrier {
     #[pyo3(item)]
     pub pfd: f64,
@@ -410,6 +419,23 @@ pub struct MapCurvePoint {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct PipeFireRuptureMaterialPoint {
+    #[pyo3(item)]
+    pub temperature: f64,
+    #[pyo3(item)]
+    pub heat_capacity: f64,
+    #[pyo3(item)]
+    pub thermal_conductivity: f64,
+    #[pyo3(item)]
+    pub ultimate_tensile_strength: f64,
+    #[pyo3(item)]
+    pub strain_effect_factor: f64,
+    #[pyo3(item)]
+    pub rupture_strain_limit: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct PipeFitting {
     #[pyo3(item)]
     pub ld_ratio: f64,
@@ -573,6 +599,17 @@ pub struct TurboUcPoint {
     pub uc: f64,
     #[pyo3(item)]
     pub efficiency: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct VesselRuptureState {
+    #[pyo3(item)]
+    pub time: f64,
+    #[pyo3(item)]
+    pub internal_pressure: f64,
+    #[pyo3(item)]
+    pub metal_temperature: f64,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

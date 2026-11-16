@@ -331,6 +331,7 @@ Five sections, and the difference between them is the point:
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
 - [`process.api537_flare_flame_model`](./process/api537_flare_flame_model.md) — API 537 flare flame model
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation
+- [`process.blowdown_pressure_profile`](./process/blowdown_pressure_profile.md) — Blowdown pressure profile
 - [`process.bow_tie`](./process/bow_tie.md) — Bow-tie risk
 - [`process.component_splitter`](./process/component_splitter.md) — Component splitter
 - [`process.compressor`](./process/compressor.md) — Compressor
@@ -368,6 +369,8 @@ Five sections, and the difference between them is the point:
 - [`process.packed_column`](./process/packed_column.md) — Packed column
 - [`process.pfp_demand`](./process/pfp_demand.md) — Passive fire protection demand
 - [`process.pipe`](./process/pipe.md) — Pipe
+- [`process.pipe_fire_rupture`](./process/pipe_fire_rupture.md) — Pipe fire rupture
+- [`process.pipe_fire_rupture_material`](./process/pipe_fire_rupture_material.md) — Pipe fire-rupture material
 - [`process.pipeline_pressure_protection`](./process/pipeline_pressure_protection.md) — Pipeline pressure protection
 - [`process.plug_flow_reactor`](./process/plug_flow_reactor.md) — Plug-flow reactor
 - [`process.pool_fire`](./process/pool_fire.md) — Pool fire radiation
@@ -394,6 +397,7 @@ Five sections, and the difference between them is the point:
 - [`process.tr3001_compliance`](./process/tr3001_compliance.md) — TR3001 compliance
 - [`process.turbo_expander_compressor`](./process/turbo_expander_compressor.md) — Turbo-expander compressor
 - [`process.vce`](./process/vce.md) — Vapour-cloud explosion overpressure
+- [`process.vessel_rupture`](./process/vessel_rupture.md) — Vessel rupture
 
 **Reactions** - [`reactions/index.md`](./reactions/index.md):
 

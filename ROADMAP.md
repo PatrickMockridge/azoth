@@ -929,8 +929,9 @@ a claim nothing holds.
   `opendrain/`, `blowby/`, `vacuum/`, `settleout/`, `pump/`, `reaction/`, `inventory/`,
   `mdmt/`, `leakdetection/`, `cfd/`, `envelope/`, `scenario/` and `dto/`, plus the risk
   subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
-  own classes - the risk core, the two release models, the five overpressure calculators and
-  the six dispersion ids; the types no bullet names remain unported, each with its class.
+  own classes - the risk core, the two release models, the five overpressure calculators,
+  the six dispersion ids and the four rupture ids; the types no bullet names remain
+  unported, each with its class.
 - **The relief and overpressure arithmetic** — seven ids. **`process.psv_sizing` is
   `ReliefValveSizing`'s three area methods and the API 520 D to T ladder**: gas with the
   conventional/balanced-bellows `Kb` and the rupture-disk `Kc`, liquid with `Kw`, the
@@ -958,6 +959,31 @@ a claim nothing holds.
   **`process.toxic_library`** is the ten-row IDLH/ERPG-2/AEGL-2 table and the `8.314` ppm
   conversion. **The table's javadoc says case-insensitive and the code is not**: the eight
   formula keys are exact-case only, measured in the capture and stated rather than fixed.
+- **The rupture core** — four ids. **`process.blowdown_pressure_profile`** is
+  `BlowdownPressureProfile`'s step or linear lookup, its absolute `1e-10` second window, both
+  endpoint clamps and the gauge offset. **`process.pipe_fire_rupture_material`** is
+  `PipeFireRuptureMaterial`'s six workbook tables, its lowercased `contains` selector, the
+  clamped interpolation and the Sellars-Tegart strain rate with the class's temperature
+  correction. **`process.pipe_fire_rupture`** is `PipeFireRuptureStudy.run()`: the thick-wall
+  von Mises stress, the strain-stretched geometry, the thermal mass, the strict accumulated-
+  strain test and the spreadsheet release. **The workbook Pipe 1 state ruptures at 115.0 s,
+  32.0255 barg and 22.344 kg/s**, where the class's own test allows `110 ± 5`; the
+  `+273.0` offset is carried, `spreadsheetGasThermalMass` defaults to true, the gas mass uses
+  gauge pressure as if absolute, and a no-rupture result carries no release estimate because
+  the class's builder is handed null on that path. **`weldFactor` is validated and read by no
+  formula**, so the id declares no such input. **`process.vessel_rupture`** is
+  `VesselRuptureAnalyzer.analyze` over `MaterialStrengthCurve`: the thin-wall von Mises stress,
+  the generic retained-strength curve, the first margin at or below zero with the linear
+  crossover, and the API 5L fallback table with the class's `L`-grade normalisation. The
+  severe X65 state ruptures at `t = 0`; the grade helper's first route is a
+  `MaterialPipeProperties` query, and the capture shows the jar's database answering with the
+  fallback's own values. The class's javadoc requires strictly increasing history times and
+  its code does not check; the port refuses them. What remains in `rupture/` is
+  `TrappedLiquidFireRuptureStudy`/`Result` (a TP flash and the inventory model), the eight
+  governance classes (data source, runner, handoff, readiness, evidence, topology, standards
+  validator, uncertainty); `PipeFireRuptureScenario` and `PipeFireRuptureInput` are the
+  study's input groups rather than ids, and `FireExposureScenario`'s heat flux is that
+  scenario's own.
 - **The reactions family's**: the **ionic branch** of `reactions.reactive_tp_flash` and
   `reactions.reactive_ph_flash`, which is why a charged substance is refused at all;
   `reactions.reactive_ph_flash`'s **entropy-specified variant** and its `NR = 0` delegation to

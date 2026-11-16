@@ -21,9 +21,10 @@ use crate::record_outputs_gen::{
     PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
     PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow,
-    PyReliefDisposalRow, PyRemediationOptionRow, PyRiskAssessmentRow, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySilIssue, PySterileRadius,
-    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyWaterMixingResult, PyZoneRatingRow,
+    PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow, PyRiskAssessmentRow,
+    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
+    PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -14342,6 +14343,57 @@ impl From<&azoth_process::models::bleve::BleveResult> for PyBleveResult {
         }
     }
 }
+/// Result of `process.blowdown_pressure_profile`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BlowdownPressureProfileResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBlowdownPressureProfileResult {
+    /// the profile's absolute pressure at `time`.
+    #[pyo3(get)]
+    pub pressure_absolute: PyQty,
+    /// `pressure_absolute - gauge_offset`.
+    #[pyo3(get)]
+    pub pressure_gauge: PyQty,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBlowdownPressureProfileResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BlowdownPressureProfileResult(pressure_absolute={:?}, pressure_gauge={:?}, {} warning(s))",
+            self.pressure_absolute,
+            self.pressure_gauge,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::blowdown_pressure_profile::BlowdownPressureProfileResult>
+    for PyBlowdownPressureProfileResult
+{
+    fn from(
+        r: &azoth_process::models::blowdown_pressure_profile::BlowdownPressureProfileResult,
+    ) -> Self {
+        Self {
+            pressure_absolute: PyQty {
+                magnitude_si: r.pressure_absolute.value,
+                unit: "bar".to_string(),
+            },
+            pressure_gauge: PyQty {
+                magnitude_si: r.pressure_gauge.value,
+                unit: "bar".to_string(),
+            },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.bow_tie`, transported.
 #[pyclass(
     frozen,
@@ -20099,6 +20151,231 @@ impl From<&azoth_process::models::pipe::PipeResult> for PyPipeResult {
         }
     }
 }
+/// Result of `process.pipe_fire_rupture`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipeFireRuptureResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipeFireRuptureResult {
+    /// the strict strain test: rupture when the accumulated strain exceeds the limit at the current step.
+    #[pyo3(get)]
+    pub status: String,
+    /// the branch the density switch selected: `gas` below 500 kg/m3 and `liquid` at or above it.
+    #[pyo3(get)]
+    pub fluid_basis: String,
+    /// the time of the first step whose accumulated strain exceeds the limit; absent when none does.
+    #[pyo3(get)]
+    pub rupture_time: Option<PyQty>,
+    /// the gauge pressure at the rupture step; absent when none.
+    #[pyo3(get)]
+    pub rupture_pressure: Option<PyQty>,
+    /// the mean wall temperature at the rupture step; absent when none.
+    #[pyo3(get)]
+    pub rupture_mean_wall_temperature: Option<PyQty>,
+    /// the outer surface temperature at the rupture step; absent when none.
+    #[pyo3(get)]
+    pub rupture_outer_surface_temperature: Option<PyQty>,
+    /// the accumulated strain at the rupture step; absent when none.
+    #[pyo3(get)]
+    pub rupture_accumulated_strain: Option<f64>,
+    /// the temperature-dependent limit at the rupture step; absent when none.
+    #[pyo3(get)]
+    pub rupture_strain_limit: Option<f64>,
+    /// `0.00527 A P_barg 1e5 sqrt(MW 1000 / max(1, T0 + 273))` for both sides; absent when no rupture or on the liquid branch, and zero there.
+    #[pyo3(get)]
+    pub long_pipe_gas_two_sides: Option<PyQty>,
+    /// half the two-sided gas release; absent when no rupture or on the liquid branch, and zero there.
+    #[pyo3(get)]
+    pub long_pipe_gas_one_side: Option<PyQty>,
+    /// the one-sided gas release times the class's 1.541; absent when no rupture or on the liquid branch, and zero there.
+    #[pyo3(get)]
+    pub short_pipe_gas_one_side: Option<PyQty>,
+    /// `((A 1e6) 0.62 / 11.78 / sqrt(SG / (max(P_barg, 1) 100))) / 60 SG`; absent when no rupture or on the gas branch, and zero there.
+    #[pyo3(get)]
+    pub liquid_one_side: Option<PyQty>,
+    /// the initial temperature the gas release was evaluated at; absent when no rupture.
+    #[pyo3(get)]
+    pub release_gas_temperature: Option<PyQty>,
+    /// one row per marching step, in time order, ending at the rupture step when one is found.
+    #[pyo3(get)]
+    pub history: Vec<PyPipeFireRupturePoint>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPipeFireRuptureResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipeFireRuptureResult(status={:?}, fluid_basis={:?}, rupture_time={:?}, rupture_pressure={:?}, rupture_mean_wall_temperature={:?}, rupture_outer_surface_temperature={:?}, rupture_accumulated_strain={:?}, rupture_strain_limit={:?}, long_pipe_gas_two_sides={:?}, long_pipe_gas_one_side={:?}, short_pipe_gas_one_side={:?}, liquid_one_side={:?}, release_gas_temperature={:?}, history={:?}, {} warning(s))",
+            self.status,
+            self.fluid_basis,
+            self.rupture_time,
+            self.rupture_pressure,
+            self.rupture_mean_wall_temperature,
+            self.rupture_outer_surface_temperature,
+            self.rupture_accumulated_strain,
+            self.rupture_strain_limit,
+            self.long_pipe_gas_two_sides,
+            self.long_pipe_gas_one_side,
+            self.short_pipe_gas_one_side,
+            self.liquid_one_side,
+            self.release_gas_temperature,
+            self.history,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::pipe_fire_rupture::PipeFireRuptureResult>
+    for PyPipeFireRuptureResult
+{
+    fn from(r: &azoth_process::models::pipe_fire_rupture::PipeFireRuptureResult) -> Self {
+        Self {
+            status: r.status.as_str().to_string(),
+            fluid_basis: r.fluid_basis.as_str().to_string(),
+            rupture_time: r.rupture_time.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            rupture_pressure: r.rupture_pressure.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "bar".to_string(),
+            }),
+            rupture_mean_wall_temperature: r.rupture_mean_wall_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            rupture_outer_surface_temperature: r.rupture_outer_surface_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            rupture_accumulated_strain: r.rupture_accumulated_strain,
+            rupture_strain_limit: r.rupture_strain_limit,
+            long_pipe_gas_two_sides: r.long_pipe_gas_two_sides.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            long_pipe_gas_one_side: r.long_pipe_gas_one_side.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            short_pipe_gas_one_side: r.short_pipe_gas_one_side.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            liquid_one_side: r.liquid_one_side.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            release_gas_temperature: r.release_gas_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            history: r.history.iter().map(PyPipeFireRupturePoint::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.pipe_fire_rupture_material`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipeFireRuptureMaterialResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipeFireRuptureMaterialResult {
+    /// the built-in table's name, or the supplied label when a curve is used.
+    #[pyo3(get)]
+    pub resolved_material_name: String,
+    /// the material density.
+    #[pyo3(get)]
+    pub density: PyQty,
+    /// `heatCapacityAt(evaluation_temperature)`, with endpoint clamping.
+    #[pyo3(get)]
+    pub heat_capacity: PyQty,
+    /// `thermalConductivityAt(evaluation_temperature)`.
+    #[pyo3(get)]
+    pub thermal_conductivity: PyQty,
+    /// `ultimateTensileStrengthAt(evaluation_temperature)`.
+    #[pyo3(get)]
+    pub ultimate_tensile_strength: PyQty,
+    /// `strainEffectAt(evaluation_temperature)`.
+    #[pyo3(get)]
+    pub strain_effect_factor: f64,
+    /// `ruptureStrainLimitAt(evaluation_temperature)`.
+    #[pyo3(get)]
+    pub rupture_strain_limit: f64,
+    /// the class's `temperatureCorrectionFactor`: exactly 1 at or above the limit, else `T/Q (ln(sinh(alpha UTS)) n - ln(60 correction_strain_rate) + ln(A))`.
+    #[pyo3(get)]
+    pub temperature_correction_factor: f64,
+    /// `temperatureCorrectionFactor`-corrected Sellars-Tegart strain rate, the class's per-minute rate divided by 60.
+    #[pyo3(get)]
+    pub strain_rate: PyQty,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPipeFireRuptureMaterialResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipeFireRuptureMaterialResult(resolved_material_name={:?}, density={:?}, heat_capacity={:?}, thermal_conductivity={:?}, ultimate_tensile_strength={:?}, strain_effect_factor={:?}, rupture_strain_limit={:?}, temperature_correction_factor={:?}, strain_rate={:?}, {} warning(s))",
+            self.resolved_material_name,
+            self.density,
+            self.heat_capacity,
+            self.thermal_conductivity,
+            self.ultimate_tensile_strength,
+            self.strain_effect_factor,
+            self.rupture_strain_limit,
+            self.temperature_correction_factor,
+            self.strain_rate,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::pipe_fire_rupture_material::PipeFireRuptureMaterialResult>
+    for PyPipeFireRuptureMaterialResult
+{
+    fn from(
+        r: &azoth_process::models::pipe_fire_rupture_material::PipeFireRuptureMaterialResult,
+    ) -> Self {
+        Self {
+            resolved_material_name: r.resolved_material_name.clone(),
+            density: PyQty {
+                magnitude_si: r.density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            heat_capacity: PyQty {
+                magnitude_si: r.heat_capacity.value,
+                unit: "J/(kg*K)".to_string(),
+            },
+            thermal_conductivity: PyQty {
+                magnitude_si: r.thermal_conductivity.value,
+                unit: "W/(m*K)".to_string(),
+            },
+            ultimate_tensile_strength: PyQty {
+                magnitude_si: r.ultimate_tensile_strength.value,
+                unit: "MPa".to_string(),
+            },
+            strain_effect_factor: r.strain_effect_factor,
+            rupture_strain_limit: r.rupture_strain_limit,
+            temperature_correction_factor: r.temperature_correction_factor,
+            strain_rate: PyQty {
+                magnitude_si: r.strain_rate.value,
+                unit: "1/s".to_string(),
+            },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.pipeline_pressure_protection`, transported.
 #[pyclass(
     frozen,
@@ -24614,6 +24891,116 @@ impl From<&azoth_process::models::vce::VceResult> for PyVceResult {
                 magnitude_si: v.value,
                 unit: "m".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.vessel_rupture`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "VesselRuptureResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyVesselRuptureResult {
+    /// whether any step's margin is at or below zero.
+    #[pyo3(get)]
+    pub ruptured: bool,
+    /// the interpolated first crossover time; absent when no step reaches zero.
+    #[pyo3(get)]
+    pub rupture_time: Option<PyQty>,
+    /// the von Mises stress at the rupture step; absent when none.
+    #[pyo3(get)]
+    pub rupture_stress: Option<PyQty>,
+    /// the allowable stress at the rupture step; absent when none.
+    #[pyo3(get)]
+    pub rupture_allowable_stress: Option<PyQty>,
+    /// the metal temperature at the rupture step; absent when none.
+    #[pyo3(get)]
+    pub rupture_metal_temperature: Option<PyQty>,
+    /// the smallest margin over the history.
+    #[pyo3(get)]
+    pub min_margin: PyQty,
+    /// the time of the first occurrence of the smallest margin.
+    #[pyo3(get)]
+    pub min_margin_time: PyQty,
+    /// the class's name: `CS` for the carbon-steel branch and `API 5L <grade>` for the grade branch.
+    #[pyo3(get)]
+    pub material_name: String,
+    /// the ambient yield strength the material curve carries.
+    #[pyo3(get)]
+    pub ambient_yield_strength: PyQty,
+    /// the ambient tensile strength the allowable is built from.
+    #[pyo3(get)]
+    pub ambient_tensile_strength: PyQty,
+    /// one row per input state, in the caller's order.
+    #[pyo3(get)]
+    pub history: Vec<PyVesselRuptureStep>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyVesselRuptureResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "VesselRuptureResult(ruptured={:?}, rupture_time={:?}, rupture_stress={:?}, rupture_allowable_stress={:?}, rupture_metal_temperature={:?}, min_margin={:?}, min_margin_time={:?}, material_name={:?}, ambient_yield_strength={:?}, ambient_tensile_strength={:?}, history={:?}, {} warning(s))",
+            self.ruptured,
+            self.rupture_time,
+            self.rupture_stress,
+            self.rupture_allowable_stress,
+            self.rupture_metal_temperature,
+            self.min_margin,
+            self.min_margin_time,
+            self.material_name,
+            self.ambient_yield_strength,
+            self.ambient_tensile_strength,
+            self.history,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::vessel_rupture::VesselRuptureResult> for PyVesselRuptureResult {
+    fn from(r: &azoth_process::models::vessel_rupture::VesselRuptureResult) -> Self {
+        Self {
+            ruptured: r.ruptured,
+            rupture_time: r.rupture_time.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            rupture_stress: r.rupture_stress.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            rupture_allowable_stress: r.rupture_allowable_stress.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            rupture_metal_temperature: r.rupture_metal_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            min_margin: PyQty {
+                magnitude_si: r.min_margin.value,
+                unit: "Pa".to_string(),
+            },
+            min_margin_time: PyQty {
+                magnitude_si: r.min_margin_time.value,
+                unit: "s".to_string(),
+            },
+            material_name: r.material_name.clone(),
+            ambient_yield_strength: PyQty {
+                magnitude_si: r.ambient_yield_strength.value,
+                unit: "MPa".to_string(),
+            },
+            ambient_tensile_strength: PyQty {
+                magnitude_si: r.ambient_tensile_strength.value,
+                unit: "MPa".to_string(),
+            },
+            history: r.history.iter().map(PyVesselRuptureStep::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

@@ -1,0 +1,331 @@
+model = "process.pipe_fire_rupture_material"
+
+[[cases]]
+id = "duplex_22cr_600c"
+tolerance = 1.0e-12
+source = "The 22Cr duplex table at 600 degC and 100 MPa. From `validation/neqsim/captures/process_pipe_fire_rupture_material.tsv` (`material_22cr_duplex`)."
+[cases.inputs]
+material_name = "22Cr duplex"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "22Cr duplex"
+density = 7850.0
+heat_capacity = 670.0
+thermal_conductivity = 28.0
+ultimate_tensile_strength = 371.0
+strain_effect_factor = 1.0
+rupture_strain_limit = 0.22
+temperature_correction_factor = 1.2601625651473616
+strain_rate = 1.21078539325457e-11
+
+[[cases]]
+id = "ss_316_600c"
+tolerance = 1.0e-12
+source = "The SS 316 table at 600 degC and 100 MPa. From (`material_ss_316`)."
+[cases.inputs]
+material_name = "SS 316"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "SS 316"
+density = 7850.0
+heat_capacity = 549.9592356687898
+thermal_conductivity = 22.7
+ultimate_tensile_strength = 363.0
+strain_effect_factor = 1.0
+rupture_strain_limit = 0.15
+temperature_correction_factor = 1.0797171079352614
+strain_rate = 1.394931509282041e-10
+
+[[cases]]
+id = "cs_235_600c"
+tolerance = 1.0e-12
+source = "The CS 235 table at 600 degC and 100 MPa. From (`material_cs_235_asme_a106_b`)."
+[cases.inputs]
+material_name = "CS 235 ASME A106-B"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "CS 235 ASME A106-B"
+density = 7850.0
+heat_capacity = 750.0
+thermal_conductivity = 33.95
+ultimate_tensile_strength = 189.0
+strain_effect_factor = 1.0
+rupture_strain_limit = 0.15
+temperature_correction_factor = 1.066215335302499
+strain_rate = 3.986959364379403e-08
+
+[[cases]]
+id = "cs_360_x52_600c"
+tolerance = 1.0e-12
+source = "The CS 360 API 5L-X52 table at 600 degC and 100 MPa. From (`material_cs_360_api_5l_x52`)."
+[cases.inputs]
+material_name = "CS 360 API 5L-X52"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "CS 360 API 5L-X52"
+density = 7850.0
+heat_capacity = 750.0
+thermal_conductivity = 33.95
+ultimate_tensile_strength = 245.0
+strain_effect_factor = 1.0
+rupture_strain_limit = 0.15
+temperature_correction_factor = 1.0394026624917467
+strain_rate = 5.2429064786352175e-08
+
+[[cases]]
+id = "superduplex_600c"
+tolerance = 1.0e-12
+source = "The superduplex table at 600 degC and 100 MPa. From (`material_superduplex`)."
+[cases.inputs]
+material_name = "Superduplex"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "Superduplex"
+density = 7850.0
+heat_capacity = 670.0
+thermal_conductivity = 28.0
+ultimate_tensile_strength = 427.0
+strain_effect_factor = 1.0
+rupture_strain_limit = 0.22
+temperature_correction_factor = 1.2468594650803833
+strain_rate = 3.4855710669529987e-13
+
+[[cases]]
+id = "6mo_600c"
+tolerance = 1.0e-12
+source = "The 6Mo table at 600 degC and 100 MPa. From (`material_6mo`)."
+[cases.inputs]
+material_name = "6Mo"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "6Mo"
+density = 7850.0
+heat_capacity = 549.9592356687898
+thermal_conductivity = 22.7
+ultimate_tensile_strength = 480.0
+strain_effect_factor = 1.0
+rupture_strain_limit = 0.15
+temperature_correction_factor = 1.0811934944180024
+strain_rate = 1.6825588251174457e-11
+
+[[cases]]
+id = "duplex_22cr_800c"
+tolerance = 1.0e-12
+source = "The 22Cr table at 800 degC and 100 MPa. From (`material_22cr_800c`)."
+[cases.inputs]
+material_name = "22Cr duplex"
+evaluation_temperature = 1073.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "22Cr duplex"
+density = 7850.0
+heat_capacity = 750.0
+thermal_conductivity = 28.0
+ultimate_tensile_strength = 157.0
+strain_effect_factor = 0.7
+rupture_strain_limit = 0.23
+temperature_correction_factor = 1.1134489981072802
+strain_rate = 8.718460200416476e-06
+
+[[cases]]
+id = "duplex_22cr_clamp_low"
+tolerance = 1.0e-12
+source = "Below the 0 degC grid the first row answers. From (`material_22cr_clamp_low`)."
+[cases.inputs]
+material_name = "22Cr duplex"
+evaluation_temperature = 173.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "22Cr duplex"
+density = 7850.0
+heat_capacity = 480.0
+thermal_conductivity = 15.0
+ultimate_tensile_strength = 650.0
+strain_effect_factor = 1.0
+rupture_strain_limit = 0.22
+temperature_correction_factor = 0.3412459535538541
+strain_rate = 1.756844949575397e-19
+
+[[cases]]
+id = "duplex_22cr_clamp_high"
+tolerance = 1.0e-12
+source = "Above the 1350 degC grid the last row answers. From (`material_22cr_clamp_high`)."
+[cases.inputs]
+material_name = "22Cr duplex"
+evaluation_temperature = 1673.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "22Cr duplex"
+density = 7850.0
+heat_capacity = 900.0
+thermal_conductivity = 28.0
+ultimate_tensile_strength = 0.0
+strain_effect_factor = 2.3
+rupture_strain_limit = 0.5
+temperature_correction_factor = 1.0
+strain_rate = 94.57383509975604
+
+[[cases]]
+id = "custom_50c"
+tolerance = 1.0e-12
+source = "A three-point custom curve at 50 degC and 100 MPa. From (`material_custom_50c`)."
+[cases.inputs]
+material_name = "Probe custom"
+evaluation_temperature = 323.15
+evaluation_stress = 100.0
+density = 8000.0
+sellars_tegart_a = 1.0e10
+sellars_tegart_alpha = 0.02
+sellars_tegart_n = 2.0
+activation_temperature = 40000.0
+correction_strain_rate = 8.333333333333333e-4
+correction_limit_temperature = 1173.15
+curve = [
+  { temperature = 273.15, heat_capacity = 500.0, thermal_conductivity = 16.0, ultimate_tensile_strength = 600.0, strain_effect_factor = 1.0, rupture_strain_limit = 0.2 },
+  { temperature = 373.15, heat_capacity = 520.0, thermal_conductivity = 17.0, ultimate_tensile_strength = 550.0, strain_effect_factor = 1.1, rupture_strain_limit = 0.2 },
+  { temperature = 473.15, heat_capacity = 540.0, thermal_conductivity = 18.0, ultimate_tensile_strength = 500.0, strain_effect_factor = 1.2, rupture_strain_limit = 0.2 },
+]
+[cases.expected]
+resolved_material_name = "Probe custom"
+density = 8000.0
+heat_capacity = 510.0
+thermal_conductivity = 16.5
+ultimate_tensile_strength = 575.0
+strain_effect_factor = 1.05
+rupture_strain_limit = 0.2
+temperature_correction_factor = 0.38465495740051725
+strain_rate = 4.72450857797446e-12
+
+[[cases]]
+id = "custom_clamp_low"
+tolerance = 1.0e-12
+source = "The custom curve below its first point. From (`material_custom_clamp_low`)."
+[cases.inputs]
+material_name = "Probe custom"
+evaluation_temperature = 173.15
+evaluation_stress = 100.0
+density = 8000.0
+sellars_tegart_a = 1.0e10
+sellars_tegart_alpha = 0.02
+sellars_tegart_n = 2.0
+activation_temperature = 40000.0
+correction_strain_rate = 8.333333333333333e-4
+correction_limit_temperature = 1173.15
+curve = [
+  { temperature = 273.15, heat_capacity = 500.0, thermal_conductivity = 16.0, ultimate_tensile_strength = 600.0, strain_effect_factor = 1.0, rupture_strain_limit = 0.2 },
+  { temperature = 373.15, heat_capacity = 520.0, thermal_conductivity = 17.0, ultimate_tensile_strength = 550.0, strain_effect_factor = 1.1, rupture_strain_limit = 0.2 },
+  { temperature = 473.15, heat_capacity = 540.0, thermal_conductivity = 18.0, ultimate_tensile_strength = 500.0, strain_effect_factor = 1.2, rupture_strain_limit = 0.2 },
+]
+[cases.expected]
+resolved_material_name = "Probe custom"
+density = 8000.0
+heat_capacity = 500.0
+thermal_conductivity = 16.0
+ultimate_tensile_strength = 600.0
+strain_effect_factor = 1.0
+rupture_strain_limit = 0.2
+temperature_correction_factor = 0.2103476242429434
+strain_rate = 1.65528530976137e-12
+
+[[cases]]
+id = "custom_clamp_high"
+tolerance = 1.0e-12
+source = "The custom curve above its last point. From (`material_custom_clamp_high`)."
+[cases.inputs]
+material_name = "Probe custom"
+evaluation_temperature = 673.15
+evaluation_stress = 100.0
+density = 8000.0
+sellars_tegart_a = 1.0e10
+sellars_tegart_alpha = 0.02
+sellars_tegart_n = 2.0
+activation_temperature = 40000.0
+correction_strain_rate = 8.333333333333333e-4
+correction_limit_temperature = 1173.15
+curve = [
+  { temperature = 273.15, heat_capacity = 500.0, thermal_conductivity = 16.0, ultimate_tensile_strength = 600.0, strain_effect_factor = 1.0, rupture_strain_limit = 0.2 },
+  { temperature = 373.15, heat_capacity = 520.0, thermal_conductivity = 17.0, ultimate_tensile_strength = 550.0, strain_effect_factor = 1.1, rupture_strain_limit = 0.2 },
+  { temperature = 473.15, heat_capacity = 540.0, thermal_conductivity = 18.0, ultimate_tensile_strength = 500.0, strain_effect_factor = 1.2, rupture_strain_limit = 0.2 },
+]
+[cases.expected]
+resolved_material_name = "Probe custom"
+density = 8000.0
+heat_capacity = 540.0
+thermal_conductivity = 18.0
+ultimate_tensile_strength = 500.0
+strain_effect_factor = 1.2
+rupture_strain_limit = 0.2
+temperature_correction_factor = 0.7509887347035941
+strain_rate = 1.0845061926689225e-10
+
+[[cases]]
+id = "alias_superduplex"
+tolerance = 1.0e-12
+source = "The class's uppercase alias resolves to the superduplex table. From (`material_alias_superduplex`)."
+[cases.inputs]
+material_name = "SUPERDUPLEX"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "Superduplex"
+
+[[cases]]
+id = "alias_25cr"
+tolerance = 1.0e-12
+source = "`25Cr` resolves to the superduplex table. From (`material_alias_25cr`)."
+[cases.inputs]
+material_name = "25Cr"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "Superduplex"
+
+[[cases]]
+id = "alias_api5l_x52"
+tolerance = 1.0e-12
+source = "`API 5L-X52` resolves to the CS 360 table. From (`material_alias_api5l_x52`)."
+[cases.inputs]
+material_name = "API 5L-X52"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "CS 360 API 5L-X52"
+
+[[cases]]
+id = "alias_6mo"
+tolerance = 1.0e-12
+source = "`6 Mo` resolves to the 6Mo table. From (`material_alias_6mo`)."
+[cases.inputs]
+material_name = "6 Mo"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "6Mo"
+
+[[cases]]
+id = "alias_a106"
+tolerance = 1.0e-12
+source = "`A106` resolves to the CS 235 table. From (`material_alias_a106`)."
+[cases.inputs]
+material_name = "A106"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "CS 235 ASME A106-B"
+
+[[cases]]
+id = "alias_316"
+tolerance = 1.0e-12
+source = "`316` resolves to the SS 316 table. From (`material_alias_316`)."
+[cases.inputs]
+material_name = "316"
+evaluation_temperature = 873.15
+evaluation_stress = 100.0
+[cases.expected]
+resolved_material_name = "SS 316"

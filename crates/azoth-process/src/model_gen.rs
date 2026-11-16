@@ -6,6 +6,7 @@
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
@@ -43,6 +44,8 @@
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
+//!   - specs/models/process/pipe_fire_rupture.toml
+//!   - specs/models/process/pipe_fire_rupture_material.toml
 //!   - specs/models/process/pipeline_pressure_protection.toml
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
@@ -69,6 +72,7 @@
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
+//!   - specs/models/process/vessel_rupture.toml
 //!
 //! Regenerate with `python tools/gen_models.py`; CI runs `--check` and fails
 //! on any difference.
@@ -5537,6 +5541,1732 @@ pub static BLEVE_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&BLEVE_ALGORITHM),
     checks: BLEVE_CHECKS,
     cases: BLEVE_CASES,
+};
+
+static BLOWDOWN_PRESSURE_PROFILE_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "time",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative query time is not an instant on the profile",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "gauge_offset",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a negative gauge offset",
+        },
+    },
+];
+
+static BLOWDOWN_PRESSURE_PROFILE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "step_exact",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 110.0), ("gauge_offset", 1.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "step_previous")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("pressure_absolute", 33.0255), ("pressure_gauge", 32.0255)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "step_between",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 107.0), ("gauge_offset", 1.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "step_previous")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("pressure_absolute", 34.0082), ("pressure_gauge", 33.0082)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "clamp_before",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 0.0), ("gauge_offset", 1.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "step_previous")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("pressure_absolute", 61.3), ("pressure_gauge", 60.3)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "clamp_after",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 130.0), ("gauge_offset", 1.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "step_previous")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("pressure_absolute", 31.1758), ("pressure_gauge", 30.1758)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "linear_between",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 107.5), ("gauge_offset", 1.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "linear")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("pressure_absolute", 33.5168499980346),
+            ("pressure_gauge", 32.5168499980346),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "near_equal_upper_step",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 4.99999999995), ("gauge_offset", 1.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "step_previous")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("pressure_absolute", 80.0), ("pressure_gauge", 79.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(87.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(80.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(74.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "near_equal_lower_step",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 4.9999999998), ("gauge_offset", 1.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "step_previous")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("pressure_absolute", 87.0), ("pressure_gauge", 86.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(87.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(80.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(74.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "near_equal_upper_linear",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 4.99999999995), ("gauge_offset", 1.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "linear")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("pressure_absolute", 80.0), ("pressure_gauge", 79.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(87.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(80.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(74.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "near_equal_lower_linear",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 4.9999999998), ("gauge_offset", 1.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "linear")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("pressure_absolute", 80.00000000028),
+            ("pressure_gauge", 79.00000000028),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(87.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(80.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(74.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "gauge_offset_two",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 5.0), ("gauge_offset", 2.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "step_previous")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("pressure_absolute", 80.0), ("pressure_gauge", 78.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(87.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(80.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "gauge_offset_zero",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("time", 5.0), ("gauge_offset", 0.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("interpolation_mode", "step_previous")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("pressure_absolute", 80.0), ("pressure_gauge", 80.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(87.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(80.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static BLOWDOWN_PRESSURE_PROFILE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "piecewise_step_or_linear_pressure_profile",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.blowdown_pressure_profile`.
+pub static BLOWDOWN_PRESSURE_PROFILE_SPEC: ModelSpec = ModelSpec {
+    id: "process.blowdown_pressure_profile",
+    kind: "procedure",
+    algorithm: Some(&BLOWDOWN_PRESSURE_PROFILE_ALGORITHM),
+    checks: BLOWDOWN_PRESSURE_PROFILE_CHECKS,
+    cases: BLOWDOWN_PRESSURE_PROFILE_CASES,
 };
 
 static BOW_TIE_CHECKS: &[SpecCheck] = &[];
@@ -48735,6 +50465,4170 @@ pub static PIPE_SPEC: ModelSpec = ModelSpec {
     cases: PIPE_CASES,
 };
 
+static PIPE_FIRE_RUPTURE_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "outside_diameter",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's builder refuses a non-positive outside diameter",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "nominal_wall_thickness",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's builder refuses a non-positive nominal wall",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "corrosion_allowance",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative corrosion allowance is not a thickness",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "wall_thickness_undertolerance",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: false,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's setter refuses a fraction outside [0, 1)",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "exposed_length",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's builder refuses a non-positive exposed length",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "fluid_density",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's setter refuses a non-positive density",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "fluid_heat_capacity",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's setter refuses a non-positive heat capacity",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "gas_molecular_weight",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's setter refuses a non-positive molecular weight",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "initial_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's Celsius value becomes an absolute temperature; a non-positive kelvin value is not one",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "fire_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the explicit fire temperature is an absolute temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "gas_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the explicit gas temperature is an absolute temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "convective_heat_transfer_coefficient",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's scenario constructor refuses a negative coefficient",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "fire_emissivity",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's scenario constructor refuses a fraction outside [0, 1]",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "metal_emissivity",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's scenario constructor refuses a fraction outside [0, 1]",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "metal_absorptivity",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's scenario constructor refuses a fraction outside [0, 1]",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "passive_protection_heat_flux_factor",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's scenario constructor refuses a factor outside [0, 1]",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "gauge_offset",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the profile's gauge offset is non-negative",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "time_step",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's builder refuses a non-positive step",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "max_time",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's builder refuses a non-positive maximum time",
+        },
+    },
+];
+
+static PIPE_FIRE_RUPTURE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "benchmark",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("outside_diameter", 88.9),
+            ("nominal_wall_thickness", 3.7),
+            ("corrosion_allowance", 0.0),
+            ("wall_thickness_undertolerance", 0.1),
+            ("exposed_length", 1.0),
+            ("weight_stress", 0.0),
+            ("fluid_density", 23.7487037155012),
+            ("fluid_heat_capacity", 2283.35469905934),
+            ("gas_molecular_weight", 0.0182),
+            ("initial_temperature", 293.15),
+            ("time_step", 5.0),
+            ("max_time", 200.0),
+        ],
+        flags: &[("spreadsheet_gas_thermal_mass", true)],
+        lists: &[],
+        strings: &[
+            ("material_name", "22Cr duplex"),
+            ("fire_scenario", "large_jet_fire"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("rupture_time", 115.0),
+            ("rupture_pressure", 32.0255),
+            ("rupture_mean_wall_temperature", 1363.9956502338634),
+            ("rupture_outer_surface_temperature", 1365.901405217305),
+            ("rupture_accumulated_strain", 0.9826275792826241),
+            ("rupture_strain_limit", 0.4844376053975677),
+            ("long_pipe_gas_two_sides", 22.34418418399767),
+            ("long_pipe_gas_one_side", 11.172092091998834),
+            ("short_pipe_gas_one_side", 17.2161939137702),
+            ("liquid_one_side", 0.0),
+            ("release_gas_temperature", 293.15),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("status", "rupture"), ("fluid_basis", "gas")],
+        records: &[(
+            "pressure_profile",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "no_rupture_10s",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("outside_diameter", 88.9),
+            ("nominal_wall_thickness", 3.7),
+            ("corrosion_allowance", 0.0),
+            ("wall_thickness_undertolerance", 0.1),
+            ("exposed_length", 1.0),
+            ("weight_stress", 0.0),
+            ("fluid_density", 23.7487037155012),
+            ("fluid_heat_capacity", 2283.35469905934),
+            ("gas_molecular_weight", 0.0182),
+            ("initial_temperature", 293.15),
+            ("time_step", 5.0),
+            ("max_time", 10.0),
+        ],
+        flags: &[("spreadsheet_gas_thermal_mass", true)],
+        lists: &[],
+        strings: &[
+            ("material_name", "22Cr duplex"),
+            ("fire_scenario", "large_jet_fire"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("status", "no_rupture"), ("fluid_basis", "gas")],
+        records: &[(
+            "pressure_profile",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "small_jet_builtin",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("outside_diameter", 88.9),
+            ("nominal_wall_thickness", 3.7),
+            ("corrosion_allowance", 0.0),
+            ("wall_thickness_undertolerance", 0.1),
+            ("exposed_length", 1.0),
+            ("weight_stress", 0.0),
+            ("fluid_density", 23.7487037155012),
+            ("fluid_heat_capacity", 2283.35469905934),
+            ("gas_molecular_weight", 0.0182),
+            ("initial_temperature", 293.15),
+            ("time_step", 5.0),
+            ("max_time", 200.0),
+        ],
+        flags: &[("spreadsheet_gas_thermal_mass", true)],
+        lists: &[],
+        strings: &[
+            ("material_name", "22Cr duplex"),
+            ("fire_scenario", "small_jet_fire"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("status", "no_rupture"), ("fluid_basis", "gas")],
+        records: &[(
+            "pressure_profile",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "explicit_small_jet",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("outside_diameter", 88.9),
+            ("nominal_wall_thickness", 3.7),
+            ("corrosion_allowance", 0.0),
+            ("wall_thickness_undertolerance", 0.1),
+            ("exposed_length", 1.0),
+            ("weight_stress", 0.0),
+            ("fluid_density", 23.7487037155012),
+            ("fluid_heat_capacity", 2283.35469905934),
+            ("gas_molecular_weight", 0.0182),
+            ("initial_temperature", 293.15),
+            ("time_step", 5.0),
+            ("fire_temperature", 1273.15),
+            ("gas_temperature", 1273.15),
+            ("convective_heat_transfer_coefficient", 100.0),
+            ("fire_emissivity", 1.0),
+            ("metal_emissivity", 0.85),
+            ("metal_absorptivity", 0.85),
+            ("passive_protection_heat_flux_factor", 1.0),
+            ("max_time", 200.0),
+        ],
+        flags: &[("spreadsheet_gas_thermal_mass", true)],
+        lists: &[],
+        strings: &[
+            ("material_name", "22Cr duplex"),
+            ("fire_scenario", "explicit"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("status", "no_rupture"), ("fluid_basis", "gas")],
+        records: &[(
+            "pressure_profile",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ss_316",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("outside_diameter", 88.9),
+            ("nominal_wall_thickness", 3.7),
+            ("corrosion_allowance", 0.0),
+            ("wall_thickness_undertolerance", 0.1),
+            ("exposed_length", 1.0),
+            ("weight_stress", 0.0),
+            ("fluid_density", 23.7487037155012),
+            ("fluid_heat_capacity", 2283.35469905934),
+            ("gas_molecular_weight", 0.0182),
+            ("initial_temperature", 293.15),
+            ("time_step", 5.0),
+            ("max_time", 200.0),
+        ],
+        flags: &[("spreadsheet_gas_thermal_mass", true)],
+        lists: &[],
+        strings: &[
+            ("material_name", "SS 316"),
+            ("fire_scenario", "large_jet_fire"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("rupture_time", 180.0),
+            ("rupture_pressure", 30.1758),
+            ("rupture_mean_wall_temperature", 1427.187566305562),
+            ("rupture_outer_surface_temperature", 1427.218751010287),
+            ("rupture_accumulated_strain", 0.25125365824324236),
+            ("rupture_strain_limit", 0.2510093915763905),
+            ("long_pipe_gas_two_sides", 21.053648907885176),
+            ("long_pipe_gas_one_side", 10.526824453942588),
+            ("short_pipe_gas_one_side", 16.22183648352553),
+            ("liquid_one_side", 0.0),
+            ("release_gas_temperature", 293.15),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("status", "rupture"), ("fluid_basis", "gas")],
+        records: &[(
+            "pressure_profile",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "liquid",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("outside_diameter", 88.9),
+            ("nominal_wall_thickness", 3.7),
+            ("corrosion_allowance", 0.0),
+            ("wall_thickness_undertolerance", 0.1),
+            ("exposed_length", 1.0),
+            ("weight_stress", 0.0),
+            ("fluid_density", 800.0),
+            ("fluid_heat_capacity", 2000.0),
+            ("gas_molecular_weight", 0.0182),
+            ("initial_temperature", 293.15),
+            ("time_step", 5.0),
+            ("max_time", 200.0),
+        ],
+        flags: &[("spreadsheet_gas_thermal_mass", true)],
+        lists: &[],
+        strings: &[
+            ("material_name", "22Cr duplex"),
+            ("fire_scenario", "large_jet_fire"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("status", "no_rupture"), ("fluid_basis", "liquid")],
+        records: &[(
+            "pressure_profile",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "gas_thermal_mass_off",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("outside_diameter", 88.9),
+            ("nominal_wall_thickness", 3.7),
+            ("corrosion_allowance", 0.0),
+            ("wall_thickness_undertolerance", 0.1),
+            ("exposed_length", 1.0),
+            ("weight_stress", 0.0),
+            ("fluid_density", 23.7487037155012),
+            ("fluid_heat_capacity", 2283.35469905934),
+            ("gas_molecular_weight", 0.0182),
+            ("initial_temperature", 293.15),
+            ("time_step", 5.0),
+            ("max_time", 60.0),
+        ],
+        flags: &[("spreadsheet_gas_thermal_mass", false)],
+        lists: &[],
+        strings: &[
+            ("material_name", "22Cr duplex"),
+            ("fire_scenario", "large_jet_fire"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("status", "no_rupture"), ("fluid_basis", "gas")],
+        records: &[(
+            "pressure_profile",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "gas_thermal_mass_on",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("outside_diameter", 88.9),
+            ("nominal_wall_thickness", 3.7),
+            ("corrosion_allowance", 0.0),
+            ("wall_thickness_undertolerance", 0.1),
+            ("exposed_length", 1.0),
+            ("weight_stress", 0.0),
+            ("fluid_density", 23.7487037155012),
+            ("fluid_heat_capacity", 2283.35469905934),
+            ("gas_molecular_weight", 0.0182),
+            ("initial_temperature", 293.15),
+            ("time_step", 5.0),
+            ("max_time", 60.0),
+        ],
+        flags: &[("spreadsheet_gas_thermal_mass", true)],
+        lists: &[],
+        strings: &[
+            ("material_name", "22Cr duplex"),
+            ("fire_scenario", "large_jet_fire"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("status", "no_rupture"), ("fluid_basis", "gas")],
+        records: &[(
+            "pressure_profile",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pool_fire",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("outside_diameter", 88.9),
+            ("nominal_wall_thickness", 3.7),
+            ("corrosion_allowance", 0.0),
+            ("wall_thickness_undertolerance", 0.1),
+            ("exposed_length", 1.0),
+            ("weight_stress", 0.0),
+            ("fluid_density", 23.7487037155012),
+            ("fluid_heat_capacity", 2283.35469905934),
+            ("gas_molecular_weight", 0.0182),
+            ("initial_temperature", 293.15),
+            ("time_step", 5.0),
+            ("max_time", 200.0),
+        ],
+        flags: &[("spreadsheet_gas_thermal_mass", true)],
+        lists: &[],
+        strings: &[
+            ("material_name", "22Cr duplex"),
+            ("fire_scenario", "pool_fire"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("rupture_time", 160.0),
+            ("rupture_pressure", 30.1758),
+            ("rupture_mean_wall_temperature", 1356.0270670004556),
+            ("rupture_outer_surface_temperature", 1357.094264492638),
+            ("rupture_accumulated_strain", 0.7127751704624172),
+            ("rupture_strain_limit", 0.4708910139007745),
+            ("long_pipe_gas_two_sides", 21.053648907885176),
+            ("long_pipe_gas_one_side", 10.526824453942588),
+            ("short_pipe_gas_one_side", 16.22183648352553),
+            ("liquid_one_side", 0.0),
+            ("release_gas_temperature", 293.15),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("status", "rupture"), ("fluid_basis", "gas")],
+        records: &[(
+            "pressure_profile",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pfp_factor",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("outside_diameter", 88.9),
+            ("nominal_wall_thickness", 3.7),
+            ("corrosion_allowance", 0.0),
+            ("wall_thickness_undertolerance", 0.1),
+            ("exposed_length", 1.0),
+            ("weight_stress", 0.0),
+            ("fluid_density", 23.7487037155012),
+            ("fluid_heat_capacity", 2283.35469905934),
+            ("gas_molecular_weight", 0.0182),
+            ("initial_temperature", 293.15),
+            ("time_step", 5.0),
+            ("passive_protection_heat_flux_factor", 0.1),
+            ("max_time", 200.0),
+        ],
+        flags: &[("spreadsheet_gas_thermal_mass", true)],
+        lists: &[],
+        strings: &[
+            ("material_name", "22Cr duplex"),
+            ("fire_scenario", "large_jet_fire"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("status", "no_rupture"), ("fluid_basis", "gas")],
+        records: &[(
+            "pressure_profile",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(61.3),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(59.7053),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(10.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(58.6349),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(57.3483),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(19.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55.9731),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(25.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(54.5583),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(53.1249),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(34.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(51.6842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(40.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(50.2472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(48.8145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(49.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(47.3977),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(55.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(46.004),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(44.6383),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(64.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(43.3046),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(70.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(42.0058),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(75.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(40.7442),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(79.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(39.5206),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(85.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(38.3367),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(37.1941),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(94.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(36.0922),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(35.0302),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(105.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(34.0082),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(109.99999998),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(33.0255),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(115.00000002),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32.0817),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(31.1758),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static PIPE_FIRE_RUPTURE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "strain_rate_pipe_fire_rupture",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 100000,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.pipe_fire_rupture`.
+pub static PIPE_FIRE_RUPTURE_SPEC: ModelSpec = ModelSpec {
+    id: "process.pipe_fire_rupture",
+    kind: "procedure",
+    algorithm: Some(&PIPE_FIRE_RUPTURE_ALGORITHM),
+    checks: PIPE_FIRE_RUPTURE_CHECKS,
+    cases: PIPE_FIRE_RUPTURE_CASES,
+};
+
+static PIPE_FIRE_RUPTURE_MATERIAL_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "evaluation_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's absolute temperature is a kelvin value; a non-positive one is not a temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "density",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a non-positive density",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "sellars_tegart_a",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a non-positive A",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "sellars_tegart_alpha",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a non-positive alpha",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "sellars_tegart_n",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a non-positive exponent",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "activation_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a non-positive activation temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "correction_strain_rate",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a non-positive correction rate",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "correction_limit_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's correction limit is an absolute temperature",
+        },
+    },
+];
+
+static PIPE_FIRE_RUPTURE_MATERIAL_CASES: &[TestCase] = &[
+    TestCase {
+        id: "duplex_22cr_600c",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "22Cr duplex")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 7850.0),
+            ("heat_capacity", 670.0),
+            ("thermal_conductivity", 28.0),
+            ("ultimate_tensile_strength", 371.0),
+            ("strain_effect_factor", 1.0),
+            ("rupture_strain_limit", 0.22),
+            ("temperature_correction_factor", 1.2601625651473616),
+            ("strain_rate", 1.21078539325457e-11),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "22Cr duplex")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "ss_316_600c",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "SS 316")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 7850.0),
+            ("heat_capacity", 549.9592356687898),
+            ("thermal_conductivity", 22.7),
+            ("ultimate_tensile_strength", 363.0),
+            ("strain_effect_factor", 1.0),
+            ("rupture_strain_limit", 0.15),
+            ("temperature_correction_factor", 1.0797171079352614),
+            ("strain_rate", 1.394931509282041e-10),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "SS 316")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "cs_235_600c",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "CS 235 ASME A106-B")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 7850.0),
+            ("heat_capacity", 750.0),
+            ("thermal_conductivity", 33.95),
+            ("ultimate_tensile_strength", 189.0),
+            ("strain_effect_factor", 1.0),
+            ("rupture_strain_limit", 0.15),
+            ("temperature_correction_factor", 1.066215335302499),
+            ("strain_rate", 3.986959364379403e-08),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "CS 235 ASME A106-B")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "cs_360_x52_600c",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "CS 360 API 5L-X52")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 7850.0),
+            ("heat_capacity", 750.0),
+            ("thermal_conductivity", 33.95),
+            ("ultimate_tensile_strength", 245.0),
+            ("strain_effect_factor", 1.0),
+            ("rupture_strain_limit", 0.15),
+            ("temperature_correction_factor", 1.0394026624917467),
+            ("strain_rate", 5.2429064786352175e-08),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "CS 360 API 5L-X52")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "superduplex_600c",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "Superduplex")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 7850.0),
+            ("heat_capacity", 670.0),
+            ("thermal_conductivity", 28.0),
+            ("ultimate_tensile_strength", 427.0),
+            ("strain_effect_factor", 1.0),
+            ("rupture_strain_limit", 0.22),
+            ("temperature_correction_factor", 1.2468594650803833),
+            ("strain_rate", 3.4855710669529987e-13),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "Superduplex")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "6mo_600c",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "6Mo")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 7850.0),
+            ("heat_capacity", 549.9592356687898),
+            ("thermal_conductivity", 22.7),
+            ("ultimate_tensile_strength", 480.0),
+            ("strain_effect_factor", 1.0),
+            ("rupture_strain_limit", 0.15),
+            ("temperature_correction_factor", 1.0811934944180024),
+            ("strain_rate", 1.6825588251174457e-11),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "6Mo")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "duplex_22cr_800c",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 1073.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "22Cr duplex")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 7850.0),
+            ("heat_capacity", 750.0),
+            ("thermal_conductivity", 28.0),
+            ("ultimate_tensile_strength", 157.0),
+            ("strain_effect_factor", 0.7),
+            ("rupture_strain_limit", 0.23),
+            ("temperature_correction_factor", 1.1134489981072802),
+            ("strain_rate", 8.718460200416476e-06),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "22Cr duplex")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "duplex_22cr_clamp_low",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 173.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "22Cr duplex")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 7850.0),
+            ("heat_capacity", 480.0),
+            ("thermal_conductivity", 15.0),
+            ("ultimate_tensile_strength", 650.0),
+            ("strain_effect_factor", 1.0),
+            ("rupture_strain_limit", 0.22),
+            ("temperature_correction_factor", 0.3412459535538541),
+            ("strain_rate", 1.756844949575397e-19),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "22Cr duplex")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "duplex_22cr_clamp_high",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 1673.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "22Cr duplex")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 7850.0),
+            ("heat_capacity", 900.0),
+            ("thermal_conductivity", 28.0),
+            ("ultimate_tensile_strength", 0.0),
+            ("strain_effect_factor", 2.3),
+            ("rupture_strain_limit", 0.5),
+            ("temperature_correction_factor", 1.0),
+            ("strain_rate", 94.57383509975604),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "22Cr duplex")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "custom_50c",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 323.15),
+            ("evaluation_stress", 100.0),
+            ("density", 8000.0),
+            ("sellars_tegart_a", 10000000000.0),
+            ("sellars_tegart_alpha", 0.02),
+            ("sellars_tegart_n", 2.0),
+            ("activation_temperature", 40000.0),
+            ("correction_strain_rate", 0.0008333333333333333),
+            ("correction_limit_temperature", 1173.15),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "Probe custom")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 8000.0),
+            ("heat_capacity", 510.0),
+            ("thermal_conductivity", 16.5),
+            ("ultimate_tensile_strength", 575.0),
+            ("strain_effect_factor", 1.05),
+            ("rupture_strain_limit", 0.2),
+            ("temperature_correction_factor", 0.38465495740051725),
+            ("strain_rate", 4.72450857797446e-12),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "Probe custom")],
+        records: &[(
+            "curve",
+            &[
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(273.15),
+                    },
+                    RecordField {
+                        name: "heat_capacity",
+                        value: FieldValue::Number(500.0),
+                    },
+                    RecordField {
+                        name: "thermal_conductivity",
+                        value: FieldValue::Number(16.0),
+                    },
+                    RecordField {
+                        name: "ultimate_tensile_strength",
+                        value: FieldValue::Number(600.0),
+                    },
+                    RecordField {
+                        name: "strain_effect_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "rupture_strain_limit",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(373.15),
+                    },
+                    RecordField {
+                        name: "heat_capacity",
+                        value: FieldValue::Number(520.0),
+                    },
+                    RecordField {
+                        name: "thermal_conductivity",
+                        value: FieldValue::Number(17.0),
+                    },
+                    RecordField {
+                        name: "ultimate_tensile_strength",
+                        value: FieldValue::Number(550.0),
+                    },
+                    RecordField {
+                        name: "strain_effect_factor",
+                        value: FieldValue::Number(1.1),
+                    },
+                    RecordField {
+                        name: "rupture_strain_limit",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(473.15),
+                    },
+                    RecordField {
+                        name: "heat_capacity",
+                        value: FieldValue::Number(540.0),
+                    },
+                    RecordField {
+                        name: "thermal_conductivity",
+                        value: FieldValue::Number(18.0),
+                    },
+                    RecordField {
+                        name: "ultimate_tensile_strength",
+                        value: FieldValue::Number(500.0),
+                    },
+                    RecordField {
+                        name: "strain_effect_factor",
+                        value: FieldValue::Number(1.2),
+                    },
+                    RecordField {
+                        name: "rupture_strain_limit",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "custom_clamp_low",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 173.15),
+            ("evaluation_stress", 100.0),
+            ("density", 8000.0),
+            ("sellars_tegart_a", 10000000000.0),
+            ("sellars_tegart_alpha", 0.02),
+            ("sellars_tegart_n", 2.0),
+            ("activation_temperature", 40000.0),
+            ("correction_strain_rate", 0.0008333333333333333),
+            ("correction_limit_temperature", 1173.15),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "Probe custom")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 8000.0),
+            ("heat_capacity", 500.0),
+            ("thermal_conductivity", 16.0),
+            ("ultimate_tensile_strength", 600.0),
+            ("strain_effect_factor", 1.0),
+            ("rupture_strain_limit", 0.2),
+            ("temperature_correction_factor", 0.2103476242429434),
+            ("strain_rate", 1.65528530976137e-12),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "Probe custom")],
+        records: &[(
+            "curve",
+            &[
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(273.15),
+                    },
+                    RecordField {
+                        name: "heat_capacity",
+                        value: FieldValue::Number(500.0),
+                    },
+                    RecordField {
+                        name: "thermal_conductivity",
+                        value: FieldValue::Number(16.0),
+                    },
+                    RecordField {
+                        name: "ultimate_tensile_strength",
+                        value: FieldValue::Number(600.0),
+                    },
+                    RecordField {
+                        name: "strain_effect_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "rupture_strain_limit",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(373.15),
+                    },
+                    RecordField {
+                        name: "heat_capacity",
+                        value: FieldValue::Number(520.0),
+                    },
+                    RecordField {
+                        name: "thermal_conductivity",
+                        value: FieldValue::Number(17.0),
+                    },
+                    RecordField {
+                        name: "ultimate_tensile_strength",
+                        value: FieldValue::Number(550.0),
+                    },
+                    RecordField {
+                        name: "strain_effect_factor",
+                        value: FieldValue::Number(1.1),
+                    },
+                    RecordField {
+                        name: "rupture_strain_limit",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(473.15),
+                    },
+                    RecordField {
+                        name: "heat_capacity",
+                        value: FieldValue::Number(540.0),
+                    },
+                    RecordField {
+                        name: "thermal_conductivity",
+                        value: FieldValue::Number(18.0),
+                    },
+                    RecordField {
+                        name: "ultimate_tensile_strength",
+                        value: FieldValue::Number(500.0),
+                    },
+                    RecordField {
+                        name: "strain_effect_factor",
+                        value: FieldValue::Number(1.2),
+                    },
+                    RecordField {
+                        name: "rupture_strain_limit",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "custom_clamp_high",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 673.15),
+            ("evaluation_stress", 100.0),
+            ("density", 8000.0),
+            ("sellars_tegart_a", 10000000000.0),
+            ("sellars_tegart_alpha", 0.02),
+            ("sellars_tegart_n", 2.0),
+            ("activation_temperature", 40000.0),
+            ("correction_strain_rate", 0.0008333333333333333),
+            ("correction_limit_temperature", 1173.15),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "Probe custom")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("density", 8000.0),
+            ("heat_capacity", 540.0),
+            ("thermal_conductivity", 18.0),
+            ("ultimate_tensile_strength", 500.0),
+            ("strain_effect_factor", 1.2),
+            ("rupture_strain_limit", 0.2),
+            ("temperature_correction_factor", 0.7509887347035941),
+            ("strain_rate", 1.0845061926689225e-10),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "Probe custom")],
+        records: &[(
+            "curve",
+            &[
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(273.15),
+                    },
+                    RecordField {
+                        name: "heat_capacity",
+                        value: FieldValue::Number(500.0),
+                    },
+                    RecordField {
+                        name: "thermal_conductivity",
+                        value: FieldValue::Number(16.0),
+                    },
+                    RecordField {
+                        name: "ultimate_tensile_strength",
+                        value: FieldValue::Number(600.0),
+                    },
+                    RecordField {
+                        name: "strain_effect_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "rupture_strain_limit",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(373.15),
+                    },
+                    RecordField {
+                        name: "heat_capacity",
+                        value: FieldValue::Number(520.0),
+                    },
+                    RecordField {
+                        name: "thermal_conductivity",
+                        value: FieldValue::Number(17.0),
+                    },
+                    RecordField {
+                        name: "ultimate_tensile_strength",
+                        value: FieldValue::Number(550.0),
+                    },
+                    RecordField {
+                        name: "strain_effect_factor",
+                        value: FieldValue::Number(1.1),
+                    },
+                    RecordField {
+                        name: "rupture_strain_limit",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(473.15),
+                    },
+                    RecordField {
+                        name: "heat_capacity",
+                        value: FieldValue::Number(540.0),
+                    },
+                    RecordField {
+                        name: "thermal_conductivity",
+                        value: FieldValue::Number(18.0),
+                    },
+                    RecordField {
+                        name: "ultimate_tensile_strength",
+                        value: FieldValue::Number(500.0),
+                    },
+                    RecordField {
+                        name: "strain_effect_factor",
+                        value: FieldValue::Number(1.2),
+                    },
+                    RecordField {
+                        name: "rupture_strain_limit",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "alias_superduplex",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "SUPERDUPLEX")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "Superduplex")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "alias_25cr",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "25Cr")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "Superduplex")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "alias_api5l_x52",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "API 5L-X52")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "CS 360 API 5L-X52")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "alias_6mo",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "6 Mo")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "6Mo")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "alias_a106",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "A106")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "CS 235 ASME A106-B")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "alias_316",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("evaluation_temperature", 873.15),
+            ("evaluation_stress", 100.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material_name", "316")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("resolved_material_name", "SS 316")],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static PIPE_FIRE_RUPTURE_MATERIAL_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "sellars_tegart_pipe_material_curves",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1000,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.pipe_fire_rupture_material`.
+pub static PIPE_FIRE_RUPTURE_MATERIAL_SPEC: ModelSpec = ModelSpec {
+    id: "process.pipe_fire_rupture_material",
+    kind: "procedure",
+    algorithm: Some(&PIPE_FIRE_RUPTURE_MATERIAL_ALGORITHM),
+    checks: PIPE_FIRE_RUPTURE_MATERIAL_CHECKS,
+    cases: PIPE_FIRE_RUPTURE_MATERIAL_CASES,
+};
+
 static PIPELINE_PRESSURE_PROTECTION_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -66692,12 +72586,1159 @@ pub static VCE_SPEC: ModelSpec = ModelSpec {
     cases: VCE_CASES,
 };
 
+static VESSEL_RUPTURE_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "inner_radius",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a non-positive radius",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "wall_thickness",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's constructor refuses a non-positive wall",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "yield_strength",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's material constructor refuses a non-positive yield strength",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "tensile_strength",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's material constructor refuses a non-positive tensile strength",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "tensile_strength_factor",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's setter refuses a factor outside (0, 1]",
+        },
+    },
+];
+
+static VESSEL_RUPTURE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "severe_x65",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("inner_radius", 0.5), ("wall_thickness", 0.01)],
+        flags: &[],
+        lists: &[],
+        strings: &[("material", "api_5l"), ("grade", "X65")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("rupture_time", 0.0),
+            ("rupture_stress", 43301270.18922193),
+            ("rupture_allowable_stress", 37162756.400000006),
+            ("rupture_metal_temperature", 973.15),
+            ("min_margin", -395849945.4922193),
+            ("min_margin_time", 300.0),
+            ("ambient_yield_strength", 448.1594),
+            ("ambient_tensile_strength", 530.89652),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("material_name", "API 5L X65")],
+        records: &[(
+            "history",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1900000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2800000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(3700000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(4600000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(150.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(5500000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(180.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(6400000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(210.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(7300000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(240.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(8200000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(270.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(9100000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(300.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(10000000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(973.15),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "mild_x65",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("inner_radius", 0.5), ("wall_thickness", 0.02)],
+        flags: &[],
+        lists: &[],
+        strings: &[("material", "api_5l"), ("grade", "X65")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("min_margin", 485322349.0845281),
+            ("min_margin_time", 0.0),
+            ("ambient_yield_strength", 448.1594),
+            ("ambient_tensile_strength", 530.89652),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("material_name", "API 5L X65")],
+        records: &[(
+            "history",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(150.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "lpg_bare",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("inner_radius", 0.5),
+            ("wall_thickness", 0.012),
+            ("yield_strength", 245.0),
+            ("tensile_strength", 415.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material", "carbon_steel")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("rupture_time", 536.4597344970786),
+            ("rupture_stress", 90932667.39736606),
+            ("rupture_allowable_stress", 88411599.99999999),
+            ("rupture_metal_temperature", 840.0),
+            ("min_margin", -37447893.7433142),
+            ("min_margin_time", 600.0),
+            ("ambient_yield_strength", 245.0),
+            ("ambient_tensile_strength", 415.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("material_name", "CS")],
+        records: &[(
+            "history",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1800000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1839999.9999999998),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(330.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1880000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(360.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1920000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(390.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1960000.0000000002),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(420.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(150.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(450.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(180.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2039999.9999999998),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(480.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(210.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2080000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(510.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(240.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2120000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(540.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(270.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2160000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(570.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(300.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2200000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(600.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(330.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2240000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(630.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(360.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2280000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(660.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(390.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2320000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(690.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(420.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2360000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(720.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(450.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2400000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(750.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(480.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2440000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(780.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(510.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2480000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(810.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(540.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2520000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(840.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(570.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2560000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(870.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(600.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2600000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(900.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "lpg_insulated",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("inner_radius", 0.5),
+            ("wall_thickness", 0.012),
+            ("yield_strength", 245.0),
+            ("tensile_strength", 415.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("material", "carbon_steel")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("min_margin", 295963148.80399126),
+            ("min_margin_time", 600.0),
+            ("ambient_yield_strength", 245.0),
+            ("ambient_tensile_strength", 415.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("material_name", "CS")],
+        records: &[(
+            "history",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1800000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1825000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(305.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(60.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1850000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(311.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(90.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1875000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(316.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1900000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(322.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(150.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1925000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(327.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(180.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1950000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(333.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(210.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(1975000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(338.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(240.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(344.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(270.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2025000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(349.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(300.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2050000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(355.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(330.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2075000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(360.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(360.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2100000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(366.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(390.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2125000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(371.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(420.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2150000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(377.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(450.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2175000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(382.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(480.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2200000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(388.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(510.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2225000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(393.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(540.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2250000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(399.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(570.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2275000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(404.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(600.0),
+                    },
+                    RecordField {
+                        name: "internal_pressure",
+                        value: FieldValue::Number(2300000.0),
+                    },
+                    RecordField {
+                        name: "metal_temperature",
+                        value: FieldValue::Number(410.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "x90_one_row",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("inner_radius", 0.5), ("wall_thickness", 0.01)],
+        flags: &[],
+        lists: &[],
+        strings: &[("material", "api_5l"), ("grade", "X90")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("rupture_time", 0.0),
+            ("rupture_stress", 86602540.37844387),
+            ("rupture_allowable_stress", 48650000.00000001),
+            ("rupture_metal_temperature", 973.15),
+            ("min_margin", -37952540.37844386),
+            ("min_margin_time", 0.0),
+            ("ambient_yield_strength", 620.0),
+            ("ambient_tensile_strength", 695.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("material_name", "API 5L X90")],
+        records: &[(
+            "history",
+            &[&[
+                RecordField {
+                    name: "time",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "internal_pressure",
+                    value: FieldValue::Number(2000000.0),
+                },
+                RecordField {
+                    name: "metal_temperature",
+                    value: FieldValue::Number(973.15),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "l450_alias",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("inner_radius", 0.5), ("wall_thickness", 0.01)],
+        flags: &[],
+        lists: &[],
+        strings: &[("material", "api_5l"), ("grade", "L450")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("rupture_time", 0.0),
+            ("rupture_stress", 86602540.37844387),
+            ("rupture_allowable_stress", 37162756.400000006),
+            ("rupture_metal_temperature", 973.15),
+            ("min_margin", -49439783.97844386),
+            ("min_margin_time", 0.0),
+            ("ambient_yield_strength", 448.1594),
+            ("ambient_tensile_strength", 530.89652),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("material_name", "API 5L X65")],
+        records: &[(
+            "history",
+            &[&[
+                RecordField {
+                    name: "time",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "internal_pressure",
+                    value: FieldValue::Number(2000000.0),
+                },
+                RecordField {
+                    name: "metal_temperature",
+                    value: FieldValue::Number(973.15),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+];
+
+static VESSEL_RUPTURE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "thin_wall_vessel_rupture_crossover",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 100000,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.vessel_rupture`.
+pub static VESSEL_RUPTURE_SPEC: ModelSpec = ModelSpec {
+    id: "process.vessel_rupture",
+    kind: "procedure",
+    algorithm: Some(&VESSEL_RUPTURE_ALGORITHM),
+    checks: VESSEL_RUPTURE_CHECKS,
+    cases: VESSEL_RUPTURE_CASES,
+};
+
 static ALL_MODELS: &[&ModelSpec] = &[
     &ABSORPTION_COLUMN_SPEC,
     &ACTIVE_FIRE_PROTECTION_SCREENING_SPEC,
     &ANTI_SURGE_RECYCLE_SPEC,
     &API537_FLARE_FLAME_MODEL_SPEC,
     &BLEVE_SPEC,
+    &BLOWDOWN_PRESSURE_PROFILE_SPEC,
     &BOW_TIE_SPEC,
     &COMPONENT_SPLITTER_SPEC,
     &COMPRESSOR_SPEC,
@@ -66735,6 +73776,8 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &PACKED_COLUMN_SPEC,
     &PFP_DEMAND_SPEC,
     &PIPE_SPEC,
+    &PIPE_FIRE_RUPTURE_SPEC,
+    &PIPE_FIRE_RUPTURE_MATERIAL_SPEC,
     &PIPELINE_PRESSURE_PROTECTION_SPEC,
     &PLUG_FLOW_REACTOR_SPEC,
     &POOL_FIRE_SPEC,
@@ -66761,6 +73804,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &TR3001_COMPLIANCE_SPEC,
     &TURBO_EXPANDER_COMPRESSOR_SPEC,
     &VCE_SPEC,
+    &VESSEL_RUPTURE_SPEC,
 ];
 
 /// Every model in this namespace, in id order.

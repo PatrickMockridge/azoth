@@ -1719,6 +1719,101 @@ impl From<&azoth_thermal::results::NaceIssueRow> for PyNaceIssueRow {
     }
 }
 
+/// one row per marching step, in time order, ending at the rupture step when one is found.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipeFireRupturePoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipeFireRupturePoint {
+    /// the step's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the step's gauge pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the step's mean wall temperature.
+    #[pyo3(get)]
+    pub mean_wall_temperature: PyQty,
+    /// the step's outer surface temperature.
+    #[pyo3(get)]
+    pub outer_surface_temperature: PyQty,
+    /// the step's absorbed heat flux.
+    #[pyo3(get)]
+    pub heat_flux: PyQty,
+    /// the step's thick-wall von Mises stress.
+    #[pyo3(get)]
+    pub von_mises_stress: PyQty,
+    /// the step's Sellars-Tegart strain rate, the class's per-minute value divided by 60.
+    #[pyo3(get)]
+    pub strain_rate: PyQty,
+    /// the running accumulated strain, capped at 2 as the class caps it.
+    #[pyo3(get)]
+    pub accumulated_strain: f64,
+    /// the step's temperature-dependent rupture strain limit.
+    #[pyo3(get)]
+    pub rupture_strain_limit: f64,
+}
+
+#[pymethods]
+impl PyPipeFireRupturePoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipeFireRupturePoint(time={:?}, pressure={:?}, mean_wall_temperature={:?}, outer_surface_temperature={:?}, heat_flux={:?}, von_mises_stress={:?}, strain_rate={:?}, accumulated_strain={}, rupture_strain_limit={})",
+            self.time,
+            self.pressure,
+            self.mean_wall_temperature,
+            self.outer_surface_temperature,
+            self.heat_flux,
+            self.von_mises_stress,
+            self.strain_rate,
+            self.accumulated_strain,
+            self.rupture_strain_limit
+        )
+    }
+}
+
+impl From<&azoth_process::models::pipe_fire_rupture::PipeFireRupturePoint>
+    for PyPipeFireRupturePoint
+{
+    fn from(row: &azoth_process::models::pipe_fire_rupture::PipeFireRupturePoint) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "bar".to_string(),
+            },
+            mean_wall_temperature: PyQty {
+                magnitude_si: row.mean_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            outer_surface_temperature: PyQty {
+                magnitude_si: row.outer_surface_temperature.value,
+                unit: "K".to_string(),
+            },
+            heat_flux: PyQty {
+                magnitude_si: row.heat_flux.value,
+                unit: "W/m**2".to_string(),
+            },
+            von_mises_stress: PyQty {
+                magnitude_si: row.von_mises_stress.value,
+                unit: "MPa".to_string(),
+            },
+            strain_rate: PyQty {
+                magnitude_si: row.strain_rate.value,
+                unit: "1/s".to_string(),
+            },
+            accumulated_strain: row.accumulated_strain,
+            rupture_strain_limit: row.rupture_strain_limit,
+        }
+    }
+}
+
 /// one row per input row, in caller order.
 #[pyclass(
     frozen,
@@ -2335,6 +2430,62 @@ impl From<&azoth_process::models::tr3001_compliance::Tr3001Finding> for PyTr3001
         Self {
             check: row.check.as_str().to_string(),
             status: row.status.as_str().to_string(),
+        }
+    }
+}
+
+/// one row per input state, in the caller's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "VesselRuptureStep"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyVesselRuptureStep {
+    /// the state's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the state's thin-wall von Mises stress.
+    #[pyo3(get)]
+    pub von_mises_stress: PyQty,
+    /// the state's derated allowable stress.
+    #[pyo3(get)]
+    pub allowable_stress: PyQty,
+    /// `allowable_stress - von_mises_stress`.
+    #[pyo3(get)]
+    pub margin: PyQty,
+}
+
+#[pymethods]
+impl PyVesselRuptureStep {
+    fn __repr__(&self) -> String {
+        format!(
+            "VesselRuptureStep(time={:?}, von_mises_stress={:?}, allowable_stress={:?}, margin={:?})",
+            self.time, self.von_mises_stress, self.allowable_stress, self.margin
+        )
+    }
+}
+
+impl From<&azoth_process::models::vessel_rupture::VesselRuptureStep> for PyVesselRuptureStep {
+    fn from(row: &azoth_process::models::vessel_rupture::VesselRuptureStep) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            von_mises_stress: PyQty {
+                magnitude_si: row.von_mises_stress.value,
+                unit: "Pa".to_string(),
+            },
+            allowable_stress: PyQty {
+                magnitude_si: row.allowable_stress.value,
+                unit: "Pa".to_string(),
+            },
+            margin: PyQty {
+                magnitude_si: row.margin.value,
+                unit: "Pa".to_string(),
+            },
         }
     }
 }

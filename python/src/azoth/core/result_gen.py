@@ -46,6 +46,7 @@ from azoth.core.record_outputs_gen import (
     MineralEquilibriumRow,
     MinimalCutSet,
     NaceIssueRow,
+    PipeFireRupturePoint,
     ReliefDisposalRow,
     RemediationOptionRow,
     RiskAssessmentRow,
@@ -58,6 +59,7 @@ from azoth.core.record_outputs_gen import (
     StreamScaleMineralRow,
     SubFraction,
     Tr3001Finding,
+    VesselRuptureStep,
     WaterMixingResult,
     ZoneRatingRow,
 )
@@ -69,6 +71,7 @@ from azoth.core.result_base import (
     ErosionRiskLevel,
     FeSMorphology,
     FlowRegime,
+    FluidBasis,
     GoverningCriterion,
     HenryStatus,
     HydrateRiskLevel,
@@ -77,6 +80,7 @@ from azoth.core.result_base import (
     Phase,
     PlusModel,
     RootStructure,
+    RuptureStatus,
     StabilityVerdict,
     Sts0131PressureCategory,
     SupplyVerdict,
@@ -5741,6 +5745,22 @@ class BleveResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class BlowdownPressureProfileResult(_HasWarnings):
+    """Result of ``process.blowdown_pressure_profile``."""
+
+    CALC_ID: ClassVar[str] = "process.blowdown_pressure_profile"
+
+    #: the profile's absolute pressure at `time`.
+    pressure_absolute: Q
+
+    #: `pressure_absolute - gauge_offset`.
+    pressure_gauge: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class BowTieResult(_HasWarnings):
     """Result of ``process.bow_tie``."""
 
@@ -8085,6 +8105,95 @@ class PipeResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PipeFireRuptureResult(_HasWarnings):
+    """Result of ``process.pipe_fire_rupture``."""
+
+    CALC_ID: ClassVar[str] = "process.pipe_fire_rupture"
+
+    #: the strict strain test: rupture when the accumulated strain exceeds the limit at the current step.
+    status: RuptureStatus
+
+    #: the branch the density switch selected: `gas` below 500 kg/m3 and `liquid` at or above it.
+    fluid_basis: FluidBasis
+
+    #: the time of the first step whose accumulated strain exceeds the limit; absent when none does.
+    rupture_time: Q | None
+
+    #: the gauge pressure at the rupture step; absent when none.
+    rupture_pressure: Q | None
+
+    #: the mean wall temperature at the rupture step; absent when none.
+    rupture_mean_wall_temperature: Q | None
+
+    #: the outer surface temperature at the rupture step; absent when none.
+    rupture_outer_surface_temperature: Q | None
+
+    #: the accumulated strain at the rupture step; absent when none.
+    rupture_accumulated_strain: float | None
+
+    #: the temperature-dependent limit at the rupture step; absent when none.
+    rupture_strain_limit: float | None
+
+    #: `0.00527 A P_barg 1e5 sqrt(MW 1000 / max(1, T0 + 273))` for both sides; absent when no rupture or on the liquid branch, and zero there.
+    long_pipe_gas_two_sides: Q | None
+
+    #: half the two-sided gas release; absent when no rupture or on the liquid branch, and zero there.
+    long_pipe_gas_one_side: Q | None
+
+    #: the one-sided gas release times the class's 1.541; absent when no rupture or on the liquid branch, and zero there.
+    short_pipe_gas_one_side: Q | None
+
+    #: `((A 1e6) 0.62 / 11.78 / sqrt(SG / (max(P_barg, 1) 100))) / 60 SG`; absent when no rupture or on the gas branch, and zero there.
+    liquid_one_side: Q | None
+
+    #: the initial temperature the gas release was evaluated at; absent when no rupture.
+    release_gas_temperature: Q | None
+
+    #: one row per marching step, in time order, ending at the rupture step when one is found.
+    history: tuple[PipeFireRupturePoint, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PipeFireRuptureMaterialResult(_HasWarnings):
+    """Result of ``process.pipe_fire_rupture_material``."""
+
+    CALC_ID: ClassVar[str] = "process.pipe_fire_rupture_material"
+
+    #: the built-in table's name, or the supplied label when a curve is used.
+    resolved_material_name: str
+
+    #: the material density.
+    density: Q
+
+    #: `heatCapacityAt(evaluation_temperature)`, with endpoint clamping.
+    heat_capacity: Q
+
+    #: `thermalConductivityAt(evaluation_temperature)`.
+    thermal_conductivity: Q
+
+    #: `ultimateTensileStrengthAt(evaluation_temperature)`.
+    ultimate_tensile_strength: Q
+
+    #: `strainEffectAt(evaluation_temperature)`.
+    strain_effect_factor: float
+
+    #: `ruptureStrainLimitAt(evaluation_temperature)`.
+    rupture_strain_limit: float
+
+    #: the class's `temperatureCorrectionFactor`: exactly 1 at or above the limit, else `T/Q (ln(sinh(alpha UTS)) n - ln(60 correction_strain_rate) + ln(A))`.
+    temperature_correction_factor: float
+
+    #: `temperatureCorrectionFactor`-corrected Sellars-Tegart strain rate, the class's per-minute rate divided by 60.
+    strain_rate: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PipelinePressureProtectionResult(_HasWarnings):
     """Result of ``process.pipeline_pressure_protection``."""
 
@@ -9875,6 +9984,49 @@ class VceResult(_HasWarnings):
 
     #: the distance at which the overpressure falls to the target. **Absent when the overpressure at 0.1 m is already below the target**, where the class answers that near bound.
     distance_to_overpressure: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class VesselRuptureResult(_HasWarnings):
+    """Result of ``process.vessel_rupture``."""
+
+    CALC_ID: ClassVar[str] = "process.vessel_rupture"
+
+    #: whether any step's margin is at or below zero.
+    ruptured: bool
+
+    #: the interpolated first crossover time; absent when no step reaches zero.
+    rupture_time: Q | None
+
+    #: the von Mises stress at the rupture step; absent when none.
+    rupture_stress: Q | None
+
+    #: the allowable stress at the rupture step; absent when none.
+    rupture_allowable_stress: Q | None
+
+    #: the metal temperature at the rupture step; absent when none.
+    rupture_metal_temperature: Q | None
+
+    #: the smallest margin over the history.
+    min_margin: Q
+
+    #: the time of the first occurrence of the smallest margin.
+    min_margin_time: Q
+
+    #: the class's name: `CS` for the carbon-steel branch and `API 5L <grade>` for the grade branch.
+    material_name: str
+
+    #: the ambient yield strength the material curve carries.
+    ambient_yield_strength: Q
+
+    #: the ambient tensile strength the allowable is built from.
+    ambient_tensile_strength: Q
+
+    #: one row per input state, in the caller's order.
+    history: tuple[VesselRuptureStep, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

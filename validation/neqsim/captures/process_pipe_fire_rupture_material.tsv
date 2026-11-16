@@ -1,0 +1,204 @@
+material_22cr_duplex
+material_name=22Cr duplex
+metal_temperature_c=600.0
+stress_mpa=100.0
+density_kg_m3=7850.0
+heat_capacity_j_kg_k=670.0
+thermal_conductivity_w_m_k=28.0
+ultimate_tensile_strength_mpa=371.0
+strain_effect_factor=1.0
+rupture_strain_limit=0.22
+temperature_correction_factor=1.2601625651473616
+strain_rate_per_minute=7.26471235952742E-10
+
+material_ss_316
+material_name=SS 316
+metal_temperature_c=600.0
+stress_mpa=100.0
+density_kg_m3=7850.0
+heat_capacity_j_kg_k=549.9592356687898
+thermal_conductivity_w_m_k=22.7
+ultimate_tensile_strength_mpa=363.0
+strain_effect_factor=1.0
+rupture_strain_limit=0.15
+temperature_correction_factor=1.0797171079352614
+strain_rate_per_minute=8.369589055692245E-9
+
+material_cs_235_asme_a106_b
+material_name=CS 235 ASME A106-B
+metal_temperature_c=600.0
+stress_mpa=100.0
+density_kg_m3=7850.0
+heat_capacity_j_kg_k=750.0
+thermal_conductivity_w_m_k=33.95
+ultimate_tensile_strength_mpa=189.0
+strain_effect_factor=1.0
+rupture_strain_limit=0.15
+temperature_correction_factor=1.066215335302499
+strain_rate_per_minute=2.3921756186276417E-6
+
+material_cs_360_api_5l_x52
+material_name=CS 360 API 5L-X52
+metal_temperature_c=600.0
+stress_mpa=100.0
+density_kg_m3=7850.0
+heat_capacity_j_kg_k=750.0
+thermal_conductivity_w_m_k=33.95
+ultimate_tensile_strength_mpa=245.0
+strain_effect_factor=1.0
+rupture_strain_limit=0.15
+temperature_correction_factor=1.0394026624917467
+strain_rate_per_minute=3.1457438871811307E-6
+
+material_superduplex
+material_name=Superduplex
+metal_temperature_c=600.0
+stress_mpa=100.0
+density_kg_m3=7850.0
+heat_capacity_j_kg_k=670.0
+thermal_conductivity_w_m_k=28.0
+ultimate_tensile_strength_mpa=427.0
+strain_effect_factor=1.0
+rupture_strain_limit=0.22
+temperature_correction_factor=1.2468594650803833
+strain_rate_per_minute=2.0913426401717992E-11
+
+material_6mo
+material_name=6Mo
+metal_temperature_c=600.0
+stress_mpa=100.0
+density_kg_m3=7850.0
+heat_capacity_j_kg_k=549.9592356687898
+thermal_conductivity_w_m_k=22.7
+ultimate_tensile_strength_mpa=480.0
+strain_effect_factor=1.0
+rupture_strain_limit=0.15
+temperature_correction_factor=1.0811934944180024
+strain_rate_per_minute=1.0095352950704674E-9
+
+material_22cr_800c
+material_name=22Cr duplex
+metal_temperature_c=800.0
+stress_mpa=100.0
+density_kg_m3=7850.0
+heat_capacity_j_kg_k=750.0
+thermal_conductivity_w_m_k=28.0
+ultimate_tensile_strength_mpa=157.0
+strain_effect_factor=0.7
+rupture_strain_limit=0.23
+temperature_correction_factor=1.1134489981072802
+strain_rate_per_minute=5.231076120249886E-4
+
+material_22cr_clamp_low
+material_name=22Cr duplex
+metal_temperature_c=-100.0
+stress_mpa=100.0
+density_kg_m3=7850.0
+heat_capacity_j_kg_k=480.0
+thermal_conductivity_w_m_k=15.0
+ultimate_tensile_strength_mpa=650.0
+strain_effect_factor=1.0
+rupture_strain_limit=0.22
+temperature_correction_factor=0.3412459535538541
+strain_rate_per_minute=1.0541069697452381E-17
+
+material_22cr_clamp_high
+material_name=22Cr duplex
+metal_temperature_c=1400.0
+stress_mpa=100.0
+density_kg_m3=7850.0
+heat_capacity_j_kg_k=900.0
+thermal_conductivity_w_m_k=28.0
+ultimate_tensile_strength_mpa=0.0
+strain_effect_factor=2.3
+rupture_strain_limit=0.5
+temperature_correction_factor=1.0
+strain_rate_per_minute=5674.430105985362
+
+material_custom_50c
+material_name=Probe custom
+metal_temperature_c=50.0
+stress_mpa=100.0
+density_kg_m3=8000.0
+heat_capacity_j_kg_k=510.0
+thermal_conductivity_w_m_k=16.5
+ultimate_tensile_strength_mpa=575.0
+strain_effect_factor=1.05
+rupture_strain_limit=0.2
+temperature_correction_factor=0.38465495740051725
+strain_rate_per_minute=2.834705146784676E-10
+
+material_custom_clamp_low
+material_name=Probe custom
+metal_temperature_c=-100.0
+stress_mpa=100.0
+density_kg_m3=8000.0
+heat_capacity_j_kg_k=500.0
+thermal_conductivity_w_m_k=16.0
+ultimate_tensile_strength_mpa=600.0
+strain_effect_factor=1.0
+rupture_strain_limit=0.2
+temperature_correction_factor=0.2103476242429434
+strain_rate_per_minute=9.93171185856822E-11
+
+material_custom_clamp_high
+material_name=Probe custom
+metal_temperature_c=400.0
+stress_mpa=100.0
+density_kg_m3=8000.0
+heat_capacity_j_kg_k=540.0
+thermal_conductivity_w_m_k=18.0
+ultimate_tensile_strength_mpa=500.0
+strain_effect_factor=1.2
+rupture_strain_limit=0.2
+temperature_correction_factor=0.7509887347035941
+strain_rate_per_minute=6.5070371560135355E-9
+
+material_alias_superduplex
+alias=SUPERDUPLEX
+resolved_material_name=Superduplex
+
+material_alias_25cr
+alias=25Cr
+resolved_material_name=Superduplex
+
+material_alias_api5l_x52
+alias=API 5L-X52
+resolved_material_name=CS 360 API 5L-X52
+
+material_alias_6mo
+alias=6 Mo
+resolved_material_name=6Mo
+
+material_alias_a106
+alias=A106
+resolved_material_name=CS 235 ASME A106-B
+
+material_alias_316
+alias=316
+resolved_material_name=SS 316
+
+material_empty_name_refused
+refusal=IllegalArgumentException: materialName must not be empty
+
+material_unknown_name_refused
+refusal=IllegalArgumentException: No built-in pipe fire rupture material for: unobtainium
+
+material_short_grid_refused
+refusal=IllegalArgumentException: temperatureC must contain at least two values
+
+material_non_increasing_grid_refused
+refusal=IllegalArgumentException: temperatureC must be strictly increasing and finite
+
+material_mismatched_lengths_refused
+refusal=IllegalArgumentException: heatCapacityJPerKgK must match the temperature grid length
+
+material_zero_density_refused
+refusal=IllegalArgumentException: densityKgPerM3 must be positive and finite
+
+material_zero_alpha_refused
+refusal=IllegalArgumentException: sellarsTegartAlpha must be positive and finite
+
+material_zero_correction_rate_refused
+refusal=IllegalArgumentException: correctionStrainRatePerMinute must be positive and finite
+
