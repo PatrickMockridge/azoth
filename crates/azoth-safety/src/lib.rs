@@ -10,5 +10,10 @@
 //! safety ids are models.
 
 pub mod catalogue;
+pub mod command;
+pub mod dispatch;
 pub mod forms_gen;
+pub mod graph;
+pub mod profile;
 pub mod study;
+pub mod workspace;

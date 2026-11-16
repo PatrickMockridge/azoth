@@ -233,6 +233,69 @@ impl SafetyStudy {
     }
 }
 
+/// The rules a wholesale edit must satisfy before it reaches the document.
+///
+/// **A hand-written document is held to diagnostics instead.** A negative frequency in a saved
+/// study opens and shows the model's refusal beside the field; a command that would write one
+/// is refused, because the editor is the place that can still say why.
+///
+/// # Errors
+/// [`AzothError::InvalidInput`] naming the first violation.
+pub fn validate_bowtie(bowtie: &Bowtie) -> Result<()> {
+    require_text("a bow-tie id", &bowtie.id)?;
+    require_text("a bow-tie name", &bowtie.name)?;
+    require_text("a top-event label", &bowtie.top_event)?;
+    unique("threat", bowtie.threats.iter().map(|row| row.id.as_str()))?;
+    unique("barrier", bowtie.barriers.iter().map(|row| row.id.as_str()))?;
+    unique(
+        "consequence",
+        bowtie.consequences.iter().map(|row| row.id.as_str()),
+    )?;
+    for threat in &bowtie.threats {
+        require_text("a threat id", &threat.id)?;
+        require_text("a threat label", &threat.label)?;
+        if !threat.frequency.is_finite() || threat.frequency < 0.0 {
+            return Err(AzothError::invalid_input(
+                format!("threats.{}", threat.id),
+                "a frequency is a finite number at least zero",
+            ));
+        }
+    }
+    for barrier in &bowtie.barriers {
+        require_text("a barrier id", &barrier.id)?;
+        require_text("a barrier label", &barrier.label)?;
+        if !barrier.pfd.is_finite() || !(0.0..=1.0).contains(&barrier.pfd) {
+            return Err(AzothError::invalid_input(
+                format!("barriers.{}", barrier.id),
+                "a PFD is a finite number in [0, 1]",
+            ));
+        }
+        if !matches!(
+            barrier.barrier_type.as_str(),
+            "prevention" | "mitigation" | "both"
+        ) {
+            return Err(AzothError::invalid_input(
+                format!("barriers.{}", barrier.id),
+                "a barrier type is `prevention`, `mitigation` or `both`",
+            ));
+        }
+    }
+    for consequence in &bowtie.consequences {
+        require_text("a consequence id", &consequence.id)?;
+        require_text("a consequence label", &consequence.label)?;
+        if !consequence.severity.is_finite()
+            || consequence.severity < 0.0
+            || consequence.severity.fract() != 0.0
+        {
+            return Err(AzothError::invalid_input(
+                format!("consequences.{}", consequence.id),
+                "a severity is a whole number at least zero",
+            ));
+        }
+    }
+    Ok(())
+}
+
 fn require_text(what: &str, value: &str) -> Result<()> {
     if value.trim().is_empty() {
         return Err(AzothError::invalid_input(
