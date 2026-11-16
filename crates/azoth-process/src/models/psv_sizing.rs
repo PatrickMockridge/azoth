@@ -67,7 +67,7 @@ const ORIFICES: [(&str, f64); 14] = [
 ];
 
 /// The first ladder row at or above the requirement, else T at 26.0 in².
-fn select_orifice(required_area_in2: f64) -> (String, f64) {
+pub(crate) fn select_orifice(required_area_in2: f64) -> (String, f64) {
     for (letter, area) in ORIFICES {
         if area >= required_area_in2 {
             return (letter.to_string(), area);
@@ -77,18 +77,18 @@ fn select_orifice(required_area_in2: f64) -> (String, f64) {
 }
 
 /// The gas area and its corrections.
-struct GasArea {
-    required_area: f64,
-    required_area_in2: f64,
-    recommended_orifice: String,
-    selected_area_in2: f64,
-    back_pressure_fraction: f64,
-    back_pressure_correction: f64,
-    combination_correction: f64,
+pub(crate) struct GasArea {
+    pub(crate) required_area: f64,
+    pub(crate) required_area_in2: f64,
+    pub(crate) recommended_orifice: String,
+    pub(crate) selected_area_in2: f64,
+    pub(crate) back_pressure_fraction: f64,
+    pub(crate) back_pressure_correction: f64,
+    pub(crate) combination_correction: f64,
 }
 
 #[allow(clippy::too_many_arguments)] // one parameter per quantity the class method reads
-fn gas_area(
+pub(crate) fn gas_area(
     mass_flow: f64,
     set_pressure: f64,
     overpressure_fraction: f64,
@@ -141,19 +141,19 @@ fn gas_area(
 }
 
 /// The liquid area and its corrections.
-struct LiquidArea {
-    required_area: f64,
-    required_area_in2: f64,
-    recommended_orifice: String,
-    selected_area_in2: f64,
-    back_pressure_fraction: f64,
-    back_pressure_correction: f64,
-    viscosity_correction: f64,
-    mass_flow: f64,
+pub(crate) struct LiquidArea {
+    pub(crate) required_area: f64,
+    pub(crate) required_area_in2: f64,
+    pub(crate) recommended_orifice: String,
+    pub(crate) selected_area_in2: f64,
+    pub(crate) back_pressure_fraction: f64,
+    pub(crate) back_pressure_correction: f64,
+    pub(crate) viscosity_correction: f64,
+    pub(crate) mass_flow: f64,
 }
 
 #[allow(clippy::too_many_arguments)]
-fn liquid_area(
+pub(crate) fn liquid_area(
     volume_flow: f64,
     liquid_density: f64,
     set_pressure: f64,
@@ -209,7 +209,7 @@ fn liquid_area(
 }
 
 #[allow(clippy::too_many_arguments)] // one parameter per quantity the class method reads
-fn two_phase_area(
+pub(crate) fn two_phase_area(
     mass_flow: f64,
     set_pressure: f64,
     overpressure_fraction: f64,

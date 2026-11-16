@@ -54,6 +54,7 @@ use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mixer::MixerResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
 use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
+use crate::models::overpressure_protection_study::OverpressureProtectionStudyResult;
 use crate::models::packed_column::PackedColumnResult;
 use crate::models::pfp_demand::PfpDemandResult;
 use crate::models::pipe::PipeResult;
@@ -1237,6 +1238,33 @@ impl CalcResult for OverpressureAcceptanceResult {
         "allowable_pressure",
         "margin",
         "accepted",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for OverpressureProtectionStudyResult {
+    const CALC_ID: &'static str = "process.overpressure_protection_study";
+    const FIELDS: &'static [&'static str] = &[
+        "governing_name",
+        "governing_cause",
+        "governing_phase",
+        "governing_relief_rate",
+        "required_area",
+        "required_area_in2",
+        "recommended_orifice",
+        "selected_area_in2",
+        "selected_orifice_capacity",
+        "capacity_adequate",
+        "acceptance_peak_pressure",
+        "acceptance_allowable_pressure",
+        "acceptance_accumulation_factor",
+        "acceptance_margin",
+        "accepted",
+        "messages",
         "warnings",
     ];
 

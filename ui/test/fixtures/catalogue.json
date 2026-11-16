@@ -24606,6 +24606,15 @@
       "sub_interface": "overpressure"
     },
     {
+      "family": "overpressure",
+      "id": "process.overpressure_protection_study",
+      "name": "Overpressure protection study",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "overpressure"
+    },
+    {
       "family": "fire",
       "form": {
         "assumptions": [
@@ -26552,7 +26561,7 @@
         ],
         "provenance": {
           "python_sha256": "8a90fe3622107596ff9911a4dcb5fe8e7a79c5db8a286a82e18af3b0fffb3480",
-          "rust_sha256": "299062b64a375e34097c35f662d6f5560a3dac327ccd2d2fbf3d803e1bd3a4db",
+          "rust_sha256": "99271db3cc689072c1f7d8d21c560e420b391665c1be9f5e104cc85482ebab95",
           "spec_sha256": "3eee3074bd0c80637e37ddc005f7b73fd42a44d30476c5044349a250040673f4",
           "tests_active": 14,
           "tests_skipped": 0,

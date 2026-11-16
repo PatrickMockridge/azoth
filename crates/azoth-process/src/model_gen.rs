@@ -44,6 +44,7 @@
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/overpressure_acceptance.toml
+//!   - specs/models/process/overpressure_protection_study.toml
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
@@ -50099,6 +50100,686 @@ pub static OVERPRESSURE_ACCEPTANCE_SPEC: ModelSpec = ModelSpec {
     cases: OVERPRESSURE_ACCEPTANCE_CASES,
 };
 
+static OVERPRESSURE_PROTECTION_STUDY_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "mawp",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure must be positive",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "relief_set_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure must be positive",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "back_pressure",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a back pressure is non-negative",
+        },
+    },
+];
+
+static OVERPRESSURE_PROTECTION_STUDY_CASES: &[TestCase] = &[
+    TestCase {
+        id: "study_gas",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[("mawp", 2000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("governing_relief_rate", 2.0),
+            ("required_area", 0.000536864508122035),
+            ("required_area_in2", 0.832141651872458),
+            ("selected_area_in2", 1.287),
+            ("selected_orifice_capacity", 3.093223364325135),
+            ("acceptance_peak_pressure", 2200000.0),
+            ("acceptance_allowable_pressure", 2200000.0),
+            ("acceptance_accumulation_factor", 1.1),
+            ("acceptance_margin", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("governing_name", "Blocked outlet gas"),
+            ("governing_cause", "blocked_outlet"),
+            ("governing_phase", "vapour"),
+            ("recommended_orifice", "J"),
+        ],
+        records: &[(
+            "scenarios",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Blocked outlet small"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("blocked_outlet"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "relief_rate",
+                        value: FieldValue::Number(0.5),
+                    },
+                    RecordField {
+                        name: "relief_temperature",
+                        value: FieldValue::Number(320.0),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.017445699999999998),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.9591602013460842),
+                    },
+                    RecordField {
+                        name: "specific_heat_ratio",
+                        value: FieldValue::Number(1.2795798973843786),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Blocked outlet gas"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("blocked_outlet"),
+                    },
+                    RecordField {
+                        name: "phase",
+                        value: FieldValue::Name("vapour"),
+                    },
+                    RecordField {
+                        name: "relief_rate",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "relief_temperature",
+                        value: FieldValue::Number(320.0),
+                    },
+                    RecordField {
+                        name: "molar_mass",
+                        value: FieldValue::Number(0.017445699999999998),
+                    },
+                    RecordField {
+                        name: "compressibility",
+                        value: FieldValue::Number(0.9591602013460842),
+                    },
+                    RecordField {
+                        name: "specific_heat_ratio",
+                        value: FieldValue::Number(1.2795798973843786),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "study_liquid",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[("mawp", 2000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("governing_relief_rate", 5.0),
+            ("required_area", 0.00015325215271438418),
+            ("required_area_in2", 0.23754131178991908),
+            ("selected_area_in2", 0.307),
+            ("selected_orifice_capacity", 6.462033860272482),
+            ("acceptance_peak_pressure", 2200000.0),
+            ("acceptance_allowable_pressure", 2200000.0),
+            ("acceptance_accumulation_factor", 1.1),
+            ("acceptance_margin", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("governing_name", "Liquid release"),
+            ("governing_cause", "blocked_outlet"),
+            ("governing_phase", "liquid"),
+            ("recommended_orifice", "F"),
+        ],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Liquid release"),
+                },
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("blocked_outlet"),
+                },
+                RecordField {
+                    name: "phase",
+                    value: FieldValue::Name("liquid"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(5.0),
+                },
+                RecordField {
+                    name: "relief_temperature",
+                    value: FieldValue::Number(320.0),
+                },
+                RecordField {
+                    name: "molar_mass",
+                    value: FieldValue::Number(0.058),
+                },
+                RecordField {
+                    name: "compressibility",
+                    value: FieldValue::Number(0.05),
+                },
+                RecordField {
+                    name: "specific_heat_ratio",
+                    value: FieldValue::Number(1.1),
+                },
+                RecordField {
+                    name: "density",
+                    value: FieldValue::Number(600.0),
+                },
+                RecordField {
+                    name: "viscosity",
+                    value: FieldValue::Number(0.001),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "study_two_phase",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[("mawp", 2000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("governing_relief_rate", 1.0),
+            ("required_area", 1.3583252875593678e-05),
+            ("required_area_in2", 0.021054084065338333),
+            ("selected_area_in2", 0.11),
+            ("selected_orifice_capacity", 5.224639535903379),
+            ("acceptance_peak_pressure", 2200000.0),
+            ("acceptance_allowable_pressure", 2200000.0),
+            ("acceptance_accumulation_factor", 1.1),
+            ("acceptance_margin", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("governing_name", "Two phase release"),
+            ("governing_cause", "blocked_outlet"),
+            ("governing_phase", "two_phase"),
+            ("recommended_orifice", "D"),
+        ],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Two phase release"),
+                },
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("blocked_outlet"),
+                },
+                RecordField {
+                    name: "phase",
+                    value: FieldValue::Name("two_phase"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "relief_temperature",
+                    value: FieldValue::Number(350.0),
+                },
+                RecordField {
+                    name: "molar_mass",
+                    value: FieldValue::Number(0.03),
+                },
+                RecordField {
+                    name: "compressibility",
+                    value: FieldValue::Number(0.85),
+                },
+                RecordField {
+                    name: "specific_heat_ratio",
+                    value: FieldValue::Number(1.2),
+                },
+                RecordField {
+                    name: "gas_mass_fraction",
+                    value: FieldValue::Number(0.2),
+                },
+                RecordField {
+                    name: "gas_density",
+                    value: FieldValue::Number(20.0),
+                },
+                RecordField {
+                    name: "liquid_density",
+                    value: FieldValue::Number(600.0),
+                },
+                RecordField {
+                    name: "latent_heat",
+                    value: FieldValue::Number(200000.0),
+                },
+                RecordField {
+                    name: "liquid_heat_capacity",
+                    value: FieldValue::Number(2500.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "study_no_credible",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[("mawp", 2000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Not credible"),
+                },
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("fire"),
+                },
+                RecordField {
+                    name: "phase",
+                    value: FieldValue::Name("vapour"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(100.0),
+                },
+                RecordField {
+                    name: "relief_temperature",
+                    value: FieldValue::Number(350.0),
+                },
+                RecordField {
+                    name: "molar_mass",
+                    value: FieldValue::Number(0.02),
+                },
+                RecordField {
+                    name: "compressibility",
+                    value: FieldValue::Number(0.9),
+                },
+                RecordField {
+                    name: "specific_heat_ratio",
+                    value: FieldValue::Number(1.3),
+                },
+                RecordField {
+                    name: "credible",
+                    value: FieldValue::Flag(false),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "study_zero_rate",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[("mawp", 2000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("governing_relief_rate", 0.0),
+            ("acceptance_peak_pressure", 2200000.0),
+            ("acceptance_allowable_pressure", 2200000.0),
+            ("acceptance_accumulation_factor", 1.1),
+            ("acceptance_margin", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("governing_name", "Zero rate"),
+            ("governing_cause", "blocked_outlet"),
+            ("governing_phase", "vapour"),
+        ],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Zero rate"),
+                },
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("blocked_outlet"),
+                },
+                RecordField {
+                    name: "phase",
+                    value: FieldValue::Name("vapour"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "relief_temperature",
+                    value: FieldValue::Number(320.0),
+                },
+                RecordField {
+                    name: "molar_mass",
+                    value: FieldValue::Number(0.02),
+                },
+                RecordField {
+                    name: "compressibility",
+                    value: FieldValue::Number(0.9),
+                },
+                RecordField {
+                    name: "specific_heat_ratio",
+                    value: FieldValue::Number(1.3),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "study_capacity_shortfall",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[("mawp", 2000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("governing_relief_rate", 1000.0),
+            ("required_area", 0.24149798146623763),
+            ("required_area_in2", 374.3226199179082),
+            ("selected_area_in2", 26.0),
+            ("selected_orifice_capacity", 69.45880002042622),
+            ("acceptance_peak_pressure", 2200000.0),
+            ("acceptance_allowable_pressure", 2200000.0),
+            ("acceptance_accumulation_factor", 1.1),
+            ("acceptance_margin", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("governing_name", "Capacity shortfall"),
+            ("governing_cause", "blocked_outlet"),
+            ("governing_phase", "vapour"),
+            ("recommended_orifice", "T"),
+        ],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Capacity shortfall"),
+                },
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("blocked_outlet"),
+                },
+                RecordField {
+                    name: "phase",
+                    value: FieldValue::Name("vapour"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(1000.0),
+                },
+                RecordField {
+                    name: "relief_temperature",
+                    value: FieldValue::Number(320.0),
+                },
+                RecordField {
+                    name: "molar_mass",
+                    value: FieldValue::Number(0.02),
+                },
+                RecordField {
+                    name: "compressibility",
+                    value: FieldValue::Number(0.9),
+                },
+                RecordField {
+                    name: "specific_heat_ratio",
+                    value: FieldValue::Number(1.3),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "study_acceptance_fail",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[("mawp", 800000.0), ("relief_set_pressure", 1000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("governing_relief_rate", 2.0),
+            ("required_area", 0.00107372901624407),
+            ("required_area_in2", 1.664283303744916),
+            ("selected_area_in2", 1.838),
+            ("selected_orifice_capacity", 2.208758563958663),
+            ("acceptance_peak_pressure", 1100000.0),
+            ("acceptance_allowable_pressure", 880000.0),
+            ("acceptance_accumulation_factor", 1.1),
+            ("acceptance_margin", -220000.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("governing_name", "Blocked outlet gas"),
+            ("governing_cause", "blocked_outlet"),
+            ("governing_phase", "vapour"),
+            ("recommended_orifice", "K"),
+        ],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Blocked outlet gas"),
+                },
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("blocked_outlet"),
+                },
+                RecordField {
+                    name: "phase",
+                    value: FieldValue::Name("vapour"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(2.0),
+                },
+                RecordField {
+                    name: "relief_temperature",
+                    value: FieldValue::Number(320.0),
+                },
+                RecordField {
+                    name: "molar_mass",
+                    value: FieldValue::Number(0.017445699999999998),
+                },
+                RecordField {
+                    name: "compressibility",
+                    value: FieldValue::Number(0.9591602013460842),
+                },
+                RecordField {
+                    name: "specific_heat_ratio",
+                    value: FieldValue::Number(1.2795798973843786),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "study_fire",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[("mawp", 2000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("governing_relief_rate", 2.0),
+            ("required_area", 0.000439087239029523),
+            ("required_area_in2", 0.680586581668924),
+            ("selected_area_in2", 0.785),
+            ("selected_orifice_capacity", 2.306833608370694),
+            ("acceptance_peak_pressure", 2420000.0),
+            ("acceptance_allowable_pressure", 2420000.0),
+            ("acceptance_accumulation_factor", 1.21),
+            ("acceptance_margin", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("governing_name", "Fire case"),
+            ("governing_cause", "fire"),
+            ("governing_phase", "vapour"),
+            ("recommended_orifice", "H"),
+        ],
+        records: &[(
+            "scenarios",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Fire case"),
+                },
+                RecordField {
+                    name: "cause",
+                    value: FieldValue::Name("fire"),
+                },
+                RecordField {
+                    name: "phase",
+                    value: FieldValue::Name("vapour"),
+                },
+                RecordField {
+                    name: "relief_rate",
+                    value: FieldValue::Number(2.0),
+                },
+                RecordField {
+                    name: "relief_temperature",
+                    value: FieldValue::Number(320.0),
+                },
+                RecordField {
+                    name: "molar_mass",
+                    value: FieldValue::Number(0.02),
+                },
+                RecordField {
+                    name: "compressibility",
+                    value: FieldValue::Number(0.9),
+                },
+                RecordField {
+                    name: "specific_heat_ratio",
+                    value: FieldValue::Number(1.3),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+];
+
+static OVERPRESSURE_PROTECTION_STUDY_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "overpressure_protection_study",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.overpressure_protection_study`.
+pub static OVERPRESSURE_PROTECTION_STUDY_SPEC: ModelSpec = ModelSpec {
+    id: "process.overpressure_protection_study",
+    kind: "procedure",
+    algorithm: Some(&OVERPRESSURE_PROTECTION_STUDY_ALGORITHM),
+    checks: OVERPRESSURE_PROTECTION_STUDY_CHECKS,
+    cases: OVERPRESSURE_PROTECTION_STUDY_CASES,
+};
+
 static PACKED_COLUMN_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -74754,6 +75435,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &MIXER_SPEC,
     &NOG070_SIL_DETERMINATION_SPEC,
     &OVERPRESSURE_ACCEPTANCE_SPEC,
+    &OVERPRESSURE_PROTECTION_STUDY_SPEC,
     &PACKED_COLUMN_SPEC,
     &PFP_DEMAND_SPEC,
     &PIPE_SPEC,

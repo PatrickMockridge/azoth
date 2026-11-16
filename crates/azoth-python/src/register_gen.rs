@@ -283,6 +283,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyMixerResult>()?;
     m.add_class::<crate::transport_gen::PyNog070SilDeterminationResult>()?;
     m.add_class::<crate::transport_gen::PyOverpressureAcceptanceResult>()?;
+    m.add_class::<crate::transport_gen::PyOverpressureProtectionStudyResult>()?;
     m.add_class::<crate::transport_gen::PyPackedColumnResult>()?;
     m.add_class::<crate::transport_gen::PyPfpDemandResult>()?;
     m.add_class::<crate::transport_gen::PyPipeResult>()?;
@@ -1007,6 +1008,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::overpressure_acceptance,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::overpressure_protection_study,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::packed_column, m)?)?;

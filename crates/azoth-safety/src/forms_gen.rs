@@ -2849,6 +2849,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.overpressure_protection_study",
+        name: "Overpressure protection study",
+        family: "overpressure",
+        sub_interface: Some("overpressure"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.pfp_demand",
         name: "Passive fire protection demand",
         family: "fire",

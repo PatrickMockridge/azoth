@@ -62,6 +62,7 @@ from azoth.core.result import (
     MixerResult,
     Nog070SilDeterminationResult,
     OverpressureAcceptanceResult,
+    OverpressureProtectionStudyResult,
     PackedColumnResult,
     PfpDemandResult,
     PipeFireRuptureMaterialResult,
@@ -202,6 +203,7 @@ _MANIFOLD = "process.manifold"
 _MIXER = "process.mixer"
 _NOG070_SIL_DETERMINATION = "process.nog070_sil_determination"
 _OVERPRESSURE_ACCEPTANCE = "process.overpressure_acceptance"
+_OVERPRESSURE_PROTECTION_STUDY = "process.overpressure_protection_study"
 _PACKED_COLUMN = "process.packed_column"
 _PFP_DEMAND = "process.pfp_demand"
 _PIPELINE_PRESSURE_PROTECTION = "process.pipeline_pressure_protection"
@@ -2536,6 +2538,31 @@ def nog070_sil_determination(
         sif_type=sif_type,
         pfd_average=pfd_average,
         minimum_sil=minimum_sil,
+    )
+
+
+def overpressure_protection_study(
+    mawp: Q,
+    scenarios: list[dict[str, object]],
+    relief_set_pressure: Q | None = None,
+    back_pressure: Q | None = None,
+    multiple_devices: bool | None = None,
+) -> OverpressureProtectionStudyResult:
+    """The governing case, its sizing and the accumulated-pressure verdict.
+
+    **The governing case is the first credible row with the largest rate**, the fire basis
+    is 21 % and every other cause 10 %, and the sizing is the ported API 520 arithmetic.
+    A liquid case with no density falls back to 700 kg/m3; a two-phase case missing an
+    omega input is not sized and still runs acceptance.
+
+    See :func:`azoth.process.reference.overpressure_protection_study`.
+    """
+    return resolve(_OVERPRESSURE_PROTECTION_STUDY)(  # type: ignore[no-any-return]
+        mawp=mawp,
+        scenarios=scenarios,
+        relief_set_pressure=relief_set_pressure,
+        back_pressure=back_pressure,
+        multiple_devices=multiple_devices,
     )
 
 

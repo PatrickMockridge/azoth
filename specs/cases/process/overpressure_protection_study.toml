@@ -1,0 +1,196 @@
+model = "process.overpressure_protection_study"
+
+[[cases]]
+id = "study_gas"
+tolerance = 1.0e-7
+source = "A 20 bara MAWP item with a 0.5 kg/s and a 2.0 kg/s blocked-outlet gas case: the larger governs and the J orifice is selected. From `validation/neqsim/captures/process_overpressure_protection_study.tsv` (`study_gas`)."
+[cases.inputs]
+mawp = 2000000.0
+scenarios = [
+    { name = "Blocked outlet small", cause = "blocked_outlet", phase = "vapour", relief_rate = 0.5, relief_temperature = 320.0, molar_mass = 0.017445699999999998, compressibility = 0.9591602013460842, specific_heat_ratio = 1.2795798973843786 },
+    { name = "Blocked outlet gas", cause = "blocked_outlet", phase = "vapour", relief_rate = 2.0, relief_temperature = 320.0, molar_mass = 0.017445699999999998, compressibility = 0.9591602013460842, specific_heat_ratio = 1.2795798973843786 },
+]
+[cases.expected]
+governing_name = "Blocked outlet gas"
+governing_cause = "blocked_outlet"
+governing_phase = "vapour"
+governing_relief_rate = 2.0
+required_area = 5.36864508122035e-4
+required_area_in2 = 0.832141651872458
+recommended_orifice = "J"
+selected_area_in2 = 1.287
+selected_orifice_capacity = 3.093223364325135
+capacity_adequate = true
+acceptance_peak_pressure = 2200000.0
+acceptance_allowable_pressure = 2200000.0
+acceptance_accumulation_factor = 1.1
+acceptance_margin = 0.0
+accepted = true
+
+[[cases]]
+id = "study_liquid"
+tolerance = 1.0e-7
+source = "A liquid case with a stated 600 kg/m3 density and 1e-3 Pa s viscosity: the F orifice. From (`study_liquid`)."
+[cases.inputs]
+mawp = 2000000.0
+scenarios = [
+    { name = "Liquid release", cause = "blocked_outlet", phase = "liquid", relief_rate = 5.0, relief_temperature = 320.0, molar_mass = 0.058, compressibility = 0.05, specific_heat_ratio = 1.1, density = 600.0, viscosity = 1.0e-3 },
+]
+[cases.expected]
+governing_name = "Liquid release"
+governing_cause = "blocked_outlet"
+governing_phase = "liquid"
+governing_relief_rate = 5.0
+required_area = 1.5325215271438418e-4
+required_area_in2 = 0.23754131178991908
+recommended_orifice = "F"
+selected_area_in2 = 0.307
+selected_orifice_capacity = 6.462033860272482
+capacity_adequate = true
+acceptance_peak_pressure = 2200000.0
+acceptance_allowable_pressure = 2200000.0
+acceptance_accumulation_factor = 1.1
+acceptance_margin = 0.0
+accepted = true
+
+[[cases]]
+id = "study_two_phase"
+tolerance = 1.0e-7
+source = "A two-phase case with all five omega inputs: the D orifice. From (`study_two_phase`)."
+[cases.inputs]
+mawp = 2000000.0
+scenarios = [
+    { name = "Two phase release", cause = "blocked_outlet", phase = "two_phase", relief_rate = 1.0, relief_temperature = 350.0, molar_mass = 0.03, compressibility = 0.85, specific_heat_ratio = 1.2, gas_mass_fraction = 0.2, gas_density = 20.0, liquid_density = 600.0, latent_heat = 200000.0, liquid_heat_capacity = 2500.0 },
+]
+[cases.expected]
+governing_name = "Two phase release"
+governing_cause = "blocked_outlet"
+governing_phase = "two_phase"
+governing_relief_rate = 1.0
+required_area = 1.3583252875593678e-5
+required_area_in2 = 0.021054084065338333
+recommended_orifice = "D"
+selected_area_in2 = 0.11
+selected_orifice_capacity = 5.224639535903379
+capacity_adequate = true
+acceptance_peak_pressure = 2200000.0
+acceptance_allowable_pressure = 2200000.0
+acceptance_accumulation_factor = 1.1
+acceptance_margin = 0.0
+accepted = true
+
+[[cases]]
+id = "study_no_credible"
+tolerance = 1.0e-7
+source = "One non-credible fire case: nothing governs and nothing is sized. From (`study_no_credible`)."
+[cases.inputs]
+mawp = 2000000.0
+scenarios = [
+    { name = "Not credible", cause = "fire", phase = "vapour", relief_rate = 100.0, relief_temperature = 350.0, molar_mass = 0.02, compressibility = 0.9, specific_heat_ratio = 1.3, credible = false },
+]
+[cases.expected]
+capacity_adequate = false
+messages = ["No credible relief scenario defined; nothing to size"]
+
+[[cases]]
+id = "study_zero_rate"
+tolerance = 1.0e-7
+source = "A credible zero-rate case governs, is not sized, and the acceptance still runs. From (`study_zero_rate`)."
+[cases.inputs]
+mawp = 2000000.0
+scenarios = [
+    { name = "Zero rate", cause = "blocked_outlet", phase = "vapour", relief_rate = 0.0, relief_temperature = 320.0, molar_mass = 0.02, compressibility = 0.9, specific_heat_ratio = 1.3 },
+]
+[cases.expected]
+governing_name = "Zero rate"
+governing_cause = "blocked_outlet"
+governing_phase = "vapour"
+governing_relief_rate = 0.0
+capacity_adequate = false
+acceptance_peak_pressure = 2200000.0
+acceptance_allowable_pressure = 2200000.0
+acceptance_accumulation_factor = 1.1
+acceptance_margin = 0.0
+accepted = true
+messages = ["Governing relief rate is zero; relief device cannot be sized"]
+
+[[cases]]
+id = "study_capacity_shortfall"
+tolerance = 1.0e-7
+source = "A 1000 kg/s gas case: the largest orifice is still short. From (`study_capacity_shortfall`)."
+[cases.inputs]
+mawp = 2000000.0
+scenarios = [
+    { name = "Capacity shortfall", cause = "blocked_outlet", phase = "vapour", relief_rate = 1000.0, relief_temperature = 320.0, molar_mass = 0.02, compressibility = 0.9, specific_heat_ratio = 1.3 },
+]
+[cases.expected]
+governing_name = "Capacity shortfall"
+governing_cause = "blocked_outlet"
+governing_phase = "vapour"
+governing_relief_rate = 1000.0
+required_area = 0.24149798146623763
+required_area_in2 = 374.3226199179082
+recommended_orifice = "T"
+selected_area_in2 = 26.0
+selected_orifice_capacity = 69.45880002042622
+capacity_adequate = false
+acceptance_peak_pressure = 2200000.0
+acceptance_allowable_pressure = 2200000.0
+acceptance_accumulation_factor = 1.1
+acceptance_margin = 0.0
+accepted = true
+messages = ["Required relief area exceeds the largest standard orifice; multiple or larger relief devices are required"]
+
+[[cases]]
+id = "study_acceptance_fail"
+tolerance = 1.0e-7
+source = "An 8 bara MAWP item set at 10 bara: the K orifice sizes, but the peak exceeds the allowable and the message carries the basis. From (`study_acceptance_fail`)."
+[cases.inputs]
+mawp = 800000.0
+relief_set_pressure = 1000000.0
+scenarios = [
+    { name = "Blocked outlet gas", cause = "blocked_outlet", phase = "vapour", relief_rate = 2.0, relief_temperature = 320.0, molar_mass = 0.017445699999999998, compressibility = 0.9591602013460842, specific_heat_ratio = 1.2795798973843786 },
+]
+[cases.expected]
+governing_name = "Blocked outlet gas"
+governing_cause = "blocked_outlet"
+governing_phase = "vapour"
+governing_relief_rate = 2.0
+required_area = 0.00107372901624407
+required_area_in2 = 1.664283303744916
+recommended_orifice = "K"
+selected_area_in2 = 1.838
+selected_orifice_capacity = 2.208758563958663
+capacity_adequate = true
+acceptance_peak_pressure = 1100000.0
+acceptance_allowable_pressure = 880000.0
+acceptance_accumulation_factor = 1.1
+acceptance_margin = -220000.0
+accepted = false
+messages = ["Relieving pressure exceeds the allowable accumulated pressure: 110% of MAWP (8.00 bara x 1.10) for Blocked outlet, single device"]
+
+[[cases]]
+id = "study_fire"
+tolerance = 1.0e-7
+source = "A fire-cause case takes the 21% basis and the H orifice. From (`study_fire`)."
+[cases.inputs]
+mawp = 2000000.0
+scenarios = [
+    { name = "Fire case", cause = "fire", phase = "vapour", relief_rate = 2.0, relief_temperature = 320.0, molar_mass = 0.02, compressibility = 0.9, specific_heat_ratio = 1.3 },
+]
+[cases.expected]
+governing_name = "Fire case"
+governing_cause = "fire"
+governing_phase = "vapour"
+governing_relief_rate = 2.0
+required_area = 4.39087239029523e-4
+required_area_in2 = 0.680586581668924
+recommended_orifice = "H"
+selected_area_in2 = 0.785
+selected_orifice_capacity = 2.306833608370694
+capacity_adequate = true
+acceptance_peak_pressure = 2420000.0
+acceptance_allowable_pressure = 2420000.0
+acceptance_accumulation_factor = 1.21
+acceptance_margin = 0.0
+accepted = true

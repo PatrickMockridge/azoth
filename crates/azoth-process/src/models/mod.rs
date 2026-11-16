@@ -74,6 +74,7 @@ pub mod mixer;
 pub mod nog070_sil_determination;
 pub mod overpressure;
 pub mod overpressure_acceptance;
+pub mod overpressure_protection_study;
 pub mod packed_column;
 pub mod pfp_demand;
 pub mod pipe;
@@ -168,6 +169,9 @@ pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expand
 pub use mixer::{MixerResult, mixer};
 pub use nog070_sil_determination::{Nog070SilDeterminationResult, nog070_sil_determination};
 pub use overpressure_acceptance::{OverpressureAcceptanceResult, overpressure_acceptance};
+pub use overpressure_protection_study::{
+    OverpressureProtectionStudyResult, OverpressureScenario, overpressure_protection_study,
+};
 pub use packed_column::{PackedColumnResult, packed_column};
 pub use pfp_demand::{PfpDemandResult, pfp_demand};
 pub use pipe::{PipeResult, pipe};

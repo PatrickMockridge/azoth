@@ -219,6 +219,14 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # fallback rows' strings against the capture, and `test_cross_impl` compares the
         # tuple on both results.
         "assumptions",
+        # The study's message strings, a `vector_string` for the same reason.
+        # `crates/azoth-process/tests/overpressure_protection_study.rs` asserts them, and
+        # `test_cross_impl` compares the tuple.
+        "messages",
+        # The study's two verdicts, booleans with no slot in `TestCase`; the model's own
+        # test asserts them against the capture and `test_cross_impl` compares them.
+        "capacity_adequate",
+        "accepted",
         # `deluge_nozzle_layout`'s three flags, booleans with no slot in `TestCase`.
         # `crates/azoth-process/tests/deluge_nozzle_layout.rs` asserts them against the
         # capture, and `test_cross_impl` compares them on both results.

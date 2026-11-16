@@ -8004,6 +8004,64 @@ class OverpressureAcceptanceResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class OverpressureProtectionStudyResult(_HasWarnings):
+    """Result of ``process.overpressure_protection_study``."""
+
+    CALC_ID: ClassVar[str] = "process.overpressure_protection_study"
+
+    #: the governing scenario's name; absent when no credible scenario exists.
+    governing_name: str | None
+
+    #: the governing cause's spelling.
+    governing_cause: str | None
+
+    #: the governing phase's spelling.
+    governing_phase: str | None
+
+    #: the governing scenario's relief rate.
+    governing_relief_rate: Q | None
+
+    #: the required orifice area; absent when the case was not sized.
+    required_area: Q | None
+
+    #: the required area in square inches.
+    required_area_in2: float | None
+
+    #: the first standard orifice at or above the requirement; absent when not sized.
+    recommended_orifice: str | None
+
+    #: the selected standard orifice's area in square inches.
+    selected_area_in2: float | None
+
+    #: `rate selected_area / required_area`; absent when not sized.
+    selected_orifice_capacity: Q | None
+
+    #: whether the selected orifice is at least the required area.
+    capacity_adequate: bool
+
+    #: the peak pressure the acceptance compared; absent when no credible scenario exists.
+    acceptance_peak_pressure: Q | None
+
+    #: `mawp accumulation_factor`.
+    acceptance_allowable_pressure: Q | None
+
+    #: 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.
+    acceptance_accumulation_factor: float | None
+
+    #: `allowable - peak`.
+    acceptance_margin: Q | None
+
+    #: whether the peak is at or below the allowable pressure; absent when no credible scenario exists.
+    accepted: bool | None
+
+    #: the class's warning strings in order, with the acceptance failure's basis prose when it fails.
+    messages: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PackedColumnResult(_HasWarnings):
     """Result of ``process.packed_column``."""
 

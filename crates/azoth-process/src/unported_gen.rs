@@ -44,6 +44,7 @@
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/overpressure_acceptance.toml
+//!   - specs/models/process/overpressure_protection_study.toml
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml

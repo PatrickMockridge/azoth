@@ -203,6 +203,7 @@ from azoth.core.result import (
     OilAssayDerivationResult,
     OrificeFlowResult,
     OverpressureAcceptanceResult,
+    OverpressureProtectionStudyResult,
     PackedColumnResult,
     PackingHydraulicsResult,
     PackingSizingResult,
@@ -582,6 +583,7 @@ __all__ = [
     "oil_assay_derivation",
     "orifice_flow",
     "overpressure_acceptance",
+    "overpressure_protection_study",
     "packed_column",
     "packing_hydraulics",
     "packing_sizing",
@@ -7294,6 +7296,37 @@ def overpressure_acceptance(peak_pressure: Q, mawp: Q, cause: str, multiple_devi
         allowable_pressure=from_si(result.allowable_pressure.magnitude_si, result.allowable_pressure.unit),
         margin=from_si(result.margin.magnitude_si, result.margin.unit),
         accepted=result.accepted,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def overpressure_protection_study(mawp: Q, scenarios: list[dict[str, object]], relief_set_pressure: Q | None=None, back_pressure: Q | None=None, multiple_devices: bool | None=None) -> OverpressureProtectionStudyResult:
+    """``process.overpressure_protection_study``, computed in Rust."""
+    spec = _models_gen.model("process.overpressure_protection_study")
+    result = _core.overpressure_protection_study(
+        input_to_si(spec, "mawp", mawp),
+        input_records_to_si(spec, "scenarios", scenarios),
+        None if relief_set_pressure is None else input_to_si(spec, "relief_set_pressure", relief_set_pressure),
+        None if back_pressure is None else input_to_si(spec, "back_pressure", back_pressure),
+        multiple_devices,
+    )
+    return OverpressureProtectionStudyResult(
+        governing_name=result.governing_name,
+        governing_cause=result.governing_cause,
+        governing_phase=result.governing_phase,
+        governing_relief_rate=None if result.governing_relief_rate is None else from_si(result.governing_relief_rate.magnitude_si, result.governing_relief_rate.unit),
+        required_area=None if result.required_area is None else from_si(result.required_area.magnitude_si, result.required_area.unit),
+        required_area_in2=result.required_area_in2,
+        recommended_orifice=result.recommended_orifice,
+        selected_area_in2=result.selected_area_in2,
+        selected_orifice_capacity=None if result.selected_orifice_capacity is None else from_si(result.selected_orifice_capacity.magnitude_si, result.selected_orifice_capacity.unit),
+        capacity_adequate=result.capacity_adequate,
+        acceptance_peak_pressure=None if result.acceptance_peak_pressure is None else from_si(result.acceptance_peak_pressure.magnitude_si, result.acceptance_peak_pressure.unit),
+        acceptance_allowable_pressure=None if result.acceptance_allowable_pressure is None else from_si(result.acceptance_allowable_pressure.magnitude_si, result.acceptance_allowable_pressure.unit),
+        acceptance_accumulation_factor=result.acceptance_accumulation_factor,
+        acceptance_margin=None if result.acceptance_margin is None else from_si(result.acceptance_margin.magnitude_si, result.acceptance_margin.unit),
+        accepted=result.accepted,
+        messages=tuple(result.messages),
         warnings=_warnings(result.warnings),
     )
 

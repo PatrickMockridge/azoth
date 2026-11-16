@@ -19870,6 +19870,139 @@ impl From<&azoth_process::models::overpressure_acceptance::OverpressureAcceptanc
         }
     }
 }
+/// Result of `process.overpressure_protection_study`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OverpressureProtectionStudyResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOverpressureProtectionStudyResult {
+    /// the governing scenario's name; absent when no credible scenario exists.
+    #[pyo3(get)]
+    pub governing_name: Option<String>,
+    /// the governing cause's spelling.
+    #[pyo3(get)]
+    pub governing_cause: Option<String>,
+    /// the governing phase's spelling.
+    #[pyo3(get)]
+    pub governing_phase: Option<String>,
+    /// the governing scenario's relief rate.
+    #[pyo3(get)]
+    pub governing_relief_rate: Option<PyQty>,
+    /// the required orifice area; absent when the case was not sized.
+    #[pyo3(get)]
+    pub required_area: Option<PyQty>,
+    /// the required area in square inches.
+    #[pyo3(get)]
+    pub required_area_in2: Option<f64>,
+    /// the first standard orifice at or above the requirement; absent when not sized.
+    #[pyo3(get)]
+    pub recommended_orifice: Option<String>,
+    /// the selected standard orifice's area in square inches.
+    #[pyo3(get)]
+    pub selected_area_in2: Option<f64>,
+    /// `rate selected_area / required_area`; absent when not sized.
+    #[pyo3(get)]
+    pub selected_orifice_capacity: Option<PyQty>,
+    /// whether the selected orifice is at least the required area.
+    #[pyo3(get)]
+    pub capacity_adequate: bool,
+    /// the peak pressure the acceptance compared; absent when no credible scenario exists.
+    #[pyo3(get)]
+    pub acceptance_peak_pressure: Option<PyQty>,
+    /// `mawp accumulation_factor`.
+    #[pyo3(get)]
+    pub acceptance_allowable_pressure: Option<PyQty>,
+    /// 1.21 fire, 1.16 multiple non-fire, 1.10 single non-fire.
+    #[pyo3(get)]
+    pub acceptance_accumulation_factor: Option<f64>,
+    /// `allowable - peak`.
+    #[pyo3(get)]
+    pub acceptance_margin: Option<PyQty>,
+    /// whether the peak is at or below the allowable pressure; absent when no credible scenario exists.
+    #[pyo3(get)]
+    pub accepted: Option<bool>,
+    /// the class's warning strings in order, with the acceptance failure's basis prose when it fails.
+    #[pyo3(get)]
+    pub messages: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyOverpressureProtectionStudyResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "OverpressureProtectionStudyResult(governing_name={:?}, governing_cause={:?}, governing_phase={:?}, governing_relief_rate={:?}, required_area={:?}, required_area_in2={:?}, recommended_orifice={:?}, selected_area_in2={:?}, selected_orifice_capacity={:?}, capacity_adequate={:?}, acceptance_peak_pressure={:?}, acceptance_allowable_pressure={:?}, acceptance_accumulation_factor={:?}, acceptance_margin={:?}, accepted={:?}, messages={:?}, {} warning(s))",
+            self.governing_name,
+            self.governing_cause,
+            self.governing_phase,
+            self.governing_relief_rate,
+            self.required_area,
+            self.required_area_in2,
+            self.recommended_orifice,
+            self.selected_area_in2,
+            self.selected_orifice_capacity,
+            self.capacity_adequate,
+            self.acceptance_peak_pressure,
+            self.acceptance_allowable_pressure,
+            self.acceptance_accumulation_factor,
+            self.acceptance_margin,
+            self.accepted,
+            self.messages,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::overpressure_protection_study::OverpressureProtectionStudyResult>
+    for PyOverpressureProtectionStudyResult
+{
+    fn from(
+        r: &azoth_process::models::overpressure_protection_study::OverpressureProtectionStudyResult,
+    ) -> Self {
+        Self {
+            governing_name: r.governing_name.clone(),
+            governing_cause: r.governing_cause.clone(),
+            governing_phase: r.governing_phase.clone(),
+            governing_relief_rate: r.governing_relief_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            required_area: r.required_area.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m**2".to_string(),
+            }),
+            required_area_in2: r.required_area_in2,
+            recommended_orifice: r.recommended_orifice.clone(),
+            selected_area_in2: r.selected_area_in2,
+            selected_orifice_capacity: r.selected_orifice_capacity.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            capacity_adequate: r.capacity_adequate,
+            acceptance_peak_pressure: r.acceptance_peak_pressure.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            acceptance_allowable_pressure: r.acceptance_allowable_pressure.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            acceptance_accumulation_factor: r.acceptance_accumulation_factor,
+            acceptance_margin: r.acceptance_margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            accepted: r.accepted,
+            messages: r.messages.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.packed_column`, transported.
 #[pyclass(
     frozen,

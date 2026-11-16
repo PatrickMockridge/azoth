@@ -6948,6 +6948,56 @@ pub fn overpressure_acceptance(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Overpressure protection study.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (mawp, scenarios, relief_set_pressure, back_pressure, multiple_devices))]
+#[pyo3(text_signature = "(mawp, scenarios, relief_set_pressure, back_pressure, multiple_devices)")]
+pub fn overpressure_protection_study(
+    py: Python<'_>,
+    mawp: f64,
+    scenarios: Vec<crate::records_gen::OverpressureScenario>,
+    relief_set_pressure: Option<f64>,
+    back_pressure: Option<f64>,
+    multiple_devices: Option<bool>,
+) -> PyResult<crate::transport_gen::PyOverpressureProtectionStudyResult> {
+    let scenarios_records: Vec<
+        azoth_process::models::overpressure_protection_study::OverpressureScenario,
+    > = scenarios
+        .into_iter()
+        .map(
+            |row| azoth_process::models::overpressure_protection_study::OverpressureScenario {
+                name: row.name,
+                cause: row.cause,
+                phase: row.phase,
+                relief_rate: kilograms_per_second(row.relief_rate),
+                relief_temperature: row.relief_temperature.map(kelvins),
+                molar_mass: row.molar_mass.map(kilograms_per_mole),
+                compressibility: row.compressibility,
+                specific_heat_ratio: row.specific_heat_ratio,
+                density: row.density.map(kilograms_per_cubic_meter),
+                viscosity: row.viscosity.map(pascal_seconds),
+                gas_mass_fraction: row.gas_mass_fraction,
+                gas_density: row.gas_density.map(kilograms_per_cubic_meter),
+                liquid_density: row.liquid_density.map(kilograms_per_cubic_meter),
+                latent_heat: row.latent_heat,
+                liquid_heat_capacity: row.liquid_heat_capacity,
+                credible: row.credible,
+            },
+        )
+        .collect();
+    azoth_process::models::overpressure_protection_study::overpressure_protection_study(
+        pascals(mawp),
+        &scenarios_records,
+        relief_set_pressure.map(pascals),
+        back_pressure.map(pascals),
+        multiple_devices,
+    )
+    .map(|r| crate::transport_gen::PyOverpressureProtectionStudyResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Packed column.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

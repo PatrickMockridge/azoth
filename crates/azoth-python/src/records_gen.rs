@@ -419,6 +419,43 @@ pub struct MapCurvePoint {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct OverpressureScenario {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub cause: String,
+    #[pyo3(item)]
+    pub phase: String,
+    #[pyo3(item)]
+    pub relief_rate: f64,
+    #[pyo3(item)]
+    pub relief_temperature: Option<f64>,
+    #[pyo3(item)]
+    pub molar_mass: Option<f64>,
+    #[pyo3(item)]
+    pub compressibility: Option<f64>,
+    #[pyo3(item)]
+    pub specific_heat_ratio: Option<f64>,
+    #[pyo3(item)]
+    pub density: Option<f64>,
+    #[pyo3(item)]
+    pub viscosity: Option<f64>,
+    #[pyo3(item)]
+    pub gas_mass_fraction: Option<f64>,
+    #[pyo3(item)]
+    pub gas_density: Option<f64>,
+    #[pyo3(item)]
+    pub liquid_density: Option<f64>,
+    #[pyo3(item)]
+    pub latent_heat: Option<f64>,
+    #[pyo3(item)]
+    pub liquid_heat_capacity: Option<f64>,
+    #[pyo3(item)]
+    pub credible: Option<bool>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct PipeFireRuptureMaterialPoint {
     #[pyo3(item)]
     pub temperature: f64,

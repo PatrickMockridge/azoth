@@ -284,6 +284,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.mixer" => azoth_process::models::mixer::MixerResult::FIELDS.to_vec(),
         "process.nog070_sil_determination" => azoth_process::models::nog070_sil_determination::Nog070SilDeterminationResult::FIELDS.to_vec(),
         "process.overpressure_acceptance" => azoth_process::models::overpressure_acceptance::OverpressureAcceptanceResult::FIELDS.to_vec(),
+        "process.overpressure_protection_study" => azoth_process::models::overpressure_protection_study::OverpressureProtectionStudyResult::FIELDS.to_vec(),
         "process.packed_column" => azoth_process::models::packed_column::PackedColumnResult::FIELDS.to_vec(),
         "process.pfp_demand" => azoth_process::models::pfp_demand::PfpDemandResult::FIELDS.to_vec(),
         "process.pipe" => azoth_process::models::pipe::PipeResult::FIELDS.to_vec(),

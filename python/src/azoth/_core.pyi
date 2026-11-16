@@ -517,6 +517,26 @@ class MapCurvePoint(TypedDict):
     head: float
     efficiency: float
 
+class OverpressureScenario(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    cause: str
+    phase: str
+    relief_rate: float
+    relief_temperature: float | None
+    molar_mass: float | None
+    compressibility: float | None
+    specific_heat_ratio: float | None
+    density: float | None
+    viscosity: float | None
+    gas_mass_fraction: float | None
+    gas_density: float | None
+    liquid_density: float | None
+    latent_heat: float | None
+    liquid_heat_capacity: float | None
+    credible: bool | None
+
 class PipeFitting(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -3867,6 +3887,26 @@ class OverpressureAcceptanceResult:
     allowable_pressure: Qty
     margin: Qty
     accepted: bool
+    warnings: list[Warning]
+
+@final
+class OverpressureProtectionStudyResult:
+    governing_name: str | None
+    governing_cause: str | None
+    governing_phase: str | None
+    governing_relief_rate: Qty | None
+    required_area: Qty | None
+    required_area_in2: float | None
+    recommended_orifice: str | None
+    selected_area_in2: float | None
+    selected_orifice_capacity: Qty | None
+    capacity_adequate: bool
+    acceptance_peak_pressure: Qty | None
+    acceptance_allowable_pressure: Qty | None
+    acceptance_accumulation_factor: float | None
+    acceptance_margin: Qty | None
+    accepted: bool | None
+    messages: list[str]
     warnings: list[Warning]
 
 @final
@@ -7538,6 +7578,13 @@ def overpressure_acceptance(
     cause: str,
     multiple_devices: bool,
 ) -> OverpressureAcceptanceResult: ...
+def overpressure_protection_study(
+    mawp: float,
+    scenarios: list[OverpressureScenario],
+    relief_set_pressure: float | None = None,
+    back_pressure: float | None = None,
+    multiple_devices: bool | None = None,
+) -> OverpressureProtectionStudyResult: ...
 def packed_column(
     components: list[str],
     feed_n: float,

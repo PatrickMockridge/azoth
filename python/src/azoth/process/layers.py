@@ -2632,6 +2632,70 @@ def _tube_rupture_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _overpressure_protection_study(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.overpressure_protection_study`'s layers, from the reference's arithmetic."""
+    from azoth import _models_gen
+    from azoth.core.units import quantity
+    from azoth.process.reference.overpressure_protection_study import (
+        overpressure_protection_study as evaluate,
+    )
+
+    spec = _models_gen.model("process.overpressure_protection_study")
+    fields = spec["inputs"]["scenarios"]["fields"]
+    prepared = []
+    for row in inputs["scenarios"]:
+        converted: dict[str, Any] = {}
+        for name, declaration in fields.items():
+            value = row.get(name)
+            if value is None:
+                converted[name] = None
+            elif declaration.get("type") in ("enum", "string", "boolean"):
+                converted[name] = value
+            elif declaration.get("unit") == "dimensionless":
+                converted[name] = float(value)
+            else:
+                converted[name] = quantity(float(value), str(declaration["unit"]))
+        prepared.append(converted)
+
+    def optional(name: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), "Pa")
+
+    result = evaluate(
+        quantity(float(inputs["mawp"]), "Pa"),
+        prepared,
+        optional("relief_set_pressure"),
+        optional("back_pressure"),
+        None if inputs.get("multiple_devices") is None else bool(inputs["multiple_devices"]),
+    )
+    layers: dict[str, float] = {}
+    if result.governing_relief_rate is not None:
+        layers["governing_relief_rate_kg_per_s"] = result.governing_relief_rate.to("kg/s").magnitude
+    if result.required_area is not None:
+        layers["required_area_m2"] = result.required_area.to("m**2").magnitude
+    if result.required_area_in2 is not None:
+        layers["required_area_in2"] = result.required_area_in2
+    if result.selected_area_in2 is not None:
+        layers["selected_area_in2"] = result.selected_area_in2
+    if result.selected_orifice_capacity is not None:
+        layers["selected_orifice_capacity_kg_per_s"] = result.selected_orifice_capacity.to(
+            "kg/s"
+        ).magnitude
+    if result.acceptance_peak_pressure is not None:
+        layers["acceptance_peak_pressure_bara"] = result.acceptance_peak_pressure.to(
+            "bar"
+        ).magnitude
+    if result.acceptance_allowable_pressure is not None:
+        layers["acceptance_allowable_pressure_bara"] = result.acceptance_allowable_pressure.to(
+            "bar"
+        ).magnitude
+    if result.acceptance_accumulation_factor is not None:
+        layers["acceptance_accumulation_factor"] = result.acceptance_accumulation_factor
+    if result.acceptance_margin is not None:
+        layers["acceptance_margin_bara"] = result.acceptance_margin.to("bar").magnitude
+    return layers
+
+
 def _fire_case_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.fire_case_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3004,6 +3068,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
+    "process.overpressure_protection_study": _overpressure_protection_study,
     "process.fire_case_relief": _fire_case_relief,
     "process.overpressure_acceptance": _overpressure_acceptance,
     "process.pipeline_pressure_protection": _pipeline_pressure_protection,
@@ -4570,6 +4635,57 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     # The fire relief's six cased blocks: both drainage branches, the geometry, the
     # no-area state, the latent default and the unread firefighting flag. The negative
     # latent heat the class silently defaults sits outside them.
+    # The protection studies: the no-credible and empty blocks carry no numeric output, so
+    # they are declared in `UNCASED_ROWS` and held by the model cases and the cross-impl.
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_gas",
+        capture="process_overpressure_protection_study.tsv",
+        block=0,
+        identified_by=("#label", "study_gas"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_liquid",
+        capture="process_overpressure_protection_study.tsv",
+        block=1,
+        identified_by=("#label", "study_liquid"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_two_phase",
+        capture="process_overpressure_protection_study.tsv",
+        block=2,
+        identified_by=("#label", "study_two_phase"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_zero_rate",
+        capture="process_overpressure_protection_study.tsv",
+        block=4,
+        identified_by=("#label", "study_zero_rate"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_capacity_shortfall",
+        capture="process_overpressure_protection_study.tsv",
+        block=5,
+        identified_by=("#label", "study_capacity_shortfall"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_acceptance_fail",
+        capture="process_overpressure_protection_study.tsv",
+        block=6,
+        identified_by=("#label", "study_acceptance_fail"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_fire",
+        capture="process_overpressure_protection_study.tsv",
+        block=7,
+        identified_by=("#label", "study_fire"),
+    ),
     # The tube ruptures: the raw state block, the class's zero-end reset and the no-fluid
     # branch are uncased.
     LayerCase(
@@ -6397,6 +6513,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The tube-rupture capture's three: the raw state block, the class's zero-end reset
     # (which the port refuses) and the no-fluid branch.
     "process_tube_rupture_relief.tsv": 3,
+    # The study's two: the no-credible and empty blocks carry no numeric output, so they
+    # are held by their cases and the cross-impl rather than the layer diff.
+    "process_overpressure_protection_study.tsv": 2,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.
