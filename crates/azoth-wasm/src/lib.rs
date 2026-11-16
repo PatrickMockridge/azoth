@@ -271,9 +271,7 @@ impl SafetyEditor {
             None => None,
             Some(text) => Some(serde_json::from_str(&text).map_err(failed)?),
         };
-        self.workspace
-            .calculate(target.as_ref())
-            .map_err(failed)?;
+        self.workspace.calculate(target.as_ref()).map_err(failed)?;
         self.envelope()
     }
 

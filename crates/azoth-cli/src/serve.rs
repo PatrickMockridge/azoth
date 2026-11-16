@@ -248,9 +248,7 @@ fn handle(
     }
 
     if request.method != "POST"
-        || (request.path != ROUTE
-            && request.path != SHEETS_ROUTE
-            && request.path != SAFETY_ROUTE)
+        || (request.path != ROUTE && request.path != SHEETS_ROUTE && request.path != SAFETY_ROUTE)
     {
         return write_json(
             &mut writer,

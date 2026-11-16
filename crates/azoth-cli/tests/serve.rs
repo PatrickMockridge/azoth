@@ -571,7 +571,12 @@ fn the_safety_study_is_a_third_route() {
     let text = json!({ "calculate": { "nope": "x" } }).to_string();
     let (status, answer) = server.request_to("/safety", "POST", Some(&text), None);
     assert_eq!(status, 400);
-    assert!(answer["error"].as_str().unwrap_or_default().contains("scenario"));
+    assert!(
+        answer["error"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("scenario")
+    );
 }
 
 #[test]

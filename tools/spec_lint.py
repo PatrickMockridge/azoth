@@ -1353,9 +1353,7 @@ def main() -> int:
     if SAFETY_SCHEMA_PATH.exists() and SAFETY_DIR.exists():
         safety_schema = schema_registry.load("safety.schema.json")
         Draft202012Validator.check_schema(safety_schema)
-        safety_validator = Draft202012Validator(
-            safety_schema, registry=schema_registry.registry()
-        )
+        safety_validator = Draft202012Validator(safety_schema, registry=schema_registry.registry())
         for rel, study in check_schema(report, safety_validator, SAFETY_DIR):
             check_safety(report, rel, study, models_by_id)
 

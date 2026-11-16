@@ -148,10 +148,7 @@ def emit_entry(spec: dict) -> str:
     sub_interface = sub_interface_of(spec, family)
     native = native_of(spec)
     refusal = REFUSALS.get(spec["id"])
-    if spec["id"] in NATIVE_SCENARIOS:
-        form = emit_form(spec)
-    else:
-        form = "None"
+    form = emit_form(spec) if spec["id"] in NATIVE_SCENARIOS else "None"
     return (
         "    SafetyCalculation { "
         f"id: {gen_sheets.rust_str(spec['id'])}, "

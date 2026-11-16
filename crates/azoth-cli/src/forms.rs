@@ -19,7 +19,6 @@ use azoth_process::middleware::catalogue_with;
 /// an agent may send rather than as the fields a person fills.
 pub fn forms_json(palette_dir: &Path, with_tools: bool) -> Result<String, String> {
     let palette = load_palette(palette_dir)?;
-    let safety =
-        azoth_safety::catalogue::to_value().map_err(|error| error.to_string())?;
+    let safety = azoth_safety::catalogue::to_value().map_err(|error| error.to_string())?;
     catalogue_with(&palette, with_tools, Some(safety)).map_err(|error| error.to_string())
 }

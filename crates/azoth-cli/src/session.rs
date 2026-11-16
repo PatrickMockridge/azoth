@@ -73,8 +73,7 @@ impl Session {
     /// # Errors
     /// A sentence if the catalogue cannot be written.
     pub fn catalogue(&self, with_tools: bool) -> std::result::Result<Value, String> {
-        let safety =
-            azoth_safety::catalogue::to_value().map_err(|error| error.to_string())?;
+        let safety = azoth_safety::catalogue::to_value().map_err(|error| error.to_string())?;
         let document = middleware::catalogue_with(&self.palette, with_tools, Some(safety))
             .map_err(|error| error.to_string())?;
         serde_json::from_str(&document).map_err(|error| error.to_string())
