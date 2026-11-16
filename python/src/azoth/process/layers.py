@@ -2539,7 +2539,7 @@ def _control_valve_failure_relief(inputs: Mapping[str, Any]) -> dict[str, float]
         control_valve_failure_relief as evaluate,
     )
 
-    def optional(name: str, unit: str) -> object | None:
+    def optional(name: str, unit: str) -> Any:
         value = inputs.get(name)
         return None if value is None else quantity(float(value), unit)
 
