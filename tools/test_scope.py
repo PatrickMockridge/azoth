@@ -410,6 +410,7 @@ SPEC_GENERATORS = frozenset(
         "gen_python_wrappers",
         "gen_reaction_data",
         "gen_registry",
+        "gen_safety",
         "gen_sheets",
         "gen_rust_model_records",
         "gen_stub",
@@ -570,6 +571,14 @@ SPEC_TREES: tuple[tuple[str, Claim], ...] = (
             # `ui` job is what proves the wire and the screen.
             crates=("azoth-safety",),
             jobs=("ui",),
+            commands=(
+                Command(
+                    "the safety catalogue the specs generate",
+                    SCRIPT,
+                    "python tools/gen_safety.py --check",
+                ),
+            ),
+            files=(f"{TESTS}/test_gen_safety.py",),
         ),
     ),
     (

@@ -608,7 +608,7 @@ def check_safety(
             )
             continue
         source = (model.get("source") or {}).get("standard", "")
-        if not source.startswith(SAFETY_SOURCE):
+        if not source.startswith(SAFETY_SOURCE) and calculation not in SAFETY_EXTRAS:
             report.error(
                 str(rel),
                 f"scenario '{scenario['id']}' names '{calculation}', whose source is "
@@ -640,6 +640,10 @@ def check_safety(
 
 #: The source-path prefix every ported safety class carries.
 SAFETY_SOURCE = "NeqSim process/safety/"
+
+#: The same two relief ids `tools/gen_safety.py` names: upstream files their class outside
+#: `process/safety/`, and both are overpressure screens on this surface.
+SAFETY_EXTRAS = {"process.psv_sizing", "process.psv_fire_sizing"}
 
 
 def _unique_ids(report: Report, rel: Path, what: str, rows: list[dict[str, Any]]) -> None:

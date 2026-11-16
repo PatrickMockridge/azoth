@@ -258,6 +258,9 @@ jobs:
       # `rustfmt` so the generated files are what `cargo fmt --check` wants; this job has the
       # toolchain, and `spec-validate` does not.
       - run: python tools/gen_sheets.py --check
+      # The safety catalogue, held to the model specs it is projected from. It formats through
+      # rustfmt for the same reason, so it sits here rather than in spec-validate.
+      - run: python tools/gen_safety.py --check
 
   rust-lint:
     name: rust-lint
@@ -572,6 +575,7 @@ jobs:
           .venv/bin/python tools/gen_rust_model_records.py
           .venv/bin/python tools/gen_parameter_bounds.py
           .venv/bin/python tools/gen_sheets.py
+          .venv/bin/python tools/gen_safety.py
       - name: Fail if anything drifted
         run: |
           if ! git diff --exit-code; then
@@ -585,6 +589,7 @@ jobs:
             echo "::error::  python tools/gen_guard_theorems.py"
             echo "::error::  python tools/gen_dispatch.py"
             echo "::error::  python tools/gen_sheets.py"
+            echo "::error::  python tools/gen_safety.py"
             echo "::error::  python tools/gen_python_records.py"
             echo "::error::  python tools/gen_python_wrappers.py"
             echo "::error::  python tools/gen_python_bridge.py"

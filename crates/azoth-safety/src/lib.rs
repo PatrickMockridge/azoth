@@ -9,4 +9,6 @@
 //! is written out because the sheet dispatcher is generated from `specs/calcs` and the
 //! safety ids are models.
 
+pub mod catalogue;
+pub mod forms_gen;
 pub mod study;
