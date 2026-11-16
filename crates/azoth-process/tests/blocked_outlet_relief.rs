@@ -98,7 +98,7 @@ fn the_liquid_state_carries_the_isentropic_exponent_not_gamma() {
     // The capture's `gamma` is 1.2639517801547224; the class reads `kappa`.
     close_exponent(
         liquid.specific_heat_ratio,
-        1255.272_378_839_346_4,
+        1_255.272_378_839_346_4,
         "the isentropic exponent",
     );
     assert!(liquid.specific_heat_ratio > 100.0);
@@ -119,7 +119,7 @@ fn the_two_phase_state_reproduces_the_capture() {
     close(two_phase.compressibility, 0.532_567_794_212_993_9, "Z");
     close_exponent(
         two_phase.specific_heat_ratio,
-        1965.173_645_351_309,
+        1_965.173_645_351_309,
         "the isentropic exponent",
     );
 }

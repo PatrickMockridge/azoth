@@ -1,7 +1,7 @@
 //! `process.control_valve_failure_relief` against
 //! `validation/neqsim/captures/process_control_valve_failure_relief.tsv`.
 
-use azoth_core::units::{kelvins, kilograms_per_second, pascals, square_meters};
+use azoth_core::units::{kelvins, pascals, square_meters};
 use azoth_process::models::ReliefPhase;
 use azoth_process::models::control_valve_failure_relief::{
     ControlValveFailureReliefResult, control_valve_failure_relief,
@@ -23,6 +23,7 @@ fn close_rate(actual: f64, expected: f64, what: &str) {
     );
 }
 
+#[allow(clippy::too_many_arguments)] // one argument per captured input
 fn relief(
     upstream_pressure: f64,
     upstream_temperature: Option<f64>,
