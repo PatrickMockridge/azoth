@@ -1,0 +1,137 @@
+cvl_default_state
+kappa=1.2795798973843786
+gamma=1.3319393916069173
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+density_kg_per_m3=13.616754236185573
+phase_count=1
+has_gas=true
+has_liquid=false
+
+cvl_default
+name=Check valve default
+cause=check_valve_leakage
+phase=vapour
+relief_rate_kg_per_s=0.5269038860347555
+relief_rate_kg_per_hr=1896.8539897251196
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26466 / API 521 4.4.9.3
+assumption_count=3
+assumption0=Leak area = 1.00% of nominal flow area per TR3001 SR-26466
+assumption1=Upstream pressure taken at high-pressure source MAAP
+assumption2=Discharge coefficient Cd = 0.85
+
+cvl_clamped
+name=Check valve clamped
+cause=check_valve_leakage
+phase=vapour
+relief_rate_kg_per_s=0.052690388603475545
+relief_rate_kg_per_hr=189.68539897251196
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26466 / API 521 4.4.9.3
+assumption_count=4
+assumption0=Leak area = 0.10% of nominal flow area per TR3001 SR-26466
+assumption1=Upstream pressure taken at high-pressure source MAAP
+assumption2=Discharge coefficient Cd = 0.85
+assumption3=Leak area fraction below TR3001 minimum 0.1%; clamped to 0.001
+
+cvl_subcritical
+name=Check valve subcritical
+cause=check_valve_leakage
+phase=vapour
+relief_rate_kg_per_s=0.47359050741812003
+relief_rate_kg_per_hr=1704.925826705232
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26466 / API 521 4.4.9.3
+assumption_count=3
+assumption0=Leak area = 1.00% of nominal flow area per TR3001 SR-26466
+assumption1=Upstream pressure taken at high-pressure source MAAP
+assumption2=Discharge coefficient Cd = 0.85
+
+cvl_zero_diameter
+name=Check valve zero
+cause=check_valve_leakage
+phase=vapour
+relief_rate_kg_per_s=0.0
+relief_rate_kg_per_hr=0.0
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26466 / API 521 4.4.9.3
+assumption_count=4
+assumption0=Leak area = 1.00% of nominal flow area per TR3001 SR-26466
+assumption1=Upstream pressure taken at high-pressure source MAAP
+assumption2=Discharge coefficient Cd = 0.85
+assumption3=Nominal check-valve diameter not set; relief rate is zero
+
+cvl_no_fluid
+name=Check valve no fluid
+cause=check_valve_leakage
+phase=vapour
+relief_rate_kg_per_s=0.5595002802334088
+relief_rate_kg_per_hr=2014.2010088402717
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.02
+compressibility=1.0
+specific_heat_ratio=1.25
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26466 / API 521 4.4.9.3
+assumption_count=3
+assumption0=Leak area = 1.00% of nominal flow area per TR3001 SR-26466
+assumption1=Upstream pressure taken at high-pressure source MAAP
+assumption2=Discharge coefficient Cd = 0.85
+
