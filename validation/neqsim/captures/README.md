@@ -2822,3 +2822,85 @@ Java's: `Double.parseDouble` trims, accepts `NaN`, `Infinity` and a trailing `f`
 `1.5f` is `1.5`), and a first-present alias with an unparseable value yields the default
 rather than falling through. The class evaluates two items with the same `functionId`; the
 port refuses them.
+
+`process_gas_blowby.tsv` is `GasBlowbyAnalyzer.analyze` over a choked and adequate state, a
+subcritical and inadequate state, the critical-ratio boundary, a zero margin, the no-capacity
+state, the unit-string aliases and the restriction-diameter setter.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe gas_blowby \
+  > captures/process_gas_blowby.tsv
+```
+
+**The standard state is 15 °C and 101325 Pa**, not 0 °C. Equality at the critical ratio is
+choked and a zero margin is adequate. A missing capacity publishes `NO_RELIEF_DATA` with
+`relief_adequate=false` and a NaN margin; the gas-derived `k` and molar mass are not carried,
+so the capture states them explicitly.
+
+`process_pump_deadhead.tsv` is `PumpDeadheadAnalyzer.analyze` over a within-rating state, an
+exceeded rating, rating equality, no rating, an exceeded temperature rise, the absent
+density/specific-heat path, the unit-string aliases and a changed minimum-flow efficiency.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe pump_deadhead \
+  > captures/process_pump_deadhead.tsv
+```
+
+The defaults are a shut-off ratio of 1.20 and a minimum-flow efficiency of 0.30; equality with
+the rating is within it, while the temperature-rise test is strict. Without density or
+specific heat the shut-off head and rise are absent and `temp_rise_exceeded` is false.
+
+`process_vacuum_collapse.tsv` is `VacuumCollapseAnalyzer.analyze` over a pure-methane cool
+with no vacuum, a methane/propane cool that condenses below atmospheric, a state below the
+external rating, no rating (the class's 0-bara full-vacuum assumption), a make-up setpoint,
+five cooling steps, the unit-string aliases and a cold end above the initial temperature.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe vacuum_collapse \
+  > captures/process_vacuum_collapse.tsv
+```
+
+The fluid is a `SystemPrEos` on the classic mixing rule, so the port's databank PR is the
+same state. The sweep holds the molar volume and runs a `TVflash` at every step; the capture
+prints the final and minimum pressures and the make-up gas, not the cooling curve. An absent
+rating is 0 bara and still yields a verdict; the cold-end refusal is the class's own message.
+
+`process_settle_out_pressure.tsv` is `SettleOutPressureAnalyzer.analyze` over two and three
+compartments, a within and an exceeded rating, rating equality, a stated settle temperature,
+no rating, the unit-string aliases and the one-compartment refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe settle_out_pressure \
+  > captures/process_settle_out_pressure.tsv
+```
+
+No gas is supplied, so every compartment's Z and the settle-out Z are exactly 1.0 - the
+class's own no-gas basis. The settle temperature is the mole-weighted mean unless stated;
+equality with the rating is within it; the class refuses fewer than two compartments.
+
+`process_runaway_reaction.tsv` is `RunawayReactionAnalyzer.analyze` over the no-MAT bands at
+5, 50 and 200 K, an acceptable and a marginal MAT state, an exceeded and gassy state, the
+TMR pair and the unit-string aliases.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe runaway_reaction \
+  > captures/process_runaway_reaction.tsv
+```
+
+Without a MAT the verdict is `RUNAWAY_RISK` at an adiabatic rise of 200 K and `MARGINAL` at
+50 K, both inclusive; with a MAT the exceeded test is strict and a margin below the
+acceptable 50 K is marginal. The enthalpy sign is ignored; the TMR needs both a positive
+activation energy and a positive initial heat-release rate.
+
+`process_mdmt.tsv` is `MDMTCalculator.getMDMT_C` and `isAcceptable` over the four curves at
+25 mm, a 0.35 stress ratio, the 6 and 100 mm clamps and a 150 mm input outside them, and a
+passing and a failing cold-service state.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe mdmt \
+  > captures/process_mdmt.tsv
+```
+
+The four curves are the class's analytic approximations of ASME Fig. UCS-66, not the figure's
+table. The thickness is silently clamped to `[6, 100]` mm; the stress-ratio reduction is 55 K
+at or below 0.35, zero at or above 1.0, and linear between. The capture prints both °C and K.

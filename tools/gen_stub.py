@@ -475,6 +475,11 @@ ENUMS = {
     "SelfHeatingGeometry",
     "SelfHeatingVerdict",
     "OverallVerdict",
+    "BlowbyVerdict",
+    "DeadheadVerdict",
+    "VacuumVerdict",
+    "SettleOutVerdict",
+    "RunawayVerdict",
 }
 
 

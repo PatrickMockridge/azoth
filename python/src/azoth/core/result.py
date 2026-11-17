@@ -27,6 +27,8 @@ from azoth.core.result_base import CorrosionSeverity as CorrosionSeverity
 from azoth.core.result_base import EmulsionType as EmulsionType
 from azoth.core.result_base import ErosionRiskLevel as ErosionRiskLevel
 from azoth.core.result_base import FeSMorphology as FeSMorphology
+from azoth.core.result_base import BlowbyVerdict as BlowbyVerdict
+from azoth.core.result_base import DeadheadVerdict as DeadheadVerdict
 from azoth.core.result_base import FlowRegime as FlowRegime
 from azoth.core.result_base import FluidBasis as FluidBasis
 from azoth.core.result_base import GoverningCriterion as GoverningCriterion
@@ -38,6 +40,8 @@ from azoth.core.result_base import OverallVerdict as OverallVerdict
 from azoth.core.result_base import Phase as Phase
 from azoth.core.result_base import PlusModel as PlusModel
 from azoth.core.result_base import ReliefPhase as ReliefPhase
+from azoth.core.result_base import RunawayVerdict as RunawayVerdict
+from azoth.core.result_base import SettleOutVerdict as SettleOutVerdict
 from azoth.core.result_base import RootStructure as RootStructure
 from azoth.core.result_base import RuptureStatus as RuptureStatus
 from azoth.core.result_base import SelfHeatingGeometry as SelfHeatingGeometry
@@ -46,5 +50,6 @@ from azoth.core.result_base import StabilityVerdict as StabilityVerdict
 from azoth.core.result_base import Sts0131PressureCategory as Sts0131PressureCategory
 from azoth.core.result_base import SupplyVerdict as SupplyVerdict
 from azoth.core.result_base import TpMultiflashSeed as TpMultiflashSeed
+from azoth.core.result_base import VacuumVerdict as VacuumVerdict
 from azoth.core.result_base import _HasWarnings as _HasWarnings
 from azoth.core.result_gen import *  # noqa: F403
