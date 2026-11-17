@@ -7601,6 +7601,40 @@ pub fn psv_sizing(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Pump deadhead and minimum-flow temperature rise.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (suction_pressure, normal_discharge_pressure, shutoff_head_ratio, protected_pressure_rating, liquid_density, specific_heat, minimum_flow_efficiency, max_allowable_temperature_rise))]
+#[pyo3(
+    text_signature = "(suction_pressure, normal_discharge_pressure, shutoff_head_ratio, protected_pressure_rating, liquid_density, specific_heat, minimum_flow_efficiency, max_allowable_temperature_rise)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn pump_deadhead(
+    py: Python<'_>,
+    suction_pressure: f64,
+    normal_discharge_pressure: f64,
+    shutoff_head_ratio: Option<f64>,
+    protected_pressure_rating: Option<f64>,
+    liquid_density: Option<f64>,
+    specific_heat: Option<f64>,
+    minimum_flow_efficiency: Option<f64>,
+    max_allowable_temperature_rise: Option<f64>,
+) -> PyResult<crate::transport_gen::PyPumpDeadheadResult> {
+    azoth_process::models::pump_deadhead::pump_deadhead(
+        pascals(suction_pressure),
+        pascals(normal_discharge_pressure),
+        shutoff_head_ratio,
+        protected_pressure_rating.map(pascals),
+        liquid_density.map(kilograms_per_cubic_meter),
+        specific_heat.map(joules_per_kilogram_kelvin),
+        minimum_flow_efficiency,
+        max_allowable_temperature_rise.map(kelvin_intervals),
+    )
+    .map(|r| crate::transport_gen::PyPumpDeadheadResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Relief disposal network.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

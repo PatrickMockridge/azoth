@@ -4479,6 +4479,18 @@ class PumpResult:
     warnings: list[Warning]
 
 @final
+class PumpDeadheadResult:
+    rated_differential_pressure: Qty
+    deadhead_pressure: Qty
+    pressure_margin: Qty | None
+    pressure_rating_exceeded: bool
+    shutoff_head: Qty | None
+    recirculation_temperature_rise: Qty | None
+    temp_rise_exceeded: bool
+    verdict: str
+    warnings: list[Warning]
+
+@final
 class RateBasedPackedColumnResult:
     gas_out_n: Qty
     gas_out_z: list[float]
@@ -8243,6 +8255,16 @@ def pump(
     aor_low_fraction: float | None = None,
     aor_high_fraction: float | None = None,
 ) -> PumpResult: ...
+def pump_deadhead(
+    suction_pressure: float,
+    normal_discharge_pressure: float,
+    shutoff_head_ratio: float | None = None,
+    protected_pressure_rating: float | None = None,
+    liquid_density: float | None = None,
+    specific_heat: float | None = None,
+    minimum_flow_efficiency: float | None = None,
+    max_allowable_temperature_rise: float | None = None,
+) -> PumpDeadheadResult: ...
 def rate_based_packed_column(
     gas_components: list[str],
     liquid_components: list[str],

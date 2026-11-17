@@ -306,6 +306,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.psv_fire_sizing" => azoth_process::models::psv_fire_sizing::PsvFireSizingResult::FIELDS.to_vec(),
         "process.psv_sizing" => azoth_process::models::psv_sizing::PsvSizingResult::FIELDS.to_vec(),
         "process.pump" => azoth_process::models::pump::PumpResult::FIELDS.to_vec(),
+        "process.pump_deadhead" => azoth_process::models::pump_deadhead::PumpDeadheadResult::FIELDS.to_vec(),
         "process.rate_based_packed_column" => azoth_process::models::rate_based_packed_column::RateBasedPackedColumnResult::FIELDS.to_vec(),
         "process.relief_disposal_network" => azoth_process::models::relief_disposal_network::ReliefDisposalNetworkResult::FIELDS.to_vec(),
         "process.risk_matrix" => azoth_process::models::risk_matrix::RiskMatrixResult::FIELDS.to_vec(),

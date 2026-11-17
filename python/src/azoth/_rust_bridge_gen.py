@@ -77,6 +77,7 @@ from azoth.core.result import (
     CostaldMolarVolumeResult,
     CriticalPointResult,
     DarcyWeisbachResult,
+    DeadheadVerdict,
     DelugeNozzleLayoutResult,
     DelumpingResult,
     DepositionSegmentRow,
@@ -267,6 +268,7 @@ from azoth.core.result import (
     PtFlashResult,
     PtPhaseEnvelopeResult,
     PuFlashResult,
+    PumpDeadheadResult,
     PumpPowerResult,
     PumpResult,
     PvfFlashResult,
@@ -669,6 +671,7 @@ __all__ = [
     "pt_phase_envelope",
     "pu_flash",
     "pump",
+    "pump_deadhead",
     "pump_power",
     "pv_flash",
     "pv_reflux_flash",
@@ -8078,6 +8081,32 @@ def pump(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, in
         design_head_rise_to_shutoff=result.design_head_rise_to_shutoff,
         design_required_driver_power=None if result.design_required_driver_power is None else from_si(result.design_required_driver_power.magnitude_si, result.design_required_driver_power.unit),
         design_pump_type_source=result.design_pump_type_source,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def pump_deadhead(suction_pressure: Q, normal_discharge_pressure: Q, shutoff_head_ratio: float | None=None, protected_pressure_rating: Q | None=None, liquid_density: Q | None=None, specific_heat: Q | None=None, minimum_flow_efficiency: float | None=None, max_allowable_temperature_rise: Q | None=None) -> PumpDeadheadResult:
+    """``process.pump_deadhead``, computed in Rust."""
+    spec = _models_gen.model("process.pump_deadhead")
+    result = _core.pump_deadhead(
+        input_to_si(spec, "suction_pressure", suction_pressure),
+        input_to_si(spec, "normal_discharge_pressure", normal_discharge_pressure),
+        None if shutoff_head_ratio is None else shutoff_head_ratio,
+        None if protected_pressure_rating is None else input_to_si(spec, "protected_pressure_rating", protected_pressure_rating),
+        None if liquid_density is None else input_to_si(spec, "liquid_density", liquid_density),
+        None if specific_heat is None else input_to_si(spec, "specific_heat", specific_heat),
+        None if minimum_flow_efficiency is None else minimum_flow_efficiency,
+        None if max_allowable_temperature_rise is None else input_to_si(spec, "max_allowable_temperature_rise", max_allowable_temperature_rise),
+    )
+    return PumpDeadheadResult(
+        rated_differential_pressure=from_si(result.rated_differential_pressure.magnitude_si, result.rated_differential_pressure.unit),
+        deadhead_pressure=from_si(result.deadhead_pressure.magnitude_si, result.deadhead_pressure.unit),
+        pressure_margin=None if result.pressure_margin is None else from_si(result.pressure_margin.magnitude_si, result.pressure_margin.unit),
+        pressure_rating_exceeded=result.pressure_rating_exceeded,
+        shutoff_head=None if result.shutoff_head is None else from_si(result.shutoff_head.magnitude_si, result.shutoff_head.unit),
+        recirculation_temperature_rise=None if result.recirculation_temperature_rise is None else from_si(result.recirculation_temperature_rise.magnitude_si, result.recirculation_temperature_rise.unit),
+        temp_rise_exceeded=result.temp_rise_exceeded,
+        verdict=DeadheadVerdict(result.verdict),
         warnings=_warnings(result.warnings),
     )
 

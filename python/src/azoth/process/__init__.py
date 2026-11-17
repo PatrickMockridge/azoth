@@ -83,6 +83,7 @@ from azoth.core.result import (
     ProbitResult,
     PsvFireSizingResult,
     PsvSizingResult,
+    PumpDeadheadResult,
     PumpResult,
     RateBasedPackedColumnResult,
     ReliefDisposalNetworkResult,
@@ -189,6 +190,7 @@ __all__ = [
     "psv_fire_sizing",
     "psv_sizing",
     "pump",
+    "pump_deadhead",
     "rate_based_packed_column",
     "relief_disposal_network",
     "risk_matrix",
@@ -279,6 +281,7 @@ _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
 _POOL_FIRE = "process.pool_fire"
 _POROUS_MEDIA_SELF_HEATING = "process.porous_media_self_heating"
+_PUMP_DEADHEAD = "process.pump_deadhead"
 _PUMP = "process.pump"
 _SPLITTER = "process.splitter"
 _STIRRED_TANK_REACTOR = "process.stirred_tank_reactor"
@@ -317,6 +320,36 @@ def validate(flowsheet: str, palette_dir: str = "specs/unit_ops") -> list[str]:
 def load_flowsheet(path: str, palette_dir: str = "specs/unit_ops") -> list[str]:
     """Read a flowsheet file and validate it; returns the diagnostic lines."""
     return validate(pathlib.Path(path).read_text(), palette_dir)
+
+
+def pump_deadhead(
+    suction_pressure: Q,
+    normal_discharge_pressure: Q,
+    shutoff_head_ratio: float | None = None,
+    protected_pressure_rating: Q | None = None,
+    liquid_density: Q | None = None,
+    specific_heat: Q | None = None,
+    minimum_flow_efficiency: float | None = None,
+    max_allowable_temperature_rise: Q | None = None,
+) -> PumpDeadheadResult:
+    """The deadhead pressure, the rating verdict and the minimum-flow rise.
+
+    **Equality with the protected rating is within it** and the temperature-rise test is
+    strict. Without density or specific heat the shut-off head and rise are absent. The
+    defaults are a 1.20 shut-off ratio and a 0.30 minimum-flow efficiency.
+
+    See :func:`azoth.process.reference.pump_deadhead`.
+    """
+    return resolve(_PUMP_DEADHEAD)(  # type: ignore[no-any-return]
+        suction_pressure=suction_pressure,
+        normal_discharge_pressure=normal_discharge_pressure,
+        shutoff_head_ratio=shutoff_head_ratio,
+        protected_pressure_rating=protected_pressure_rating,
+        liquid_density=liquid_density,
+        specific_heat=specific_heat,
+        minimum_flow_efficiency=minimum_flow_efficiency,
+        max_allowable_temperature_rise=max_allowable_temperature_rise,
+    )
 
 
 def pump(

@@ -3161,6 +3161,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 8,
         "tests_skipped": 0,
     },
+    'process.pump_deadhead': {
+        "calc_id": 'process.pump_deadhead',
+        "name": 'Pump deadhead and minimum-flow temperature rise',
+        "spec": {'path': 'specs/models/process/pump_deadhead.toml', 'sha256': '8c68ff3b9f7303cca4f1200ea0ac29ee5d0967043cb4c20544115e907824f9bb'},
+        "code": [{'path': 'python/src/azoth/process/reference/pump_deadhead.py', 'sha256': '02d422b686ed3c8d8361d681cbe5fb2a60424632c2c86eb037299c76dde76dff'}, {'path': 'crates/azoth-process/src/models/pump_deadhead.rs', 'sha256': '0d2705461eaf7f1d61e662de68e078584171a96618e18a13313d781793187ce3'}],
+        "source": 'NeqSim process/safety/pump/PumpDeadheadAnalyzer.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 7,
+        "tests_skipped": 0,
+    },
     'process.rate_based_packed_column': {
         "calc_id": 'process.rate_based_packed_column',
         "name": 'Rate-based packed column',

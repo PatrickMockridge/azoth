@@ -287,6 +287,7 @@
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/pump.toml
+//!   - specs/models/process/pump_deadhead.toml
 //!   - specs/models/process/rate_based_packed_column.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
@@ -4530,6 +4531,38 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.pump", "por_high_fraction", "dimensionless"),
     ("process.pump", "aor_low_fraction", "dimensionless"),
     ("process.pump", "aor_high_fraction", "dimensionless"),
+    ("process.pump_deadhead", "suction_pressure", "pressure"),
+    (
+        "process.pump_deadhead",
+        "normal_discharge_pressure",
+        "pressure",
+    ),
+    (
+        "process.pump_deadhead",
+        "shutoff_head_ratio",
+        "dimensionless",
+    ),
+    (
+        "process.pump_deadhead",
+        "protected_pressure_rating",
+        "pressure",
+    ),
+    ("process.pump_deadhead", "liquid_density", "mass_density"),
+    (
+        "process.pump_deadhead",
+        "specific_heat",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.pump_deadhead",
+        "minimum_flow_efficiency",
+        "dimensionless",
+    ),
+    (
+        "process.pump_deadhead",
+        "max_allowable_temperature_rise",
+        "thermodynamic_temperature",
+    ),
     ("process.rate_based_packed_column", "gas_n", "molar_flow"),
     ("process.rate_based_packed_column", "gas_z", "dimensionless"),
     ("process.rate_based_packed_column", "gas_p", "pressure"),

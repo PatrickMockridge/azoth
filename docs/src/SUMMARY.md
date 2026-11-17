@@ -300,6 +300,7 @@
   - [PSV fire sizing](./process/psv_fire_sizing.md)
   - [PSV sizing](./process/psv_sizing.md)
   - [Pump](./process/pump.md)
+  - [Pump deadhead and minimum-flow temperature rise](./process/pump_deadhead.md)
   - [Rate-based packed column](./process/rate_based_packed_column.md)
   - [Relief disposal network](./process/relief_disposal_network.md)
   - [Risk matrix](./process/risk_matrix.md)

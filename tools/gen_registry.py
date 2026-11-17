@@ -209,6 +209,11 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `crates/azoth-process/tests/gas_blowby.rs` asserts it against the capture, and
         # `test_cross_impl` compares it on both results.
         "relief_adequate",
+        # `pump_deadhead`'s two flags, booleans with no slot in `TestCase`.
+        # `crates/azoth-process/tests/pump_deadhead.rs` asserts them against the capture,
+        # and `test_cross_impl` compares them on both results.
+        "pressure_rating_exceeded",
+        "temp_rise_exceeded",
         # `gas_dispersion`'s two endpoint predicates, booleans with no slot in `TestCase`.
         # `crates/azoth-process/tests/gas_dispersion.rs` asserts them against the capture,
         # and `test_cross_impl` compares them on both results.

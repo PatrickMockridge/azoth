@@ -22456,6 +22456,92 @@ impl From<&azoth_process::models::pump::PumpResult> for PyPumpResult {
         }
     }
 }
+/// Result of `process.pump_deadhead`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PumpDeadheadResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPumpDeadheadResult {
+    /// `normal_discharge_pressure - suction_pressure`.
+    #[pyo3(get)]
+    pub rated_differential_pressure: PyQty,
+    /// `suction_pressure + ratio (normal_discharge_pressure - suction_pressure)`.
+    #[pyo3(get)]
+    pub deadhead_pressure: PyQty,
+    /// `rating - deadhead_pressure`; **absent when no rating is stated**.
+    #[pyo3(get)]
+    pub pressure_margin: Option<PyQty>,
+    /// whether the deadhead pressure is strictly above the rating; false without a rating.
+    #[pyo3(get)]
+    pub pressure_rating_exceeded: bool,
+    /// `shutoff_dp/(rho g)`; **absent without density or specific heat**.
+    #[pyo3(get)]
+    pub shutoff_head: Option<PyQty>,
+    /// the minimum-flow recirculation rise; **absent without density or specific heat**.
+    #[pyo3(get)]
+    pub recirculation_temperature_rise: Option<PyQty>,
+    /// whether the rise is strictly above the allowable one; false when either is absent.
+    #[pyo3(get)]
+    pub temp_rise_exceeded: bool,
+    /// the class's verdict: no rating, within it, or exceeded.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPumpDeadheadResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PumpDeadheadResult(rated_differential_pressure={:?}, deadhead_pressure={:?}, pressure_margin={:?}, pressure_rating_exceeded={:?}, shutoff_head={:?}, recirculation_temperature_rise={:?}, temp_rise_exceeded={:?}, verdict={:?}, {} warning(s))",
+            self.rated_differential_pressure,
+            self.deadhead_pressure,
+            self.pressure_margin,
+            self.pressure_rating_exceeded,
+            self.shutoff_head,
+            self.recirculation_temperature_rise,
+            self.temp_rise_exceeded,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::pump_deadhead::PumpDeadheadResult> for PyPumpDeadheadResult {
+    fn from(r: &azoth_process::models::pump_deadhead::PumpDeadheadResult) -> Self {
+        Self {
+            rated_differential_pressure: PyQty {
+                magnitude_si: r.rated_differential_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            deadhead_pressure: PyQty {
+                magnitude_si: r.deadhead_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            pressure_margin: r.pressure_margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            pressure_rating_exceeded: r.pressure_rating_exceeded,
+            shutoff_head: r.shutoff_head.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m".to_string(),
+            }),
+            recirculation_temperature_rise: r.recirculation_temperature_rise.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            temp_rise_exceeded: r.temp_rise_exceeded,
+            verdict: r.verdict.as_str().to_string(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.rate_based_packed_column`, transported.
 #[pyclass(
     frozen,

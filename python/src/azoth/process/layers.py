@@ -1630,6 +1630,50 @@ def _fire_monitor_coverage(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _pump_deadhead(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.pump_deadhead`'s layers, from the reference's arithmetic.
+
+    The verdict and the two flags are the model's own words, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.pump_deadhead import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["suction_pressure"]), "Pa"),
+        quantity(float(inputs["normal_discharge_pressure"]), "Pa"),
+        shutoff_head_ratio=(
+            None
+            if inputs.get("shutoff_head_ratio") is None
+            else float(inputs["shutoff_head_ratio"])
+        ),
+        protected_pressure_rating=optional("protected_pressure_rating", "Pa"),
+        liquid_density=optional("liquid_density", "kg/m**3"),
+        specific_heat=optional("specific_heat", "J/(kg*K)"),
+        minimum_flow_efficiency=(
+            None
+            if inputs.get("minimum_flow_efficiency") is None
+            else float(inputs["minimum_flow_efficiency"])
+        ),
+        max_allowable_temperature_rise=optional("max_allowable_temperature_rise", "K"),
+    )
+    dumped = {
+        "rated_differential_bara": solution.rated / 1.0e5,
+        "deadhead_pressure_bara": solution.deadhead / 1.0e5,
+    }
+    if solution.margin is not None:
+        dumped["pressure_margin_bara"] = solution.margin / 1.0e5
+    if solution.head is not None:
+        dumped["shutoff_head_m"] = solution.head
+    if solution.rise is not None:
+        dumped["recirculation_temp_rise_k"] = solution.rise
+    return dumped
+
+
 def _gas_blowby(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.gas_blowby`'s layers, from the reference's arithmetic.
 
@@ -3455,6 +3499,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.fire_monitor_coverage": _fire_monitor_coverage,
     "process.fire_water_coverage_assessment": _fire_water_coverage_assessment,
     "process.gas_blowby": _gas_blowby,
+    "process.pump_deadhead": _pump_deadhead,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.fault_tree": _fault_tree,
@@ -4511,6 +4556,16 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_monitor_coverage.tsv",
         block=8,
         identified_by=("#label", "fmc_characteristic_dimension"),
+    ),
+    # Pump deadhead's one: the within-rating state. The six further cases are the exceeded,
+    # equality, no-rating, rise and absent-density states; the unit aliases are declared in
+    # `UNCASED_ROWS`.
+    LayerCase(
+        model="process.pump_deadhead",
+        case="within_rating",
+        capture="process_pump_deadhead.tsv",
+        block=0,
+        identified_by=("#label", "pump_within_rating"),
     ),
     # Gas blowby's one: the choked state the class's first test states. The five further
     # cases are the subcritical, boundary, zero-margin and no-capacity states; the unit
@@ -7328,6 +7383,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_deluge_nozzle_layout.tsv": 8,
     # The monitor coverage's eleven: the constructor and each setter's refusal.
     "process_fire_monitor_coverage.tsv": 11,
+    # Pump deadhead's one: the unit-string aliases, the within-rating state restated. The
+    # refusal states are hand tests.
+    "process_pump_deadhead.tsv": 1,
     # Gas blowby's two: the unit-string aliases and the restriction-diameter setter, both
     # the choked state restated. The six refusal states are hand tests.
     "process_gas_blowby.tsv": 2,

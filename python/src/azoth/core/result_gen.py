@@ -81,6 +81,7 @@ from azoth.core.result_base import (
     BlowbyVerdict,
     CooldownVerdict,
     CorrosionSeverity,
+    DeadheadVerdict,
     EmulsionType,
     ErosionRiskLevel,
     FeSMorphology,
@@ -9051,6 +9052,40 @@ class PumpResult(_HasWarnings):
 
     #: `purchaser_input` or `screening_estimate`.
     design_pump_type_source: str | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PumpDeadheadResult(_HasWarnings):
+    """Result of ``process.pump_deadhead``."""
+
+    CALC_ID: ClassVar[str] = "process.pump_deadhead"
+
+    #: `normal_discharge_pressure - suction_pressure`.
+    rated_differential_pressure: Q
+
+    #: `suction_pressure + ratio (normal_discharge_pressure - suction_pressure)`.
+    deadhead_pressure: Q
+
+    #: `rating - deadhead_pressure`; **absent when no rating is stated**.
+    pressure_margin: Q | None
+
+    #: whether the deadhead pressure is strictly above the rating; false without a rating.
+    pressure_rating_exceeded: bool
+
+    #: `shutoff_dp/(rho g)`; **absent without density or specific heat**.
+    shutoff_head: Q | None
+
+    #: the minimum-flow recirculation rise; **absent without density or specific heat**.
+    recirculation_temperature_rise: Q | None
+
+    #: whether the rise is strictly above the allowable one; false when either is absent.
+    temp_rise_exceeded: bool
+
+    #: the class's verdict: no rating, within it, or exceeded.
+    verdict: DeadheadVerdict
 
     #: Caveats.
     warnings: tuple[Warning, ...]

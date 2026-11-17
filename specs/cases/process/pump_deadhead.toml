@@ -1,0 +1,130 @@
+model = "process.pump_deadhead"
+[[cases]]
+id = "within_rating"
+tolerance = 1.0e-12
+source = "2 bara suction, 10 bara discharge and a 15 bara rating: the default 1.20 shut-off ratio puts the deadhead at 11.6 bara, inside the rating, and the default 0.30 efficiency puts the minimum-flow rise at 0.537 K. From `validation/neqsim/captures/process_pump_deadhead.tsv` (`pump_within_rating`)."
+[cases.inputs]
+suction_pressure = 2.0e5
+normal_discharge_pressure = 1.0e6
+protected_pressure_rating = 1.5e6
+liquid_density = 998.0
+specific_heat = 4180.0
+[cases.expected]
+rated_differential_pressure = 8.0e5
+deadhead_pressure = 1.16e6
+pressure_margin = 3.4e5
+pressure_rating_exceeded = false
+shutoff_head = 98.08893431451014
+recirculation_temperature_rise = 0.5369590856353856
+temp_rise_exceeded = false
+verdict = "within_rating"
+[[cases]]
+id = "exceeds_rating"
+tolerance = 1.0e-12
+source = "An 11 bara rating is below the 11.6 bara deadhead. From (`pump_exceeds_rating`)."
+[cases.inputs]
+suction_pressure = 2.0e5
+normal_discharge_pressure = 1.0e6
+protected_pressure_rating = 1.1e6
+liquid_density = 998.0
+specific_heat = 4180.0
+[cases.expected]
+rated_differential_pressure = 8.0e5
+deadhead_pressure = 1.16e6
+pressure_margin = -60000.0
+pressure_rating_exceeded = true
+shutoff_head = 98.08893431451014
+recirculation_temperature_rise = 0.5369590856353856
+temp_rise_exceeded = false
+verdict = "exceeds_rating"
+[[cases]]
+id = "rating_equal"
+tolerance = 1.0e-12
+source = "The rating set to the deadhead pressure: equality is within it. From (`pump_rating_equal`)."
+[cases.inputs]
+suction_pressure = 2.0e5
+normal_discharge_pressure = 1.0e6
+protected_pressure_rating = 1.16e6
+liquid_density = 998.0
+specific_heat = 4180.0
+[cases.expected]
+rated_differential_pressure = 8.0e5
+deadhead_pressure = 1.16e6
+pressure_margin = 0.0
+pressure_rating_exceeded = false
+shutoff_head = 98.08893431451014
+recirculation_temperature_rise = 0.5369590856353856
+temp_rise_exceeded = false
+verdict = "within_rating"
+[[cases]]
+id = "no_rating"
+tolerance = 1.0e-12
+source = "No protected rating: the deadhead and the rise are still published, the margin is absent and the verdict is `no_rating`. From (`pump_no_rating`)."
+[cases.inputs]
+suction_pressure = 2.0e5
+normal_discharge_pressure = 1.0e6
+liquid_density = 998.0
+specific_heat = 4180.0
+[cases.expected]
+rated_differential_pressure = 8.0e5
+deadhead_pressure = 1.16e6
+pressure_rating_exceeded = false
+shutoff_head = 98.08893431451014
+recirculation_temperature_rise = 0.5369590856353856
+temp_rise_exceeded = false
+verdict = "no_rating"
+[[cases]]
+id = "temperature_rise_exceeded"
+tolerance = 1.0e-12
+source = "A 0.5 K allowable rise against the 0.537 K recirculation rise. From (`pump_temp_rise_exceeded`)."
+[cases.inputs]
+suction_pressure = 2.0e5
+normal_discharge_pressure = 1.0e6
+protected_pressure_rating = 1.5e6
+liquid_density = 998.0
+specific_heat = 4180.0
+max_allowable_temperature_rise = 0.5
+[cases.expected]
+rated_differential_pressure = 8.0e5
+deadhead_pressure = 1.16e6
+pressure_margin = 3.4e5
+pressure_rating_exceeded = false
+shutoff_head = 98.08893431451014
+recirculation_temperature_rise = 0.5369590856353856
+temp_rise_exceeded = true
+verdict = "within_rating"
+[[cases]]
+id = "no_density"
+tolerance = 1.0e-12
+source = "No density or specific heat: the pressure screen still answers, and the head and rise are absent. From (`pump_no_density`)."
+[cases.inputs]
+suction_pressure = 2.0e5
+normal_discharge_pressure = 1.0e6
+protected_pressure_rating = 1.5e6
+[cases.expected]
+rated_differential_pressure = 8.0e5
+deadhead_pressure = 1.16e6
+pressure_margin = 3.4e5
+pressure_rating_exceeded = false
+temp_rise_exceeded = false
+verdict = "within_rating"
+[[cases]]
+id = "half_efficiency"
+tolerance = 1.0e-12
+source = "A 0.5 minimum-flow efficiency halves the recirculation rise against the 0.30 default. From (`pump_efficiency`)."
+[cases.inputs]
+suction_pressure = 2.0e5
+normal_discharge_pressure = 1.0e6
+protected_pressure_rating = 1.5e6
+liquid_density = 998.0
+specific_heat = 4180.0
+minimum_flow_efficiency = 0.5
+[cases.expected]
+rated_differential_pressure = 8.0e5
+deadhead_pressure = 1.16e6
+pressure_margin = 3.4e5
+pressure_rating_exceeded = false
+shutoff_head = 98.08893431451014
+recirculation_temperature_rise = 0.23012532241516526
+temp_rise_exceeded = false
+verdict = "within_rating"

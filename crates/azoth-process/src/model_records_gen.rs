@@ -76,6 +76,7 @@ use crate::models::probit::ProbitResult;
 use crate::models::psv_fire_sizing::PsvFireSizingResult;
 use crate::models::psv_sizing::PsvSizingResult;
 use crate::models::pump::PumpResult;
+use crate::models::pump_deadhead::PumpDeadheadResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
@@ -1748,6 +1749,25 @@ impl CalcResult for PumpResult {
         "design_head_rise_to_shutoff",
         "design_required_driver_power",
         "design_pump_type_source",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PumpDeadheadResult {
+    const CALC_ID: &'static str = "process.pump_deadhead";
+    const FIELDS: &'static [&'static str] = &[
+        "rated_differential_pressure",
+        "deadhead_pressure",
+        "pressure_margin",
+        "pressure_rating_exceeded",
+        "shutoff_head",
+        "recirculation_temperature_rise",
+        "temp_rise_exceeded",
+        "verdict",
         "warnings",
     ];
 
