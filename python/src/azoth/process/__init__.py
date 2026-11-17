@@ -98,6 +98,7 @@ from azoth.core.result import (
     SeparatorCapacityAssessmentResult,
     SeparatorPerformanceResult,
     SeparatorResult,
+    SettleOutPressureResult,
     ShortcutDistillationColumnResult,
     SilVerificationResult,
     SplitterResult,
@@ -205,6 +206,7 @@ __all__ = [
     "safety_instrumented_function",
     "separator",
     "separator_capacity_assessment",
+    "settle_out_pressure",
     "shortcut_distillation_column",
     "sil_verification",
     "splitter",
@@ -280,6 +282,7 @@ _PSV_SIZING = "process.psv_sizing"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
+_SETTLE_OUT_PRESSURE = "process.settle_out_pressure"
 _SHORTCUT_DISTILLATION_COLUMN = "process.shortcut_distillation_column"
 _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
@@ -3956,6 +3959,26 @@ def separator_capacity_assessment(
         design_basis_provenance=design_basis_provenance,
         heat_input=heat_input,
         mechanical_design_max_gas_flow=mechanical_design_max_gas_flow,
+    )
+
+
+def settle_out_pressure(
+    compartments: list[dict[str, object]],
+    settle_out_temperature: Q | None = None,
+    protected_pressure_rating: Q | None = None,
+) -> SettleOutPressureResult:
+    """The settle-out pressure of connected gas volumes and the rating verdict.
+
+    Each compartment's inventory is ``p V/(R T)`` with ``Z = 1``, the class's no-gas basis;
+    the settle temperature is the mole-weighted mean unless stated. **At least two
+    compartments are required.**
+
+    See :func:`azoth.process.reference.settle_out_pressure`.
+    """
+    return resolve(_SETTLE_OUT_PRESSURE)(  # type: ignore[no-any-return]
+        compartments=compartments,
+        settle_out_temperature=settle_out_temperature,
+        protected_pressure_rating=protected_pressure_rating,
     )
 
 

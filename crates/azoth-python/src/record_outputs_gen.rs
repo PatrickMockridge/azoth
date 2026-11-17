@@ -2823,6 +2823,72 @@ impl From<&azoth_process::models::self_heating_induction::SelfHeatingTimePoint>
     }
 }
 
+/// one row per compartment, in the caller's order, with its Z and moles.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SettleOutCompartmentResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySettleOutCompartmentResult {
+    /// the compartment's label.
+    #[pyo3(get)]
+    pub name: String,
+    /// the compartment's volume.
+    #[pyo3(get)]
+    pub volume: PyQty,
+    /// the compartment's pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the compartment's temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// the compartment's compressibility, 1.0.
+    #[pyo3(get)]
+    pub z_factor: f64,
+    /// the compartment's inventory.
+    #[pyo3(get)]
+    pub moles: PyQty,
+}
+
+#[pymethods]
+impl PySettleOutCompartmentResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SettleOutCompartmentResult(name={}, volume={:?}, pressure={:?}, temperature={:?}, z_factor={}, moles={:?})",
+            self.name, self.volume, self.pressure, self.temperature, self.z_factor, self.moles
+        )
+    }
+}
+
+impl From<&azoth_process::models::settle_out_pressure::SettleOutCompartmentResult>
+    for PySettleOutCompartmentResult
+{
+    fn from(row: &azoth_process::models::settle_out_pressure::SettleOutCompartmentResult) -> Self {
+        Self {
+            name: row.name.clone(),
+            volume: PyQty {
+                magnitude_si: row.volume.value,
+                unit: "m**3".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            temperature: PyQty {
+                magnitude_si: row.temperature.value,
+                unit: "K".to_string(),
+            },
+            z_factor: row.z_factor,
+            moles: PyQty {
+                magnitude_si: row.moles.value,
+                unit: "mol".to_string(),
+            },
+        }
+    }
+}
+
 /// one row per issue, in the class's check order.
 #[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "SilIssue")]
 #[derive(Debug, Clone, PartialEq)]

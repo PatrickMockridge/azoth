@@ -8012,6 +8012,40 @@ pub fn separator_capacity_assessment(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Settle-out pressure of connected gas volumes.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (compartments, settle_out_temperature, protected_pressure_rating))]
+#[pyo3(text_signature = "(compartments, settle_out_temperature, protected_pressure_rating)")]
+pub fn settle_out_pressure(
+    py: Python<'_>,
+    compartments: Vec<crate::records_gen::SettleOutCompartment>,
+    settle_out_temperature: Option<f64>,
+    protected_pressure_rating: Option<f64>,
+) -> PyResult<crate::transport_gen::PySettleOutPressureResult> {
+    let compartments_records: Vec<
+        azoth_process::models::settle_out_pressure::SettleOutCompartment,
+    > = compartments
+        .into_iter()
+        .map(
+            |row| azoth_process::models::settle_out_pressure::SettleOutCompartment {
+                name: row.name,
+                volume: cubic_meters(row.volume),
+                pressure: pascals(row.pressure),
+                temperature: kelvins(row.temperature),
+            },
+        )
+        .collect();
+    azoth_process::models::settle_out_pressure::settle_out_pressure(
+        &compartments_records,
+        settle_out_temperature.map(kelvins),
+        protected_pressure_rating.map(pascals),
+    )
+    .map(|r| crate::transport_gen::PySettleOutPressureResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Shortcut distillation column.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

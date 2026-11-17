@@ -6393,6 +6393,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.settle_out_pressure",
+        name: "Settle-out pressure of connected gas volumes",
+        family: "equipmentsafety",
+        sub_interface: None,
+        purpose: "The settle-out pressure of connected gas volumes against the protected rating, with each compartment's inventory.",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.sil_verification",
         name: "SIL verification",
         family: "risk",

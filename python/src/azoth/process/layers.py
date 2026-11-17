@@ -1630,6 +1630,47 @@ def _fire_monitor_coverage(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _settle_out_pressure(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.settle_out_pressure`'s layers, from the reference's arithmetic.
+
+    The verdict and the exceeds flag are the model's own words, asserted by its test and
+    the cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.settle_out_pressure import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    rows = [
+        {
+            "name": str(row["name"]),
+            "volume": quantity(float(row["volume"]), "m**3"),
+            "pressure": quantity(float(row["pressure"]), "Pa"),
+            "temperature": quantity(float(row["temperature"]), "K"),
+        }
+        for row in inputs["compartments"]
+    ]
+    solution, _ = _evaluate(
+        rows,
+        settle_out_temperature=optional("settle_out_temperature", "K"),
+        protected_pressure_rating=optional("protected_pressure_rating", "Pa"),
+    )
+    dumped = {
+        "settle_out_pressure_bara": solution.pressure / 1.0e5,
+        "settle_out_temperature_k": solution.temperature,
+        "settle_out_z_factor": 1.0,
+        "total_moles": solution.total_moles,
+        "total_volume_m3": solution.total_volume,
+        "max_compartment_pressure_bara": solution.max_pressure / 1.0e5,
+        "min_compartment_pressure_bara": solution.min_pressure / 1.0e5,
+    }
+    if solution.margin is not None:
+        dumped["margin_to_rating_bar"] = solution.margin / 1.0e5
+    return dumped
+
+
 def _vacuum_collapse(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.vacuum_collapse`'s layers, from the reference's arithmetic.
 
@@ -3613,6 +3654,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.runaway_reaction": _runaway_reaction,
     "process.mdmt": _mdmt,
     "process.vacuum_collapse": _vacuum_collapse,
+    "process.settle_out_pressure": _settle_out_pressure,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.fault_tree": _fault_tree,
@@ -4669,6 +4711,16 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_monitor_coverage.tsv",
         block=8,
         identified_by=("#label", "fmc_characteristic_dimension"),
+    ),
+    # Settle-out pressure's one: the two-compartment balance. The five further cases are the
+    # exceeded, equality, three-compartment, stated-temperature and no-rating states; the
+    # unit aliases and the one-compartment refusal are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.settle_out_pressure",
+        case="two_compartments_within",
+        capture="process_settle_out_pressure.tsv",
+        block=0,
+        identified_by=("#label", "settle_two_within"),
     ),
     # Vacuum collapse's one: the condensing sweep at a 0.2 bara rating. The five further
     # cases are the non-condensing, exceeded, no-rating, make-up and five-step states; the
@@ -7526,6 +7578,8 @@ UNCASED_ROWS: dict[str, int] = {
     "process_deluge_nozzle_layout.tsv": 8,
     # The monitor coverage's eleven: the constructor and each setter's refusal.
     "process_fire_monitor_coverage.tsv": 11,
+    # Settle-out pressure's two: the unit-string aliases and the one-compartment refusal.
+    "process_settle_out_pressure.tsv": 2,
     # Vacuum collapse's two: the unit-string aliases and the cold-end refusal.
     "process_vacuum_collapse.tsv": 2,
     # MDMT's two: curves C and D at 25 mm, restatements of the curve family the other cases

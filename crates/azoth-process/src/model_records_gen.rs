@@ -90,6 +90,7 @@ use crate::models::semenov_self_heating::SemenovSelfHeatingResult;
 use crate::models::separator::SeparatorResult;
 use crate::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult;
 use crate::models::separator_performance::SeparatorPerformanceResult;
+use crate::models::settle_out_pressure::SettleOutPressureResult;
 use crate::models::shortcut_distillation_column::ShortcutDistillationColumnResult;
 use crate::models::sil_verification::SilVerificationResult;
 use crate::models::splitter::SplitterResult;
@@ -2122,6 +2123,28 @@ impl CalcResult for SeparatorPerformanceResult {
         "post_inlet_device_spread",
         "post_inlet_d50",
         "post_inlet_d32",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SettleOutPressureResult {
+    const CALC_ID: &'static str = "process.settle_out_pressure";
+    const FIELDS: &'static [&'static str] = &[
+        "settle_out_pressure",
+        "settle_out_temperature",
+        "settle_out_z_factor",
+        "total_moles",
+        "total_volume",
+        "max_compartment_pressure",
+        "min_compartment_pressure",
+        "margin_to_rating",
+        "exceeds_rating",
+        "verdict",
+        "compartments",
         "warnings",
     ];
 

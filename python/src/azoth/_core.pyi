@@ -698,6 +698,14 @@ class EfficiencyPoint(TypedDict):
     diameter: float
     efficiency: float
 
+class SettleOutCompartment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    volume: float
+    pressure: float
+    temperature: float
+
 class Tr3001Scenario(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1277,6 +1285,17 @@ class SelfHeatingTimePoint:
     time: Qty
     centre_temperature: Qty
     max_temperature: Qty
+
+@final
+class SettleOutCompartmentResult:
+    """one row per compartment, in the caller's order, with its Z and moles."""
+
+    name: str
+    volume: Qty
+    pressure: Qty
+    temperature: Qty
+    z_factor: float
+    moles: Qty
 
 @final
 class SilIssue:
@@ -4756,6 +4775,21 @@ class SeparatorPerformanceResult:
     post_inlet_device_spread: float | None
     post_inlet_d50: Qty | None
     post_inlet_d32: Qty | None
+    warnings: list[Warning]
+
+@final
+class SettleOutPressureResult:
+    settle_out_pressure: Qty
+    settle_out_temperature: Qty
+    settle_out_z_factor: float
+    total_moles: Qty
+    total_volume: Qty
+    max_compartment_pressure: Qty
+    min_compartment_pressure: Qty
+    margin_to_rating: Qty | None
+    exceeds_rating: bool
+    verdict: str
+    compartments: list[SettleOutCompartmentResult]
     warnings: list[Warning]
 
 @final
@@ -8489,6 +8523,11 @@ def separator_performance(
     design_k_factor: float | None = None,
     liquid_liquid_residence_time: float | None = None,
 ) -> SeparatorPerformanceResult: ...
+def settle_out_pressure(
+    compartments: list[SettleOutCompartment],
+    settle_out_temperature: float | None = None,
+    protected_pressure_rating: float | None = None,
+) -> SettleOutPressureResult: ...
 def shortcut_distillation_column(
     components: list[str],
     feed_n: float,

@@ -67,6 +67,7 @@ from azoth.core.record_outputs_gen import (
     ScenarioChangeRow,
     ScenarioIndexRow,
     SelfHeatingTimePoint,
+    SettleOutCompartmentResult,
     SilIssue,
     SterileRadius,
     StreamScaleMineralRow,
@@ -101,6 +102,7 @@ from azoth.core.result_base import (
     RuptureStatus,
     SelfHeatingGeometry,
     SelfHeatingVerdict,
+    SettleOutVerdict,
     StabilityVerdict,
     Sts0131PressureCategory,
     SupplyVerdict,
@@ -9866,6 +9868,49 @@ class SeparatorPerformanceResult(_HasWarnings):
 
     #: the downstream distribution's Sauter mean diameter, the 50-class `sum(d^3)/sum(d^2)`.
     post_inlet_d32: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SettleOutPressureResult(_HasWarnings):
+    """Result of ``process.settle_out_pressure``."""
+
+    CALC_ID: ClassVar[str] = "process.settle_out_pressure"
+
+    #: the pressure the connected volumes settle at, `N R T_s / sum V_i`.
+    settle_out_pressure: Q
+
+    #: the settled temperature, stated or mole-weighted.
+    settle_out_temperature: Q
+
+    #: the settle-out compressibility, **1.0**: the class's no-gas state.
+    settle_out_z_factor: float
+
+    #: the summed inventory.
+    total_moles: Q
+
+    #: the summed volume.
+    total_volume: Q
+
+    #: the largest stated compartment pressure.
+    max_compartment_pressure: Q
+
+    #: the smallest stated compartment pressure.
+    min_compartment_pressure: Q
+
+    #: `rating - settle_out_pressure`; **absent when no rating is stated**.
+    margin_to_rating: Q | None
+
+    #: whether the settle-out pressure is strictly above the rating.
+    exceeds_rating: bool
+
+    #: the class's verdict.
+    verdict: SettleOutVerdict
+
+    #: one row per compartment, in the caller's order, with its Z and moles.
+    compartments: tuple[SettleOutCompartmentResult, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

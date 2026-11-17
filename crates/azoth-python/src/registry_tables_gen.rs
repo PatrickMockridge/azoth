@@ -320,6 +320,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.separator" => azoth_process::models::separator::SeparatorResult::FIELDS.to_vec(),
         "process.separator_capacity_assessment" => azoth_process::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult::FIELDS.to_vec(),
         "process.separator_performance" => azoth_process::models::separator_performance::SeparatorPerformanceResult::FIELDS.to_vec(),
+        "process.settle_out_pressure" => azoth_process::models::settle_out_pressure::SettleOutPressureResult::FIELDS.to_vec(),
         "process.shortcut_distillation_column" => azoth_process::models::shortcut_distillation_column::ShortcutDistillationColumnResult::FIELDS.to_vec(),
         "process.sil_verification" => azoth_process::models::sil_verification::SilVerificationResult::FIELDS.to_vec(),
         "process.splitter" => azoth_process::models::splitter::SplitterResult::FIELDS.to_vec(),

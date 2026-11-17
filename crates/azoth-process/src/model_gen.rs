@@ -80,6 +80,7 @@
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml
+//!   - specs/models/process/settle_out_pressure.toml
 //!   - specs/models/process/shortcut_distillation_column.toml
 //!   - specs/models/process/sil_verification.toml
 //!   - specs/models/process/splitter.toml
@@ -76068,6 +76069,460 @@ pub static SEPARATOR_PERFORMANCE_SPEC: ModelSpec = ModelSpec {
     cases: SEPARATOR_PERFORMANCE_CASES,
 };
 
+static SETTLE_OUT_PRESSURE_CHECKS: &[SpecCheck] = &[];
+
+static SETTLE_OUT_PRESSURE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "two_compartments_within",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("protected_pressure_rating", 1500000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("settle_out_pressure", 1285714.285714286),
+            ("settle_out_temperature", 308.57142857142856),
+            ("settle_out_z_factor", 1.0),
+            ("total_moles", 3507.9436888108294),
+            ("total_volume", 7.0),
+            ("max_compartment_pressure", 2000000.0),
+            ("min_compartment_pressure", 1000000.0),
+            ("margin_to_rating", 214285.71428571423),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "within_rating")],
+        records: &[(
+            "compartments",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("suction"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("discharge"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(320.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "two_compartments_exceed",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("protected_pressure_rating", 1000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("settle_out_pressure", 1285714.285714286),
+            ("settle_out_temperature", 308.57142857142856),
+            ("settle_out_z_factor", 1.0),
+            ("total_moles", 3507.9436888108294),
+            ("total_volume", 7.0),
+            ("max_compartment_pressure", 2000000.0),
+            ("min_compartment_pressure", 1000000.0),
+            ("margin_to_rating", -285714.2857142858),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "exceeds_rating")],
+        records: &[(
+            "compartments",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("suction"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("discharge"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(320.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "rating_equal",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[("protected_pressure_rating", 1285714.285714286)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("settle_out_pressure", 1285714.285714286),
+            ("settle_out_temperature", 308.57142857142856),
+            ("settle_out_z_factor", 1.0),
+            ("total_moles", 3507.9436888108294),
+            ("total_volume", 7.0),
+            ("max_compartment_pressure", 2000000.0),
+            ("min_compartment_pressure", 1000000.0),
+            ("margin_to_rating", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "within_rating")],
+        records: &[(
+            "compartments",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("suction"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("discharge"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(320.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "three_compartments",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("protected_pressure_rating", 1500000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("settle_out_pressure", 1049999.9999999998),
+            ("settle_out_temperature", 305.7740585774058),
+            ("settle_out_z_factor", 1.0),
+            ("total_moles", 4130.042076974326),
+            ("total_volume", 10.0),
+            ("max_compartment_pressure", 2000000.0),
+            ("min_compartment_pressure", 500000.0),
+            ("margin_to_rating", 450000.0000000002),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "within_rating")],
+        records: &[(
+            "compartments",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("suction"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("discharge"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(320.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("header"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(290.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "stated_temperature",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("settle_out_temperature", 310.0),
+            ("protected_pressure_rating", 1500000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("settle_out_pressure", 1291666.6666666667),
+            ("settle_out_temperature", 310.0),
+            ("settle_out_z_factor", 1.0),
+            ("total_moles", 3507.9436888108294),
+            ("total_volume", 7.0),
+            ("max_compartment_pressure", 2000000.0),
+            ("min_compartment_pressure", 1000000.0),
+            ("margin_to_rating", 208333.3333333332),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "within_rating")],
+        records: &[(
+            "compartments",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("suction"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("discharge"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(320.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "no_rating",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("settle_out_pressure", 1285714.285714286),
+            ("settle_out_temperature", 308.57142857142856),
+            ("settle_out_z_factor", 1.0),
+            ("total_moles", 3507.9436888108294),
+            ("total_volume", 7.0),
+            ("max_compartment_pressure", 2000000.0),
+            ("min_compartment_pressure", 1000000.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("verdict", "no_rating")],
+        records: &[(
+            "compartments",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("suction"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("discharge"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(320.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static SETTLE_OUT_PRESSURE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "ideal_gas_settle_out_balance",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.settle_out_pressure`.
+pub static SETTLE_OUT_PRESSURE_SPEC: ModelSpec = ModelSpec {
+    id: "process.settle_out_pressure",
+    kind: "procedure",
+    algorithm: Some(&SETTLE_OUT_PRESSURE_ALGORITHM),
+    checks: SETTLE_OUT_PRESSURE_CHECKS,
+    cases: SETTLE_OUT_PRESSURE_CASES,
+};
+
 static SHORTCUT_DISTILLATION_COLUMN_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -84571,6 +85026,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &SEPARATOR_SPEC,
     &SEPARATOR_CAPACITY_ASSESSMENT_SPEC,
     &SEPARATOR_PERFORMANCE_SPEC,
+    &SETTLE_OUT_PRESSURE_SPEC,
     &SHORTCUT_DISTILLATION_COLUMN_SPEC,
     &SIL_VERIFICATION_SPEC,
     &SPLITTER_SPEC,

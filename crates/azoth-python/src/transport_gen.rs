@@ -25,9 +25,9 @@ use crate::record_outputs_gen::{
     PyNaceIssueRow, PyPipeFireRupturePoint, PyRegisterFinding, PyReliefDisposalRow,
     PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
     PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
-    PyWaterMixingResult, PyZoneRatingRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint,
+    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
+    PySubFraction, PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -24515,6 +24515,119 @@ impl From<&azoth_process::models::separator_performance::SeparatorPerformanceRes
                 magnitude_si: v.value,
                 unit: "m".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.settle_out_pressure`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SettleOutPressureResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySettleOutPressureResult {
+    /// the pressure the connected volumes settle at, `N R T_s / sum V_i`.
+    #[pyo3(get)]
+    pub settle_out_pressure: PyQty,
+    /// the settled temperature, stated or mole-weighted.
+    #[pyo3(get)]
+    pub settle_out_temperature: PyQty,
+    /// the settle-out compressibility, **1.0**: the class's no-gas state.
+    #[pyo3(get)]
+    pub settle_out_z_factor: f64,
+    /// the summed inventory.
+    #[pyo3(get)]
+    pub total_moles: PyQty,
+    /// the summed volume.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the largest stated compartment pressure.
+    #[pyo3(get)]
+    pub max_compartment_pressure: PyQty,
+    /// the smallest stated compartment pressure.
+    #[pyo3(get)]
+    pub min_compartment_pressure: PyQty,
+    /// `rating - settle_out_pressure`; **absent when no rating is stated**.
+    #[pyo3(get)]
+    pub margin_to_rating: Option<PyQty>,
+    /// whether the settle-out pressure is strictly above the rating.
+    #[pyo3(get)]
+    pub exceeds_rating: bool,
+    /// the class's verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// one row per compartment, in the caller's order, with its Z and moles.
+    #[pyo3(get)]
+    pub compartments: Vec<PySettleOutCompartmentResult>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySettleOutPressureResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SettleOutPressureResult(settle_out_pressure={:?}, settle_out_temperature={:?}, settle_out_z_factor={:?}, total_moles={:?}, total_volume={:?}, max_compartment_pressure={:?}, min_compartment_pressure={:?}, margin_to_rating={:?}, exceeds_rating={:?}, verdict={:?}, compartments={:?}, {} warning(s))",
+            self.settle_out_pressure,
+            self.settle_out_temperature,
+            self.settle_out_z_factor,
+            self.total_moles,
+            self.total_volume,
+            self.max_compartment_pressure,
+            self.min_compartment_pressure,
+            self.margin_to_rating,
+            self.exceeds_rating,
+            self.verdict,
+            self.compartments,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::settle_out_pressure::SettleOutPressureResult>
+    for PySettleOutPressureResult
+{
+    fn from(r: &azoth_process::models::settle_out_pressure::SettleOutPressureResult) -> Self {
+        Self {
+            settle_out_pressure: PyQty {
+                magnitude_si: r.settle_out_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            settle_out_temperature: PyQty {
+                magnitude_si: r.settle_out_temperature.value,
+                unit: "K".to_string(),
+            },
+            settle_out_z_factor: r.settle_out_z_factor,
+            total_moles: PyQty {
+                magnitude_si: r.total_moles.value,
+                unit: "mol".to_string(),
+            },
+            total_volume: PyQty {
+                magnitude_si: r.total_volume.value,
+                unit: "m**3".to_string(),
+            },
+            max_compartment_pressure: PyQty {
+                magnitude_si: r.max_compartment_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            min_compartment_pressure: PyQty {
+                magnitude_si: r.min_compartment_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            margin_to_rating: r.margin_to_rating.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            exceeds_rating: r.exceeds_rating,
+            verdict: r.verdict.as_str().to_string(),
+            compartments: r
+                .compartments
+                .iter()
+                .map(PySettleOutCompartmentResult::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }

@@ -113,6 +113,7 @@ pub mod semenov_self_heating;
 pub mod separator;
 pub mod separator_capacity_assessment;
 pub mod separator_performance;
+pub mod settle_out_pressure;
 pub mod shortcut_distillation_column;
 pub mod sil_verification;
 pub mod splitter;
@@ -268,6 +269,10 @@ pub use separator_capacity_assessment::{
     SeparatorCapacityAssessmentResult, separator_capacity_assessment,
 };
 pub use separator_performance::{SeparatorPerformanceResult, separator_performance};
+pub use settle_out_pressure::{
+    SettleOutCompartment, SettleOutCompartmentResult, SettleOutPressureResult, SettleOutVerdict,
+    settle_out_pressure,
+};
 pub use shortcut_distillation_column::{
     ShortcutDistillationColumnResult, shortcut_distillation_column,
 };

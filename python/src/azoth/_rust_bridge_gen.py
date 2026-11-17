@@ -331,6 +331,9 @@ from azoth.core.result import (
     SeparatorPerformanceResult,
     SeparatorResult,
     SetHeavyTbpToPlusResult,
+    SettleOutCompartmentResult,
+    SettleOutPressureResult,
+    SettleOutVerdict,
     ShahCondensationResult,
     ShellAndTubeDesignResult,
     ShellAndTubeRatingResult,
@@ -717,6 +720,7 @@ __all__ = [
     "separator_capacity_assessment",
     "separator_performance",
     "set_heavy_tbp_to_plus",
+    "settle_out_pressure",
     "shah_condensation",
     "shell_and_tube_design",
     "shell_and_tube_rating",
@@ -8608,6 +8612,30 @@ def separator_performance(gas_density: Q, oil_density: Q, water_density: Q, gas_
         post_inlet_device_spread=result.post_inlet_device_spread,
         post_inlet_d50=None if result.post_inlet_d50 is None else from_si(result.post_inlet_d50.magnitude_si, result.post_inlet_d50.unit),
         post_inlet_d32=None if result.post_inlet_d32 is None else from_si(result.post_inlet_d32.magnitude_si, result.post_inlet_d32.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def settle_out_pressure(compartments: list[dict[str, object]], settle_out_temperature: Q | None=None, protected_pressure_rating: Q | None=None) -> SettleOutPressureResult:
+    """``process.settle_out_pressure``, computed in Rust."""
+    spec = _models_gen.model("process.settle_out_pressure")
+    result = _core.settle_out_pressure(
+        input_records_to_si(spec, "compartments", compartments),
+        None if settle_out_temperature is None else input_to_si(spec, "settle_out_temperature", settle_out_temperature),
+        None if protected_pressure_rating is None else input_to_si(spec, "protected_pressure_rating", protected_pressure_rating),
+    )
+    return SettleOutPressureResult(
+        settle_out_pressure=from_si(result.settle_out_pressure.magnitude_si, result.settle_out_pressure.unit),
+        settle_out_temperature=from_si(result.settle_out_temperature.magnitude_si, result.settle_out_temperature.unit),
+        settle_out_z_factor=result.settle_out_z_factor,
+        total_moles=from_si(result.total_moles.magnitude_si, result.total_moles.unit),
+        total_volume=from_si(result.total_volume.magnitude_si, result.total_volume.unit),
+        max_compartment_pressure=from_si(result.max_compartment_pressure.magnitude_si, result.max_compartment_pressure.unit),
+        min_compartment_pressure=from_si(result.min_compartment_pressure.magnitude_si, result.min_compartment_pressure.unit),
+        margin_to_rating=None if result.margin_to_rating is None else from_si(result.margin_to_rating.magnitude_si, result.margin_to_rating.unit),
+        exceeds_rating=result.exceeds_rating,
+        verdict=SettleOutVerdict(result.verdict),
+        compartments=tuple(SettleOutCompartmentResult(name=c.name, volume=from_si(c.volume.magnitude_si, c.volume.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), z_factor=c.z_factor, moles=from_si(c.moles.magnitude_si, c.moles.unit)) for c in result.compartments),
         warnings=_warnings(result.warnings),
     )
 

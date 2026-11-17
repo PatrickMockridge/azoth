@@ -406,6 +406,7 @@ Five sections, and the difference between them is the point:
 - [`process.separator`](./process/separator.md) — Separator
 - [`process.separator_capacity_assessment`](./process/separator_capacity_assessment.md) — Separator capacity assessment
 - [`process.separator_performance`](./process/separator_performance.md) — Separator performance calculator
+- [`process.settle_out_pressure`](./process/settle_out_pressure.md) — Settle-out pressure of connected gas volumes
 - [`process.shortcut_distillation_column`](./process/shortcut_distillation_column.md) — Shortcut distillation column
 - [`process.sil_verification`](./process/sil_verification.md) — SIL verification
 - [`process.splitter`](./process/splitter.md) — Splitter

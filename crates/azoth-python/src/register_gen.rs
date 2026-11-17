@@ -319,6 +319,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PySeparatorResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorCapacityAssessmentResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorPerformanceResult>()?;
+    m.add_class::<crate::transport_gen::PySettleOutPressureResult>()?;
     m.add_class::<crate::transport_gen::PyShortcutDistillationColumnResult>()?;
     m.add_class::<crate::transport_gen::PySilVerificationResult>()?;
     m.add_class::<crate::transport_gen::PySplitterResult>()?;
@@ -403,6 +404,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyScenarioChangeRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioIndexRow>()?;
     m.add_class::<crate::record_outputs_gen::PySelfHeatingTimePoint>()?;
+    m.add_class::<crate::record_outputs_gen::PySettleOutCompartmentResult>()?;
     m.add_class::<crate::record_outputs_gen::PySilIssue>()?;
     m.add_class::<crate::record_outputs_gen::PySterileRadius>()?;
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
@@ -1121,6 +1123,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::process::separator_performance, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::settle_out_pressure,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::shortcut_distillation_column,
         m

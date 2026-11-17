@@ -301,6 +301,7 @@
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml
+//!   - specs/models/process/settle_out_pressure.toml
 //!   - specs/models/process/shortcut_distillation_column.toml
 //!   - specs/models/process/sil_verification.toml
 //!   - specs/models/process/splitter.toml
@@ -5072,6 +5073,16 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.separator_performance",
         "liquid_liquid_residence_time",
         "time",
+    ),
+    (
+        "process.settle_out_pressure",
+        "settle_out_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.settle_out_pressure",
+        "protected_pressure_rating",
+        "pressure",
     ),
     (
         "process.shortcut_distillation_column",

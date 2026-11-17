@@ -49,6 +49,7 @@ EXTRA_FAMILIES = {
     "process.runaway_reaction": "equipmentsafety",
     "process.mdmt": "equipmentsafety",
     "process.vacuum_collapse": "equipmentsafety",
+    "process.settle_out_pressure": "equipmentsafety",
 }
 
 #: The ids a scenario can run: every safety model whose inputs and outputs are all scalar,
@@ -125,6 +126,7 @@ PURPOSES = {
     "process.runaway_reaction": "The adiabatic temperature rise, MTSR, margin, time to maximum rate and the two-phase relief flag.",
     "process.mdmt": "The UCS-66 curve's minimum design metal temperature and whether the cold service is acceptable.",
     "process.vacuum_collapse": "The constant-volume cooling sweep's minimum pressure against the external rating, and the make-up gas.",
+    "process.settle_out_pressure": "The settle-out pressure of connected gas volumes against the protected rating, with each compartment's inventory.",
     "process.safety_instrumented_function": "The SIF's RRF, required PFD and SIL, architecture PFDs and spurious-trip availability.",
     "process.toxic_library": "The IDLH, ERPG-2 and AEGL-2 thresholds for a chemical, and a ppm concentration converted to kg/m3.",
     "process.vce": "The TNO multi-energy overpressure and the distance to a target overpressure.",

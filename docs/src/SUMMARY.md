@@ -314,6 +314,7 @@
   - [Separator](./process/separator.md)
   - [Separator capacity assessment](./process/separator_capacity_assessment.md)
   - [Separator performance calculator](./process/separator_performance.md)
+  - [Settle-out pressure of connected gas volumes](./process/settle_out_pressure.md)
   - [Shortcut distillation column](./process/shortcut_distillation_column.md)
   - [SIL verification](./process/sil_verification.md)
   - [Splitter](./process/splitter.md)
