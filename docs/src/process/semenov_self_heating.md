@@ -63,7 +63,7 @@ not an equation, and both implementations read it from here.
 
 - **the Semenov limit is a thermally thin body**: internal gradients are negligible and the surface film carries the whole heat-loss resistance. The porous-media Frank-Kamenetskii screen is the conduction-controlled limit.
 - **the parameter is `psi = E V P exp(-E/(R Ta)) / (h S R Ta^2)`**, evaluated in logarithmic form, and `psi_crit` is `1/e`.
-- **the critical temperature is a bisection on [150, 2000] K with a 1e-4 K tolerance and a 200-iteration cap.** It is absent when `psi(150)` is already above critical or `psi(2000)` below it. At the returned temperature `psi_ratio` is one to the bisection's residue, so that state screens as self-ignition.
+- **the critical temperature is a bisection on [150, 2000] K with a 1e-4 K tolerance and a 200-iteration cap**, absent when `psi(150)` is above critical or `psi(2000)` below it. At the returned temperature `psi_ratio` is one only to the residue, so that state screens as self-ignition.
 - **the verdict is `psi_ratio > 1` self-ignition and `psi_ratio >= marginal_ratio` marginal**, so the critical state is a self-ignition and the marginal band is inclusive at its lower edge.
 - **`critical_temperature_rise` is `R Ta^2/E`**, the steady self-heating excess at criticality in kelvin, which is only tens of kelvin for a typical organic oxidation.
 - **the class's warning strings are published in order in `messages`**: the bracket failure when it happens, then the spatial-uniformity note, which is always present.
