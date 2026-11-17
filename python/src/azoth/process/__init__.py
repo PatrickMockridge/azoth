@@ -88,6 +88,7 @@ from azoth.core.result import (
     RateBasedPackedColumnResult,
     ReliefDisposalNetworkResult,
     RiskMatrixResult,
+    RunawayReactionResult,
     S001Clause10ReviewResult,
     S001SecondaryPressureProtectionResult,
     SafetyInstrumentedFunctionResult,
@@ -194,6 +195,7 @@ __all__ = [
     "rate_based_packed_column",
     "relief_disposal_network",
     "risk_matrix",
+    "runaway_reaction",
     "run_flowsheet",
     "s001_clause10_review",
     "s001_secondary_pressure_protection",
@@ -230,6 +232,7 @@ _PIPELINE_PRESSURE_PROTECTION = "process.pipeline_pressure_protection"
 _RATE_BASED_PACKED_COLUMN = "process.rate_based_packed_column"
 _RELIEF_DISPOSAL_NETWORK = "process.relief_disposal_network"
 _RISK_MATRIX = "process.risk_matrix"
+_RUNAWAY_REACTION = "process.runaway_reaction"
 _SAFETY_INSTRUMENTED_FUNCTION = "process.safety_instrumented_function"
 _PIPE = "process.pipe"
 _GAS_SCRUBBER = "process.gas_scrubber"
@@ -2832,6 +2835,40 @@ def tr3001_compliance(
         required_area_in2=required_area_in2,
         acceptance_accepted=acceptance_accepted,
         accumulation_fraction=accumulation_fraction,
+    )
+
+
+def runaway_reaction(
+    process_temperature: Q,
+    reaction_enthalpy: Q,
+    limiting_reactant_moles: Q,
+    total_mass: Q,
+    specific_heat: Q,
+    max_allowable_temperature: Q | None = None,
+    activation_energy: Q | None = None,
+    initial_heat_release_rate: float | None = None,
+    acceptable_margin: Q | None = None,
+    gassy_system: bool | None = None,
+) -> RunawayReactionResult:
+    """The adiabatic rise, MTSR, margin, time to maximum rate and runaway verdict.
+
+    The enthalpy sign is ignored. Without a MAT the verdict reads the adiabatic rise alone;
+    with one the exceeded test is strict. The TMR needs a positive activation energy and a
+    positive initial rate, the latter **in W/kg**.
+
+    See :func:`azoth.process.reference.runaway_reaction`.
+    """
+    return resolve(_RUNAWAY_REACTION)(  # type: ignore[no-any-return]
+        process_temperature=process_temperature,
+        reaction_enthalpy=reaction_enthalpy,
+        limiting_reactant_moles=limiting_reactant_moles,
+        total_mass=total_mass,
+        specific_heat=specific_heat,
+        max_allowable_temperature=max_allowable_temperature,
+        activation_energy=activation_energy,
+        initial_heat_release_rate=initial_heat_release_rate,
+        acceptable_margin=acceptable_margin,
+        gassy_system=gassy_system,
     )
 
 

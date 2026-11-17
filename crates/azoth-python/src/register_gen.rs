@@ -309,6 +309,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyRateBasedPackedColumnResult>()?;
     m.add_class::<crate::transport_gen::PyReliefDisposalNetworkResult>()?;
     m.add_class::<crate::transport_gen::PyRiskMatrixResult>()?;
+    m.add_class::<crate::transport_gen::PyRunawayReactionResult>()?;
     m.add_class::<crate::transport_gen::PyS001Clause10ReviewResult>()?;
     m.add_class::<crate::transport_gen::PyS001SecondaryPressureProtectionResult>()?;
     m.add_class::<crate::transport_gen::PySafetyInstrumentedFunctionResult>()?;
@@ -1093,6 +1094,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::risk_matrix, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::runaway_reaction, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::s001_clause10_review, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::s001_secondary_pressure_protection,

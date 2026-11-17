@@ -80,6 +80,7 @@ use crate::models::pump_deadhead::PumpDeadheadResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
+use crate::models::runaway_reaction::RunawayReactionResult;
 use crate::models::s001_clause10_review::S001Clause10ReviewResult;
 use crate::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
@@ -1847,6 +1848,25 @@ impl CalcResult for ReliefDisposalNetworkResult {
 impl CalcResult for RiskMatrixResult {
     const CALC_ID: &'static str = "process.risk_matrix";
     const FIELDS: &'static [&'static str] = &["assessments", "total_annual_risk_cost", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for RunawayReactionResult {
+    const CALC_ID: &'static str = "process.runaway_reaction";
+    const FIELDS: &'static [&'static str] = &[
+        "adiabatic_temperature_rise",
+        "mtsr",
+        "temperature_margin",
+        "margin_exceeded",
+        "total_heat_release",
+        "time_to_max_rate",
+        "two_phase_relief_screening_required",
+        "verdict",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

@@ -298,6 +298,8 @@ from azoth.core.result import (
     RkAlphaAbResult,
     RkDepartureResult,
     RootStructure,
+    RunawayReactionResult,
+    RunawayVerdict,
     RuptureStatus,
     S001Clause10ReviewResult,
     S001SecondaryPressureProtectionResult,
@@ -691,6 +693,7 @@ __all__ = [
     "risk_matrix",
     "rk_alpha_ab",
     "rk_departure",
+    "runaway_reaction",
     "s001_clause10_review",
     "s001_secondary_pressure_protection",
     "safety_instrumented_function",
@@ -8212,6 +8215,34 @@ def risk_matrix(equipment: list[dict[str, object]], product_price_per_kg: float 
     return RiskMatrixResult(
         assessments=tuple(RiskAssessmentRow(name=c.name, failures_per_year=c.failures_per_year, mtbf_hours=c.mtbf_hours, mttr_hours=c.mttr_hours, expected_downtime_hours_per_year=c.expected_downtime_hours_per_year, probability_category=c.probability_category, probability_level=c.probability_level, production_loss_percent=c.production_loss_percent, production_loss_kg_hr=from_si(c.production_loss_kg_hr.magnitude_si, c.production_loss_kg_hr.unit), consequence_category=c.consequence_category, consequence_level=c.consequence_level, risk_score=c.risk_score, risk_level=c.risk_level, cost_per_failure=c.cost_per_failure, annual_risk_cost=c.annual_risk_cost) for c in result.assessments),
         total_annual_risk_cost=result.total_annual_risk_cost,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def runaway_reaction(process_temperature: Q, reaction_enthalpy: Q, limiting_reactant_moles: Q, total_mass: Q, specific_heat: Q, max_allowable_temperature: Q | None=None, activation_energy: Q | None=None, initial_heat_release_rate: float | None=None, acceptable_margin: Q | None=None, gassy_system: bool | None=None) -> RunawayReactionResult:
+    """``process.runaway_reaction``, computed in Rust."""
+    spec = _models_gen.model("process.runaway_reaction")
+    result = _core.runaway_reaction(
+        input_to_si(spec, "process_temperature", process_temperature),
+        input_to_si(spec, "reaction_enthalpy", reaction_enthalpy),
+        input_to_si(spec, "limiting_reactant_moles", limiting_reactant_moles),
+        input_to_si(spec, "total_mass", total_mass),
+        input_to_si(spec, "specific_heat", specific_heat),
+        None if max_allowable_temperature is None else input_to_si(spec, "max_allowable_temperature", max_allowable_temperature),
+        None if activation_energy is None else input_to_si(spec, "activation_energy", activation_energy),
+        None if initial_heat_release_rate is None else initial_heat_release_rate,
+        None if acceptable_margin is None else input_to_si(spec, "acceptable_margin", acceptable_margin),
+        gassy_system,
+    )
+    return RunawayReactionResult(
+        adiabatic_temperature_rise=from_si(result.adiabatic_temperature_rise.magnitude_si, result.adiabatic_temperature_rise.unit),
+        mtsr=from_si(result.mtsr.magnitude_si, result.mtsr.unit),
+        temperature_margin=None if result.temperature_margin is None else from_si(result.temperature_margin.magnitude_si, result.temperature_margin.unit),
+        margin_exceeded=result.margin_exceeded,
+        total_heat_release=from_si(result.total_heat_release.magnitude_si, result.total_heat_release.unit),
+        time_to_max_rate=None if result.time_to_max_rate is None else from_si(result.time_to_max_rate.magnitude_si, result.time_to_max_rate.unit),
+        two_phase_relief_screening_required=result.two_phase_relief_screening_required,
+        verdict=RunawayVerdict(result.verdict),
         warnings=_warnings(result.warnings),
     )
 

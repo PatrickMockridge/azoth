@@ -1,0 +1,130 @@
+model = "process.runaway_reaction"
+[[cases]]
+id = "no_mat_low"
+tolerance = 1.0e-12
+source = "No MAT and a 5 K adiabatic rise: below both severity bands, so the verdict is `no_rating`. From `validation/neqsim/captures/process_runaway_reaction.tsv` (`runaway_no_mat_low`)."
+[cases.inputs]
+process_temperature = 350.0
+reaction_enthalpy = -100000.0
+limiting_reactant_moles = 10.0
+total_mass = 100.0
+specific_heat = 2000.0
+[cases.expected]
+adiabatic_temperature_rise = 5.0
+mtsr = 355.0
+margin_exceeded = false
+total_heat_release = 1000000.0
+two_phase_relief_screening_required = false
+verdict = "no_rating"
+[[cases]]
+id = "no_mat_marginal"
+tolerance = 1.0e-12
+source = "No MAT and a 50 K adiabatic rise: the marginal band is inclusive. From (`runaway_no_mat_marginal`)."
+[cases.inputs]
+process_temperature = 350.0
+reaction_enthalpy = -1000000.0
+limiting_reactant_moles = 10.0
+total_mass = 100.0
+specific_heat = 2000.0
+[cases.expected]
+adiabatic_temperature_rise = 50.0
+mtsr = 400.0
+margin_exceeded = false
+total_heat_release = 10000000.0
+two_phase_relief_screening_required = false
+verdict = "marginal"
+[[cases]]
+id = "no_mat_risk"
+tolerance = 1.0e-12
+source = "No MAT and a 200 K adiabatic rise: the risk band is inclusive. From (`runaway_no_mat_risk`)."
+[cases.inputs]
+process_temperature = 350.0
+reaction_enthalpy = -4000000.0
+limiting_reactant_moles = 10.0
+total_mass = 100.0
+specific_heat = 2000.0
+[cases.expected]
+adiabatic_temperature_rise = 200.0
+mtsr = 550.0
+margin_exceeded = false
+total_heat_release = 40000000.0
+two_phase_relief_screening_required = false
+verdict = "runaway_risk"
+[[cases]]
+id = "acceptable_margin"
+tolerance = 1.0e-12
+source = "A 500 K MAT against a 375 K MTSR: 125 K of margin, above the 50 K default, so the verdict is `acceptable_margin`. From (`runaway_acceptable`)."
+[cases.inputs]
+process_temperature = 350.0
+reaction_enthalpy = -500000.0
+limiting_reactant_moles = 10.0
+total_mass = 100.0
+specific_heat = 2000.0
+max_allowable_temperature = 500.0
+[cases.expected]
+adiabatic_temperature_rise = 25.0
+mtsr = 375.0
+temperature_margin = 125.0
+margin_exceeded = false
+total_heat_release = 5000000.0
+two_phase_relief_screening_required = false
+verdict = "acceptable_margin"
+[[cases]]
+id = "marginal_margin"
+tolerance = 1.0e-12
+source = "A 400 K MAT against a 390 K MTSR: 10 K of margin, below the 50 K default and not negative, so `marginal`. From (`runaway_marginal`)."
+[cases.inputs]
+process_temperature = 350.0
+reaction_enthalpy = -800000.0
+limiting_reactant_moles = 10.0
+total_mass = 100.0
+specific_heat = 2000.0
+max_allowable_temperature = 400.0
+[cases.expected]
+adiabatic_temperature_rise = 40.0
+mtsr = 390.0
+temperature_margin = 10.0
+margin_exceeded = false
+total_heat_release = 8000000.0
+two_phase_relief_screening_required = false
+verdict = "marginal"
+[[cases]]
+id = "exceeded_and_gassy"
+tolerance = 1.0e-12
+source = "A 370 K MAT below the 390 K MTSR: the margin is negative and a gassy system forces the two-phase relief screen. From (`runaway_exceeded_gassy`)."
+[cases.inputs]
+process_temperature = 350.0
+reaction_enthalpy = -800000.0
+limiting_reactant_moles = 10.0
+total_mass = 100.0
+specific_heat = 2000.0
+max_allowable_temperature = 370.0
+gassy_system = true
+[cases.expected]
+adiabatic_temperature_rise = 40.0
+mtsr = 390.0
+temperature_margin = -20.0
+margin_exceeded = true
+total_heat_release = 8000000.0
+two_phase_relief_screening_required = true
+verdict = "runaway_risk"
+[[cases]]
+id = "time_to_max_rate"
+tolerance = 1.0e-12
+source = "An 80000 J/mol activation energy and a 1 W/kg initial rate publish the TMR; the verdict stays `no_rating` without a MAT. From (`runaway_tmr`)."
+[cases.inputs]
+process_temperature = 350.0
+reaction_enthalpy = -100000.0
+limiting_reactant_moles = 10.0
+total_mass = 100.0
+specific_heat = 2000.0
+activation_energy = 80000.0
+initial_heat_release_rate = 1.0
+[cases.expected]
+adiabatic_temperature_rise = 5.0
+mtsr = 355.0
+margin_exceeded = false
+total_heat_release = 1000000.0
+time_to_max_rate = 25463.041767624996
+two_phase_relief_screening_required = false
+verdict = "no_rating"

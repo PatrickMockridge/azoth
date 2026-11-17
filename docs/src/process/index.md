@@ -82,6 +82,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.rate_based_packed_column`](./rate_based_packed_column.md) | `counter_current_fixed_point_profile` | NeqSim process/equipment/distillation/RateBasedPackedColumn.java |
 | [`process.relief_disposal_network`](./relief_disposal_network.md) | `closed_form_relief_disposal_network` | NeqSim process/safety/overpressure/ReliefDisposalNetwork.java |
 | [`process.risk_matrix`](./risk_matrix.md) | `closed_form_risk_matrix` | NeqSim process/safety/risk/RiskMatrix.java |
+| [`process.runaway_reaction`](./runaway_reaction.md) | `adiabatic_runaway_screen` | NeqSim process/safety/reaction/RunawayReactionAnalyzer.java |
 | [`process.s001_clause10_review`](./s001_clause10_review.md) | `norsok_s001_clause10_review` | NeqSim process/safety/processsafetysystem/ProcessSafetySystemReviewEngine.java |
 | [`process.s001_secondary_pressure_protection`](./s001_secondary_pressure_protection.md) | `norsok_s001_secondary_pressure_protection` | NeqSim process/safety/processsafetysystem/S001SecondaryPressureProtectionCriteria.java |
 | [`process.safety_instrumented_function`](./safety_instrumented_function.md) | `closed_form_safety_instrumented_function` | NeqSim process/safety/risk/sis/SafetyInstrumentedFunction.java |

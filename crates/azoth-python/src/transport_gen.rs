@@ -23067,6 +23067,94 @@ impl From<&azoth_process::models::risk_matrix::RiskMatrixResult> for PyRiskMatri
         }
     }
 }
+/// Result of `process.runaway_reaction`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RunawayReactionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRunawayReactionResult {
+    /// `|dH| n/(m cp)`.
+    #[pyo3(get)]
+    pub adiabatic_temperature_rise: PyQty,
+    /// `process_temperature + adiabatic_temperature_rise`.
+    #[pyo3(get)]
+    pub mtsr: PyQty,
+    /// `max_allowable_temperature - mtsr`; **absent without a MAT**.
+    #[pyo3(get)]
+    pub temperature_margin: Option<PyQty>,
+    /// whether the MTSR is strictly above the MAT; false without a MAT.
+    #[pyo3(get)]
+    pub margin_exceeded: bool,
+    /// `|dH| n`.
+    #[pyo3(get)]
+    pub total_heat_release: PyQty,
+    /// `cp R T0^2/(q0 Ea)`; **absent unless both the activation energy and the initial rate are positive**.
+    #[pyo3(get)]
+    pub time_to_max_rate: Option<PyQty>,
+    /// whether the gassy flag is set or the margin is exceeded.
+    #[pyo3(get)]
+    pub two_phase_relief_screening_required: bool,
+    /// the class's classification.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyRunawayReactionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "RunawayReactionResult(adiabatic_temperature_rise={:?}, mtsr={:?}, temperature_margin={:?}, margin_exceeded={:?}, total_heat_release={:?}, time_to_max_rate={:?}, two_phase_relief_screening_required={:?}, verdict={:?}, {} warning(s))",
+            self.adiabatic_temperature_rise,
+            self.mtsr,
+            self.temperature_margin,
+            self.margin_exceeded,
+            self.total_heat_release,
+            self.time_to_max_rate,
+            self.two_phase_relief_screening_required,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::runaway_reaction::RunawayReactionResult>
+    for PyRunawayReactionResult
+{
+    fn from(r: &azoth_process::models::runaway_reaction::RunawayReactionResult) -> Self {
+        Self {
+            adiabatic_temperature_rise: PyQty {
+                magnitude_si: r.adiabatic_temperature_rise.value,
+                unit: "K".to_string(),
+            },
+            mtsr: PyQty {
+                magnitude_si: r.mtsr.value,
+                unit: "K".to_string(),
+            },
+            temperature_margin: r.temperature_margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            margin_exceeded: r.margin_exceeded,
+            total_heat_release: PyQty {
+                magnitude_si: r.total_heat_release.value,
+                unit: "J".to_string(),
+            },
+            time_to_max_rate: r.time_to_max_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            two_phase_relief_screening_required: r.two_phase_relief_screening_required,
+            verdict: r.verdict.as_str().to_string(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.s001_clause10_review`, transported.
 #[pyclass(
     frozen,

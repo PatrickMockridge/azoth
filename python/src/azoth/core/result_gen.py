@@ -97,6 +97,7 @@ from azoth.core.result_base import (
     PlusModel,
     ReliefPhase,
     RootStructure,
+    RunawayVerdict,
     RuptureStatus,
     SelfHeatingGeometry,
     SelfHeatingVerdict,
@@ -9260,6 +9261,40 @@ class RiskMatrixResult(_HasWarnings):
 
     #: the sum of the annual costs.
     total_annual_risk_cost: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class RunawayReactionResult(_HasWarnings):
+    """Result of ``process.runaway_reaction``."""
+
+    CALC_ID: ClassVar[str] = "process.runaway_reaction"
+
+    #: `|dH| n/(m cp)`.
+    adiabatic_temperature_rise: Q
+
+    #: `process_temperature + adiabatic_temperature_rise`.
+    mtsr: Q
+
+    #: `max_allowable_temperature - mtsr`; **absent without a MAT**.
+    temperature_margin: Q | None
+
+    #: whether the MTSR is strictly above the MAT; false without a MAT.
+    margin_exceeded: bool
+
+    #: `|dH| n`.
+    total_heat_release: Q
+
+    #: `cp R T0^2/(q0 Ea)`; **absent unless both the activation energy and the initial rate are positive**.
+    time_to_max_rate: Q | None
+
+    #: whether the gassy flag is set or the margin is exceeded.
+    two_phase_relief_screening_required: bool
+
+    #: the class's classification.
+    verdict: RunawayVerdict
 
     #: Caveats.
     warnings: tuple[Warning, ...]

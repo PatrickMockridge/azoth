@@ -304,6 +304,7 @@
   - [Rate-based packed column](./process/rate_based_packed_column.md)
   - [Relief disposal network](./process/relief_disposal_network.md)
   - [Risk matrix](./process/risk_matrix.md)
+  - [Runaway reaction screening](./process/runaway_reaction.md)
   - [NORSOK S-001 Clause 10 review](./process/s001_clause10_review.md)
   - [NORSOK S-001 secondary pressure protection](./process/s001_secondary_pressure_protection.md)
   - [Safety instrumented function](./process/safety_instrumented_function.md)

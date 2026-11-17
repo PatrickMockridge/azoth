@@ -101,6 +101,7 @@ pub mod pump_deadhead;
 pub mod rate_based_packed_column;
 pub mod relief_disposal_network;
 pub mod risk_matrix;
+pub mod runaway_reaction;
 pub mod s001_clause10_review;
 pub mod s001_secondary_pressure_protection;
 pub mod safety_instrumented_function;
@@ -242,6 +243,7 @@ pub use risk_matrix::{
     RiskAssessmentRow, RiskConsequenceCategory, RiskEquipment, RiskLevel, RiskMatrixResult,
     RiskProbabilityCategory, risk_matrix,
 };
+pub use runaway_reaction::{RunawayReactionResult, RunawayVerdict, runaway_reaction};
 pub use s001_clause10_review::{
     OverallVerdict, ReviewAssessment, ReviewCoverage, ReviewEvidence, ReviewItem, ReviewReference,
     ReviewVerdict, S001Clause10ReviewResult, s001_clause10_review,

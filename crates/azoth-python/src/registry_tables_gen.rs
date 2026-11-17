@@ -310,6 +310,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.rate_based_packed_column" => azoth_process::models::rate_based_packed_column::RateBasedPackedColumnResult::FIELDS.to_vec(),
         "process.relief_disposal_network" => azoth_process::models::relief_disposal_network::ReliefDisposalNetworkResult::FIELDS.to_vec(),
         "process.risk_matrix" => azoth_process::models::risk_matrix::RiskMatrixResult::FIELDS.to_vec(),
+        "process.runaway_reaction" => azoth_process::models::runaway_reaction::RunawayReactionResult::FIELDS.to_vec(),
         "process.s001_clause10_review" => azoth_process::models::s001_clause10_review::S001Clause10ReviewResult::FIELDS.to_vec(),
         "process.s001_secondary_pressure_protection" => azoth_process::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult::FIELDS.to_vec(),
         "process.safety_instrumented_function" => azoth_process::models::safety_instrumented_function::SafetyInstrumentedFunctionResult::FIELDS.to_vec(),

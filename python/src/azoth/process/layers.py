@@ -1630,6 +1630,51 @@ def _fire_monitor_coverage(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _runaway_reaction(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.runaway_reaction`'s layers, from the reference's arithmetic.
+
+    The verdict and the two flags are the model's own words, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.runaway_reaction import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["process_temperature"]), "K"),
+        quantity(float(inputs["reaction_enthalpy"]), "J/mol"),
+        quantity(float(inputs["limiting_reactant_moles"]), "mol"),
+        quantity(float(inputs["total_mass"]), "kg"),
+        quantity(float(inputs["specific_heat"]), "J/(kg*K)"),
+        max_allowable_temperature=optional("max_allowable_temperature", "K"),
+        activation_energy=optional("activation_energy", "J/mol"),
+        initial_heat_release_rate=(
+            None
+            if inputs.get("initial_heat_release_rate") is None
+            else float(inputs["initial_heat_release_rate"])
+        ),
+        acceptable_margin=optional("acceptable_margin", "K"),
+        gassy_system=(
+            None
+            if inputs.get("gassy_system") is None
+            else bool(inputs["gassy_system"])
+        ),
+    )
+    dumped = {
+        "adiabatic_temperature_rise_k": solution.rise,
+        "mtsr_k": solution.mtsr,
+        "total_heat_release_j": solution.heat,
+    }
+    if solution.margin is not None:
+        dumped["temperature_margin_k"] = solution.margin
+    if solution.tmr is not None:
+        dumped["time_to_max_rate_s"] = solution.tmr
+    return dumped
+
+
 def _pump_deadhead(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.pump_deadhead`'s layers, from the reference's arithmetic.
 
@@ -3500,6 +3545,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.fire_water_coverage_assessment": _fire_water_coverage_assessment,
     "process.gas_blowby": _gas_blowby,
     "process.pump_deadhead": _pump_deadhead,
+    "process.runaway_reaction": _runaway_reaction,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.fault_tree": _fault_tree,
@@ -4556,6 +4602,16 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_monitor_coverage.tsv",
         block=8,
         identified_by=("#label", "fmc_characteristic_dimension"),
+    ),
+    # Runaway reaction's one: the no-MAT low state. The six further cases are the severity
+    # bands, the MAT verdicts, the gassy state and the TMR; the unit aliases are declared in
+    # `UNCASED_ROWS`.
+    LayerCase(
+        model="process.runaway_reaction",
+        case="no_mat_low",
+        capture="process_runaway_reaction.tsv",
+        block=0,
+        identified_by=("#label", "runaway_no_mat_low"),
     ),
     # Pump deadhead's one: the within-rating state. The six further cases are the exceeded,
     # equality, no-rating, rise and absent-density states; the unit aliases are declared in
@@ -7383,6 +7439,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_deluge_nozzle_layout.tsv": 8,
     # The monitor coverage's eleven: the constructor and each setter's refusal.
     "process_fire_monitor_coverage.tsv": 11,
+    # Runaway reaction's one: the unit-string aliases, the no-MAT low state restated. The
+    # refusal states are hand tests.
+    "process_runaway_reaction.tsv": 1,
     # Pump deadhead's one: the unit-string aliases, the within-rating state restated. The
     # refusal states are hand tests.
     "process_pump_deadhead.tsv": 1,

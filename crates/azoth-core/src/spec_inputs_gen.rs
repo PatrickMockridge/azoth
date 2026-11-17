@@ -291,6 +291,7 @@
 //!   - specs/models/process/rate_based_packed_column.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
+//!   - specs/models/process/runaway_reaction.toml
 //!   - specs/models/process/s001_clause10_review.toml
 //!   - specs/models/process/s001_secondary_pressure_protection.toml
 //!   - specs/models/process/safety_instrumented_function.toml
@@ -4622,6 +4623,47 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.risk_matrix",
         "downtime_cost_per_hour",
         "dimensionless",
+    ),
+    (
+        "process.runaway_reaction",
+        "process_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.runaway_reaction",
+        "reaction_enthalpy",
+        "molar_energy",
+    ),
+    (
+        "process.runaway_reaction",
+        "limiting_reactant_moles",
+        "amount",
+    ),
+    ("process.runaway_reaction", "total_mass", "mass"),
+    (
+        "process.runaway_reaction",
+        "specific_heat",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.runaway_reaction",
+        "max_allowable_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.runaway_reaction",
+        "activation_energy",
+        "molar_energy",
+    ),
+    (
+        "process.runaway_reaction",
+        "initial_heat_release_rate",
+        "dimensionless",
+    ),
+    (
+        "process.runaway_reaction",
+        "acceptable_margin",
+        "thermodynamic_temperature",
     ),
     (
         "process.s001_secondary_pressure_protection",

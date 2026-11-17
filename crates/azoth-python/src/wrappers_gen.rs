@@ -12,7 +12,7 @@ use azoth_core::units::{
     cubic_meters, cubic_meters_per_mole, cubic_meters_per_second, joules_per_kilogram_kelvin,
     joules_per_mole, joules_per_mole_kelvin, kelvin_intervals, kelvins, kilograms,
     kilograms_per_cubic_meter, kilograms_per_mole, kilograms_per_second,
-    kilograms_per_square_meter_second, meters, meters_per_second, moles_per_cubic_meter,
+    kilograms_per_square_meter_second, meters, meters_per_second, moles, moles_per_cubic_meter,
     newtons_per_meter, pascal_seconds, pascals, seconds, square_meters, watts,
     watts_per_meter_kelvin, watts_per_square_meter, watts_per_square_meter_kelvin,
 };
@@ -7692,6 +7692,44 @@ pub fn risk_matrix(
         downtime_cost_per_hour,
     )
     .map(|r| crate::transport_gen::PyRiskMatrixResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Runaway reaction screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (process_temperature, reaction_enthalpy, limiting_reactant_moles, total_mass, specific_heat, max_allowable_temperature, activation_energy, initial_heat_release_rate, acceptable_margin, gassy_system))]
+#[pyo3(
+    text_signature = "(process_temperature, reaction_enthalpy, limiting_reactant_moles, total_mass, specific_heat, max_allowable_temperature, activation_energy, initial_heat_release_rate, acceptable_margin, gassy_system)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn runaway_reaction(
+    py: Python<'_>,
+    process_temperature: f64,
+    reaction_enthalpy: f64,
+    limiting_reactant_moles: f64,
+    total_mass: f64,
+    specific_heat: f64,
+    max_allowable_temperature: Option<f64>,
+    activation_energy: Option<f64>,
+    initial_heat_release_rate: Option<f64>,
+    acceptable_margin: Option<f64>,
+    gassy_system: Option<bool>,
+) -> PyResult<crate::transport_gen::PyRunawayReactionResult> {
+    azoth_process::models::runaway_reaction::runaway_reaction(
+        kelvins(process_temperature),
+        joules_per_mole(reaction_enthalpy),
+        moles(limiting_reactant_moles),
+        kilograms(total_mass),
+        joules_per_kilogram_kelvin(specific_heat),
+        max_allowable_temperature.map(kelvins),
+        activation_energy.map(joules_per_mole),
+        initial_heat_release_rate,
+        acceptable_margin.map(kelvin_intervals),
+        gassy_system,
+    )
+    .map(|r| crate::transport_gen::PyRunawayReactionResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

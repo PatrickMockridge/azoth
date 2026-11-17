@@ -4551,6 +4551,18 @@ class RiskMatrixResult:
     warnings: list[Warning]
 
 @final
+class RunawayReactionResult:
+    adiabatic_temperature_rise: Qty
+    mtsr: Qty
+    temperature_margin: Qty | None
+    margin_exceeded: bool
+    total_heat_release: Qty
+    time_to_max_rate: Qty | None
+    two_phase_relief_screening_required: bool
+    verdict: str
+    warnings: list[Warning]
+
+@final
 class S001Clause10ReviewResult:
     assessments: list[ReviewAssessment]
     verdicts: list[ReviewVerdict]
@@ -8298,6 +8310,18 @@ def risk_matrix(
     product_price_per_kg: float | None = None,
     downtime_cost_per_hour: float | None = None,
 ) -> RiskMatrixResult: ...
+def runaway_reaction(
+    process_temperature: float,
+    reaction_enthalpy: float,
+    limiting_reactant_moles: float,
+    total_mass: float,
+    specific_heat: float,
+    max_allowable_temperature: float | None = None,
+    activation_energy: float | None = None,
+    initial_heat_release_rate: float | None = None,
+    acceptable_margin: float | None = None,
+    gassy_system: bool | None = None,
+) -> RunawayReactionResult: ...
 def s001_clause10_review(
     items: list[ReviewItem] | None = None,
     evidence: list[ReviewEvidence] | None = None,
