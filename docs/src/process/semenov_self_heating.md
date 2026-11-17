@@ -80,6 +80,16 @@ not an equation, and both implementations read it from here.
 | `semenov_marginal_ratio` | volume = 0.01, surface_area = 0.3, heat_transfer_coefficient = 10.0, activation_energy = 110000.0, volumetric_pre_factor = 50000000000000.0, ambient_temperature = 553.7418280541897, marginal_ratio = 0.8 | psi = 0.3024549866634328, psi_crit = 0.36787944117144233, psi_ratio = 0.8221578941740322, critical_temperature = 558.7418280541897, temperature_margin = 5.0, critical_temperature_rise = 23.176943395166134, verdict = marginal, messages = ['Semenov theory assumes a spatially uniform body temperature (small Biot number); use PorousMediaSelfHeatingAnalyzer when internal conduction controls'] |
 | `semenov_not_bracketed` | volume = 0.01, surface_area = 0.3, heat_transfer_coefficient = 10.0, activation_energy = 1000.0, volumetric_pre_factor = 50000000000000.0, ambient_temperature = 400.0 | psi = 92749276.72605176, psi_crit = 0.36787944117144233, psi_ratio = 252118673.52714595, critical_temperature_rise = 1330.31401888, verdict = self_ignition, messages = ['Critical ambient temperature could not be bracketed between 150.0 K and 2000.0 K; check the kinetic parameters', 'Semenov theory assumes a spatially uniform body temperature (small Biot number); use PorousMediaSelfHeatingAnalyzer when internal conduction controls'] |
 
+## How far this is checked
+**`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.
+
+- Tests: 7 declared, every one run
+- External check: no external validation case names it
+
+The same account travels with every result this returns: `result.provenance`
+carries the status, the spec and both kernels with a SHA-256 of each, and which
+declared checks *that call* could not evaluate.
+
 ## References
 
 - Semenov, N. N. (1928). Zur Theorie des Verbrennungsprozesses. Zeitschrift fur Physik 48.
