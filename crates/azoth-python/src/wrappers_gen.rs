@@ -7627,6 +7627,40 @@ pub fn risk_matrix(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// NORSOK S-001 secondary pressure protection.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (maximum_event_pressure, design_pressure, test_pressure, demand_frequency_per_year, target_frequency_per_year, relief_leakage_assessed, relief_leakage_to_safe_location, proof_test_interval_months))]
+#[pyo3(
+    text_signature = "(maximum_event_pressure, design_pressure, test_pressure, demand_frequency_per_year, target_frequency_per_year, relief_leakage_assessed, relief_leakage_to_safe_location, proof_test_interval_months)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn s001_secondary_pressure_protection(
+    py: Python<'_>,
+    maximum_event_pressure: Option<f64>,
+    design_pressure: Option<f64>,
+    test_pressure: Option<f64>,
+    demand_frequency_per_year: Option<f64>,
+    target_frequency_per_year: Option<f64>,
+    relief_leakage_assessed: Option<bool>,
+    relief_leakage_to_safe_location: Option<bool>,
+    proof_test_interval_months: Option<f64>,
+) -> PyResult<crate::transport_gen::PyS001SecondaryPressureProtectionResult> {
+    azoth_process::models::s001_secondary_pressure_protection::s001_secondary_pressure_protection(
+        maximum_event_pressure.map(pascals),
+        design_pressure.map(pascals),
+        test_pressure.map(pascals),
+        demand_frequency_per_year,
+        target_frequency_per_year,
+        relief_leakage_assessed,
+        relief_leakage_to_safe_location,
+        proof_test_interval_months,
+    )
+    .map(|r| crate::transport_gen::PyS001SecondaryPressureProtectionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Safety instrumented function.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

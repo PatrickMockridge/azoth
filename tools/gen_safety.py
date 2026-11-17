@@ -68,6 +68,7 @@ NATIVE_SCENARIOS = (
     "process.probit",
     "process.psv_fire_sizing",
     "process.psv_sizing",
+    "process.s001_secondary_pressure_protection",
     "process.safety_instrumented_function",
     "process.toxic_library",
     "process.vce",
@@ -78,7 +79,14 @@ BOWTIE = "process.bow_tie"
 
 #: The families with a deck of scenario cards. A family here gets a tab and a picker; the
 #: families without one are listed on the overview and linked to their manual pages.
-SCENARIO_FAMILIES = ("dispersion", "fire", "firewater", "overpressure", "risk")
+SCENARIO_FAMILIES = (
+    "dispersion",
+    "fire",
+    "firewater",
+    "overpressure",
+    "processsafetysystem",
+    "risk",
+)
 
 #: The purpose line a native entry's card and form show. Model specs have no summary, so this
 #: is the only copy and a native id without one is a generator error.
@@ -98,6 +106,7 @@ PURPOSES = {
     "process.overpressure_acceptance": "The accumulation factor, the allowable pressure and whether the peak is accepted.",
     "process.pfp_demand": "The time a steel member survives a fire unprotected, and the protection a required survival time demands.",
     "process.pipeline_pressure_protection": "The incidental pressure, the design margin and whether the segment is fully rated or needs two barriers.",
+    "process.s001_secondary_pressure_protection": "The pressure band's default target frequency, the test and event pressure checks, the demand-versus-target test and the leakage and proof-test criteria.",
     "process.pool_fire": "Pool-fire flame height, surface emissive power and the distance to a target flux.",
     "process.probit": "The probit from a dose, or the probability at a stated probit.",
     "process.psv_fire_sizing": "The fire-case relief area, the selected API 520 orifice and the blowdown pressure.",

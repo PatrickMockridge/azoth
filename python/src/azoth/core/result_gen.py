@@ -9192,6 +9192,49 @@ class RiskMatrixResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class S001SecondaryPressureProtectionResult(_HasWarnings):
+    """Result of ``process.s001_secondary_pressure_protection``."""
+
+    CALC_ID: ClassVar[str] = "process.s001_secondary_pressure_protection"
+
+    #: the resolved target frequency, stated or from the band. **Absent when the band cannot resolve**: a missing or non-positive pressure basis with no stated target.
+    target_frequency_per_year: float | None
+
+    #: whether all three pressures are finite and positive.
+    pressure_basis_complete: bool
+
+    #: whether the test pressure is at or above the design pressure; vacuous-true without a basis.
+    test_pressure_valid: bool
+
+    #: whether the event pressure is at or below the test pressure; vacuous-true without a basis.
+    pressure_within_test: bool
+
+    #: whether the demand and the resolved target are configured.
+    frequency_configured: bool
+
+    #: whether the demand is at or below the target; vacuous-true when unconfigured.
+    frequency_criterion_met: bool
+
+    #: whether relief leakage has been assessed.
+    leakage_assessed: bool
+
+    #: whether the leakage is routed to a safe location.
+    leakage_routed_safe: bool
+
+    #: whether a proof-test interval is stated.
+    proof_test_configured: bool
+
+    #: whether the interval is at most twelve months; vacuous-true when unconfigured.
+    proof_test_criterion_met: bool
+
+    #: whether every criterion is met.
+    acceptable: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SafetyInstrumentedFunctionResult(_HasWarnings):
     """Result of ``process.safety_instrumented_function``."""
 

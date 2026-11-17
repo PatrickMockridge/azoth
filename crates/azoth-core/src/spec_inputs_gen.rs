@@ -289,6 +289,7 @@
 //!   - specs/models/process/rate_based_packed_column.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
+//!   - specs/models/process/s001_secondary_pressure_protection.toml
 //!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/self_heating_induction.toml
 //!   - specs/models/process/semenov_self_heating.toml
@@ -4565,6 +4566,36 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.risk_matrix",
         "downtime_cost_per_hour",
+        "dimensionless",
+    ),
+    (
+        "process.s001_secondary_pressure_protection",
+        "maximum_event_pressure",
+        "pressure",
+    ),
+    (
+        "process.s001_secondary_pressure_protection",
+        "design_pressure",
+        "pressure",
+    ),
+    (
+        "process.s001_secondary_pressure_protection",
+        "test_pressure",
+        "pressure",
+    ),
+    (
+        "process.s001_secondary_pressure_protection",
+        "demand_frequency_per_year",
+        "dimensionless",
+    ),
+    (
+        "process.s001_secondary_pressure_protection",
+        "target_frequency_per_year",
+        "dimensionless",
+    ),
+    (
+        "process.s001_secondary_pressure_protection",
+        "proof_test_interval_months",
         "dimensionless",
     ),
     (

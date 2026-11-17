@@ -43,6 +43,7 @@ pub const NATIVE: &[&str] = &[
     "process.probit",
     "process.psv_fire_sizing",
     "process.psv_sizing",
+    "process.s001_secondary_pressure_protection",
     "process.safety_instrumented_function",
     "process.toxic_library",
     "process.vce",
@@ -149,6 +150,7 @@ pub fn required(id: &str) -> Option<&'static [&'static str]> {
             "overpressure_fraction",
             "back_pressure",
         ],
+        "process.s001_secondary_pressure_protection" => &[],
         "process.safety_instrumented_function" => &[
             "pfd_average",
             "claimed_sil",
@@ -195,6 +197,7 @@ fn arm(id: &str, inputs: &Value) -> Result<Outcome, Outcome> {
         "process.probit" => probit(inputs),
         "process.psv_fire_sizing" => psv_fire_sizing(inputs),
         "process.psv_sizing" => psv_sizing(inputs),
+        "process.s001_secondary_pressure_protection" => s001_secondary_pressure_protection(inputs),
         "process.safety_instrumented_function" => safety_instrumented_function(inputs),
         "process.toxic_library" => toxic_library(inputs),
         other => Err(Outcome::Error {
@@ -1280,6 +1283,52 @@ fn nog070_sil_determination(inputs: &Value) -> Result<Outcome, Outcome> {
                     "required_pfd_reduction_factor",
                     result.required_pfd_reduction_factor,
                 );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn s001_secondary_pressure_protection(inputs: &Value) -> Result<Outcome, Outcome> {
+    let maximum_event_pressure = optional_number(inputs, "maximum_event_pressure")?.map(pascals);
+    let design_pressure = optional_number(inputs, "design_pressure")?.map(pascals);
+    let test_pressure = optional_number(inputs, "test_pressure")?.map(pascals);
+    let demand_frequency_per_year = optional_number(inputs, "demand_frequency_per_year")?;
+    let target_frequency_per_year = optional_number(inputs, "target_frequency_per_year")?;
+    let relief_leakage_assessed = optional_flag(inputs, "relief_leakage_assessed")?;
+    let relief_leakage_to_safe_location = optional_flag(inputs, "relief_leakage_to_safe_location")?;
+    let proof_test_interval_months = optional_number(inputs, "proof_test_interval_months")?;
+    Ok(
+        match azoth_process::s001_secondary_pressure_protection(
+            maximum_event_pressure,
+            design_pressure,
+            test_pressure,
+            demand_frequency_per_year,
+            target_frequency_per_year,
+            relief_leakage_assessed,
+            relief_leakage_to_safe_location,
+            proof_test_interval_months,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                if let Some(target) = result.target_frequency_per_year {
+                    scalar(&mut outputs, "target_frequency_per_year", target);
+                }
+                for (name, value) in [
+                    ("pressure_basis_complete", result.pressure_basis_complete),
+                    ("test_pressure_valid", result.test_pressure_valid),
+                    ("pressure_within_test", result.pressure_within_test),
+                    ("frequency_configured", result.frequency_configured),
+                    ("frequency_criterion_met", result.frequency_criterion_met),
+                    ("leakage_assessed", result.leakage_assessed),
+                    ("leakage_routed_safe", result.leakage_routed_safe),
+                    ("proof_test_configured", result.proof_test_configured),
+                    ("proof_test_criterion_met", result.proof_test_criterion_met),
+                    ("acceptable", result.acceptable),
+                ] {
+                    outputs.insert(name.to_string(), json!(value));
+                }
                 done(outputs, &result.warnings)
             }
             Err(error) => refused(error),

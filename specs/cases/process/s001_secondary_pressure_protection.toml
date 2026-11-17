@@ -1,0 +1,149 @@
+model = "process.s001_secondary_pressure_protection"
+[[cases]]
+id = "s001_band_below_design"
+tolerance = 1.0e-12
+source = "90, 100 and 150 bara in Pa: the event is below the design pressure, so the default target is 1e-2. From `validation/neqsim/captures/process_s001_secondary_pressure_protection.tsv` (`s001_band_below_design`)."
+[cases.inputs]
+maximum_event_pressure = 9.0e6
+design_pressure = 1.0e7
+test_pressure = 1.5e7
+[cases.expected]
+target_frequency_per_year = 1.0e-2
+pressure_basis_complete = true
+test_pressure_valid = true
+pressure_within_test = true
+frequency_configured = false
+frequency_criterion_met = true
+leakage_assessed = false
+leakage_routed_safe = false
+proof_test_configured = false
+proof_test_criterion_met = true
+acceptable = false
+[[cases]]
+id = "s001_band_above_design"
+tolerance = 1.0e-12
+source = "120, 100 and 150 bara in Pa: above design but within test, so the default target is 1e-3. From (`s001_band_above_design`)."
+[cases.inputs]
+maximum_event_pressure = 1.2e7
+design_pressure = 1.0e7
+test_pressure = 1.5e7
+[cases.expected]
+target_frequency_per_year = 1.0e-3
+pressure_basis_complete = true
+test_pressure_valid = true
+pressure_within_test = true
+frequency_configured = false
+frequency_criterion_met = true
+leakage_assessed = false
+leakage_routed_safe = false
+proof_test_configured = false
+proof_test_criterion_met = true
+acceptable = false
+[[cases]]
+id = "s001_band_above_test"
+tolerance = 1.0e-12
+source = "175, 100 and 150 bara in Pa: above test but within twice design, so the default target is 1e-4. From (`s001_band_above_test`)."
+[cases.inputs]
+maximum_event_pressure = 1.75e7
+design_pressure = 1.0e7
+test_pressure = 1.5e7
+[cases.expected]
+target_frequency_per_year = 1.0e-4
+pressure_basis_complete = true
+test_pressure_valid = true
+pressure_within_test = false
+frequency_configured = false
+frequency_criterion_met = true
+leakage_assessed = false
+leakage_routed_safe = false
+proof_test_configured = false
+proof_test_criterion_met = true
+acceptable = false
+[[cases]]
+id = "s001_band_above_two_design"
+tolerance = 1.0e-12
+source = "201, 100 and 150 bara in Pa: above twice design, so the default target is 1e-5. From (`s001_band_above_two_design`)."
+[cases.inputs]
+maximum_event_pressure = 2.01e7
+design_pressure = 1.0e7
+test_pressure = 1.5e7
+[cases.expected]
+target_frequency_per_year = 1.0e-5
+pressure_basis_complete = true
+test_pressure_valid = true
+pressure_within_test = false
+frequency_configured = false
+frequency_criterion_met = true
+leakage_assessed = false
+leakage_routed_safe = false
+proof_test_configured = false
+proof_test_criterion_met = true
+acceptable = false
+[[cases]]
+id = "s001_complete_pass"
+tolerance = 1.0e-12
+source = "The class test's complete case: 120, 100 and 150 bara in Pa, demand 1e-4, both leakage flags and a six-month interval. From (`s001_complete_pass`)."
+[cases.inputs]
+maximum_event_pressure = 1.2e7
+design_pressure = 1.0e7
+test_pressure = 1.5e7
+demand_frequency_per_year = 1.0e-4
+relief_leakage_assessed = true
+relief_leakage_to_safe_location = true
+proof_test_interval_months = 6.0
+[cases.expected]
+target_frequency_per_year = 1.0e-3
+pressure_basis_complete = true
+test_pressure_valid = true
+pressure_within_test = true
+frequency_configured = true
+frequency_criterion_met = true
+leakage_assessed = true
+leakage_routed_safe = true
+proof_test_configured = true
+proof_test_criterion_met = true
+acceptable = true
+[[cases]]
+id = "s001_event_above_test"
+tolerance = 1.0e-12
+source = "The class test's failure: the event pressure above the test pressure. From (`s001_event_above_test`)."
+[cases.inputs]
+maximum_event_pressure = 1.75e7
+design_pressure = 1.0e7
+test_pressure = 1.5e7
+demand_frequency_per_year = 1.0e-5
+relief_leakage_assessed = true
+relief_leakage_to_safe_location = true
+proof_test_interval_months = 6.0
+[cases.expected]
+target_frequency_per_year = 1.0e-4
+pressure_basis_complete = true
+test_pressure_valid = true
+pressure_within_test = false
+frequency_configured = true
+frequency_criterion_met = true
+leakage_assessed = true
+leakage_routed_safe = true
+proof_test_configured = true
+proof_test_criterion_met = true
+acceptable = false
+[[cases]]
+id = "s001_missing_basis"
+tolerance = 1.0e-12
+source = "No pressures: the basis is incomplete and no target resolves, though the demand and the other criteria are stated. From (`s001_missing_basis`)."
+[cases.inputs]
+demand_frequency_per_year = 1.0e-3
+relief_leakage_assessed = true
+relief_leakage_to_safe_location = true
+proof_test_interval_months = 6.0
+[cases.expected]
+pressure_basis_complete = false
+test_pressure_valid = true
+pressure_within_test = true
+frequency_configured = false
+frequency_criterion_met = true
+leakage_assessed = true
+leakage_routed_safe = true
+proof_test_configured = true
+proof_test_criterion_met = true
+acceptable = false

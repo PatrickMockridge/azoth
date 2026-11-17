@@ -86,6 +86,7 @@ from azoth.core.result import (
     RateBasedPackedColumnResult,
     ReliefDisposalNetworkResult,
     RiskMatrixResult,
+    S001SecondaryPressureProtectionResult,
     SafetyInstrumentedFunctionResult,
     SelfHeatingInductionResult,
     SemenovSelfHeatingResult,
@@ -189,6 +190,7 @@ __all__ = [
     "relief_disposal_network",
     "risk_matrix",
     "run_flowsheet",
+    "s001_secondary_pressure_protection",
     "safety_instrumented_function",
     "separator",
     "separator_capacity_assessment",
@@ -291,6 +293,7 @@ _SELF_HEATING_INDUCTION = "process.self_heating_induction"
 _BASKET_TEST_REGRESSION = "process.basket_test_regression"
 _API14C_SAFE_CHART = "process.api14c_safe_chart"
 _BARRIER_REGISTER_VALIDATION = "process.barrier_register_validation"
+_S001_SECONDARY_PRESSURE_PROTECTION = "process.s001_secondary_pressure_protection"
 _HAZOP_TEMPLATE = "process.hazop_template"
 _FMEA_WORKSHEET = "process.fmea_worksheet"
 _HAZOP_CONSEQUENCE_POPULATION = "process.hazop_consequence_population"
@@ -2539,6 +2542,36 @@ def bow_tie(
         threats=threats,
         consequences=consequences,
         barriers=barriers,
+    )
+
+
+def s001_secondary_pressure_protection(
+    maximum_event_pressure: float | None = None,
+    design_pressure: float | None = None,
+    test_pressure: float | None = None,
+    demand_frequency_per_year: float | None = None,
+    target_frequency_per_year: float | None = None,
+    relief_leakage_assessed: bool | None = None,
+    relief_leakage_to_safe_location: bool | None = None,
+    proof_test_interval_months: float | None = None,
+) -> S001SecondaryPressureProtectionResult:
+    """The NORSOK S-001 secondary-pressure screen.
+
+    **The pressure band's default target, the test and event pressure checks, the
+    demand-versus-target test and the leakage and proof-test criteria.** The two leakage
+    flags are true-only; an absent proof-test interval is not a failure of its criterion.
+
+    See :func:`azoth.process.reference.s001_secondary_pressure_protection`.
+    """
+    return resolve(_S001_SECONDARY_PRESSURE_PROTECTION)(  # type: ignore[no-any-return]
+        maximum_event_pressure=maximum_event_pressure,
+        design_pressure=design_pressure,
+        test_pressure=test_pressure,
+        demand_frequency_per_year=demand_frequency_per_year,
+        target_frequency_per_year=target_frequency_per_year,
+        relief_leakage_assessed=relief_leakage_assessed,
+        relief_leakage_to_safe_location=relief_leakage_to_safe_location,
+        proof_test_interval_months=proof_test_interval_months,
     )
 
 

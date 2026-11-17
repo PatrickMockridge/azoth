@@ -4482,6 +4482,21 @@ class RiskMatrixResult:
     warnings: list[Warning]
 
 @final
+class S001SecondaryPressureProtectionResult:
+    target_frequency_per_year: float | None
+    pressure_basis_complete: bool
+    test_pressure_valid: bool
+    pressure_within_test: bool
+    frequency_configured: bool
+    frequency_criterion_met: bool
+    leakage_assessed: bool
+    leakage_routed_safe: bool
+    proof_test_configured: bool
+    proof_test_criterion_met: bool
+    acceptable: bool
+    warnings: list[Warning]
+
+@final
 class SafetyInstrumentedFunctionResult:
     risk_reduction_factor: float | None
     mitigated_frequency_per_year: float
@@ -8180,6 +8195,16 @@ def risk_matrix(
     product_price_per_kg: float | None = None,
     downtime_cost_per_hour: float | None = None,
 ) -> RiskMatrixResult: ...
+def s001_secondary_pressure_protection(
+    maximum_event_pressure: float | None = None,
+    design_pressure: float | None = None,
+    test_pressure: float | None = None,
+    demand_frequency_per_year: float | None = None,
+    target_frequency_per_year: float | None = None,
+    relief_leakage_assessed: bool | None = None,
+    relief_leakage_to_safe_location: bool | None = None,
+    proof_test_interval_months: float | None = None,
+) -> S001SecondaryPressureProtectionResult: ...
 def safety_instrumented_function(
     pfd_average: float,
     claimed_sil: float,

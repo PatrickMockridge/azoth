@@ -291,6 +291,7 @@ from azoth.core.result import (
     RkDepartureResult,
     RootStructure,
     RuptureStatus,
+    S001SecondaryPressureProtectionResult,
     SafeChartItem,
     SafeChartMissingDevice,
     SafetyInstrumentedFunctionResult,
@@ -679,6 +680,7 @@ __all__ = [
     "risk_matrix",
     "rk_alpha_ab",
     "rk_departure",
+    "s001_secondary_pressure_protection",
     "safety_instrumented_function",
     "saft_vr_mie_phase",
     "salt_precipitation",
@@ -8146,6 +8148,35 @@ def risk_matrix(equipment: list[dict[str, object]], product_price_per_kg: float 
     return RiskMatrixResult(
         assessments=tuple(RiskAssessmentRow(name=c.name, failures_per_year=c.failures_per_year, mtbf_hours=c.mtbf_hours, mttr_hours=c.mttr_hours, expected_downtime_hours_per_year=c.expected_downtime_hours_per_year, probability_category=c.probability_category, probability_level=c.probability_level, production_loss_percent=c.production_loss_percent, production_loss_kg_hr=from_si(c.production_loss_kg_hr.magnitude_si, c.production_loss_kg_hr.unit), consequence_category=c.consequence_category, consequence_level=c.consequence_level, risk_score=c.risk_score, risk_level=c.risk_level, cost_per_failure=c.cost_per_failure, annual_risk_cost=c.annual_risk_cost) for c in result.assessments),
         total_annual_risk_cost=result.total_annual_risk_cost,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def s001_secondary_pressure_protection(maximum_event_pressure: float | None=None, design_pressure: float | None=None, test_pressure: float | None=None, demand_frequency_per_year: float | None=None, target_frequency_per_year: float | None=None, relief_leakage_assessed: bool | None=None, relief_leakage_to_safe_location: bool | None=None, proof_test_interval_months: float | None=None) -> S001SecondaryPressureProtectionResult:
+    """``process.s001_secondary_pressure_protection``, computed in Rust."""
+    spec = _models_gen.model("process.s001_secondary_pressure_protection")
+    result = _core.s001_secondary_pressure_protection(
+        None if maximum_event_pressure is None else _si(spec, "maximum_event_pressure", maximum_event_pressure),
+        None if design_pressure is None else _si(spec, "design_pressure", design_pressure),
+        None if test_pressure is None else _si(spec, "test_pressure", test_pressure),
+        None if demand_frequency_per_year is None else demand_frequency_per_year,
+        None if target_frequency_per_year is None else target_frequency_per_year,
+        relief_leakage_assessed,
+        relief_leakage_to_safe_location,
+        None if proof_test_interval_months is None else proof_test_interval_months,
+    )
+    return S001SecondaryPressureProtectionResult(
+        target_frequency_per_year=result.target_frequency_per_year,
+        pressure_basis_complete=result.pressure_basis_complete,
+        test_pressure_valid=result.test_pressure_valid,
+        pressure_within_test=result.pressure_within_test,
+        frequency_configured=result.frequency_configured,
+        frequency_criterion_met=result.frequency_criterion_met,
+        leakage_assessed=result.leakage_assessed,
+        leakage_routed_safe=result.leakage_routed_safe,
+        proof_test_configured=result.proof_test_configured,
+        proof_test_criterion_met=result.proof_test_criterion_met,
+        acceptable=result.acceptable,
         warnings=_warnings(result.warnings),
     )
 

@@ -78,6 +78,7 @@ use crate::models::pump::PumpResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
+use crate::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
 use crate::models::self_heating_induction::SelfHeatingInductionResult;
 use crate::models::semenov_self_heating::SemenovSelfHeatingResult;
@@ -1805,6 +1806,28 @@ impl CalcResult for ReliefDisposalNetworkResult {
 impl CalcResult for RiskMatrixResult {
     const CALC_ID: &'static str = "process.risk_matrix";
     const FIELDS: &'static [&'static str] = &["assessments", "total_annual_risk_cost", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for S001SecondaryPressureProtectionResult {
+    const CALC_ID: &'static str = "process.s001_secondary_pressure_protection";
+    const FIELDS: &'static [&'static str] = &[
+        "target_frequency_per_year",
+        "pressure_basis_complete",
+        "test_pressure_valid",
+        "pressure_within_test",
+        "frequency_configured",
+        "frequency_criterion_met",
+        "leakage_assessed",
+        "leakage_routed_safe",
+        "proof_test_configured",
+        "proof_test_criterion_met",
+        "acceptable",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

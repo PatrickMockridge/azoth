@@ -17172,10 +17172,22 @@ public class ProcessProbe {
     return criteria.evaluate();
   }
 
+  static String s001Key(String key) {
+    StringBuilder out = new StringBuilder();
+    for (char character : key.toCharArray()) {
+      if (Character.isUpperCase(character)) {
+        out.append('_').append(Character.toLowerCase(character));
+      } else {
+        out.append(character);
+      }
+    }
+    return out.toString();
+  }
+
   static void printS001(String label, S001SecondaryPressureProtectionResult result) {
     System.out.println(label);
     for (java.util.Map.Entry<String, Object> entry : result.toMap().entrySet()) {
-      System.out.println(entry.getKey() + "=" + entry.getValue());
+      System.out.println(s001Key(entry.getKey()) + "=" + entry.getValue());
     }
     System.out.println();
   }

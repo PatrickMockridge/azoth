@@ -418,6 +418,19 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `crates/azoth-process/tests/barrier_register_validation.rs` asserts it against
         # the capture, and `test_cross_impl` compares it on both results.
         "valid",
+        # `s001_secondary_pressure_protection`'s ten flags, booleans with no slot in
+        # `TestCase`. `crates/azoth-process/tests/s001_secondary_pressure_protection.rs`
+        # asserts them against the capture, and `test_cross_impl` compares them.
+        "pressure_basis_complete",
+        "test_pressure_valid",
+        "pressure_within_test",
+        "frequency_configured",
+        "frequency_criterion_met",
+        "leakage_assessed",
+        "leakage_routed_safe",
+        "proof_test_configured",
+        "proof_test_criterion_met",
+        "acceptable",
     }
 )
 

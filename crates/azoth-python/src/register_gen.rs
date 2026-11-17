@@ -307,6 +307,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyRateBasedPackedColumnResult>()?;
     m.add_class::<crate::transport_gen::PyReliefDisposalNetworkResult>()?;
     m.add_class::<crate::transport_gen::PyRiskMatrixResult>()?;
+    m.add_class::<crate::transport_gen::PyS001SecondaryPressureProtectionResult>()?;
     m.add_class::<crate::transport_gen::PySafetyInstrumentedFunctionResult>()?;
     m.add_class::<crate::transport_gen::PySelfHeatingInductionResult>()?;
     m.add_class::<crate::transport_gen::PySemenovSelfHeatingResult>()?;
@@ -1084,6 +1085,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::risk_matrix, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::s001_secondary_pressure_protection,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::safety_instrumented_function,
         m

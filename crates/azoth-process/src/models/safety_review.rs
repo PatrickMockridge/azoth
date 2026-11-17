@@ -236,6 +236,138 @@ pub(crate) fn api14c_classify(unit_class: &str) -> Option<Api14cCategory> {
     }
 }
 
+/// The S-001 secondary-pressure criteria, in the class's bara.
+#[derive(Debug, Clone, Copy, Default)]
+pub(crate) struct S001Criteria {
+    /// The maximum event pressure.
+    pub maximum_event_pressure: Option<f64>,
+    /// The design pressure.
+    pub design_pressure: Option<f64>,
+    /// The test pressure.
+    pub test_pressure: Option<f64>,
+    /// The annual demand frequency.
+    pub demand_frequency_per_year: Option<f64>,
+    /// The stated target frequency, overriding the band.
+    pub target_frequency_per_year: Option<f64>,
+    /// Whether relief leakage has been assessed.
+    pub relief_leakage_assessed: Option<bool>,
+    /// Whether the leakage is routed to a safe location.
+    pub relief_leakage_to_safe_location: Option<bool>,
+    /// The proof-test interval in months.
+    pub proof_test_interval_months: Option<f64>,
+}
+
+/// The S-001 evaluation.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) struct S001Outcome {
+    /// The resolved target frequency, absent where the band cannot resolve.
+    pub target_frequency_per_year: Option<f64>,
+    /// Whether all three pressures are finite and positive.
+    pub pressure_basis_complete: bool,
+    /// Whether the test pressure is at or above the design pressure.
+    pub test_pressure_valid: bool,
+    /// Whether the event pressure is at or below the test pressure.
+    pub pressure_within_test: bool,
+    /// Whether the demand and target are configured.
+    pub frequency_configured: bool,
+    /// Whether the demand is at or below the target.
+    pub frequency_criterion_met: bool,
+    /// Whether relief leakage has been assessed.
+    pub leakage_assessed: bool,
+    /// Whether the leakage is routed to a safe location.
+    pub leakage_routed_safe: bool,
+    /// Whether the proof-test interval is configured.
+    pub proof_test_configured: bool,
+    /// Whether the interval is at most twelve months.
+    pub proof_test_criterion_met: bool,
+    /// Whether every criterion is met.
+    pub acceptable: bool,
+}
+
+fn positive(value: Option<f64>) -> Option<f64> {
+    value.filter(|number| number.is_finite() && *number > 0.0)
+}
+
+/// The class's default target frequency by pressure band, `NaN` without a complete basis.
+pub(crate) fn s001_default_target(
+    maximum_event_pressure: Option<f64>,
+    design_pressure: Option<f64>,
+    test_pressure: Option<f64>,
+) -> f64 {
+    let (Some(event), Some(design), Some(test)) = (
+        positive(maximum_event_pressure),
+        positive(design_pressure),
+        positive(test_pressure),
+    ) else {
+        return f64::NAN;
+    };
+    if event > 2.0 * design {
+        1.0e-5
+    } else if event > test {
+        1.0e-4
+    } else if event > design {
+        1.0e-3
+    } else {
+        1.0e-2
+    }
+}
+
+/// The class's evaluation of the criteria.
+pub(crate) fn s001_evaluate(criteria: S001Criteria) -> S001Outcome {
+    let event = criteria.maximum_event_pressure;
+    let design = criteria.design_pressure;
+    let test = criteria.test_pressure;
+    let pressure_basis_complete =
+        positive(event).is_some() && positive(design).is_some() && positive(test).is_some();
+    let test_pressure_valid =
+        !pressure_basis_complete || test.unwrap_or(f64::NAN) >= design.unwrap_or(f64::NAN);
+    let pressure_within_test =
+        !pressure_basis_complete || event.unwrap_or(f64::NAN) <= test.unwrap_or(f64::NAN);
+
+    let stated_target = criteria
+        .target_frequency_per_year
+        .filter(|target| target.is_finite());
+    let resolved_target = stated_target
+        .unwrap_or_else(|| s001_default_target(criteria.maximum_event_pressure, design, test));
+    let frequency_configured = criteria
+        .demand_frequency_per_year
+        .is_some_and(|demand| demand.is_finite() && demand >= 0.0)
+        && resolved_target.is_finite();
+    let frequency_criterion_met = !frequency_configured
+        || criteria.demand_frequency_per_year.unwrap_or(f64::INFINITY) <= resolved_target;
+
+    let leakage_assessed = criteria.relief_leakage_assessed == Some(true);
+    let leakage_routed_safe = criteria.relief_leakage_to_safe_location == Some(true);
+    let proof_test_configured = criteria
+        .proof_test_interval_months
+        .is_some_and(|interval| interval.is_finite());
+    let proof_test_criterion_met = !proof_test_configured
+        || criteria.proof_test_interval_months.unwrap_or(f64::INFINITY) <= 12.0;
+
+    let acceptable = pressure_basis_complete
+        && test_pressure_valid
+        && pressure_within_test
+        && frequency_configured
+        && frequency_criterion_met
+        && leakage_assessed
+        && leakage_routed_safe
+        && proof_test_criterion_met;
+
+    S001Outcome {
+        target_frequency_per_year: resolved_target.is_finite().then_some(resolved_target),
+        pressure_basis_complete,
+        test_pressure_valid,
+        pressure_within_test,
+        frequency_configured,
+        frequency_criterion_met,
+        leakage_assessed,
+        leakage_routed_safe,
+        proof_test_configured,
+        proof_test_criterion_met,
+        acceptable,
+    }
+}
+
 /// A safety-critical element's type.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub enum BarrierElementType {

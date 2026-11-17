@@ -2804,6 +2804,43 @@ def _barrier_register_validation(inputs: Mapping[str, Any]) -> dict[str, float]:
     return {"finding_count": result.finding_count}
 
 
+def _s001_secondary_pressure_protection(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.s001_secondary_pressure_protection`'s layers, from the reference."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.s001_secondary_pressure_protection import (
+        s001_secondary_pressure_protection as evaluate,
+    )
+
+    def optional(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    def optional_pressure(name: str) -> Any:
+        value = optional(name)
+        return None if value is None else quantity(value, "Pa")
+
+    def optional_flag(name: str) -> bool | None:
+        value = inputs.get(name)
+        return None if value is None else bool(value)
+
+    result = evaluate(
+        optional_pressure("maximum_event_pressure"),
+        optional_pressure("design_pressure"),
+        optional_pressure("test_pressure"),
+        optional("demand_frequency_per_year"),
+        optional("target_frequency_per_year"),
+        optional_flag("relief_leakage_assessed"),
+        optional_flag("relief_leakage_to_safe_location"),
+        optional("proof_test_interval_months"),
+    )
+    # The target is the one numeric output; the ten flags are held by the cases and the
+    # capture prints NaN where it is absent, which `float` would make uncomparable.
+    layers: dict[str, float] = {}
+    if result.target_frequency_per_year is not None:
+        layers["target_frequency_per_year"] = result.target_frequency_per_year
+    return layers
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3347,6 +3384,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.mah_bow_tie_skeleton": _mah_bow_tie_skeleton,
     "process.api14c_safe_chart": _api14c_safe_chart,
     "process.barrier_register_validation": _barrier_register_validation,
+    "process.s001_secondary_pressure_protection": _s001_secondary_pressure_protection,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -5356,6 +5394,37 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=24,
         identified_by=("#label", "br_shared_standard"),
     ),
+    # The S-001 screen's four cased states; the other eleven blocks are declared in
+    # `UNCASED_ROWS`. The target is the only numeric layer, so the missing-basis block
+    # shares no key with a dump and stays uncased.
+    LayerCase(
+        model="process.s001_secondary_pressure_protection",
+        case="s001_band_below_design",
+        capture="process_s001_secondary_pressure_protection.tsv",
+        block=0,
+        identified_by=("#label", "s001_band_below_design"),
+    ),
+    LayerCase(
+        model="process.s001_secondary_pressure_protection",
+        case="s001_complete_pass",
+        capture="process_s001_secondary_pressure_protection.tsv",
+        block=4,
+        identified_by=("#label", "s001_complete_pass"),
+    ),
+    LayerCase(
+        model="process.s001_secondary_pressure_protection",
+        case="s001_event_above_test",
+        capture="process_s001_secondary_pressure_protection.tsv",
+        block=5,
+        identified_by=("#label", "s001_event_above_test"),
+    ),
+    LayerCase(
+        model="process.s001_secondary_pressure_protection",
+        case="s001_band_above_design",
+        capture="process_s001_secondary_pressure_protection.tsv",
+        block=1,
+        identified_by=("#label", "s001_band_above_design"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -7126,6 +7195,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_api14c_safe_chart.tsv": 11,
     # The register's twenty-two: the rule-per-register blocks and the linked-twice state.
     "process_barrier_register_validation.tsv": 22,
+    # The S-001 screen's eleven: the other two bands, the other leakage states, the proof
+    # intervals and the empty criteria.
+    "process_s001_secondary_pressure_protection.tsv": 11,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

@@ -22900,6 +22900,92 @@ impl From<&azoth_process::models::risk_matrix::RiskMatrixResult> for PyRiskMatri
         }
     }
 }
+/// Result of `process.s001_secondary_pressure_protection`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "S001SecondaryPressureProtectionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyS001SecondaryPressureProtectionResult {
+    /// the resolved target frequency, stated or from the band. **Absent when the band cannot resolve**: a missing or non-positive pressure basis with no stated target.
+    #[pyo3(get)]
+    pub target_frequency_per_year: Option<f64>,
+    /// whether all three pressures are finite and positive.
+    #[pyo3(get)]
+    pub pressure_basis_complete: bool,
+    /// whether the test pressure is at or above the design pressure; vacuous-true without a basis.
+    #[pyo3(get)]
+    pub test_pressure_valid: bool,
+    /// whether the event pressure is at or below the test pressure; vacuous-true without a basis.
+    #[pyo3(get)]
+    pub pressure_within_test: bool,
+    /// whether the demand and the resolved target are configured.
+    #[pyo3(get)]
+    pub frequency_configured: bool,
+    /// whether the demand is at or below the target; vacuous-true when unconfigured.
+    #[pyo3(get)]
+    pub frequency_criterion_met: bool,
+    /// whether relief leakage has been assessed.
+    #[pyo3(get)]
+    pub leakage_assessed: bool,
+    /// whether the leakage is routed to a safe location.
+    #[pyo3(get)]
+    pub leakage_routed_safe: bool,
+    /// whether a proof-test interval is stated.
+    #[pyo3(get)]
+    pub proof_test_configured: bool,
+    /// whether the interval is at most twelve months; vacuous-true when unconfigured.
+    #[pyo3(get)]
+    pub proof_test_criterion_met: bool,
+    /// whether every criterion is met.
+    #[pyo3(get)]
+    pub acceptable: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyS001SecondaryPressureProtectionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "S001SecondaryPressureProtectionResult(target_frequency_per_year={:?}, pressure_basis_complete={:?}, test_pressure_valid={:?}, pressure_within_test={:?}, frequency_configured={:?}, frequency_criterion_met={:?}, leakage_assessed={:?}, leakage_routed_safe={:?}, proof_test_configured={:?}, proof_test_criterion_met={:?}, acceptable={:?}, {} warning(s))",
+            self.target_frequency_per_year,
+            self.pressure_basis_complete,
+            self.test_pressure_valid,
+            self.pressure_within_test,
+            self.frequency_configured,
+            self.frequency_criterion_met,
+            self.leakage_assessed,
+            self.leakage_routed_safe,
+            self.proof_test_configured,
+            self.proof_test_criterion_met,
+            self.acceptable,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult> for PyS001SecondaryPressureProtectionResult {
+    fn from(r: &azoth_process::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult) -> Self {
+        Self {
+            target_frequency_per_year: r.target_frequency_per_year,
+            pressure_basis_complete: r.pressure_basis_complete,
+            test_pressure_valid: r.test_pressure_valid,
+            pressure_within_test: r.pressure_within_test,
+            frequency_configured: r.frequency_configured,
+            frequency_criterion_met: r.frequency_criterion_met,
+            leakage_assessed: r.leakage_assessed,
+            leakage_routed_safe: r.leakage_routed_safe,
+            proof_test_configured: r.proof_test_configured,
+            proof_test_criterion_met: r.proof_test_criterion_met,
+            acceptable: r.acceptable,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.safety_instrumented_function`, transported.
 #[pyclass(
     frozen,
