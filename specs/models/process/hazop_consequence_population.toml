@@ -58,7 +58,6 @@ description = "the unit's simple class name or category, matched by lower-case s
 [outputs]
 [outputs.populated]
 type = "record_list"
-row_type = "HazopPopulationRow"
 description = "the populated rows, one per input row and in its order.\n"
 [outputs.populated.fields.guide_word]
 type = "enum"

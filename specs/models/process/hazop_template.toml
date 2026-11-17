@@ -40,7 +40,6 @@ description = "the unit's simple class name or category, matched by lower-case s
 [outputs]
 [outputs.deviations]
 type = "record_list"
-row_type = "HazopTemplateDeviation"
 description = "the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order.\n"
 [outputs.deviations.fields.guide_word]
 type = "enum"

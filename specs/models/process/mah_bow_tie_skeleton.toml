@@ -29,7 +29,6 @@ description = "the ISO 17776 major accident hazard category.\n"
 [outputs]
 [outputs.threats]
 type = "record_list"
-row_type = "MahThreat"
 description = "the catalogue's default threats, in their order.\n"
 [outputs.threats.fields.id]
 type = "string"
@@ -42,7 +41,6 @@ unit = "dimensionless"
 description = "the placeholder frequency, `0.001` in 1/year; the vocabulary has no year unit, so the value crosses unconverted.\n"
 [outputs.consequences]
 type = "record_list"
-row_type = "MahConsequence"
 description = "the catalogue's default consequences, in their order.\n"
 [outputs.consequences.fields.id]
 type = "string"
@@ -55,7 +53,6 @@ unit = "dimensionless"
 description = "the placeholder severity, `4` on the class's 1-to-5 scale.\n"
 [outputs.barriers]
 type = "record_list"
-row_type = "MahBarrier"
 description = "the catalogue's default barrier classes, in their order.\n"
 [outputs.barriers.fields.id]
 type = "string"
