@@ -49,6 +49,32 @@ API14C_REQUIRED: dict[str, tuple[str, ...]] = {
 }
 
 
+#: The element types the register accepts.
+ELEMENT_TYPES: tuple[str, ...] = (
+    "process_equipment",
+    "instrumented_function",
+    "fire_protection",
+    "structural",
+    "utility",
+    "other",
+)
+
+#: The barrier types.
+BARRIER_TYPES: tuple[str, ...] = ("prevention", "mitigation", "both")
+
+#: The barrier statuses.
+BARRIER_STATUSES: tuple[str, ...] = (
+    "available",
+    "impaired",
+    "bypassed",
+    "out_of_service",
+    "unknown",
+)
+
+#: Which record a piece of evidence is attached to.
+EVIDENCE_OWNERS: tuple[str, ...] = ("element", "barrier", "standard")
+
+
 def classify_api14c(unit_class: str) -> str | None:
     """The class's equipment classifier: a lower-case substring test on the simple name."""
     name = unit_class.lower()

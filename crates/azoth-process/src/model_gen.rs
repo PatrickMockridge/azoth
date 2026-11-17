@@ -6,6 +6,7 @@
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api14c_safe_chart.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
+//!   - specs/models/process/barrier_register_validation.toml
 //!   - specs/models/process/basket_test_regression.toml
 //!   - specs/models/process/bleve.toml
 //!   - specs/models/process/blocked_outlet_relief.toml
@@ -6152,6 +6153,547 @@ pub static API537_FLARE_FLAME_MODEL_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&API537_FLARE_FLAME_MODEL_ALGORITHM),
     checks: API537_FLARE_FLAME_MODEL_CHECKS,
     cases: API537_FLARE_FLAME_MODEL_CASES,
+};
+
+static BARRIER_REGISTER_VALIDATION_CHECKS: &[SpecCheck] = &[];
+
+static BARRIER_REGISTER_VALIDATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "br_valid",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("register_id", "BR-001")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("finding_count", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-V-101"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Protected equipment"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("process_equipment"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-HIPPS-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Barrier B-HIPPS-001"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Prevents the overpressure scenario"),
+                    },
+                    RecordField {
+                        name: "barrier_type",
+                        value: FieldValue::Name("prevention"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "effectiveness",
+                        value: FieldValue::Number(0.999),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-HIPPS-001"),
+                    },
+                    RecordField {
+                        name: "equipment_tag_count",
+                        value: FieldValue::Number(1.0),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-HIPPS-001"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Isolate the protected equipment"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.995),
+                    },
+                    RecordField {
+                        name: "proof_test_interval_hours",
+                        value: FieldValue::Number(8760.0),
+                    },
+                    RecordField {
+                        name: "acceptance_criteria_count",
+                        value: FieldValue::Number(1.0),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-V-101"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-HIPPS-001"),
+                    },
+                ]],
+            ),
+            (
+                "evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "owner_kind",
+                            value: FieldValue::Name("standard"),
+                        },
+                        RecordField {
+                            name: "owner_id",
+                            value: FieldValue::Name("PS-HIPPS-001"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("SRS-E-S-PS-HIPPS-001"),
+                        },
+                        RecordField {
+                            name: "source_reference",
+                            value: FieldValue::Name("references/E-S-PS-HIPPS-001.pdf"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("Evidence excerpt E-S-PS-HIPPS-001."),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "owner_kind",
+                            value: FieldValue::Name("barrier"),
+                        },
+                        RecordField {
+                            name: "owner_id",
+                            value: FieldValue::Name("B-HIPPS-001"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("SRS-E-B-B-HIPPS-001"),
+                        },
+                        RecordField {
+                            name: "source_reference",
+                            value: FieldValue::Name("references/E-B-B-HIPPS-001.pdf"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("Evidence excerpt E-B-B-HIPPS-001."),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "br_shared_standard",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("register_id", "BR-001")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("finding_count", 2.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-022"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Protected equipment"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("process_equipment"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[
+                    &[
+                        RecordField {
+                            name: "id",
+                            value: FieldValue::Name("B-SHARED-1"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Barrier B-SHARED-1"),
+                        },
+                        RecordField {
+                            name: "description",
+                            value: FieldValue::Name("Prevents the overpressure scenario"),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("available"),
+                        },
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.001),
+                        },
+                        RecordField {
+                            name: "effectiveness",
+                            value: FieldValue::Number(0.999),
+                        },
+                        RecordField {
+                            name: "performance_standard_id",
+                            value: FieldValue::Name("PS-SHARED"),
+                        },
+                        RecordField {
+                            name: "equipment_tag_count",
+                            value: FieldValue::Number(1.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "id",
+                            value: FieldValue::Name("B-SHARED-2"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Barrier B-SHARED-2"),
+                        },
+                        RecordField {
+                            name: "description",
+                            value: FieldValue::Name("Prevents the overpressure scenario"),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("available"),
+                        },
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.001),
+                        },
+                        RecordField {
+                            name: "effectiveness",
+                            value: FieldValue::Number(0.999),
+                        },
+                        RecordField {
+                            name: "performance_standard_id",
+                            value: FieldValue::Name("PS-SHARED"),
+                        },
+                        RecordField {
+                            name: "equipment_tag_count",
+                            value: FieldValue::Number(1.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-SHARED"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Standard shared by two barriers"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "proof_test_interval_hours",
+                        value: FieldValue::Number(8760.0),
+                    },
+                    RecordField {
+                        name: "acceptance_criteria_count",
+                        value: FieldValue::Number(0.0),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[
+                    &[
+                        RecordField {
+                            name: "element_id",
+                            value: FieldValue::Name("SCE-022"),
+                        },
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-SHARED-1"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "element_id",
+                            value: FieldValue::Name("SCE-022"),
+                        },
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-SHARED-2"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "owner_kind",
+                            value: FieldValue::Name("standard"),
+                        },
+                        RecordField {
+                            name: "owner_id",
+                            value: FieldValue::Name("PS-SHARED"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("SRS-E-S-SHARED"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("Evidence excerpt E-S-SHARED."),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "owner_kind",
+                            value: FieldValue::Name("barrier"),
+                        },
+                        RecordField {
+                            name: "owner_id",
+                            value: FieldValue::Name("B-SHARED-1"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("SRS-E-B-SHARED-1"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("Evidence excerpt E-B-SHARED-1."),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "owner_kind",
+                            value: FieldValue::Name("barrier"),
+                        },
+                        RecordField {
+                            name: "owner_id",
+                            value: FieldValue::Name("B-SHARED-2"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("SRS-E-B-SHARED-2"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("Evidence excerpt E-B-SHARED-2."),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[(
+            "findings",
+            &[
+                &[
+                    RecordField {
+                        name: "scope",
+                        value: FieldValue::Name("standard"),
+                    },
+                    RecordField {
+                        name: "subject_id",
+                        value: FieldValue::Name("PS-SHARED"),
+                    },
+                    RecordField {
+                        name: "rule",
+                        value: FieldValue::Name("standard_no_acceptance_criteria"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "scope",
+                        value: FieldValue::Name("standard"),
+                    },
+                    RecordField {
+                        name: "subject_id",
+                        value: FieldValue::Name("PS-SHARED"),
+                    },
+                    RecordField {
+                        name: "rule",
+                        value: FieldValue::Name("standard_no_acceptance_criteria"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "br_barrier_not_linked",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("register_id", "BR-001")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("finding_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "barriers",
+            &[&[
+                RecordField {
+                    name: "id",
+                    value: FieldValue::Name("B-UNLINKED"),
+                },
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Barrier B-UNLINKED"),
+                },
+                RecordField {
+                    name: "description",
+                    value: FieldValue::Name("Prevents the overpressure scenario"),
+                },
+                RecordField {
+                    name: "barrier_type",
+                    value: FieldValue::Name("prevention"),
+                },
+                RecordField {
+                    name: "status",
+                    value: FieldValue::Name("available"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.001),
+                },
+                RecordField {
+                    name: "effectiveness",
+                    value: FieldValue::Number(0.999),
+                },
+                RecordField {
+                    name: "performance_standard_id",
+                    value: FieldValue::Name("PS-HIPPS-001"),
+                },
+                RecordField {
+                    name: "equipment_tag_count",
+                    value: FieldValue::Number(1.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "findings",
+            &[&[
+                RecordField {
+                    name: "scope",
+                    value: FieldValue::Name("barrier"),
+                },
+                RecordField {
+                    name: "subject_id",
+                    value: FieldValue::Name("B-UNLINKED"),
+                },
+                RecordField {
+                    name: "rule",
+                    value: FieldValue::Name("barrier_not_linked_to_element"),
+                },
+            ]],
+        )],
+    },
+];
+
+static BARRIER_REGISTER_VALIDATION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "barrier_register_validation",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.barrier_register_validation`.
+pub static BARRIER_REGISTER_VALIDATION_SPEC: ModelSpec = ModelSpec {
+    id: "process.barrier_register_validation",
+    kind: "procedure",
+    algorithm: Some(&BARRIER_REGISTER_VALIDATION_ALGORITHM),
+    checks: BARRIER_REGISTER_VALIDATION_CHECKS,
+    cases: BARRIER_REGISTER_VALIDATION_CASES,
 };
 
 static BASKET_TEST_REGRESSION_CHECKS: &[SpecCheck] = &[SpecCheck {
@@ -79726,6 +80268,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &ANTI_SURGE_RECYCLE_SPEC,
     &API14C_SAFE_CHART_SPEC,
     &API537_FLARE_FLAME_MODEL_SPEC,
+    &BARRIER_REGISTER_VALIDATION_SPEC,
     &BASKET_TEST_REGRESSION_SPEC,
     &BLEVE_SPEC,
     &BLOCKED_OUTLET_RELIEF_SPEC,

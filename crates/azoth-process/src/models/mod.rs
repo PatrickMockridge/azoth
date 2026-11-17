@@ -35,6 +35,7 @@ pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
 pub mod api14c_safe_chart;
 pub mod api537_flare_flame_model;
+pub mod barrier_register_validation;
 pub mod basket_test_regression;
 pub mod bleve;
 pub mod blocked_outlet_relief;
@@ -132,6 +133,10 @@ pub use api14c_safe_chart::{
 };
 pub use api537_flare_flame_model::{
     Api537FlareFlameModelResult, FlareTargetFlux, SterileRadius, api537_flare_flame_model,
+};
+pub use barrier_register_validation::{
+    BarrierElement, BarrierRegisterValidationResult, BarrierRow, ElementBarrierLink,
+    PerformanceStandardRow, RegisterEvidence, RegisterFinding, barrier_register_validation,
 };
 pub use basket_test_regression::{
     BasketTestPoint, BasketTestRegressionResult, basket_test_regression,

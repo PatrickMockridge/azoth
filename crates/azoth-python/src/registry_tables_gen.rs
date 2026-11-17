@@ -246,6 +246,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.anti_surge_recycle" => azoth_process::models::anti_surge_recycle::AntiSurgeRecycleResult::FIELDS.to_vec(),
         "process.api14c_safe_chart" => azoth_process::models::api14c_safe_chart::Api14cSafeChartResult::FIELDS.to_vec(),
         "process.api537_flare_flame_model" => azoth_process::models::api537_flare_flame_model::Api537FlareFlameModelResult::FIELDS.to_vec(),
+        "process.barrier_register_validation" => azoth_process::models::barrier_register_validation::BarrierRegisterValidationResult::FIELDS.to_vec(),
         "process.basket_test_regression" => azoth_process::models::basket_test_regression::BasketTestRegressionResult::FIELDS.to_vec(),
         "process.bleve" => azoth_process::models::bleve::BleveResult::FIELDS.to_vec(),
         "process.blocked_outlet_relief" => azoth_process::models::blocked_outlet_relief::BlockedOutletReliefResult::FIELDS.to_vec(),

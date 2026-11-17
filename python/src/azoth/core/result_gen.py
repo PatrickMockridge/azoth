@@ -53,6 +53,7 @@ from azoth.core.record_outputs_gen import (
     MinimalCutSet,
     NaceIssueRow,
     PipeFireRupturePoint,
+    RegisterFinding,
     ReliefDisposalRow,
     RemediationOptionRow,
     RiskAssessmentRow,
@@ -5748,6 +5749,25 @@ class Api537FlareFlameModelResult(_HasWarnings):
 
     #: `(radiative_power / (pi max(0.12 flame_length, 0.1) flame_length) / sigma)^0.25`; zero when the flame surface is zero.
     equivalent_flame_temperature: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class BarrierRegisterValidationResult(_HasWarnings):
+    """Result of ``process.barrier_register_validation``."""
+
+    CALC_ID: ClassVar[str] = "process.barrier_register_validation"
+
+    #: one row per finding, in the class's order and with its duplicates.
+    findings: tuple[RegisterFinding, ...]
+
+    #: the number of findings.
+    finding_count: float
+
+    #: whether the register has no findings.
+    valid: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]

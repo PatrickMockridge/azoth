@@ -41,6 +41,42 @@ pub struct AssayCutDerivation {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BarrierElement {
+    #[pyo3(item)]
+    pub id: String,
+    #[pyo3(item)]
+    pub tag: Option<String>,
+    #[pyo3(item)]
+    pub name: Option<String>,
+    #[pyo3(item)]
+    pub element_type: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BarrierRow {
+    #[pyo3(item)]
+    pub id: String,
+    #[pyo3(item)]
+    pub name: Option<String>,
+    #[pyo3(item)]
+    pub description: Option<String>,
+    #[pyo3(item)]
+    pub barrier_type: String,
+    #[pyo3(item)]
+    pub status: String,
+    #[pyo3(item)]
+    pub pfd: Option<f64>,
+    #[pyo3(item)]
+    pub effectiveness: Option<f64>,
+    #[pyo3(item)]
+    pub performance_standard_id: Option<String>,
+    #[pyo3(item)]
+    pub equipment_tag_count: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct BasketTestPoint {
     #[pyo3(item)]
     pub geometry: String,
@@ -200,6 +236,15 @@ pub struct EfficiencyPoint {
     pub diameter: f64,
     #[pyo3(item)]
     pub efficiency: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct ElementBarrierLink {
+    #[pyo3(item)]
+    pub element_id: String,
+    #[pyo3(item)]
+    pub barrier_id: String,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
@@ -512,6 +557,23 @@ pub struct OverpressureScenario {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct PerformanceStandardRow {
+    #[pyo3(item)]
+    pub id: String,
+    #[pyo3(item)]
+    pub safety_function: Option<String>,
+    #[pyo3(item)]
+    pub target_pfd: Option<f64>,
+    #[pyo3(item)]
+    pub required_availability: Option<f64>,
+    #[pyo3(item)]
+    pub proof_test_interval_hours: Option<f64>,
+    #[pyo3(item)]
+    pub acceptance_criteria_count: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct PipeFireRuptureMaterialPoint {
     #[pyo3(item)]
     pub temperature: f64,
@@ -590,6 +652,21 @@ pub struct ReferenceRow {
     pub moles: Option<f64>,
     #[pyo3(item)]
     pub density: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct RegisterEvidence {
+    #[pyo3(item)]
+    pub owner_kind: String,
+    #[pyo3(item)]
+    pub owner_id: String,
+    #[pyo3(item)]
+    pub document_id: Option<String>,
+    #[pyo3(item)]
+    pub source_reference: Option<String>,
+    #[pyo3(item)]
+    pub excerpt: Option<String>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

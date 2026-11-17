@@ -1,0 +1,198 @@
+id = "process.barrier_register_validation"
+name = "Barrier register validation"
+kind = "procedure"
+assumptions = [
+    "**the findings are in the class's order**: the register id, the register-empty test, each safety-critical element's own rules and its embedded barriers' rules, and finally one not-linked finding per register barrier that no element contains.",
+    "**a linked barrier is validated once per element that contains it**, so the same barrier's rules appear twice when two elements link it; **an unlinked barrier gets only the not-linked finding**, never its own rules; and **a standard linked by two barriers is validated twice**, once through each barrier.",
+    "**a standard is validated only through a barrier that links it**: a standard no barrier names is never read, and a barrier naming no standard row answers the class's null standard rather than a validation.",
+    "**traceability is (`document_id` or `source_reference`) and `excerpt`**, trimmed and non-empty. A barrier is also traceable through its linked standard's evidence, and an element through any embedded barrier's.",
+    "**ids and text are trimmed and an empty trimmed name is absent.** A register, element, barrier or standard id is a map key, so a duplicate row replaces the earlier one in place and keeps the first position.",
+    "**the class's finding messages are presentation**: the rows carry the rule, the scope and the subject id. A standard's finding carries the standard id; a duplicated finding is two identical rows.",
+    "**the class validates nothing it is given**: the port refuses a link naming an unknown element or barrier id, because the class's link API requires both to exist.",
+]
+references = [
+    "NORSOK S-001:2020+AC:2021. Risk and emergency preparedness analysis.",
+    "ISO 17776:2016. Petroleum and natural gas industries - Offshore production installations - Major accident hazard management during the design of new installations.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/barrier/BarrierRegister.java` (`validate`) and its `SafetyBarrier`, `PerformanceStandard` and `SafetyCriticalElement` `validate` methods are the port source.",
+    "`validation/neqsim/captures/process_barrier_register_validation.tsv` - a valid register, one register per rule, the linked-twice and shared-standard states and the unlinked barrier.",
+]
+[source]
+standard = "NeqSim process/safety/barrier/BarrierRegister.java"
+edition = "Its `validate`, with `SafetyBarrier.validate`, `PerformanceStandard.validate` and `SafetyCriticalElement.validate`."
+[algorithm]
+scheme = "barrier_register_validation"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.register_id]
+type = "string"
+description = "the register id. An empty trimmed id is the class's missing-id finding, not a refusal.\n"
+[inputs.elements]
+type = "record_list"
+row_type = "BarrierElement"
+optional = true
+description = "the safety-critical elements, in caller order. **Absent is no elements.**\n"
+[inputs.elements.fields.id]
+type = "string"
+description = "the element id.\n"
+[inputs.elements.fields.tag]
+type = "string"
+optional = true
+description = "the equipment tag, one of the class's tag-or-name pair.\n"
+[inputs.elements.fields.name]
+type = "string"
+optional = true
+description = "the element name, the other half of the tag-or-name pair.\n"
+[inputs.elements.fields.element_type]
+type = "enum"
+values = ["process_equipment", "instrumented_function", "fire_protection", "structural", "utility", "other"]
+description = "the element type.\n"
+[inputs.barriers]
+type = "record_list"
+row_type = "BarrierRow"
+optional = true
+description = "the barriers, in caller order. **Absent is no barriers.**\n"
+[inputs.barriers.fields.id]
+type = "string"
+description = "the barrier id.\n"
+[inputs.barriers.fields.name]
+type = "string"
+optional = true
+description = "the barrier name, one of the class's name-or-description pair.\n"
+[inputs.barriers.fields.description]
+type = "string"
+optional = true
+description = "the barrier description, the other half of the pair.\n"
+[inputs.barriers.fields.barrier_type]
+type = "enum"
+values = ["prevention", "mitigation", "both"]
+description = "the barrier type.\n"
+[inputs.barriers.fields.status]
+type = "enum"
+values = ["available", "impaired", "bypassed", "out_of_service", "unknown"]
+description = "the barrier status.\n"
+[inputs.barriers.fields.pfd]
+unit = "dimensionless"
+optional = true
+description = "the probability of failure on demand, in `[0, 1]`; **absent is the class's NaN**, which the range rule skips.\n"
+[inputs.barriers.fields.effectiveness]
+unit = "dimensionless"
+optional = true
+description = "the barrier effectiveness, in `[0, 1]`; **absent is the class's NaN**, which the range rule skips.\n"
+[inputs.barriers.fields.performance_standard_id]
+type = "string"
+optional = true
+description = "the linked performance standard's id; a value naming no standard row is the class's null standard.\n"
+[inputs.barriers.fields.equipment_tag_count]
+unit = "dimensionless"
+description = "the number of equipment tags the barrier links. The rule is emptiness, so a count is the flattened set.\n"
+[inputs.standards]
+type = "record_list"
+row_type = "PerformanceStandardRow"
+optional = true
+description = "the performance standards, in caller order. **Absent is no standards.**\n"
+[inputs.standards.fields.id]
+type = "string"
+description = "the standard id.\n"
+[inputs.standards.fields.safety_function]
+type = "string"
+optional = true
+description = "the safety-function description.\n"
+[inputs.standards.fields.target_pfd]
+unit = "dimensionless"
+optional = true
+description = "the target PFD, in `(0, 1]`; **absent is the class's NaN**, which the range rule skips.\n"
+[inputs.standards.fields.required_availability]
+unit = "dimensionless"
+optional = true
+description = "the required availability, in `[0, 1]`; absent skips the range rule.\n"
+[inputs.standards.fields.proof_test_interval_hours]
+unit = "dimensionless"
+optional = true
+description = "the proof-test interval in hours, above zero; absent skips the rule.\n"
+[inputs.standards.fields.acceptance_criteria_count]
+unit = "dimensionless"
+description = "the number of acceptance criteria. The rule is emptiness.\n"
+[inputs.links]
+type = "record_list"
+row_type = "ElementBarrierLink"
+optional = true
+description = "the element-to-barrier links, in caller order. **Absent is no links.**\n"
+[inputs.links.fields.element_id]
+type = "string"
+description = "the element id; it must name an element row.\n"
+[inputs.links.fields.barrier_id]
+type = "string"
+description = "the barrier id; it must name a barrier row.\n"
+[inputs.evidence]
+type = "record_list"
+row_type = "RegisterEvidence"
+optional = true
+description = "the document evidence, in caller order. **Absent is no evidence.**\n"
+[inputs.evidence.fields.owner_kind]
+type = "enum"
+values = ["element", "barrier", "standard"]
+description = "which record the evidence is attached to.\n"
+[inputs.evidence.fields.owner_id]
+type = "string"
+description = "the owner's id.\n"
+[inputs.evidence.fields.document_id]
+type = "string"
+optional = true
+description = "the source document identifier, one half of the traceability pair.\n"
+[inputs.evidence.fields.source_reference]
+type = "string"
+optional = true
+description = "the source reference, the other half of the traceability pair.\n"
+[inputs.evidence.fields.excerpt]
+type = "string"
+optional = true
+description = "the supporting excerpt; traceability requires it.\n"
+[outputs]
+[outputs.findings]
+type = "record_list"
+description = "one row per finding, in the class's order and with its duplicates.\n"
+[outputs.findings.fields.scope]
+type = "enum"
+values = ["register", "element", "barrier", "standard"]
+description = "which record the finding is about.\n"
+[outputs.findings.fields.subject_id]
+type = "string"
+description = "the record's id; the register's own finding carries the register id.\n"
+[outputs.findings.fields.rule]
+type = "enum"
+values = [
+    "register_id_missing",
+    "register_empty",
+    "element_id_missing",
+    "element_tag_or_name_missing",
+    "element_no_barriers",
+    "element_no_traceable_evidence",
+    "barrier_id_missing",
+    "barrier_name_or_description_missing",
+    "barrier_pfd_out_of_range",
+    "barrier_effectiveness_out_of_range",
+    "barrier_status_unknown",
+    "barrier_no_equipment_tag",
+    "barrier_no_performance_standard",
+    "barrier_no_traceable_evidence",
+    "standard_id_missing",
+    "standard_safety_function_missing",
+    "standard_target_pfd_out_of_range",
+    "standard_required_availability_out_of_range",
+    "standard_proof_test_interval_not_positive",
+    "standard_no_acceptance_criteria",
+    "standard_no_traceable_evidence",
+    "barrier_not_linked_to_element",
+]
+description = "the rule the row violates.\n"
+[outputs.finding_count]
+unit = "dimensionless"
+description = "the number of findings.\n"
+[outputs.valid]
+type = "boolean"
+description = "whether the register has no findings.\n"
+[implementations]
+python = "azoth.process.barrier_register_validation"
+rust = "azoth_process::barrier_register_validation"

@@ -24,6 +24,7 @@ from azoth.core.result import (
     AntiSurgeRecycleResult,
     Api14cSafeChartResult,
     Api537FlareFlameModelResult,
+    BarrierRegisterValidationResult,
     BasketTestRegressionResult,
     BleveResult,
     BlockedOutletReliefResult,
@@ -132,6 +133,7 @@ __all__ = [
     "anti_surge_recycle",
     "api14c_safe_chart",
     "api537_flare_flame_model",
+    "barrier_register_validation",
     "bleve",
     "blowdown_pressure_profile",
     "bow_tie",
@@ -288,6 +290,7 @@ _SEMENOV_SELF_HEATING = "process.semenov_self_heating"
 _SELF_HEATING_INDUCTION = "process.self_heating_induction"
 _BASKET_TEST_REGRESSION = "process.basket_test_regression"
 _API14C_SAFE_CHART = "process.api14c_safe_chart"
+_BARRIER_REGISTER_VALIDATION = "process.barrier_register_validation"
 _HAZOP_TEMPLATE = "process.hazop_template"
 _FMEA_WORKSHEET = "process.fmea_worksheet"
 _HAZOP_CONSEQUENCE_POPULATION = "process.hazop_consequence_population"
@@ -3236,6 +3239,32 @@ def api14c_safe_chart(
         equipment=equipment,
         present_devices=present_devices,
         assume_complete=assume_complete,
+    )
+
+
+def barrier_register_validation(
+    register_id: str,
+    elements: list[dict[str, object]] | None = None,
+    barriers: list[dict[str, object]] | None = None,
+    standards: list[dict[str, object]] | None = None,
+    links: list[dict[str, object]] | None = None,
+    evidence: list[dict[str, object]] | None = None,
+) -> BarrierRegisterValidationResult:
+    """The barrier register's consistency findings.
+
+    **The register, element, barrier and performance-standard rules**, with the class's
+    iteration quirks: a linked barrier is validated once per element, an unlinked barrier
+    gets only the linkage finding, and a shared standard is validated once per barrier.
+
+    See :func:`azoth.process.reference.barrier_register_validation`.
+    """
+    return resolve(_BARRIER_REGISTER_VALIDATION)(  # type: ignore[no-any-return]
+        register_id=register_id,
+        elements=elements,
+        barriers=barriers,
+        standards=standards,
+        links=links,
+        evidence=evidence,
     )
 
 

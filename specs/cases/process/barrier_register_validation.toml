@@ -1,0 +1,73 @@
+model = "process.barrier_register_validation"
+[[cases]]
+id = "br_valid"
+tolerance = 1.0e-12
+source = "A valid register: one element, one barrier, one standard, one link and the two evidence rows that make them traceable. From `validation/neqsim/captures/process_barrier_register_validation.tsv` (`br_valid`)."
+[cases.inputs]
+register_id = "BR-001"
+elements = [
+  { id = "SCE-V-101", tag = "V-101", name = "Protected equipment", element_type = "process_equipment" },
+]
+barriers = [
+  { id = "B-HIPPS-001", name = "Barrier B-HIPPS-001", description = "Prevents the overpressure scenario", barrier_type = "prevention", status = "available", pfd = 0.001, effectiveness = 0.999, performance_standard_id = "PS-HIPPS-001", equipment_tag_count = 1.0 },
+]
+standards = [
+  { id = "PS-HIPPS-001", safety_function = "Isolate the protected equipment", target_pfd = 0.001, required_availability = 0.995, proof_test_interval_hours = 8760.0, acceptance_criteria_count = 1.0 },
+]
+links = [
+  { element_id = "SCE-V-101", barrier_id = "B-HIPPS-001" },
+]
+evidence = [
+  { owner_kind = "standard", owner_id = "PS-HIPPS-001", document_id = "SRS-E-S-PS-HIPPS-001", source_reference = "references/E-S-PS-HIPPS-001.pdf", excerpt = "Evidence excerpt E-S-PS-HIPPS-001." },
+  { owner_kind = "barrier", owner_id = "B-HIPPS-001", document_id = "SRS-E-B-B-HIPPS-001", source_reference = "references/E-B-B-HIPPS-001.pdf", excerpt = "Evidence excerpt E-B-B-HIPPS-001." },
+]
+[cases.expected]
+finding_count = 0.0
+valid = true
+[[cases]]
+id = "br_shared_standard"
+tolerance = 1.0e-12
+source = "Two barriers sharing one standard with no acceptance criterion: the standard's finding appears once per barrier. From (`br_shared_standard`)."
+[cases.inputs]
+register_id = "BR-001"
+elements = [
+  { id = "SCE-022", tag = "V-101", name = "Protected equipment", element_type = "process_equipment" },
+]
+barriers = [
+  { id = "B-SHARED-1", name = "Barrier B-SHARED-1", description = "Prevents the overpressure scenario", barrier_type = "prevention", status = "available", pfd = 0.001, effectiveness = 0.999, performance_standard_id = "PS-SHARED", equipment_tag_count = 1.0 },
+  { id = "B-SHARED-2", name = "Barrier B-SHARED-2", description = "Prevents the overpressure scenario", barrier_type = "prevention", status = "available", pfd = 0.001, effectiveness = 0.999, performance_standard_id = "PS-SHARED", equipment_tag_count = 1.0 },
+]
+standards = [
+  { id = "PS-SHARED", safety_function = "Standard shared by two barriers", target_pfd = 0.001, required_availability = 0.99, proof_test_interval_hours = 8760.0, acceptance_criteria_count = 0.0 },
+]
+links = [
+  { element_id = "SCE-022", barrier_id = "B-SHARED-1" },
+  { element_id = "SCE-022", barrier_id = "B-SHARED-2" },
+]
+evidence = [
+  { owner_kind = "standard", owner_id = "PS-SHARED", document_id = "SRS-E-S-SHARED", excerpt = "Evidence excerpt E-S-SHARED." },
+  { owner_kind = "barrier", owner_id = "B-SHARED-1", document_id = "SRS-E-B-SHARED-1", excerpt = "Evidence excerpt E-B-SHARED-1." },
+  { owner_kind = "barrier", owner_id = "B-SHARED-2", document_id = "SRS-E-B-SHARED-2", excerpt = "Evidence excerpt E-B-SHARED-2." },
+]
+[cases.expected]
+finding_count = 2.0
+valid = false
+findings = [
+  { scope = "standard", subject_id = "PS-SHARED", rule = "standard_no_acceptance_criteria" },
+  { scope = "standard", subject_id = "PS-SHARED", rule = "standard_no_acceptance_criteria" },
+]
+[[cases]]
+id = "br_barrier_not_linked"
+tolerance = 1.0e-12
+source = "A barrier no element contains: the linkage finding alone, its own rules never run. From (`br_barrier_not_linked`)."
+[cases.inputs]
+register_id = "BR-001"
+barriers = [
+  { id = "B-UNLINKED", name = "Barrier B-UNLINKED", description = "Prevents the overpressure scenario", barrier_type = "prevention", status = "available", pfd = 0.001, effectiveness = 0.999, performance_standard_id = "PS-HIPPS-001", equipment_tag_count = 1.0 },
+]
+[cases.expected]
+finding_count = 1.0
+valid = false
+findings = [
+  { scope = "barrier", subject_id = "B-UNLINKED", rule = "barrier_not_linked_to_element" },
+]

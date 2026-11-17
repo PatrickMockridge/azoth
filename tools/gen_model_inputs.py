@@ -485,6 +485,7 @@ NON_UNIT_MODELS = {
     "process.hazop_consequence_population": "the consequence-catalogue fill over rows, not a unit",
     "process.mah_bow_tie_skeleton": "the ISO 17776 MAH catalogue lookup, not a unit",
     "process.api14c_safe_chart": "the API 14C SAFE-chart table over equipment rows, not a unit",
+    "process.barrier_register_validation": "the barrier-register rules over rows, not a unit",
 }
 
 

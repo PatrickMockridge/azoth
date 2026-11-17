@@ -2782,6 +2782,28 @@ def _api14c_safe_chart(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _barrier_register_validation(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.barrier_register_validation`'s layers, from the reference's arithmetic."""
+    from azoth.process.reference.barrier_register_validation import (
+        barrier_register_validation as evaluate,
+    )
+
+    def optional(name: str) -> list[dict[str, object]] | None:
+        value = inputs.get(name)
+        return None if value is None else list(value)
+
+    result = evaluate(
+        str(inputs["register_id"]),
+        optional("elements"),
+        optional("barriers"),
+        optional("standards"),
+        optional("links"),
+        optional("evidence"),
+    )
+    # The findings are rows held by the cases; the count is the one numeric layer.
+    return {"finding_count": result.finding_count}
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3324,6 +3346,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.hazop_consequence_population": _hazop_consequence_population,
     "process.mah_bow_tie_skeleton": _mah_bow_tie_skeleton,
     "process.api14c_safe_chart": _api14c_safe_chart,
+    "process.barrier_register_validation": _barrier_register_validation,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -5310,6 +5333,29 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=12,
         identified_by=("#label", "api14c_chart_empty"),
     ),
+    # The register's three cased states; the twenty-two fault blocks are declared in
+    # `UNCASED_ROWS`.
+    LayerCase(
+        model="process.barrier_register_validation",
+        case="br_valid",
+        capture="process_barrier_register_validation.tsv",
+        block=0,
+        identified_by=("#label", "br_valid"),
+    ),
+    LayerCase(
+        model="process.barrier_register_validation",
+        case="br_barrier_not_linked",
+        capture="process_barrier_register_validation.tsv",
+        block=22,
+        identified_by=("#label", "br_barrier_not_linked"),
+    ),
+    LayerCase(
+        model="process.barrier_register_validation",
+        case="br_shared_standard",
+        capture="process_barrier_register_validation.tsv",
+        block=24,
+        identified_by=("#label", "br_shared_standard"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -7078,6 +7124,8 @@ UNCASED_ROWS: dict[str, int] = {
     # The chart's eleven: the two vocabularies, the eight table rows and the
     # assuming-complete chart.
     "process_api14c_safe_chart.tsv": 11,
+    # The register's twenty-two: the rule-per-register blocks and the linked-twice state.
+    "process_barrier_register_validation.tsv": 22,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

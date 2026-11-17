@@ -240,6 +240,7 @@
   - [Anti-surge recycle calculator](./process/anti_surge_recycle.md)
   - [API 14C SAFE chart](./process/api14c_safe_chart.md)
   - [API 537 flare flame model](./process/api537_flare_flame_model.md)
+  - [Barrier register validation](./process/barrier_register_validation.md)
   - [Basket-test regression](./process/basket_test_regression.md)
   - [BLEVE fireball radiation](./process/bleve.md)
   - [Blocked outlet relief](./process/blocked_outlet_relief.md)

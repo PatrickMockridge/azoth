@@ -22,11 +22,11 @@ use crate::record_outputs_gen::{
     PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIncrementalZoneRow,
     PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
     PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyNaceIssueRow, PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
-    PyWaterMixingResult, PyZoneRatingRow,
+    PyNaceIssueRow, PyPipeFireRupturePoint, PyRegisterFinding, PyReliefDisposalRow,
+    PyRemediationOptionRow, PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice,
+    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
+    PySelfHeatingTimePoint, PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySubFraction,
+    PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -14327,6 +14327,56 @@ impl From<&azoth_process::models::api537_flare_flame_model::Api537FlareFlameMode
                 magnitude_si: r.equivalent_flame_temperature.value,
                 unit: "K".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.barrier_register_validation`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BarrierRegisterValidationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBarrierRegisterValidationResult {
+    /// one row per finding, in the class's order and with its duplicates.
+    #[pyo3(get)]
+    pub findings: Vec<PyRegisterFinding>,
+    /// the number of findings.
+    #[pyo3(get)]
+    pub finding_count: f64,
+    /// whether the register has no findings.
+    #[pyo3(get)]
+    pub valid: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBarrierRegisterValidationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BarrierRegisterValidationResult(findings={:?}, finding_count={:?}, valid={:?}, {} warning(s))",
+            self.findings,
+            self.finding_count,
+            self.valid,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::barrier_register_validation::BarrierRegisterValidationResult>
+    for PyBarrierRegisterValidationResult
+{
+    fn from(
+        r: &azoth_process::models::barrier_register_validation::BarrierRegisterValidationResult,
+    ) -> Self {
+        Self {
+            findings: r.findings.iter().map(PyRegisterFinding::from).collect(),
+            finding_count: r.finding_count,
+            valid: r.valid,
             warnings: transport(&r.warnings),
         }
     }

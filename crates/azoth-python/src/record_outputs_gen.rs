@@ -2114,6 +2114,48 @@ impl From<&azoth_process::models::pipe_fire_rupture::PipeFireRupturePoint>
     }
 }
 
+/// one row per finding, in the class's order and with its duplicates.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RegisterFinding"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRegisterFinding {
+    /// which record the finding is about.
+    #[pyo3(get)]
+    pub scope: String,
+    /// the record's id; the register's own finding carries the register id.
+    #[pyo3(get)]
+    pub subject_id: String,
+    /// the rule the row violates.
+    #[pyo3(get)]
+    pub rule: String,
+}
+
+#[pymethods]
+impl PyRegisterFinding {
+    fn __repr__(&self) -> String {
+        format!(
+            "RegisterFinding(scope={}, subject_id={}, rule={})",
+            self.scope, self.subject_id, self.rule
+        )
+    }
+}
+
+impl From<&azoth_process::models::barrier_register_validation::RegisterFinding>
+    for PyRegisterFinding
+{
+    fn from(row: &azoth_process::models::barrier_register_validation::RegisterFinding) -> Self {
+        Self {
+            scope: row.scope.as_str().to_string(),
+            subject_id: row.subject_id.clone(),
+            rule: row.rule.as_str().to_string(),
+        }
+    }
+}
+
 /// one row per input row, in caller order.
 #[pyclass(
     frozen,

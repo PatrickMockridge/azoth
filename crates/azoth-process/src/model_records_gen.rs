@@ -16,6 +16,7 @@ use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeni
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::api14c_safe_chart::Api14cSafeChartResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
+use crate::models::barrier_register_validation::BarrierRegisterValidationResult;
 use crate::models::basket_test_regression::BasketTestRegressionResult;
 use crate::models::bleve::BleveResult;
 use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
@@ -214,6 +215,15 @@ impl CalcResult for Api537FlareFlameModelResult {
         "equivalent_flame_temperature",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for BarrierRegisterValidationResult {
+    const CALC_ID: &'static str = "process.barrier_register_validation";
+    const FIELDS: &'static [&'static str] = &["findings", "finding_count", "valid", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

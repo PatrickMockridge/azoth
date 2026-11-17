@@ -2501,6 +2501,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 6,
         "tests_skipped": 0,
     },
+    'process.barrier_register_validation': {
+        "calc_id": 'process.barrier_register_validation',
+        "name": 'Barrier register validation',
+        "spec": {'path': 'specs/models/process/barrier_register_validation.toml', 'sha256': 'dccd31f9b96d764bd4c4ade5d5d0acc17830f0df3fe34cb167244a88125493b2'},
+        "code": [{'path': 'python/src/azoth/process/reference/barrier_register_validation.py', 'sha256': '41a340846d65714db5ffabb608a97fe695f87f95b1a3f6d2331683db78abac20'}, {'path': 'crates/azoth-process/src/models/barrier_register_validation.rs', 'sha256': '14b36f2c131d7bed4e0ea42e99aca98a94cd74f203682ef9f04a3866c0bff749'}],
+        "source": 'NeqSim process/safety/barrier/BarrierRegister.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 3,
+        "tests_skipped": 0,
+    },
     'process.basket_test_regression': {
         "calc_id": 'process.basket_test_regression',
         "name": 'Basket-test regression',

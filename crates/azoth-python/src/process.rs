@@ -860,6 +860,92 @@ pub fn api14c_safe_chart(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// `process.barrier_register_validation` - the barrier register's rule review.
+///
+/// The register, element, barrier and standard rules, with the class's iteration quirks.
+#[pyfunction]
+#[pyo3(signature = (register_id, elements = None, barriers = None, standards = None, links = None, evidence = None))]
+#[pyo3(
+    text_signature = "(register_id, elements=None, barriers=None, standards=None, links=None, evidence=None)"
+)]
+pub fn barrier_register_validation(
+    py: Python<'_>,
+    register_id: &str,
+    elements: Option<Vec<crate::records_gen::BarrierElement>>,
+    barriers: Option<Vec<crate::records_gen::BarrierRow>>,
+    standards: Option<Vec<crate::records_gen::PerformanceStandardRow>>,
+    links: Option<Vec<crate::records_gen::ElementBarrierLink>>,
+    evidence: Option<Vec<crate::records_gen::RegisterEvidence>>,
+) -> PyResult<crate::transport_gen::PyBarrierRegisterValidationResult> {
+    use azoth_process::models::barrier_register_validation as brv;
+    let elements = elements.map(|rows| {
+        rows.into_iter()
+            .map(|row| brv::BarrierElement {
+                id: row.id,
+                tag: row.tag,
+                name: row.name,
+                element_type: row.element_type,
+            })
+            .collect::<Vec<_>>()
+    });
+    let barriers = barriers.map(|rows| {
+        rows.into_iter()
+            .map(|row| brv::BarrierRow {
+                id: row.id,
+                name: row.name,
+                description: row.description,
+                barrier_type: row.barrier_type,
+                status: row.status,
+                pfd: row.pfd,
+                effectiveness: row.effectiveness,
+                performance_standard_id: row.performance_standard_id,
+                equipment_tag_count: row.equipment_tag_count,
+            })
+            .collect::<Vec<_>>()
+    });
+    let standards = standards.map(|rows| {
+        rows.into_iter()
+            .map(|row| brv::PerformanceStandardRow {
+                id: row.id,
+                safety_function: row.safety_function,
+                target_pfd: row.target_pfd,
+                required_availability: row.required_availability,
+                proof_test_interval_hours: row.proof_test_interval_hours,
+                acceptance_criteria_count: row.acceptance_criteria_count,
+            })
+            .collect::<Vec<_>>()
+    });
+    let links = links.map(|rows| {
+        rows.into_iter()
+            .map(|row| brv::ElementBarrierLink {
+                element_id: row.element_id,
+                barrier_id: row.barrier_id,
+            })
+            .collect::<Vec<_>>()
+    });
+    let evidence = evidence.map(|rows| {
+        rows.into_iter()
+            .map(|row| brv::RegisterEvidence {
+                owner_kind: row.owner_kind,
+                owner_id: row.owner_id,
+                document_id: row.document_id,
+                source_reference: row.source_reference,
+                excerpt: row.excerpt,
+            })
+            .collect::<Vec<_>>()
+    });
+    brv::barrier_register_validation(
+        register_id,
+        elements.as_deref(),
+        barriers.as_deref(),
+        standards.as_deref(),
+        links.as_deref(),
+        evidence.as_deref(),
+    )
+    .map(|r| crate::transport_gen::PyBarrierRegisterValidationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// `process.absorption_column` - the tray absorber as a registered id.
 ///
 /// **The column's own profile shape with the class's own product names**, and two inlets where

@@ -245,6 +245,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyAntiSurgeRecycleResult>()?;
     m.add_class::<crate::transport_gen::PyApi14cSafeChartResult>()?;
     m.add_class::<crate::transport_gen::PyApi537FlareFlameModelResult>()?;
+    m.add_class::<crate::transport_gen::PyBarrierRegisterValidationResult>()?;
     m.add_class::<crate::transport_gen::PyBasketTestRegressionResult>()?;
     m.add_class::<crate::transport_gen::PyBleveResult>()?;
     m.add_class::<crate::transport_gen::PyBlockedOutletReliefResult>()?;
@@ -381,6 +382,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyMinimalCutSet>()?;
     m.add_class::<crate::record_outputs_gen::PyNaceIssueRow>()?;
     m.add_class::<crate::record_outputs_gen::PyPipeFireRupturePoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyRegisterFinding>()?;
     m.add_class::<crate::record_outputs_gen::PyReliefDisposalRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRiskAssessmentRow>()?;
@@ -946,6 +948,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::process::api14c_safe_chart, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::api537_flare_flame_model,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::process::barrier_register_validation,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(

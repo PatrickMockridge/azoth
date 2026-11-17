@@ -29,6 +29,7 @@ from azoth.core.result import (
     ArgonSolidPhaseResult,
     AssayMassFractionsResult,
     BariteCelestiteSolidSolutionResult,
+    BarrierRegisterValidationResult,
     BasketTestRegressionResult,
     BeggsBrillRegime,
     BeggsBrillSegmentResult,
@@ -278,6 +279,7 @@ from azoth.core.result import (
     ReactivePhFlashResult,
     ReactiveTpFlashResult,
     ReferencePotentialsResult,
+    RegisterFinding,
     ReliefDisposalNetworkResult,
     ReliefDisposalRow,
     ReliefPhase,
@@ -461,6 +463,7 @@ __all__ = [
     "argon_solid_phase",
     "assay_mass_fractions",
     "barite_celestite_solid_solution",
+    "barrier_register_validation",
     "basket_test_regression",
     "beggs_brill_segment",
     "bleve",
@@ -5776,6 +5779,25 @@ def api537_flare_flame_model(mass_flow: Q, heat_of_combustion: float, radiative_
         sound_power_level=result.sound_power_level,
         sound_pressure_level=result.sound_pressure_level,
         equivalent_flame_temperature=from_si(result.equivalent_flame_temperature.magnitude_si, result.equivalent_flame_temperature.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def barrier_register_validation(register_id: str, elements: list[dict[str, object]] | None=None, barriers: list[dict[str, object]] | None=None, standards: list[dict[str, object]] | None=None, links: list[dict[str, object]] | None=None, evidence: list[dict[str, object]] | None=None) -> BarrierRegisterValidationResult:
+    """``process.barrier_register_validation``, computed in Rust."""
+    spec = _models_gen.model("process.barrier_register_validation")
+    result = _core.barrier_register_validation(
+        register_id,
+        None if elements is None else input_records_to_si(spec, "elements", elements),
+        None if barriers is None else input_records_to_si(spec, "barriers", barriers),
+        None if standards is None else input_records_to_si(spec, "standards", standards),
+        None if links is None else input_records_to_si(spec, "links", links),
+        None if evidence is None else input_records_to_si(spec, "evidence", evidence),
+    )
+    return BarrierRegisterValidationResult(
+        findings=tuple(RegisterFinding(scope=c.scope, subject_id=c.subject_id, rule=c.rule) for c in result.findings),
+        finding_count=result.finding_count,
+        valid=result.valid,
         warnings=_warnings(result.warnings),
     )
 

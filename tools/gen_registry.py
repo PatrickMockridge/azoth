@@ -414,6 +414,10 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `crates/azoth-process/tests/api14c_safe_chart.rs` asserts it against the capture,
         # and `test_cross_impl` compares it on both results.
         "complete",
+        # `barrier_register_validation`'s verdict, a boolean with no slot in `TestCase`.
+        # `crates/azoth-process/tests/barrier_register_validation.rs` asserts it against
+        # the capture, and `test_cross_impl` compares it on both results.
+        "valid",
     }
 )
 

@@ -774,6 +774,20 @@ class PipeFireRupturePoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class RegisterFinding:
+    """one row per finding, in the class's order and with its duplicates."""
+
+    #: which record the finding is about.
+    scope: str
+
+    #: the record's id; the register's own finding carries the register id.
+    subject_id: str
+
+    #: the rule the row violates.
+    rule: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ReliefDisposalRow:
     """one row per input row, in caller order."""
 

@@ -421,6 +421,52 @@ class FlareTargetFlux(TypedDict):
 
     flux: float
 
+class BarrierElement(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    tag: str | None
+    name: str | None
+    element_type: str
+
+class BarrierRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    name: str | None
+    description: str | None
+    barrier_type: str
+    status: str
+    pfd: float | None
+    effectiveness: float | None
+    performance_standard_id: str | None
+    equipment_tag_count: float
+
+class PerformanceStandardRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    safety_function: str | None
+    target_pfd: float | None
+    required_availability: float | None
+    proof_test_interval_hours: float | None
+    acceptance_criteria_count: float
+
+class ElementBarrierLink(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    element_id: str
+    barrier_id: str
+
+class RegisterEvidence(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    owner_kind: str
+    owner_id: str
+    document_id: str | None
+    source_reference: str | None
+    excerpt: str | None
+
 class BasketTestPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -931,6 +977,14 @@ class SterileRadius:
 
     flux: Qty
     radius: Qty
+
+@final
+class RegisterFinding:
+    """one row per finding, in the class's order and with its duplicates."""
+
+    scope: str
+    subject_id: str
+    rule: str
 
 @final
 class ConsequenceOutcomeResult:
@@ -3238,6 +3292,13 @@ class Api537FlareFlameModelResult:
     sound_power_level: float
     sound_pressure_level: float
     equivalent_flame_temperature: Qty
+    warnings: list[Warning]
+
+@final
+class BarrierRegisterValidationResult:
+    findings: list[RegisterFinding]
+    finding_count: float
+    valid: bool
     warnings: list[Warning]
 
 @final
@@ -7193,6 +7254,14 @@ def api537_flare_flame_model(
     transmissivity: float | None = None,
     acoustic_efficiency: float | None = None,
 ) -> Api537FlareFlameModelResult: ...
+def barrier_register_validation(
+    register_id: str,
+    elements: list[BarrierElement] | None = None,
+    barriers: list[BarrierRow] | None = None,
+    standards: list[PerformanceStandardRow] | None = None,
+    links: list[ElementBarrierLink] | None = None,
+    evidence: list[RegisterEvidence] | None = None,
+) -> BarrierRegisterValidationResult: ...
 def basket_test_regression(
     points: list[BasketTestPoint],
     effective_conductivity: float | None = None,
