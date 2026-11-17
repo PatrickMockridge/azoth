@@ -33,6 +33,7 @@ from azoth.core.record_outputs_gen import (
     EventTreeOutcome,
     FlowlineScaleSegment,
     FmeaRankedEntry,
+    HazopPopulationRow,
     HazopTemplateDeviation,
     HeaterInstrument,
     HeaterMechanicalType,
@@ -7369,6 +7370,22 @@ class HazardousAreaResult(_HasWarnings):
 
     #: the class's zone label: `Zone 0`, `Zone 1` or `Zone 2`.
     zone_classification: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class HazopConsequencePopulationResult(_HasWarnings):
+    """Result of ``process.hazop_consequence_population``."""
+
+    CALC_ID: ClassVar[str] = "process.hazop_consequence_population"
+
+    #: the populated rows, one per input row and in its order.
+    populated: tuple[HazopPopulationRow, ...]
+
+    #: the number of rows a catalogue mapping was found for, the neutral fallback included.
+    mapped_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

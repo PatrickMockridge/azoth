@@ -52,6 +52,7 @@ from azoth.core.result import (
     GaussianPlumeResult,
     GibbsReactorResult,
     HazardousAreaResult,
+    HazopConsequencePopulationResult,
     HazopTemplateResult,
     HeaterResult,
     HeatExchangerResult,
@@ -285,6 +286,7 @@ _SELF_HEATING_INDUCTION = "process.self_heating_induction"
 _BASKET_TEST_REGRESSION = "process.basket_test_regression"
 _HAZOP_TEMPLATE = "process.hazop_template"
 _FMEA_WORKSHEET = "process.fmea_worksheet"
+_HAZOP_CONSEQUENCE_POPULATION = "process.hazop_consequence_population"
 
 
 def validate(flowsheet: str, palette_dir: str = "specs/unit_ops") -> list[str]:
@@ -3244,6 +3246,24 @@ def fmea_worksheet(
     return resolve(_FMEA_WORKSHEET)(  # type: ignore[no-any-return]
         entries=entries,
         rpn_threshold=rpn_threshold,
+    )
+
+
+def hazop_consequence_population(
+    deviations: list[dict[str, object]],
+    equipment_type: str | None = None,
+) -> HazopConsequencePopulationResult:
+    """The consequence, safeguard and calculator citation that fill a node's TBD cells.
+
+    **Eleven generic mappings and six equipment-specific flow mappings.** A flow deviation
+    with no equipment entry gets the neutral fallback, which requires facilitator
+    confirmation; only null, blank or ``TBD`` cells are filled.
+
+    See :func:`azoth.process.reference.hazop_consequence_population`.
+    """
+    return resolve(_HAZOP_CONSEQUENCE_POPULATION)(  # type: ignore[no-any-return]
+        deviations=deviations,
+        equipment_type=equipment_type,
     )
 
 

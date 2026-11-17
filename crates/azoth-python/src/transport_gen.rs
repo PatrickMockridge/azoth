@@ -17,7 +17,7 @@ use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
     PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEventTreeOutcome,
-    PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopTemplateDeviation,
+    PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
     PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
     PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIncrementalZoneRow,
     PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
@@ -18379,6 +18379,51 @@ impl From<&azoth_process::models::hazardous_area::HazardousAreaResult> for PyHaz
             },
             release_grade: r.release_grade.clone(),
             zone_classification: r.zone_classification.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.hazop_consequence_population`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "HazopConsequencePopulationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyHazopConsequencePopulationResult {
+    /// the populated rows, one per input row and in its order.
+    #[pyo3(get)]
+    pub populated: Vec<PyHazopPopulationRow>,
+    /// the number of rows a catalogue mapping was found for, the neutral fallback included.
+    #[pyo3(get)]
+    pub mapped_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyHazopConsequencePopulationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "HazopConsequencePopulationResult(populated={:?}, mapped_count={:?}, {} warning(s))",
+            self.populated,
+            self.mapped_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::hazop_consequence_population::HazopConsequencePopulationResult>
+    for PyHazopConsequencePopulationResult
+{
+    fn from(
+        r: &azoth_process::models::hazop_consequence_population::HazopConsequencePopulationResult,
+    ) -> Self {
+        Self {
+            populated: r.populated.iter().map(PyHazopPopulationRow::from).collect(),
+            mapped_count: r.mapped_count,
             warnings: transport(&r.warnings),
         }
     }

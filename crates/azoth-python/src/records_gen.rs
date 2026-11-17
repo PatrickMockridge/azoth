@@ -338,6 +338,23 @@ pub struct FmeaEntry {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct HazopDeviationInput {
+    #[pyo3(item)]
+    pub guide_word: String,
+    #[pyo3(item)]
+    pub parameter: String,
+    #[pyo3(item)]
+    pub cause: String,
+    #[pyo3(item)]
+    pub consequence: String,
+    #[pyo3(item)]
+    pub safeguard: String,
+    #[pyo3(item)]
+    pub recommendation: Option<String>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct HazopGridParameter {
     #[pyo3(item)]
     pub parameter: String,

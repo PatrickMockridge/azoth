@@ -6654,6 +6654,40 @@ pub fn hazardous_area(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// HAZOP consequence population.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (deviations, equipment_type))]
+#[pyo3(text_signature = "(deviations, equipment_type)")]
+pub fn hazop_consequence_population(
+    py: Python<'_>,
+    deviations: Vec<crate::records_gen::HazopDeviationInput>,
+    equipment_type: Option<&str>,
+) -> PyResult<crate::transport_gen::PyHazopConsequencePopulationResult> {
+    let deviations_records: Vec<
+        azoth_process::models::hazop_consequence_population::HazopDeviationInput,
+    > = deviations
+        .into_iter()
+        .map(
+            |row| azoth_process::models::hazop_consequence_population::HazopDeviationInput {
+                guide_word: row.guide_word,
+                parameter: row.parameter,
+                cause: row.cause,
+                consequence: row.consequence,
+                safeguard: row.safeguard,
+                recommendation: row.recommendation,
+            },
+        )
+        .collect();
+    azoth_process::models::hazop_consequence_population::hazop_consequence_population(
+        &deviations_records,
+        equipment_type,
+    )
+    .map(|r| crate::transport_gen::PyHazopConsequencePopulationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// HAZOP template.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

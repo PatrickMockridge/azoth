@@ -16655,12 +16655,16 @@ public class ProcessProbe {
     System.out.println();
 
     // A non-flow deviation on equipment without an equipment entry falls back to the generic table.
+    System.out.println("hp_nonflow_fallback");
     printMapping("hp_nonflow_fallback_",
         populator.mappingFor(HAZOPTemplate.GuideWord.LESS, HAZOPTemplate.Parameter.PRESSURE,
             "Compressor"));
+    System.out.println();
     // A manual, equipment-neutral node keeps the generic table.
+    System.out.println("hp_manual_lookup");
     printMapping("hp_manual_lookup_",
         populator.mappingFor(HAZOPTemplate.GuideWord.NO, HAZOPTemplate.Parameter.FLOW, null));
+    System.out.println();
 
     // Populate a manual node: two mapped cells, one with no mapping.
     HAZOPTemplate manual = new HAZOPTemplate("manual", "Facilitator-defined design intent");

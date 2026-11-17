@@ -2722,6 +2722,23 @@ def _fmea_worksheet(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _hazop_consequence_population(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.hazop_consequence_population`'s layers, from the reference's arithmetic."""
+    from azoth.process.reference.hazop_consequence_population import (
+        hazop_consequence_population as evaluate,
+    )
+
+    equipment = inputs.get("equipment_type")
+    result = evaluate(
+        list(inputs["deviations"]),
+        None if equipment is None else str(equipment),
+    )
+    return {
+        "deviation_count": float(len(result.populated)),
+        "mapped_count": result.mapped_count,
+    }
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3261,6 +3278,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.basket_test_regression": _basket_test_regression,
     "process.hazop_template": _hazop_template,
     "process.fmea_worksheet": _fmea_worksheet,
+    "process.hazop_consequence_population": _hazop_consequence_population,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -5207,6 +5225,22 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=1,
         identified_by=("#label", "fw_tie"),
     ),
+    # The population's two cased nodes; the catalogue, the flow sweep, the two lookups, the
+    # separator, valve, stream and preserved nodes and the empty node are uncased.
+    LayerCase(
+        model="process.hazop_consequence_population",
+        case="hp_manual_node",
+        capture="process_hazop_consequence_population.tsv",
+        block=4,
+        identified_by=("#label", "hp_populate_manual"),
+    ),
+    LayerCase(
+        model="process.hazop_consequence_population",
+        case="hp_compressor_node",
+        capture="process_hazop_consequence_population.tsv",
+        block=5,
+        identified_by=("#label", "hp_populate_compressor"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -6967,6 +7001,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The worksheet's six: the inclusive-threshold block, the empty worksheet and the four
     # refusals. The empty list is not a case state.
     "process_fmea_worksheet.tsv": 6,
+    # The population's nine: the whole catalogue, the flow sweep, the two lookups, the
+    # separator, valve, stream and preserved nodes and the empty node.
+    "process_hazop_consequence_population.tsv": 9,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

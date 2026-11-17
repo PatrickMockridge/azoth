@@ -268,6 +268,7 @@
   - [Gaussian plume dispersion](./process/gaussian_plume.md)
   - [Gibbs reactor](./process/gibbs_reactor.md)
   - [Hazardous-area classification](./process/hazardous_area.md)
+  - [HAZOP consequence population](./process/hazop_consequence_population.md)
   - [HAZOP template](./process/hazop_template.md)
   - [Heat exchanger](./process/heat_exchanger.md)
   - [Heater](./process/heater.md)

@@ -64,6 +64,7 @@ pub mod gaussian_plume;
 pub mod gibbs_reactor;
 pub mod hazardous_area;
 pub mod hazid;
+pub mod hazop_consequence_population;
 pub mod hazop_template;
 pub mod heat_exchanger;
 pub mod heater;
@@ -168,6 +169,10 @@ pub use gaussian_plume::{GaussianPlumeResult, gaussian_plume};
 pub use gibbs_reactor::{GibbsReactorResult, gibbs_reactor};
 pub use hazardous_area::{HazardousAreaResult, hazardous_area};
 pub use hazid::{HazopGuideWord, HazopParameter};
+pub use hazop_consequence_population::{
+    HazopConsequencePopulationResult, HazopDeviationInput, HazopPopulationRow,
+    hazop_consequence_population,
+};
 pub use hazop_template::{
     HazopGridParameter, HazopTemplateDeviation, HazopTemplateResult, hazop_template,
 };

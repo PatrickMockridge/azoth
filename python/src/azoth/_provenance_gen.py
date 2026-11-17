@@ -2809,6 +2809,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 6,
         "tests_skipped": 0,
     },
+    'process.hazop_consequence_population': {
+        "calc_id": 'process.hazop_consequence_population',
+        "name": 'HAZOP consequence population',
+        "spec": {'path': 'specs/models/process/hazop_consequence_population.toml', 'sha256': '746dfe80bf93e89eacddb5faeead505973aa3c1dc3eb4702fd7796d6b83e9320'},
+        "code": [{'path': 'python/src/azoth/process/reference/hazop_consequence_population.py', 'sha256': '8046216352700a0737b0008a81d83df4fa58631b0d43c67c82c52a27c95ef78b'}, {'path': 'crates/azoth-process/src/models/hazop_consequence_population.rs', 'sha256': '5fbb1c5662d92782594ef1e5dbb7075a74739694e4ae239a0bfe4434f7ada9e6'}],
+        "source": 'NeqSim process/safety/hazid/HazopConsequenceAutoPopulator.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 2,
+        "tests_skipped": 0,
+    },
     'process.hazop_template': {
         "calc_id": 'process.hazop_template',
         "name": 'HAZOP template',

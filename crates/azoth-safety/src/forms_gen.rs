@@ -2159,6 +2159,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.hazop_consequence_population",
+        name: "HAZOP consequence population",
+        family: "hazid",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.hazop_template",
         name: "HAZOP template",
         family: "hazid",

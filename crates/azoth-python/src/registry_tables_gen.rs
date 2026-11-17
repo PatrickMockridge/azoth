@@ -274,6 +274,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.gaussian_plume" => azoth_process::models::gaussian_plume::GaussianPlumeResult::FIELDS.to_vec(),
         "process.gibbs_reactor" => azoth_process::models::gibbs_reactor::GibbsReactorResult::FIELDS.to_vec(),
         "process.hazardous_area" => azoth_process::models::hazardous_area::HazardousAreaResult::FIELDS.to_vec(),
+        "process.hazop_consequence_population" => azoth_process::models::hazop_consequence_population::HazopConsequencePopulationResult::FIELDS.to_vec(),
         "process.hazop_template" => azoth_process::models::hazop_template::HazopTemplateResult::FIELDS.to_vec(),
         "process.heat_exchanger" => azoth_process::models::heat_exchanger::HeatExchangerResult::FIELDS.to_vec(),
         "process.heater" => azoth_process::models::heater::HeaterResult::FIELDS.to_vec(),

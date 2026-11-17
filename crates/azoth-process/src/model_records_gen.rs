@@ -44,6 +44,7 @@ use crate::models::gas_scrubber::GasScrubberResult;
 use crate::models::gaussian_plume::GaussianPlumeResult;
 use crate::models::gibbs_reactor::GibbsReactorResult;
 use crate::models::hazardous_area::HazardousAreaResult;
+use crate::models::hazop_consequence_population::HazopConsequencePopulationResult;
 use crate::models::hazop_template::HazopTemplateResult;
 use crate::models::heat_exchanger::HeatExchangerResult;
 use crate::models::heater::HeaterResult;
@@ -958,6 +959,15 @@ impl CalcResult for HazardousAreaResult {
         "zone_classification",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for HazopConsequencePopulationResult {
+    const CALC_ID: &'static str = "process.hazop_consequence_population";
+    const FIELDS: &'static [&'static str] = &["populated", "mapped_count", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

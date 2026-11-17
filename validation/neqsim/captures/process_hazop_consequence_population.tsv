@@ -436,6 +436,7 @@ flow_reactor_other_than_consequence=OTHER THAN FLOW on other equipment has topol
 flow_reactor_other_than_calculator=Facilitator review of process topology, inventory and transient response
 flow_reactor_other_than_facilitator=true
 
+hp_nonflow_fallback
 hp_nonflow_fallback_found=true
 hp_nonflow_fallback_guide_word=less
 hp_nonflow_fallback_parameter=pressure
@@ -445,6 +446,8 @@ hp_nonflow_fallback_recommended_calculator=VacuumCollapseAnalyzer
 hp_nonflow_fallback_standard_reference=API 521 / ASME BPVC
 hp_nonflow_fallback_typical_safeguard=Vacuum breaker / vacuum relief valve
 hp_nonflow_fallback_facilitator_confirmation_required=false
+
+hp_manual_lookup
 hp_manual_lookup_found=true
 hp_manual_lookup_guide_word=no
 hp_manual_lookup_parameter=flow
@@ -454,6 +457,7 @@ hp_manual_lookup_recommended_calculator=PumpDeadheadAnalyzer
 hp_manual_lookup_standard_reference=API 610
 hp_manual_lookup_typical_safeguard=Minimum-flow recycle line, low-flow trip
 hp_manual_lookup_facilitator_confirmation_required=false
+
 hp_populate_manual
 equipment_type=null
 deviation_count=3

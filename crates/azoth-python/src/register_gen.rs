@@ -273,6 +273,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyGaussianPlumeResult>()?;
     m.add_class::<crate::transport_gen::PyGibbsReactorResult>()?;
     m.add_class::<crate::transport_gen::PyHazardousAreaResult>()?;
+    m.add_class::<crate::transport_gen::PyHazopConsequencePopulationResult>()?;
     m.add_class::<crate::transport_gen::PyHazopTemplateResult>()?;
     m.add_class::<crate::transport_gen::PyHeatExchangerResult>()?;
     m.add_class::<crate::transport_gen::PyHeaterResult>()?;
@@ -358,6 +359,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
     m.add_class::<crate::record_outputs_gen::PyFlowlineScaleSegment>()?;
     m.add_class::<crate::record_outputs_gen::PyFmeaRankedEntry>()?;
+    m.add_class::<crate::record_outputs_gen::PyHazopPopulationRow>()?;
     m.add_class::<crate::record_outputs_gen::PyHazopTemplateDeviation>()?;
     m.add_class::<crate::record_outputs_gen::PyHeatExchangerMechanicalType>()?;
     m.add_class::<crate::record_outputs_gen::PyHeaterInstrument>()?;
@@ -1000,6 +1002,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gaussian_plume, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gibbs_reactor, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::hazardous_area, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::hazop_consequence_population,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::hazop_template, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::heat_exchanger, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::heater, m)?)?;

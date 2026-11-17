@@ -1,0 +1,38 @@
+model = "process.hazop_consequence_population"
+[[cases]]
+id = "hp_manual_node"
+tolerance = 1.0e-12
+source = "A manual node: a mapped overpressure, a mapped deadhead and a deviation with no entry copied unchanged. From `validation/neqsim/captures/process_hazop_consequence_population.tsv` (`hp_populate_manual`)."
+[cases.inputs]
+deviations = [
+  { guide_word = "more", parameter = "pressure", cause = "TBD", consequence = "TBD", safeguard = "TBD" },
+  { guide_word = "no", parameter = "flow", cause = "TBD", consequence = "TBD", safeguard = "TBD" },
+  { guide_word = "as_well_as", parameter = "level", cause = "TBD", consequence = "TBD", safeguard = "TBD" },
+]
+[cases.expected]
+populated = [
+  { guide_word = "more", parameter = "pressure", cause = "TBD", consequence = "Overpressure of equipment beyond MAWP from blocked outlet, gas blow-by or settle-out", safeguard = "Pressure safety valve (PSV) and/or high-integrity pressure protection system (HIPPS)", recommendation = "Quantify with ReliefValveSizing, SettleOutPressureAnalyzer, GasBlowbyAnalyzer per API 520 / API 521" },
+  { guide_word = "no", parameter = "flow", cause = "TBD", consequence = "Pump deadhead — blocked discharge causing temperature rise and shutoff overpressure", safeguard = "Minimum-flow recycle line, low-flow trip", recommendation = "Quantify with PumpDeadheadAnalyzer per API 610" },
+  { guide_word = "as_well_as", parameter = "level", cause = "TBD", consequence = "TBD", safeguard = "TBD" },
+]
+mapped_count = 2.0
+[[cases]]
+id = "hp_compressor_node"
+tolerance = 1.0e-12
+source = "A compressor: two equipment-specific entries, the neutral MORE FLOW fallback and the generic vacuum entry. From (`hp_populate_compressor`)."
+[cases.inputs]
+equipment_type = "Compressor"
+deviations = [
+  { guide_word = "no", parameter = "flow", cause = "TBD", consequence = "TBD", safeguard = "TBD" },
+  { guide_word = "reverse", parameter = "flow", cause = "TBD", consequence = "TBD", safeguard = "TBD" },
+  { guide_word = "more", parameter = "flow", cause = "TBD", consequence = "TBD", safeguard = "TBD" },
+  { guide_word = "less", parameter = "pressure", cause = "TBD", consequence = "TBD", safeguard = "TBD" },
+]
+[cases.expected]
+populated = [
+  { guide_word = "no", parameter = "flow", cause = "TBD", consequence = "Loss of forward flow can drive a running compressor into surge or recycle heating", safeguard = "Anti-surge recycle, low-flow trip and discharge check valve", recommendation = "Quantify with getUtilizationSnapshot (surge constraint) and compressor performance-chart review per API 617" },
+  { guide_word = "reverse", parameter = "flow", cause = "TBD", consequence = "Reverse flow can cause compressor backspin, surge and mechanical damage", safeguard = "Discharge check valve, anti-surge recycle and reverse-rotation protection", recommendation = "Quantify with Compressor performance-chart and transient check-valve review per API 617" },
+  { guide_word = "more", parameter = "flow", cause = "TBD", consequence = "MORE FLOW on compressor equipment has topology-dependent causes and consequences; facilitator confirmation required", safeguard = "Confirm applicable alarms, trips, isolation, relief and operating safeguards in the HAZOP workshop", recommendation = "Facilitator confirmation required: review causes, consequence pathways, safeguards and calculation basis per IEC 61882 / CCPS" },
+  { guide_word = "less", parameter = "pressure", cause = "TBD", consequence = "Vacuum collapse of a vessel from cooling, draining or blocked make-up gas", safeguard = "Vacuum breaker / vacuum relief valve", recommendation = "Quantify with VacuumCollapseAnalyzer per API 521 / ASME BPVC" },
+]
+mapped_count = 4.0

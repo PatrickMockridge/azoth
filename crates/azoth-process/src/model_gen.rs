@@ -34,6 +34,7 @@
 //!   - specs/models/process/gaussian_plume.toml
 //!   - specs/models/process/gibbs_reactor.toml
 //!   - specs/models/process/hazardous_area.toml
+//!   - specs/models/process/hazop_consequence_population.toml
 //!   - specs/models/process/hazop_template.toml
 //!   - specs/models/process/heat_exchanger.toml
 //!   - specs/models/process/heater.toml
@@ -35695,6 +35696,448 @@ pub static HAZARDOUS_AREA_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&HAZARDOUS_AREA_ALGORITHM),
     checks: HAZARDOUS_AREA_CHECKS,
     cases: HAZARDOUS_AREA_CASES,
+};
+
+static HAZOP_CONSEQUENCE_POPULATION_CHECKS: &[SpecCheck] = &[];
+
+static HAZOP_CONSEQUENCE_POPULATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "hp_manual_node",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("mapped_count", 2.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "deviations",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("as_well_as"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("level"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "populated",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "Overpressure of equipment beyond MAWP from blocked outlet, gas blow-by or settle-out",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name(
+                            "Pressure safety valve (PSV) and/or high-integrity pressure protection system (HIPPS)",
+                        ),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name(
+                            "Quantify with ReliefValveSizing, SettleOutPressureAnalyzer, GasBlowbyAnalyzer per API 520 / API 521",
+                        ),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "Pump deadhead — blocked discharge causing temperature rise and shutoff overpressure",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("Minimum-flow recycle line, low-flow trip"),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name("Quantify with PumpDeadheadAnalyzer per API 610"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("as_well_as"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("level"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "hp_compressor_node",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("equipment_type", "Compressor")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("mapped_count", 4.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "deviations",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("reverse"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "populated",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "Loss of forward flow can drive a running compressor into surge or recycle heating",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name(
+                            "Anti-surge recycle, low-flow trip and discharge check valve",
+                        ),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name(
+                            "Quantify with getUtilizationSnapshot (surge constraint) and compressor performance-chart review per API 617",
+                        ),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("reverse"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "Reverse flow can cause compressor backspin, surge and mechanical damage",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name(
+                            "Discharge check valve, anti-surge recycle and reverse-rotation protection",
+                        ),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name(
+                            "Quantify with Compressor performance-chart and transient check-valve review per API 617",
+                        ),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "MORE FLOW on compressor equipment has topology-dependent causes and consequences; facilitator confirmation required",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name(
+                            "Confirm applicable alarms, trips, isolation, relief and operating safeguards in the HAZOP workshop",
+                        ),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name(
+                            "Facilitator confirmation required: review causes, consequence pathways, safeguards and calculation basis per IEC 61882 / CCPS",
+                        ),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "Vacuum collapse of a vessel from cooling, draining or blocked make-up gas",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("Vacuum breaker / vacuum relief valve"),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name(
+                            "Quantify with VacuumCollapseAnalyzer per API 521 / ASME BPVC",
+                        ),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+static HAZOP_CONSEQUENCE_POPULATION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "hazop_consequence_catalogue",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.hazop_consequence_population`.
+pub static HAZOP_CONSEQUENCE_POPULATION_SPEC: ModelSpec = ModelSpec {
+    id: "process.hazop_consequence_population",
+    kind: "procedure",
+    algorithm: Some(&HAZOP_CONSEQUENCE_POPULATION_ALGORITHM),
+    checks: HAZOP_CONSEQUENCE_POPULATION_CHECKS,
+    cases: HAZOP_CONSEQUENCE_POPULATION_CASES,
 };
 
 static HAZOP_TEMPLATE_CHECKS: &[SpecCheck] = &[];
@@ -78204,6 +78647,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &GAUSSIAN_PLUME_SPEC,
     &GIBBS_REACTOR_SPEC,
     &HAZARDOUS_AREA_SPEC,
+    &HAZOP_CONSEQUENCE_POPULATION_SPEC,
     &HAZOP_TEMPLATE_SPEC,
     &HEAT_EXCHANGER_SPEC,
     &HEATER_SPEC,

@@ -520,6 +520,16 @@ class FmeaEntry(TypedDict):
     detection: float
     mitigation: str | None
 
+class HazopDeviationInput(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    guide_word: str
+    parameter: str
+    cause: str
+    consequence: str
+    safeguard: str
+    recommendation: str | None
+
 class HazopGridParameter(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -928,6 +938,17 @@ class FmeaRankedEntry:
     detection: float
     rpn: float
     mitigation: str | None
+
+@final
+class HazopPopulationRow:
+    """the populated rows, one per input row and in its order."""
+
+    guide_word: str
+    parameter: str
+    cause: str
+    consequence: str
+    safeguard: str
+    recommendation: str | None
 
 @final
 class HazopTemplateDeviation:
@@ -3724,6 +3745,12 @@ class HazardousAreaResult:
     hazardous_distance: Qty
     release_grade: str
     zone_classification: str
+    warnings: list[Warning]
+
+@final
+class HazopConsequencePopulationResult:
+    populated: list[HazopPopulationRow]
+    mapped_count: float
     warnings: list[Warning]
 
 @final
@@ -7518,6 +7545,10 @@ def hazardous_area(
     safety_factor: float | None = None,
     release_grade: str | None = None,
 ) -> HazardousAreaResult: ...
+def hazop_consequence_population(
+    deviations: list[HazopDeviationInput],
+    equipment_type: str | None = None,
+) -> HazopConsequencePopulationResult: ...
 def hazop_template(
     grid_parameters: list[HazopGridParameter],
     equipment_type: str | None = None,

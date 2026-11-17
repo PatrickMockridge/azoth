@@ -138,6 +138,8 @@ from azoth.core.result import (
     HaalandResult,
     HaydukMinhasDiffusivityResult,
     HazardousAreaResult,
+    HazopConsequencePopulationResult,
+    HazopPopulationRow,
     HazopTemplateDeviation,
     HazopTemplateResult,
     HeaterInstrument,
@@ -545,6 +547,7 @@ __all__ = [
     "gt_surface_tension_simple",
     "hayduk_minhas_diffusivity",
     "hazardous_area",
+    "hazop_consequence_population",
     "hazop_template",
     "heat_exchanger",
     "heat_of_vaporization",
@@ -6868,6 +6871,20 @@ def hazardous_area(mass_flow: Q, exit_density: Q, exit_velocity: Q, lfl_volume_f
         hazardous_distance=from_si(result.hazardous_distance.magnitude_si, result.hazardous_distance.unit),
         release_grade=result.release_grade,
         zone_classification=result.zone_classification,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def hazop_consequence_population(deviations: list[dict[str, object]], equipment_type: str | None=None) -> HazopConsequencePopulationResult:
+    """``process.hazop_consequence_population``, computed in Rust."""
+    spec = _models_gen.model("process.hazop_consequence_population")
+    result = _core.hazop_consequence_population(
+        input_records_to_si(spec, "deviations", deviations),
+        equipment_type,
+    )
+    return HazopConsequencePopulationResult(
+        populated=tuple(HazopPopulationRow(guide_word=c.guide_word, parameter=c.parameter, cause=c.cause, consequence=c.consequence, safeguard=c.safeguard, recommendation=c.recommendation) for c in result.populated),
+        mapped_count=result.mapped_count,
         warnings=_warnings(result.warnings),
     )
 

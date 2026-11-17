@@ -687,6 +687,65 @@ impl From<&azoth_process::models::fmea_worksheet::FmeaRankedEntry> for PyFmeaRan
     }
 }
 
+/// the populated rows, one per input row and in its order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "HazopPopulationRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyHazopPopulationRow {
+    /// the guide word.
+    #[pyo3(get)]
+    pub guide_word: String,
+    /// the process parameter.
+    #[pyo3(get)]
+    pub parameter: String,
+    /// the hypothesised cause, echoed.
+    #[pyo3(get)]
+    pub cause: String,
+    /// the consequence, mapped when the source cell was a placeholder.
+    #[pyo3(get)]
+    pub consequence: String,
+    /// the safeguard, mapped when the source cell was a placeholder.
+    #[pyo3(get)]
+    pub safeguard: String,
+    /// the recommendation, cited when the source cell was a placeholder; absent only when the row has no mapping and stated none.
+    #[pyo3(get)]
+    pub recommendation: Option<String>,
+}
+
+#[pymethods]
+impl PyHazopPopulationRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "HazopPopulationRow(guide_word={}, parameter={}, cause={}, consequence={}, safeguard={}, recommendation={:?})",
+            self.guide_word,
+            self.parameter,
+            self.cause,
+            self.consequence,
+            self.safeguard,
+            self.recommendation
+        )
+    }
+}
+
+impl From<&azoth_process::models::hazop_consequence_population::HazopPopulationRow>
+    for PyHazopPopulationRow
+{
+    fn from(row: &azoth_process::models::hazop_consequence_population::HazopPopulationRow) -> Self {
+        Self {
+            guide_word: row.guide_word.as_str().to_string(),
+            parameter: row.parameter.as_str().to_string(),
+            cause: row.cause.clone(),
+            consequence: row.consequence.clone(),
+            safeguard: row.safeguard.clone(),
+            recommendation: row.recommendation.clone(),
+        }
+    }
+}
+
 /// the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order.
 #[pyclass(
     frozen,

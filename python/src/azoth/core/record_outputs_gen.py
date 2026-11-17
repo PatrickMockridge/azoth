@@ -260,6 +260,29 @@ class FmeaRankedEntry:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class HazopPopulationRow:
+    """the populated rows, one per input row and in its order."""
+
+    #: the guide word.
+    guide_word: str
+
+    #: the process parameter.
+    parameter: str
+
+    #: the hypothesised cause, echoed.
+    cause: str
+
+    #: the consequence, mapped when the source cell was a placeholder.
+    consequence: str
+
+    #: the safeguard, mapped when the source cell was a placeholder.
+    safeguard: str
+
+    #: the recommendation, cited when the source cell was a placeholder; absent only when the row has no mapping and stated none.
+    recommendation: str | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class HazopTemplateDeviation:
     """the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order."""
 

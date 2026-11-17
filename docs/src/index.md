@@ -360,6 +360,7 @@ Five sections, and the difference between them is the point:
 - [`process.gaussian_plume`](./process/gaussian_plume.md) — Gaussian plume dispersion
 - [`process.gibbs_reactor`](./process/gibbs_reactor.md) — Gibbs reactor
 - [`process.hazardous_area`](./process/hazardous_area.md) — Hazardous-area classification
+- [`process.hazop_consequence_population`](./process/hazop_consequence_population.md) — HAZOP consequence population
 - [`process.hazop_template`](./process/hazop_template.md) — HAZOP template
 - [`process.heat_exchanger`](./process/heat_exchanger.md) — Heat exchanger
 - [`process.heater`](./process/heater.md) — Heater
