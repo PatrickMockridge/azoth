@@ -129,7 +129,6 @@ impl SelfHeatingGeometry {
     pub(crate) fn one_dimensional(self) -> bool {
         matches!(self, Self::Slab | Self::InfiniteCylinder | Self::Sphere)
     }
-
 }
 
 /// The screening verdict.
