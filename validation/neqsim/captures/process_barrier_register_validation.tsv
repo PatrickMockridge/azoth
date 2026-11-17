@@ -1,0 +1,106 @@
+br_valid
+finding_count=0
+
+br_register_id_missing
+finding_count=1
+finding0=Barrier register id is missing.
+
+br_register_empty
+finding_count=1
+finding0=Barrier register contains no SCEs or barriers.
+
+br_element_id_missing
+finding_count=1
+finding0=SCE : SCE id is missing.
+
+br_element_tag_or_name_missing
+finding_count=1
+finding0=SCE SCE-002: SCE tag or name is missing.
+
+br_element_no_barriers
+finding_count=2
+finding0=SCE SCE-003: SCE has no linked barriers.
+finding1=SCE SCE-003: SCE has no traceable evidence.
+
+br_element_no_traceable_evidence
+finding_count=3
+finding0=SCE SCE-004: SCE has no traceable evidence.
+finding1=SCE SCE-004: Barrier B-004: No performance standard is linked.
+finding2=SCE SCE-004: Barrier B-004: No traceable document evidence is linked.
+
+br_barrier_id_missing
+finding_count=1
+finding0=SCE SCE-005: Barrier : Barrier id is missing.
+
+br_barrier_name_or_description_missing
+finding_count=1
+finding0=SCE SCE-006: Barrier B-005: Barrier name or description is missing.
+
+br_barrier_pfd_out_of_range
+finding_count=1
+finding0=SCE SCE-007: Barrier B-006: Barrier PFD must be in the range 0 to 1.
+
+br_barrier_effectiveness_out_of_range
+finding_count=1
+finding0=SCE SCE-008: Barrier B-007: Barrier effectiveness must be in the range 0 to 1.
+
+br_barrier_status_unknown
+finding_count=1
+finding0=SCE SCE-009: Barrier B-008: Barrier status is unknown.
+
+br_barrier_no_equipment_tag
+finding_count=1
+finding0=SCE SCE-010: Barrier B-009: No linked equipment tag is registered.
+
+br_barrier_no_performance_standard
+finding_count=1
+finding0=SCE SCE-011: Barrier B-010: No performance standard is linked.
+
+br_barrier_no_traceable_evidence
+finding_count=3
+finding0=SCE SCE-012: SCE has no traceable evidence.
+finding1=SCE SCE-012: Barrier B-011: Performance standard PS-BARE: No traceable document evidence is linked.
+finding2=SCE SCE-012: Barrier B-011: No traceable document evidence is linked.
+
+br_standard_id_missing
+finding_count=1
+finding0=SCE SCE-013: Barrier B-012: Performance standard : Performance standard id is missing.
+
+br_standard_safety_function_missing
+finding_count=1
+finding0=SCE SCE-014: Barrier B-013: Performance standard PS-NOFUNC: Safety function description is missing.
+
+br_standard_target_pfd_out_of_range
+finding_count=1
+finding0=SCE SCE-015: Barrier B-014: Performance standard PS-ZEROPFD: Target PFD must be in the range 0 to 1.
+
+br_standard_required_availability_out_of_range
+finding_count=1
+finding0=SCE SCE-016: Barrier B-015: Performance standard PS-AVAIL: Required availability must be in the range 0 to 1.
+
+br_standard_proof_test_interval_not_positive
+finding_count=1
+finding0=SCE SCE-017: Barrier B-016: Performance standard PS-PROOF: Proof-test interval must be positive.
+
+br_standard_no_acceptance_criteria
+finding_count=1
+finding0=SCE SCE-018: Barrier B-017: Performance standard PS-NOCRIT: At least one acceptance criterion should be defined.
+
+br_standard_no_traceable_evidence
+finding_count=1
+finding0=SCE SCE-019: Barrier B-018: Performance standard PS-NOEVID: No traceable document evidence is linked.
+
+br_barrier_not_linked
+finding_count=1
+finding0=Barrier B-UNLINKED is not linked to an SCE.
+
+br_linked_twice
+finding_count=2
+finding0=SCE SCE-020: Barrier B-TWICE: Barrier status is unknown.
+finding1=SCE SCE-021: Barrier B-TWICE: Barrier status is unknown.
+
+br_shared_standard
+finding_count=2
+finding0=SCE SCE-022: Barrier B-SHARED-1: Performance standard PS-SHARED: At least one acceptance criterion should be defined.
+finding1=SCE SCE-022: Barrier B-SHARED-2: Performance standard PS-SHARED: At least one acceptance criterion should be defined.
+

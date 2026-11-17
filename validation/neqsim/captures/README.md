@@ -2755,3 +2755,70 @@ Each type carries its default threats, consequences and barrier classes with ids
 and a barrier PFD of `0.01`. The counts run from two to five threats, two to four
 consequences and three to eight barriers. The skeleton is the input to `process.bow_tie`;
 it does not compute the risk.
+
+## The safety-review worksheets
+
+`process_api14c_safe_chart.tsv` is `Api14cSafeChartBuilder` over a flowsheet with one unit of
+each classification branch (a Stream, a Separator, a GasScrubber, a Tank, a FiredHeater, a
+PipeBeggsAndBrills, a Compressor, a Pump, a Cooler and a WellFlow), with `V-101` declared
+present `PSH` and `PSV`, the assuming-complete build, and the empty chart.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe api14c_safe_chart \
+  > captures/process_api14c_safe_chart.tsv
+```
+
+The class stores each required set in a **`HashSet`**, so the capture prints membership in
+`Api14cSafetyAnalysisTable.deviceOrder()` - the device enum's declaration order - and never
+the set's iteration order. The classification is a lower-case substring test on the Java
+simple class name in the order scrubber/separator/flashdrum/knockout/(flash and drum), tank,
+heater/furnace/reformer, pipe/flowline/riser, compressor/expander, pump, the heat-exchanger
+words, well, else **skip the row**. The `Stream` is skipped; an undeclared equipment has an
+empty present set; `buildAssumingComplete` ignores declarations.
+
+`process_barrier_register_validation.tsv` is `BarrierRegister.validate` over a valid register
+and one register per rule, plus the linked-twice, shared-standard and unlinked states.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe barrier_register_validation \
+  > captures/process_barrier_register_validation.tsv
+```
+
+The findings are messages, not ids. **A linked barrier is validated once per SCE that
+contains it** (the same invalid barrier appears twice when linked twice); **an unlinked
+barrier gets only the not-linked finding**; and **a standard linked by two barriers is
+validated twice**. Traceability is (`documentId` or `sourceReference`) and `excerpt`;
+a barrier is also traceable through its linked standard, and an SCE through its barriers.
+
+`process_s001_secondary_pressure_protection.tsv` is
+`S001SecondaryPressureProtectionCriteria.evaluate` over the four pressure bands, a complete
+pass, a missing basis, null and false leakage, an explicit target, proof-test intervals of 6,
+13, -6 and 0, and the empty criteria.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe s001_secondary_pressure_protection \
+  > captures/process_s001_secondary_pressure_protection.tsv
+```
+
+The bands are `event > 2 design -> 1e-5`, `> test -> 1e-4`, `> design -> 1e-3`, else `1e-2`.
+**The class's `<= 12` proof-test test passes `-6` and `0`**, so both blocks answer
+`acceptable=true` with a complete basis; the port refuses a non-positive interval and keeps
+both rows as the evidence.
+
+`process_s001_clause10_review.tsv` is `ProcessSafetySystemReviewEngine.evaluate` over the
+class's four-item example, the three fail states, the empty input, an empty item, utility
+false and missing, a gated item, an alias-only item, a duplicate function id, a first-alias
+parse failure and the value-coercion block.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe s001_clause10_review \
+  > captures/process_s001_clause10_review.tsv
+```
+
+**The synthetic `CLAUSE10-COVERAGE` result comes first**, then one result per item; the
+empty input has the coverage result alone and answers `PASS_WITH_WARNINGS`. A boolean key is
+tri-state: absent -> WARNING/HIGH, false -> FAIL/CRITICAL, true -> PASS/LOW. The coercion is
+Java's: `Double.parseDouble` trims, accepts `NaN`, `Infinity` and a trailing `f`/`d` (so
+`1.5f` is `1.5`), and a first-present alias with an unparseable value yields the default
+rather than falling through. The class evaluates two items with the same `functionId`; the
+port refuses them.
