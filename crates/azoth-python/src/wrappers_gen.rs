@@ -7044,6 +7044,31 @@ pub fn manifold(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Minimum design metal temperature.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (material_curve, governing_thickness, stress_ratio, min_operating_temperature))]
+#[pyo3(
+    text_signature = "(material_curve, governing_thickness, stress_ratio, min_operating_temperature)"
+)]
+pub fn mdmt(
+    py: Python<'_>,
+    material_curve: &str,
+    governing_thickness: f64,
+    stress_ratio: Option<f64>,
+    min_operating_temperature: f64,
+) -> PyResult<crate::transport_gen::PyMdmtResult> {
+    azoth_process::models::mdmt::mdmt(
+        material_curve,
+        meters(governing_thickness),
+        stress_ratio,
+        kelvins(min_operating_temperature),
+    )
+    .map(|r| crate::transport_gen::PyMdmtResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Mixer.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

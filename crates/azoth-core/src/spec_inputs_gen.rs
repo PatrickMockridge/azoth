@@ -270,6 +270,7 @@
 //!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
+//!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/overpressure_acceptance.toml
@@ -3969,6 +3970,13 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.map_turbo_expander_compressor",
         "impeller_diameter",
         "length",
+    ),
+    ("process.mdmt", "governing_thickness", "length"),
+    ("process.mdmt", "stress_ratio", "dimensionless"),
+    (
+        "process.mdmt",
+        "min_operating_temperature",
+        "thermodynamic_temperature",
     ),
     ("process.mixer", "feed_n", "molar_flow"),
     ("process.mixer", "feed_z", "dimensionless"),

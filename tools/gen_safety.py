@@ -47,6 +47,7 @@ EXTRA_FAMILIES = {
     "process.gas_blowby": "equipmentsafety",
     "process.pump_deadhead": "equipmentsafety",
     "process.runaway_reaction": "equipmentsafety",
+    "process.mdmt": "equipmentsafety",
 }
 
 #: The ids a scenario can run: every safety model whose inputs and outputs are all scalar,
@@ -64,6 +65,7 @@ NATIVE_SCENARIOS = (
     "process.hazardous_area",
     "process.heavy_gas_dispersion",
     "process.jet_fire",
+    "process.mdmt",
     "process.nog070_sil_determination",
     "process.overpressure_acceptance",
     "process.pfp_demand",
@@ -120,6 +122,7 @@ PURPOSES = {
     "process.psv_sizing": "The API 520 gas, liquid or two-phase relief area and the selected orifice.",
     "process.pump_deadhead": "The shut-off deadhead pressure against the protected rating, and the minimum-flow recirculation temperature rise.",
     "process.runaway_reaction": "The adiabatic temperature rise, MTSR, margin, time to maximum rate and the two-phase relief flag.",
+    "process.mdmt": "The UCS-66 curve's minimum design metal temperature and whether the cold service is acceptable.",
     "process.safety_instrumented_function": "The SIF's RRF, required PFD and SIL, architecture PFDs and spurious-trip availability.",
     "process.toxic_library": "The IDLH, ERPG-2 and AEGL-2 thresholds for a chemical, and a ppm concentration converted to kg/m3.",
     "process.vce": "The TNO multi-energy overpressure and the distance to a target overpressure.",

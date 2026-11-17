@@ -67,6 +67,7 @@ from azoth.core.result import (
     MahBowTieSkeletonResult,
     ManifoldResult,
     MapTurboExpanderResult,
+    MdmtResult,
     MixerResult,
     Nog070SilDeterminationResult,
     OverpressureAcceptanceResult,
@@ -176,6 +177,7 @@ __all__ = [
     "lopa",
     "manifold",
     "map_turbo_expander_compressor",
+    "mdmt",
     "mixer",
     "nog070_sil_determination",
     "overpressure_acceptance",
@@ -254,6 +256,7 @@ _BOW_TIE = "process.bow_tie"
 _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
+_MDMT = "process.mdmt"
 _VCE = "process.vce"
 _FILTER = "process.filter"
 _FIRE_CASE_RELIEF = "process.fire_case_relief"
@@ -1766,6 +1769,28 @@ def expander(
         shaft_power=shaft_power,
         outlet_temperature=outlet_temperature,
         mechanical_design=mechanical_design,
+    )
+
+
+def mdmt(
+    material_curve: str,
+    governing_thickness: Q,
+    stress_ratio: float | None = None,
+    min_operating_temperature: Q | None = None,
+) -> MdmtResult:
+    """The UCS-66 curve's MDMT and the cold-service verdict.
+
+    The thickness is clamped to 6-100 mm. The four curves are analytic approximations of
+    ASME Fig. UCS-66, **not the figure's table**, and the verdict is
+    ``min_operating_temperature >= MDMT``.
+
+    See :func:`azoth.process.reference.mdmt`.
+    """
+    return resolve(_MDMT)(  # type: ignore[no-any-return]
+        material_curve=material_curve,
+        governing_thickness=governing_thickness,
+        stress_ratio=stress_ratio,
+        min_operating_temperature=min_operating_temperature,
     )
 
 

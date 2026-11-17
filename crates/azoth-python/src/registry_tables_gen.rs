@@ -289,6 +289,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.mah_bow_tie_skeleton" => azoth_process::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult::FIELDS.to_vec(),
         "process.manifold" => azoth_process::models::manifold::ManifoldResult::FIELDS.to_vec(),
         "process.map_turbo_expander_compressor" => azoth_process::models::map_turbo_expander_compressor::MapTurboExpanderResult::FIELDS.to_vec(),
+        "process.mdmt" => azoth_process::models::mdmt::MdmtResult::FIELDS.to_vec(),
         "process.mixer" => azoth_process::models::mixer::MixerResult::FIELDS.to_vec(),
         "process.nog070_sil_determination" => azoth_process::models::nog070_sil_determination::Nog070SilDeterminationResult::FIELDS.to_vec(),
         "process.overpressure_acceptance" => azoth_process::models::overpressure_acceptance::OverpressureAcceptanceResult::FIELDS.to_vec(),

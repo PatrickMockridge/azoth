@@ -1630,6 +1630,30 @@ def _fire_monitor_coverage(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _mdmt(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.mdmt`'s layers, from the reference's arithmetic.
+
+    The verdict is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.mdmt import _evaluate
+
+    solution, _ = _evaluate(
+        str(inputs["material_curve"]),
+        quantity(float(inputs["governing_thickness"]), "m"),
+        stress_ratio=(
+            None
+            if inputs.get("stress_ratio") is None
+            else float(inputs["stress_ratio"])
+        ),
+        min_operating_temperature=quantity(
+            float(inputs["min_operating_temperature"]), "K"
+        ),
+    )
+    return {"mdmt_c": solution.mdmt_k - 273.15, "mdmt_k": solution.mdmt_k}
+
+
 def _runaway_reaction(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.runaway_reaction`'s layers, from the reference's arithmetic.
 
@@ -3546,6 +3570,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.gas_blowby": _gas_blowby,
     "process.pump_deadhead": _pump_deadhead,
     "process.runaway_reaction": _runaway_reaction,
+    "process.mdmt": _mdmt,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.fault_tree": _fault_tree,
@@ -4602,6 +4627,16 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_monitor_coverage.tsv",
         block=8,
         identified_by=("#label", "fmc_characteristic_dimension"),
+    ),
+    # MDMT's one: curve B at 25 mm. The seven further cases are the other curves, the
+    # stress-ratio reduction, the clamps and the passing and failing verdicts; the curves C
+    # and D at 25 mm are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.mdmt",
+        case="curve_b_25",
+        capture="process_mdmt.tsv",
+        block=1,
+        identified_by=("#label", "mdmt_curve_b_25"),
     ),
     # Runaway reaction's one: the no-MAT low state. The six further cases are the severity
     # bands, the MAT verdicts, the gassy state and the TMR; the unit aliases are declared in
@@ -7439,6 +7474,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_deluge_nozzle_layout.tsv": 8,
     # The monitor coverage's eleven: the constructor and each setter's refusal.
     "process_fire_monitor_coverage.tsv": 11,
+    # MDMT's two: curves C and D at 25 mm, restatements of the curve family the other cases
+    # already cover. The curve refusal is a hand test.
+    "process_mdmt.tsv": 2,
     # Runaway reaction's one: the unit-string aliases, the no-MAT low state restated. The
     # refusal states are hand tests.
     "process_runaway_reaction.tsv": 1,

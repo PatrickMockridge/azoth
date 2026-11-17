@@ -8142,6 +8142,22 @@ class MapTurboExpanderResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MdmtResult(_HasWarnings):
+    """Result of ``process.mdmt``."""
+
+    CALC_ID: ClassVar[str] = "process.mdmt"
+
+    #: the minimum design metal temperature without impact testing.
+    mdmt: Q
+
+    #: whether the minimum operating temperature is at or above the MDMT.
+    acceptable: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class MixerResult(_HasWarnings):
     """Result of ``process.mixer``."""
 

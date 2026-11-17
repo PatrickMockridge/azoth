@@ -4162,6 +4162,12 @@ class MapTurboExpanderResult:
     warnings: list[Warning]
 
 @final
+class MdmtResult:
+    mdmt: Qty
+    acceptable: bool
+    warnings: list[Warning]
+
+@final
 class MixerResult:
     product_n: Qty
     product_z: list[float]
@@ -7998,6 +8004,12 @@ def map_turbo_expander_compressor(
     chart_conditions: list[float] | None = None,
     impeller_diameter: float | None = None,
 ) -> MapTurboExpanderResult: ...
+def mdmt(
+    material_curve: str,
+    governing_thickness: float,
+    min_operating_temperature: float,
+    stress_ratio: float | None = None,
+) -> MdmtResult: ...
 def mixer(
     components: list[str],
     feed_n: list[float],

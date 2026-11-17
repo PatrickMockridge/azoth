@@ -79,6 +79,7 @@ pub mod lopa;
 pub mod mah_bow_tie_skeleton;
 pub mod manifold;
 pub mod map_turbo_expander_compressor;
+pub mod mdmt;
 pub mod mixer;
 pub mod nog070_sil_determination;
 pub mod overpressure;
@@ -208,6 +209,7 @@ pub use mah_bow_tie_skeleton::{
 };
 pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};
+pub use mdmt::{MdmtResult, mdmt};
 pub use mixer::{MixerResult, mixer};
 pub use nog070_sil_determination::{Nog070SilDeterminationResult, nog070_sil_determination};
 pub use overpressure_acceptance::{OverpressureAcceptanceResult, overpressure_acceptance};

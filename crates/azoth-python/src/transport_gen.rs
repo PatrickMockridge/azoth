@@ -20159,6 +20159,50 @@ impl From<&azoth_process::models::map_turbo_expander_compressor::MapTurboExpande
         }
     }
 }
+/// Result of `process.mdmt`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MdmtResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMdmtResult {
+    /// the minimum design metal temperature without impact testing.
+    #[pyo3(get)]
+    pub mdmt: PyQty,
+    /// whether the minimum operating temperature is at or above the MDMT.
+    #[pyo3(get)]
+    pub acceptable: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyMdmtResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "MdmtResult(mdmt={:?}, acceptable={:?}, {} warning(s))",
+            self.mdmt,
+            self.acceptable,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::mdmt::MdmtResult> for PyMdmtResult {
+    fn from(r: &azoth_process::models::mdmt::MdmtResult) -> Self {
+        Self {
+            mdmt: PyQty {
+                magnitude_si: r.mdmt.value,
+                unit: "K".to_string(),
+            },
+            acceptable: r.acceptable,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.mixer`, transported.
 #[pyclass(
     frozen,

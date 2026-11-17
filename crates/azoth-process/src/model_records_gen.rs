@@ -59,6 +59,7 @@ use crate::models::lopa::LopaResult;
 use crate::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult;
 use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
+use crate::models::mdmt::MdmtResult;
 use crate::models::mixer::MixerResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
 use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
@@ -1320,6 +1321,15 @@ impl CalcResult for MapTurboExpanderResult {
         "operating_status",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for MdmtResult {
+    const CALC_ID: &'static str = "process.mdmt";
+    const FIELDS: &'static [&'static str] = &["mdmt", "acceptable", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
