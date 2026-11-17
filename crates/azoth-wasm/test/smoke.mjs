@@ -159,5 +159,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.log(
-  "wasm smoke: OK (31 palette entries, 16 tools, 98 calculations, 48 safety ids, 22 native, 6 nodes, 43 values)",
+  "wasm smoke: OK (31 palette entries, 16 tools, 98 calculations, 52 safety ids, 22 native, 6 nodes, 43 values)",
 );
