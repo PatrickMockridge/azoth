@@ -2,10 +2,10 @@ id = "process.api14c_safe_chart"
 name = "API 14C SAFE chart"
 kind = "procedure"
 assumptions = [
-    "**the required set per category is API RP 14C / ISO 10418 Appendix A's table**: pressure vessel `PSH PSL LSH LSL PSV SDV`; atmospheric vessel `LSH PSV FSV`; fired vessel `PSH TSH LSL PSV SDV BDV FIRE`; pipeline segment `PSH PSL SDV FSV`; compressor `PSH PSL TSH SDV BDV PSV`; pump `PSH SDV PSV FSV`; heat exchanger `PSH PSV TSH`; wellhead `PSH PSL USV SDV PSV`.",
+    "**the required set per category is API RP 14C / ISO 10418 Appendix A's table**, transcribed in the kernel: pressure vessel `PSH PSL LSH LSL PSV SDV`, atmospheric vessel `LSH PSV FSV`, and so on for the six other categories.",
     "**the class stores each set in a `HashSet`**, so it fixes no order. The rows are published in the device enum's declaration order, the class's own `deviceOrder()`.",
-    "**the category is a lower-case substring test on the unit's Java simple class name, first match wins**: scrubber, separator, flashdrum, knockout, or both flash and drum; tank; heater, furnace or reformer; pipe, flowline or riser; compressor or expander; pump; heatexchanger, cooler, condenser, reboiler or aircooler; well; else the row is skipped. `&&` binds before `||`, so `Flash` alone and `Drum` alone do not classify.",
-    "**an undeclared equipment has an empty present set**, so every required device is missing; extra declared devices are counted in the present set and are not required rows. `missing = required - present`.",
+    "**the category is a lower-case substring test on the unit's simple class name, first match wins**: scrubber, separator, flashdrum, knockout or flash-and-drum; tank; heater, furnace or reformer; pipe, flowline or riser; compressor or expander; pump; the heat-exchanger words; well; else skipped.",
+    "**an undeclared equipment has an empty present set**, so every required device is missing; extra declared devices count in the present set and are not required rows. `missing = required - present`.",
     "**`assume_complete` sets present equal to required and ignores the declarations**, the class's `buildAssumingComplete`.",
     "**`build(ProcessSystem)` is caller state**: it reads only each unit's name and class simple name, so the id takes `(equipment, unit_class)` rows. The markdown and JSON exports and the gap sentences are presentation.",
 ]

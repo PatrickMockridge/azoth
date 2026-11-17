@@ -802,9 +802,9 @@ def s001_clause10_review(
     warnings: list[Warning] = []
     apply_checks(checks_for(spec).on_input, lambda _: None, warnings)
 
-    item_rows = input_records_to_si(spec, "items", items or [])
-    evidence_rows = input_records_to_si(spec, "evidence", evidence or [])
-    reference_rows = input_records_to_si(spec, "references", references or [])
+    item_rows: list[dict[str, Any]] = input_records_to_si(spec, "items", items or [])
+    evidence_rows: list[dict[str, Any]] = input_records_to_si(spec, "evidence", evidence or [])
+    reference_rows: list[dict[str, Any]] = input_records_to_si(spec, "references", references or [])
 
     reviewed: list[_Item] = []
     for row in item_rows:

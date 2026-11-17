@@ -703,9 +703,8 @@ tags = ["safety"]
 name = "azoth-safety-function-coverage-screening"
 version = "0.1.0"
 description = "Educational process safety-function coverage screening using the public API RP 14C / ISO 10418 SAFE-chart concept. USE WHEN: a task needs a public, screening-level check of whether a process component has the typically required protective functions (PSH, PSL, PSV, LSH, LSL, etc.) before a formal SAFE-chart and safety analysis review."
-calculation_basis = "screening"
+calculation_basis = "azoth"
 path = "skills/safety/safety-function-coverage-screening/SKILL.md"
-tranche = "safety"
 tags = ["safety"]
 
 [[skill]]

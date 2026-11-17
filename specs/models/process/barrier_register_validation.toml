@@ -2,8 +2,8 @@ id = "process.barrier_register_validation"
 name = "Barrier register validation"
 kind = "procedure"
 assumptions = [
-    "**the findings are in the class's order**: the register id, the register-empty test, each safety-critical element's own rules and its embedded barriers' rules, and finally one not-linked finding per register barrier that no element contains.",
-    "**a linked barrier is validated once per element that contains it**, so the same barrier's rules appear twice when two elements link it; **an unlinked barrier gets only the not-linked finding**, never its own rules; and **a standard linked by two barriers is validated twice**, once through each barrier.",
+    "**the findings are in the class's order**: the register id and empty test, each element's own rules and its embedded barriers, and one not-linked finding per register barrier no element contains.",
+    "**a linked barrier is validated once per element that contains it**, so its rules appear twice when two elements link it; an unlinked barrier gets only the not-linked finding; a standard linked by two barriers is validated twice.",
     "**a standard is validated only through a barrier that links it**: a standard no barrier names is never read, and a barrier naming no standard row answers the class's null standard rather than a validation.",
     "**traceability is (`document_id` or `source_reference`) and `excerpt`**, trimmed and non-empty. A barrier is also traceable through its linked standard's evidence, and an element through any embedded barrier's.",
     "**ids and text are trimmed and an empty trimmed name is absent.** A register, element, barrier or standard id is a map key, so a duplicate row replaces the earlier one in place and keeps the first position.",

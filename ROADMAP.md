@@ -925,13 +925,14 @@ a claim nothing holds.
   and `BowTieAnalyzer.autoGenerateFromProcess`; `BowTieSvgExporter` is presentation. The safety
   tree still carries **229 top-level public types** across `barrier/`, `alarp/`, `inherent/`,
   `escalation/`, `vibration/`, `compliance/`, `processsafetysystem/`,
-  `overpressure/`, `rupture/`, `depressurization/`, `release/`, `esd/`, `sif/`, `api14c/`,
-  `opendrain/`, `blowby/`, `vacuum/`, `settleout/`, `pump/`, `reaction/`, `inventory/`,
+  `overpressure/`, `rupture/`, `depressurization/`, `release/`, `esd/`, `sif/`, `opendrain/`,
+  `blowby/`, `vacuum/`, `settleout/`, `pump/`, `reaction/`, `inventory/`,
   `mdmt/`, `leakdetection/`, `cfd/`, `envelope/`, `scenario/` and `dto/`, plus the risk
   subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
   own classes - the risk core, the two release models, the five overpressure calculators,
-  the six dispersion ids, the four rupture ids, the four self-heating ids and the four hazid
-  worksheet ids; the types no bullet names remain unported, each with its class.
+  the six dispersion ids, the four rupture ids, the four self-heating ids, the four hazid
+  worksheet ids and the four safety-review worksheet ids; the types no bullet names remain
+  unported, each with its class.
 - **The self-heating family** - four ids. **`process.semenov_self_heating` is
   `SemenovSelfHeatingAnalyzer.analyze`**: `psi` against `1/e`, the critical-temperature
   bisection on [150, 2000] K, the margin and the three-value verdict.
@@ -966,6 +967,24 @@ a claim nothing holds.
   deviation. `quantify` (a solved flowsheet's outlet temperatures and the 150 degC /
   -46 degC limit resolution), `StidHazopDataSource` (a JSON adapter), `report`/`toJson` and
   `fromProcessSystem`'s flowsheet walk are not carried.
+- **The safety-review worksheets** - four ids. **`process.api14c_safe_chart` is
+  `Api14cSafeChartBuilder`**: the class-name classifier and the API RP 14C Appendix A
+  required-device table, with the present-versus-required comparison. The class's required
+  sets are `HashSet`s, so the rows are published in the device declaration order.
+  **`process.barrier_register_validation` is `BarrierRegister.validate`**: the register,
+  element, barrier and performance-standard rules, with the class's measured iteration - a
+  linked barrier is validated once per element, an unlinked barrier gets only the linkage
+  finding, and a shared standard is validated once per barrier. **`process.s001_clause10_review`
+  is `ProcessSafetySystemReviewEngine.evaluate`**: the fifteen Clause 10 checks over
+  normalized evidence, the coverage result first, the confidence increments and the verdict
+  cascade; the evidence is tidy key-value rows coerced the way Java coerces them.
+  **`process.s001_secondary_pressure_protection` is `S001SecondaryPressureProtectionCriteria.evaluate`**:
+  the pressure bands, the frequency, leakage and proof-test criteria, with the class's
+  true-only leakage flags. **The class's `<= 12` test passes a negative or zero proof-test
+  interval**, and the port refuses a non-positive one. The JSON adapters (`Stid...DataSource`,
+  `ProcessSafetySystemReviewInput.fromJsonObject`, the function-id merging), the messages and
+  detail maps, the performance analyzer's live-detector and SIF arms, `TR2237Templates` and
+  the report exporters are not carried.
 - **The relief and overpressure arithmetic** — seven ids. **`process.psv_sizing` is
   `ReliefValveSizing`'s three area methods and the API 520 D to T ladder**: gas with the
   conventional/balanced-bellows `Kb` and the rupture-disk `Kc`, liquid with `Kw`, the

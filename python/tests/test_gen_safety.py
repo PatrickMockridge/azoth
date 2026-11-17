@@ -44,7 +44,7 @@ def test_the_catalogue_is_every_safety_model_and_nothing_else() -> None:
     specs = [spec for _, spec in module.documents()]
     ids = [spec["id"] for spec in specs]
     assert len(ids) == len(set(ids))
-    assert len(ids) == 52
+    assert len(ids) == 56
     families = [module.family_of(spec) for spec in specs]
     assert families.count("dispersion") == 6
     assert families.count("fire") == 6
@@ -56,6 +56,9 @@ def test_the_catalogue_is_every_safety_model_and_nothing_else() -> None:
     assert families.count("qra") == 1
     assert families.count("selfheating") == 4
     assert families.count("hazid") == 4
+    assert families.count("api14c") == 1
+    assert families.count("barrier") == 1
+    assert families.count("processsafetysystem") == 2
 
 
 def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
@@ -81,6 +84,7 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
         "process.probit",
         "process.psv_fire_sizing",
         "process.psv_sizing",
+        "process.s001_secondary_pressure_protection",
         "process.safety_instrumented_function",
         "process.toxic_library",
         "process.vce",
@@ -93,14 +97,20 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
     assert module.sub_interface_of(by_id["process.fire_water_demand"], "firewater") == "firewater"
     assert module.sub_interface_of(by_id["process.psv_sizing"], "overpressure") == "overpressure"
     assert module.sub_interface_of(by_id["process.safety_instrumented_function"], "risk") == "risk"
+    assert (
+        module.sub_interface_of(
+            by_id["process.s001_secondary_pressure_protection"], "processsafetysystem"
+        )
+        == "processsafetysystem"
+    )
     assert module.sub_interface_of(by_id["process.hem_release"], "release") is None
 
 
 def test_every_non_native_entry_has_a_refusal_and_no_form() -> None:
     module: Any = tool()
     entries = module.render()
-    assert entries.count("native: false") == 30
-    assert entries.count("refusal: Some(") == 30
+    assert entries.count("native: false") == 33
+    assert entries.count("refusal: Some(") == 33
     for _, spec in module.documents():
         if module.native_of(spec):
             assert module.refusal_of(spec) is None, spec["id"]

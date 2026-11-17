@@ -153,11 +153,11 @@ def barrier_register_validation(
     warnings: list[Warning] = []
     apply_checks(checks_for(spec).on_input, lambda _: None, warnings)
 
-    element_rows = input_records_to_si(spec, "elements", elements or [])
-    barrier_rows = input_records_to_si(spec, "barriers", barriers or [])
-    standard_rows = input_records_to_si(spec, "standards", standards or [])
-    link_rows = input_records_to_si(spec, "links", links or [])
-    evidence_rows = input_records_to_si(spec, "evidence", evidence or [])
+    element_rows: list[dict[str, Any]] = input_records_to_si(spec, "elements", elements or [])
+    barrier_rows: list[dict[str, Any]] = input_records_to_si(spec, "barriers", barriers or [])
+    standard_rows: list[dict[str, Any]] = input_records_to_si(spec, "standards", standards or [])
+    link_rows: list[dict[str, Any]] = input_records_to_si(spec, "links", links or [])
+    evidence_rows: list[dict[str, Any]] = input_records_to_si(spec, "evidence", evidence or [])
 
     element_map: dict[str, dict[str, Any]] = {}
     for row in element_rows:
@@ -257,8 +257,8 @@ def barrier_register_validation(
                 _validate_barrier(barrier_id, barrier, standard_map, evidence_list, findings)
 
     for barrier_id in barrier_map:
-        linked = any(barrier_id in ids for ids in element_links.values())
-        if not linked:
+        is_linked = any(barrier_id in ids for ids in element_links.values())
+        if not is_linked:
             findings.append(_finding("barrier", barrier_id, "barrier_not_linked_to_element"))
 
     return BarrierRegisterValidationResult(

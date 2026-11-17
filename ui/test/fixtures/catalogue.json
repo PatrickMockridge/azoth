@@ -21772,6 +21772,15 @@
       "sub_interface": "firewater"
     },
     {
+      "family": "api14c",
+      "id": "process.api14c_safe_chart",
+      "name": "API 14C SAFE chart",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "fire",
       "id": "process.api537_flare_flame_model",
       "name": "API 537 flare flame model",
@@ -21779,6 +21788,15 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": "fire"
+    },
+    {
+      "family": "barrier",
+      "id": "process.barrier_register_validation",
+      "name": "Barrier register validation",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
     },
     {
       "family": "selfheating",
@@ -26655,6 +26673,318 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": "risk"
+    },
+    {
+      "family": "processsafetysystem",
+      "id": "process.s001_clause10_review",
+      "name": "NORSOK S-001 Clause 10 review",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "processsafetysystem"
+    },
+    {
+      "family": "processsafetysystem",
+      "form": {
+        "assumptions": [
+          "**the default target frequency follows the class's pressure bands**: event `> 2 design` gives `1e-5` per year, `> test` gives `1e-4`, `> design` gives `1e-3`, else `1e-2`. The band resolves only when all three pressures are finite and positive; a stated target overrides it.",
+          "**the two pressure checks are vacuous-true without a basis**, but `acceptable` also requires the basis; `test_pressure_valid` is test `>=` design and `pressure_within_test` is event `<=` test.",
+          "**the frequency is configured when the demand is finite and at least zero and the resolved target is finite**; the criterion is demand `<=` target. Without a configured frequency the criterion is vacuous-true but `acceptable` is false.",
+          "**the two leakage flags are `true`-only**: absent and false both fail. The proof-test interval is configured when stated; its criterion is at most twelve months, and an absent interval is not a failure of the criterion.",
+          "**the pressures are declared in Pa**; only their ratios matter to the bands, so the answer is the same as the class's bara. No month unit exists, so the interval is dimensionless.",
+          "**measured divergence: the class's `<= 12` test passes a negative or zero proof-test interval**, so it answers acceptable where the interval is nonsense. The port refuses a non-positive interval and keeps both class answers in the capture.",
+          "**the class's `fromItem` alias mapping and `isEmpty` are adapter state**: the id takes the eight criteria directly."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.s001_secondary_pressure_protection",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the maximum event pressure, at least zero. **Absent is the class's NaN** and leaves the basis incomplete.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "maximum_event_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "a negative pressure is not a basis",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the protected equipment's design pressure, at least zero.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "design_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "a negative pressure is not a basis",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pressure-test pressure, at least zero.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "test_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "a negative pressure is not a basis",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the annual demand frequency, at least zero. **Absent leaves the frequency unconfigured.**\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "demand_frequency_per_year",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "a negative annual frequency is not a demand",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the stated target frequency per year, at least zero; it overrides the band. Absent resolves the band.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "target_frequency_per_year",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "a negative annual frequency is not a target",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "whether relief leakage has been assessed. **Absent and false both fail**; only true satisfies the criterion.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "relief_leakage_assessed",
+            "range": [],
+            "required": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "whether the relief leakage is routed to a safe location. **Absent and false both fail.**\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "relief_leakage_to_safe_location",
+            "range": [],
+            "required": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the proof-test interval in months, above zero. **Absent leaves the interval unconfigured**, which does not fail the criterion.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "proof_test_interval_months",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's `<= 12` test passes zero and negative intervals; a proof-test interval must be positive, and the capture keeps the class's answer at -6 and 0 as the divergence evidence",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          }
+        ],
+        "name": "NORSOK S-001 secondary pressure protection",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "the resolved target frequency, stated or from the band. **Absent when the band cannot resolve**: a missing or non-positive pressure basis with no stated target.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "target_frequency_per_year",
+            "optional": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "whether all three pressures are finite and positive.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "pressure_basis_complete",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "whether the test pressure is at or above the design pressure; vacuous-true without a basis.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "test_pressure_valid",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "whether the event pressure is at or below the test pressure; vacuous-true without a basis.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "pressure_within_test",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "whether the demand and the resolved target are configured.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "frequency_configured",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "whether the demand is at or below the target; vacuous-true when unconfigured.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "frequency_criterion_met",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "whether relief leakage has been assessed.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "leakage_assessed",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "whether the leakage is routed to a safe location.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "leakage_routed_safe",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "whether a proof-test interval is stated.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "proof_test_configured",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "whether the interval is at most twelve months; vacuous-true when unconfigured.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "proof_test_criterion_met",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "whether every criterion is met.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "acceptable",
+            "optional": false,
+            "unit": null,
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "553ecec1633708b8fcef6fbe61e97505d46dbd9bf76cb67ed022bb1a73102a65",
+          "rust_sha256": "3d7f283cdc9f26ef7828186f8c175d646a1c84b52b7106827c28af6ccdc87d4c",
+          "spec_sha256": "44cbe4e54cdcd0d734061b318d33dad8418d41904379fae266535e1103528593",
+          "tests_active": 7,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "NORSOK S-001:2020+AC:2021, clause 10.4.7. Secondary pressure protection."
+        ],
+        "refusal": null,
+        "summary": "The pressure band's default target frequency, the test and event pressure checks, the demand-versus-target test and the leakage and proof-test criteria.",
+        "worked_example": {}
+      },
+      "id": "process.s001_secondary_pressure_protection",
+      "name": "NORSOK S-001 secondary pressure protection",
+      "native": true,
+      "purpose": "The pressure band's default target frequency, the test and event pressure checks, the demand-versus-target test and the leakage and proof-test criteria.",
+      "refusal": null,
+      "sub_interface": "processsafetysystem"
     },
     {
       "family": "risk",

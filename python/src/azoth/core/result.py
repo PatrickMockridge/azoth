@@ -34,6 +34,7 @@ from azoth.core.result_base import HenryStatus as HenryStatus
 from azoth.core.result_base import HydrateRiskLevel as HydrateRiskLevel
 from azoth.core.result_base import HydrateStructure as HydrateStructure
 from azoth.core.result_base import MultiflashSeedPath as MultiflashSeedPath
+from azoth.core.result_base import OverallVerdict as OverallVerdict
 from azoth.core.result_base import Phase as Phase
 from azoth.core.result_base import PlusModel as PlusModel
 from azoth.core.result_base import ReliefPhase as ReliefPhase
