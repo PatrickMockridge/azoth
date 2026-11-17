@@ -28,6 +28,7 @@
 //!   - specs/models/process/fire_water_coverage_assessment.toml
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
+//!   - specs/models/process/fmea_worksheet.toml
 //!   - specs/models/process/gas_dispersion.toml
 //!   - specs/models/process/gas_scrubber.toml
 //!   - specs/models/process/gaussian_plume.toml
@@ -32271,6 +32272,496 @@ pub static FLARE_SPEC: ModelSpec = ModelSpec {
     algorithm: None,
     checks: FLARE_CHECKS,
     cases: FLARE_CASES,
+};
+
+static FMEA_WORKSHEET_CHECKS: &[SpecCheck] = &[];
+
+static FMEA_WORKSHEET_CASES: &[TestCase] = &[
+    TestCase {
+        id: "fmea_class_test",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("rpn_threshold", 110.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("highest_rpn", 120.0), ("entry_count", 2.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "entries",
+            &[
+                &[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("Bearing"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("Wear"),
+                    },
+                    RecordField {
+                        name: "effect",
+                        value: FieldValue::Name("Vibration"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("Lub failure"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(6.0),
+                    },
+                    RecordField {
+                        name: "mitigation",
+                        value: FieldValue::Name("VIB monitor"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("Seal"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("Leak"),
+                    },
+                    RecordField {
+                        name: "effect",
+                        value: FieldValue::Name("HC release"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("Aging"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(9.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "mitigation",
+                        value: FieldValue::Name("Online seal monitor"),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[
+            (
+                "ranked_entries",
+                &[
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("Bearing"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("Wear"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(120.0),
+                        },
+                        RecordField {
+                            name: "mitigation",
+                            value: FieldValue::Name("VIB monitor"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("Seal"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("Leak"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(9.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(108.0),
+                        },
+                        RecordField {
+                            name: "mitigation",
+                            value: FieldValue::Name("Online seal monitor"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "entries_above_threshold",
+                &[&[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("Bearing"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("Wear"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(6.0),
+                    },
+                    RecordField {
+                        name: "rpn",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "mitigation",
+                        value: FieldValue::Name("VIB monitor"),
+                    },
+                ]],
+            ),
+        ],
+    },
+    TestCase {
+        id: "fmea_tie_and_inclusive_threshold",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("rpn_threshold", 120.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("highest_rpn", 120.0), ("entry_count", 3.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "entries",
+            &[
+                &[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("wear"),
+                    },
+                    RecordField {
+                        name: "effect",
+                        value: FieldValue::Name("vibration"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("lubrication"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(6.0),
+                    },
+                    RecordField {
+                        name: "mitigation",
+                        value: FieldValue::Name("monitor A"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("leak"),
+                    },
+                    RecordField {
+                        name: "effect",
+                        value: FieldValue::Name("release"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("aging"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(6.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("plug"),
+                    },
+                    RecordField {
+                        name: "effect",
+                        value: FieldValue::Name("stop"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("debris"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "mitigation",
+                        value: FieldValue::Name("strainer"),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[
+            (
+                "ranked_entries",
+                &[
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("wear"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(120.0),
+                        },
+                        RecordField {
+                            name: "mitigation",
+                            value: FieldValue::Name("monitor A"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("leak"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(120.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("C"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("plug"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(2.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(24.0),
+                        },
+                        RecordField {
+                            name: "mitigation",
+                            value: FieldValue::Name("strainer"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "entries_above_threshold",
+                &[
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("wear"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(120.0),
+                        },
+                        RecordField {
+                            name: "mitigation",
+                            value: FieldValue::Name("monitor A"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("leak"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(120.0),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+];
+
+static FMEA_WORKSHEET_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "fmea_rpn",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.fmea_worksheet`.
+pub static FMEA_WORKSHEET_SPEC: ModelSpec = ModelSpec {
+    id: "process.fmea_worksheet",
+    kind: "procedure",
+    algorithm: Some(&FMEA_WORKSHEET_ALGORITHM),
+    checks: FMEA_WORKSHEET_CHECKS,
+    cases: FMEA_WORKSHEET_CASES,
 };
 
 static GAS_DISPERSION_CHECKS: &[SpecCheck] = &[
@@ -77707,6 +78198,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &FIRE_WATER_COVERAGE_ASSESSMENT_SPEC,
     &FIRE_WATER_DEMAND_SPEC,
     &FLARE_SPEC,
+    &FMEA_WORKSHEET_SPEC,
     &GAS_DISPERSION_SPEC,
     &GAS_SCRUBBER_SPEC,
     &GAUSSIAN_PLUME_SPEC,

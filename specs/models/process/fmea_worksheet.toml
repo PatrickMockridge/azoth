@@ -1,0 +1,119 @@
+id = "process.fmea_worksheet"
+name = "FMEA worksheet"
+kind = "procedure"
+assumptions = [
+    "**`RPN = S O D`**, and S, O and D are whole numbers in `[1, 10]`; the class refuses a score outside that band with `S, O, D must each be in [1, 10]`.",
+    "**the ranking is by descending RPN and is stable**: `Collections.sort` keeps caller order for a tie, so two entries of equal RPN appear in the order they were stated.",
+    "**the threshold filter is inclusive and in caller order**: an entry is kept when `RPN >= threshold`, and the threshold is any whole number, negative included.",
+    "**`highest_rpn` is the first ranked entry's RPN**, absent on an empty worksheet, which the class answers.",
+    "**`report` and `toJson` are presentation** and are not carried; the worksheet's rows are the result.",
+]
+references = [
+    "IEC 60812:2018. Failure modes and effects analysis (FMEA and FMECA).",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/hazid/FMEAWorksheet.java` is the port source.",
+    "`validation/neqsim/captures/process_fmea_worksheet.tsv` - the class test's 120/108 pair at a threshold of 110, a tie, an inclusive threshold, an empty worksheet and the four refusals.",
+]
+[source]
+standard = "NeqSim process/safety/hazid/FMEAWorksheet.java"
+edition = "Its `addEntry` validation, `sortedByRPN` and `entriesAboveRPN`; `report` and `toJson` are not carried."
+[algorithm]
+scheme = "fmea_rpn"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.entries]
+type = "record_list"
+row_type = "FmeaEntry"
+description = "the failure-mode entries in caller order; the ranking is stable for a tie. An empty list is a state the class answers.\n"
+[inputs.entries.fields.component]
+type = "string"
+description = "the component or item analysed.\n"
+[inputs.entries.fields.failure_mode]
+type = "string"
+description = "the failure mode.\n"
+[inputs.entries.fields.effect]
+type = "string"
+description = "the effect on the system.\n"
+[inputs.entries.fields.cause]
+type = "string"
+description = "the root cause.\n"
+[inputs.entries.fields.severity]
+unit = "dimensionless"
+description = "the severity score S, a whole number in `[1, 10]`.\n"
+[inputs.entries.fields.occurrence]
+unit = "dimensionless"
+description = "the occurrence score O, a whole number in `[1, 10]`.\n"
+[inputs.entries.fields.detection]
+unit = "dimensionless"
+description = "the detection score D, a whole number in `[1, 10]`.\n"
+[inputs.entries.fields.mitigation]
+type = "string"
+optional = true
+description = "the recommended mitigation; absent when the class carries a null.\n"
+[inputs.rpn_threshold]
+unit = "dimensionless"
+description = "the RPN at which an entry is kept, inclusive; any whole number.\n"
+[outputs]
+[outputs.ranked_entries]
+type = "record_list"
+row_type = "FmeaRankedEntry"
+description = "the entries by descending RPN; caller order for a tie.\n"
+[outputs.ranked_entries.fields.component]
+type = "string"
+description = "the component or item analysed, echoed.\n"
+[outputs.ranked_entries.fields.failure_mode]
+type = "string"
+description = "the failure mode, echoed.\n"
+[outputs.ranked_entries.fields.severity]
+unit = "dimensionless"
+description = "the severity score, echoed.\n"
+[outputs.ranked_entries.fields.occurrence]
+unit = "dimensionless"
+description = "the occurrence score, echoed.\n"
+[outputs.ranked_entries.fields.detection]
+unit = "dimensionless"
+description = "the detection score, echoed.\n"
+[outputs.ranked_entries.fields.rpn]
+unit = "dimensionless"
+description = "`S O D`, a whole number in `[1, 1000]`.\n"
+[outputs.ranked_entries.fields.mitigation]
+type = "string"
+optional = true
+description = "the recommended mitigation, echoed; absent when it is.\n"
+[outputs.entries_above_threshold]
+type = "record_list"
+row_type = "FmeaRankedEntry"
+description = "the entries with `RPN >= rpn_threshold`, in caller order.\n"
+[outputs.entries_above_threshold.fields.component]
+type = "string"
+description = "the component or item analysed, echoed.\n"
+[outputs.entries_above_threshold.fields.failure_mode]
+type = "string"
+description = "the failure mode, echoed.\n"
+[outputs.entries_above_threshold.fields.severity]
+unit = "dimensionless"
+description = "the severity score, echoed.\n"
+[outputs.entries_above_threshold.fields.occurrence]
+unit = "dimensionless"
+description = "the occurrence score, echoed.\n"
+[outputs.entries_above_threshold.fields.detection]
+unit = "dimensionless"
+description = "the detection score, echoed.\n"
+[outputs.entries_above_threshold.fields.rpn]
+unit = "dimensionless"
+description = "`S O D`, a whole number in `[1, 1000]`.\n"
+[outputs.entries_above_threshold.fields.mitigation]
+type = "string"
+optional = true
+description = "the recommended mitigation, echoed; absent when it is.\n"
+[outputs.highest_rpn]
+unit = "dimensionless"
+optional = true
+description = "the largest RPN; absent on an empty worksheet.\n"
+[outputs.entry_count]
+unit = "dimensionless"
+description = "the number of entries.\n"
+[implementations]
+python = "azoth.process.fmea_worksheet"
+rust = "azoth_process::fmea_worksheet"

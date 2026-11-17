@@ -267,6 +267,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyFireWaterCoverageAssessmentResult>()?;
     m.add_class::<crate::transport_gen::PyFireWaterDemandResult>()?;
     m.add_class::<crate::transport_gen::PyFlareResult>()?;
+    m.add_class::<crate::transport_gen::PyFmeaWorksheetResult>()?;
     m.add_class::<crate::transport_gen::PyGasDispersionResult>()?;
     m.add_class::<crate::transport_gen::PyGasScrubberResult>()?;
     m.add_class::<crate::transport_gen::PyGaussianPlumeResult>()?;
@@ -356,6 +357,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyEquilibriumSoundSpeedSample>()?;
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
     m.add_class::<crate::record_outputs_gen::PyFlowlineScaleSegment>()?;
+    m.add_class::<crate::record_outputs_gen::PyFmeaRankedEntry>()?;
     m.add_class::<crate::record_outputs_gen::PyHazopTemplateDeviation>()?;
     m.add_class::<crate::record_outputs_gen::PyHeatExchangerMechanicalType>()?;
     m.add_class::<crate::record_outputs_gen::PyHeaterInstrument>()?;
@@ -992,6 +994,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::process::fire_water_demand, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::flare, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::fmea_worksheet, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_dispersion, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_scrubber, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gaussian_plume, m)?)?;

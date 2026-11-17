@@ -234,6 +234,32 @@ class FlowlineScaleSegment:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class FmeaRankedEntry:
+    """the entries with `RPN >= rpn_threshold`, in caller order."""
+
+    #: the component or item analysed, echoed.
+    component: str
+
+    #: the failure mode, echoed.
+    failure_mode: str
+
+    #: the severity score, echoed.
+    severity: float
+
+    #: the occurrence score, echoed.
+    occurrence: float
+
+    #: the detection score, echoed.
+    detection: float
+
+    #: `S O D`, a whole number in `[1, 1000]`.
+    rpn: float
+
+    #: the recommended mitigation, echoed; absent when it is.
+    mitigation: str | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class HazopTemplateDeviation:
     """the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order."""
 

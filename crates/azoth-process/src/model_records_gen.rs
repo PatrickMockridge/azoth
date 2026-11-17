@@ -38,6 +38,7 @@ use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
 use crate::models::fire_water_demand::FireWaterDemandResult;
 use crate::models::flare::FlareResult;
+use crate::models::fmea_worksheet::FmeaWorksheetResult;
 use crate::models::gas_dispersion::GasDispersionResult;
 use crate::models::gas_scrubber::GasScrubberResult;
 use crate::models::gaussian_plume::GaussianPlumeResult;
@@ -781,6 +782,21 @@ impl CalcResult for FlareResult {
         "mass_utilization",
         "molar_utilization",
         "overloaded",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FmeaWorksheetResult {
+    const CALC_ID: &'static str = "process.fmea_worksheet";
+    const FIELDS: &'static [&'static str] = &[
+        "ranked_entries",
+        "entries_above_threshold",
+        "highest_rpn",
+        "entry_count",
         "warnings",
     ];
 

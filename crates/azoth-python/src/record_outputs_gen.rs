@@ -625,6 +625,68 @@ impl From<&azoth_eos::results::FlowlineScaleSegment> for PyFlowlineScaleSegment 
     }
 }
 
+/// the entries with `RPN >= rpn_threshold`, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FmeaRankedEntry"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFmeaRankedEntry {
+    /// the component or item analysed, echoed.
+    #[pyo3(get)]
+    pub component: String,
+    /// the failure mode, echoed.
+    #[pyo3(get)]
+    pub failure_mode: String,
+    /// the severity score, echoed.
+    #[pyo3(get)]
+    pub severity: f64,
+    /// the occurrence score, echoed.
+    #[pyo3(get)]
+    pub occurrence: f64,
+    /// the detection score, echoed.
+    #[pyo3(get)]
+    pub detection: f64,
+    /// `S O D`, a whole number in `[1, 1000]`.
+    #[pyo3(get)]
+    pub rpn: f64,
+    /// the recommended mitigation, echoed; absent when it is.
+    #[pyo3(get)]
+    pub mitigation: Option<String>,
+}
+
+#[pymethods]
+impl PyFmeaRankedEntry {
+    fn __repr__(&self) -> String {
+        format!(
+            "FmeaRankedEntry(component={}, failure_mode={}, severity={}, occurrence={}, detection={}, rpn={}, mitigation={:?})",
+            self.component,
+            self.failure_mode,
+            self.severity,
+            self.occurrence,
+            self.detection,
+            self.rpn,
+            self.mitigation
+        )
+    }
+}
+
+impl From<&azoth_process::models::fmea_worksheet::FmeaRankedEntry> for PyFmeaRankedEntry {
+    fn from(row: &azoth_process::models::fmea_worksheet::FmeaRankedEntry) -> Self {
+        Self {
+            component: row.component.clone(),
+            failure_mode: row.failure_mode.clone(),
+            severity: row.severity,
+            occurrence: row.occurrence,
+            detection: row.detection,
+            rpn: row.rpn,
+            mitigation: row.mitigation.clone(),
+        }
+    }
+}
+
 /// the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order.
 #[pyclass(
     frozen,

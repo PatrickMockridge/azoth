@@ -508,6 +508,18 @@ class ProtectedObject(TypedDict):
     surface_area: float
     application_rate: float
 
+class FmeaEntry(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    component: str
+    failure_mode: str
+    effect: str
+    cause: str
+    severity: float
+    occurrence: float
+    detection: float
+    mitigation: str | None
+
 class HazopGridParameter(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -904,6 +916,18 @@ class MinimalCutSet:
 
     members: str
     cardinality: float
+
+@final
+class FmeaRankedEntry:
+    """the entries with `RPN >= rpn_threshold`, in caller order."""
+
+    component: str
+    failure_mode: str
+    severity: float
+    occurrence: float
+    detection: float
+    rpn: float
+    mitigation: str | None
 
 @final
 class HazopTemplateDeviation:
@@ -3568,6 +3592,14 @@ class FlareResult:
     mass_utilization: float | None
     molar_utilization: float | None
     overloaded: bool | None
+    warnings: list[Warning]
+
+@final
+class FmeaWorksheetResult:
+    ranked_entries: list[FmeaRankedEntry]
+    entries_above_threshold: list[FmeaRankedEntry]
+    highest_rpn: float | None
+    entry_count: float
     warnings: list[Warning]
 
 @final
@@ -7392,6 +7424,7 @@ def flare(
     design_mass_flow_capacity: float | None = None,
     design_molar_flow_capacity: float | None = None,
 ) -> FlareResult: ...
+def fmea_worksheet(entries: list[FmeaEntry], rpn_threshold: float) -> FmeaWorksheetResult: ...
 def gas_dispersion(
     components: list[str],
     composition: list[float],

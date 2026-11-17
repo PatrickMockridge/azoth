@@ -2704,6 +2704,24 @@ def _hazop_template(inputs: Mapping[str, Any]) -> dict[str, float]:
     return {"deviation_count": result.deviation_count}
 
 
+def _fmea_worksheet(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fmea_worksheet`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.fmea_worksheet import fmea_worksheet as evaluate
+
+    result = evaluate(list(inputs["entries"]), float(inputs["rpn_threshold"]))
+    layers = {
+        "entry_count": result.entry_count,
+        "above_count": float(len(result.entries_above_threshold)),
+    }
+    if result.highest_rpn is not None:
+        layers["highest_rpn"] = result.highest_rpn
+    for index, row in enumerate(result.ranked_entries):
+        layers[f"ranked{index}_rpn"] = row.rpn
+    for index, row in enumerate(result.entries_above_threshold):
+        layers[f"above{index}_rpn"] = row.rpn
+    return layers
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3242,6 +3260,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.self_heating_induction": _self_heating_induction,
     "process.basket_test_regression": _basket_test_regression,
     "process.hazop_template": _hazop_template,
+    "process.fmea_worksheet": _fmea_worksheet,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -5172,6 +5191,22 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=11,
         identified_by=("#label", "ht_seed_separator_then_grid"),
     ),
+    # The worksheet's two cased states; the inclusive-threshold block, the empty worksheet
+    # and the four refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.fmea_worksheet",
+        case="fmea_class_test",
+        capture="process_fmea_worksheet.tsv",
+        block=0,
+        identified_by=("#label", "fw_class_test"),
+    ),
+    LayerCase(
+        model="process.fmea_worksheet",
+        case="fmea_tie_and_inclusive_threshold",
+        capture="process_fmea_worksheet.tsv",
+        block=1,
+        identified_by=("#label", "fw_tie"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -6929,6 +6964,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The template's ten: the one-parameter grid, the empty grid, the manual row and the
     # seven equipment seed blocks. The rows are strings; the cases hold them.
     "process_hazop_template.tsv": 10,
+    # The worksheet's six: the inclusive-threshold block, the empty worksheet and the four
+    # refusals. The empty list is not a case state.
+    "process_fmea_worksheet.tsv": 6,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

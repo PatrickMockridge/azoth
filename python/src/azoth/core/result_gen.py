@@ -32,6 +32,7 @@ from azoth.core.record_outputs_gen import (
     EquilibriumSoundSpeedSample,
     EventTreeOutcome,
     FlowlineScaleSegment,
+    FmeaRankedEntry,
     HazopTemplateDeviation,
     HeaterInstrument,
     HeaterMechanicalType,
@@ -6984,6 +6985,28 @@ class FlareResult(_HasWarnings):
 
     #: `isOverloaded`: any present utilisation above `1 + 1e-6`. Absent until at least one utilisation exists.
     overloaded: bool | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FmeaWorksheetResult(_HasWarnings):
+    """Result of ``process.fmea_worksheet``."""
+
+    CALC_ID: ClassVar[str] = "process.fmea_worksheet"
+
+    #: the entries by descending RPN; caller order for a tie.
+    ranked_entries: tuple[FmeaRankedEntry, ...]
+
+    #: the entries with `RPN >= rpn_threshold`, in caller order.
+    entries_above_threshold: tuple[FmeaRankedEntry, ...]
+
+    #: the largest RPN; absent on an empty worksheet.
+    highest_rpn: float | None
+
+    #: the number of entries.
+    entry_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

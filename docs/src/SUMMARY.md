@@ -262,6 +262,7 @@
   - [Fire-water coverage assessment](./process/fire_water_coverage_assessment.md)
   - [Fire-water demand](./process/fire_water_demand.md)
   - [Flare](./process/flare.md)
+  - [FMEA worksheet](./process/fmea_worksheet.md)
   - [Gas dispersion screening](./process/gas_dispersion.md)
   - [Gas scrubber](./process/gas_scrubber.md)
   - [Gaussian plume dispersion](./process/gaussian_plume.md)

@@ -111,6 +111,8 @@ from azoth.core.result import (
     FlowlineScaleSegment,
     FlowRegime,
     FluidBasis,
+    FmeaRankedEntry,
+    FmeaWorksheetResult,
     FoulingModelResult,
     FreezingPointResult,
     FrictionTheoryConductivityResult,
@@ -516,6 +518,7 @@ __all__ = [
     "firozabadi_ramley_interface_tension",
     "flare",
     "flowline_scale_profile",
+    "fmea_worksheet",
     "fouling_model",
     "freezing_point",
     "friction_factor_colebrook",
@@ -6612,6 +6615,22 @@ def flare(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, i
         mass_utilization=result.mass_utilization,
         molar_utilization=result.molar_utilization,
         overloaded=result.overloaded,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def fmea_worksheet(entries: list[dict[str, object]], rpn_threshold: float) -> FmeaWorksheetResult:
+    """``process.fmea_worksheet``, computed in Rust."""
+    spec = _models_gen.model("process.fmea_worksheet")
+    result = _core.fmea_worksheet(
+        input_records_to_si(spec, "entries", entries),
+        rpn_threshold,
+    )
+    return FmeaWorksheetResult(
+        ranked_entries=tuple(FmeaRankedEntry(component=c.component, failure_mode=c.failure_mode, severity=c.severity, occurrence=c.occurrence, detection=c.detection, rpn=c.rpn, mitigation=c.mitigation) for c in result.ranked_entries),
+        entries_above_threshold=tuple(FmeaRankedEntry(component=c.component, failure_mode=c.failure_mode, severity=c.severity, occurrence=c.occurrence, detection=c.detection, rpn=c.rpn, mitigation=c.mitigation) for c in result.entries_above_threshold),
+        highest_rpn=result.highest_rpn,
+        entry_count=result.entry_count,
         warnings=_warnings(result.warnings),
     )
 

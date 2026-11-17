@@ -17,14 +17,14 @@ use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
     PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEventTreeOutcome,
-    PyFlowlineScaleSegment, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
-    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
-    PyHydrateRiskPoint, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
-    PyLeakBlowdownPoint, PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyNaceIssueRow, PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyRiskAssessmentRow, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue, PySterileRadius,
-    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
+    PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopTemplateDeviation,
+    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
+    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIncrementalZoneRow,
+    PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
+    PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow, PyPipeFireRupturePoint,
+    PyReliefDisposalRow, PyRemediationOptionRow, PyRiskAssessmentRow, PyScaleControlRiskRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
     PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
@@ -17402,6 +17402,65 @@ impl From<&azoth_process::models::flare::FlareResult> for PyFlareResult {
             mass_utilization: r.mass_utilization,
             molar_utilization: r.molar_utilization,
             overloaded: r.overloaded,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.fmea_worksheet`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FmeaWorksheetResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFmeaWorksheetResult {
+    /// the entries by descending RPN; caller order for a tie.
+    #[pyo3(get)]
+    pub ranked_entries: Vec<PyFmeaRankedEntry>,
+    /// the entries with `RPN >= rpn_threshold`, in caller order.
+    #[pyo3(get)]
+    pub entries_above_threshold: Vec<PyFmeaRankedEntry>,
+    /// the largest RPN; absent on an empty worksheet.
+    #[pyo3(get)]
+    pub highest_rpn: Option<f64>,
+    /// the number of entries.
+    #[pyo3(get)]
+    pub entry_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFmeaWorksheetResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FmeaWorksheetResult(ranked_entries={:?}, entries_above_threshold={:?}, highest_rpn={:?}, entry_count={:?}, {} warning(s))",
+            self.ranked_entries,
+            self.entries_above_threshold,
+            self.highest_rpn,
+            self.entry_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fmea_worksheet::FmeaWorksheetResult> for PyFmeaWorksheetResult {
+    fn from(r: &azoth_process::models::fmea_worksheet::FmeaWorksheetResult) -> Self {
+        Self {
+            ranked_entries: r
+                .ranked_entries
+                .iter()
+                .map(PyFmeaRankedEntry::from)
+                .collect(),
+            entries_above_threshold: r
+                .entries_above_threshold
+                .iter()
+                .map(PyFmeaRankedEntry::from)
+                .collect(),
+            highest_rpn: r.highest_rpn,
+            entry_count: r.entry_count,
             warnings: transport(&r.warnings),
         }
     }

@@ -354,6 +354,7 @@ Five sections, and the difference between them is the point:
 - [`process.fire_water_coverage_assessment`](./process/fire_water_coverage_assessment.md) — Fire-water coverage assessment
 - [`process.fire_water_demand`](./process/fire_water_demand.md) — Fire-water demand
 - [`process.flare`](./process/flare.md) — Flare
+- [`process.fmea_worksheet`](./process/fmea_worksheet.md) — FMEA worksheet
 - [`process.gas_dispersion`](./process/gas_dispersion.md) — Gas dispersion screening
 - [`process.gas_scrubber`](./process/gas_scrubber.md) — Gas scrubber
 - [`process.gaussian_plume`](./process/gaussian_plume.md) — Gaussian plume dispersion

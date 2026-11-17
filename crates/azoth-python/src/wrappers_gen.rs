@@ -6369,6 +6369,35 @@ pub fn flare(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// FMEA worksheet.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (entries, rpn_threshold))]
+#[pyo3(text_signature = "(entries, rpn_threshold)")]
+pub fn fmea_worksheet(
+    py: Python<'_>,
+    entries: Vec<crate::records_gen::FmeaEntry>,
+    rpn_threshold: f64,
+) -> PyResult<crate::transport_gen::PyFmeaWorksheetResult> {
+    let entries_records: Vec<azoth_process::models::fmea_worksheet::FmeaEntry> = entries
+        .into_iter()
+        .map(|row| azoth_process::models::fmea_worksheet::FmeaEntry {
+            component: row.component,
+            failure_mode: row.failure_mode,
+            effect: row.effect,
+            cause: row.cause,
+            severity: row.severity,
+            occurrence: row.occurrence,
+            detection: row.detection,
+            mitigation: row.mitigation,
+        })
+        .collect();
+    azoth_process::models::fmea_worksheet::fmea_worksheet(&entries_records, rpn_threshold)
+        .map(|r| crate::transport_gen::PyFmeaWorksheetResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Gas dispersion screening.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

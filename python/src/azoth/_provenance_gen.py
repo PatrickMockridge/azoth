@@ -2743,6 +2743,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 9,
         "tests_skipped": 0,
     },
+    'process.fmea_worksheet': {
+        "calc_id": 'process.fmea_worksheet',
+        "name": 'FMEA worksheet',
+        "spec": {'path': 'specs/models/process/fmea_worksheet.toml', 'sha256': '36cb00db1efdbb868c8bc8ebb06159f4edac6d7a74eb579cbb3135569f4dc7cb'},
+        "code": [{'path': 'python/src/azoth/process/reference/fmea_worksheet.py', 'sha256': '54afdaabb991f2c5786f9c0d8c1e9cd11e99cb8cf4e8d1762b2cbb7ae2fa2922'}, {'path': 'crates/azoth-process/src/models/fmea_worksheet.rs', 'sha256': '3a9a4b39c8c5568801d2884335eb0c686d4fc9b596367b4db3926df9723ee416'}],
+        "source": 'NeqSim process/safety/hazid/FMEAWorksheet.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 2,
+        "tests_skipped": 0,
+    },
     'process.gas_dispersion': {
         "calc_id": 'process.gas_dispersion',
         "name": 'Gas dispersion screening',

@@ -46,6 +46,7 @@ from azoth.core.result import (
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
     FlareResult,
+    FmeaWorksheetResult,
     GasDispersionResult,
     GasScrubberResult,
     GaussianPlumeResult,
@@ -283,6 +284,7 @@ _SEMENOV_SELF_HEATING = "process.semenov_self_heating"
 _SELF_HEATING_INDUCTION = "process.self_heating_induction"
 _BASKET_TEST_REGRESSION = "process.basket_test_regression"
 _HAZOP_TEMPLATE = "process.hazop_template"
+_FMEA_WORKSHEET = "process.fmea_worksheet"
 
 
 def validate(flowsheet: str, palette_dir: str = "specs/unit_ops") -> list[str]:
@@ -3225,6 +3227,23 @@ def hazop_template(
     return resolve(_HAZOP_TEMPLATE)(  # type: ignore[no-any-return]
         grid_parameters=grid_parameters,
         equipment_type=equipment_type,
+    )
+
+
+def fmea_worksheet(
+    entries: list[dict[str, object]],
+    rpn_threshold: float,
+) -> FmeaWorksheetResult:
+    """The RPN ranking and the entries at or above a threshold.
+
+    **`RPN = S O D`**, ranked descending and stable for a tie. The threshold filter is
+    inclusive and keeps caller order; S, O and D are whole numbers in ``[1, 10]``.
+
+    See :func:`azoth.process.reference.fmea_worksheet`.
+    """
+    return resolve(_FMEA_WORKSHEET)(  # type: ignore[no-any-return]
+        entries=entries,
+        rpn_threshold=rpn_threshold,
     )
 
 
