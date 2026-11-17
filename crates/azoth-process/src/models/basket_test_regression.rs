@@ -96,13 +96,13 @@ pub fn basket_test_regression(
     for point in points {
         let temperature = point.critical_temperature.value;
         let dimension = point.characteristic_dimension.value;
-        if !(dimension > 0.0) {
+        if dimension.is_nan() || dimension <= 0.0 {
             return Err(AzothError::invalid_input(
                 "points",
                 "a basket's characteristic dimension must be positive",
             ));
         }
-        if !(temperature > 0.0) {
+        if temperature.is_nan() || temperature <= 0.0 {
             return Err(AzothError::invalid_input(
                 "points",
                 "a basket's critical temperature must be positive",
@@ -120,7 +120,7 @@ pub fn basket_test_regression(
         sxx += (x[index] - mean_x) * (x[index] - mean_x);
         sxy += (x[index] - mean_x) * (y[index] - mean_y);
     }
-    if !(sxx > 0.0) {
+    if sxx.is_nan() || sxx <= 0.0 {
         return Err(AzothError::invalid_input(
             "points",
             "All basket-test points share the same critical temperature; cannot fit a slope",
@@ -143,7 +143,7 @@ pub fn basket_test_regression(
     };
 
     let activation_energy = -slope * R_GAS;
-    if !(activation_energy > 0.0) {
+    if activation_energy.is_nan() || activation_energy <= 0.0 {
         messages.push(
             "Fitted activation energy is not positive; the critical temperature should fall as \
              basket size increases, so check the ordering and units of the input data"

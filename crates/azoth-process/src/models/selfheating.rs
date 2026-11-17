@@ -130,14 +130,6 @@ impl SelfHeatingGeometry {
         matches!(self, Self::Slab | Self::InfiniteCylinder | Self::Sphere)
     }
 
-    /// The characteristic dimension's own name for this shape.
-    #[must_use]
-    pub(crate) fn dimension_description(self) -> &'static str {
-        match self {
-            Self::Slab | Self::Cube => "half-thickness",
-            Self::InfiniteCylinder | Self::Sphere | Self::Equicylinder => "radius",
-        }
-    }
 }
 
 /// The screening verdict.

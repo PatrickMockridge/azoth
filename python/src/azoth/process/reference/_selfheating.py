@@ -78,11 +78,6 @@ def one_dimensional(geometry: str) -> bool:
     return GEOMETRIES[geometry][2]
 
 
-def dimension_description(geometry: str) -> str:
-    """The characteristic dimension's own name for this shape."""
-    return GEOMETRIES[geometry][3]
-
-
 def verdict_of(ratio: float, marginal_ratio: float) -> str:
     """The verdict rule: strictly above one is ignition, marginally at the ratio or above."""
     if ratio > 1.0:

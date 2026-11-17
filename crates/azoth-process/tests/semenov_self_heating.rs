@@ -209,7 +209,7 @@ fn a_failed_bracket_answers_absent_and_carries_both_messages() {
     assert_eq!(result.temperature_margin, None);
     close(
         result.critical_temperature_rise.value,
-        1330.314_018_88,
+        1_330.314_018_88,
         "the critical rise",
     );
     assert_eq!(result.verdict, SelfHeatingVerdict::SelfIgnition);

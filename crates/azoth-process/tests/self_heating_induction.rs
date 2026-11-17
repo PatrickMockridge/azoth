@@ -45,7 +45,7 @@ fn the_igniting_slab_reproduces_the_capture() {
     assert!(result.ignited);
     close(
         result.induction_time.expect("it ignited").value,
-        3631.288_064_208_441,
+        3_631.288_064_208_441,
         "the induction time",
     );
     close(
@@ -61,7 +61,7 @@ fn the_igniting_slab_reproduces_the_capture() {
     assert!(!result.steady_state_reached);
     close(
         result.simulated_time.value,
-        3631.288_064_208_441,
+        3_631.288_064_208_441,
         "the simulated time",
     );
     assert!(result.messages.is_empty());
@@ -78,7 +78,7 @@ fn the_igniting_slab_reproduces_the_capture() {
         "the second sample's centre",
     );
     let last = result.history.last().expect("the final sample");
-    close(last.time.value, 3631.288_064_208_441, "the last time");
+    close(last.time.value, 3_631.288_064_208_441, "the last time");
     close(
         last.max_temperature.value,
         648.492_201_613_980_7,

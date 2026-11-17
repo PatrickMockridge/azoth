@@ -306,7 +306,7 @@ fn a_failed_bracket_answers_absent() {
     );
     close(
         result.fk_temperature_scale.value,
-        1537.344_138_068_2,
+        1_537.344_138_068_2,
         "the temperature scale",
     );
     assert_eq!(result.verdict, SelfHeatingVerdict::SelfIgnition);
