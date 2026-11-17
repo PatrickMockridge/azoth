@@ -4233,7 +4233,7 @@ pub static ALL_PROVENANCE: &[ProvenanceStatic] = &[
         calc_id: "process.semenov_self_heating",
         name: "Semenov self-heating",
         spec_path: "specs/models/process/semenov_self_heating.toml",
-        spec_sha256: "d54ec316336e63f7315623f3b4092d3b4df827cb01f8712efb295c65f97ab379",
+        spec_sha256: "efb23c9a9229515d578d33845e7b7acf3a6b0d1b3f984f5608bee62274090586",
         python_path: "python/src/azoth/process/reference/semenov_self_heating.py",
         python_sha256: "33bea41bc202749b257eb3a1690a082f7169b87f5280528201a5e243e8143051",
         rust_path: "crates/azoth-process/src/models/semenov_self_heating.rs",
