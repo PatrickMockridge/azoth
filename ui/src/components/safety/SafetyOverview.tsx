@@ -2,7 +2,7 @@
  * The safety study's overview.
  *
  * **What this workspace can run, and what it can only point at.** Five fire models and the
- * bow-tie are native here; the other eight families are listed with their manual pages, because
+ * bow-tie are native here; the other nine families are listed with their manual pages, because
  * a card that ran nothing would be a promise the workspace does not keep.
  */
 
@@ -19,6 +19,7 @@ const FAMILIES: { id: string; label: string }[] = [
   { id: "release", label: "Release" },
   { id: "risk", label: "Risk and SIL" },
   { id: "rupture", label: "Rupture" },
+  { id: "selfheating", label: "Self-heating" },
 ];
 
 const SCENARIO_CARDS: { id: ScenarioView; label: string; blurb: string }[] = [

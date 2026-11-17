@@ -2561,6 +2561,135 @@ def _semenov_self_heating(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _porous_media_self_heating(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.porous_media_self_heating`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.porous_media_self_heating import (
+        porous_media_self_heating as evaluate,
+    )
+
+    result = evaluate(
+        None if inputs.get("geometry") is None else str(inputs["geometry"]),
+        quantity(float(inputs["characteristic_dimension"]), "m"),
+        quantity(float(inputs["effective_conductivity"]), "W/(m*K)"),
+        quantity(float(inputs["activation_energy"]), "J/mol"),
+        float(inputs["volumetric_pre_factor"]),
+        quantity(float(inputs["boundary_temperature"]), "K"),
+        None if inputs.get("marginal_ratio") is None else float(inputs["marginal_ratio"]),
+        None
+        if inputs.get("pipe_insulation_screening") is None
+        else bool(inputs["pipe_insulation_screening"]),
+    )
+    layers = {
+        "delta": result.delta,
+        "delta_crit": result.delta_crit,
+        "delta_ratio": result.delta_ratio,
+        "critical_dimension_m": result.critical_dimension.to("m").magnitude,
+        "dimension_margin_m": result.dimension_margin.to("m").magnitude,
+        "fk_temperature_scale_k": result.fk_temperature_scale.to("K").magnitude,
+    }
+    if result.critical_temperature is not None:
+        layers["critical_temperature_k"] = result.critical_temperature.to("K").magnitude
+    if result.temperature_margin is not None:
+        layers["temperature_margin_k"] = result.temperature_margin.to("K").magnitude
+    return layers
+
+
+def _self_heating_induction(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.self_heating_induction`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.self_heating_induction import (
+        self_heating_induction as evaluate,
+    )
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    result = evaluate(
+        None if inputs.get("geometry") is None else str(inputs["geometry"]),
+        quantity(float(inputs["characteristic_dimension"]), "m"),
+        quantity(float(inputs["effective_conductivity"]), "W/(m*K)"),
+        float(inputs["volumetric_heat_capacity"]),
+        quantity(float(inputs["activation_energy"]), "J/mol"),
+        float(inputs["volumetric_pre_factor"]),
+        quantity(float(inputs["boundary_temperature"]), "K"),
+        optional("initial_temperature", "K"),
+        optional("ignition_rise", "K"),
+        optional("max_time", "s"),
+        None if inputs.get("node_count") is None else float(inputs["node_count"]),
+    )
+    layers = {
+        "peak_temperature_k": result.peak_temperature.to("K").magnitude,
+        "peak_temperature_rise_k": result.peak_temperature_rise.to("K").magnitude,
+        "simulated_time_s": result.simulated_time.to("s").magnitude,
+        "history_count": float(len(result.history)),
+    }
+    if result.induction_time is not None:
+        layers["induction_time_s"] = result.induction_time.to("s").magnitude
+    for index in range(min(3, len(result.history))):
+        point = result.history[index]
+        layers[f"history{index}_time_s"] = point.time.to("s").magnitude
+        layers[f"history{index}_centre_temperature_k"] = point.centre_temperature.to("K").magnitude
+        layers[f"history{index}_max_temperature_k"] = point.max_temperature.to("K").magnitude
+    last = max(0, len(result.history) - 3)
+    for offset, index in enumerate(range(last, len(result.history))):
+        point = result.history[index]
+        layers[f"history_last{offset}_time_s"] = point.time.to("s").magnitude
+        layers[f"history_last{offset}_centre_temperature_k"] = point.centre_temperature.to(
+            "K"
+        ).magnitude
+        layers[f"history_last{offset}_max_temperature_k"] = point.max_temperature.to("K").magnitude
+    return layers
+
+
+def _basket_test_regression(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.basket_test_regression`'s layers, from the reference's arithmetic."""
+    from azoth import _models_gen
+    from azoth.core.units import quantity
+    from azoth.process.reference.basket_test_regression import (
+        basket_test_regression as evaluate,
+    )
+
+    spec = _models_gen.model("process.basket_test_regression")
+    fields = spec["inputs"]["points"]["fields"]
+    prepared = []
+    for row in inputs["points"]:
+        converted: dict[str, Any] = {}
+        for name, declaration in fields.items():
+            value = row.get(name)
+            if value is None:
+                converted[name] = None
+            elif declaration.get("type") in ("enum", "string", "boolean"):
+                converted[name] = value
+            elif declaration.get("unit") == "dimensionless":
+                converted[name] = float(value)
+            else:
+                converted[name] = quantity(float(value), str(declaration["unit"]))
+        prepared.append(converted)
+
+    conductivity = inputs.get("effective_conductivity")
+    result = evaluate(
+        prepared,
+        None if conductivity is None else quantity(float(conductivity), "W/(m*K)"),
+    )
+    layers = {
+        "point_count": result.point_count,
+        "slope_k": result.slope,
+        "intercept": result.intercept,
+        "activation_energy_j_per_mol": result.activation_energy.to("J/mol").magnitude,
+    }
+    if result.r_squared is not None:
+        layers["r_squared"] = result.r_squared
+    if result.volumetric_pre_factor is not None:
+        layers["volumetric_pre_factor_w_per_m3"] = result.volumetric_pre_factor
+    if result.effective_conductivity is not None:
+        layers["effective_conductivity_w_per_m_k"] = result.effective_conductivity.to(
+            "W/(m*K)"
+        ).magnitude
+    return layers
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3095,6 +3224,9 @@ DUMPERS: dict[str, Dumper] = {
     "process.pfp_demand": _pfp_demand,
     "process.blocked_outlet_relief": _blocked_outlet_relief,
     "process.semenov_self_heating": _semenov_self_heating,
+    "process.porous_media_self_heating": _porous_media_self_heating,
+    "process.self_heating_induction": _self_heating_induction,
+    "process.basket_test_regression": _basket_test_regression,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -4850,6 +4982,164 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=6,
         identified_by=("#label", "semenov_not_bracketed"),
     ),
+    # The porous screen: every run block is a case; the class's `setKinetics` row is
+    # evidence for the identity, not a state the id can express.
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_slab",
+        capture="process_porous_media_self_heating.tsv",
+        block=0,
+        identified_by=("#label", "porous_slab"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_infinite_cylinder",
+        capture="process_porous_media_self_heating.tsv",
+        block=1,
+        identified_by=("#label", "porous_infinite_cylinder"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_sphere",
+        capture="process_porous_media_self_heating.tsv",
+        block=2,
+        identified_by=("#label", "porous_sphere"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_cube",
+        capture="process_porous_media_self_heating.tsv",
+        block=3,
+        identified_by=("#label", "porous_cube"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_equicylinder",
+        capture="process_porous_media_self_heating.tsv",
+        block=4,
+        identified_by=("#label", "porous_equicylinder"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_at_critical_dimension",
+        capture="process_porous_media_self_heating.tsv",
+        block=5,
+        identified_by=("#label", "porous_at_critical_dimension"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_thin",
+        capture="process_porous_media_self_heating.tsv",
+        block=6,
+        identified_by=("#label", "porous_thin"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_near_critical",
+        capture="process_porous_media_self_heating.tsv",
+        block=7,
+        identified_by=("#label", "porous_near_critical"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_thick",
+        capture="process_porous_media_self_heating.tsv",
+        block=8,
+        identified_by=("#label", "porous_thick"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_pipe_insulation",
+        capture="process_porous_media_self_heating.tsv",
+        block=9,
+        identified_by=("#label", "porous_pipe_insulation"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_not_bracketed",
+        capture="process_porous_media_self_heating.tsv",
+        block=10,
+        identified_by=("#label", "porous_not_bracketed"),
+    ),
+    LayerCase(
+        model="process.porous_media_self_heating",
+        case="porous_kinetics_combined",
+        capture="process_porous_media_self_heating.tsv",
+        block=11,
+        identified_by=("#label", "porous_kinetics_combined"),
+    ),
+    # The induction runs: six cases, and the cube refusal is evidence.
+    LayerCase(
+        model="process.self_heating_induction",
+        case="induction_ignite",
+        capture="process_self_heating_induction.tsv",
+        block=0,
+        identified_by=("#label", "induction_ignite"),
+    ),
+    LayerCase(
+        model="process.self_heating_induction",
+        case="induction_steady",
+        capture="process_self_heating_induction.tsv",
+        block=1,
+        identified_by=("#label", "induction_steady"),
+    ),
+    LayerCase(
+        model="process.self_heating_induction",
+        case="induction_hot",
+        capture="process_self_heating_induction.tsv",
+        block=2,
+        identified_by=("#label", "induction_hot"),
+    ),
+    LayerCase(
+        model="process.self_heating_induction",
+        case="induction_sphere",
+        capture="process_self_heating_induction.tsv",
+        block=3,
+        identified_by=("#label", "induction_sphere"),
+    ),
+    LayerCase(
+        model="process.self_heating_induction",
+        case="induction_preheated",
+        capture="process_self_heating_induction.tsv",
+        block=4,
+        identified_by=("#label", "induction_preheated"),
+    ),
+    LayerCase(
+        model="process.self_heating_induction",
+        case="induction_near_critical",
+        capture="process_self_heating_induction.tsv",
+        block=5,
+        identified_by=("#label", "induction_near_critical"),
+    ),
+    # The basket fits: four cases, and the two refusals are evidence.
+    LayerCase(
+        model="process.basket_test_regression",
+        case="basket_cube_four_points",
+        capture="process_basket_test_regression.tsv",
+        block=0,
+        identified_by=("#label", "basket_cube_four_points"),
+    ),
+    LayerCase(
+        model="process.basket_test_regression",
+        case="basket_mixed_geometries",
+        capture="process_basket_test_regression.tsv",
+        block=1,
+        identified_by=("#label", "basket_mixed_geometries"),
+    ),
+    LayerCase(
+        model="process.basket_test_regression",
+        case="basket_missing_conductivity",
+        capture="process_basket_test_regression.tsv",
+        block=2,
+        identified_by=("#label", "basket_missing_conductivity"),
+    ),
+    LayerCase(
+        model="process.basket_test_regression",
+        case="basket_two_points",
+        capture="process_basket_test_regression.tsv",
+        block=3,
+        identified_by=("#label", "basket_two_points"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -6597,6 +6887,13 @@ UNCASED_ROWS: dict[str, int] = {
     # The study's two: the no-credible and empty blocks carry no numeric output, so they
     # are held by their cases and the cross-impl rather than the layer diff.
     "process_overpressure_protection_study.tsv": 2,
+    # The class's `setKinetics` row: the identity it records is the caller's multiplication,
+    # which this id does not take as an input.
+    "process_porous_media_self_heating.tsv": 1,
+    # The cube the transient solver refuses: not a shape this id declares.
+    "process_self_heating_induction.tsv": 1,
+    # The two fits the class refuses: a single point and equal temperatures.
+    "process_basket_test_regression.tsv": 2,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

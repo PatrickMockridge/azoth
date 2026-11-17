@@ -166,8 +166,8 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # blowdown pressure profile; 315: the pipe material curves; 316: the pipe fire
     # rupture; 317: the vessel rupture; 318: the blocked-outlet relief load; 319: the
     # control-valve failure load; 320: the check-valve leak load; 321: the tube-rupture
-    # load; 322: the overpressure protection study; 323: the Semenov self-heating screen.
-    assert len(registered) == 323
+    # load; 322: the overpressure protection study; 323-326: the self-heating family.
+    assert len(registered) == 326
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

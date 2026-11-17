@@ -1,0 +1,172 @@
+model = "process.self_heating_induction"
+
+# The class test's slab: r = 0.05 m, lambda = 0.09 W/(m K), rho c = 1.8e5 J/(m3 K),
+# E = 110 kJ/mol, P = 5e13 W/m3, 21 nodes and a five-day cap. Every case states the
+# same run; `history` is deliberately not asserted (see the spec).
+
+[[cases]]
+id = "induction_ignite"
+tolerance = 1.0e-9
+source = "Twenty kelvin above the slab's Frank-Kamenetskii critical temperature: it ignites at 3631.288 s. From `validation/neqsim/captures/process_self_heating_induction.tsv` (`induction_ignite`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+volumetric_heat_capacity = 1.8e5
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 548.3451326191425
+max_time = 432000.0
+node_count = 21
+[cases.expected]
+geometry = "slab"
+characteristic_dimension = 0.05
+boundary_temperature = 548.3451326191425
+initial_temperature = 548.3451326191425
+ignition_rise = 100.0
+ignited = true
+induction_time = 3631.288064208441
+peak_temperature = 648.4922016139807
+peak_temperature_rise = 100.14706899483815
+steady_state_reached = false
+simulated_time = 3631.288064208441
+
+[[cases]]
+id = "induction_steady"
+tolerance = 1.0e-9
+source = "Ten kelvin below the critical temperature: a steady 7.859 K rise at 27165 s. From (`induction_steady`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+volumetric_heat_capacity = 1.8e5
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 518.3451326191425
+max_time = 432000.0
+node_count = 21
+[cases.expected]
+geometry = "slab"
+characteristic_dimension = 0.05
+boundary_temperature = 518.3451326191425
+initial_temperature = 518.3451326191425
+ignition_rise = 100.0
+ignited = false
+peak_temperature = 526.2043490480029
+peak_temperature_rise = 7.85921642886035
+steady_state_reached = true
+simulated_time = 27165.000000000004
+messages = [
+    "A steady temperature profile was reached, so the body is subcritical at this boundary temperature",
+]
+
+[[cases]]
+id = "induction_hot"
+tolerance = 1.0e-9
+source = "Sixty kelvin above the critical temperature: the induction time falls to 585.337 s. From (`induction_hot`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+volumetric_heat_capacity = 1.8e5
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 588.3451326191425
+max_time = 432000.0
+node_count = 21
+[cases.expected]
+geometry = "slab"
+characteristic_dimension = 0.05
+boundary_temperature = 588.3451326191425
+initial_temperature = 588.3451326191425
+ignition_rise = 100.0
+ignited = true
+induction_time = 585.3368024941619
+peak_temperature = 688.742595958479
+peak_temperature_rise = 100.39746333933647
+steady_state_reached = false
+simulated_time = 585.3368024941619
+
+[[cases]]
+id = "induction_sphere"
+tolerance = 1.0e-9
+source = "The sphere twenty kelvin above its own critical temperature: it ignites at 944.586 s. From (`induction_sphere`)."
+[cases.inputs]
+geometry = "sphere"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+volumetric_heat_capacity = 1.8e5
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 580.8196742832661
+max_time = 432000.0
+node_count = 21
+[cases.expected]
+geometry = "sphere"
+characteristic_dimension = 0.05
+boundary_temperature = 580.8196742832661
+initial_temperature = 580.8196742832661
+ignition_rise = 100.0
+ignited = true
+induction_time = 944.585538175886
+peak_temperature = 681.2567577123533
+peak_temperature_rise = 100.43708342908724
+steady_state_reached = false
+simulated_time = 944.585538175886
+
+[[cases]]
+id = "induction_preheated"
+tolerance = 1.0e-9
+source = "The +20 K slab started 40 K hotter: it ignites at 564.893 s rather than 3631.288 s. From (`induction_preheated`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+volumetric_heat_capacity = 1.8e5
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 548.3451326191425
+initial_temperature = 588.3451326191425
+max_time = 432000.0
+node_count = 21
+[cases.expected]
+geometry = "slab"
+characteristic_dimension = 0.05
+boundary_temperature = 548.3451326191425
+initial_temperature = 588.3451326191425
+ignition_rise = 100.0
+ignited = true
+induction_time = 564.8931706053196
+peak_temperature = 648.7411765738602
+peak_temperature_rise = 100.3960439547177
+steady_state_reached = false
+simulated_time = 564.8931706053196
+
+[[cases]]
+id = "induction_near_critical"
+tolerance = 1.0e-9
+source = "Half a kelvin above the critical temperature: the transient reaches a steady 21.877 K rise at 83837.5 s where the steady-state screen predicts ignition. From (`induction_near_critical`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+volumetric_heat_capacity = 1.8e5
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 528.8451326191425
+max_time = 432000.0
+node_count = 21
+[cases.expected]
+geometry = "slab"
+characteristic_dimension = 0.05
+boundary_temperature = 528.8451326191425
+initial_temperature = 528.8451326191425
+ignition_rise = 100.0
+ignited = false
+peak_temperature = 550.7226242103998
+peak_temperature_rise = 21.87749159125724
+steady_state_reached = true
+simulated_time = 83837.50000000001
+messages = [
+    "A steady temperature profile was reached, so the body is subcritical at this boundary temperature",
+]

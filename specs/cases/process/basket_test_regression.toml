@@ -1,0 +1,88 @@
+model = "process.basket_test_regression"
+
+[[cases]]
+id = "basket_cube_four_points"
+tolerance = 1.0e-9
+source = "Four cube baskets whose critical temperatures come from the porous model at E = 110 kJ/mol, P = 5e13 W/m3 and lambda = 0.09 W/(m K): the fit recovers both constants. From `validation/neqsim/captures/process_basket_test_regression.tsv` (`basket_cube_four_points`)."
+[cases.inputs]
+points = [
+    { geometry = "cube", characteristic_dimension = 0.0125, critical_temperature = 634.6264682710171 },
+    { geometry = "cube", characteristic_dimension = 0.025, critical_temperature = 591.2940539419651 },
+    { geometry = "cube", characteristic_dimension = 0.05, critical_temperature = 553.7372328341007 },
+    { geometry = "cube", characteristic_dimension = 0.1, critical_temperature = 520.8462618291378 },
+]
+effective_conductivity = 0.09
+[cases.expected]
+point_count = 4.0
+slope = -13229.959020078551
+intercept = 43.44122935603803
+r_squared = 0.9999999999999432
+activation_energy = 109999.99971011504
+volumetric_pre_factor = 5.0000023321254945e13
+effective_conductivity = 0.09
+conductivity_provided = true
+
+[[cases]]
+id = "basket_mixed_geometries"
+tolerance = 1.0e-9
+source = "A cube, a sphere and a cylinder: the shape enters only through its critical parameter, so the same line is recovered. From (`basket_mixed_geometries`)."
+[cases.inputs]
+points = [
+    { geometry = "cube", characteristic_dimension = 0.025, critical_temperature = 591.2940539419651 },
+    { geometry = "sphere", characteristic_dimension = 0.05, critical_temperature = 560.8196742832661 },
+    { geometry = "infinite_cylinder", characteristic_dimension = 0.1, critical_temperature = 515.7547198235989 },
+]
+effective_conductivity = 0.09
+[cases.expected]
+point_count = 3.0
+slope = -13229.960782943328
+intercept = 43.44123198160831
+r_squared = 0.9999999999997294
+activation_energy = 110000.01436738831
+volumetric_pre_factor = 5.000014793758595e13
+effective_conductivity = 0.09
+conductivity_provided = true
+
+[[cases]]
+id = "basket_missing_conductivity"
+tolerance = 1.0e-9
+source = "Three cube baskets with no conductivity: E is recovered and P is absent, with the class's message. From (`basket_missing_conductivity`)."
+[cases.inputs]
+points = [
+    { geometry = "cube", characteristic_dimension = 0.025, critical_temperature = 591.2940539419651 },
+    { geometry = "cube", characteristic_dimension = 0.05, critical_temperature = 553.7372328341007 },
+    { geometry = "cube", characteristic_dimension = 0.1, critical_temperature = 520.8462618291378 },
+]
+[cases.expected]
+point_count = 3.0
+slope = -13229.958597530644
+intercept = 43.441228577023196
+r_squared = 0.9999999999998586
+activation_energy = 109999.99619685624
+conductivity_provided = false
+messages = [
+    "Effective thermal conductivity not supplied; the volumetric heat-release pre-factor could not be separated from the regression intercept",
+]
+
+[[cases]]
+id = "basket_two_points"
+tolerance = 1.0e-9
+source = "Two cube baskets: the line is exact and the fit carries the class's recommendation. From (`basket_two_points`)."
+[cases.inputs]
+points = [
+    { geometry = "cube", characteristic_dimension = 0.025, critical_temperature = 591.2940539419651 },
+    { geometry = "cube", characteristic_dimension = 0.1, critical_temperature = 520.8462618291378 },
+]
+effective_conductivity = 0.09
+[cases.expected]
+point_count = 2.0
+slope = -13229.958589203492
+intercept = 43.441228890499836
+r_squared = 1.0
+activation_energy = 109999.99612762046
+volumetric_pre_factor = 5.000000167274655e13
+effective_conductivity = 0.09
+conductivity_provided = true
+messages = [
+    "Only 2 basket sizes supplied; at least 3 are recommended for a defensible fit and a meaningful coefficient of determination",
+]

@@ -1,0 +1,182 @@
+id = "process.self_heating_induction"
+name = "Self-heating induction time"
+kind = "procedure"
+assumptions = [
+    "**explicit Euler on a one-dimensional conduction equation with an Arrhenius source**, symmetry at the centre and the boundary temperature held at the surface. Only the three one-dimensional shapes exist here; the class refuses the cube and the equicylinder.",
+    "**the step is the smaller of the conduction limit `0.4 dx^2/(2 (j+1) alpha)` and a reaction limit `0.02 (R T^2/E) rho c / (P exp(-E/RT))`**, clamped to the remaining time.",
+    "**ignition is the peak reaching the boundary plus the ignition rise** (default 100 K), tested at the top of a step; the steady heuristic is `maxRate (maxTime - time) < 0.1` after a step, which uses the run's own cap, not the remaining time.",
+    "**the history is decimated**: sampled every step, halved whenever it reaches 500 rows with the sampling stride doubling, and the final state appended.",
+    "**the three warnings are the class's own**: the 20000000-step cap, a steady profile, and the maximum time without either. `messages` publishes them in order.",
+    "**`history` is published and the cases do not assert it**: a 500-row expected block is not maintainable, so the capture holds the samples and the Rust test reads them.",
+]
+references = [
+    "Frank-Kamenetskii, D. A. (1969). Diffusion and Heat Transfer in Chemical Kinetics, 2nd ed.",
+    "Bowes, P. C. (1984). Self-Heating: Evaluating and Controlling the Hazards. HMSO.",
+    "Babrauskas, V. (2003). Ignition Handbook. Fire Science Publishers.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/selfheating/SelfHeatingInductionSolver.java` is the port source.",
+    "`validation/neqsim/captures/process_self_heating_induction.tsv` - the class test's slab above, below and far above its critical temperature, the sphere, a pre-heated start and a near-critical run.",
+]
+[source]
+standard = "NeqSim process/safety/selfheating/SelfHeatingInductionSolver.java"
+edition = "Its `solve`: the explicit Euler march, the adaptive step, the three termination states and the retained history."
+[algorithm]
+scheme = "explicit_euler_induction"
+convergence = "absolute"
+tolerance = 0.1
+max_iterations = 20000000
+[inputs]
+[inputs.geometry]
+type = "enum"
+values = ["slab", "infinite_cylinder", "sphere"]
+optional = true
+description = "the one-dimensional body shape. **Absent is `slab`.**\n"
+[inputs.characteristic_dimension]
+unit = "m"
+description = "the half-thickness for a slab, the radius for a cylinder or sphere, above zero.\n"
+[inputs.effective_conductivity]
+unit = "W/(m*K)"
+description = "the effective thermal conductivity of the wetted porous body, above zero.\n"
+[inputs.volumetric_heat_capacity]
+unit = "dimensionless"
+description = "`rho c`, the volumetric heat capacity **in J/(m3 K)**, above zero. Declared dimensionless because the vocabulary has no such unit.\n"
+[inputs.activation_energy]
+unit = "J/mol"
+description = "the apparent activation energy of the self-heating reaction, above zero.\n"
+[inputs.volumetric_pre_factor]
+unit = "dimensionless"
+description = "`P = A Q rho`, the volumetric heat-release pre-exponential factor **in W/m3**, above zero.\n"
+[inputs.boundary_temperature]
+unit = "K"
+description = "the surface temperature held fixed, absolute and above zero.\n"
+[inputs.initial_temperature]
+unit = "K"
+optional = true
+description = "the uniform starting temperature, absolute and above zero. **Absent is the boundary temperature.**\n"
+[inputs.ignition_rise]
+unit = "K"
+interval = true
+optional = true
+description = "the rise above the boundary that defines ignition, above zero. **Absent is 100 K.**\n"
+[inputs.max_time]
+unit = "s"
+optional = true
+description = "the simulated-time cap, above zero. **Absent is 2592000 s, 30 days.**\n"
+[inputs.node_count]
+unit = "dimensionless"
+optional = true
+description = "the spatial node count, a whole number of at least 5. **Absent is 41.**\n"
+[outputs]
+[outputs.geometry]
+type = "enum"
+values = ["slab", "infinite_cylinder", "sphere"]
+description = "the shape the march used.\n"
+[outputs.characteristic_dimension]
+unit = "m"
+description = "the half-dimension, echoed.\n"
+[outputs.boundary_temperature]
+unit = "K"
+description = "the surface temperature, echoed.\n"
+[outputs.initial_temperature]
+unit = "K"
+description = "the uniform starting temperature.\n"
+[outputs.ignition_rise]
+unit = "K"
+description = "the ignition rise, echoed or defaulted.\n"
+[outputs.ignited]
+type = "boolean"
+description = "whether the peak reached the ignition temperature.\n"
+[outputs.induction_time]
+unit = "s"
+optional = true
+description = "the time at which it did; absent when the body did not ignite.\n"
+[outputs.peak_temperature]
+unit = "K"
+description = "the final peak node temperature.\n"
+[outputs.peak_temperature_rise]
+unit = "K"
+description = "`peak_temperature - boundary_temperature`.\n"
+[outputs.steady_state_reached]
+type = "boolean"
+description = "whether the steady heuristic ended the run.\n"
+[outputs.simulated_time]
+unit = "s"
+description = "the simulated time the run reached.\n"
+[outputs.history]
+type = "record_list"
+description = "the retained temperature samples, in the class's order.\n"
+[outputs.history.fields.time]
+unit = "s"
+description = "the sample's time.\n"
+[outputs.history.fields.centre_temperature]
+unit = "K"
+description = "the centre-node temperature.\n"
+[outputs.history.fields.max_temperature]
+unit = "K"
+description = "the peak node temperature.\n"
+[outputs.messages]
+type = "vector_string"
+length = "one per message"
+description = "the class's warning strings, in the order it appends them.\n"
+[[valid_range]]
+quantity = "characteristic_dimension"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a characteristic dimension is positive"
+[[valid_range]]
+quantity = "effective_conductivity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive conductivity"
+[[valid_range]]
+quantity = "volumetric_heat_capacity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive heat capacity"
+[[valid_range]]
+quantity = "activation_energy"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive activation energy"
+[[valid_range]]
+quantity = "volumetric_pre_factor"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive pre-factor"
+[[valid_range]]
+quantity = "boundary_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "initial_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "ignition_rise"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive rise"
+[[valid_range]]
+quantity = "max_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive time"
+[[valid_range]]
+quantity = "node_count"
+min = 5
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses fewer than five nodes"
+[implementations]
+python = "azoth.process.self_heating_induction"
+rust = "azoth_process::self_heating_induction"

@@ -227,6 +227,11 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # test asserts it against the capture and `test_cross_impl` compares it. The study's
         # `accepted` is the acceptance id's own flag, already declared below.
         "capacity_adequate",
+        # The self-heating family's boolean outputs, which have no slot in `TestCase`. The
+        # model tests assert them against the capture and `test_cross_impl` compares them.
+        "ignited",
+        "steady_state_reached",
+        "conductivity_provided",
         # `deluge_nozzle_layout`'s three flags, booleans with no slot in `TestCase`.
         # `crates/azoth-process/tests/deluge_nozzle_layout.rs` asserts them against the
         # capture, and `test_cross_impl` compares them on both results.

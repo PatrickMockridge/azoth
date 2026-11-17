@@ -28,6 +28,7 @@ from azoth.core.result import (
     ArgonSolidPhaseResult,
     AssayMassFractionsResult,
     BariteCelestiteSolidSolutionResult,
+    BasketTestRegressionResult,
     BeggsBrillRegime,
     BeggsBrillSegmentResult,
     BleveResult,
@@ -228,6 +229,7 @@ from azoth.core.result import (
     PitzerScaleActivityResult,
     PlugFlowReactorResult,
     PoolFireResult,
+    PorousMediaSelfHeatingResult,
     Pr78KappaResult,
     PrAlphaAbResult,
     PrCpaPhaseResult,
@@ -293,6 +295,9 @@ from azoth.core.result import (
     ScenarioChangeRow,
     ScenarioIndexRow,
     SchwartzentruberAlphaResult,
+    SelfHeatingGeometry,
+    SelfHeatingInductionResult,
+    SelfHeatingTimePoint,
     SelfHeatingVerdict,
     SemenovSelfHeatingResult,
     SeparatorCapacityAssessmentResult,
@@ -442,6 +447,7 @@ __all__ = [
     "argon_solid_phase",
     "assay_mass_fractions",
     "barite_celestite_solid_solution",
+    "basket_test_regression",
     "beggs_brill_segment",
     "bleve",
     "blocked_outlet_relief",
@@ -609,6 +615,7 @@ __all__ = [
     "pitzer_scale_activity",
     "plug_flow_reactor",
     "pool_fire",
+    "porous_media_self_heating",
     "pr78_kappa",
     "pr_alpha_ab",
     "pr_cpa_phase",
@@ -664,6 +671,7 @@ __all__ = [
     "scale_remediation_advisor",
     "scale_saturation_ratio",
     "schwartzentruber_alpha",
+    "self_heating_induction",
     "semenov_self_heating",
     "separator",
     "separator_capacity_assessment",
@@ -5736,6 +5744,27 @@ def api537_flare_flame_model(mass_flow: Q, heat_of_combustion: float, radiative_
     )
 
 
+def basket_test_regression(points: list[dict[str, object]], effective_conductivity: Q | None=None) -> BasketTestRegressionResult:
+    """``process.basket_test_regression``, computed in Rust."""
+    spec = _models_gen.model("process.basket_test_regression")
+    result = _core.basket_test_regression(
+        input_records_to_si(spec, "points", points),
+        None if effective_conductivity is None else input_to_si(spec, "effective_conductivity", effective_conductivity),
+    )
+    return BasketTestRegressionResult(
+        point_count=result.point_count,
+        slope=result.slope,
+        intercept=result.intercept,
+        r_squared=result.r_squared,
+        activation_energy=from_si(result.activation_energy.magnitude_si, result.activation_energy.unit),
+        volumetric_pre_factor=result.volumetric_pre_factor,
+        effective_conductivity=None if result.effective_conductivity is None else from_si(result.effective_conductivity.magnitude_si, result.effective_conductivity.unit),
+        conductivity_provided=result.conductivity_provided,
+        messages=tuple(result.messages),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def bleve(fuel_mass: Q, heat_of_combustion: float, radiative_fraction: float, relative_humidity: float | None=None, distance: Q | None=None, target_flux: Q | None=None) -> BleveResult:
     """``process.bleve``, computed in Rust."""
     spec = _models_gen.model("process.bleve")
@@ -7668,6 +7697,40 @@ def pool_fire(pool_diameter: Q, burn_rate: Q, air_density: float | None=None, di
     )
 
 
+def porous_media_self_heating(geometry: str | None, characteristic_dimension: Q, effective_conductivity: Q, activation_energy: Q, volumetric_pre_factor: float, boundary_temperature: Q, marginal_ratio: float | None=None, pipe_insulation_screening: bool | None=None) -> PorousMediaSelfHeatingResult:
+    """``process.porous_media_self_heating``, computed in Rust."""
+    spec = _models_gen.model("process.porous_media_self_heating")
+    result = _core.porous_media_self_heating(
+        geometry,
+        input_to_si(spec, "characteristic_dimension", characteristic_dimension),
+        input_to_si(spec, "effective_conductivity", effective_conductivity),
+        input_to_si(spec, "activation_energy", activation_energy),
+        volumetric_pre_factor,
+        input_to_si(spec, "boundary_temperature", boundary_temperature),
+        None if marginal_ratio is None else marginal_ratio,
+        pipe_insulation_screening,
+    )
+    return PorousMediaSelfHeatingResult(
+        geometry=SelfHeatingGeometry(result.geometry),
+        characteristic_dimension=from_si(result.characteristic_dimension.magnitude_si, result.characteristic_dimension.unit),
+        effective_conductivity=from_si(result.effective_conductivity.magnitude_si, result.effective_conductivity.unit),
+        activation_energy=from_si(result.activation_energy.magnitude_si, result.activation_energy.unit),
+        volumetric_pre_factor=result.volumetric_pre_factor,
+        boundary_temperature=from_si(result.boundary_temperature.magnitude_si, result.boundary_temperature.unit),
+        delta=result.delta,
+        delta_crit=result.delta_crit,
+        delta_ratio=result.delta_ratio,
+        critical_temperature=None if result.critical_temperature is None else from_si(result.critical_temperature.magnitude_si, result.critical_temperature.unit),
+        critical_dimension=from_si(result.critical_dimension.magnitude_si, result.critical_dimension.unit),
+        temperature_margin=None if result.temperature_margin is None else from_si(result.temperature_margin.magnitude_si, result.temperature_margin.unit),
+        dimension_margin=from_si(result.dimension_margin.magnitude_si, result.dimension_margin.unit),
+        fk_temperature_scale=from_si(result.fk_temperature_scale.magnitude_si, result.fk_temperature_scale.unit),
+        verdict=SelfHeatingVerdict(result.verdict),
+        messages=tuple(result.messages),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def probit(a: float, b: float, n: float, dose: Q | None=None, probit_value: Q | None=None) -> ProbitResult:
     """``process.probit``, computed in Rust."""
     spec = _models_gen.model("process.probit")
@@ -7994,6 +8057,40 @@ def safety_instrumented_function(pfd_average: float, claimed_sil: float, unmitig
         pfd_1oo2=result.pfd_1oo2,
         pfd_2oo3=result.pfd_2oo3,
         availability_with_spurious_trips=result.availability_with_spurious_trips,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def self_heating_induction(geometry: str | None, characteristic_dimension: Q, effective_conductivity: Q, volumetric_heat_capacity: float, activation_energy: Q, volumetric_pre_factor: float, boundary_temperature: Q, initial_temperature: Q | None=None, ignition_rise: Q | None=None, max_time: Q | None=None, node_count: float | None=None) -> SelfHeatingInductionResult:
+    """``process.self_heating_induction``, computed in Rust."""
+    spec = _models_gen.model("process.self_heating_induction")
+    result = _core.self_heating_induction(
+        geometry,
+        input_to_si(spec, "characteristic_dimension", characteristic_dimension),
+        input_to_si(spec, "effective_conductivity", effective_conductivity),
+        volumetric_heat_capacity,
+        input_to_si(spec, "activation_energy", activation_energy),
+        volumetric_pre_factor,
+        input_to_si(spec, "boundary_temperature", boundary_temperature),
+        None if initial_temperature is None else input_to_si(spec, "initial_temperature", initial_temperature),
+        None if ignition_rise is None else input_to_si(spec, "ignition_rise", ignition_rise),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+        None if node_count is None else node_count,
+    )
+    return SelfHeatingInductionResult(
+        geometry=SelfHeatingGeometry(result.geometry),
+        characteristic_dimension=from_si(result.characteristic_dimension.magnitude_si, result.characteristic_dimension.unit),
+        boundary_temperature=from_si(result.boundary_temperature.magnitude_si, result.boundary_temperature.unit),
+        initial_temperature=from_si(result.initial_temperature.magnitude_si, result.initial_temperature.unit),
+        ignition_rise=from_si(result.ignition_rise.magnitude_si, result.ignition_rise.unit),
+        ignited=result.ignited,
+        induction_time=None if result.induction_time is None else from_si(result.induction_time.magnitude_si, result.induction_time.unit),
+        peak_temperature=from_si(result.peak_temperature.magnitude_si, result.peak_temperature.unit),
+        peak_temperature_rise=from_si(result.peak_temperature_rise.magnitude_si, result.peak_temperature_rise.unit),
+        steady_state_reached=result.steady_state_reached,
+        simulated_time=from_si(result.simulated_time.magnitude_si, result.simulated_time.unit),
+        history=tuple(SelfHeatingTimePoint(time=from_si(c.time.magnitude_si, c.time.unit), centre_temperature=from_si(c.centre_temperature.magnitude_si, c.centre_temperature.unit), max_temperature=from_si(c.max_temperature.magnitude_si, c.max_temperature.unit)) for c in result.history),
+        messages=tuple(result.messages),
         warnings=_warnings(result.warnings),
     )
 

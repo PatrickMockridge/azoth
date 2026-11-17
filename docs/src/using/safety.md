@@ -105,8 +105,10 @@ with the refusal its shape earns rather than given a field it cannot express.
 `process.fire_water_demand`, `process.relief_disposal_network`, `process.tr3001_compliance`,
 `process.consequence_analysis`, `process.risk_matrix`, `process.fault_tree`, `process.lopa` and
 `process.event_tree` take and/or return record lists; `process.sil_verification` returns one;
-`process.api537_flare_flame_model` takes a flux table. The four rupture models take records
-too, and their manual pages state the inputs, the range and the worked example.
+`process.api537_flare_flame_model` takes a flux table; the four self-heating ids publish the
+class's warning strings as a vector output, and the basket test takes a record list. The four
+rupture models take records too, and their manual pages state the inputs, the range and the
+worked example.
 
 ## Units
 

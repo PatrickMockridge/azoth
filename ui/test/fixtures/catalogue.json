@@ -21781,6 +21781,15 @@
       "sub_interface": "fire"
     },
     {
+      "family": "selfheating",
+      "id": "process.basket_test_regression",
+      "name": "Basket-test regression",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "fire",
       "form": {
         "assumptions": [
@@ -25379,6 +25388,15 @@
       "sub_interface": "fire"
     },
     {
+      "family": "selfheating",
+      "id": "process.porous_media_self_heating",
+      "name": "Porous media self-heating",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation returns a table of rows, which this workspace does not yet draw",
+      "sub_interface": null
+    },
+    {
       "family": "dispersion",
       "form": {
         "assumptions": [
@@ -26954,6 +26972,24 @@
       "purpose": "The SIF's RRF, required PFD and SIL, architecture PFDs and spurious-trip availability.",
       "refusal": null,
       "sub_interface": "risk"
+    },
+    {
+      "family": "selfheating",
+      "id": "process.self_heating_induction",
+      "name": "Self-heating induction time",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation returns a table of rows, which this workspace does not yet draw",
+      "sub_interface": null
+    },
+    {
+      "family": "selfheating",
+      "id": "process.semenov_self_heating",
+      "name": "Semenov self-heating",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation returns a table of rows, which this workspace does not yet draw",
+      "sub_interface": null
     },
     {
       "family": "risk",

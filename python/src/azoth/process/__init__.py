@@ -23,6 +23,7 @@ from azoth.core.result import (
     ActiveFireProtectionScreeningResult,
     AntiSurgeRecycleResult,
     Api537FlareFlameModelResult,
+    BasketTestRegressionResult,
     BleveResult,
     BlockedOutletReliefResult,
     BlowdownPressureProfileResult,
@@ -71,6 +72,7 @@ from azoth.core.result import (
     PipeResult,
     PlugFlowReactorResult,
     PoolFireResult,
+    PorousMediaSelfHeatingResult,
     ProbitResult,
     PsvFireSizingResult,
     PsvSizingResult,
@@ -79,6 +81,7 @@ from azoth.core.result import (
     ReliefDisposalNetworkResult,
     RiskMatrixResult,
     SafetyInstrumentedFunctionResult,
+    SelfHeatingInductionResult,
     SemenovSelfHeatingResult,
     SeparatorCapacityAssessmentResult,
     SeparatorPerformanceResult,
@@ -260,6 +263,7 @@ _TUBE_RUPTURE_RELIEF = "process.tube_rupture_relief"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
 _POOL_FIRE = "process.pool_fire"
+_POROUS_MEDIA_SELF_HEATING = "process.porous_media_self_heating"
 _PUMP = "process.pump"
 _SPLITTER = "process.splitter"
 _STIRRED_TANK_REACTOR = "process.stirred_tank_reactor"
@@ -275,6 +279,8 @@ _PIPE_FIRE_RUPTURE = "process.pipe_fire_rupture"
 _PIPE_FIRE_RUPTURE_MATERIAL = "process.pipe_fire_rupture_material"
 _VESSEL_RUPTURE = "process.vessel_rupture"
 _SEMENOV_SELF_HEATING = "process.semenov_self_heating"
+_SELF_HEATING_INDUCTION = "process.self_heating_induction"
+_BASKET_TEST_REGRESSION = "process.basket_test_regression"
 
 
 def validate(flowsheet: str, palette_dir: str = "specs/unit_ops") -> list[str]:
@@ -1096,6 +1102,91 @@ def pool_fire(
         air_density=air_density,
         distance=distance,
         target_flux=target_flux,
+    )
+
+
+def porous_media_self_heating(
+    geometry: str | None,
+    characteristic_dimension: Q,
+    effective_conductivity: Q,
+    activation_energy: Q,
+    volumetric_pre_factor: float,
+    boundary_temperature: Q,
+    marginal_ratio: float | None = None,
+    pipe_insulation_screening: bool | None = None,
+) -> PorousMediaSelfHeatingResult:
+    """The Frank-Kamenetskii criticality screen for a porous body.
+
+    **`delta` scales with the square of the characteristic dimension**, so a thick layer
+    ignites where a laboratory dish does not. The critical boundary temperature is the
+    same bisection as the Semenov screen; the critical half-dimension is closed form.
+    ``pipe_insulation_screening`` forces the slab and records the conservative bounding.
+
+    See :func:`azoth.process.reference.porous_media_self_heating`.
+    """
+    return resolve(_POROUS_MEDIA_SELF_HEATING)(  # type: ignore[no-any-return]
+        geometry=geometry,
+        characteristic_dimension=characteristic_dimension,
+        effective_conductivity=effective_conductivity,
+        activation_energy=activation_energy,
+        volumetric_pre_factor=volumetric_pre_factor,
+        boundary_temperature=boundary_temperature,
+        marginal_ratio=marginal_ratio,
+        pipe_insulation_screening=pipe_insulation_screening,
+    )
+
+
+def self_heating_induction(
+    geometry: str | None,
+    characteristic_dimension: Q,
+    effective_conductivity: Q,
+    volumetric_heat_capacity: float,
+    activation_energy: Q,
+    volumetric_pre_factor: float,
+    boundary_temperature: Q,
+    initial_temperature: Q | None = None,
+    ignition_rise: Q | None = None,
+    max_time: Q | None = None,
+    node_count: float | None = None,
+) -> SelfHeatingInductionResult:
+    """The one-dimensional induction-time march for a self-heating body.
+
+    **Explicit Euler with an adaptive step**, ending on ignition, on the steady heuristic,
+    or at the time cap. The retained history is decimated; the three warnings are the
+    class's own.
+
+    See :func:`azoth.process.reference.self_heating_induction`.
+    """
+    return resolve(_SELF_HEATING_INDUCTION)(  # type: ignore[no-any-return]
+        geometry=geometry,
+        characteristic_dimension=characteristic_dimension,
+        effective_conductivity=effective_conductivity,
+        volumetric_heat_capacity=volumetric_heat_capacity,
+        activation_energy=activation_energy,
+        volumetric_pre_factor=volumetric_pre_factor,
+        boundary_temperature=boundary_temperature,
+        initial_temperature=initial_temperature,
+        ignition_rise=ignition_rise,
+        max_time=max_time,
+        node_count=node_count,
+    )
+
+
+def basket_test_regression(
+    points: list[dict[str, object]],
+    effective_conductivity: Q | None = None,
+) -> BasketTestRegressionResult:
+    """The least-squares basket-test fit for the activation energy and pre-factor.
+
+    **The slope alone gives E; the conductivity splits the intercept into P.** A fit with
+    fewer than three sizes carries the class's recommendation, and a fit without a
+    conductivity yields no pre-factor.
+
+    See :func:`azoth.process.reference.basket_test_regression`.
+    """
+    return resolve(_BASKET_TEST_REGRESSION)(  # type: ignore[no-any-return]
+        points=points,
+        effective_conductivity=effective_conductivity,
     )
 
 

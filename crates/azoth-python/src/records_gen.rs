@@ -41,6 +41,17 @@ pub struct AssayCutDerivation {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BasketTestPoint {
+    #[pyo3(item)]
+    pub geometry: String,
+    #[pyo3(item)]
+    pub characteristic_dimension: f64,
+    #[pyo3(item)]
+    pub critical_temperature: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct BlowdownProfilePoint {
     #[pyo3(item)]
     pub time: f64,

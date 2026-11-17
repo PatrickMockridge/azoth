@@ -1897,3 +1897,74 @@ pub fn pipe_fire_rupture_material(
     .map(|r| crate::transport_gen::PyPipeFireRuptureMaterialResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
+
+/// The one-dimensional induction-time march.
+///
+/// All arguments are SI magnitudes. **The kernel takes an interval for `ignition_rise` and
+/// returns a `record_list` history**, which the wrapper generator leaves hand-written.
+#[pyfunction]
+#[pyo3(signature = (geometry, characteristic_dimension, effective_conductivity, volumetric_heat_capacity, activation_energy, volumetric_pre_factor, boundary_temperature, initial_temperature, ignition_rise, max_time, node_count))]
+#[pyo3(
+    text_signature = "(geometry, characteristic_dimension, effective_conductivity, volumetric_heat_capacity, activation_energy, volumetric_pre_factor, boundary_temperature, initial_temperature, ignition_rise, max_time, node_count)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn self_heating_induction(
+    py: Python<'_>,
+    geometry: Option<&str>,
+    characteristic_dimension: f64,
+    effective_conductivity: f64,
+    volumetric_heat_capacity: f64,
+    activation_energy: f64,
+    volumetric_pre_factor: f64,
+    boundary_temperature: f64,
+    initial_temperature: Option<f64>,
+    ignition_rise: Option<f64>,
+    max_time: Option<f64>,
+    node_count: Option<f64>,
+) -> PyResult<crate::transport_gen::PySelfHeatingInductionResult> {
+    azoth_process::models::self_heating_induction::self_heating_induction(
+        geometry,
+        meters(characteristic_dimension),
+        watts_per_meter_kelvin(effective_conductivity),
+        volumetric_heat_capacity,
+        joules_per_mole(activation_energy),
+        volumetric_pre_factor,
+        kelvins(boundary_temperature),
+        initial_temperature.map(kelvins),
+        ignition_rise.map(kelvin_intervals),
+        max_time.map(seconds),
+        node_count,
+    )
+    .map(|r| crate::transport_gen::PySelfHeatingInductionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// The basket-test regression.
+///
+/// All arguments are SI magnitudes. **The `record_list` input is one the wrapper generator
+/// leaves hand-written**, so this binding sits here rather than in `wrappers_gen.rs`.
+#[pyfunction]
+#[pyo3(signature = (points, effective_conductivity))]
+#[pyo3(text_signature = "(points, effective_conductivity)")]
+pub fn basket_test_regression(
+    py: Python<'_>,
+    points: Vec<crate::records_gen::BasketTestPoint>,
+    effective_conductivity: Option<f64>,
+) -> PyResult<crate::transport_gen::PyBasketTestRegressionResult> {
+    let rows: Vec<azoth_process::models::basket_test_regression::BasketTestPoint> = points
+        .into_iter()
+        .map(
+            |row| azoth_process::models::basket_test_regression::BasketTestPoint {
+                geometry: row.geometry,
+                characteristic_dimension: meters(row.characteristic_dimension),
+                critical_temperature: kelvins(row.critical_temperature),
+            },
+        )
+        .collect();
+    azoth_process::models::basket_test_regression::basket_test_regression(
+        &rows,
+        effective_conductivity.map(watts_per_meter_kelvin),
+    )
+    .map(|r| crate::transport_gen::PyBasketTestRegressionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}

@@ -226,6 +226,7 @@
 //!   - specs/models/process/active_fire_protection_screening.toml
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
+//!   - specs/models/process/basket_test_regression.toml
 //!   - specs/models/process/bleve.toml
 //!   - specs/models/process/blocked_outlet_relief.toml
 //!   - specs/models/process/blowdown_pressure_profile.toml
@@ -274,6 +275,7 @@
 //!   - specs/models/process/pipeline_pressure_protection.toml
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
+//!   - specs/models/process/porous_media_self_heating.toml
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
@@ -282,6 +284,7 @@
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/safety_instrumented_function.toml
+//!   - specs/models/process/self_heating_induction.toml
 //!   - specs/models/process/semenov_self_heating.toml
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
@@ -2788,6 +2791,11 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "acoustic_efficiency",
         "dimensionless",
     ),
+    (
+        "process.basket_test_regression",
+        "effective_conductivity",
+        "thermal_conductivity",
+    ),
     ("process.bleve", "fuel_mass", "mass"),
     ("process.bleve", "heat_of_combustion", "dimensionless"),
     ("process.bleve", "radiative_fraction", "dimensionless"),
@@ -4367,6 +4375,36 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.pool_fire", "air_density", "mass_density"),
     ("process.pool_fire", "distance", "length"),
     ("process.pool_fire", "target_flux", "heat_flux_density"),
+    (
+        "process.porous_media_self_heating",
+        "characteristic_dimension",
+        "length",
+    ),
+    (
+        "process.porous_media_self_heating",
+        "effective_conductivity",
+        "thermal_conductivity",
+    ),
+    (
+        "process.porous_media_self_heating",
+        "activation_energy",
+        "molar_energy",
+    ),
+    (
+        "process.porous_media_self_heating",
+        "volumetric_pre_factor",
+        "dimensionless",
+    ),
+    (
+        "process.porous_media_self_heating",
+        "boundary_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.porous_media_self_heating",
+        "marginal_ratio",
+        "dimensionless",
+    ),
     ("process.probit", "a", "dimensionless"),
     ("process.probit", "b", "dimensionless"),
     ("process.probit", "n", "dimensionless"),
@@ -4565,6 +4603,52 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.safety_instrumented_function",
         "base_availability",
+        "dimensionless",
+    ),
+    (
+        "process.self_heating_induction",
+        "characteristic_dimension",
+        "length",
+    ),
+    (
+        "process.self_heating_induction",
+        "effective_conductivity",
+        "thermal_conductivity",
+    ),
+    (
+        "process.self_heating_induction",
+        "volumetric_heat_capacity",
+        "dimensionless",
+    ),
+    (
+        "process.self_heating_induction",
+        "activation_energy",
+        "molar_energy",
+    ),
+    (
+        "process.self_heating_induction",
+        "volumetric_pre_factor",
+        "dimensionless",
+    ),
+    (
+        "process.self_heating_induction",
+        "boundary_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.self_heating_induction",
+        "initial_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.self_heating_induction",
+        "ignition_rise",
+        "thermodynamic_temperature",
+    ),
+    ("process.self_heating_induction", "max_time", "time"),
+    (
+        "process.self_heating_induction",
+        "node_count",
         "dimensionless",
     ),
     ("process.semenov_self_heating", "volume", "volume"),

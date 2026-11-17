@@ -244,6 +244,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyActiveFireProtectionScreeningResult>()?;
     m.add_class::<crate::transport_gen::PyAntiSurgeRecycleResult>()?;
     m.add_class::<crate::transport_gen::PyApi537FlareFlameModelResult>()?;
+    m.add_class::<crate::transport_gen::PyBasketTestRegressionResult>()?;
     m.add_class::<crate::transport_gen::PyBleveResult>()?;
     m.add_class::<crate::transport_gen::PyBlockedOutletReliefResult>()?;
     m.add_class::<crate::transport_gen::PyBlowdownPressureProfileResult>()?;
@@ -292,6 +293,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPipelinePressureProtectionResult>()?;
     m.add_class::<crate::transport_gen::PyPlugFlowReactorResult>()?;
     m.add_class::<crate::transport_gen::PyPoolFireResult>()?;
+    m.add_class::<crate::transport_gen::PyPorousMediaSelfHeatingResult>()?;
     m.add_class::<crate::transport_gen::PyProbitResult>()?;
     m.add_class::<crate::transport_gen::PyPsvFireSizingResult>()?;
     m.add_class::<crate::transport_gen::PyPsvSizingResult>()?;
@@ -300,6 +302,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyReliefDisposalNetworkResult>()?;
     m.add_class::<crate::transport_gen::PyRiskMatrixResult>()?;
     m.add_class::<crate::transport_gen::PySafetyInstrumentedFunctionResult>()?;
+    m.add_class::<crate::transport_gen::PySelfHeatingInductionResult>()?;
     m.add_class::<crate::transport_gen::PySemenovSelfHeatingResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorCapacityAssessmentResult>()?;
@@ -374,6 +377,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyScaleControlRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioChangeRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioIndexRow>()?;
+    m.add_class::<crate::record_outputs_gen::PySelfHeatingTimePoint>()?;
     m.add_class::<crate::record_outputs_gen::PySilIssue>()?;
     m.add_class::<crate::record_outputs_gen::PySterileRadius>()?;
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
@@ -930,6 +934,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::api537_flare_flame_model,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::basket_test_regression,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::bleve, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::blocked_outlet_relief,
@@ -1029,6 +1037,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::process::plug_flow_reactor, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::pool_fire, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::porous_media_self_heating,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::probit, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::psv_fire_sizing, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::psv_sizing, m)?)?;
@@ -1044,6 +1056,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::risk_matrix, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::safety_instrumented_function,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::self_heating_induction,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(

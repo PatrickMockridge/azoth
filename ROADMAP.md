@@ -924,14 +924,32 @@ a claim nothing holds.
   `PhysicsBasedRiskMonitor`, `ConditionBasedReliability`, `OREDADataImporter`, `RiskMLInterface`
   and `BowTieAnalyzer.autoGenerateFromProcess`; `BowTieSvgExporter` is presentation. The safety
   tree still carries **229 top-level public types** across `barrier/`, `alarp/`, `hazid/`, `inherent/`,
-  `escalation/`, `selfheating/`, `vibration/`, `compliance/`, `processsafetysystem/`,
+  `escalation/`, `vibration/`, `compliance/`, `processsafetysystem/`,
   `overpressure/`, `rupture/`, `depressurization/`, `release/`, `esd/`, `sif/`, `api14c/`,
   `opendrain/`, `blowby/`, `vacuum/`, `settleout/`, `pump/`, `reaction/`, `inventory/`,
   `mdmt/`, `leakdetection/`, `cfd/`, `envelope/`, `scenario/` and `dto/`, plus the risk
   subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
   own classes - the risk core, the two release models, the five overpressure calculators,
-  the six dispersion ids and the four rupture ids; the types no bullet names remain
-  unported, each with its class.
+  the six dispersion ids, the four rupture ids and the four self-heating ids; the types no
+  bullet names remain unported, each with its class.
+- **The self-heating family** - four ids. **`process.semenov_self_heating` is
+  `SemenovSelfHeatingAnalyzer.analyze`**: `psi` against `1/e`, the critical-temperature
+  bisection on [150, 2000] K, the margin and the three-value verdict.
+  **`process.porous_media_self_heating` is `PorousMediaSelfHeatingAnalyzer.analyze`**: the
+  Frank-Kamenetskii parameter against the shape's critical value (0.878 slab, 2.000
+  infinite cylinder, 3.322 sphere, 2.520 cube, 2.760 equicylinder), the closed-form
+  critical dimension and the pipe-insulation configuration.
+  **`process.self_heating_induction` is `SelfHeatingInductionSolver.solve`**: the explicit
+  Euler march, its conduction- and reaction-limited step, the ignition/steady/time-cap
+  termination and the decimated history. **`process.basket_test_regression` is
+  `BasketTestRegression.regress`**: the least-squares line that recovers `E` and, with the
+  conductivity, `P`. **At the reported critical dimension `delta_ratio` is
+  0.9999999999999952**, below one, so that state screens marginal; **at the reported
+  critical temperature `psi_ratio` is 1.0000004**, so the Semenov critical state screens as
+  a self-ignition. The two criticality models agree away from the critical point and part
+  at +0.5 K, where the transient reaches a steady 21.877 K rise and the steady-state screen
+  predicts ignition. `setKinetics`, `createAnalyzer` and `toJson` are not carried; the
+  class's `setKinetics` identity is captured as evidence.
 - **The relief and overpressure arithmetic** — seven ids. **`process.psv_sizing` is
   `ReliefValveSizing`'s three area methods and the API 520 D to T ladder**: gas with the
   conventional/balanced-bellows `Kb` and the rupture-disk `Kc`, liquid with `Kw`, the

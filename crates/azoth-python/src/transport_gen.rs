@@ -22,9 +22,9 @@ use crate::record_outputs_gen::{
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
     PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow,
     PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow, PyRiskAssessmentRow,
-    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
-    PyWaterMixingResult, PyZoneRatingRow,
+    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
+    PySelfHeatingTimePoint, PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySubFraction,
+    PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -14267,6 +14267,90 @@ impl From<&azoth_process::models::api537_flare_flame_model::Api537FlareFlameMode
         }
     }
 }
+/// Result of `process.basket_test_regression`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BasketTestRegressionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBasketTestRegressionResult {
+    /// the number of observations fitted.
+    #[pyo3(get)]
+    pub point_count: f64,
+    /// the line's slope, **in kelvin**: `dy/dx` with `x = 1/Tc`.
+    #[pyo3(get)]
+    pub slope: f64,
+    /// the line's intercept.
+    #[pyo3(get)]
+    pub intercept: f64,
+    /// the coefficient of determination; absent when the ordinates do not vary.
+    #[pyo3(get)]
+    pub r_squared: Option<f64>,
+    /// `-slope R`, the apparent activation energy.
+    #[pyo3(get)]
+    pub activation_energy: PyQty,
+    /// `exp(intercept) lambda R / E`, **in W/m3**; absent without a conductivity or with a non-positive E.
+    #[pyo3(get)]
+    pub volumetric_pre_factor: Option<f64>,
+    /// the conductivity the fit used, echoed; absent when it was not supplied.
+    #[pyo3(get)]
+    pub effective_conductivity: Option<PyQty>,
+    /// whether a conductivity was supplied.
+    #[pyo3(get)]
+    pub conductivity_provided: bool,
+    /// the class's warning strings, in the order it appends them.
+    #[pyo3(get)]
+    pub messages: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBasketTestRegressionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BasketTestRegressionResult(point_count={:?}, slope={:?}, intercept={:?}, r_squared={:?}, activation_energy={:?}, volumetric_pre_factor={:?}, effective_conductivity={:?}, conductivity_provided={:?}, messages={:?}, {} warning(s))",
+            self.point_count,
+            self.slope,
+            self.intercept,
+            self.r_squared,
+            self.activation_energy,
+            self.volumetric_pre_factor,
+            self.effective_conductivity,
+            self.conductivity_provided,
+            self.messages,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::basket_test_regression::BasketTestRegressionResult>
+    for PyBasketTestRegressionResult
+{
+    fn from(r: &azoth_process::models::basket_test_regression::BasketTestRegressionResult) -> Self {
+        Self {
+            point_count: r.point_count,
+            slope: r.slope,
+            intercept: r.intercept,
+            r_squared: r.r_squared,
+            activation_energy: PyQty {
+                magnitude_si: r.activation_energy.value,
+                unit: "J/mol".to_string(),
+            },
+            volumetric_pre_factor: r.volumetric_pre_factor,
+            effective_conductivity: r.effective_conductivity.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "W/(m*K)".to_string(),
+            }),
+            conductivity_provided: r.conductivity_provided,
+            messages: r.messages.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.bleve`, transported.
 #[pyclass(
     frozen,
@@ -21087,6 +21171,148 @@ impl From<&azoth_process::models::pool_fire::PoolFireResult> for PyPoolFireResul
         }
     }
 }
+/// Result of `process.porous_media_self_heating`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PorousMediaSelfHeatingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPorousMediaSelfHeatingResult {
+    /// the shape the screen used, which `pipe_insulation_screening` forces to `slab`.
+    #[pyo3(get)]
+    pub geometry: String,
+    /// the half-dimension, echoed.
+    #[pyo3(get)]
+    pub characteristic_dimension: PyQty,
+    /// the conductivity, echoed.
+    #[pyo3(get)]
+    pub effective_conductivity: PyQty,
+    /// the activation energy, echoed.
+    #[pyo3(get)]
+    pub activation_energy: PyQty,
+    /// the volumetric pre-factor, echoed, in W/m3.
+    #[pyo3(get)]
+    pub volumetric_pre_factor: f64,
+    /// the boundary temperature, echoed.
+    #[pyo3(get)]
+    pub boundary_temperature: PyQty,
+    /// the Frank-Kamenetskii criticality parameter.
+    #[pyo3(get)]
+    pub delta: f64,
+    /// the shape's critical parameter.
+    #[pyo3(get)]
+    pub delta_crit: f64,
+    /// `delta / delta_crit`.
+    #[pyo3(get)]
+    pub delta_ratio: f64,
+    /// the boundary temperature at which `delta` reaches its critical value; absent when it cannot be bracketed between 150 K and 2000 K.
+    #[pyo3(get)]
+    pub critical_temperature: Option<PyQty>,
+    /// the half-dimension at which `delta` reaches its critical value.
+    #[pyo3(get)]
+    pub critical_dimension: PyQty,
+    /// `critical_temperature - boundary_temperature`; absent with the critical temperature.
+    #[pyo3(get)]
+    pub temperature_margin: Option<PyQty>,
+    /// `critical_dimension - characteristic_dimension`; negative is supercritical.
+    #[pyo3(get)]
+    pub dimension_margin: PyQty,
+    /// `R Tb^2/E`, the Frank-Kamenetskii temperature scale.
+    #[pyo3(get)]
+    pub fk_temperature_scale: PyQty,
+    /// the screening verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// the class's warning strings, in the order it appends them.
+    #[pyo3(get)]
+    pub messages: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPorousMediaSelfHeatingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PorousMediaSelfHeatingResult(geometry={:?}, characteristic_dimension={:?}, effective_conductivity={:?}, activation_energy={:?}, volumetric_pre_factor={:?}, boundary_temperature={:?}, delta={:?}, delta_crit={:?}, delta_ratio={:?}, critical_temperature={:?}, critical_dimension={:?}, temperature_margin={:?}, dimension_margin={:?}, fk_temperature_scale={:?}, verdict={:?}, messages={:?}, {} warning(s))",
+            self.geometry,
+            self.characteristic_dimension,
+            self.effective_conductivity,
+            self.activation_energy,
+            self.volumetric_pre_factor,
+            self.boundary_temperature,
+            self.delta,
+            self.delta_crit,
+            self.delta_ratio,
+            self.critical_temperature,
+            self.critical_dimension,
+            self.temperature_margin,
+            self.dimension_margin,
+            self.fk_temperature_scale,
+            self.verdict,
+            self.messages,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::porous_media_self_heating::PorousMediaSelfHeatingResult>
+    for PyPorousMediaSelfHeatingResult
+{
+    fn from(
+        r: &azoth_process::models::porous_media_self_heating::PorousMediaSelfHeatingResult,
+    ) -> Self {
+        Self {
+            geometry: r.geometry.as_str().to_string(),
+            characteristic_dimension: PyQty {
+                magnitude_si: r.characteristic_dimension.value,
+                unit: "m".to_string(),
+            },
+            effective_conductivity: PyQty {
+                magnitude_si: r.effective_conductivity.value,
+                unit: "W/(m*K)".to_string(),
+            },
+            activation_energy: PyQty {
+                magnitude_si: r.activation_energy.value,
+                unit: "J/mol".to_string(),
+            },
+            volumetric_pre_factor: r.volumetric_pre_factor,
+            boundary_temperature: PyQty {
+                magnitude_si: r.boundary_temperature.value,
+                unit: "K".to_string(),
+            },
+            delta: r.delta,
+            delta_crit: r.delta_crit,
+            delta_ratio: r.delta_ratio,
+            critical_temperature: r.critical_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            critical_dimension: PyQty {
+                magnitude_si: r.critical_dimension.value,
+                unit: "m".to_string(),
+            },
+            temperature_margin: r.temperature_margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            dimension_margin: PyQty {
+                magnitude_si: r.dimension_margin.value,
+                unit: "m".to_string(),
+            },
+            fk_temperature_scale: PyQty {
+                magnitude_si: r.fk_temperature_scale.value,
+                unit: "K".to_string(),
+            },
+            verdict: r.verdict.as_str().to_string(),
+            messages: r.messages.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.probit`, transported.
 #[pyclass(
     frozen,
@@ -22434,6 +22660,128 @@ impl From<&azoth_process::models::safety_instrumented_function::SafetyInstrument
             pfd_1oo2: r.pfd_1oo2,
             pfd_2oo3: r.pfd_2oo3,
             availability_with_spurious_trips: r.availability_with_spurious_trips,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.self_heating_induction`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SelfHeatingInductionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySelfHeatingInductionResult {
+    /// the shape the march used.
+    #[pyo3(get)]
+    pub geometry: String,
+    /// the half-dimension, echoed.
+    #[pyo3(get)]
+    pub characteristic_dimension: PyQty,
+    /// the surface temperature, echoed.
+    #[pyo3(get)]
+    pub boundary_temperature: PyQty,
+    /// the uniform starting temperature.
+    #[pyo3(get)]
+    pub initial_temperature: PyQty,
+    /// the ignition rise, echoed or defaulted.
+    #[pyo3(get)]
+    pub ignition_rise: PyQty,
+    /// whether the peak reached the ignition temperature.
+    #[pyo3(get)]
+    pub ignited: bool,
+    /// the time at which it did; absent when the body did not ignite.
+    #[pyo3(get)]
+    pub induction_time: Option<PyQty>,
+    /// the final peak node temperature.
+    #[pyo3(get)]
+    pub peak_temperature: PyQty,
+    /// `peak_temperature - boundary_temperature`.
+    #[pyo3(get)]
+    pub peak_temperature_rise: PyQty,
+    /// whether the steady heuristic ended the run.
+    #[pyo3(get)]
+    pub steady_state_reached: bool,
+    /// the simulated time the run reached.
+    #[pyo3(get)]
+    pub simulated_time: PyQty,
+    /// the retained temperature samples, in the class's order.
+    #[pyo3(get)]
+    pub history: Vec<PySelfHeatingTimePoint>,
+    /// the class's warning strings, in the order it appends them.
+    #[pyo3(get)]
+    pub messages: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySelfHeatingInductionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SelfHeatingInductionResult(geometry={:?}, characteristic_dimension={:?}, boundary_temperature={:?}, initial_temperature={:?}, ignition_rise={:?}, ignited={:?}, induction_time={:?}, peak_temperature={:?}, peak_temperature_rise={:?}, steady_state_reached={:?}, simulated_time={:?}, history={:?}, messages={:?}, {} warning(s))",
+            self.geometry,
+            self.characteristic_dimension,
+            self.boundary_temperature,
+            self.initial_temperature,
+            self.ignition_rise,
+            self.ignited,
+            self.induction_time,
+            self.peak_temperature,
+            self.peak_temperature_rise,
+            self.steady_state_reached,
+            self.simulated_time,
+            self.history,
+            self.messages,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::self_heating_induction::SelfHeatingInductionResult>
+    for PySelfHeatingInductionResult
+{
+    fn from(r: &azoth_process::models::self_heating_induction::SelfHeatingInductionResult) -> Self {
+        Self {
+            geometry: r.geometry.as_str().to_string(),
+            characteristic_dimension: PyQty {
+                magnitude_si: r.characteristic_dimension.value,
+                unit: "m".to_string(),
+            },
+            boundary_temperature: PyQty {
+                magnitude_si: r.boundary_temperature.value,
+                unit: "K".to_string(),
+            },
+            initial_temperature: PyQty {
+                magnitude_si: r.initial_temperature.value,
+                unit: "K".to_string(),
+            },
+            ignition_rise: PyQty {
+                magnitude_si: r.ignition_rise.value,
+                unit: "K".to_string(),
+            },
+            ignited: r.ignited,
+            induction_time: r.induction_time.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            peak_temperature: PyQty {
+                magnitude_si: r.peak_temperature.value,
+                unit: "K".to_string(),
+            },
+            peak_temperature_rise: PyQty {
+                magnitude_si: r.peak_temperature_rise.value,
+                unit: "K".to_string(),
+            },
+            steady_state_reached: r.steady_state_reached,
+            simulated_time: PyQty {
+                magnitude_si: r.simulated_time.value,
+                unit: "s".to_string(),
+            },
+            history: r.history.iter().map(PySelfHeatingTimePoint::from).collect(),
+            messages: r.messages.clone(),
             warnings: transport(&r.warnings),
         }
     }

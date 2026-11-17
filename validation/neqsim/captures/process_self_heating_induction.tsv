@@ -164,7 +164,7 @@ history_last2_centre_temperature_k=648.7411765738602
 history_last2_max_temperature_k=648.7411765738602
 warning_count=0
 
-induction_max_time
+induction_near_critical
 geometry=slab
 characteristic_dimension_m=0.05
 boundary_temperature_k=528.8451326191425
