@@ -66,7 +66,7 @@ def hazop_template(
                 )
             )
 
-    rows = input_records_to_si(spec, "grid_parameters", grid_parameters)
+    rows: list[dict[str, Any]] = input_records_to_si(spec, "grid_parameters", grid_parameters)
     for index, row in enumerate(rows):
         parameter = str(row["parameter"])
         if parameter not in PARAMETERS:

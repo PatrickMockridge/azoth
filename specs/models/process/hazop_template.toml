@@ -6,8 +6,8 @@ assumptions = [
     "**every grid row is `TBD` in cause, consequence and safeguard, with an absent recommendation**, the class's placeholder state; an empty parameter list is its no-argument `generateGrid()`.",
     "**the seed table is selected by a lower-case substring test in the class's order**: separator or scrubber (five rows), compressor or expander (four), pump (three), valve (three), the heat-exchanger words (three), pipe (three), and everything else, which includes a Stream, the four-row default.",
     "**the seed rows come first**: `fromProcessSystem` seeds a process-derived node, and only then can the caller append a grid, which is the one order the class's own API produces.",
-    "**`fromProcessSystem`'s flowsheet walk is not carried**: it only names the nodes and reads the units' simple class names, so the port takes the equipment type the caller already has. An absent type runs no seed arm; a stated one, including a blank, runs the selection.",
-    "**`addDeviation` is caller state and `report` is presentation**, so neither is carried; the manual row is a capture row, not an output.",
+    "**`fromProcessSystem`'s flowsheet walk is caller state**: it only names the nodes and reads the units' simple class names, so the id takes the equipment type the caller already has. An absent type runs no seed arm; a stated one, including a blank, runs the selection.",
+    "**`addDeviation` is caller state and `report` is presentation**, so the id takes the equipment type and the grid parameters and answers with the generated rows.",
     "**an empty deviation list is a state the class answers**; a case cannot state an empty row list, so it is capture evidence and a hand test.",
 ]
 references = [
@@ -18,7 +18,7 @@ references = [
 ]
 [source]
 standard = "NeqSim process/safety/hazid/HAZOPTemplate.java"
-edition = "Its `generateGrid` and the `seedDeviations` table `fromProcessSystem` applies; the flowsheet walk and `report` are not carried."
+edition = "Its `generateGrid` and the `seedDeviations` table `fromProcessSystem` applies."
 [algorithm]
 scheme = "hazop_deviation_grid"
 convergence = "absolute"

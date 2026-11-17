@@ -57,7 +57,7 @@ def hazop_consequence_population(
     warnings: list[Warning] = []
     apply_checks(checks_for(spec).on_input, lambda _: None, warnings)
 
-    rows = input_records_to_si(spec, "deviations", deviations)
+    rows: list[dict[str, Any]] = input_records_to_si(spec, "deviations", deviations)
     populated: list[HazopPopulationRow] = []
     mapped_count = 0
     for index, row in enumerate(rows):

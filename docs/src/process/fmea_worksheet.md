@@ -8,7 +8,7 @@
 
 **NeqSim process/safety/hazid/FMEAWorksheet.java**
 
-Its `addEntry` validation, `sortedByRPN` and `entriesAboveRPN`; `report` and `toJson` are not carried.
+Its `addEntry` validation, `sortedByRPN` and `entriesAboveRPN`.
 
 
 ## Algorithm
@@ -49,7 +49,7 @@ checked against one.
 - **the ranking is by descending RPN and is stable**: `Collections.sort` keeps caller order for a tie, so two entries of equal RPN appear in the order they were stated.
 - **the threshold filter is inclusive and in caller order**: an entry is kept when `RPN >= threshold`, and the threshold is any whole number, negative included.
 - **`highest_rpn` is the first ranked entry's RPN**, absent on an empty worksheet, which the class answers.
-- **`report` and `toJson` are presentation** and are not carried; the worksheet's rows are the result.
+- **`report` and `toJson` are presentation**: the worksheet's rows are the result.
 
 ## Cases
 

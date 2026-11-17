@@ -8,7 +8,7 @@
 
 **NeqSim process/safety/hazid/HazopConsequenceAutoPopulator.java**
 
-Its `mappingFor`, the two catalogues, the neutral flow fallback, `populate` and the two cell-fill rules; `quantify`, `report` and `toJson` are not carried.
+Its `mappingFor`, the two catalogues, the neutral flow fallback, `populate` and the two cell-fill rules.
 
 
 ## Algorithm
@@ -49,7 +49,7 @@ checked against one.
 - **the neutral fallback reads `<GUIDE> FLOW on <category> equipment has topology-dependent causes and consequences; facilitator confirmation required`**, with `IEC 61882 / CCPS` as its standard and the class's review text as its calculator and safeguard.
 - **only a null, blank or `TBD` cell is filled**, trimmed and case-insensitive; a cell with content is preserved, and the cause is always copied unchanged.
 - **the recommendation is `Quantify with <calculator> per <standard>`**, or `Facilitator confirmation required: ... per <standard>` for a neutral fallback; a row with no mapping is copied unchanged and does not count as mapped.
-- **`quantify` is not carried**: it reads a solved flowsheet's outlet temperature and compares it with a per-unit-resolved limit (default 150 degC discharge, -46 degC MDMT), and the workspace has no flowsheet seam. `report` and `toJson` are presentation.
+- **`quantify` reads a solved flowsheet's outlet temperature** and compares it with a per-unit-resolved limit (default 150 degC discharge, -46 degC MDMT), which the workspace has no flowsheet seam to reach. `report` and `toJson` are presentation.
 
 ## Cases
 

@@ -53,7 +53,7 @@ def fmea_worksheet(
     warnings: list[Warning] = []
     apply_checks(checks_for(spec).on_input, lambda _: None, warnings)
 
-    rows = input_records_to_si(spec, "entries", entries)
+    rows: list[dict[str, Any]] = input_records_to_si(spec, "entries", entries)
     threshold = float(rpn_threshold)
     for index, row in enumerate(rows):
         for name in ("severity", "occurrence", "detection"):

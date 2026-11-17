@@ -2751,12 +2751,12 @@ def _mah_bow_tie_skeleton(inputs: Mapping[str, Any]) -> dict[str, float]:
         "consequence_count": result.consequence_count,
         "barrier_count": result.barrier_count,
     }
-    for index, row in enumerate(result.threats):
-        layers[f"threat{index}_frequency_per_year"] = row.frequency_per_year
-    for index, row in enumerate(result.consequences):
-        layers[f"consequence{index}_severity"] = row.severity
-    for index, row in enumerate(result.barriers):
-        layers[f"barrier{index}_pfd"] = row.pfd
+    for index, threat in enumerate(result.threats):
+        layers[f"threat{index}_frequency_per_year"] = threat.frequency_per_year
+    for index, consequence in enumerate(result.consequences):
+        layers[f"consequence{index}_severity"] = consequence.severity
+    for index, barrier in enumerate(result.barriers):
+        layers[f"barrier{index}_pfd"] = barrier.pfd
     return layers
 
 

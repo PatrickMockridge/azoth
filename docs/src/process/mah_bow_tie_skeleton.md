@@ -50,7 +50,7 @@ checked against one.
 - **the rows are identified `T1...`, `C1...` and `B1...`**, in the catalogue's order, which is the class's constructor order.
 - **the placeholders are `0.001` per year for every threat, `4` for every consequence severity and `0.01` for every barrier PFD**, the class's three constants; they are a workshop starting point, not evidence.
 - **the counts are the catalogue lengths**, and the skeleton is the input to `process.bow_tie`, which computes the frequency; this id does not.
-- **an unknown type is refused**; the class's null check is the wrapper's enum typing here, and `toJson` is presentation and not carried.
+- **an unknown type is refused**; the class's null check is the wrapper's enum typing here, and `toJson` is presentation.
 
 ## Cases
 
