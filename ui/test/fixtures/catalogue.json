@@ -23324,6 +23324,15 @@
       "sub_interface": "firewater"
     },
     {
+      "family": "hazid",
+      "id": "process.fmea_worksheet",
+      "name": "FMEA worksheet",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "dispersion",
       "id": "process.gas_dispersion",
       "name": "Gas dispersion screening",
@@ -23852,6 +23861,24 @@
       "sub_interface": "dispersion"
     },
     {
+      "family": "hazid",
+      "id": "process.hazop_consequence_population",
+      "name": "HAZOP consequence population",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
+      "family": "hazid",
+      "id": "process.hazop_template",
+      "name": "HAZOP template",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "dispersion",
       "form": {
         "assumptions": [
@@ -24285,6 +24312,15 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": "risk"
+    },
+    {
+      "family": "hazid",
+      "id": "process.mah_bow_tie_skeleton",
+      "name": "MAH bow-tie skeleton",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation returns a table of rows, which this workspace does not yet draw",
+      "sub_interface": null
     },
     {
       "family": "risk",

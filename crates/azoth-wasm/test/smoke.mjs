@@ -42,7 +42,7 @@ check("20 tools", withTools.tools.length === 20, `${withTools.tools.length}`);
 check("98 calculations", catalogue.calcs.length === 98, `${catalogue.calcs.length}`);
 const available = catalogue.calcs.filter((entry) => entry.available).length;
 check("94 a sheet can draw", available === 94, `${available}`);
-check("48 safety calculations", catalogue.safety.length === 48, `${catalogue.safety.length}`);
+check("52 safety calculations", catalogue.safety.length === 52, `${catalogue.safety.length}`);
 const nativeSafety = catalogue.safety.filter((entry) => entry.native).length;
 check("22 native safety ids", nativeSafety === 22, `${nativeSafety}`);
 

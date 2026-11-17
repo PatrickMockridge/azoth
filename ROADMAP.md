@@ -923,15 +923,15 @@ a claim nothing holds.
   `DynamicRiskSimulator`, `PortfolioRiskAnalyzer`, `RealTimeRiskMonitor`,
   `PhysicsBasedRiskMonitor`, `ConditionBasedReliability`, `OREDADataImporter`, `RiskMLInterface`
   and `BowTieAnalyzer.autoGenerateFromProcess`; `BowTieSvgExporter` is presentation. The safety
-  tree still carries **229 top-level public types** across `barrier/`, `alarp/`, `hazid/`, `inherent/`,
+  tree still carries **229 top-level public types** across `barrier/`, `alarp/`, `inherent/`,
   `escalation/`, `vibration/`, `compliance/`, `processsafetysystem/`,
   `overpressure/`, `rupture/`, `depressurization/`, `release/`, `esd/`, `sif/`, `api14c/`,
   `opendrain/`, `blowby/`, `vacuum/`, `settleout/`, `pump/`, `reaction/`, `inventory/`,
   `mdmt/`, `leakdetection/`, `cfd/`, `envelope/`, `scenario/` and `dto/`, plus the risk
   subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
   own classes - the risk core, the two release models, the five overpressure calculators,
-  the six dispersion ids, the four rupture ids and the four self-heating ids; the types no
-  bullet names remain unported, each with its class.
+  the six dispersion ids, the four rupture ids, the four self-heating ids and the four hazid
+  worksheet ids; the types no bullet names remain unported, each with its class.
 - **The self-heating family** - four ids. **`process.semenov_self_heating` is
   `SemenovSelfHeatingAnalyzer.analyze`**: `psi` against `1/e`, the critical-temperature
   bisection on [150, 2000] K, the margin and the three-value verdict.
@@ -950,6 +950,22 @@ a claim nothing holds.
   at +0.5 K, where the transient reaches a steady 21.877 K rise and the steady-state screen
   predicts ignition. `setKinetics`, `createAnalyzer` and `toJson` are not carried; the
   class's `setKinetics` identity is captured as evidence.
+- **The HAZID worksheets** - four ids. **`process.hazop_template` is
+  `HAZOPTemplate.generateGrid` and `fromProcessSystem`'s seed table**: seven guide words per
+  stated parameter, or the equipment-type seed set (separator/scrubber, compressor/expander,
+  pump, valve, heat exchanger, pipe, default), the seed rows first with `TBD` placeholders.
+  **`process.fmea_worksheet` is `FMEAWorksheet`**: `RPN = S O D`, the descending stable
+  ranking and the inclusive threshold filter. **`process.hazop_consequence_population` is
+  `HazopConsequenceAutoPopulator.populate`**: the eleven generic and six equipment-specific
+  mappings, the equipment categorisation and the neutral flow fallback, filling only
+  null/blank/`TBD` cells. **`process.mah_bow_tie_skeleton` is `MahBowTieBuilder.build` and
+  `MahCatalogue`**: the eleven ISO 17776 categories with their default threats,
+  consequences and barrier classes at 0.001/year, severity 4 and PFD 0.01. **A seeded
+  separator's NO FLOW is the neutral fallback, not the pump deadhead mapping**, because the
+  category is the equipment type; the generic table reads only a manual or non-flow
+  deviation. `quantify` (a solved flowsheet's outlet temperatures and the 150 degC /
+  -46 degC limit resolution), `StidHazopDataSource` (a JSON adapter), `report`/`toJson` and
+  `fromProcessSystem`'s flowsheet walk are not carried.
 - **The relief and overpressure arithmetic** — seven ids. **`process.psv_sizing` is
   `ReliefValveSizing`'s three area methods and the API 520 D to T ladder**: gas with the
   conventional/balanced-bellows `Kb` and the rupture-disk `Kc`, liquid with `Kw`, the
