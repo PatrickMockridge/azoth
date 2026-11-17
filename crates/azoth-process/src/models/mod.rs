@@ -125,6 +125,7 @@ pub mod toxic_library;
 pub mod tr3001_compliance;
 pub mod tube_rupture_relief;
 pub mod turbo_expander_compressor;
+pub mod vacuum_collapse;
 pub mod vce;
 pub mod vessel_rupture;
 
@@ -286,6 +287,7 @@ pub use tr3001_compliance::{
 };
 pub use tube_rupture_relief::{TubeRuptureReliefResult, tube_rupture_relief};
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};
+pub use vacuum_collapse::{VacuumCollapseResult, VacuumVerdict, vacuum_collapse};
 pub use vce::{VceResult, vce};
 pub use vessel_rupture::{
     VesselRuptureResult, VesselRuptureState, VesselRuptureStep, vessel_rupture,

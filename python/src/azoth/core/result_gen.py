@@ -105,6 +105,7 @@ from azoth.core.result_base import (
     Sts0131PressureCategory,
     SupplyVerdict,
     TpMultiflashSeed,
+    VacuumVerdict,
     _HasWarnings,
 )
 from azoth.core.units import Q
@@ -10678,6 +10679,46 @@ class TurboExpanderResult(_HasWarnings):
 
     #: `getModuleHeight`, floored at `2.0`.
     design_module_height: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class VacuumCollapseResult(_HasWarnings):
+    """Result of ``process.vacuum_collapse``."""
+
+    CALC_ID: ClassVar[str] = "process.vacuum_collapse"
+
+    #: the pressure at the cold end, the last step's.
+    final_pressure: Q
+
+    #: the smallest pressure on the cooling curve.
+    minimum_pressure: Q
+
+    #: the temperature at which the smallest pressure is reached.
+    minimum_pressure_temperature: Q
+
+    #: `max(0, atmospheric_pressure - minimum_pressure)`.
+    vacuum_depth: Q
+
+    #: `minimum_pressure - external_pressure_rating`.
+    margin_to_rating: Q
+
+    #: whether the minimum pressure is below the atmospheric pressure.
+    vacuum_present: bool
+
+    #: whether the minimum pressure is at or above the external rating.
+    within_rating: bool
+
+    #: the make-up moles needed to hold the setpoint; zero when the minimum stays above it.
+    makeup_gas_moles: Q
+
+    #: the make-up mass, `moles` times the molar mass.
+    makeup_gas_mass: Q
+
+    #: the class's verdict.
+    verdict: VacuumVerdict
 
     #: Caveats.
     warnings: tuple[Warning, ...]

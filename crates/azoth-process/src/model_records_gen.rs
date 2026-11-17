@@ -102,6 +102,7 @@ use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
 use crate::models::tube_rupture_relief::TubeRuptureReliefResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
+use crate::models::vacuum_collapse::VacuumCollapseResult;
 use crate::models::vce::VceResult;
 use crate::models::vessel_rupture::VesselRuptureResult;
 
@@ -2475,6 +2476,27 @@ impl CalcResult for TurboExpanderResult {
         "design_module_length",
         "design_module_width",
         "design_module_height",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for VacuumCollapseResult {
+    const CALC_ID: &'static str = "process.vacuum_collapse";
+    const FIELDS: &'static [&'static str] = &[
+        "final_pressure",
+        "minimum_pressure",
+        "minimum_pressure_temperature",
+        "vacuum_depth",
+        "margin_to_rating",
+        "vacuum_present",
+        "within_rating",
+        "makeup_gas_moles",
+        "makeup_gas_mass",
+        "verdict",
         "warnings",
     ];
 

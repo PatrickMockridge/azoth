@@ -418,6 +418,7 @@ Five sections, and the difference between them is the point:
 - [`process.tr3001_compliance`](./process/tr3001_compliance.md) — TR3001 compliance
 - [`process.tube_rupture_relief`](./process/tube_rupture_relief.md) — Tube rupture relief
 - [`process.turbo_expander_compressor`](./process/turbo_expander_compressor.md) — Turbo-expander compressor
+- [`process.vacuum_collapse`](./process/vacuum_collapse.md) — Vacuum collapse screening
 - [`process.vce`](./process/vce.md) — Vapour-cloud explosion overpressure
 - [`process.vessel_rupture`](./process/vessel_rupture.md) — Vessel rupture
 

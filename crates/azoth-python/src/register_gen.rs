@@ -331,6 +331,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyTr3001ComplianceResult>()?;
     m.add_class::<crate::transport_gen::PyTubeRuptureReliefResult>()?;
     m.add_class::<crate::transport_gen::PyTurboExpanderResult>()?;
+    m.add_class::<crate::transport_gen::PyVacuumCollapseResult>()?;
     m.add_class::<crate::transport_gen::PyVceResult>()?;
     m.add_class::<crate::transport_gen::PyVesselRuptureResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
@@ -1144,6 +1145,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::process::turbo_expander_compressor,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::vacuum_collapse, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vce, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vessel_rupture, m)?)?;
     m.add_function(wrap_pyfunction!(

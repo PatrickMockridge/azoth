@@ -326,6 +326,7 @@
   - [TR3001 compliance](./process/tr3001_compliance.md)
   - [Tube rupture relief](./process/tube_rupture_relief.md)
   - [Turbo-expander compressor](./process/turbo_expander_compressor.md)
+  - [Vacuum collapse screening](./process/vacuum_collapse.md)
   - [Vapour-cloud explosion overpressure](./process/vce.md)
   - [Vessel rupture](./process/vessel_rupture.md)
 - [Reactions](./reactions/index.md)

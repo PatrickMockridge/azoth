@@ -78,7 +78,7 @@ pub use models::{
     SeparatorResult, ShortcutDistillationColumnResult, SilVerificationResult, SplitterResult,
     StirredTankReactorResult, StrippingColumnResult, TankResult, ThreePhaseSeparatorResult,
     ThrottlingValveResult, ToxicLibraryResult, Tr3001ComplianceResult, TubeRuptureReliefResult,
-    TurboExpanderResult, VceResult, VesselRuptureResult, absorption_column,
+    TurboExpanderResult, VacuumCollapseResult, VceResult, VesselRuptureResult, absorption_column,
     active_fire_protection_screening, anti_surge_recycle, api14c_safe_chart,
     api537_flare_flame_model, barrier_register_validation, basket_test_regression, bleve,
     blocked_outlet_relief, blowdown_pressure_profile, bow_tie, check_valve_leak_relief,
@@ -97,8 +97,8 @@ pub use models::{
     self_heating_induction, semenov_self_heating, separator, separator_capacity_assessment,
     separator_performance, shortcut_distillation_column, sil_verification, splitter,
     stirred_tank_reactor, stripping_column, tank, three_phase_separator, throttling_valve,
-    toxic_library, tr3001_compliance, tube_rupture_relief, turbo_expander_compressor, vce,
-    vessel_rupture,
+    toxic_library, tr3001_compliance, tube_rupture_relief, turbo_expander_compressor,
+    vacuum_collapse, vce, vessel_rupture,
 };
 pub use stream::Stream;
 pub use unit_op::{Param, Source, UnitOpSpec};

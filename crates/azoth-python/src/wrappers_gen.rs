@@ -8362,6 +8362,46 @@ pub fn tube_rupture_relief(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Vacuum collapse screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mole_fractions, vessel_volume, initial_pressure, initial_temperature, cold_end_temperature, atmospheric_pressure, external_pressure_rating, makeup_setpoint, makeup_gas_molar_mass, cooling_steps))]
+#[pyo3(
+    text_signature = "(components, mole_fractions, vessel_volume, initial_pressure, initial_temperature, cold_end_temperature, atmospheric_pressure, external_pressure_rating, makeup_setpoint, makeup_gas_molar_mass, cooling_steps)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn vacuum_collapse(
+    py: Python<'_>,
+    components: Vec<String>,
+    mole_fractions: Vec<f64>,
+    vessel_volume: f64,
+    initial_pressure: f64,
+    initial_temperature: f64,
+    cold_end_temperature: f64,
+    atmospheric_pressure: Option<f64>,
+    external_pressure_rating: Option<f64>,
+    makeup_setpoint: Option<f64>,
+    makeup_gas_molar_mass: Option<f64>,
+    cooling_steps: Option<f64>,
+) -> PyResult<crate::transport_gen::PyVacuumCollapseResult> {
+    azoth_process::models::vacuum_collapse::vacuum_collapse(
+        &components,
+        &mole_fractions,
+        cubic_meters(vessel_volume),
+        pascals(initial_pressure),
+        kelvins(initial_temperature),
+        kelvins(cold_end_temperature),
+        atmospheric_pressure.map(pascals),
+        external_pressure_rating.map(pascals),
+        makeup_setpoint.map(pascals),
+        makeup_gas_molar_mass.map(kilograms_per_mole),
+        cooling_steps,
+    )
+    .map(|r| crate::transport_gen::PyVacuumCollapseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Vapour-cloud explosion overpressure.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

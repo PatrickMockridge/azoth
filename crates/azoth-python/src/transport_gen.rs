@@ -26519,6 +26519,110 @@ impl From<&azoth_process::models::turbo_expander_compressor::TurboExpanderResult
         }
     }
 }
+/// Result of `process.vacuum_collapse`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "VacuumCollapseResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyVacuumCollapseResult {
+    /// the pressure at the cold end, the last step's.
+    #[pyo3(get)]
+    pub final_pressure: PyQty,
+    /// the smallest pressure on the cooling curve.
+    #[pyo3(get)]
+    pub minimum_pressure: PyQty,
+    /// the temperature at which the smallest pressure is reached.
+    #[pyo3(get)]
+    pub minimum_pressure_temperature: PyQty,
+    /// `max(0, atmospheric_pressure - minimum_pressure)`.
+    #[pyo3(get)]
+    pub vacuum_depth: PyQty,
+    /// `minimum_pressure - external_pressure_rating`.
+    #[pyo3(get)]
+    pub margin_to_rating: PyQty,
+    /// whether the minimum pressure is below the atmospheric pressure.
+    #[pyo3(get)]
+    pub vacuum_present: bool,
+    /// whether the minimum pressure is at or above the external rating.
+    #[pyo3(get)]
+    pub within_rating: bool,
+    /// the make-up moles needed to hold the setpoint; zero when the minimum stays above it.
+    #[pyo3(get)]
+    pub makeup_gas_moles: PyQty,
+    /// the make-up mass, `moles` times the molar mass.
+    #[pyo3(get)]
+    pub makeup_gas_mass: PyQty,
+    /// the class's verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyVacuumCollapseResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "VacuumCollapseResult(final_pressure={:?}, minimum_pressure={:?}, minimum_pressure_temperature={:?}, vacuum_depth={:?}, margin_to_rating={:?}, vacuum_present={:?}, within_rating={:?}, makeup_gas_moles={:?}, makeup_gas_mass={:?}, verdict={:?}, {} warning(s))",
+            self.final_pressure,
+            self.minimum_pressure,
+            self.minimum_pressure_temperature,
+            self.vacuum_depth,
+            self.margin_to_rating,
+            self.vacuum_present,
+            self.within_rating,
+            self.makeup_gas_moles,
+            self.makeup_gas_mass,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::vacuum_collapse::VacuumCollapseResult>
+    for PyVacuumCollapseResult
+{
+    fn from(r: &azoth_process::models::vacuum_collapse::VacuumCollapseResult) -> Self {
+        Self {
+            final_pressure: PyQty {
+                magnitude_si: r.final_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            minimum_pressure: PyQty {
+                magnitude_si: r.minimum_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            minimum_pressure_temperature: PyQty {
+                magnitude_si: r.minimum_pressure_temperature.value,
+                unit: "K".to_string(),
+            },
+            vacuum_depth: PyQty {
+                magnitude_si: r.vacuum_depth.value,
+                unit: "Pa".to_string(),
+            },
+            margin_to_rating: PyQty {
+                magnitude_si: r.margin_to_rating.value,
+                unit: "Pa".to_string(),
+            },
+            vacuum_present: r.vacuum_present,
+            within_rating: r.within_rating,
+            makeup_gas_moles: PyQty {
+                magnitude_si: r.makeup_gas_moles.value,
+                unit: "mol".to_string(),
+            },
+            makeup_gas_mass: PyQty {
+                magnitude_si: r.makeup_gas_mass.value,
+                unit: "kg".to_string(),
+            },
+            verdict: r.verdict.as_str().to_string(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.vce`, transported.
 #[pyclass(
     frozen,

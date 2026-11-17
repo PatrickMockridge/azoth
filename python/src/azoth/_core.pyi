@@ -5038,6 +5038,20 @@ class TurboExpanderResult:
     warnings: list[Warning]
 
 @final
+class VacuumCollapseResult:
+    final_pressure: Qty
+    minimum_pressure: Qty
+    minimum_pressure_temperature: Qty
+    vacuum_depth: Qty
+    margin_to_rating: Qty
+    vacuum_present: bool
+    within_rating: bool
+    makeup_gas_moles: Qty
+    makeup_gas_mass: Qty
+    verdict: str
+    warnings: list[Warning]
+
+@final
 class VceResult:
     combustion_energy: Qty
     scaled_distance: float | None
@@ -8683,6 +8697,19 @@ def turbo_expander_compressor(
     igv_penalty_curve: list[TurboIgvPenaltyPoint] | None = None,
     mechanical_design: bool | None = None,
 ) -> TurboExpanderResult: ...
+def vacuum_collapse(
+    components: list[str],
+    mole_fractions: list[float],
+    vessel_volume: float,
+    initial_pressure: float,
+    initial_temperature: float,
+    cold_end_temperature: float,
+    atmospheric_pressure: float | None = None,
+    external_pressure_rating: float | None = None,
+    makeup_setpoint: float | None = None,
+    makeup_gas_molar_mass: float | None = None,
+    cooling_steps: float | None = None,
+) -> VacuumCollapseResult: ...
 def vce(
     cloud_fuel_mass: float,
     heat_of_combustion: float,

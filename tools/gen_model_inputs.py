@@ -446,6 +446,7 @@ NON_UNIT_MODELS = {
     "process.pump_deadhead": "the pump deadhead and minimum-flow screen over scalars, not a unit",
     "process.runaway_reaction": "the adiabatic runaway screen over scalars, not a unit",
     "process.mdmt": "the UCS-66 MDMT curve over scalars, not a unit",
+    "process.vacuum_collapse": "the constant-volume cooling sweep over a fluid, not a unit",
     "process.blocked_outlet_relief": "the blocked-outlet relief load over a fluid, not a unit",
     "process.control_valve_failure_relief": "the fail-open relief load over a fluid, not a unit",
     "process.check_valve_leak_relief": "the check-valve leak load over a fluid, not a unit",

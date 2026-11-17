@@ -402,6 +402,8 @@ from azoth.core.result import (
     UnifacPsrkActivityCoefficientsResult,
     UnifacUmrpruActivityCoefficientsResult,
     UniquacActivityCoefficientsResult,
+    VacuumCollapseResult,
+    VacuumVerdict,
     ValveScaleDriftResult,
     VanLaarAcidActivityCoefficientsResult,
     VceResult,
@@ -778,6 +780,7 @@ __all__ = [
     "unifac_psrk_activity_coefficients",
     "unifac_umrpru_activity_coefficients",
     "uniquac_activity_coefficients",
+    "vacuum_collapse",
     "valve_scale_drift",
     "van_laar_acid_activity_coefficients",
     "vce",
@@ -9139,6 +9142,37 @@ def turbo_expander_compressor(expander_components: list[str], compressor_compone
         design_module_length=None if result.design_module_length is None else from_si(result.design_module_length.magnitude_si, result.design_module_length.unit),
         design_module_width=None if result.design_module_width is None else from_si(result.design_module_width.magnitude_si, result.design_module_width.unit),
         design_module_height=None if result.design_module_height is None else from_si(result.design_module_height.magnitude_si, result.design_module_height.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def vacuum_collapse(components: list[str], mole_fractions: list[float], vessel_volume: Q, initial_pressure: Q, initial_temperature: Q, cold_end_temperature: Q, atmospheric_pressure: Q | None=None, external_pressure_rating: Q | None=None, makeup_setpoint: Q | None=None, makeup_gas_molar_mass: Q | None=None, cooling_steps: float | None=None) -> VacuumCollapseResult:
+    """``process.vacuum_collapse``, computed in Rust."""
+    spec = _models_gen.model("process.vacuum_collapse")
+    result = _core.vacuum_collapse(
+        list(components),
+        list(mole_fractions),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "initial_pressure", initial_pressure),
+        input_to_si(spec, "initial_temperature", initial_temperature),
+        input_to_si(spec, "cold_end_temperature", cold_end_temperature),
+        None if atmospheric_pressure is None else input_to_si(spec, "atmospheric_pressure", atmospheric_pressure),
+        None if external_pressure_rating is None else input_to_si(spec, "external_pressure_rating", external_pressure_rating),
+        None if makeup_setpoint is None else input_to_si(spec, "makeup_setpoint", makeup_setpoint),
+        None if makeup_gas_molar_mass is None else input_to_si(spec, "makeup_gas_molar_mass", makeup_gas_molar_mass),
+        None if cooling_steps is None else cooling_steps,
+    )
+    return VacuumCollapseResult(
+        final_pressure=from_si(result.final_pressure.magnitude_si, result.final_pressure.unit),
+        minimum_pressure=from_si(result.minimum_pressure.magnitude_si, result.minimum_pressure.unit),
+        minimum_pressure_temperature=from_si(result.minimum_pressure_temperature.magnitude_si, result.minimum_pressure_temperature.unit),
+        vacuum_depth=from_si(result.vacuum_depth.magnitude_si, result.vacuum_depth.unit),
+        margin_to_rating=from_si(result.margin_to_rating.magnitude_si, result.margin_to_rating.unit),
+        vacuum_present=result.vacuum_present,
+        within_rating=result.within_rating,
+        makeup_gas_moles=from_si(result.makeup_gas_moles.magnitude_si, result.makeup_gas_moles.unit),
+        makeup_gas_mass=from_si(result.makeup_gas_mass.magnitude_si, result.makeup_gas_mass.unit),
+        verdict=VacuumVerdict(result.verdict),
         warnings=_warnings(result.warnings),
     )
 

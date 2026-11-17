@@ -219,6 +219,11 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # and `test_cross_impl` compares them on both results.
         "margin_exceeded",
         "two_phase_relief_screening_required",
+        # `vacuum_collapse`'s two flags, booleans with no slot in `TestCase`.
+        # `crates/azoth-process/tests/vacuum_collapse.rs` asserts them against the capture,
+        # and `test_cross_impl` compares them on both results.
+        "vacuum_present",
+        "within_rating",
         # `gas_dispersion`'s two endpoint predicates, booleans with no slot in `TestCase`.
         # `crates/azoth-process/tests/gas_dispersion.rs` asserts them against the capture,
         # and `test_cross_impl` compares them on both results.

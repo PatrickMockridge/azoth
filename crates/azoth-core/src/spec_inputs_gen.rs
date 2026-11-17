@@ -313,6 +313,7 @@
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
+//!   - specs/models/process/vacuum_collapse.toml
 //!   - specs/models/process/vce.toml
 //!   - specs/models/process/vessel_rupture.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
@@ -5570,6 +5571,36 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "expander_out_temperature",
         "thermodynamic_temperature",
     ),
+    ("process.vacuum_collapse", "mole_fractions", "dimensionless"),
+    ("process.vacuum_collapse", "vessel_volume", "volume"),
+    ("process.vacuum_collapse", "initial_pressure", "pressure"),
+    (
+        "process.vacuum_collapse",
+        "initial_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.vacuum_collapse",
+        "cold_end_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.vacuum_collapse",
+        "atmospheric_pressure",
+        "pressure",
+    ),
+    (
+        "process.vacuum_collapse",
+        "external_pressure_rating",
+        "pressure",
+    ),
+    ("process.vacuum_collapse", "makeup_setpoint", "pressure"),
+    (
+        "process.vacuum_collapse",
+        "makeup_gas_molar_mass",
+        "molar_mass",
+    ),
+    ("process.vacuum_collapse", "cooling_steps", "dimensionless"),
     ("process.vce", "cloud_fuel_mass", "mass"),
     ("process.vce", "heat_of_combustion", "dimensionless"),
     ("process.vce", "strength_class", "dimensionless"),

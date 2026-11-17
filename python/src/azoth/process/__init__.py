@@ -110,6 +110,7 @@ from azoth.core.result import (
     Tr3001ComplianceResult,
     TubeRuptureReliefResult,
     TurboExpanderResult,
+    VacuumCollapseResult,
     VceResult,
     VesselRuptureResult,
 )
@@ -216,6 +217,7 @@ __all__ = [
     "toxic_library",
     "tr3001_compliance",
     "validate",
+    "vacuum_collapse",
     "vce",
     "vessel_rupture",
 ]
@@ -257,6 +259,7 @@ _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _MDMT = "process.mdmt"
+_VACUUM_COLLAPSE = "process.vacuum_collapse"
 _VCE = "process.vce"
 _FILTER = "process.filter"
 _FIRE_CASE_RELIEF = "process.fire_case_relief"
@@ -4451,6 +4454,42 @@ def gibbs_reactor(
         regularization=regularization,
         regularization_threshold=regularization_threshold,
         regularization_tau=regularization_tau,
+    )
+
+
+def vacuum_collapse(
+    components: list[str],
+    mole_fractions: list[float],
+    vessel_volume: Q,
+    initial_pressure: Q,
+    initial_temperature: Q,
+    cold_end_temperature: Q,
+    atmospheric_pressure: Q | None = None,
+    external_pressure_rating: Q | None = None,
+    makeup_setpoint: Q | None = None,
+    makeup_gas_molar_mass: Q | None = None,
+    cooling_steps: float | None = None,
+) -> VacuumCollapseResult:
+    """The constant-volume cooling sweep's minimum pressure and the make-up gas.
+
+    The inventory is the amount that fills the rigid vessel at the stated state, and the
+    sweep holds its molar volume while a constant-volume flash runs at every cooling step.
+    **An absent external rating is 0 bara**, the class's full-vacuum assumption.
+
+    See :func:`azoth.process.reference.vacuum_collapse`.
+    """
+    return resolve(_VACUUM_COLLAPSE)(  # type: ignore[no-any-return]
+        components=components,
+        mole_fractions=mole_fractions,
+        vessel_volume=vessel_volume,
+        initial_pressure=initial_pressure,
+        initial_temperature=initial_temperature,
+        cold_end_temperature=cold_end_temperature,
+        atmospheric_pressure=atmospheric_pressure,
+        external_pressure_rating=external_pressure_rating,
+        makeup_setpoint=makeup_setpoint,
+        makeup_gas_molar_mass=makeup_gas_molar_mass,
+        cooling_steps=cooling_steps,
     )
 
 

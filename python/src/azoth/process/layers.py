@@ -1630,6 +1630,47 @@ def _fire_monitor_coverage(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _vacuum_collapse(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.vacuum_collapse`'s layers, from the reference's arithmetic.
+
+    The verdict and the two flags are the model's own words, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.vacuum_collapse import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["mole_fractions"]],
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["initial_pressure"]), "Pa"),
+        quantity(float(inputs["initial_temperature"]), "K"),
+        quantity(float(inputs["cold_end_temperature"]), "K"),
+        atmospheric_pressure=optional("atmospheric_pressure", "Pa"),
+        external_pressure_rating=optional("external_pressure_rating", "Pa"),
+        makeup_setpoint=optional("makeup_setpoint", "Pa"),
+        makeup_gas_molar_mass=optional("makeup_gas_molar_mass", "kg/mol"),
+        cooling_steps=(
+            None
+            if inputs.get("cooling_steps") is None
+            else float(inputs["cooling_steps"])
+        ),
+    )
+    return {
+        "final_pressure_bara": solution.final_pressure / 1.0e5,
+        "minimum_pressure_bara": solution.minimum_pressure / 1.0e5,
+        "minimum_pressure_temperature_k": solution.minimum_temperature,
+        "vacuum_depth_bar": solution.vacuum_depth / 1.0e5,
+        "margin_to_rating_bar": solution.margin / 1.0e5,
+        "makeup_gas_moles": solution.makeup_moles,
+        "makeup_gas_mass_kg": solution.makeup_mass,
+    }
+
+
 def _mdmt(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.mdmt`'s layers, from the reference's arithmetic.
 
@@ -3571,6 +3612,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.pump_deadhead": _pump_deadhead,
     "process.runaway_reaction": _runaway_reaction,
     "process.mdmt": _mdmt,
+    "process.vacuum_collapse": _vacuum_collapse,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.fault_tree": _fault_tree,
@@ -4627,6 +4669,16 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_monitor_coverage.tsv",
         block=8,
         identified_by=("#label", "fmc_characteristic_dimension"),
+    ),
+    # Vacuum collapse's one: the condensing sweep at a 0.2 bara rating. The five further
+    # cases are the non-condensing, exceeded, no-rating, make-up and five-step states; the
+    # unit aliases and the cold-end refusal are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.vacuum_collapse",
+        case="vacuum_within_rating",
+        capture="process_vacuum_collapse.tsv",
+        block=1,
+        identified_by=("#label", "vacuum_mixed_condense"),
     ),
     # MDMT's one: curve B at 25 mm. The seven further cases are the other curves, the
     # stress-ratio reduction, the clamps and the passing and failing verdicts; the curves C
@@ -7474,6 +7526,8 @@ UNCASED_ROWS: dict[str, int] = {
     "process_deluge_nozzle_layout.tsv": 8,
     # The monitor coverage's eleven: the constructor and each setter's refusal.
     "process_fire_monitor_coverage.tsv": 11,
+    # Vacuum collapse's two: the unit-string aliases and the cold-end refusal.
+    "process_vacuum_collapse.tsv": 2,
     # MDMT's two: curves C and D at 25 mm, restatements of the curve family the other cases
     # already cover. The curve refusal is a hand test.
     "process_mdmt.tsv": 2,

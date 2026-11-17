@@ -104,5 +104,6 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.tr3001_compliance`](./tr3001_compliance.md) | `closed_form_tr3001_compliance` | NeqSim process/safety/overpressure/TR3001ComplianceChecker.java |
 | [`process.tube_rupture_relief`](./tube_rupture_relief.md) | `tube_rupture_nozzle` | NeqSim process/safety/overpressure/TubeRuptureRelief.java |
 | [`process.turbo_expander_compressor`](./turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/TurboExpanderCompressor.java |
+| [`process.vacuum_collapse`](./vacuum_collapse.md) | `constant_volume_cooling_sweep` | NeqSim process/safety/vacuum/VacuumCollapseAnalyzer.java |
 | [`process.vce`](./vce.md) | `tno_multi_energy_scaled_overpressure` | NeqSim process/safety/fire/VCEModel.java |
 | [`process.vessel_rupture`](./vessel_rupture.md) | `thin_wall_vessel_rupture_crossover` | NeqSim process/safety/rupture/VesselRuptureAnalyzer.java |

@@ -6620,6 +6620,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.vacuum_collapse",
+        name: "Vacuum collapse screening",
+        family: "equipmentsafety",
+        sub_interface: None,
+        purpose: "The constant-volume cooling sweep's minimum pressure against the external rating, and the make-up gas.",
+        native: false,
+        refusal: Some(
+            "this calculation takes a fluid as input, which a scenario does not yet provide",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.vce",
         name: "Vapour-cloud explosion overpressure",
         family: "fire",
