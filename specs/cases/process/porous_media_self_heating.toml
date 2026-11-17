@@ -1,0 +1,319 @@
+model = "process.porous_media_self_heating"
+
+[[cases]]
+id = "porous_slab"
+tolerance = 1.0e-9
+source = "A 0.05 m slab at 430 K with E = 110 kJ/mol, P = 5e13 W/m3 and lambda = 0.09 W/(m K). From `validation/neqsim/captures/process_porous_media_self_heating.tsv` (`porous_slab`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "slab"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+delta = 0.004317180673554722
+delta_crit = 0.878
+delta_ratio = 0.004917062270563465
+critical_temperature = 528.3451326191425
+critical_dimension = 0.7130453469298679
+temperature_margin = 98.34513261914253
+dimension_margin = 0.6630453469298678
+fk_temperature_scale = 13.975855800620002
+verdict = "subcritical"
+messages = [
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_infinite_cylinder"
+tolerance = 1.0e-9
+source = "The same state as an infinite cylinder: the critical parameter is 2.000 and the critical dimension is the radius. From (`porous_infinite_cylinder`)."
+[cases.inputs]
+geometry = "infinite_cylinder"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "infinite_cylinder"
+delta = 0.004317180673554722
+delta_crit = 2.0
+delta_ratio = 0.002158590336777361
+critical_temperature = 547.9552991688251
+critical_dimension = 1.0761799338700502
+temperature_margin = 117.95529916882515
+dimension_margin = 1.0261799338700501
+fk_temperature_scale = 13.975855800620002
+verdict = "subcritical"
+messages = [
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_sphere"
+tolerance = 1.0e-9
+source = "The same state as a sphere: the critical parameter is 3.322. From (`porous_sphere`)."
+[cases.inputs]
+geometry = "sphere"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "sphere"
+delta = 0.004317180673554722
+delta_crit = 3.322
+delta_ratio = 0.0012995727494144256
+critical_temperature = 560.8196742832661
+critical_dimension = 1.3869784275024692
+temperature_margin = 130.81967428326607
+dimension_margin = 1.3369784275024692
+fk_temperature_scale = 13.975855800620002
+verdict = "subcritical"
+messages = [
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_cube"
+tolerance = 1.0e-9
+source = "The same state as a cube: the critical parameter is 2.520. From (`porous_cube`)."
+[cases.inputs]
+geometry = "cube"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "cube"
+delta = 0.004317180673554722
+delta_crit = 2.52
+delta_ratio = 0.0017131669339502864
+critical_temperature = 553.7372328341007
+critical_dimension = 1.2080089797188318
+temperature_margin = 123.73723283410072
+dimension_margin = 1.1580089797188318
+fk_temperature_scale = 13.975855800620002
+verdict = "subcritical"
+messages = [
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_equicylinder"
+tolerance = 1.0e-9
+source = "The same state as an equicylinder: the critical parameter is 2.760. From (`porous_equicylinder`)."
+[cases.inputs]
+geometry = "equicylinder"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "equicylinder"
+delta = 0.004317180673554722
+delta_crit = 2.76
+delta_ratio = 0.001564195896215479
+critical_temperature = 556.048297137022
+critical_dimension = 1.2642251718301925
+temperature_margin = 126.04829713702202
+dimension_margin = 1.2142251718301924
+fk_temperature_scale = 13.975855800620002
+verdict = "subcritical"
+messages = [
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_at_critical_dimension"
+tolerance = 1.0e-9
+source = "The slab re-evaluated at its reported critical dimension: `delta_ratio` is 0.9999999999999952, below one, so it screens marginal. From (`porous_at_critical_dimension`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.7130453469298679
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "slab"
+delta = 0.8779999999999958
+delta_crit = 0.878
+delta_ratio = 0.9999999999999952
+critical_temperature = 429.99999299645424
+critical_dimension = 0.7130453469298679
+temperature_margin = -7.0035457611083984e-6
+dimension_margin = 0.0
+fk_temperature_scale = 13.975855800620002
+verdict = "marginal"
+messages = [
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_thin"
+tolerance = 1.0e-9
+source = "A quarter of the critical dimension: subcritical. From (`porous_thin`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.17826133673246697
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "slab"
+delta = 0.054874999999999716
+delta_crit = 0.878
+delta_ratio = 0.062499999999999674
+critical_temperature = 476.046834141016
+critical_dimension = 0.7130453469298679
+temperature_margin = 46.04683414101601
+dimension_margin = 0.5347840101974008
+fk_temperature_scale = 13.975855800620002
+verdict = "subcritical"
+messages = [
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_near_critical"
+tolerance = 1.0e-9
+source = "0.95 of the critical dimension: `delta_ratio` 0.9025 is inside the marginal band. From (`porous_near_critical`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.6773930795833745
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "slab"
+delta = 0.792394999999994
+delta_crit = 0.878
+delta_ratio = 0.9024999999999931
+critical_temperature = 431.5390668809414
+critical_dimension = 0.7130453469298679
+temperature_margin = 1.539066880941391
+dimension_margin = 0.035652267346493405
+fk_temperature_scale = 13.975855800620002
+verdict = "marginal"
+messages = [
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_thick"
+tolerance = 1.0e-9
+source = "Twice the critical dimension: `delta_ratio` 4.0, a negative dimension margin and a self-ignition. From (`porous_thick`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 1.4260906938597357
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "slab"
+delta = 3.511999999999971
+delta_crit = 0.878
+delta_ratio = 3.999999999999967
+critical_temperature = 410.2615289390087
+critical_dimension = 0.7130453469298679
+temperature_margin = -19.738471060991287
+dimension_margin = -0.7130453469298679
+fk_temperature_scale = 13.975855800620002
+verdict = "self_ignition"
+messages = [
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_pipe_insulation"
+tolerance = 1.0e-9
+source = "The pipe-insulation configuration on a 50 mm layer at a 180 C wall: the flag forces the slab and records its message ahead of the theory note. From (`porous_pipe_insulation`)."
+[cases.inputs]
+geometry = "cube"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 453.15
+pipe_insulation_screening = true
+[cases.expected]
+geometry = "slab"
+delta = 0.018718886767640146
+delta_crit = 0.878
+delta_ratio = 0.02131991659184527
+critical_temperature = 528.3451326191425
+critical_dimension = 0.34243429551115906
+temperature_margin = 75.19513261914256
+dimension_margin = 0.29243429551115907
+fk_temperature_scale = 15.521206199294152
+verdict = "subcritical"
+messages = [
+    "Pipe-insulation screening: slab half-dimension set to the full insulation thickness and boundary temperature set to the pipe wall temperature (conservative bounding assumption)",
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_not_bracketed"
+tolerance = 1.0e-9
+source = "A 1 kJ/mol activation energy: `delta` is already above critical at 150 K, so the critical temperature and its margin are absent. From (`porous_not_bracketed`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+activation_energy = 1000.0
+volumetric_pre_factor = 5.0e13
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "slab"
+delta = 683003410.3438746
+delta_crit = 0.878
+delta_ratio = 777908212.2367592
+critical_dimension = 1.7926926017313195e-6
+dimension_margin = -0.04999820730739827
+fk_temperature_scale = 1537.3441380682
+verdict = "self_ignition"
+messages = [
+    "Critical ambient temperature could not be bracketed between 150.0 K and 2000.0 K; check the kinetic parameters",
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]
+
+[[cases]]
+id = "porous_kinetics_combined"
+tolerance = 1.0e-9
+source = "The class's `setKinetics` identity: A = 2.5e8 1/s, Q = 2e7 J/kg and rho = 200 kg/m3 combine to P = 1e18 W/m3. From (`porous_kinetics_combined`)."
+[cases.inputs]
+geometry = "slab"
+characteristic_dimension = 0.05
+effective_conductivity = 0.09
+activation_energy = 110000.0
+volumetric_pre_factor = 1.0e18
+boundary_temperature = 430.0
+[cases.expected]
+geometry = "slab"
+delta = 86.34361347109436
+delta_crit = 0.878
+delta_ratio = 98.3412454112692
+critical_temperature = 371.1026705801487
+critical_dimension = 0.005041992001076242
+temperature_margin = -58.8973294198513
+dimension_margin = -0.04495800799892376
+fk_temperature_scale = 13.975855800620002
+verdict = "self_ignition"
+messages = [
+    "Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls",
+]

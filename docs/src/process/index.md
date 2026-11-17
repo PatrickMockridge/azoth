@@ -17,6 +17,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.active_fire_protection_screening`](./active_fire_protection_screening.md) | `closed_form_active_fire_protection_screening` | NeqSim process/safety/firewater/ActiveFireProtectionScreening.java |
 | [`process.anti_surge_recycle`](./anti_surge_recycle.md) | `damped_fixed_point_recycle` | NeqSim process/equipment/compressor/AntiSurgeRecycleCalculator.java |
 | [`process.api537_flare_flame_model`](./api537_flare_flame_model.md) | `closed_form_flare_flame_and_radiation` | NeqSim process/safety/fire/Api537FlareFlameModel.java |
+| [`process.basket_test_regression`](./basket_test_regression.md) | `basket_least_squares` | NeqSim process/safety/selfheating/BasketTestRegression.java |
 | [`process.bleve`](./bleve.md) | `ccps_fireball_point_source` | NeqSim process/safety/fire/BLEVECalculator.java |
 | [`process.blocked_outlet_relief`](./blocked_outlet_relief.md) | `blocked_outlet_full_inflow` | NeqSim process/safety/overpressure/BlockedOutletRelief.java |
 | [`process.blowdown_pressure_profile`](./blowdown_pressure_profile.md) | `piecewise_step_or_linear_pressure_profile` | NeqSim process/safety/rupture/BlowdownPressureProfile.java |
@@ -65,6 +66,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.pipeline_pressure_protection`](./pipeline_pressure_protection.md) | `closed_form_pipeline_pressure_protection` | NeqSim process/safety/overpressure/PipelinePressureProtectionCalculator.java |
 | [`process.plug_flow_reactor`](./plug_flow_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/PlugFlowReactor.java |
 | [`process.pool_fire`](./pool_fire.md) | `api521_mudan_pool_fire` | NeqSim process/safety/fire/PoolFireModel.java |
+| [`process.porous_media_self_heating`](./porous_media_self_heating.md) | `frank_kamenetskii_criticality` | NeqSim process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.java |
 | [`process.probit`](./probit.md) | `closed_form_probit` | NeqSim process/safety/dispersion/ProbitModel.java |
 | [`process.psv_fire_sizing`](./psv_fire_sizing.md) | `closed_form_psv_fire_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
 | [`process.psv_sizing`](./psv_sizing.md) | `closed_form_psv_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
@@ -73,6 +75,8 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.relief_disposal_network`](./relief_disposal_network.md) | `closed_form_relief_disposal_network` | NeqSim process/safety/overpressure/ReliefDisposalNetwork.java |
 | [`process.risk_matrix`](./risk_matrix.md) | `closed_form_risk_matrix` | NeqSim process/safety/risk/RiskMatrix.java |
 | [`process.safety_instrumented_function`](./safety_instrumented_function.md) | `closed_form_safety_instrumented_function` | NeqSim process/safety/risk/sis/SafetyInstrumentedFunction.java |
+| [`process.self_heating_induction`](./self_heating_induction.md) | `explicit_euler_induction` | NeqSim process/safety/selfheating/SelfHeatingInductionSolver.java |
+| [`process.semenov_self_heating`](./semenov_self_heating.md) | `semenov_criticality` | NeqSim process/safety/selfheating/SemenovSelfHeatingAnalyzer.java |
 | [`process.separator`](./separator.md) | `direct composition` | NeqSim process/equipment/separator/Separator.java |
 | [`process.separator_capacity_assessment`](./separator_capacity_assessment.md) | `direct composition` | NeqSim process/equipment/separator/SeparatorCapacityAssessment.java |
 | [`process.separator_performance`](./separator_performance.md) | `direct composition` | NeqSim process/equipment/separator/entrainment/SeparatorPerformanceCalculator.java |

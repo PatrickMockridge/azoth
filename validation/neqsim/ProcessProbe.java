@@ -216,6 +216,16 @@ import neqsim.process.safety.rupture.PipeFireRuptureResult;
 import neqsim.process.safety.rupture.PipeFireRuptureScenario;
 import neqsim.process.safety.rupture.PipeFireRuptureStudy;
 import neqsim.process.safety.rupture.VesselRuptureAnalyzer;
+import neqsim.process.safety.selfheating.BasketTestRegression;
+import neqsim.process.safety.selfheating.BasketTestRegressionResult;
+import neqsim.process.safety.selfheating.PorousMediaSelfHeatingAnalyzer;
+import neqsim.process.safety.selfheating.PorousMediaSelfHeatingResult;
+import neqsim.process.safety.selfheating.SelfHeatingGeometry;
+import neqsim.process.safety.selfheating.SelfHeatingInductionResult;
+import neqsim.process.safety.selfheating.SelfHeatingInductionSolver;
+import neqsim.process.safety.selfheating.SelfHeatingTimePoint;
+import neqsim.process.safety.selfheating.SemenovSelfHeatingAnalyzer;
+import neqsim.process.safety.selfheating.SemenovSelfHeatingResult;
 import neqsim.process.util.fire.ReliefValveSizing;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -479,6 +489,18 @@ public class ProcessProbe {
         break;
       case "overpressure_protection_study":
         overpressureProtectionStudyRows();
+        break;
+      case "semenov_self_heating":
+        semenovSelfHeatingRows();
+        break;
+      case "porous_media_self_heating":
+        porousMediaSelfHeatingRows();
+        break;
+      case "self_heating_induction":
+        selfHeatingInductionRows();
+        break;
+      case "basket_test_regression":
+        basketTestRegressionRows();
         break;
       case "pipe_fire_rupture":
         pipeFireRuptureRows();
@@ -16030,6 +16052,358 @@ public class ProcessProbe {
     System.out.println("message_count=" + messages.size());
     for (int i = 0; i < messages.size(); i++) {
       System.out.println("message" + i + "=" + messages.get(i));
+    }
+    System.out.println();
+  }
+
+  // ---------------------------------------------------------------------------
+  // The self-heating family
+  // ---------------------------------------------------------------------------
+
+  /// A Semenov analyzer with every mandatory input set, in SI.
+  static SemenovSelfHeatingAnalyzer semenovAnalyzer(double volumeM3, double surfaceAreaM2,
+      double heatTransferCoefficientWPerM2K, double activationEnergyJPerMol,
+      double volumetricPreFactorWPerM3, double ambientTemperatureK) {
+    return new SemenovSelfHeatingAnalyzer().setBodySize(volumeM3, surfaceAreaM2)
+        .setHeatTransferCoefficient(heatTransferCoefficientWPerM2K)
+        .setActivationEnergy(activationEnergyJPerMol, "J/mol")
+        .setVolumetricHeatReleasePreFactor(volumetricPreFactorWPerM3)
+        .setAmbientTemperature(ambientTemperatureK, "K");
+  }
+
+  /// A Frank-Kamenetskii analyzer with every mandatory input set, in SI.
+  static PorousMediaSelfHeatingAnalyzer porousAnalyzer(SelfHeatingGeometry geometry,
+      double characteristicDimensionM, double effectiveConductivityWPerMK,
+      double activationEnergyJPerMol, double volumetricPreFactorWPerM3,
+      double boundaryTemperatureK) {
+    return new PorousMediaSelfHeatingAnalyzer().setGeometry(geometry)
+        .setCharacteristicDimension(characteristicDimensionM, "m")
+        .setEffectiveThermalConductivity(effectiveConductivityWPerMK)
+        .setActivationEnergy(activationEnergyJPerMol, "J/mol")
+        .setVolumetricHeatReleasePreFactor(volumetricPreFactorWPerM3)
+        .setBoundaryTemperature(boundaryTemperatureK, "K");
+  }
+
+  /// An induction solver on the class test's reference case, in SI.
+  static SelfHeatingInductionSolver inductionSolver(SelfHeatingGeometry geometry,
+      double characteristicDimensionM, double effectiveConductivityWPerMK,
+      double volumetricHeatCapacityJPerM3K, double activationEnergyJPerMol,
+      double volumetricPreFactorWPerM3, double boundaryTemperatureK) {
+    return new SelfHeatingInductionSolver().setGeometry(geometry)
+        .setCharacteristicDimension(characteristicDimensionM, "m")
+        .setEffectiveThermalConductivity(effectiveConductivityWPerMK)
+        .setVolumetricHeatCapacity(volumetricHeatCapacityJPerM3K)
+        .setActivationEnergy(activationEnergyJPerMol, "J/mol")
+        .setVolumetricHeatReleasePreFactor(volumetricPreFactorWPerM3)
+        .setBoundaryTemperature(boundaryTemperatureK, "K").setNodeCount(21)
+        .setMaxTime(5.0, "day");
+  }
+
+  /// The critical oven temperature the synthetic kinetics give a basket of this size.
+  static double syntheticCriticalTemperature(SelfHeatingGeometry geometry,
+      double characteristicDimensionM) {
+    return porousAnalyzer(geometry, characteristicDimensionM, 0.09, 110000.0, 5.0e13, 400.0)
+        .analyze().getCriticalTemperatureK();
+  }
+
+  static void printSemenov(String label, SemenovSelfHeatingAnalyzer analyzer) {
+    System.out.println(label);
+    try {
+      SemenovSelfHeatingResult result = analyzer.analyze();
+      System.out.println("volume_m3=" + result.getVolumeM3());
+      System.out.println("surface_area_m2=" + result.getSurfaceAreaM2());
+      System.out.println("heat_transfer_coefficient_w_per_m2_k="
+          + result.getHeatTransferCoefficientWPerM2K());
+      System.out.println("activation_energy_j_per_mol=" + result.getActivationEnergyJPerMol());
+      System.out.println("volumetric_pre_factor_w_per_m3=" + result.getVolumetricPreFactorWPerM3());
+      System.out.println("ambient_temperature_k=" + result.getAmbientTemperatureK());
+      System.out.println("psi=" + result.getPsi());
+      System.out.println("psi_crit=" + result.getPsiCrit());
+      System.out.println("psi_ratio=" + result.getPsiRatio());
+      System.out.println("critical_temperature_k=" + result.getCriticalTemperatureK());
+      System.out.println("temperature_margin_k=" + result.getTemperatureMarginK());
+      System.out.println("critical_temperature_rise_k=" + result.getCriticalTemperatureRiseK());
+      System.out.println("verdict=" + result.getVerdict().name().toLowerCase());
+      List<String> warnings = result.getWarnings();
+      System.out.println("warning_count=" + warnings.size());
+      for (int i = 0; i < warnings.size(); i++) {
+        System.out.println("warning" + i + "=" + warnings.get(i));
+      }
+    } catch (RuntimeException ex) {
+      System.out.println("state_error=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void printPorous(String label, PorousMediaSelfHeatingAnalyzer analyzer) {
+    System.out.println(label);
+    try {
+      PorousMediaSelfHeatingResult result = analyzer.analyze();
+      System.out.println("geometry=" + result.getGeometry().name().toLowerCase());
+      System.out.println("characteristic_dimension_m=" + result.getCharacteristicDimensionM());
+      System.out.println("effective_conductivity_w_per_m_k="
+          + result.getEffectiveConductivityWPerMK());
+      System.out.println("activation_energy_j_per_mol=" + result.getActivationEnergyJPerMol());
+      System.out.println("volumetric_pre_factor_w_per_m3=" + result.getVolumetricPreFactorWPerM3());
+      System.out.println("boundary_temperature_k=" + result.getBoundaryTemperatureK());
+      System.out.println("delta=" + result.getDelta());
+      System.out.println("delta_crit=" + result.getDeltaCrit());
+      System.out.println("delta_ratio=" + result.getDeltaRatio());
+      System.out.println("critical_temperature_k=" + result.getCriticalTemperatureK());
+      System.out.println("critical_dimension_m=" + result.getCriticalDimensionM());
+      System.out.println("temperature_margin_k=" + result.getTemperatureMarginK());
+      System.out.println("dimension_margin_m=" + result.getDimensionMarginM());
+      System.out.println("fk_temperature_scale_k=" + result.getFkTemperatureScaleK());
+      System.out.println("verdict=" + result.getVerdict().name().toLowerCase());
+      List<String> warnings = result.getWarnings();
+      System.out.println("warning_count=" + warnings.size());
+      for (int i = 0; i < warnings.size(); i++) {
+        System.out.println("warning" + i + "=" + warnings.get(i));
+      }
+    } catch (RuntimeException ex) {
+      System.out.println("state_error=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void printTimePoint(String label, SelfHeatingTimePoint point) {
+    System.out.println(label + "_time_s=" + point.getTimeS());
+    System.out.println(label + "_centre_temperature_k=" + point.getCentreTemperatureK());
+    System.out.println(label + "_max_temperature_k=" + point.getMaxTemperatureK());
+  }
+
+  static void printInduction(String label, SelfHeatingInductionSolver solver) {
+    System.out.println(label);
+    try {
+      SelfHeatingInductionResult result = solver.solve();
+      System.out.println("geometry=" + result.getGeometry().name().toLowerCase());
+      System.out.println("characteristic_dimension_m=" + result.getCharacteristicDimensionM());
+      System.out.println("boundary_temperature_k=" + result.getBoundaryTemperatureK());
+      System.out.println("initial_temperature_k=" + result.getInitialTemperatureK());
+      System.out.println("ignition_rise_k=" + result.getIgnitionRiseK());
+      System.out.println("ignited=" + result.isIgnited());
+      System.out.println("induction_time_s=" + result.getInductionTimeS());
+      System.out.println("peak_temperature_k=" + result.getPeakTemperatureK());
+      System.out.println("peak_temperature_rise_k=" + result.getPeakTemperatureRiseK());
+      System.out.println("steady_state_reached=" + result.isSteadyStateReached());
+      System.out.println("simulated_time_s=" + result.getSimulatedTimeS());
+      List<SelfHeatingTimePoint> history = result.getHistory();
+      System.out.println("history_count=" + history.size());
+      int first = Math.min(3, history.size());
+      for (int i = 0; i < first; i++) {
+        printTimePoint("history" + i, history.get(i));
+      }
+      int last = Math.max(0, history.size() - 3);
+      for (int i = last; i < history.size(); i++) {
+        printTimePoint("history_last" + (i - last), history.get(i));
+      }
+      List<String> warnings = result.getWarnings();
+      System.out.println("warning_count=" + warnings.size());
+      for (int i = 0; i < warnings.size(); i++) {
+        System.out.println("warning" + i + "=" + warnings.get(i));
+      }
+    } catch (RuntimeException ex) {
+      System.out.println("state_error=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void printBasketOutputs(BasketTestRegression regression) {
+    try {
+      BasketTestRegressionResult result = regression.regress();
+      System.out.println("point_count=" + result.getPointCount());
+      System.out.println("slope_k=" + result.getSlope());
+      System.out.println("intercept=" + result.getIntercept());
+      System.out.println("r_squared=" + result.getRSquared());
+      System.out.println("activation_energy_j_per_mol=" + result.getActivationEnergyJPerMol());
+      System.out.println("volumetric_pre_factor_w_per_m3="
+          + result.getVolumetricPreFactorWPerM3());
+      System.out.println("effective_conductivity_w_per_m_k="
+          + result.getEffectiveConductivityWPerMK());
+      System.out.println("conductivity_provided=" + result.isConductivityProvided());
+      List<String> warnings = result.getWarnings();
+      System.out.println("warning_count=" + warnings.size());
+      for (int i = 0; i < warnings.size(); i++) {
+        System.out.println("warning" + i + "=" + warnings.get(i));
+      }
+    } catch (RuntimeException ex) {
+      System.out.println("state_error=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void semenovSelfHeatingRows() {
+    SemenovSelfHeatingAnalyzer base = semenovAnalyzer(0.01, 0.3, 10.0, 110000.0, 5.0e13, 400.0);
+    double criticalTemperatureK = base.analyze().getCriticalTemperatureK();
+    printSemenov("semenov_base", base);
+    printSemenov("semenov_at_critical",
+        semenovAnalyzer(0.01, 0.3, 10.0, 110000.0, 5.0e13, criticalTemperatureK));
+    printSemenov("semenov_subcritical",
+        semenovAnalyzer(0.01, 0.3, 10.0, 110000.0, 5.0e13, criticalTemperatureK - 40.0));
+    printSemenov("semenov_ignition",
+        semenovAnalyzer(0.01, 0.3, 10.0, 110000.0, 5.0e13, criticalTemperatureK + 10.0));
+    printSemenov("semenov_bulky",
+        semenovAnalyzer(0.01, 0.2, 10.0, 110000.0, 5.0e13, 450.0));
+    printSemenov("semenov_marginal_ratio", semenovAnalyzer(0.01, 0.3, 10.0, 110000.0, 5.0e13,
+        criticalTemperatureK - 5.0).setMarginalRatio(0.8));
+    printSemenov("semenov_not_bracketed",
+        semenovAnalyzer(0.01, 0.3, 10.0, 1000.0, 5.0e13, 400.0));
+  }
+
+  static void porousMediaSelfHeatingRows() {
+    SelfHeatingGeometry[] geometries = {SelfHeatingGeometry.SLAB,
+        SelfHeatingGeometry.INFINITE_CYLINDER, SelfHeatingGeometry.SPHERE, SelfHeatingGeometry.CUBE,
+        SelfHeatingGeometry.EQUICYLINDER};
+    for (SelfHeatingGeometry geometry : geometries) {
+      printPorous("porous_" + geometry.name().toLowerCase(),
+          porousAnalyzer(geometry, 0.05, 0.09, 110000.0, 5.0e13, 430.0));
+    }
+    double criticalDimensionM =
+        porousAnalyzer(SelfHeatingGeometry.SLAB, 0.05, 0.09, 110000.0, 5.0e13, 430.0).analyze()
+            .getCriticalDimensionM();
+    printPorous("porous_at_critical_dimension", porousAnalyzer(SelfHeatingGeometry.SLAB,
+        criticalDimensionM, 0.09, 110000.0, 5.0e13, 430.0));
+    printPorous("porous_thin",
+        porousAnalyzer(SelfHeatingGeometry.SLAB, 0.25 * criticalDimensionM, 0.09, 110000.0,
+            5.0e13, 430.0));
+    printPorous("porous_near_critical",
+        porousAnalyzer(SelfHeatingGeometry.SLAB, 0.95 * criticalDimensionM, 0.09, 110000.0,
+            5.0e13, 430.0));
+    printPorous("porous_thick",
+        porousAnalyzer(SelfHeatingGeometry.SLAB, 2.0 * criticalDimensionM, 0.09, 110000.0, 5.0e13,
+            430.0));
+    printPorous("porous_pipe_insulation", new PorousMediaSelfHeatingAnalyzer()
+        .setEffectiveThermalConductivity(0.09).setActivationEnergy(110000.0, "J/mol")
+        .setVolumetricHeatReleasePreFactor(5.0e13).forPipeInsulation(50.0, "mm", 180.0, "C"));
+    printPorous("porous_not_bracketed",
+        porousAnalyzer(SelfHeatingGeometry.SLAB, 0.05, 0.09, 1000.0, 5.0e13, 430.0));
+
+    double preExponentialPerSecond = 2.5e8;
+    double heatOfReactionJPerKg = 2.0e7;
+    double reactiveBulkDensityKgPerM3 = 200.0;
+    printPorous("porous_kinetics_combined", porousAnalyzer(SelfHeatingGeometry.SLAB, 0.05, 0.09,
+        110000.0, preExponentialPerSecond * heatOfReactionJPerKg * reactiveBulkDensityKgPerM3, 430.0));
+    printPorous("porous_kinetics_separate", new PorousMediaSelfHeatingAnalyzer()
+        .setGeometry(SelfHeatingGeometry.SLAB).setCharacteristicDimension(0.05, "m")
+        .setEffectiveThermalConductivity(0.09).setActivationEnergy(110000.0, "J/mol")
+        .setBoundaryTemperature(430.0, "K")
+        .setKinetics(preExponentialPerSecond, heatOfReactionJPerKg, reactiveBulkDensityKgPerM3));
+  }
+
+  static void selfHeatingInductionRows() {
+    double slabCriticalK =
+        porousAnalyzer(SelfHeatingGeometry.SLAB, 0.05, 0.09, 110000.0, 5.0e13, 400.0).analyze()
+            .getCriticalTemperatureK();
+    printInduction("induction_ignite",
+        inductionSolver(SelfHeatingGeometry.SLAB, 0.05, 0.09, 1.8e5, 110000.0, 5.0e13,
+            slabCriticalK + 20.0));
+    printInduction("induction_steady",
+        inductionSolver(SelfHeatingGeometry.SLAB, 0.05, 0.09, 1.8e5, 110000.0, 5.0e13,
+            slabCriticalK - 10.0));
+    printInduction("induction_hot",
+        inductionSolver(SelfHeatingGeometry.SLAB, 0.05, 0.09, 1.8e5, 110000.0, 5.0e13,
+            slabCriticalK + 60.0));
+    double sphereCriticalK =
+        porousAnalyzer(SelfHeatingGeometry.SPHERE, 0.05, 0.09, 110000.0, 5.0e13, 400.0).analyze()
+            .getCriticalTemperatureK();
+    printInduction("induction_sphere",
+        inductionSolver(SelfHeatingGeometry.SPHERE, 0.05, 0.09, 1.8e5, 110000.0, 5.0e13,
+            sphereCriticalK + 20.0));
+    printInduction("induction_preheated",
+        inductionSolver(SelfHeatingGeometry.SLAB, 0.05, 0.09, 1.8e5, 110000.0, 5.0e13,
+            slabCriticalK + 20.0).setInitialTemperature(slabCriticalK + 60.0, "K"));
+    printInduction("induction_near_critical",
+        inductionSolver(SelfHeatingGeometry.SLAB, 0.05, 0.09, 1.8e5, 110000.0, 5.0e13,
+            slabCriticalK + 0.5));
+
+    System.out.println("induction_cube_refused");
+    try {
+      new SelfHeatingInductionSolver().setGeometry(SelfHeatingGeometry.CUBE);
+      System.out.println("refused=false");
+    } catch (IllegalArgumentException ex) {
+      System.out.println("refused=true");
+      System.out.println("message=" + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void basketTestRegressionRows() {
+    double[] sizes = {0.0125, 0.025, 0.05, 0.1};
+    System.out.println("basket_cube_four_points");
+    BasketTestRegression fourPoints =
+        new BasketTestRegression().setEffectiveThermalConductivity(0.09);
+    for (int i = 0; i < sizes.length; i++) {
+      double criticalTemperatureK = syntheticCriticalTemperature(SelfHeatingGeometry.CUBE, sizes[i]);
+      System.out.println("point" + i + "_geometry=cube");
+      System.out.println("point" + i + "_characteristic_dimension_m=" + sizes[i]);
+      System.out.println("point" + i + "_critical_temperature_k=" + criticalTemperatureK);
+      fourPoints.addPoint(SelfHeatingGeometry.CUBE, sizes[i], "m", criticalTemperatureK, "K");
+    }
+    System.out.println("effective_conductivity_w_per_m_k=0.09");
+    printBasketOutputs(fourPoints);
+
+    System.out.println("basket_mixed_geometries");
+    BasketTestRegression mixed = new BasketTestRegression().setEffectiveThermalConductivity(0.09);
+    SelfHeatingGeometry[] mixedGeometries = {SelfHeatingGeometry.CUBE,
+        SelfHeatingGeometry.SPHERE, SelfHeatingGeometry.INFINITE_CYLINDER};
+    double[] mixedSizes = {0.025, 0.05, 0.1};
+    for (int i = 0; i < mixedGeometries.length; i++) {
+      double criticalTemperatureK =
+          syntheticCriticalTemperature(mixedGeometries[i], mixedSizes[i]);
+      System.out.println("point" + i + "_geometry="
+          + mixedGeometries[i].name().toLowerCase());
+      System.out.println("point" + i + "_characteristic_dimension_m=" + mixedSizes[i]);
+      System.out.println("point" + i + "_critical_temperature_k=" + criticalTemperatureK);
+      mixed.addPoint(mixedGeometries[i], mixedSizes[i], "m", criticalTemperatureK, "K");
+    }
+    System.out.println("effective_conductivity_w_per_m_k=0.09");
+    printBasketOutputs(mixed);
+
+    System.out.println("basket_missing_conductivity");
+    BasketTestRegression noConductivity = new BasketTestRegression();
+    double[] noConductivitySizes = {0.025, 0.05, 0.1};
+    for (int i = 0; i < noConductivitySizes.length; i++) {
+      double criticalTemperatureK =
+          syntheticCriticalTemperature(SelfHeatingGeometry.CUBE, noConductivitySizes[i]);
+      System.out.println("point" + i + "_geometry=cube");
+      System.out.println("point" + i + "_characteristic_dimension_m=" + noConductivitySizes[i]);
+      System.out.println("point" + i + "_critical_temperature_k=" + criticalTemperatureK);
+      noConductivity.addPoint(SelfHeatingGeometry.CUBE, noConductivitySizes[i], "m",
+          criticalTemperatureK, "K");
+    }
+    printBasketOutputs(noConductivity);
+
+    System.out.println("basket_two_points");
+    BasketTestRegression twoPoints = new BasketTestRegression().setEffectiveThermalConductivity(0.09);
+    for (double size : new double[] {0.025, 0.1}) {
+      double criticalTemperatureK =
+          syntheticCriticalTemperature(SelfHeatingGeometry.CUBE, size);
+      System.out.println("point_characteristic_dimension_m=" + size);
+      System.out.println("point_critical_temperature_k=" + criticalTemperatureK);
+      twoPoints.addPoint(SelfHeatingGeometry.CUBE, size, "m", criticalTemperatureK, "K");
+    }
+    System.out.println("effective_conductivity_w_per_m_k=0.09");
+    printBasketOutputs(twoPoints);
+
+    System.out.println("basket_single_point");
+    try {
+      new BasketTestRegression().addPoint(SelfHeatingGeometry.CUBE, 0.05, "m", 150.0, "C")
+          .regress();
+      System.out.println("refused=false");
+    } catch (IllegalStateException ex) {
+      System.out.println("refused=true");
+      System.out.println("message=" + ex.getMessage());
+    }
+    System.out.println();
+
+    System.out.println("basket_equal_temperatures");
+    try {
+      new BasketTestRegression().addPoint(SelfHeatingGeometry.CUBE, 0.05, "m", 150.0, "C")
+          .addPoint(SelfHeatingGeometry.CUBE, 0.1, "m", 150.0, "C").regress();
+      System.out.println("refused=false");
+    } catch (IllegalStateException ex) {
+      System.out.println("refused=true");
+      System.out.println("message=" + ex.getMessage());
     }
     System.out.println();
   }

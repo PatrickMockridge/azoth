@@ -1,0 +1,85 @@
+id = "process.basket_test_regression"
+name = "Basket-test regression"
+kind = "procedure"
+assumptions = [
+    "**the fit is the two-parameter line `ln(deltaCrit Tc^2 / r^2)` against `1/Tc`**: the slope alone gives `E = -slope R`, and the conductivity splits the intercept into `P = exp(intercept) lambda R / E`.",
+    "**the shape enters only through its critical parameter**, so mixed basket geometries fit the same line.",
+    "**fewer than two points, or points that share a critical temperature, are refused** with the class's own messages; fewer than three fit but carry its recommendation.",
+    "**a missing conductivity still yields E but no P**, with the class's message; a non-positive fitted E carries its ordering warning.",
+    "**`r_squared` is absent when the ordinates do not vary**; the class answers NaN there.",
+]
+references = [
+    "EN 15188. Determination of the spontaneous ignition behaviour of dust accumulations.",
+    "ASTM E2021. Standard test method for hot-surface ignition temperature of dust layers.",
+    "Bowes, P. C. (1984). Self-Heating: Evaluating and Controlling the Hazards. HMSO.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/selfheating/BasketTestRegression.java` is the port source.",
+    "`validation/neqsim/captures/process_basket_test_regression.tsv` - the four-point cube set, a mixed-shape set, a fit without a conductivity, a two-point fit and the two refusals.",
+]
+[source]
+standard = "NeqSim process/safety/selfheating/BasketTestRegression.java"
+edition = "Its `regress`: the least-squares line, the activation energy, the split pre-factor and the three warnings."
+[algorithm]
+scheme = "basket_least_squares"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.points]
+type = "record_list"
+row_type = "BasketTestPoint"
+description = "the basket-test observations, at least two and with at least two critical temperatures.\n"
+[inputs.points.fields.geometry]
+type = "enum"
+values = ["slab", "infinite_cylinder", "sphere", "cube", "equicylinder"]
+description = "the basket's shape.\n"
+[inputs.points.fields.characteristic_dimension]
+unit = "m"
+description = "the basket's characteristic half-dimension, above zero.\n"
+[inputs.points.fields.critical_temperature]
+unit = "K"
+description = "the lowest oven temperature at which the sample ran away, absolute and above zero.\n"
+[inputs.effective_conductivity]
+unit = "W/(m*K)"
+optional = true
+description = "the sample's effective thermal conductivity, above zero; required to split the intercept into a pre-factor. **Absent leaves `volumetric_pre_factor` absent.**\n"
+[outputs]
+[outputs.point_count]
+unit = "dimensionless"
+description = "the number of observations fitted.\n"
+[outputs.slope]
+unit = "dimensionless"
+description = "the line's slope, **in kelvin**: `dy/dx` with `x = 1/Tc`.\n"
+[outputs.intercept]
+unit = "dimensionless"
+description = "the line's intercept.\n"
+[outputs.r_squared]
+unit = "dimensionless"
+optional = true
+description = "the coefficient of determination; absent when the ordinates do not vary.\n"
+[outputs.activation_energy]
+unit = "J/mol"
+description = "`-slope R`, the apparent activation energy.\n"
+[outputs.volumetric_pre_factor]
+unit = "dimensionless"
+optional = true
+description = "`exp(intercept) lambda R / E`, **in W/m3**; absent without a conductivity or with a non-positive E.\n"
+[outputs.effective_conductivity]
+unit = "W/(m*K)"
+optional = true
+description = "the conductivity the fit used, echoed; absent when it was not supplied.\n"
+[outputs.conductivity_provided]
+type = "boolean"
+description = "whether a conductivity was supplied.\n"
+[outputs.messages]
+type = "vector_string"
+length = "one per message"
+description = "the class's warning strings, in the order it appends them.\n"
+[[valid_range]]
+quantity = "effective_conductivity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive conductivity"
+[implementations]
+python = "azoth.process.basket_test_regression"
+rust = "azoth_process::basket_test_regression"

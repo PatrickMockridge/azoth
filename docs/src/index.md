@@ -331,6 +331,7 @@ Five sections, and the difference between them is the point:
 - [`process.active_fire_protection_screening`](./process/active_fire_protection_screening.md) — Active fire protection screening
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
 - [`process.api537_flare_flame_model`](./process/api537_flare_flame_model.md) — API 537 flare flame model
+- [`process.basket_test_regression`](./process/basket_test_regression.md) — Basket-test regression
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation
 - [`process.blocked_outlet_relief`](./process/blocked_outlet_relief.md) — Blocked outlet relief
 - [`process.blowdown_pressure_profile`](./process/blowdown_pressure_profile.md) — Blowdown pressure profile
@@ -379,6 +380,7 @@ Five sections, and the difference between them is the point:
 - [`process.pipeline_pressure_protection`](./process/pipeline_pressure_protection.md) — Pipeline pressure protection
 - [`process.plug_flow_reactor`](./process/plug_flow_reactor.md) — Plug-flow reactor
 - [`process.pool_fire`](./process/pool_fire.md) — Pool fire radiation
+- [`process.porous_media_self_heating`](./process/porous_media_self_heating.md) — Porous media self-heating
 - [`process.probit`](./process/probit.md) — Probit dose-response
 - [`process.psv_fire_sizing`](./process/psv_fire_sizing.md) — PSV fire sizing
 - [`process.psv_sizing`](./process/psv_sizing.md) — PSV sizing
@@ -387,6 +389,8 @@ Five sections, and the difference between them is the point:
 - [`process.relief_disposal_network`](./process/relief_disposal_network.md) — Relief disposal network
 - [`process.risk_matrix`](./process/risk_matrix.md) — Risk matrix
 - [`process.safety_instrumented_function`](./process/safety_instrumented_function.md) — Safety instrumented function
+- [`process.self_heating_induction`](./process/self_heating_induction.md) — Self-heating induction time
+- [`process.semenov_self_heating`](./process/semenov_self_heating.md) — Semenov self-heating
 - [`process.separator`](./process/separator.md) — Separator
 - [`process.separator_capacity_assessment`](./process/separator_capacity_assessment.md) — Separator capacity assessment
 - [`process.separator_performance`](./process/separator_performance.md) — Separator performance calculator

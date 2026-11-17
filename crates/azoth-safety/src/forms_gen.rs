@@ -203,6 +203,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.basket_test_regression",
+        name: "Basket-test regression",
+        family: "selfheating",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.bleve",
         name: "BLEVE fireball radiation",
         family: "fire",
@@ -3571,6 +3583,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.porous_media_self_heating",
+        name: "Porous media self-heating",
+        family: "selfheating",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation returns a table of rows, which this workspace does not yet draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.probit",
         name: "Probit dose-response",
         family: "dispersion",
@@ -5042,6 +5066,30 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
             expected: &[],
             tolerance: 1.0e-12,
         }),
+    },
+    SafetyCalculation {
+        id: "process.self_heating_induction",
+        name: "Self-heating induction time",
+        family: "selfheating",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation returns a table of rows, which this workspace does not yet draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.semenov_self_heating",
+        name: "Semenov self-heating",
+        family: "selfheating",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation returns a table of rows, which this workspace does not yet draw",
+        ),
+        form: None,
     },
     SafetyCalculation {
         id: "process.sil_verification",

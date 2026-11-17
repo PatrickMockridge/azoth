@@ -39,6 +39,8 @@ from azoth.core.result_base import PlusModel as PlusModel
 from azoth.core.result_base import ReliefPhase as ReliefPhase
 from azoth.core.result_base import RootStructure as RootStructure
 from azoth.core.result_base import RuptureStatus as RuptureStatus
+from azoth.core.result_base import SelfHeatingGeometry as SelfHeatingGeometry
+from azoth.core.result_base import SelfHeatingVerdict as SelfHeatingVerdict
 from azoth.core.result_base import StabilityVerdict as StabilityVerdict
 from azoth.core.result_base import Sts0131PressureCategory as Sts0131PressureCategory
 from azoth.core.result_base import SupplyVerdict as SupplyVerdict

@@ -812,6 +812,20 @@ class ScenarioIndexRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SelfHeatingTimePoint:
+    """the retained temperature samples, in the class's order."""
+
+    #: the sample's time.
+    time: Q
+
+    #: the centre-node temperature.
+    centre_temperature: Q
+
+    #: the peak node temperature.
+    max_temperature: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SilIssue:
     """one row per issue, in the class's check order."""
 

@@ -2613,3 +2613,77 @@ generic carbon-steel grid (1.00, 0.95, 0.85, 0.72, 0.52, 0.32, 0.16, 0.07, 0.03 
 a first-point crossover reports that point's time, so the severe X65 state ruptures at 0.
 The class's javadoc says the times must be strictly increasing and the code does not check:
 the non-monotonic evidence block is accepted, and the port refuses it.
+
+## The self-heating family
+
+`process_semenov_self_heating.tsv` is `SemenovSelfHeatingAnalyzer.analyze` on the class
+test's V = 0.01 m3, S = 0.3 m2, h = 10 W/(m2 K), E = 110 kJ/mol and P = 5e13 W/m3 state at
+400 K, at its reported critical temperature, 40 K below it, 10 K above it, a 0.2 m2 bulky
+body, a marginal-ratio row and a state whose critical temperature cannot be bracketed.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe semenov_self_heating \
+  > captures/process_semenov_self_heating.tsv
+```
+
+**`psi_crit` is `1/e` and the critical temperature is a bisection on [150, 2000] K with a
+1e-4 K tolerance and a 200-iteration cap.** At the returned temperature `psi_ratio` is
+`1.0000004`, not 1, so the class's own critical state screens as `self_ignition`; the
+subcritical row is 40 K below it. The bracket test returns `NaN` when `psi(150)` is already
+above critical or `psi(2000)` below it, and that row carries the class's bracket warning
+ahead of the always-present uniformity warning.
+
+`process_porous_media_self_heating.tsv` is `PorousMediaSelfHeatingAnalyzer.analyze` over the
+five geometries at one state, the slab at its reported critical half-dimension, 0.25x,
+0.95x and 2x that dimension, the pipe-insulation configuration, a not-bracketed state and
+the `setKinetics` identity pair.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe porous_media_self_heating \
+  > captures/process_porous_media_self_heating.tsv
+```
+
+The shape table is 0.878 slab, 2.000 infinite cylinder, 3.322 sphere, 2.520 cube, 2.760
+equicylinder. **At the closed-form critical dimension `delta_ratio` is
+`0.9999999999999952`, below one, so the verdict is `marginal`** - the class's own test
+allows `1 ± 1e-6` - and the critical temperature on that row is `429.9999930` K, a residue
+below the 430 K boundary. `forPipeInsulation(50 mm, 180 C)` sets the slab, uses the full
+thickness as the half-dimension and prepends its conservative-bounding note; `setKinetics`
+and the combined pre-factor produce bit-identical `delta`.
+
+`process_self_heating_induction.tsv` is `SelfHeatingInductionSolver.solve` on the class
+test's slab (r = 0.05 m, lambda = 0.09 W/(m K), rho c = 1.8e5 J/(m3 K), E = 110 kJ/mol,
+P = 5e13 W/m3, 21 nodes, a 5-day cap) 20 K above and 10 K below the Frank-Kamenetskii
+critical temperature, 60 K above, on the sphere, from a pre-heated start, and 0.5 K above
+the critical point; the cube refusal closes it.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe self_heating_induction \
+  > captures/process_self_heating_induction.tsv
+```
+
+The step is the smaller of the conduction limit `0.4 dx^2/(2 (j+1) alpha)` and a
+reaction-limited `0.02 (R T^2/E) rho c / (P exp(-E/RT))`, clamped to the remaining time; the
+run ends on ignition at the boundary plus 100 K, on the steady heuristic
+`maxRate (maxTime - time) < 0.1` after a step, or at the maximum time. The +20 K case ignites
+at 3631.288 s with a 100.147 K rise; the -10 K case reaches a steady 7.859 K rise. **At
++0.5 K the transient reaches a steady profile at 83837.5 s with a 21.877 K rise while
+Frank-Kamenetskii predicts ignition** - the two models agree away from the critical point
+(the class test's offsets are -40, -20, 25 and 50 K) and this row records where they part.
+The retained history is decimated (365 and 340 samples here), so the capture prints its
+count and its first and last three points rather than every row.
+
+`process_basket_test_regression.tsv` is `BasketTestRegression.regress` on the four-point
+cube set whose critical temperatures come from the porous model at lambda 0.09, a mixed
+cube/sphere/cylinder set, a fit without a conductivity, a two-point fit and the two
+refusals.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe basket_test_regression \
+  > captures/process_basket_test_regression.tsv
+```
+
+The four-point fit recovers E = 109999.99971 J/mol, P = 5.0000023e13 W/m3 and
+`r^2 = 0.99999999999994`; without a conductivity P is `NaN` with the class's warning; a
+two-point fit is exact with `r^2 = 1.0` and the recommendation warning. Fewer than two
+points and equal critical temperatures are refused with the class's messages.

@@ -15,6 +15,7 @@ use crate::models::absorption_column::AbsorptionColumnResult;
 use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult;
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
+use crate::models::basket_test_regression::BasketTestRegressionResult;
 use crate::models::bleve::BleveResult;
 use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
 use crate::models::blowdown_pressure_profile::BlowdownPressureProfileResult;
@@ -63,6 +64,7 @@ use crate::models::pipe_fire_rupture_material::PipeFireRuptureMaterialResult;
 use crate::models::pipeline_pressure_protection::PipelinePressureProtectionResult;
 use crate::models::plug_flow_reactor::PlugFlowReactorResult;
 use crate::models::pool_fire::PoolFireResult;
+use crate::models::porous_media_self_heating::PorousMediaSelfHeatingResult;
 use crate::models::probit::ProbitResult;
 use crate::models::psv_fire_sizing::PsvFireSizingResult;
 use crate::models::psv_sizing::PsvSizingResult;
@@ -71,6 +73,8 @@ use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
+use crate::models::self_heating_induction::SelfHeatingInductionResult;
+use crate::models::semenov_self_heating::SemenovSelfHeatingResult;
 use crate::models::separator::SeparatorResult;
 use crate::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult;
 use crate::models::separator_performance::SeparatorPerformanceResult;
@@ -187,6 +191,26 @@ impl CalcResult for Api537FlareFlameModelResult {
         "sound_power_level",
         "sound_pressure_level",
         "equivalent_flame_temperature",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for BasketTestRegressionResult {
+    const CALC_ID: &'static str = "process.basket_test_regression";
+    const FIELDS: &'static [&'static str] = &[
+        "point_count",
+        "slope",
+        "intercept",
+        "r_squared",
+        "activation_energy",
+        "volumetric_pre_factor",
+        "effective_conductivity",
+        "conductivity_provided",
+        "messages",
         "warnings",
     ];
 
@@ -1471,6 +1495,33 @@ impl CalcResult for PoolFireResult {
     }
 }
 
+impl CalcResult for PorousMediaSelfHeatingResult {
+    const CALC_ID: &'static str = "process.porous_media_self_heating";
+    const FIELDS: &'static [&'static str] = &[
+        "geometry",
+        "characteristic_dimension",
+        "effective_conductivity",
+        "activation_energy",
+        "volumetric_pre_factor",
+        "boundary_temperature",
+        "delta",
+        "delta_crit",
+        "delta_ratio",
+        "critical_temperature",
+        "critical_dimension",
+        "temperature_margin",
+        "dimension_margin",
+        "fk_temperature_scale",
+        "verdict",
+        "messages",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for ProbitResult {
     const CALC_ID: &'static str = "process.probit";
     const FIELDS: &'static [&'static str] = &["probit", "probability", "warnings"];
@@ -1693,6 +1744,49 @@ impl CalcResult for SafetyInstrumentedFunctionResult {
         "pfd_1oo2",
         "pfd_2oo3",
         "availability_with_spurious_trips",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SelfHeatingInductionResult {
+    const CALC_ID: &'static str = "process.self_heating_induction";
+    const FIELDS: &'static [&'static str] = &[
+        "geometry",
+        "characteristic_dimension",
+        "boundary_temperature",
+        "initial_temperature",
+        "ignition_rise",
+        "ignited",
+        "induction_time",
+        "peak_temperature",
+        "peak_temperature_rise",
+        "steady_state_reached",
+        "simulated_time",
+        "history",
+        "messages",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SemenovSelfHeatingResult {
+    const CALC_ID: &'static str = "process.semenov_self_heating";
+    const FIELDS: &'static [&'static str] = &[
+        "psi",
+        "psi_crit",
+        "psi_ratio",
+        "critical_temperature",
+        "temperature_margin",
+        "critical_temperature_rise",
+        "verdict",
+        "messages",
         "warnings",
     ];
 

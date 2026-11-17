@@ -25,8 +25,8 @@
 use azoth_core::units::{
     Area, DiffusionCoefficient, DynamicViscosity, Energy, Force, Frequency, HeatFluxDensity,
     HeatTransfer, Length, Mass, MassDensity, MassFlux, MassRate, MolarEnergy, MolarHeatCapacity,
-    MolarMass, Power, Pressure, SpecificHeatCapacity, ThermalConductance, ThermalConductivity,
-    ThermodynamicTemperature, Time, Velocity, Volume, VolumeRate,
+    MolarMass, Power, Pressure, SpecificHeatCapacity, TemperatureInterval, ThermalConductance,
+    ThermalConductivity, ThermodynamicTemperature, Time, Velocity, Volume, VolumeRate,
 };
 use azoth_core::{AzothError, Result, Warning};
 use serde::ser::SerializeSeq;
@@ -87,6 +87,15 @@ impl WireScalar for Pressure {
 }
 
 impl WireScalar for ThermodynamicTemperature {
+    const UNIT: &'static str = "K";
+    fn magnitude(&self) -> f64 {
+        self.value
+    }
+}
+
+/// A difference of temperatures crosses as kelvin, which is the vocabulary's one spelling of
+/// the dimension: the spec's `interval` flag is what tells an input that `K` is a difference.
+impl WireScalar for TemperatureInterval {
     const UNIT: &'static str = "K";
     fn magnitude(&self) -> f64 {
         self.value

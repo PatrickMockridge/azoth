@@ -409,6 +409,13 @@ class FlareTargetFlux(TypedDict):
 
     flux: float
 
+class BasketTestPoint(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    geometry: str
+    characteristic_dimension: float
+    critical_temperature: float
+
 class BlowdownProfilePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1048,6 +1055,14 @@ class RiskAssessmentRow:
     risk_level: str
     cost_per_failure: float
     annual_risk_cost: float
+
+@final
+class SelfHeatingTimePoint:
+    """the retained temperature samples, in the class's order."""
+
+    time: Qty
+    centre_temperature: Qty
+    max_temperature: Qty
 
 @final
 class SilIssue:
@@ -3102,6 +3117,19 @@ class Api537FlareFlameModelResult:
     warnings: list[Warning]
 
 @final
+class BasketTestRegressionResult:
+    point_count: float
+    slope: float
+    intercept: float
+    r_squared: float | None
+    activation_energy: Qty
+    volumetric_pre_factor: float | None
+    effective_conductivity: Qty | None
+    conductivity_provided: bool
+    messages: list[str]
+    warnings: list[Warning]
+
+@final
 class BleveResult:
     fireball_diameter: Qty
     fireball_duration: Qty
@@ -4052,6 +4080,26 @@ class PoolFireResult:
     warnings: list[Warning]
 
 @final
+class PorousMediaSelfHeatingResult:
+    geometry: str
+    characteristic_dimension: Qty
+    effective_conductivity: Qty
+    activation_energy: Qty
+    volumetric_pre_factor: float
+    boundary_temperature: Qty
+    delta: float
+    delta_crit: float
+    delta_ratio: float
+    critical_temperature: Qty | None
+    critical_dimension: Qty
+    temperature_margin: Qty | None
+    dimension_margin: Qty
+    fk_temperature_scale: Qty
+    verdict: str
+    messages: list[str]
+    warnings: list[Warning]
+
+@final
 class ProbitResult:
     probit: float | None
     probability: float
@@ -4231,6 +4279,35 @@ class SafetyInstrumentedFunctionResult:
     pfd_1oo2: float | None
     pfd_2oo3: float | None
     availability_with_spurious_trips: float | None
+    warnings: list[Warning]
+
+@final
+class SelfHeatingInductionResult:
+    geometry: str
+    characteristic_dimension: Qty
+    boundary_temperature: Qty
+    initial_temperature: Qty
+    ignition_rise: Qty
+    ignited: bool
+    induction_time: Qty | None
+    peak_temperature: Qty
+    peak_temperature_rise: Qty
+    steady_state_reached: bool
+    simulated_time: Qty
+    history: list[SelfHeatingTimePoint]
+    messages: list[str]
+    warnings: list[Warning]
+
+@final
+class SemenovSelfHeatingResult:
+    psi: float
+    psi_crit: float
+    psi_ratio: float
+    critical_temperature: Qty | None
+    temperature_margin: Qty | None
+    critical_temperature_rise: Qty
+    verdict: str
+    messages: list[str]
     warnings: list[Warning]
 
 @final
@@ -6957,6 +7034,10 @@ def api537_flare_flame_model(
     transmissivity: float | None = None,
     acoustic_efficiency: float | None = None,
 ) -> Api537FlareFlameModelResult: ...
+def basket_test_regression(
+    points: list[BasketTestPoint],
+    effective_conductivity: float | None = None,
+) -> BasketTestRegressionResult: ...
 def bleve(
     fuel_mass: float,
     heat_of_combustion: float,
@@ -7745,6 +7826,16 @@ def pool_fire(
     distance: float | None = None,
     target_flux: float | None = None,
 ) -> PoolFireResult: ...
+def porous_media_self_heating(
+    geometry: str,
+    characteristic_dimension: float,
+    effective_conductivity: float,
+    activation_energy: float,
+    volumetric_pre_factor: float,
+    boundary_temperature: float,
+    marginal_ratio: float | None = None,
+    pipe_insulation_screening: bool | None = None,
+) -> PorousMediaSelfHeatingResult: ...
 def probit(
     a: float,
     b: float,
@@ -7862,6 +7953,28 @@ def safety_instrumented_function(
     mttr_hours: float | None = None,
     base_availability: float | None = None,
 ) -> SafetyInstrumentedFunctionResult: ...
+def self_heating_induction(
+    geometry: str,
+    characteristic_dimension: float,
+    effective_conductivity: float,
+    volumetric_heat_capacity: float,
+    activation_energy: float,
+    volumetric_pre_factor: float,
+    boundary_temperature: float,
+    initial_temperature: float | None = None,
+    ignition_rise: float | None = None,
+    max_time: float | None = None,
+    node_count: float | None = None,
+) -> SelfHeatingInductionResult: ...
+def semenov_self_heating(
+    volume: float,
+    surface_area: float,
+    heat_transfer_coefficient: float,
+    activation_energy: float,
+    volumetric_pre_factor: float,
+    ambient_temperature: float,
+    marginal_ratio: float | None = None,
+) -> SemenovSelfHeatingResult: ...
 def separator(
     components: list[str],
     feed_n: float,

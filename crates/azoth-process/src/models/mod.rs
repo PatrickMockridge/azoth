@@ -34,6 +34,7 @@ pub mod absorption_column;
 pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
 pub mod api537_flare_flame_model;
+pub mod basket_test_regression;
 pub mod bleve;
 pub mod blocked_outlet_relief;
 pub mod blowdown_pressure_profile;
@@ -83,6 +84,7 @@ pub mod pipe_fire_rupture_material;
 pub mod pipeline_pressure_protection;
 pub mod plug_flow_reactor;
 pub mod pool_fire;
+pub mod porous_media_self_heating;
 pub mod probit;
 pub mod psv_fire_sizing;
 pub mod psv_sizing;
@@ -91,6 +93,9 @@ pub mod rate_based_packed_column;
 pub mod relief_disposal_network;
 pub mod risk_matrix;
 pub mod safety_instrumented_function;
+pub mod self_heating_induction;
+pub mod selfheating;
+pub mod semenov_self_heating;
 pub mod separator;
 pub mod separator_capacity_assessment;
 pub mod separator_performance;
@@ -116,6 +121,9 @@ pub use active_fire_protection_screening::{
 pub use anti_surge_recycle::{AntiSurgeRecycleResult, anti_surge_recycle};
 pub use api537_flare_flame_model::{
     Api537FlareFlameModelResult, FlareTargetFlux, SterileRadius, api537_flare_flame_model,
+};
+pub use basket_test_regression::{
+    BasketTestPoint, BasketTestRegressionResult, basket_test_regression,
 };
 pub use bleve::{BleveResult, bleve};
 pub use blocked_outlet_relief::{BlockedOutletReliefResult, blocked_outlet_relief};
@@ -186,6 +194,7 @@ pub use pipeline_pressure_protection::{
 };
 pub use plug_flow_reactor::{PlugFlowReactorResult, plug_flow_reactor};
 pub use pool_fire::{PoolFireResult, pool_fire};
+pub use porous_media_self_heating::{PorousMediaSelfHeatingResult, porous_media_self_heating};
 pub use probit::{ProbitResult, probit};
 pub use psv_fire_sizing::{PsvFireSizingResult, psv_fire_sizing};
 pub use psv_sizing::{PsvSizingResult, psv_sizing};
@@ -202,6 +211,11 @@ pub use risk_matrix::{
 pub use safety_instrumented_function::{
     SafetyInstrumentedFunctionResult, safety_instrumented_function,
 };
+pub use self_heating_induction::{
+    SelfHeatingInductionResult, SelfHeatingTimePoint, self_heating_induction,
+};
+pub use selfheating::{SelfHeatingGeometry, SelfHeatingVerdict};
+pub use semenov_self_heating::{SemenovSelfHeatingResult, semenov_self_heating};
 pub use separator::{SeparatorResult, separator};
 pub use separator_capacity_assessment::{
     SeparatorCapacityAssessmentResult, separator_capacity_assessment,

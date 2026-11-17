@@ -54,6 +54,7 @@ from azoth.core.record_outputs_gen import (
     ScaleControlRow,
     ScenarioChangeRow,
     ScenarioIndexRow,
+    SelfHeatingTimePoint,
     SilIssue,
     SterileRadius,
     StreamScaleMineralRow,
@@ -82,6 +83,8 @@ from azoth.core.result_base import (
     ReliefPhase,
     RootStructure,
     RuptureStatus,
+    SelfHeatingGeometry,
+    SelfHeatingVerdict,
     StabilityVerdict,
     Sts0131PressureCategory,
     SupplyVerdict,
@@ -5718,6 +5721,43 @@ class Api537FlareFlameModelResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class BasketTestRegressionResult(_HasWarnings):
+    """Result of ``process.basket_test_regression``."""
+
+    CALC_ID: ClassVar[str] = "process.basket_test_regression"
+
+    #: the number of observations fitted.
+    point_count: float
+
+    #: the line's slope, **in kelvin**: `dy/dx` with `x = 1/Tc`.
+    slope: float
+
+    #: the line's intercept.
+    intercept: float
+
+    #: the coefficient of determination; absent when the ordinates do not vary.
+    r_squared: float | None
+
+    #: `-slope R`, the apparent activation energy.
+    activation_energy: Q
+
+    #: `exp(intercept) lambda R / E`, **in W/m3**; absent without a conductivity or with a non-positive E.
+    volumetric_pre_factor: float | None
+
+    #: the conductivity the fit used, echoed; absent when it was not supplied.
+    effective_conductivity: Q | None
+
+    #: whether a conductivity was supplied.
+    conductivity_provided: bool
+
+    #: the class's warning strings, in the order it appends them.
+    messages: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class BleveResult(_HasWarnings):
     """Result of ``process.bleve``."""
 
@@ -8472,6 +8512,64 @@ class PoolFireResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PorousMediaSelfHeatingResult(_HasWarnings):
+    """Result of ``process.porous_media_self_heating``."""
+
+    CALC_ID: ClassVar[str] = "process.porous_media_self_heating"
+
+    #: the shape the screen used, which `pipe_insulation_screening` forces to `slab`.
+    geometry: SelfHeatingGeometry
+
+    #: the half-dimension, echoed.
+    characteristic_dimension: Q
+
+    #: the conductivity, echoed.
+    effective_conductivity: Q
+
+    #: the activation energy, echoed.
+    activation_energy: Q
+
+    #: the volumetric pre-factor, echoed, in W/m3.
+    volumetric_pre_factor: float
+
+    #: the boundary temperature, echoed.
+    boundary_temperature: Q
+
+    #: the Frank-Kamenetskii criticality parameter.
+    delta: float
+
+    #: the shape's critical parameter.
+    delta_crit: float
+
+    #: `delta / delta_crit`.
+    delta_ratio: float
+
+    #: the boundary temperature at which `delta` reaches its critical value; absent when it cannot be bracketed between 150 K and 2000 K.
+    critical_temperature: Q | None
+
+    #: the half-dimension at which `delta` reaches its critical value.
+    critical_dimension: Q
+
+    #: `critical_temperature - boundary_temperature`; absent with the critical temperature.
+    temperature_margin: Q | None
+
+    #: `critical_dimension - characteristic_dimension`; negative is supercritical.
+    dimension_margin: Q
+
+    #: `R Tb^2/E`, the Frank-Kamenetskii temperature scale.
+    fk_temperature_scale: Q
+
+    #: the screening verdict.
+    verdict: SelfHeatingVerdict
+
+    #: the class's warning strings, in the order it appends them.
+    messages: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ProbitResult(_HasWarnings):
     """Result of ``process.probit``."""
 
@@ -8996,6 +9094,89 @@ class SafetyInstrumentedFunctionResult(_HasWarnings):
 
     #: `base (1 - rate mttr / 8760)`; absent when the base availability or the MTTR is absent.
     availability_with_spurious_trips: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SelfHeatingInductionResult(_HasWarnings):
+    """Result of ``process.self_heating_induction``."""
+
+    CALC_ID: ClassVar[str] = "process.self_heating_induction"
+
+    #: the shape the march used.
+    geometry: SelfHeatingGeometry
+
+    #: the half-dimension, echoed.
+    characteristic_dimension: Q
+
+    #: the surface temperature, echoed.
+    boundary_temperature: Q
+
+    #: the uniform starting temperature.
+    initial_temperature: Q
+
+    #: the ignition rise, echoed or defaulted.
+    ignition_rise: Q
+
+    #: whether the peak reached the ignition temperature.
+    ignited: bool
+
+    #: the time at which it did; absent when the body did not ignite.
+    induction_time: Q | None
+
+    #: the final peak node temperature.
+    peak_temperature: Q
+
+    #: `peak_temperature - boundary_temperature`.
+    peak_temperature_rise: Q
+
+    #: whether the steady heuristic ended the run.
+    steady_state_reached: bool
+
+    #: the simulated time the run reached.
+    simulated_time: Q
+
+    #: the retained temperature samples, in the class's order.
+    history: tuple[SelfHeatingTimePoint, ...]
+
+    #: the class's warning strings, in the order it appends them.
+    messages: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SemenovSelfHeatingResult(_HasWarnings):
+    """Result of ``process.semenov_self_heating``."""
+
+    CALC_ID: ClassVar[str] = "process.semenov_self_heating"
+
+    #: the Semenov criticality parameter at the ambient temperature.
+    psi: float
+
+    #: the critical parameter, `1/e`.
+    psi_crit: float
+
+    #: `psi / psi_crit`.
+    psi_ratio: float
+
+    #: the ambient temperature at which `psi` reaches `1/e`; absent when it cannot be bracketed between 150 K and 2000 K.
+    critical_temperature: Q | None
+
+    #: `critical_temperature - ambient_temperature`; absent with the critical temperature. Positive is subcritical.
+    temperature_margin: Q | None
+
+    #: `R Ta^2/E`, the steady self-heating excess at criticality.
+    critical_temperature_rise: Q
+
+    #: the screening verdict.
+    verdict: SelfHeatingVerdict
+
+    #: the class's warning strings, in the order it appends them.
+    messages: tuple[str, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

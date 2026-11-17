@@ -2211,6 +2211,57 @@ impl From<&azoth_eos::results::ScenarioIndexRow> for PyScenarioIndexRow {
     }
 }
 
+/// the retained temperature samples, in the class's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SelfHeatingTimePoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySelfHeatingTimePoint {
+    /// the sample's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the centre-node temperature.
+    #[pyo3(get)]
+    pub centre_temperature: PyQty,
+    /// the peak node temperature.
+    #[pyo3(get)]
+    pub max_temperature: PyQty,
+}
+
+#[pymethods]
+impl PySelfHeatingTimePoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "SelfHeatingTimePoint(time={:?}, centre_temperature={:?}, max_temperature={:?})",
+            self.time, self.centre_temperature, self.max_temperature
+        )
+    }
+}
+
+impl From<&azoth_process::models::self_heating_induction::SelfHeatingTimePoint>
+    for PySelfHeatingTimePoint
+{
+    fn from(row: &azoth_process::models::self_heating_induction::SelfHeatingTimePoint) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            centre_temperature: PyQty {
+                magnitude_si: row.centre_temperature.value,
+                unit: "K".to_string(),
+            },
+            max_temperature: PyQty {
+                magnitude_si: row.max_temperature.value,
+                unit: "K".to_string(),
+            },
+        }
+    }
+}
+
 /// one row per issue, in the class's check order.
 #[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "SilIssue")]
 #[derive(Debug, Clone, PartialEq)]

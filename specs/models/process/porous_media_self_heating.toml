@@ -1,0 +1,150 @@
+id = "process.porous_media_self_heating"
+name = "Porous media self-heating"
+kind = "procedure"
+assumptions = [
+    "**the Frank-Kamenetskii limit is conduction-controlled**: the boundary is at one temperature and the body's interior carries the profile; the Semenov screen is the surface-film limit.",
+    "**`delta = E P r^2 exp(-E/(R Tb)) / (lambda R Tb^2)`**, evaluated in logarithmic form; it scales with the square of the characteristic dimension, which is why a thick layer ignites where a dish does not.",
+    "**the shape carries its own critical value**: 0.878 slab, 2.000 infinite cylinder, 3.322 sphere, 2.520 cube, 2.760 equicylinder, the dimension being the half-thickness or the radius.",
+    "**the critical boundary temperature uses the Semenov screen's bisection** (150 to 2000 K, 1e-4 K, 200 iterations) and the critical half-dimension is closed form. The temperature is absent only when it fails its bracket; the dimension never is.",
+    "**at the reported critical dimension `delta_ratio` is 0.9999999999999952, below one, so that state screens marginal**; the class's own test allows one to within 1e-6.",
+    "**`pipe_insulation_screening` reproduces the class's helper**: slab geometry, the full insulation thickness as the half-dimension, the wall temperature as the boundary, and its bounding message first.",
+    "**verdict: `delta_ratio > 1` self-ignition, `delta_ratio >= marginal_ratio` marginal** (default 0.7). The class's warning strings are published in order in `messages`.",
+]
+references = [
+    "Frank-Kamenetskii, D. A. (1969). Diffusion and Heat Transfer in Chemical Kinetics, 2nd ed.",
+    "Bowes, P. C. (1984). Self-Heating: Evaluating and Controlling the Hazards. HMSO.",
+    "Babrauskas, V. (2003). Ignition Handbook. Fire Science Publishers.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.java` is the port source.",
+    "`validation/neqsim/captures/process_porous_media_self_heating.tsv` - the five shapes, the thin, marginal and thick layers, the pipe-insulation configuration, a failed bracket and the kinetics identity.",
+]
+[source]
+standard = "NeqSim process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.java"
+edition = "Its `analyze`: the criticality parameter, the critical temperature and half-dimension, and the verdict."
+[algorithm]
+scheme = "frank_kamenetskii_criticality"
+convergence = "absolute"
+tolerance = 1.0e-4
+max_iterations = 200
+[inputs]
+[inputs.geometry]
+type = "enum"
+values = ["slab", "infinite_cylinder", "sphere", "cube", "equicylinder"]
+description = "the body shape, which selects the critical parameter. The class defaults to `slab`; this id states it.\n"
+[inputs.characteristic_dimension]
+unit = "m"
+description = "the shape's characteristic half-dimension: the half-thickness for a slab or cube, the radius for a cylinder, sphere or equicylinder. Above zero.\n"
+[inputs.effective_conductivity]
+unit = "W/(m*K)"
+description = "the effective thermal conductivity of the wetted porous body, above zero.\n"
+[inputs.activation_energy]
+unit = "J/mol"
+description = "the apparent activation energy of the self-heating reaction, above zero.\n"
+[inputs.volumetric_pre_factor]
+unit = "dimensionless"
+description = "`P = A Q rho`, the volumetric heat-release pre-exponential factor **in W/m3**, above zero. Declared dimensionless because the vocabulary has no such unit.\n"
+[inputs.boundary_temperature]
+unit = "K"
+description = "the boundary temperature the body is held at, absolute and above zero.\n"
+[inputs.marginal_ratio]
+unit = "dimensionless"
+optional = true
+description = "the ratio of `delta` to `delta_crit` at which a subcritical state is reported marginal, strictly between zero and one. **Absent is 0.7.**\n"
+[inputs.pipe_insulation_screening]
+type = "boolean"
+optional = true
+description = "the class's pipe-insulation configuration: force the slab, take the stated thickness as the half-dimension and the wall temperature as the boundary, and record the conservative-bounding message. **Absent is false.**\n"
+[outputs]
+[outputs.geometry]
+type = "enum"
+values = ["slab", "infinite_cylinder", "sphere", "cube", "equicylinder"]
+description = "the shape the screen used, which `pipe_insulation_screening` forces to `slab`.\n"
+[outputs.characteristic_dimension]
+unit = "m"
+description = "the half-dimension, echoed.\n"
+[outputs.effective_conductivity]
+unit = "W/(m*K)"
+description = "the conductivity, echoed.\n"
+[outputs.activation_energy]
+unit = "J/mol"
+description = "the activation energy, echoed.\n"
+[outputs.volumetric_pre_factor]
+unit = "dimensionless"
+description = "the volumetric pre-factor, echoed, in W/m3.\n"
+[outputs.boundary_temperature]
+unit = "K"
+description = "the boundary temperature, echoed.\n"
+[outputs.delta]
+unit = "dimensionless"
+description = "the Frank-Kamenetskii criticality parameter.\n"
+[outputs.delta_crit]
+unit = "dimensionless"
+description = "the shape's critical parameter.\n"
+[outputs.delta_ratio]
+unit = "dimensionless"
+description = "`delta / delta_crit`.\n"
+[outputs.critical_temperature]
+unit = "K"
+optional = true
+description = "the boundary temperature at which `delta` reaches its critical value; absent when it cannot be bracketed between 150 K and 2000 K.\n"
+[outputs.critical_dimension]
+unit = "m"
+description = "the half-dimension at which `delta` reaches its critical value.\n"
+[outputs.temperature_margin]
+unit = "K"
+optional = true
+description = "`critical_temperature - boundary_temperature`; absent with the critical temperature.\n"
+[outputs.dimension_margin]
+unit = "m"
+description = "`critical_dimension - characteristic_dimension`; negative is supercritical.\n"
+[outputs.fk_temperature_scale]
+unit = "K"
+description = "`R Tb^2/E`, the Frank-Kamenetskii temperature scale.\n"
+[outputs.verdict]
+type = "enum"
+values = ["subcritical", "marginal", "self_ignition"]
+description = "the screening verdict.\n"
+[outputs.messages]
+type = "vector_string"
+length = "one per message"
+description = "the class's warning strings, in the order it appends them.\n"
+[[valid_range]]
+quantity = "characteristic_dimension"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a characteristic dimension is positive"
+[[valid_range]]
+quantity = "effective_conductivity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive conductivity"
+[[valid_range]]
+quantity = "activation_energy"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive activation energy"
+[[valid_range]]
+quantity = "volumetric_pre_factor"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive pre-factor"
+[[valid_range]]
+quantity = "boundary_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "marginal_ratio"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = false
+severity = "error"
+rationale = "the class accepts a ratio strictly between zero and one"
+[implementations]
+python = "azoth.process.porous_media_self_heating"
+rust = "azoth_process::porous_media_self_heating"

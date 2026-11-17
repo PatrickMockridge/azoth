@@ -472,6 +472,8 @@ ENUMS = {
     "RuptureStatus",
     "FluidBasis",
     "ReliefPhase",
+    "SelfHeatingGeometry",
+    "SelfHeatingVerdict",
 }
 
 
