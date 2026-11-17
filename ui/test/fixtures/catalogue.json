@@ -22021,6 +22021,15 @@
       "sub_interface": "fire"
     },
     {
+      "family": "overpressure",
+      "id": "process.blocked_outlet_relief",
+      "name": "Blocked outlet relief",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "overpressure"
+    },
+    {
       "family": "rupture",
       "id": "process.blowdown_pressure_profile",
       "name": "Blowdown pressure profile",
@@ -22039,6 +22048,15 @@
       "sub_interface": "bowtie"
     },
     {
+      "family": "overpressure",
+      "id": "process.check_valve_leak_relief",
+      "name": "Check valve leak relief",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "overpressure"
+    },
+    {
       "family": "qra",
       "id": "process.consequence_analysis",
       "name": "Consequence analysis",
@@ -22046,6 +22064,15 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": null
+    },
+    {
+      "family": "overpressure",
+      "id": "process.control_valve_failure_relief",
+      "name": "Control valve failure relief",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "overpressure"
     },
     {
       "family": "firewater",
@@ -22449,7 +22476,7 @@
           "**`has_fire_fighting` is read by no formula**: the environment factor is 1.0 on both branches, so only drainage selects the coefficient and two rows differing only in the flag answer identically.",
           "**the latent heat defaults to 350000 J/kg when absent**, the class's light-hydrocarbon value; the port treats a zero as the default and refuses a negative value.",
           "**the relief rate is `Q / latent_heat`**, and the hourly rate is that times 3600.",
-          "**the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and density, and this id carries the no-fluid path only."
+          "**the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and phase, and `process.blocked_outlet_relief` and its three siblings carry it; this id carries the no-fluid path only."
         ],
         "available": true,
         "equation": null,
@@ -22636,7 +22663,7 @@
         "provenance": {
           "python_sha256": "33d785cf877b180dbc1e81e3b534ce2524feebe60bebaecee268a5d23f37c0dc",
           "rust_sha256": "68a3380586e219d31235d83476dc5fd01b573aa243620ae2f8e39c0f0d943d82",
-          "spec_sha256": "4127990df842cd1977b00395a76a7700ebed5364a7838c406a412efadbf9f9cf",
+          "spec_sha256": "091b2671e6080300d3d4176958e04e4c7622807ee198088107e8987086a28ede",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,
@@ -23293,7 +23320,7 @@
       "name": "Gas dispersion screening",
       "native": false,
       "purpose": "",
-      "refusal": "this calculation takes a table of rows as input, which a scenario does not yet provide",
+      "refusal": "this calculation takes a fluid as input, which a scenario does not yet provide",
       "sub_interface": "dispersion"
     },
     {
@@ -24576,6 +24603,15 @@
       "native": true,
       "purpose": "The accumulation factor, the allowable pressure and whether the peak is accepted.",
       "refusal": null,
+      "sub_interface": "overpressure"
+    },
+    {
+      "family": "overpressure",
+      "id": "process.overpressure_protection_study",
+      "name": "Overpressure protection study",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": "overpressure"
     },
     {
@@ -26525,7 +26561,7 @@
         ],
         "provenance": {
           "python_sha256": "8a90fe3622107596ff9911a4dcb5fe8e7a79c5db8a286a82e18af3b0fffb3480",
-          "rust_sha256": "299062b64a375e34097c35f662d6f5560a3dac327ccd2d2fbf3d803e1bd3a4db",
+          "rust_sha256": "99271db3cc689072c1f7d8d21c560e420b391665c1be9f5e104cc85482ebab95",
           "spec_sha256": "3eee3074bd0c80637e37ddc005f7b73fd42a44d30476c5044349a250040673f4",
           "tests_active": 14,
           "tests_skipped": 0,
@@ -27138,6 +27174,15 @@
       "family": "overpressure",
       "id": "process.tr3001_compliance",
       "name": "TR3001 compliance",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "overpressure"
+    },
+    {
+      "family": "overpressure",
+      "id": "process.tube_rupture_relief",
+      "name": "Tube rupture relief",
       "native": false,
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",

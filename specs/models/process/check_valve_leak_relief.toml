@@ -1,0 +1,127 @@
+id = "process.check_valve_leak_relief"
+name = "Check valve leak relief"
+kind = "procedure"
+assumptions = [
+    "**the leak area is `leak_area_fraction` of the nominal flow area** `pi D^2 / 4`, and the fraction defaults to the class's 0.01.",
+    "**a fraction below 0.001 is clamped up to it** with the class's warning, which is where TR3001's recommended 0.1% minimum sits.",
+    "**the discharging gas is the upstream fluid's state**: `getKappa`, molar mass and `Z` from a TP flash at the upstream pressure and the stated or default temperature. The class's explicit k/M path, for a caller with no fluid, is outside this id.",
+    "**the flow is the isentropic nozzle through the leak area**, choking where the pressure ratio is at or below the critical ratio; the downstream pressure defaults to 1.01325 bara and the discharge coefficient to 0.85.",
+    "**a zero diameter answers zero** with the class's warning, and the fluid state's fallback warnings are carried in `assumptions` in the class's order.",
+]
+references = [
+    "TR3001. Overpressure protection, check-valve leakage and SR-26466.",
+    "API STD 521 (7th edition, 2020). Pressure-relieving and depressurizing systems, section 4.4.9.3.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/overpressure/CheckValveLeakRelief.java` is the port source.",
+    "`validation/neqsim/captures/process_check_valve_leak_relief.tsv` - the default and clamped fractions, a subcritical downstream, a zero diameter and the no-fluid branch.",
+]
+[source]
+standard = "NeqSim process/safety/overpressure/CheckValveLeakRelief.java"
+edition = "Its `calculate` with a fluid, through `ReliefFluidState.evaluate` and `NozzleFlow.gasMassRateKgPerS`."
+[algorithm]
+scheme = "check_valve_leak_nozzle"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.components]
+type = "components"
+description = "the upstream fluid's substances, by name, resolved against the component databank. The fluid is required: the relieving properties are a flash of it.\n"
+[inputs.mole_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream fluid's overall composition, summing to one.\n"
+[inputs.nominal_diameter]
+unit = "m"
+description = "the nominal check-valve flow diameter, at least zero; the leak area is a fraction of the circle it defines.\n"
+[inputs.upstream_pressure]
+unit = "Pa"
+description = "the high-pressure source's pressure, normally its MAAP, absolute and above zero.\n"
+[inputs.leak_area_fraction]
+unit = "dimensionless"
+optional = true
+description = "the leak area as a fraction of the nominal area, at least zero; absent is 0.01, and below 0.001 is clamped to it.\n"
+[inputs.upstream_temperature]
+unit = "K"
+optional = true
+description = "the upstream temperature the fluid is flashed at, above zero; absent is the class's 288.15 K.\n"
+[inputs.downstream_pressure]
+unit = "Pa"
+optional = true
+description = "the protected low-pressure side, at least zero; absent is the class's 1.01325 bara.\n"
+[inputs.discharge_coefficient]
+unit = "dimensionless"
+optional = true
+description = "the orifice discharge coefficient in `(0, 1]`; absent is 0.85.\n"
+[inputs.scenario_name]
+type = "string"
+optional = true
+description = "the scenario name carried on the result. Absent is the class's own `Check valve leakage`.\n"
+[outputs]
+[outputs.name]
+type = "string"
+description = "the scenario name, echoed.\n"
+[outputs.relief_rate]
+unit = "kg/s"
+description = "the isentropic nozzle flow through the leak area.\n"
+[outputs.phase]
+type = "enum"
+values = ["vapour", "liquid", "two_phase"]
+description = "the relieving phase, which this cause hardcodes to `vapour`.\n"
+[outputs.relief_temperature]
+unit = "K"
+description = "the upstream temperature, echoed.\n"
+[outputs.molar_mass]
+unit = "kg/mol"
+description = "the relieving fluid's molar mass.\n"
+[outputs.compressibility]
+unit = "dimensionless"
+description = "the relieving fluid's `Z`.\n"
+[outputs.specific_heat_ratio]
+unit = "dimensionless"
+description = "the relieving fluid's `getKappa`, the isentropic exponent.\n"
+[outputs.assumptions]
+type = "vector_string"
+length = "one per assumption"
+description = "the class's assumption strings in order, with its warning strings appended.\n"
+[[valid_range]]
+quantity = "nominal_diameter"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a zero diameter is the class's defined zero-rate state"
+[[valid_range]]
+quantity = "upstream_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure must be positive"
+[[valid_range]]
+quantity = "leak_area_fraction"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a fraction is non-negative; the class clamps below 0.001 and the port refuses a negative"
+[[valid_range]]
+quantity = "upstream_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature must be positive"
+[[valid_range]]
+quantity = "downstream_pressure"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a downstream pressure is non-negative"
+[[valid_range]]
+quantity = "discharge_coefficient"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "a discharge coefficient is in (0, 1]"
+[implementations]
+python = "azoth.process.check_valve_leak_relief"
+rust = "azoth_process::check_valve_leak_relief"

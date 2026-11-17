@@ -108,6 +108,14 @@ class GoverningCriterion(StrEnum):
     COVERAGE = "coverage"
 
 
+class ReliefPhase(StrEnum):
+    """The phase of a relief scenario's relieving fluid."""
+
+    VAPOUR = "vapour"
+    LIQUID = "liquid"
+    TWO_PHASE = "two_phase"
+
+
 class RuptureStatus(StrEnum):
     """Whether the accumulated strain crossed its limit."""
 

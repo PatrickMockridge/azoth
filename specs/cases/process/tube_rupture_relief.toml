@@ -1,0 +1,83 @@
+model = "process.tube_rupture_relief"
+
+[[cases]]
+id = "tr_two_ends"
+tolerance = 1.0e-7
+source = "A 16 mm tube on a methane/ethane gas at 20 bara and 320 K, rupturing into 1.01325 bara through two open ends. From `validation/neqsim/captures/process_tube_rupture_relief.tsv` (`tr_two_ends`)."
+[cases.inputs]
+scenario_name = "Tube rupture two ends"
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+tube_inner_diameter = 0.016
+high_pressure = 2000000.0
+high_temperature = 320.0
+low_pressure = 101325.0
+[cases.expected]
+name = "Tube rupture two ends"
+relief_rate = 1.1615326673908402
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "2 open ends (full-bore single-tube rupture) per TR3001 SR-26616",
+    "High-pressure fluid at maximum operating pressure",
+    "Vaporization/flashing on the low-pressure side not modelled (screening estimate)",
+    "Discharge coefficient Cd = 0.85",
+]
+
+[[cases]]
+id = "tr_one_end"
+tolerance = 1.0e-7
+source = "The same tube with one open end: exactly half the two-end rate. From (`tr_one_end`)."
+[cases.inputs]
+scenario_name = "Tube rupture one end"
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+tube_inner_diameter = 0.016
+high_pressure = 2000000.0
+high_temperature = 320.0
+low_pressure = 101325.0
+number_of_open_ends = 1.0
+[cases.expected]
+name = "Tube rupture one end"
+relief_rate = 0.5807663336954201
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "1 open ends (full-bore single-tube rupture) per TR3001 SR-26616",
+    "High-pressure fluid at maximum operating pressure",
+    "Vaporization/flashing on the low-pressure side not modelled (screening estimate)",
+    "Discharge coefficient Cd = 0.85",
+]
+
+[[cases]]
+id = "tr_subcritical"
+tolerance = 1.0e-7
+source = "The two-end rupture into 15 bara: the subcritical branch. From (`tr_subcritical`)."
+[cases.inputs]
+scenario_name = "Tube rupture subcritical"
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+tube_inner_diameter = 0.016
+high_pressure = 2000000.0
+high_temperature = 320.0
+low_pressure = 1500000.0
+[cases.expected]
+name = "Tube rupture subcritical"
+relief_rate = 1.044006051031602
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "2 open ends (full-bore single-tube rupture) per TR3001 SR-26616",
+    "High-pressure fluid at maximum operating pressure",
+    "Vaporization/flashing on the low-pressure side not modelled (screening estimate)",
+    "Discharge coefficient Cd = 0.85",
+]

@@ -227,11 +227,14 @@
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/blocked_outlet_relief.toml
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
+//!   - specs/models/process/check_valve_leak_relief.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
+//!   - specs/models/process/control_valve_failure_relief.toml
 //!   - specs/models/process/cooler.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/distillation_column.toml
@@ -262,6 +265,7 @@
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/overpressure_acceptance.toml
+//!   - specs/models/process/overpressure_protection_study.toml
 //!   - specs/models/process/packed_column.toml
 //!   - specs/models/process/pfp_demand.toml
 //!   - specs/models/process/pipe.toml
@@ -291,6 +295,7 @@
 //!   - specs/models/process/throttling_valve.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
+//!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vce.toml
 //!   - specs/models/process/vessel_rupture.toml
@@ -2788,11 +2793,62 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.bleve", "relative_humidity", "dimensionless"),
     ("process.bleve", "distance", "length"),
     ("process.bleve", "target_flux", "heat_flux_density"),
+    (
+        "process.blocked_outlet_relief",
+        "mole_fractions",
+        "dimensionless",
+    ),
+    ("process.blocked_outlet_relief", "inflow_rate", "mass_rate"),
+    (
+        "process.blocked_outlet_relief",
+        "relief_pressure",
+        "pressure",
+    ),
+    (
+        "process.blocked_outlet_relief",
+        "relief_temperature",
+        "thermodynamic_temperature",
+    ),
     ("process.blowdown_pressure_profile", "time", "time"),
     (
         "process.blowdown_pressure_profile",
         "gauge_offset",
         "pressure",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "mole_fractions",
+        "dimensionless",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "nominal_diameter",
+        "length",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "upstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "leak_area_fraction",
+        "dimensionless",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "upstream_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "downstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.check_valve_leak_relief",
+        "discharge_coefficient",
+        "dimensionless",
     ),
     ("process.component_splitter", "feed_n", "molar_flow"),
     ("process.component_splitter", "feed_z", "dimensionless"),
@@ -2856,6 +2912,46 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.consequence_analysis",
         "receiver_distance",
         "length",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "mole_fractions",
+        "dimensionless",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "upstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "upstream_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "downstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "effective_area",
+        "area",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "cv",
+        "dimensionless",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "cv_erosion_margin",
+        "dimensionless",
+    ),
+    (
+        "process.control_valve_failure_relief",
+        "discharge_coefficient",
+        "dimensionless",
     ),
     ("process.cooler", "inlet_n", "molar_flow"),
     ("process.cooler", "inlet_z", "dimensionless"),
@@ -3854,6 +3950,17 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "pressure",
     ),
     ("process.overpressure_acceptance", "mawp", "pressure"),
+    ("process.overpressure_protection_study", "mawp", "pressure"),
+    (
+        "process.overpressure_protection_study",
+        "relief_set_pressure",
+        "pressure",
+    ),
+    (
+        "process.overpressure_protection_study",
+        "back_pressure",
+        "pressure",
+    ),
     ("process.packed_column", "feed_n", "molar_flow"),
     ("process.packed_column", "feed_z", "dimensionless"),
     ("process.packed_column", "feed_p", "pressure"),
@@ -5078,6 +5185,33 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.tr3001_compliance",
         "accumulation_fraction",
+        "dimensionless",
+    ),
+    (
+        "process.tube_rupture_relief",
+        "mole_fractions",
+        "dimensionless",
+    ),
+    (
+        "process.tube_rupture_relief",
+        "tube_inner_diameter",
+        "length",
+    ),
+    ("process.tube_rupture_relief", "high_pressure", "pressure"),
+    (
+        "process.tube_rupture_relief",
+        "number_of_open_ends",
+        "dimensionless",
+    ),
+    (
+        "process.tube_rupture_relief",
+        "high_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.tube_rupture_relief", "low_pressure", "pressure"),
+    (
+        "process.tube_rupture_relief",
+        "discharge_coefficient",
         "dimensionless",
     ),
     (

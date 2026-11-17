@@ -1,0 +1,171 @@
+bo_gas_state
+kappa=1.2795798973843786
+gamma=1.3319393916069173
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+density_kg_per_m3=13.616754236185573
+phase_count=1
+has_gas=true
+has_liquid=false
+
+bo_gas
+name=Blocked outlet gas
+cause=blocked_outlet
+phase=vapour
+relief_rate_kg_per_s=2.0
+relief_rate_kg_per_hr=7200.0
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26460 / API 521 4.4.2
+assumption_count=1
+assumption0=Relief rate set equal to full inflow per TR3001 SR-26460
+
+bo_liquid_state
+kappa=1255.2723788393464
+gamma=1.2639517801547224
+molar_mass_kg_per_mol=0.058122999999999994
+compressibility=0.02121213854587085
+density_kg_per_m3=615.8328177436053
+phase_count=1
+has_gas=false
+has_liquid=false
+
+bo_liquid
+name=Blocked outlet liquid
+cause=blocked_outlet
+phase=liquid
+relief_rate_kg_per_s=1.5
+relief_rate_kg_per_hr=5400.0
+relief_temperature_k=249.99999999999997
+molar_mass_kg_per_mol=0.058122999999999994
+compressibility=0.021212138545870854
+specific_heat_ratio=1255.272378839346
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26460 / API 521 4.4.2
+assumption_count=1
+assumption0=Relief rate set equal to full inflow per TR3001 SR-26460
+
+bo_two_phase_state
+kappa=1965.173645351309
+gamma=1.3453951446736467
+molar_mass_kg_per_mol=0.037083
+compressibility=0.5325677942129939
+density_kg_per_m3=55.358135334406754
+phase_count=2
+has_gas=true
+has_liquid=false
+
+bo_two_phase
+name=Blocked outlet two phase
+cause=blocked_outlet
+phase=two_phase
+relief_rate_kg_per_s=1.0
+relief_rate_kg_per_hr=3600.0
+relief_temperature_k=300.0
+molar_mass_kg_per_mol=0.037083
+compressibility=0.5325677942129939
+specific_heat_ratio=1965.173645351309
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26460 / API 521 4.4.2
+assumption_count=1
+assumption0=Relief rate set equal to full inflow per TR3001 SR-26460
+
+bo_no_fluid
+name=Blocked outlet no fluid
+cause=blocked_outlet
+phase=vapour
+relief_rate_kg_per_s=2.0
+relief_rate_kg_per_hr=7200.0
+relief_temperature_k=323.15
+molar_mass_kg_per_mol=NaN
+compressibility=1.0
+specific_heat_ratio=1.3
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26460 / API 521 4.4.2
+assumption_count=2
+assumption0=Relief rate set equal to full inflow per TR3001 SR-26460
+assumption1=No fluid supplied; relieving-phase properties default to vapour
+
+bo_zero_inflow
+name=Blocked outlet zero
+cause=blocked_outlet
+phase=vapour
+relief_rate_kg_per_s=0.0
+relief_rate_kg_per_hr=0.0
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26460 / API 521 4.4.2
+assumption_count=2
+assumption0=Relief rate set equal to full inflow per TR3001 SR-26460
+assumption1=Inflow rate not set or non-positive; relief rate is zero
+
+bo_negative_inflow
+name=Blocked outlet negative
+cause=blocked_outlet
+phase=vapour
+relief_rate_kg_per_s=0.0
+relief_rate_kg_per_hr=0.0
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26460 / API 521 4.4.2
+assumption_count=2
+assumption0=Relief rate set equal to full inflow per TR3001 SR-26460
+assumption1=Inflow rate not set or non-positive; relief rate is zero
+

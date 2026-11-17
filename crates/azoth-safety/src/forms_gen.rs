@@ -424,6 +424,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.blocked_outlet_relief",
+        name: "Blocked outlet relief",
+        family: "overpressure",
+        sub_interface: Some("overpressure"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.blowdown_pressure_profile",
         name: "Blowdown pressure profile",
         family: "rupture",
@@ -446,10 +458,34 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.check_valve_leak_relief",
+        name: "Check valve leak relief",
+        family: "overpressure",
+        sub_interface: Some("overpressure"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.consequence_analysis",
         name: "Consequence analysis",
         family: "qra",
         sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.control_valve_failure_relief",
+        name: "Control valve failure relief",
+        family: "overpressure",
+        sub_interface: Some("overpressure"),
         purpose: "",
         native: false,
         refusal: Some(
@@ -850,7 +886,7 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
                 "**`has_fire_fighting` is read by no formula**: the environment factor is 1.0 on both branches, so only drainage selects the coefficient and two rows differing only in the flag answer identically.",
                 "**the latent heat defaults to 350000 J/kg when absent**, the class's light-hydrocarbon value; the port treats a zero as the default and refuses a negative value.",
                 "**the relief rate is `Q / latent_heat`**, and the hourly rate is that times 3600.",
-                "**the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and density, and this id carries the no-fluid path only.",
+                "**the fluid-enriched property path is the thermo seam**: `ReliefFluidState` flashes a `SystemInterface` for k, M, Z and phase, and `process.blocked_outlet_relief` and its three siblings carry it; this id carries the no-fluid path only.",
             ],
             references: &[
                 "API STD 521 (7th edition, 2020). Pressure-relieving and depressuring systems, the fire case and Table 4.",
@@ -1625,7 +1661,7 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         purpose: "",
         native: false,
         refusal: Some(
-            "this calculation takes a table of rows as input, which a scenario does not yet provide",
+            "this calculation takes a fluid as input, which a scenario does not yet provide",
         ),
         form: None,
     },
@@ -2811,6 +2847,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
             expected: &[],
             tolerance: 1.0e-12,
         }),
+    },
+    SafetyCalculation {
+        id: "process.overpressure_protection_study",
+        name: "Overpressure protection study",
+        family: "overpressure",
+        sub_interface: Some("overpressure"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
     },
     SafetyCalculation {
         id: "process.pfp_demand",
@@ -5201,6 +5249,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
     SafetyCalculation {
         id: "process.tr3001_compliance",
         name: "TR3001 compliance",
+        family: "overpressure",
+        sub_interface: Some("overpressure"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.tube_rupture_relief",
+        name: "Tube rupture relief",
         family: "overpressure",
         sub_interface: Some("overpressure"),
         purpose: "",

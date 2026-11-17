@@ -471,6 +471,7 @@ ENUMS = {
     "HydrateStructure",
     "RuptureStatus",
     "FluidBasis",
+    "ReliefPhase",
 }
 
 

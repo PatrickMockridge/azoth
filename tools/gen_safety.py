@@ -111,6 +111,7 @@ PURPOSES = {
 INPUT_REFUSAL = (
     "this calculation takes a table of rows as input, which a scenario does not yet provide"
 )
+FLUID_REFUSAL = "this calculation takes a fluid as input, which a scenario does not yet provide"
 OUTPUT_REFUSAL = "this calculation returns a table of rows, which this workspace does not yet draw"
 BOTH_REFUSAL = (
     "this calculation takes a table of rows as input and returns one as output, "
@@ -165,6 +166,11 @@ def refusal_of(spec: dict) -> str | None:
     if takes and returns:
         return BOTH_REFUSAL
     if takes:
+        # A fluid is not a table, and the relief loads are the first entries whose complex
+        # input is a component list rather than rows.
+        kinds = {declaration.get("type") for declaration in spec["inputs"].values()}
+        if "components" in kinds and "record_list" not in kinds:
+            return FLUID_REFUSAL
         return INPUT_REFUSAL
     if returns:
         return OUTPUT_REFUSAL

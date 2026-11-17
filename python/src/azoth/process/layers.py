@@ -2508,6 +2508,194 @@ def _psv_fire_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _blocked_outlet_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.blocked_outlet_relief`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.blocked_outlet_relief import (
+        blocked_outlet_relief as evaluate,
+    )
+
+    result = evaluate(
+        list(inputs["components"]),
+        [float(value) for value in inputs["mole_fractions"]],
+        quantity(float(inputs["inflow_rate"]), "kg/s"),
+        quantity(float(inputs["relief_pressure"]), "Pa"),
+        quantity(float(inputs["relief_temperature"]), "K"),
+        None if inputs.get("scenario_name") is None else str(inputs["scenario_name"]),
+    )
+    return {
+        "relief_rate_kg_per_s": result.relief_rate.to("kg/s").magnitude,
+        "relief_temperature_k": result.relief_temperature.to("K").magnitude,
+        "molar_mass_kg_per_mol": result.molar_mass.to("kg/mol").magnitude,
+        "compressibility": result.compressibility,
+        "specific_heat_ratio": result.specific_heat_ratio,
+    }
+
+
+def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.check_valve_leak_relief import (
+        check_valve_leak_relief as evaluate,
+    )
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    result = evaluate(
+        list(inputs["components"]),
+        [float(value) for value in inputs["mole_fractions"]],
+        quantity(float(inputs["nominal_diameter"]), "m"),
+        quantity(float(inputs["upstream_pressure"]), "Pa"),
+        None if inputs.get("leak_area_fraction") is None else float(inputs["leak_area_fraction"]),
+        optional("upstream_temperature", "K"),
+        optional("downstream_pressure", "Pa"),
+        None
+        if inputs.get("discharge_coefficient") is None
+        else float(inputs["discharge_coefficient"]),
+        None if inputs.get("scenario_name") is None else str(inputs["scenario_name"]),
+    )
+    return {
+        "relief_rate_kg_per_s": result.relief_rate.to("kg/s").magnitude,
+        "relief_temperature_k": result.relief_temperature.to("K").magnitude,
+        "molar_mass_kg_per_mol": result.molar_mass.to("kg/mol").magnitude,
+        "compressibility": result.compressibility,
+        "specific_heat_ratio": result.specific_heat_ratio,
+    }
+
+
+def _control_valve_failure_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.control_valve_failure_relief`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.control_valve_failure_relief import (
+        control_valve_failure_relief as evaluate,
+    )
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    result = evaluate(
+        list(inputs["components"]),
+        [float(value) for value in inputs["mole_fractions"]],
+        quantity(float(inputs["upstream_pressure"]), "Pa"),
+        optional("upstream_temperature", "K"),
+        optional("downstream_pressure", "Pa"),
+        optional("effective_area", "m**2"),
+        None if inputs.get("cv") is None else float(inputs["cv"]),
+        None if inputs.get("cv_erosion_margin") is None else float(inputs["cv_erosion_margin"]),
+        None
+        if inputs.get("discharge_coefficient") is None
+        else float(inputs["discharge_coefficient"]),
+        None if inputs.get("scenario_name") is None else str(inputs["scenario_name"]),
+    )
+    return {
+        "relief_rate_kg_per_s": result.relief_rate.to("kg/s").magnitude,
+        "relief_temperature_k": result.relief_temperature.to("K").magnitude,
+        "molar_mass_kg_per_mol": result.molar_mass.to("kg/mol").magnitude,
+        "compressibility": result.compressibility,
+        "specific_heat_ratio": result.specific_heat_ratio,
+    }
+
+
+def _tube_rupture_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.tube_rupture_relief`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.tube_rupture_relief import (
+        tube_rupture_relief as evaluate,
+    )
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    result = evaluate(
+        list(inputs["components"]),
+        [float(value) for value in inputs["mole_fractions"]],
+        quantity(float(inputs["tube_inner_diameter"]), "m"),
+        quantity(float(inputs["high_pressure"]), "Pa"),
+        None if inputs.get("number_of_open_ends") is None else float(inputs["number_of_open_ends"]),
+        optional("high_temperature", "K"),
+        optional("low_pressure", "Pa"),
+        None
+        if inputs.get("discharge_coefficient") is None
+        else float(inputs["discharge_coefficient"]),
+        None if inputs.get("scenario_name") is None else str(inputs["scenario_name"]),
+    )
+    return {
+        "relief_rate_kg_per_s": result.relief_rate.to("kg/s").magnitude,
+        "relief_temperature_k": result.relief_temperature.to("K").magnitude,
+        "molar_mass_kg_per_mol": result.molar_mass.to("kg/mol").magnitude,
+        "compressibility": result.compressibility,
+        "specific_heat_ratio": result.specific_heat_ratio,
+    }
+
+
+def _overpressure_protection_study(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.overpressure_protection_study`'s layers, from the reference's arithmetic."""
+    from azoth import _models_gen
+    from azoth.core.units import quantity
+    from azoth.process.reference.overpressure_protection_study import (
+        overpressure_protection_study as evaluate,
+    )
+
+    spec = _models_gen.model("process.overpressure_protection_study")
+    fields = spec["inputs"]["scenarios"]["fields"]
+    prepared = []
+    for row in inputs["scenarios"]:
+        converted: dict[str, Any] = {}
+        for name, declaration in fields.items():
+            value = row.get(name)
+            if value is None:
+                converted[name] = None
+            elif declaration.get("type") in ("enum", "string", "boolean"):
+                converted[name] = value
+            elif declaration.get("unit") == "dimensionless":
+                converted[name] = float(value)
+            else:
+                converted[name] = quantity(float(value), str(declaration["unit"]))
+        prepared.append(converted)
+
+    def optional(name: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), "Pa")
+
+    result = evaluate(
+        quantity(float(inputs["mawp"]), "Pa"),
+        prepared,
+        optional("relief_set_pressure"),
+        optional("back_pressure"),
+        None if inputs.get("multiple_devices") is None else bool(inputs["multiple_devices"]),
+    )
+    layers: dict[str, float] = {}
+    if result.governing_relief_rate is not None:
+        layers["governing_relief_rate_kg_per_s"] = result.governing_relief_rate.to("kg/s").magnitude
+    if result.required_area is not None:
+        layers["required_area_m2"] = result.required_area.to("m**2").magnitude
+    if result.required_area_in2 is not None:
+        layers["required_area_in2"] = result.required_area_in2
+    if result.selected_area_in2 is not None:
+        layers["selected_area_in2"] = result.selected_area_in2
+    if result.selected_orifice_capacity is not None:
+        layers["selected_orifice_capacity_kg_per_s"] = result.selected_orifice_capacity.to(
+            "kg/s"
+        ).magnitude
+    if result.acceptance_peak_pressure is not None:
+        layers["acceptance_peak_pressure_bara"] = result.acceptance_peak_pressure.to(
+            "bar"
+        ).magnitude
+    if result.acceptance_allowable_pressure is not None:
+        layers["acceptance_allowable_pressure_bara"] = result.acceptance_allowable_pressure.to(
+            "bar"
+        ).magnitude
+    if result.acceptance_accumulation_factor is not None:
+        layers["acceptance_accumulation_factor"] = result.acceptance_accumulation_factor
+    if result.acceptance_margin is not None:
+        layers["acceptance_margin_bara"] = result.acceptance_margin.to("bar").magnitude
+    return layers
+
+
 def _fire_case_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.fire_case_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -2876,6 +3064,11 @@ DUMPERS: dict[str, Dumper] = {
     "process.consequence_analysis": _consequence_analysis,
     "process.jet_fire": _jet_fire,
     "process.pfp_demand": _pfp_demand,
+    "process.blocked_outlet_relief": _blocked_outlet_relief,
+    "process.check_valve_leak_relief": _check_valve_leak_relief,
+    "process.control_valve_failure_relief": _control_valve_failure_relief,
+    "process.tube_rupture_relief": _tube_rupture_relief,
+    "process.overpressure_protection_study": _overpressure_protection_study,
     "process.fire_case_relief": _fire_case_relief,
     "process.overpressure_acceptance": _overpressure_acceptance,
     "process.pipeline_pressure_protection": _pipeline_pressure_protection,
@@ -4442,6 +4635,183 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     # The fire relief's six cased blocks: both drainage branches, the geometry, the
     # no-area state, the latent default and the unread firefighting flag. The negative
     # latent heat the class silently defaults sits outside them.
+    # The protection studies: the no-credible and empty blocks carry no numeric output, so
+    # they are declared in `UNCASED_ROWS` and held by the model cases and the cross-impl.
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_gas",
+        capture="process_overpressure_protection_study.tsv",
+        block=0,
+        identified_by=("#label", "study_gas"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_liquid",
+        capture="process_overpressure_protection_study.tsv",
+        block=1,
+        identified_by=("#label", "study_liquid"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_two_phase",
+        capture="process_overpressure_protection_study.tsv",
+        block=2,
+        identified_by=("#label", "study_two_phase"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_zero_rate",
+        capture="process_overpressure_protection_study.tsv",
+        block=4,
+        identified_by=("#label", "study_zero_rate"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_capacity_shortfall",
+        capture="process_overpressure_protection_study.tsv",
+        block=5,
+        identified_by=("#label", "study_capacity_shortfall"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_acceptance_fail",
+        capture="process_overpressure_protection_study.tsv",
+        block=6,
+        identified_by=("#label", "study_acceptance_fail"),
+    ),
+    LayerCase(
+        model="process.overpressure_protection_study",
+        case="study_fire",
+        capture="process_overpressure_protection_study.tsv",
+        block=7,
+        identified_by=("#label", "study_fire"),
+    ),
+    # The tube ruptures: the raw state block, the class's zero-end reset and the no-fluid
+    # branch are uncased.
+    LayerCase(
+        model="process.tube_rupture_relief",
+        case="tr_two_ends",
+        capture="process_tube_rupture_relief.tsv",
+        block=1,
+        identified_by=("#label", "tr_two_ends"),
+    ),
+    LayerCase(
+        model="process.tube_rupture_relief",
+        case="tr_one_end",
+        capture="process_tube_rupture_relief.tsv",
+        block=2,
+        identified_by=("#label", "tr_one_end"),
+    ),
+    LayerCase(
+        model="process.tube_rupture_relief",
+        case="tr_subcritical",
+        capture="process_tube_rupture_relief.tsv",
+        block=3,
+        identified_by=("#label", "tr_subcritical"),
+    ),
+    # The check-valve leaks: the raw state block and the no-fluid branch are uncased.
+    LayerCase(
+        model="process.check_valve_leak_relief",
+        case="cvl_default",
+        capture="process_check_valve_leak_relief.tsv",
+        block=1,
+        identified_by=("#label", "cvl_default"),
+    ),
+    LayerCase(
+        model="process.check_valve_leak_relief",
+        case="cvl_clamped",
+        capture="process_check_valve_leak_relief.tsv",
+        block=2,
+        identified_by=("#label", "cvl_clamped"),
+    ),
+    LayerCase(
+        model="process.check_valve_leak_relief",
+        case="cvl_subcritical",
+        capture="process_check_valve_leak_relief.tsv",
+        block=3,
+        identified_by=("#label", "cvl_subcritical"),
+    ),
+    LayerCase(
+        model="process.check_valve_leak_relief",
+        case="cvl_zero_diameter",
+        capture="process_check_valve_leak_relief.tsv",
+        block=4,
+        identified_by=("#label", "cvl_zero_diameter"),
+    ),
+    # The blocked-outlet loads are every other block, because each row prints the raw
+    # `ReliefFluidState` readings beside it. The three state blocks, the no-fluid branch
+    # and the refused negative inflow are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.blocked_outlet_relief",
+        case="bo_gas",
+        capture="process_blocked_outlet_relief.tsv",
+        block=1,
+        identified_by=("#label", "bo_gas"),
+    ),
+    LayerCase(
+        model="process.blocked_outlet_relief",
+        case="bo_liquid",
+        capture="process_blocked_outlet_relief.tsv",
+        block=3,
+        identified_by=("#label", "bo_liquid"),
+    ),
+    LayerCase(
+        model="process.blocked_outlet_relief",
+        case="bo_two_phase",
+        capture="process_blocked_outlet_relief.tsv",
+        block=5,
+        identified_by=("#label", "bo_two_phase"),
+    ),
+    LayerCase(
+        model="process.blocked_outlet_relief",
+        case="bo_zero_inflow",
+        capture="process_blocked_outlet_relief.tsv",
+        block=7,
+        identified_by=("#label", "bo_zero_inflow"),
+    ),
+    # The control-valve loads: one state block and one no-fluid block are uncased.
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_area",
+        capture="process_control_valve_failure_relief.tsv",
+        block=1,
+        identified_by=("#label", "cvf_area"),
+    ),
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_area_default_downstream",
+        capture="process_control_valve_failure_relief.tsv",
+        block=2,
+        identified_by=("#label", "cvf_area_default_downstream"),
+    ),
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_cv",
+        capture="process_control_valve_failure_relief.tsv",
+        block=3,
+        identified_by=("#label", "cvf_cv"),
+    ),
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_cv_margin",
+        capture="process_control_valve_failure_relief.tsv",
+        block=4,
+        identified_by=("#label", "cvf_cv_margin"),
+    ),
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_subcritical",
+        capture="process_control_valve_failure_relief.tsv",
+        block=5,
+        identified_by=("#label", "cvf_subcritical"),
+    ),
+    LayerCase(
+        model="process.control_valve_failure_relief",
+        case="cvf_no_area",
+        capture="process_control_valve_failure_relief.tsv",
+        block=6,
+        identified_by=("#label", "cvf_no_area"),
+    ),
     LayerCase(
         model="process.fire_case_relief",
         case="fc_area_drainage",
@@ -6133,6 +6503,19 @@ UNCASED_ROWS: dict[str, int] = {
     # evidence beside the PR oracle, and the zero-rate refusal the port raises rather than
     # reproduces.
     "process_gas_dispersion.tsv": 5,
+    # The blocked-outlet capture's five: three raw `ReliefFluidState` blocks, the class's
+    # no-fluid branch, and the negative inflow the port refuses.
+    "process_blocked_outlet_relief.tsv": 5,
+    # The control-valve capture's two: the raw state block and the no-fluid branch.
+    "process_control_valve_failure_relief.tsv": 2,
+    # The check-valve capture's two: the raw state block and the no-fluid branch.
+    "process_check_valve_leak_relief.tsv": 2,
+    # The tube-rupture capture's three: the raw state block, the class's zero-end reset
+    # (which the port refuses) and the no-fluid branch.
+    "process_tube_rupture_relief.tsv": 3,
+    # The study's two: the no-credible and empty blocks carry no numeric output, so they
+    # are held by their cases and the cross-impl rather than the layer diff.
+    "process_overpressure_protection_study.tsv": 2,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

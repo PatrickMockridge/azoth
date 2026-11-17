@@ -2327,7 +2327,90 @@ no area, the default and a negative latent heat, and the firefighting flag.
 branches, so only drainage selects 21000 or 34500 BTU/hr·ft² (`fc_area_drainage` and
 `fc_firefighting_unread` are identical). A negative latent heat is silently replaced by
 350000 J/kg (`fc_negative_latent`); the port treats absence as the default and refuses a
-negative value. The fluid-enriched property path is the thermo seam and is not captured.
+negative value. The fluid-enriched property path is the thermo seam; `process.blocked_outlet_relief`
+and its siblings below capture it.
+
+## The blocked-outlet relief load
+
+`process_blocked_outlet_relief.tsv` is `BlockedOutletRelief.calculate` over a gas, a liquid
+and a two-phase fluid, the no-fluid branch, a zero inflow and a negative inflow, with the
+raw `ReliefFluidState` readings printed beside each row.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe blocked_outlet_relief \
+  > captures/process_blocked_outlet_relief.tsv
+```
+
+**The property the DTO calls `specificHeatRatio` is `getKappa`, the isentropic exponent.**
+`getGamma` is the plain Cp/Cv; the probe prints both. On the gas row they are 1.27958 and
+1.33194; on the liquid row 1255.27 and 1.26395; on the two-phase row 1965.17 and 1.34540.
+**The DTO sets no density** - every row prints `density_kg_per_m3=NaN`, so the study's liquid
+sizing never receives one from a load. `bo_no_fluid` is the class's other branch: k = 1.3,
+Z = 1.0 and no molar mass, with its own warning. A zero or negative inflow is accepted and
+answers zero with a warning; the port allows zero and refuses a negative one.
+
+## The control-valve failure relief load
+
+`process_control_valve_failure_relief.tsv` is `ControlValveFailureRelief.calculate` from an
+explicit area, the default downstream pressure, a Cv, a Cv with an erosion margin, a
+subcritical downstream pressure, no area and the no-fluid branch.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe control_valve_failure_relief \
+  > captures/process_control_valve_failure_relief.tsv
+```
+
+The explicit 1.01325 bara downstream and the unset default answer identically. The erosion
+margin multiplies the rate by itself (2.888 → 16.710 for 1.25 on 13.368). Subcritical flow
+is 2.596 against the choked 2.888. Neither an area nor a Cv answers zero with a warning.
+
+## The check-valve leak relief load
+
+`process_check_valve_leak_relief.tsv` is `CheckValveLeakRelief.calculate` over the default
+1 % leak fraction, a fraction that is clamped to 0.1 %, a subcritical downstream pressure, a
+zero diameter and the no-fluid branch.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe check_valve_leak_relief \
+  > captures/process_check_valve_leak_relief.tsv
+```
+
+The 0.0005 fraction is clamped to 0.001 and the rate is exactly a tenth of the default row's
+(0.05269 against 0.52690), with the clamp warning appended last. A zero diameter answers
+zero.
+
+## The tube-rupture relief load
+
+`process_tube_rupture_relief.tsv` is `TubeRuptureRelief.calculate` over two open ends, one
+open end, a subcritical low-pressure side, zero open ends and the no-fluid branch.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe tube_rupture_relief \
+  > captures/process_tube_rupture_relief.tsv
+```
+
+One open end is exactly half the two-end rate. **A count below one is silently reset to two**:
+`tr_zero_ends` answers the two-end rate and appends the reset warning. The port refuses the
+count rather than reproducing the factor-of-two reset.
+
+## The overpressure protection study
+
+`process_overpressure_protection_study.tsv` is `OverpressureProtectionStudy.evaluate` over a
+governing gas case with a smaller second scenario, a liquid case with a stated density, a
+two-phase case with the omega inputs, no credible scenario, a zero-rate governing case, a
+capacity shortfall, an acceptance failure, a fire case and an empty study.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe overpressure_protection_study \
+  > captures/process_overpressure_protection_study.tsv
+```
+
+**A zero-rate row still governs and the acceptance check still runs**: `study_zero_rate` has
+no sizing (the areas are NaN) but a present acceptance. The empty and no-credible studies
+share the one message and publish no acceptance. The selected capacity is
+`rate * selected / required` (2.0 × 1.287 / 0.83214 = 3.0932 on the gas case). The basis
+string uses the cause label, not the scenario name, and the liquid case takes its stated
+600 kg/m³ because no load publishes a density.
 
 ## The overpressure acceptance
 

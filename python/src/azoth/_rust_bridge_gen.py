@@ -31,6 +31,7 @@ from azoth.core.result import (
     BeggsBrillRegime,
     BeggsBrillSegmentResult,
     BleveResult,
+    BlockedOutletReliefResult,
     BlowdownPressureProfileResult,
     BoilingHeatTransferResult,
     BowTieResult,
@@ -47,6 +48,7 @@ from azoth.core.result import (
     CharacterizationComponent,
     CharacterizeToCommonSlateResult,
     CharacterizeToReferenceResult,
+    CheckValveLeakReliefResult,
     ChemicalEquilibriumResult,
     ChemicalWarningRow,
     ChokedFlowAreaResult,
@@ -64,6 +66,7 @@ from azoth.core.result import (
     ConsequenceAnalysisResult,
     ConsequenceOutcomeResult,
     ControlValveCvResult,
+    ControlValveFailureReliefResult,
     CooldownVerdict,
     CoolerResult,
     CorrosionSeverity,
@@ -200,6 +203,7 @@ from azoth.core.result import (
     OilAssayDerivationResult,
     OrificeFlowResult,
     OverpressureAcceptanceResult,
+    OverpressureProtectionStudyResult,
     PackedColumnResult,
     PackingHydraulicsResult,
     PackingSizingResult,
@@ -263,6 +267,7 @@ from azoth.core.result import (
     ReferencePotentialsResult,
     ReliefDisposalNetworkResult,
     ReliefDisposalRow,
+    ReliefPhase,
     RemediationOptionRow,
     ReynoldsNumberResult,
     RiskAssessmentRow,
@@ -346,6 +351,7 @@ from azoth.core.result import (
     TrayHydraulicsResult,
     TsFlashResult,
     TubeInsertModelResult,
+    TubeRuptureReliefResult,
     TuFlashResult,
     TurboExpanderResult,
     TvFlashResult,
@@ -436,6 +442,7 @@ __all__ = [
     "barite_celestite_solid_solution",
     "beggs_brill_segment",
     "bleve",
+    "blocked_outlet_relief",
     "blowdown_pressure_profile",
     "boiling_heat_transfer",
     "bow_tie",
@@ -450,6 +457,7 @@ __all__ = [
     "characterise_plus_fraction",
     "characterize_to_common_slate",
     "characterize_to_reference",
+    "check_valve_leak_relief",
     "chemical_equilibrium",
     "choked_flow_area",
     "chung_conductivity",
@@ -464,6 +472,7 @@ __all__ = [
     "conduction_plane_wall",
     "consequence_analysis",
     "control_valve_cv",
+    "control_valve_failure_relief",
     "cooler",
     "costald_molar_volume",
     "crane_k_factors",
@@ -574,6 +583,7 @@ __all__ = [
     "oil_assay_derivation",
     "orifice_flow",
     "overpressure_acceptance",
+    "overpressure_protection_study",
     "packed_column",
     "packing_hydraulics",
     "packing_sizing",
@@ -703,6 +713,7 @@ __all__ = [
     "ts_flash",
     "tu_flash",
     "tube_insert_model",
+    "tube_rupture_relief",
     "turbo_expander_compressor",
     "tv_flash",
     "tv_fraction_flash",
@@ -5744,6 +5755,30 @@ def bleve(fuel_mass: Q, heat_of_combustion: float, radiative_fraction: float, re
     )
 
 
+def blocked_outlet_relief(components: list[str], mole_fractions: list[float], inflow_rate: Q, relief_pressure: Q, relief_temperature: Q, scenario_name: str | None=None) -> BlockedOutletReliefResult:
+    """``process.blocked_outlet_relief``, computed in Rust."""
+    spec = _models_gen.model("process.blocked_outlet_relief")
+    result = _core.blocked_outlet_relief(
+        list(components),
+        list(mole_fractions),
+        input_to_si(spec, "inflow_rate", inflow_rate),
+        input_to_si(spec, "relief_pressure", relief_pressure),
+        input_to_si(spec, "relief_temperature", relief_temperature),
+        scenario_name,
+    )
+    return BlockedOutletReliefResult(
+        name=result.name,
+        relief_rate=from_si(result.relief_rate.magnitude_si, result.relief_rate.unit),
+        phase=ReliefPhase(result.phase),
+        relief_temperature=from_si(result.relief_temperature.magnitude_si, result.relief_temperature.unit),
+        molar_mass=from_si(result.molar_mass.magnitude_si, result.molar_mass.unit),
+        compressibility=result.compressibility,
+        specific_heat_ratio=result.specific_heat_ratio,
+        assumptions=tuple(result.assumptions),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def blowdown_pressure_profile(points: list[dict[str, object]], time: Q, interpolation_mode: str | None=None, gauge_offset: Q | None=None) -> BlowdownPressureProfileResult:
     """``process.blowdown_pressure_profile``, computed in Rust."""
     spec = _models_gen.model("process.blowdown_pressure_profile")
@@ -5773,6 +5808,33 @@ def bow_tie(threats: list[dict[str, object]], consequences: list[dict[str, objec
         mitigated_frequency_per_year=result.mitigated_frequency_per_year,
         total_rrf=result.total_rrf,
         max_severity=result.max_severity,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def check_valve_leak_relief(components: list[str], mole_fractions: list[float], nominal_diameter: Q, upstream_pressure: Q, leak_area_fraction: float | None=None, upstream_temperature: Q | None=None, downstream_pressure: Q | None=None, discharge_coefficient: float | None=None, scenario_name: str | None=None) -> CheckValveLeakReliefResult:
+    """``process.check_valve_leak_relief``, computed in Rust."""
+    spec = _models_gen.model("process.check_valve_leak_relief")
+    result = _core.check_valve_leak_relief(
+        list(components),
+        list(mole_fractions),
+        input_to_si(spec, "nominal_diameter", nominal_diameter),
+        input_to_si(spec, "upstream_pressure", upstream_pressure),
+        None if leak_area_fraction is None else leak_area_fraction,
+        None if upstream_temperature is None else input_to_si(spec, "upstream_temperature", upstream_temperature),
+        None if downstream_pressure is None else input_to_si(spec, "downstream_pressure", downstream_pressure),
+        None if discharge_coefficient is None else discharge_coefficient,
+        scenario_name,
+    )
+    return CheckValveLeakReliefResult(
+        name=result.name,
+        relief_rate=from_si(result.relief_rate.magnitude_si, result.relief_rate.unit),
+        phase=ReliefPhase(result.phase),
+        relief_temperature=from_si(result.relief_temperature.magnitude_si, result.relief_temperature.unit),
+        molar_mass=from_si(result.molar_mass.magnitude_si, result.molar_mass.unit),
+        compressibility=result.compressibility,
+        specific_heat_ratio=result.specific_heat_ratio,
+        assumptions=tuple(result.assumptions),
         warnings=_warnings(result.warnings),
     )
 
@@ -5918,6 +5980,34 @@ def consequence_analysis(release_frequency_per_year: float, receiver_distance: Q
     return ConsequenceAnalysisResult(
         outcomes=tuple(ConsequenceOutcomeResult(outcome=c.outcome, outcome_type=c.outcome_type, frequency_per_year=c.frequency_per_year, fatality_probability=c.fatality_probability, fatality_frequency_per_year=c.fatality_frequency_per_year) for c in result.outcomes),
         individual_fatality_risk_per_year=result.individual_fatality_risk_per_year,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def control_valve_failure_relief(components: list[str], mole_fractions: list[float], upstream_pressure: Q, upstream_temperature: Q | None=None, downstream_pressure: Q | None=None, effective_area: Q | None=None, cv: float | None=None, cv_erosion_margin: float | None=None, discharge_coefficient: float | None=None, scenario_name: str | None=None) -> ControlValveFailureReliefResult:
+    """``process.control_valve_failure_relief``, computed in Rust."""
+    spec = _models_gen.model("process.control_valve_failure_relief")
+    result = _core.control_valve_failure_relief(
+        list(components),
+        list(mole_fractions),
+        input_to_si(spec, "upstream_pressure", upstream_pressure),
+        None if upstream_temperature is None else input_to_si(spec, "upstream_temperature", upstream_temperature),
+        None if downstream_pressure is None else input_to_si(spec, "downstream_pressure", downstream_pressure),
+        None if effective_area is None else input_to_si(spec, "effective_area", effective_area),
+        None if cv is None else cv,
+        None if cv_erosion_margin is None else cv_erosion_margin,
+        None if discharge_coefficient is None else discharge_coefficient,
+        scenario_name,
+    )
+    return ControlValveFailureReliefResult(
+        name=result.name,
+        relief_rate=from_si(result.relief_rate.magnitude_si, result.relief_rate.unit),
+        phase=ReliefPhase(result.phase),
+        relief_temperature=from_si(result.relief_temperature.magnitude_si, result.relief_temperature.unit),
+        molar_mass=from_si(result.molar_mass.magnitude_si, result.molar_mass.unit),
+        compressibility=result.compressibility,
+        specific_heat_ratio=result.specific_heat_ratio,
+        assumptions=tuple(result.assumptions),
         warnings=_warnings(result.warnings),
     )
 
@@ -7210,6 +7300,37 @@ def overpressure_acceptance(peak_pressure: Q, mawp: Q, cause: str, multiple_devi
     )
 
 
+def overpressure_protection_study(mawp: Q, scenarios: list[dict[str, object]], relief_set_pressure: Q | None=None, back_pressure: Q | None=None, multiple_devices: bool | None=None) -> OverpressureProtectionStudyResult:
+    """``process.overpressure_protection_study``, computed in Rust."""
+    spec = _models_gen.model("process.overpressure_protection_study")
+    result = _core.overpressure_protection_study(
+        input_to_si(spec, "mawp", mawp),
+        input_records_to_si(spec, "scenarios", scenarios),
+        None if relief_set_pressure is None else input_to_si(spec, "relief_set_pressure", relief_set_pressure),
+        None if back_pressure is None else input_to_si(spec, "back_pressure", back_pressure),
+        multiple_devices,
+    )
+    return OverpressureProtectionStudyResult(
+        governing_name=result.governing_name,
+        governing_cause=result.governing_cause,
+        governing_phase=result.governing_phase,
+        governing_relief_rate=None if result.governing_relief_rate is None else from_si(result.governing_relief_rate.magnitude_si, result.governing_relief_rate.unit),
+        required_area=None if result.required_area is None else from_si(result.required_area.magnitude_si, result.required_area.unit),
+        required_area_in2=result.required_area_in2,
+        recommended_orifice=result.recommended_orifice,
+        selected_area_in2=result.selected_area_in2,
+        selected_orifice_capacity=None if result.selected_orifice_capacity is None else from_si(result.selected_orifice_capacity.magnitude_si, result.selected_orifice_capacity.unit),
+        capacity_adequate=result.capacity_adequate,
+        acceptance_peak_pressure=None if result.acceptance_peak_pressure is None else from_si(result.acceptance_peak_pressure.magnitude_si, result.acceptance_peak_pressure.unit),
+        acceptance_allowable_pressure=None if result.acceptance_allowable_pressure is None else from_si(result.acceptance_allowable_pressure.magnitude_si, result.acceptance_allowable_pressure.unit),
+        acceptance_accumulation_factor=result.acceptance_accumulation_factor,
+        acceptance_margin=None if result.acceptance_margin is None else from_si(result.acceptance_margin.magnitude_si, result.acceptance_margin.unit),
+        accepted=result.accepted,
+        messages=tuple(result.messages),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def packed_column(components: list[str], feed_n: Q, feed_z: list[float], feed_p: Q, feed_t: Q, packed_height: Q, feed_stage: int, has_reboiler: bool, has_condenser: bool, top_pressure: Q, bottom_pressure: Q, temperature_tolerance: float=1e-06, max_iterations: int=200, reboiler_temperature: Q | None=None, condenser_temperature: Q | None=None, packing_type: str | None=None, structured_packing: bool | None=None, design_flood_fraction: float | None=None, packing_hydraulic_capacity_factor: float | None=None, column_diameter: Q | None=None, murphree_efficiency: float | None=None, tray_murphree_efficiency: list[float] | None=None, reactive: bool | None=None, reactive_start_tray: int | None=None, reactive_end_tray: int | None=None, solver_type: str | None=None, top_specification_type: str | None=None, top_specification_target: float | None=None, top_specification_component: str | None=None, bottom_specification_type: str | None=None, bottom_specification_target: float | None=None, bottom_specification_component: str | None=None, gas_side_draw_fractions: list[float] | None=None, liquid_side_draw_fractions: list[float] | None=None, pumparound_fractions: list[float] | None=None, side_draw_flow_tray: int | None=None, side_draw_flow_phase: str | None=None, side_draw_flow_target: Q | None=None, side_draw_flow_tolerance: float | None=None, side_draw_flow_max_iterations: int | None=None, pumparound_return_tray: int | None=None, pumparound_draw_tray: int | None=None, pumparound_draw_fraction: float | None=None, pumparound_temperature_drop: Q | None=None, pumparound_tolerance: float | None=None, pumparound_max_iterations: int | None=None, max_allowable_fs_factor: float | None=None) -> PackedColumnResult:
     """``process.packed_column``, computed in Rust."""
     spec = _models_gen.model("process.packed_column")
@@ -8488,6 +8609,33 @@ def tr3001_compliance(scenarios: list[dict[str, object]], capacity_adequate: boo
         review_count=result.review_count,
         fail_count=result.fail_count,
         compliant=result.compliant,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def tube_rupture_relief(components: list[str], mole_fractions: list[float], tube_inner_diameter: Q, high_pressure: Q, number_of_open_ends: float | None=None, high_temperature: Q | None=None, low_pressure: Q | None=None, discharge_coefficient: float | None=None, scenario_name: str | None=None) -> TubeRuptureReliefResult:
+    """``process.tube_rupture_relief``, computed in Rust."""
+    spec = _models_gen.model("process.tube_rupture_relief")
+    result = _core.tube_rupture_relief(
+        list(components),
+        list(mole_fractions),
+        input_to_si(spec, "tube_inner_diameter", tube_inner_diameter),
+        input_to_si(spec, "high_pressure", high_pressure),
+        None if number_of_open_ends is None else number_of_open_ends,
+        None if high_temperature is None else input_to_si(spec, "high_temperature", high_temperature),
+        None if low_pressure is None else input_to_si(spec, "low_pressure", low_pressure),
+        None if discharge_coefficient is None else discharge_coefficient,
+        scenario_name,
+    )
+    return TubeRuptureReliefResult(
+        name=result.name,
+        relief_rate=from_si(result.relief_rate.magnitude_si, result.relief_rate.unit),
+        phase=ReliefPhase(result.phase),
+        relief_temperature=from_si(result.relief_temperature.magnitude_si, result.relief_temperature.unit),
+        molar_mass=from_si(result.molar_mass.magnitude_si, result.molar_mass.unit),
+        compressibility=result.compressibility,
+        specific_heat_ratio=result.specific_heat_ratio,
+        assumptions=tuple(result.assumptions),
         warnings=_warnings(result.warnings),
     )
 

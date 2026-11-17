@@ -18,11 +18,14 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.anti_surge_recycle`](./anti_surge_recycle.md) | `damped_fixed_point_recycle` | NeqSim process/equipment/compressor/AntiSurgeRecycleCalculator.java |
 | [`process.api537_flare_flame_model`](./api537_flare_flame_model.md) | `closed_form_flare_flame_and_radiation` | NeqSim process/safety/fire/Api537FlareFlameModel.java |
 | [`process.bleve`](./bleve.md) | `ccps_fireball_point_source` | NeqSim process/safety/fire/BLEVECalculator.java |
+| [`process.blocked_outlet_relief`](./blocked_outlet_relief.md) | `blocked_outlet_full_inflow` | NeqSim process/safety/overpressure/BlockedOutletRelief.java |
 | [`process.blowdown_pressure_profile`](./blowdown_pressure_profile.md) | `piecewise_step_or_linear_pressure_profile` | NeqSim process/safety/rupture/BlowdownPressureProfile.java |
 | [`process.bow_tie`](./bow_tie.md) | `closed_form_bow_tie` | NeqSim process/safety/risk/bowtie/BowTieModel.java |
+| [`process.check_valve_leak_relief`](./check_valve_leak_relief.md) | `check_valve_leak_nozzle` | NeqSim process/safety/overpressure/CheckValveLeakRelief.java |
 | [`process.component_splitter`](./component_splitter.md) | `direct composition` | NeqSim process/equipment/splitter/ComponentSplitter.java |
 | [`process.compressor`](./compressor.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
 | [`process.consequence_analysis`](./consequence_analysis.md) | `outcome_frequency_composition` | NeqSim process/safety/qra/ConsequenceAnalysisEngine.java |
+| [`process.control_valve_failure_relief`](./control_valve_failure_relief.md) | `control_valve_fail_open_nozzle` | NeqSim process/safety/overpressure/ControlValveFailureRelief.java |
 | [`process.cooler`](./cooler.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Cooler.java |
 | [`process.deluge_nozzle_layout`](./deluge_nozzle_layout.md) | `closed_form_deluge_nozzle_layout` | NeqSim process/safety/firewater/DelugeNozzleLayout.java |
 | [`process.distillation_column`](./distillation_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/DistillationColumn.java |
@@ -53,6 +56,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.mixer`](./mixer.md) | `direct composition` | NeqSim process/equipment/mixer/Mixer.java |
 | [`process.nog070_sil_determination`](./nog070_sil_determination.md) | `closed_form_nog070_sil_determination` | NeqSim process/safety/risk/sis/nog070/Nog070SilDetermination.java |
 | [`process.overpressure_acceptance`](./overpressure_acceptance.md) | `closed_form_overpressure_acceptance` | NeqSim process/safety/overpressure/OverpressureAcceptanceChecker.java |
+| [`process.overpressure_protection_study`](./overpressure_protection_study.md) | `overpressure_protection_study` | NeqSim process/safety/overpressure/OverpressureProtectionStudy.java |
 | [`process.packed_column`](./packed_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/PackedColumn.java |
 | [`process.pfp_demand`](./pfp_demand.md) | `closed_form_steel_time_to_critical` | NeqSim process/safety/fire/PfpDemandCalculator.java |
 | [`process.pipe`](./pipe.md) | `direct composition` | NeqSim process/equipment/pipeline/AdiabaticPipe.java |
@@ -82,6 +86,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.throttling_valve`](./throttling_valve.md) | `direct composition` | NeqSim process/equipment/valve/ThrottlingValve.java |
 | [`process.toxic_library`](./toxic_library.md) | `toxic_threshold_lookup_and_ppm_conversion` | NeqSim process/safety/dispersion/ToxicLibrary.java |
 | [`process.tr3001_compliance`](./tr3001_compliance.md) | `closed_form_tr3001_compliance` | NeqSim process/safety/overpressure/TR3001ComplianceChecker.java |
+| [`process.tube_rupture_relief`](./tube_rupture_relief.md) | `tube_rupture_nozzle` | NeqSim process/safety/overpressure/TubeRuptureRelief.java |
 | [`process.turbo_expander_compressor`](./turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/TurboExpanderCompressor.java |
 | [`process.vce`](./vce.md) | `tno_multi_energy_scaled_overpressure` | NeqSim process/safety/fire/VCEModel.java |
 | [`process.vessel_rupture`](./vessel_rupture.md) | `thin_wall_vessel_rupture_crossover` | NeqSim process/safety/rupture/VesselRuptureAnalyzer.java |

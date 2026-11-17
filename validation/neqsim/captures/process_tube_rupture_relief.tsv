@@ -1,0 +1,141 @@
+tr_two_ends_state
+kappa=1.2795798973843786
+gamma=1.3319393916069173
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+density_kg_per_m3=13.616754236185573
+phase_count=1
+has_gas=true
+has_liquid=false
+
+tr_two_ends
+name=Tube rupture two ends
+cause=tube_rupture
+phase=vapour
+relief_rate_kg_per_s=1.1615326673908402
+relief_rate_kg_per_hr=4181.517602607025
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26616 / API 521 4.4.14
+assumption_count=4
+assumption0=2 open ends (full-bore single-tube rupture) per TR3001 SR-26616
+assumption1=High-pressure fluid at maximum operating pressure
+assumption2=Vaporization/flashing on the low-pressure side not modelled (screening estimate)
+assumption3=Discharge coefficient Cd = 0.85
+
+tr_one_end
+name=Tube rupture one end
+cause=tube_rupture
+phase=vapour
+relief_rate_kg_per_s=0.5807663336954201
+relief_rate_kg_per_hr=2090.7588013035124
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26616 / API 521 4.4.14
+assumption_count=4
+assumption0=1 open ends (full-bore single-tube rupture) per TR3001 SR-26616
+assumption1=High-pressure fluid at maximum operating pressure
+assumption2=Vaporization/flashing on the low-pressure side not modelled (screening estimate)
+assumption3=Discharge coefficient Cd = 0.85
+
+tr_subcritical
+name=Tube rupture subcritical
+cause=tube_rupture
+phase=vapour
+relief_rate_kg_per_s=1.044006051031602
+relief_rate_kg_per_hr=3758.4217837137676
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26616 / API 521 4.4.14
+assumption_count=4
+assumption0=2 open ends (full-bore single-tube rupture) per TR3001 SR-26616
+assumption1=High-pressure fluid at maximum operating pressure
+assumption2=Vaporization/flashing on the low-pressure side not modelled (screening estimate)
+assumption3=Discharge coefficient Cd = 0.85
+
+tr_zero_ends
+name=Tube rupture zero ends
+cause=tube_rupture
+phase=vapour
+relief_rate_kg_per_s=1.1615326673908402
+relief_rate_kg_per_hr=4181.517602607025
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26616 / API 521 4.4.14
+assumption_count=5
+assumption0=2 open ends (full-bore single-tube rupture) per TR3001 SR-26616
+assumption1=High-pressure fluid at maximum operating pressure
+assumption2=Vaporization/flashing on the low-pressure side not modelled (screening estimate)
+assumption3=Discharge coefficient Cd = 0.85
+assumption4=Number of open ends below 1; using 2 (full-bore single-tube rupture)
+
+tr_no_fluid
+name=Tube rupture no fluid
+cause=tube_rupture
+phase=vapour
+relief_rate_kg_per_s=1.2333897512051502
+relief_rate_kg_per_hr=4440.2031043385405
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.02
+compressibility=1.0
+specific_heat_ratio=1.25
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26616 / API 521 4.4.14
+assumption_count=4
+assumption0=2 open ends (full-bore single-tube rupture) per TR3001 SR-26616
+assumption1=High-pressure fluid at maximum operating pressure
+assumption2=Vaporization/flashing on the low-pressure side not modelled (screening estimate)
+assumption3=Discharge coefficient Cd = 0.85
+

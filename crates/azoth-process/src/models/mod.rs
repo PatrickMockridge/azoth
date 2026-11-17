@@ -35,11 +35,14 @@ pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
 pub mod api537_flare_flame_model;
 pub mod bleve;
+pub mod blocked_outlet_relief;
 pub mod blowdown_pressure_profile;
 pub mod bow_tie;
+pub mod check_valve_leak_relief;
 pub mod component_splitter;
 pub mod compressor;
 pub mod consequence_analysis;
+pub mod control_valve_failure_relief;
 pub mod cooler;
 pub mod deluge_nozzle_layout;
 pub mod distillation_column;
@@ -69,7 +72,9 @@ pub mod manifold;
 pub mod map_turbo_expander_compressor;
 pub mod mixer;
 pub mod nog070_sil_determination;
+pub mod overpressure;
 pub mod overpressure_acceptance;
+pub mod overpressure_protection_study;
 pub mod packed_column;
 pub mod pfp_demand;
 pub mod pipe;
@@ -99,6 +104,7 @@ pub mod three_phase_separator;
 pub mod throttling_valve;
 pub mod toxic_library;
 pub mod tr3001_compliance;
+pub mod tube_rupture_relief;
 pub mod turbo_expander_compressor;
 pub mod vce;
 pub mod vessel_rupture;
@@ -112,15 +118,20 @@ pub use api537_flare_flame_model::{
     Api537FlareFlameModelResult, FlareTargetFlux, SterileRadius, api537_flare_flame_model,
 };
 pub use bleve::{BleveResult, bleve};
+pub use blocked_outlet_relief::{BlockedOutletReliefResult, blocked_outlet_relief};
 pub use blowdown_pressure_profile::{
     BlowdownPressureProfileResult, BlowdownProfilePoint, blowdown_pressure_profile,
 };
 pub use bow_tie::{BowTieBarrier, BowTieConsequence, BowTieResult, BowTieThreat, bow_tie};
+pub use check_valve_leak_relief::{CheckValveLeakReliefResult, check_valve_leak_relief};
 pub use component_splitter::{ComponentSplitterResult, component_splitter};
 pub use compressor::{CompressorResult, compressor};
 pub use consequence_analysis::{
     ConsequenceAnalysisResult, ConsequenceOutcomeResult, ConsequenceOutcomeSpec,
     consequence_analysis,
+};
+pub use control_valve_failure_relief::{
+    ControlValveFailureReliefResult, control_valve_failure_relief,
 };
 pub use cooler::{CoolerResult, cooler};
 pub use deluge_nozzle_layout::{
@@ -158,6 +169,9 @@ pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expand
 pub use mixer::{MixerResult, mixer};
 pub use nog070_sil_determination::{Nog070SilDeterminationResult, nog070_sil_determination};
 pub use overpressure_acceptance::{OverpressureAcceptanceResult, overpressure_acceptance};
+pub use overpressure_protection_study::{
+    OverpressureProtectionStudyResult, OverpressureScenario, overpressure_protection_study,
+};
 pub use packed_column::{PackedColumnResult, packed_column};
 pub use pfp_demand::{PfpDemandResult, pfp_demand};
 pub use pipe::{PipeResult, pipe};
@@ -210,6 +224,7 @@ pub use tr3001_compliance::{
     Tr3001Check, Tr3001ComplianceResult, Tr3001Finding, Tr3001Scenario, Tr3001Status,
     tr3001_compliance,
 };
+pub use tube_rupture_relief::{TubeRuptureReliefResult, tube_rupture_relief};
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};
 pub use vce::{VceResult, vce};
 pub use vessel_rupture::{

@@ -76,6 +76,25 @@ impl ReliefCause {
         }
     }
 
+    /// The class's human-readable label, which the acceptance basis string carries.
+    pub(crate) fn label(self) -> &'static str {
+        match self {
+            Self::BlockedOutlet => "Blocked outlet",
+            Self::CheckValveLeakage => "Check valve leakage",
+            Self::GasBlowBy => "Gas blow-by",
+            Self::LiquidBlowBy => "Liquid blow-by",
+            Self::VolatileLiquidIngress => "Volatile liquid ingress",
+            Self::InadvertentValveOpening => "Inadvertent valve opening",
+            Self::ControlValveFailure => "Control valve failure",
+            Self::Fire => "Fire",
+            Self::ThermalExpansion => "Thermal expansion",
+            Self::ChokeCollapse => "Choke collapse",
+            Self::TubeRupture => "Tube rupture",
+            Self::Vacuum => "Vacuum collapse",
+            Self::Other => "Other",
+        }
+    }
+
     pub(crate) fn parse(value: &str) -> Result<Self> {
         Ok(match value {
             "blocked_outlet" => Self::BlockedOutlet,
@@ -126,7 +145,7 @@ impl ReliefPhase {
         }
     }
 
-    fn parse(value: &str) -> Result<Self> {
+    pub(crate) fn parse(value: &str) -> Result<Self> {
         Ok(match value {
             "vapour" => Self::Vapour,
             "liquid" => Self::Liquid,

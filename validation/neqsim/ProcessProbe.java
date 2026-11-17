@@ -143,6 +143,7 @@ import neqsim.process.equipment.stream.StreamInterface;
 import neqsim.thermo.system.SystemInterface;
 import neqsim.thermo.system.SystemPrEos;
 import neqsim.thermo.system.SystemSrkEos;
+import neqsim.thermodynamicoperations.ThermodynamicOperations;
 import neqsim.process.safety.BoundaryConditions;
 import neqsim.process.safety.dispersion.GasDispersionAnalyzer;
 import neqsim.process.safety.dispersion.GasDispersionResult;
@@ -188,10 +189,14 @@ import neqsim.process.safety.risk.sis.nog070.Nog070SilCatalogue;
 import neqsim.process.safety.risk.sis.nog070.Nog070SilDetermination;
 import neqsim.process.safety.risk.sis.nog070.Nog070SifType;
 import neqsim.process.safety.overpressure.AcceptanceResult;
+import neqsim.process.safety.overpressure.BlockedOutletRelief;
+import neqsim.process.safety.overpressure.CheckValveLeakRelief;
 import neqsim.process.safety.overpressure.ComplianceFinding;
 import neqsim.process.safety.overpressure.ComplianceStatus;
+import neqsim.process.safety.overpressure.ControlValveFailureRelief;
 import neqsim.process.safety.overpressure.FireCaseRelief;
 import neqsim.process.safety.overpressure.OverpressureAcceptanceChecker;
+import neqsim.process.safety.overpressure.OverpressureProtectionStudy;
 import neqsim.process.safety.overpressure.OverpressureStudyResult;
 import neqsim.process.safety.overpressure.PipelinePressureProtectionCalculator;
 import neqsim.process.safety.overpressure.ProtectedItem;
@@ -202,6 +207,7 @@ import neqsim.process.safety.overpressure.ReliefLoadContribution;
 import neqsim.process.safety.overpressure.ReliefPhase;
 import neqsim.process.safety.overpressure.ReliefScenario;
 import neqsim.process.safety.overpressure.TR3001ComplianceChecker;
+import neqsim.process.safety.overpressure.TubeRuptureRelief;
 import neqsim.process.safety.rupture.BlowdownPressureProfile;
 import neqsim.process.safety.rupture.MaterialStrengthCurve;
 import neqsim.process.safety.rupture.PipeFireRuptureInput;
@@ -458,6 +464,21 @@ public class ProcessProbe {
         break;
       case "tr3001_compliance":
         tr3001ComplianceRows();
+        break;
+      case "blocked_outlet_relief":
+        blockedOutletReliefRows();
+        break;
+      case "control_valve_failure_relief":
+        controlValveFailureReliefRows();
+        break;
+      case "check_valve_leak_relief":
+        checkValveLeakReliefRows();
+        break;
+      case "tube_rupture_relief":
+        tubeRuptureReliefRows();
+        break;
+      case "overpressure_protection_study":
+        overpressureProtectionStudyRows();
         break;
       case "pipe_fire_rupture":
         pipeFireRuptureRows();
@@ -15726,6 +15747,289 @@ public class ProcessProbe {
       System.out.println("history" + i + "_allowable_stress_pa="
           + result.allowableStressPa.get(i));
       System.out.println("history" + i + "_margin_pa=" + result.marginPa.get(i));
+    }
+    System.out.println();
+  }
+
+  // ---------------------------------------------------------------------------
+  // The thermo-bound relief loads and the overpressure protection study
+  // ---------------------------------------------------------------------------
+
+  /// A PR fluid on the classic mixing rule, built at the state the class will flash.
+  static SystemInterface reliefFluid(String[] names, double[] z, double temperatureK,
+      double pressureBara) {
+    SystemInterface fluid = new SystemPrEos(temperatureK, pressureBara);
+    for (int i = 0; i < names.length; i++) {
+      fluid.addComponent(names[i], z[i]);
+    }
+    fluid.setMixingRule(2);
+    return fluid;
+  }
+
+  /// The raw state `ReliefFluidState` reads - and the two ratios it does not confuse.
+  static void printReliefState(String label, SystemInterface fluid, double temperatureK,
+      double pressureBara) {
+    System.out.println(label + "_state");
+    try {
+      SystemInterface state = fluid.clone();
+      state.setPressure(pressureBara, "bara");
+      state.setTemperature(temperatureK);
+      new ThermodynamicOperations(state).TPflash();
+      state.initProperties();
+      System.out.println("kappa=" + state.getKappa());
+      System.out.println("gamma=" + state.getGamma());
+      System.out.println("molar_mass_kg_per_mol=" + state.getMolarMass("kg/mol"));
+      System.out.println("compressibility=" + state.getZ());
+      System.out.println("density_kg_per_m3=" + state.getDensity("kg/m3"));
+      System.out.println("phase_count=" + state.getNumberOfPhases());
+      System.out.println("has_gas=" + state.hasPhaseType("gas"));
+      System.out.println("has_liquid=" + state.hasPhaseType("liquid"));
+    } catch (RuntimeException ex) {
+      System.out.println("state_error=" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  /// Every field the `ReliefScenario` DTO publishes, in its own order.
+  static void printReliefScenario(String label, ReliefScenario scenario) {
+    System.out.println(label);
+    System.out.println("name=" + scenario.getName());
+    System.out.println("cause=" + scenario.getCause().name().toLowerCase());
+    System.out.println("phase=" + scenario.getPhase().name().toLowerCase());
+    System.out.println("relief_rate_kg_per_s=" + scenario.getReliefRateKgPerS());
+    System.out.println("relief_rate_kg_per_hr=" + scenario.getReliefRateKgPerHr());
+    System.out.println("relief_temperature_k=" + scenario.getReliefTemperatureK());
+    System.out.println("molar_mass_kg_per_mol=" + scenario.getMolarMassKgPerMol());
+    System.out.println("compressibility=" + scenario.getCompressibility());
+    System.out.println("specific_heat_ratio=" + scenario.getSpecificHeatRatio());
+    System.out.println("density_kg_per_m3=" + scenario.getDensityKgPerM3());
+    System.out.println("viscosity_pa_s=" + scenario.getViscosityPaS());
+    System.out.println("gas_mass_fraction=" + scenario.getGasMassFraction());
+    System.out.println("gas_density_kg_per_m3=" + scenario.getGasDensityKgPerM3());
+    System.out.println("liquid_density_kg_per_m3=" + scenario.getLiquidDensityKgPerM3());
+    System.out.println("latent_heat_j_per_kg=" + scenario.getLatentHeatJPerKg());
+    System.out.println("liquid_heat_capacity_j_per_kg_k=" + scenario.getLiquidHeatCapacityJPerKgK());
+    System.out.println("dynamically_determined=" + scenario.isDynamicallyDetermined());
+    System.out.println("credible=" + scenario.isCredible());
+    System.out.println("standard_reference=" + scenario.getStandardReference());
+    List<String> assumptions = scenario.getAssumptions();
+    System.out.println("assumption_count=" + assumptions.size());
+    for (int i = 0; i < assumptions.size(); i++) {
+      System.out.println("assumption" + i + "=" + assumptions.get(i));
+    }
+    System.out.println();
+  }
+
+  static void blockedOutletReliefRows() {
+    String[] gasNames = {"methane", "ethane"};
+    double[] gasZ = {0.9, 0.1};
+    SystemInterface gas = reliefFluid(gasNames, gasZ, 320.0, 20.0);
+    printReliefState("bo_gas", gas, 320.0, 20.0);
+    printReliefScenario("bo_gas", new BlockedOutletRelief().setName("Blocked outlet gas")
+        .setInflowRateKgPerS(2.0).setReliefPressureBara(20.0).setReliefTemperatureC(46.85)
+        .setFluid(gas).calculate());
+
+    SystemInterface liquid = reliefFluid(new String[] {"n-butane"}, new double[] {1.0}, 250.0, 5.0);
+    printReliefState("bo_liquid", liquid, 250.0, 5.0);
+    printReliefScenario("bo_liquid", new BlockedOutletRelief().setName("Blocked outlet liquid")
+        .setInflowRateKgPerS(1.5).setReliefPressureBara(5.0).setReliefTemperatureC(-23.15)
+        .setFluid(liquid).calculate());
+
+    String[] mixNames = {"methane", "n-butane"};
+    double[] mixZ = {0.5, 0.5};
+    SystemInterface twoPhase = reliefFluid(mixNames, mixZ, 300.0, 20.0);
+    printReliefState("bo_two_phase", twoPhase, 300.0, 20.0);
+    printReliefScenario("bo_two_phase", new BlockedOutletRelief().setName("Blocked outlet two phase")
+        .setInflowRateKgPerS(1.0).setReliefPressureBara(20.0).setReliefTemperatureC(26.85)
+        .setFluid(twoPhase).calculate());
+
+    printReliefScenario("bo_no_fluid", new BlockedOutletRelief().setName("Blocked outlet no fluid")
+        .setInflowRateKgPerS(2.0).setReliefTemperatureC(50.0).calculate());
+
+    printReliefScenario("bo_zero_inflow", new BlockedOutletRelief().setName("Blocked outlet zero")
+        .setInflowRateKgPerS(0.0).setReliefPressureBara(20.0).setReliefTemperatureC(46.85)
+        .setFluid(gas).calculate());
+
+    printReliefScenario("bo_negative_inflow", new BlockedOutletRelief().setName("Blocked outlet negative")
+        .setInflowRateKgPerS(-1.0).setReliefPressureBara(20.0).setReliefTemperatureC(46.85)
+        .setFluid(gas).calculate());
+  }
+
+  static void controlValveFailureReliefRows() {
+    String[] names = {"methane", "ethane"};
+    double[] z = {0.9, 0.1};
+    SystemInterface gas = reliefFluid(names, z, 320.0, 20.0);
+    printReliefState("cvf_area", gas, 320.0, 20.0);
+    printReliefScenario("cvf_area", new ControlValveFailureRelief().setName("CV fail area")
+        .setEffectiveAreaM2(0.001).setUpstreamPressureBara(20.0).setUpstreamTemperatureC(46.85)
+        .setDownstreamPressureBara(1.01325).setFluid(gas).calculate());
+    printReliefScenario("cvf_area_default_downstream",
+        new ControlValveFailureRelief().setName("CV fail default downstream")
+            .setEffectiveAreaM2(0.001).setUpstreamPressureBara(20.0)
+            .setUpstreamTemperatureC(46.85).setFluid(gas).calculate());
+    printReliefScenario("cvf_cv", new ControlValveFailureRelief().setName("CV fail cv")
+        .setCv(150.0).setUpstreamPressureBara(20.0).setUpstreamTemperatureC(46.85)
+        .setDownstreamPressureBara(1.01325).setFluid(gas).calculate());
+    printReliefScenario("cvf_cv_margin", new ControlValveFailureRelief().setName("CV fail margin")
+        .setCv(150.0).setCvErosionMargin(1.25).setUpstreamPressureBara(20.0)
+        .setUpstreamTemperatureC(46.85).setDownstreamPressureBara(1.01325).setFluid(gas)
+        .calculate());
+    printReliefScenario("cvf_subcritical", new ControlValveFailureRelief().setName("CV fail subcritical")
+        .setEffectiveAreaM2(0.001).setUpstreamPressureBara(20.0).setUpstreamTemperatureC(46.85)
+        .setDownstreamPressureBara(15.0).setFluid(gas).calculate());
+    printReliefScenario("cvf_no_area", new ControlValveFailureRelief().setName("CV fail no area")
+        .setUpstreamPressureBara(20.0).setUpstreamTemperatureC(46.85)
+        .setDownstreamPressureBara(1.01325).setFluid(gas).calculate());
+    printReliefScenario("cvf_no_fluid", new ControlValveFailureRelief().setName("CV fail no fluid")
+        .setEffectiveAreaM2(0.001).setUpstreamPressureBara(20.0).setUpstreamTemperatureC(46.85)
+        .setDownstreamPressureBara(1.01325).setSpecificHeatRatio(1.25)
+        .setMolarMassKgPerMol(0.02).calculate());
+  }
+
+  static void checkValveLeakReliefRows() {
+    String[] names = {"methane", "ethane"};
+    double[] z = {0.9, 0.1};
+    SystemInterface gas = reliefFluid(names, z, 320.0, 20.0);
+    printReliefState("cvl_default", gas, 320.0, 20.0);
+    printReliefScenario("cvl_default", new CheckValveLeakRelief().setName("Check valve default")
+        .setNominalDiameterM(0.1524).setUpstreamPressureBara(20.0).setUpstreamTemperatureC(46.85)
+        .setDownstreamPressureBara(1.01325).setFluid(gas).calculate());
+    printReliefScenario("cvl_clamped", new CheckValveLeakRelief().setName("Check valve clamped")
+        .setNominalDiameterM(0.1524).setLeakAreaFraction(0.0005).setUpstreamPressureBara(20.0)
+        .setUpstreamTemperatureC(46.85).setDownstreamPressureBara(1.01325).setFluid(gas)
+        .calculate());
+    printReliefScenario("cvl_subcritical", new CheckValveLeakRelief().setName("Check valve subcritical")
+        .setNominalDiameterM(0.1524).setUpstreamPressureBara(20.0).setUpstreamTemperatureC(46.85)
+        .setDownstreamPressureBara(15.0).setFluid(gas).calculate());
+    printReliefScenario("cvl_zero_diameter", new CheckValveLeakRelief().setName("Check valve zero")
+        .setUpstreamPressureBara(20.0).setUpstreamTemperatureC(46.85)
+        .setDownstreamPressureBara(1.01325).setFluid(gas).calculate());
+    printReliefScenario("cvl_no_fluid", new CheckValveLeakRelief().setName("Check valve no fluid")
+        .setNominalDiameterM(0.1524).setUpstreamPressureBara(20.0).setUpstreamTemperatureC(46.85)
+        .setDownstreamPressureBara(1.01325).setSpecificHeatRatio(1.25)
+        .setMolarMassKgPerMol(0.02).calculate());
+  }
+
+  static void tubeRuptureReliefRows() {
+    String[] names = {"methane", "ethane"};
+    double[] z = {0.9, 0.1};
+    SystemInterface gas = reliefFluid(names, z, 320.0, 20.0);
+    printReliefState("tr_two_ends", gas, 320.0, 20.0);
+    printReliefScenario("tr_two_ends", new TubeRuptureRelief().setName("Tube rupture two ends")
+        .setTubeInnerDiameterM(0.016).setHighPressureBara(20.0).setHighTemperatureC(46.85)
+        .setLowPressureBara(1.01325).setHighPressureFluid(gas).calculate());
+    printReliefScenario("tr_one_end", new TubeRuptureRelief().setName("Tube rupture one end")
+        .setTubeInnerDiameterM(0.016).setNumberOfOpenEnds(1).setHighPressureBara(20.0)
+        .setHighTemperatureC(46.85).setLowPressureBara(1.01325).setHighPressureFluid(gas).calculate());
+    printReliefScenario("tr_subcritical", new TubeRuptureRelief().setName("Tube rupture subcritical")
+        .setTubeInnerDiameterM(0.016).setHighPressureBara(20.0).setHighTemperatureC(46.85)
+        .setLowPressureBara(15.0).setHighPressureFluid(gas).calculate());
+    printReliefScenario("tr_zero_ends", new TubeRuptureRelief().setName("Tube rupture zero ends")
+        .setTubeInnerDiameterM(0.016).setNumberOfOpenEnds(0).setHighPressureBara(20.0)
+        .setHighTemperatureC(46.85).setLowPressureBara(1.01325).setHighPressureFluid(gas).calculate());
+    printReliefScenario("tr_no_fluid", new TubeRuptureRelief().setName("Tube rupture no fluid")
+        .setTubeInnerDiameterM(0.016).setHighPressureBara(20.0).setHighTemperatureC(46.85)
+        .setLowPressureBara(1.01325).setSpecificHeatRatio(1.25).setMolarMassKgPerMol(0.02)
+        .calculate());
+  }
+
+  static void overpressureProtectionStudyRows() {
+    String[] names = {"methane", "ethane"};
+    double[] z = {0.9, 0.1};
+    SystemInterface gas = reliefFluid(names, z, 320.0, 20.0);
+    ReliefScenario gasScenario = new BlockedOutletRelief().setName("Blocked outlet gas")
+        .setInflowRateKgPerS(2.0).setReliefPressureBara(20.0).setReliefTemperatureC(46.85)
+        .setFluid(gas).calculate();
+    ReliefScenario smallScenario = new BlockedOutletRelief().setName("Blocked outlet small")
+        .setInflowRateKgPerS(0.5).setReliefPressureBara(20.0).setReliefTemperatureC(46.85)
+        .setFluid(gas).calculate();
+
+    ProtectedItem item = new ProtectedItem("V-1", 20.0).setReliefSetPressureBara(20.0)
+        .setBackPressureBara(1.01325);
+    printStudy("study_gas", new OverpressureProtectionStudy(item).addScenario(smallScenario)
+        .addScenario(gasScenario).evaluate());
+
+    ReliefScenario liquid = new ReliefScenario.Builder("Liquid release", ReliefCause.BLOCKED_OUTLET)
+        .phase(ReliefPhase.LIQUID).reliefRateKgPerS(5.0).reliefTemperatureK(320.0)
+        .densityKgPerM3(600.0).viscosityPaS(1.0e-3).molarMassKgPerMol(0.058)
+        .compressibility(0.05).specificHeatRatio(1.1).build();
+    printStudy("study_liquid", new OverpressureProtectionStudy(item).addScenario(liquid).evaluate());
+
+    ReliefScenario twoPhase = new ReliefScenario.Builder("Two phase release",
+        ReliefCause.BLOCKED_OUTLET).phase(ReliefPhase.TWO_PHASE).reliefRateKgPerS(1.0)
+        .reliefTemperatureK(350.0).molarMassKgPerMol(0.03).compressibility(0.85)
+        .specificHeatRatio(1.2).gasMassFraction(0.2).gasDensityKgPerM3(20.0)
+        .liquidDensityKgPerM3(600.0).latentHeatJPerKg(2.0e5)
+        .liquidHeatCapacityJPerKgK(2500.0).build();
+    printStudy("study_two_phase",
+        new OverpressureProtectionStudy(item).addScenario(twoPhase).evaluate());
+
+    ReliefScenario notCredible = new ReliefScenario.Builder("Not credible", ReliefCause.FIRE)
+        .phase(ReliefPhase.VAPOUR).reliefRateKgPerS(100.0).reliefTemperatureK(350.0)
+        .molarMassKgPerMol(0.02).compressibility(0.9).specificHeatRatio(1.3).credible(false)
+        .build();
+    printStudy("study_no_credible",
+        new OverpressureProtectionStudy(item).addScenario(notCredible).evaluate());
+
+    ReliefScenario zeroRate = new ReliefScenario.Builder("Zero rate", ReliefCause.BLOCKED_OUTLET)
+        .phase(ReliefPhase.VAPOUR).reliefRateKgPerS(0.0).reliefTemperatureK(320.0)
+        .molarMassKgPerMol(0.02).compressibility(0.9).specificHeatRatio(1.3).build();
+    printStudy("study_zero_rate",
+        new OverpressureProtectionStudy(item).addScenario(zeroRate).evaluate());
+
+    ReliefScenario shortfall = new ReliefScenario.Builder("Capacity shortfall",
+        ReliefCause.BLOCKED_OUTLET).phase(ReliefPhase.VAPOUR).reliefRateKgPerS(1000.0)
+        .reliefTemperatureK(320.0).molarMassKgPerMol(0.02).compressibility(0.9)
+        .specificHeatRatio(1.3).build();
+    printStudy("study_capacity_shortfall",
+        new OverpressureProtectionStudy(item).addScenario(shortfall).evaluate());
+
+    ProtectedItem lowMawp = new ProtectedItem("V-2", 8.0).setReliefSetPressureBara(10.0)
+        .setBackPressureBara(1.01325);
+    printStudy("study_acceptance_fail", new OverpressureProtectionStudy(lowMawp)
+        .addScenario(gasScenario).evaluate());
+
+    ReliefScenario fire = new ReliefScenario.Builder("Fire case", ReliefCause.FIRE)
+        .phase(ReliefPhase.VAPOUR).reliefRateKgPerS(2.0).reliefTemperatureK(320.0)
+        .molarMassKgPerMol(0.02).compressibility(0.9).specificHeatRatio(1.3).build();
+    printStudy("study_fire", new OverpressureProtectionStudy(item).addScenario(fire).evaluate());
+
+    printStudy("study_empty", new OverpressureProtectionStudy(item).evaluate());
+  }
+
+  static void printStudy(String label, OverpressureStudyResult result) {
+    System.out.println(label);
+    System.out.println("scenario_count=" + result.getScenarios().size());
+    ReliefScenario governing = result.getGoverningScenario();
+    System.out.println("governing_present=" + (governing != null));
+    if (governing != null) {
+      System.out.println("governing_name=" + governing.getName());
+      System.out.println("governing_cause=" + governing.getCause().name().toLowerCase());
+      System.out.println("governing_phase=" + governing.getPhase().name().toLowerCase());
+      System.out.println("governing_relief_rate_kg_per_s=" + governing.getReliefRateKgPerS());
+    }
+    System.out.println("required_area_m2=" + result.getRequiredAreaM2());
+    System.out.println("required_area_in2=" + result.getRequiredAreaIn2());
+    System.out.println("recommended_orifice=" + result.getRecommendedOrifice());
+    System.out.println("selected_area_in2=" + result.getSelectedAreaIn2());
+    System.out.println("selected_orifice_capacity_kg_per_s="
+        + result.getSelectedOrificeCapacityKgPerS());
+    System.out.println("capacity_adequate=" + result.isCapacityAdequate());
+    AcceptanceResult acceptance = result.getAcceptance();
+    System.out.println("acceptance_present=" + (acceptance != null));
+    if (acceptance != null) {
+      System.out.println("acceptance_peak_pressure_bara=" + acceptance.getPeakPressureBara());
+      System.out.println("acceptance_allowable_pressure_bara="
+          + acceptance.getAllowableAccumulatedPressureBara());
+      System.out.println("acceptance_accumulation_fraction=" + acceptance.getAccumulationFraction());
+      System.out.println("acceptance_margin_bara=" + acceptance.getMarginBara());
+      System.out.println("accepted=" + acceptance.isAccepted());
+      System.out.println("acceptance_basis=" + acceptance.getBasis());
+    }
+    List<String> messages = result.getWarnings();
+    System.out.println("message_count=" + messages.size());
+    for (int i = 0; i < messages.size(); i++) {
+      System.out.println("message" + i + "=" + messages.get(i));
     }
     System.out.println();
   }

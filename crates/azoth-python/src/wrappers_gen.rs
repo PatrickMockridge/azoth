@@ -5606,6 +5606,35 @@ pub fn bleve(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Blocked outlet relief.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mole_fractions, inflow_rate, relief_pressure, relief_temperature, scenario_name))]
+#[pyo3(
+    text_signature = "(components, mole_fractions, inflow_rate, relief_pressure, relief_temperature, scenario_name)"
+)]
+pub fn blocked_outlet_relief(
+    py: Python<'_>,
+    components: Vec<String>,
+    mole_fractions: Vec<f64>,
+    inflow_rate: f64,
+    relief_pressure: f64,
+    relief_temperature: f64,
+    scenario_name: Option<&str>,
+) -> PyResult<crate::transport_gen::PyBlockedOutletReliefResult> {
+    azoth_process::models::blocked_outlet_relief::blocked_outlet_relief(
+        &components,
+        &mole_fractions,
+        kilograms_per_second(inflow_rate),
+        pascals(relief_pressure),
+        kelvins(relief_temperature),
+        scenario_name,
+    )
+    .map(|r| crate::transport_gen::PyBlockedOutletReliefResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Blowdown pressure profile.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -5679,6 +5708,42 @@ pub fn bow_tie(
         &barriers_records,
     )
     .map(|r| crate::transport_gen::PyBowTieResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Check valve leak relief.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mole_fractions, nominal_diameter, upstream_pressure, leak_area_fraction, upstream_temperature, downstream_pressure, discharge_coefficient, scenario_name))]
+#[pyo3(
+    text_signature = "(components, mole_fractions, nominal_diameter, upstream_pressure, leak_area_fraction, upstream_temperature, downstream_pressure, discharge_coefficient, scenario_name)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn check_valve_leak_relief(
+    py: Python<'_>,
+    components: Vec<String>,
+    mole_fractions: Vec<f64>,
+    nominal_diameter: f64,
+    upstream_pressure: f64,
+    leak_area_fraction: Option<f64>,
+    upstream_temperature: Option<f64>,
+    downstream_pressure: Option<f64>,
+    discharge_coefficient: Option<f64>,
+    scenario_name: Option<&str>,
+) -> PyResult<crate::transport_gen::PyCheckValveLeakReliefResult> {
+    azoth_process::models::check_valve_leak_relief::check_valve_leak_relief(
+        &components,
+        &mole_fractions,
+        meters(nominal_diameter),
+        pascals(upstream_pressure),
+        leak_area_fraction,
+        upstream_temperature.map(kelvins),
+        downstream_pressure.map(pascals),
+        discharge_coefficient,
+        scenario_name,
+    )
+    .map(|r| crate::transport_gen::PyCheckValveLeakReliefResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -5759,6 +5824,44 @@ pub fn consequence_analysis(
         &outcomes_records,
     )
     .map(|r| crate::transport_gen::PyConsequenceAnalysisResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Control valve failure relief.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mole_fractions, upstream_pressure, upstream_temperature, downstream_pressure, effective_area, cv, cv_erosion_margin, discharge_coefficient, scenario_name))]
+#[pyo3(
+    text_signature = "(components, mole_fractions, upstream_pressure, upstream_temperature, downstream_pressure, effective_area, cv, cv_erosion_margin, discharge_coefficient, scenario_name)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn control_valve_failure_relief(
+    py: Python<'_>,
+    components: Vec<String>,
+    mole_fractions: Vec<f64>,
+    upstream_pressure: f64,
+    upstream_temperature: Option<f64>,
+    downstream_pressure: Option<f64>,
+    effective_area: Option<f64>,
+    cv: Option<f64>,
+    cv_erosion_margin: Option<f64>,
+    discharge_coefficient: Option<f64>,
+    scenario_name: Option<&str>,
+) -> PyResult<crate::transport_gen::PyControlValveFailureReliefResult> {
+    azoth_process::models::control_valve_failure_relief::control_valve_failure_relief(
+        &components,
+        &mole_fractions,
+        pascals(upstream_pressure),
+        upstream_temperature.map(kelvins),
+        downstream_pressure.map(pascals),
+        effective_area.map(square_meters),
+        cv,
+        cv_erosion_margin,
+        discharge_coefficient,
+        scenario_name,
+    )
+    .map(|r| crate::transport_gen::PyControlValveFailureReliefResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -6845,6 +6948,56 @@ pub fn overpressure_acceptance(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Overpressure protection study.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (mawp, scenarios, relief_set_pressure, back_pressure, multiple_devices))]
+#[pyo3(text_signature = "(mawp, scenarios, relief_set_pressure, back_pressure, multiple_devices)")]
+pub fn overpressure_protection_study(
+    py: Python<'_>,
+    mawp: f64,
+    scenarios: Vec<crate::records_gen::OverpressureScenario>,
+    relief_set_pressure: Option<f64>,
+    back_pressure: Option<f64>,
+    multiple_devices: Option<bool>,
+) -> PyResult<crate::transport_gen::PyOverpressureProtectionStudyResult> {
+    let scenarios_records: Vec<
+        azoth_process::models::overpressure_protection_study::OverpressureScenario,
+    > = scenarios
+        .into_iter()
+        .map(
+            |row| azoth_process::models::overpressure_protection_study::OverpressureScenario {
+                name: row.name,
+                cause: row.cause,
+                phase: row.phase,
+                relief_rate: kilograms_per_second(row.relief_rate),
+                relief_temperature: row.relief_temperature.map(kelvins),
+                molar_mass: row.molar_mass.map(kilograms_per_mole),
+                compressibility: row.compressibility,
+                specific_heat_ratio: row.specific_heat_ratio,
+                density: row.density.map(kilograms_per_cubic_meter),
+                viscosity: row.viscosity.map(pascal_seconds),
+                gas_mass_fraction: row.gas_mass_fraction,
+                gas_density: row.gas_density.map(kilograms_per_cubic_meter),
+                liquid_density: row.liquid_density.map(kilograms_per_cubic_meter),
+                latent_heat: row.latent_heat,
+                liquid_heat_capacity: row.liquid_heat_capacity,
+                credible: row.credible,
+            },
+        )
+        .collect();
+    azoth_process::models::overpressure_protection_study::overpressure_protection_study(
+        pascals(mawp),
+        &scenarios_records,
+        relief_set_pressure.map(pascals),
+        back_pressure.map(pascals),
+        multiple_devices,
+    )
+    .map(|r| crate::transport_gen::PyOverpressureProtectionStudyResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Packed column.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -7766,6 +7919,42 @@ pub fn tr3001_compliance(
         accumulation_fraction,
     )
     .map(|r| crate::transport_gen::PyTr3001ComplianceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Tube rupture relief.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mole_fractions, tube_inner_diameter, high_pressure, number_of_open_ends, high_temperature, low_pressure, discharge_coefficient, scenario_name))]
+#[pyo3(
+    text_signature = "(components, mole_fractions, tube_inner_diameter, high_pressure, number_of_open_ends, high_temperature, low_pressure, discharge_coefficient, scenario_name)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn tube_rupture_relief(
+    py: Python<'_>,
+    components: Vec<String>,
+    mole_fractions: Vec<f64>,
+    tube_inner_diameter: f64,
+    high_pressure: f64,
+    number_of_open_ends: Option<f64>,
+    high_temperature: Option<f64>,
+    low_pressure: Option<f64>,
+    discharge_coefficient: Option<f64>,
+    scenario_name: Option<&str>,
+) -> PyResult<crate::transport_gen::PyTubeRuptureReliefResult> {
+    azoth_process::models::tube_rupture_relief::tube_rupture_relief(
+        &components,
+        &mole_fractions,
+        meters(tube_inner_diameter),
+        pascals(high_pressure),
+        number_of_open_ends,
+        high_temperature.map(kelvins),
+        low_pressure.map(pascals),
+        discharge_coefficient,
+        scenario_name,
+    )
+    .map(|r| crate::transport_gen::PyTubeRuptureReliefResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

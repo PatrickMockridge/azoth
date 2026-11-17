@@ -1,0 +1,182 @@
+cvf_area_state
+kappa=1.2795798973843786
+gamma=1.3319393916069173
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+density_kg_per_m3=13.616754236185573
+phase_count=1
+has_gas=true
+has_liquid=false
+
+cvf_area
+name=CV fail area
+cause=control_valve_failure
+phase=vapour
+relief_rate_kg_per_s=2.8884947746557277
+relief_rate_kg_per_hr=10398.58118876062
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26501 / API 521 4.4.9
+assumption_count=2
+assumption0=Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501
+assumption1=Discharge coefficient Cd = 0.85
+
+cvf_area_default_downstream
+name=CV fail default downstream
+cause=control_valve_failure
+phase=vapour
+relief_rate_kg_per_s=2.8884947746557277
+relief_rate_kg_per_hr=10398.58118876062
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26501 / API 521 4.4.9
+assumption_count=2
+assumption0=Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501
+assumption1=Discharge coefficient Cd = 0.85
+
+cvf_cv
+name=CV fail cv
+cause=control_valve_failure
+phase=vapour
+relief_rate_kg_per_s=13.36830192843862
+relief_rate_kg_per_hr=48125.88694237904
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26501 / API 521 4.4.9
+assumption_count=3
+assumption0=Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501
+assumption1=Discharge coefficient Cd = 0.85
+assumption2=Effective area derived from Cv with screening relation Cv = 24.6 Cd A_in2
+
+cvf_cv_margin
+name=CV fail margin
+cause=control_valve_failure
+phase=vapour
+relief_rate_kg_per_s=16.710377410548272
+relief_rate_kg_per_hr=60157.35867797378
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26501 / API 521 4.4.9
+assumption_count=4
+assumption0=Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501
+assumption1=Discharge coefficient Cd = 0.85
+assumption2=Cv increased by erosion/vibration margin 1.25 per TR3001 SR-26501
+assumption3=Effective area derived from Cv with screening relation Cv = 24.6 Cd A_in2
+
+cvf_subcritical
+name=CV fail subcritical
+cause=control_valve_failure
+phase=vapour
+relief_rate_kg_per_s=2.596230056867641
+relief_rate_kg_per_hr=9346.428204723508
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26501 / API 521 4.4.9
+assumption_count=2
+assumption0=Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501
+assumption1=Discharge coefficient Cd = 0.85
+
+cvf_no_area
+name=CV fail no area
+cause=control_valve_failure
+phase=vapour
+relief_rate_kg_per_s=0.0
+relief_rate_kg_per_hr=0.0
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.017445699999999998
+compressibility=0.9591602013460842
+specific_heat_ratio=1.2795798973843786
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26501 / API 521 4.4.9
+assumption_count=3
+assumption0=Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501
+assumption1=Discharge coefficient Cd = 0.85
+assumption2=Neither effective area nor Cv set; relief rate is zero
+
+cvf_no_fluid
+name=CV fail no fluid
+cause=control_valve_failure
+phase=vapour
+relief_rate_kg_per_s=3.0671886822372287
+relief_rate_kg_per_hr=11041.879256054024
+relief_temperature_k=320.0
+molar_mass_kg_per_mol=0.02
+compressibility=1.0
+specific_heat_ratio=1.25
+density_kg_per_m3=NaN
+viscosity_pa_s=NaN
+gas_mass_fraction=NaN
+gas_density_kg_per_m3=NaN
+liquid_density_kg_per_m3=NaN
+latent_heat_j_per_kg=NaN
+liquid_heat_capacity_j_per_kg_k=NaN
+dynamically_determined=false
+credible=true
+standard_reference=TR3001 SR-26501 / API 521 4.4.9
+assumption_count=2
+assumption0=Fail-open control valve, upstream at maximum operating pressure per TR3001 SR-26501
+assumption1=Discharge coefficient Cd = 0.85
+

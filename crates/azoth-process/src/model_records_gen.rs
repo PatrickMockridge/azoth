@@ -16,11 +16,14 @@ use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeni
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
 use crate::models::bleve::BleveResult;
+use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
 use crate::models::blowdown_pressure_profile::BlowdownPressureProfileResult;
 use crate::models::bow_tie::BowTieResult;
+use crate::models::check_valve_leak_relief::CheckValveLeakReliefResult;
 use crate::models::component_splitter::ComponentSplitterResult;
 use crate::models::compressor::CompressorResult;
 use crate::models::consequence_analysis::ConsequenceAnalysisResult;
+use crate::models::control_valve_failure_relief::ControlValveFailureReliefResult;
 use crate::models::cooler::CoolerResult;
 use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::distillation_column::DistillationColumnResult;
@@ -51,6 +54,7 @@ use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mixer::MixerResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
 use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
+use crate::models::overpressure_protection_study::OverpressureProtectionStudyResult;
 use crate::models::packed_column::PackedColumnResult;
 use crate::models::pfp_demand::PfpDemandResult;
 use crate::models::pipe::PipeResult;
@@ -80,6 +84,7 @@ use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
 use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
+use crate::models::tube_rupture_relief::TubeRuptureReliefResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vce::VceResult;
 use crate::models::vessel_rupture::VesselRuptureResult;
@@ -207,6 +212,25 @@ impl CalcResult for BleveResult {
     }
 }
 
+impl CalcResult for BlockedOutletReliefResult {
+    const CALC_ID: &'static str = "process.blocked_outlet_relief";
+    const FIELDS: &'static [&'static str] = &[
+        "name",
+        "relief_rate",
+        "phase",
+        "relief_temperature",
+        "molar_mass",
+        "compressibility",
+        "specific_heat_ratio",
+        "assumptions",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for BlowdownPressureProfileResult {
     const CALC_ID: &'static str = "process.blowdown_pressure_profile";
     const FIELDS: &'static [&'static str] = &["pressure_absolute", "pressure_gauge", "warnings"];
@@ -223,6 +247,25 @@ impl CalcResult for BowTieResult {
         "mitigated_frequency_per_year",
         "total_rrf",
         "max_severity",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for CheckValveLeakReliefResult {
+    const CALC_ID: &'static str = "process.check_valve_leak_relief";
+    const FIELDS: &'static [&'static str] = &[
+        "name",
+        "relief_rate",
+        "phase",
+        "relief_temperature",
+        "molar_mass",
+        "compressibility",
+        "specific_heat_ratio",
+        "assumptions",
         "warnings",
     ];
 
@@ -330,6 +373,25 @@ impl CalcResult for ConsequenceAnalysisResult {
     const CALC_ID: &'static str = "process.consequence_analysis";
     const FIELDS: &'static [&'static str] =
         &["outcomes", "individual_fatality_risk_per_year", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ControlValveFailureReliefResult {
+    const CALC_ID: &'static str = "process.control_valve_failure_relief";
+    const FIELDS: &'static [&'static str] = &[
+        "name",
+        "relief_rate",
+        "phase",
+        "relief_temperature",
+        "molar_mass",
+        "compressibility",
+        "specific_heat_ratio",
+        "assumptions",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -1184,6 +1246,33 @@ impl CalcResult for OverpressureAcceptanceResult {
     }
 }
 
+impl CalcResult for OverpressureProtectionStudyResult {
+    const CALC_ID: &'static str = "process.overpressure_protection_study";
+    const FIELDS: &'static [&'static str] = &[
+        "governing_name",
+        "governing_cause",
+        "governing_phase",
+        "governing_relief_rate",
+        "required_area",
+        "required_area_in2",
+        "recommended_orifice",
+        "selected_area_in2",
+        "selected_orifice_capacity",
+        "capacity_adequate",
+        "acceptance_peak_pressure",
+        "acceptance_allowable_pressure",
+        "acceptance_accumulation_factor",
+        "acceptance_margin",
+        "accepted",
+        "messages",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for PackedColumnResult {
     const CALC_ID: &'static str = "process.packed_column";
     const FIELDS: &'static [&'static str] = &[
@@ -1995,6 +2084,25 @@ impl CalcResult for Tr3001ComplianceResult {
         "review_count",
         "fail_count",
         "compliant",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for TubeRuptureReliefResult {
+    const CALC_ID: &'static str = "process.tube_rupture_relief";
+    const FIELDS: &'static [&'static str] = &[
+        "name",
+        "relief_rate",
+        "phase",
+        "relief_temperature",
+        "molar_mass",
+        "compressibility",
+        "specific_heat_ratio",
+        "assumptions",
         "warnings",
     ];
 

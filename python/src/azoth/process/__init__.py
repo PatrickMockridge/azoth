@@ -24,11 +24,14 @@ from azoth.core.result import (
     AntiSurgeRecycleResult,
     Api537FlareFlameModelResult,
     BleveResult,
+    BlockedOutletReliefResult,
     BlowdownPressureProfileResult,
     BowTieResult,
+    CheckValveLeakReliefResult,
     ComponentSplitterResult,
     CompressorResult,
     ConsequenceAnalysisResult,
+    ControlValveFailureReliefResult,
     CoolerResult,
     DelugeNozzleLayoutResult,
     DistillationColumnResult,
@@ -59,6 +62,7 @@ from azoth.core.result import (
     MixerResult,
     Nog070SilDeterminationResult,
     OverpressureAcceptanceResult,
+    OverpressureProtectionStudyResult,
     PackedColumnResult,
     PfpDemandResult,
     PipeFireRuptureMaterialResult,
@@ -88,6 +92,7 @@ from azoth.core.result import (
     ThrottlingValveResult,
     ToxicLibraryResult,
     Tr3001ComplianceResult,
+    TubeRuptureReliefResult,
     TurboExpanderResult,
     VceResult,
     VesselRuptureResult,
@@ -198,6 +203,7 @@ _MANIFOLD = "process.manifold"
 _MIXER = "process.mixer"
 _NOG070_SIL_DETERMINATION = "process.nog070_sil_determination"
 _OVERPRESSURE_ACCEPTANCE = "process.overpressure_acceptance"
+_OVERPRESSURE_PROTECTION_STUDY = "process.overpressure_protection_study"
 _PACKED_COLUMN = "process.packed_column"
 _PFP_DEMAND = "process.pfp_demand"
 _PIPELINE_PRESSURE_PROTECTION = "process.pipeline_pressure_protection"
@@ -211,6 +217,7 @@ _HEAT_EXCHANGER = "process.heat_exchanger"
 _COMPONENT_SPLITTER = "process.component_splitter"
 _COMPRESSOR = "process.compressor"
 _CONSEQUENCE_ANALYSIS = "process.consequence_analysis"
+_CONTROL_VALVE_FAILURE_RELIEF = "process.control_valve_failure_relief"
 _ABSORPTION_COLUMN = "process.absorption_column"
 _ACTIVE_FIRE_PROTECTION_SCREENING = "process.active_fire_protection_screening"
 _STRIPPING_COLUMN = "process.stripping_column"
@@ -248,6 +255,7 @@ _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
 _TOXIC_LIBRARY = "process.toxic_library"
 _TR3001_COMPLIANCE = "process.tr3001_compliance"
+_TUBE_RUPTURE_RELIEF = "process.tube_rupture_relief"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
 _POOL_FIRE = "process.pool_fire"
@@ -259,6 +267,8 @@ _THREE_PHASE_SEPARATOR = "process.three_phase_separator"
 _ANTI_SURGE_RECYCLE = "process.anti_surge_recycle"
 _API537_FLARE_FLAME_MODEL = "process.api537_flare_flame_model"
 _BLEVE = "process.bleve"
+_BLOCKED_OUTLET_RELIEF = "process.blocked_outlet_relief"
+_CHECK_VALVE_LEAK_RELIEF = "process.check_valve_leak_relief"
 _BLOWDOWN_PRESSURE_PROFILE = "process.blowdown_pressure_profile"
 _PIPE_FIRE_RUPTURE = "process.pipe_fire_rupture"
 _PIPE_FIRE_RUPTURE_MATERIAL = "process.pipe_fire_rupture_material"
@@ -1363,6 +1373,65 @@ def bleve(
     )
 
 
+def blocked_outlet_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    inflow_rate: Q,
+    relief_pressure: Q,
+    relief_temperature: Q,
+    scenario_name: str | None = None,
+) -> BlockedOutletReliefResult:
+    """The full-inflow relief rate and the relieving-fluid state at it.
+
+    **The relief rate is the maximum credible inflow**, TR3001 SR-26460's basis, and the
+    fluid is flashed at the relieving pressure and temperature for its ``getKappa``, molar
+    mass, ``Z`` and phase. ``specific_heat_ratio`` is that isentropic exponent, not the
+    plain ``Cp/Cv``.
+
+    See :func:`azoth.process.reference.blocked_outlet_relief`.
+    """
+    return resolve(_BLOCKED_OUTLET_RELIEF)(  # type: ignore[no-any-return]
+        components=components,
+        mole_fractions=mole_fractions,
+        inflow_rate=inflow_rate,
+        relief_pressure=relief_pressure,
+        relief_temperature=relief_temperature,
+        scenario_name=scenario_name,
+    )
+
+
+def check_valve_leak_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    nominal_diameter: Q,
+    upstream_pressure: Q,
+    leak_area_fraction: float | None = None,
+    upstream_temperature: Q | None = None,
+    downstream_pressure: Q | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> CheckValveLeakReliefResult:
+    """The leakage rate through a fraction of the nominal check-valve area.
+
+    **The fraction defaults to 1% and is clamped up to 0.1%** with the class's warning,
+    and the flow is the isentropic nozzle through the leak area. A zero diameter answers
+    zero.
+
+    See :func:`azoth.process.reference.check_valve_leak_relief`.
+    """
+    return resolve(_CHECK_VALVE_LEAK_RELIEF)(  # type: ignore[no-any-return]
+        components=components,
+        mole_fractions=mole_fractions,
+        nominal_diameter=nominal_diameter,
+        upstream_pressure=upstream_pressure,
+        leak_area_fraction=leak_area_fraction,
+        upstream_temperature=upstream_temperature,
+        downstream_pressure=downstream_pressure,
+        discharge_coefficient=discharge_coefficient,
+        scenario_name=scenario_name,
+    )
+
+
 def component_splitter(
     components: list[str],
     feed_n: Q,
@@ -1612,6 +1681,38 @@ def map_turbo_expander_compressor(
     )
 
 
+def tube_rupture_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    tube_inner_diameter: Q,
+    high_pressure: Q,
+    number_of_open_ends: float | None = None,
+    high_temperature: Q | None = None,
+    low_pressure: Q | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> TubeRuptureReliefResult:
+    """The full-bore tube-rupture rate through one or two open ends.
+
+    **A full-bore single-tube rupture presents two open ends**, the class's default, and
+    the flow is the isentropic nozzle through their combined bore. A count below one is
+    refused rather than reset. Vaporization on the low-pressure side is not modelled.
+
+    See :func:`azoth.process.reference.tube_rupture_relief`.
+    """
+    return resolve(_TUBE_RUPTURE_RELIEF)(  # type: ignore[no-any-return]
+        components=components,
+        mole_fractions=mole_fractions,
+        tube_inner_diameter=tube_inner_diameter,
+        high_pressure=high_pressure,
+        number_of_open_ends=number_of_open_ends,
+        high_temperature=high_temperature,
+        low_pressure=low_pressure,
+        discharge_coefficient=discharge_coefficient,
+        scenario_name=scenario_name,
+    )
+
+
 def turbo_expander_compressor(
     expander_components: list[str],
     compressor_components: list[str],
@@ -1715,6 +1816,41 @@ def consequence_analysis(
         release_frequency_per_year=release_frequency_per_year,
         receiver_distance=receiver_distance,
         outcomes=outcomes,
+    )
+
+
+def control_valve_failure_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    upstream_pressure: Q,
+    upstream_temperature: Q | None = None,
+    downstream_pressure: Q | None = None,
+    effective_area: Q | None = None,
+    cv: float | None = None,
+    cv_erosion_margin: float | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> ControlValveFailureReliefResult:
+    """The fail-open rate from an explicit area or a Cv with an erosion margin.
+
+    **The area is the explicit one when it is positive, else the Cv through the class's
+    screening relation.** The fluid is flashed at the upstream pressure and temperature for
+    its ``getKappa``, molar mass and ``Z``, and the downstream pressure defaults to
+    1.01325 bara.
+
+    See :func:`azoth.process.reference.control_valve_failure_relief`.
+    """
+    return resolve(_CONTROL_VALVE_FAILURE_RELIEF)(  # type: ignore[no-any-return]
+        components=components,
+        mole_fractions=mole_fractions,
+        upstream_pressure=upstream_pressure,
+        upstream_temperature=upstream_temperature,
+        downstream_pressure=downstream_pressure,
+        effective_area=effective_area,
+        cv=cv,
+        cv_erosion_margin=cv_erosion_margin,
+        discharge_coefficient=discharge_coefficient,
+        scenario_name=scenario_name,
     )
 
 
@@ -2402,6 +2538,31 @@ def nog070_sil_determination(
         sif_type=sif_type,
         pfd_average=pfd_average,
         minimum_sil=minimum_sil,
+    )
+
+
+def overpressure_protection_study(
+    mawp: Q,
+    scenarios: list[dict[str, object]],
+    relief_set_pressure: Q | None = None,
+    back_pressure: Q | None = None,
+    multiple_devices: bool | None = None,
+) -> OverpressureProtectionStudyResult:
+    """The governing case, its sizing and the accumulated-pressure verdict.
+
+    **The governing case is the first credible row with the largest rate**, the fire basis
+    is 21 % and every other cause 10 %, and the sizing is the ported API 520 arithmetic.
+    A liquid case with no density falls back to 700 kg/m3; a two-phase case missing an
+    omega input is not sized and still runs acceptance.
+
+    See :func:`azoth.process.reference.overpressure_protection_study`.
+    """
+    return resolve(_OVERPRESSURE_PROTECTION_STUDY)(  # type: ignore[no-any-return]
+        mawp=mawp,
+        scenarios=scenarios,
+        relief_set_pressure=relief_set_pressure,
+        back_pressure=back_pressure,
+        multiple_devices=multiple_devices,
     )
 
 

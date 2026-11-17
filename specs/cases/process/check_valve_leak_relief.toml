@@ -1,0 +1,108 @@
+model = "process.check_valve_leak_relief"
+
+[[cases]]
+id = "cvl_default"
+tolerance = 1.0e-7
+source = "A 6-inch check valve on a methane/ethane gas at 20 bara and 320 K, the default 1% leak fraction into 1.01325 bara. From `validation/neqsim/captures/process_check_valve_leak_relief.tsv` (`cvl_default`)."
+[cases.inputs]
+scenario_name = "Check valve default"
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+nominal_diameter = 0.1524
+upstream_pressure = 2000000.0
+upstream_temperature = 320.0
+downstream_pressure = 101325.0
+[cases.expected]
+name = "Check valve default"
+relief_rate = 0.5269038860347555
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Leak area = 1.00% of nominal flow area per TR3001 SR-26466",
+    "Upstream pressure taken at high-pressure source MAAP",
+    "Discharge coefficient Cd = 0.85",
+]
+
+[[cases]]
+id = "cvl_clamped"
+tolerance = 1.0e-7
+source = "A 0.0005 fraction, clamped to 0.001: the rate is a tenth of the default and the warning is appended. From (`cvl_clamped`)."
+[cases.inputs]
+scenario_name = "Check valve clamped"
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+nominal_diameter = 0.1524
+upstream_pressure = 2000000.0
+upstream_temperature = 320.0
+downstream_pressure = 101325.0
+leak_area_fraction = 0.0005
+[cases.expected]
+name = "Check valve clamped"
+relief_rate = 0.052690388603475545
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Leak area = 0.10% of nominal flow area per TR3001 SR-26466",
+    "Upstream pressure taken at high-pressure source MAAP",
+    "Discharge coefficient Cd = 0.85",
+    "Leak area fraction below TR3001 minimum 0.1%; clamped to 0.001",
+]
+
+[[cases]]
+id = "cvl_subcritical"
+tolerance = 1.0e-7
+source = "The default fraction discharging into 15 bara: the subcritical branch. From (`cvl_subcritical`)."
+[cases.inputs]
+scenario_name = "Check valve subcritical"
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+nominal_diameter = 0.1524
+upstream_pressure = 2000000.0
+upstream_temperature = 320.0
+downstream_pressure = 1500000.0
+[cases.expected]
+name = "Check valve subcritical"
+relief_rate = 0.47359050741812003
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Leak area = 1.00% of nominal flow area per TR3001 SR-26466",
+    "Upstream pressure taken at high-pressure source MAAP",
+    "Discharge coefficient Cd = 0.85",
+]
+
+[[cases]]
+id = "cvl_zero_diameter"
+tolerance = 1.0e-7
+source = "A zero diameter: the class warns and answers zero. From (`cvl_zero_diameter`)."
+[cases.inputs]
+scenario_name = "Check valve zero"
+components = ["methane", "ethane"]
+mole_fractions = [0.9, 0.1]
+nominal_diameter = 0.0
+upstream_pressure = 2000000.0
+upstream_temperature = 320.0
+downstream_pressure = 101325.0
+[cases.expected]
+name = "Check valve zero"
+relief_rate = 0.0
+phase = "vapour"
+relief_temperature = 320.0
+molar_mass = 0.017445699999999998
+compressibility = 0.9591602013460842
+specific_heat_ratio = 1.2795798973843786
+assumptions = [
+    "Leak area = 1.00% of nominal flow area per TR3001 SR-26466",
+    "Upstream pressure taken at high-pressure source MAAP",
+    "Discharge coefficient Cd = 0.85",
+    "Nominal check-valve diameter not set; relief rate is zero",
+]

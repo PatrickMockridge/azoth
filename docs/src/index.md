@@ -332,11 +332,14 @@ Five sections, and the difference between them is the point:
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
 - [`process.api537_flare_flame_model`](./process/api537_flare_flame_model.md) — API 537 flare flame model
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation
+- [`process.blocked_outlet_relief`](./process/blocked_outlet_relief.md) — Blocked outlet relief
 - [`process.blowdown_pressure_profile`](./process/blowdown_pressure_profile.md) — Blowdown pressure profile
 - [`process.bow_tie`](./process/bow_tie.md) — Bow-tie risk
+- [`process.check_valve_leak_relief`](./process/check_valve_leak_relief.md) — Check valve leak relief
 - [`process.component_splitter`](./process/component_splitter.md) — Component splitter
 - [`process.compressor`](./process/compressor.md) — Compressor
 - [`process.consequence_analysis`](./process/consequence_analysis.md) — Consequence analysis
+- [`process.control_valve_failure_relief`](./process/control_valve_failure_relief.md) — Control valve failure relief
 - [`process.cooler`](./process/cooler.md) — Cooler
 - [`process.deluge_nozzle_layout`](./process/deluge_nozzle_layout.md) — Deluge nozzle layout
 - [`process.distillation_column`](./process/distillation_column.md) — Distillation column
@@ -367,6 +370,7 @@ Five sections, and the difference between them is the point:
 - [`process.mixer`](./process/mixer.md) — Mixer
 - [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
 - [`process.overpressure_acceptance`](./process/overpressure_acceptance.md) — Overpressure acceptance
+- [`process.overpressure_protection_study`](./process/overpressure_protection_study.md) — Overpressure protection study
 - [`process.packed_column`](./process/packed_column.md) — Packed column
 - [`process.pfp_demand`](./process/pfp_demand.md) — Passive fire protection demand
 - [`process.pipe`](./process/pipe.md) — Pipe
@@ -396,6 +400,7 @@ Five sections, and the difference between them is the point:
 - [`process.throttling_valve`](./process/throttling_valve.md) — Throttling valve
 - [`process.toxic_library`](./process/toxic_library.md) — Toxic-exposure thresholds
 - [`process.tr3001_compliance`](./process/tr3001_compliance.md) — TR3001 compliance
+- [`process.tube_rupture_relief`](./process/tube_rupture_relief.md) — Tube rupture relief
 - [`process.turbo_expander_compressor`](./process/turbo_expander_compressor.md) — Turbo-expander compressor
 - [`process.vce`](./process/vce.md) — Vapour-cloud explosion overpressure
 - [`process.vessel_rupture`](./process/vessel_rupture.md) — Vessel rupture

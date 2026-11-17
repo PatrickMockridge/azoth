@@ -36,6 +36,7 @@ from azoth.core.result_base import HydrateStructure as HydrateStructure
 from azoth.core.result_base import MultiflashSeedPath as MultiflashSeedPath
 from azoth.core.result_base import Phase as Phase
 from azoth.core.result_base import PlusModel as PlusModel
+from azoth.core.result_base import ReliefPhase as ReliefPhase
 from azoth.core.result_base import RootStructure as RootStructure
 from azoth.core.result_base import RuptureStatus as RuptureStatus
 from azoth.core.result_base import StabilityVerdict as StabilityVerdict

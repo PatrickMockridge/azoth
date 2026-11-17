@@ -1,0 +1,183 @@
+study_gas
+scenario_count=2
+governing_present=true
+governing_name=Blocked outlet gas
+governing_cause=blocked_outlet
+governing_phase=vapour
+governing_relief_rate_kg_per_s=2.0
+required_area_m2=5.36864508122035E-4
+required_area_in2=0.832141651872458
+recommended_orifice=J
+selected_area_in2=1.287
+selected_orifice_capacity_kg_per_s=3.093223364325135
+capacity_adequate=true
+acceptance_present=true
+acceptance_peak_pressure_bara=22.0
+acceptance_allowable_pressure_bara=22.0
+acceptance_accumulation_fraction=1.1
+acceptance_margin_bara=0.0
+accepted=true
+acceptance_basis=110% of MAWP (20.00 bara x 1.10) for Blocked outlet, single device
+message_count=0
+
+study_liquid
+scenario_count=1
+governing_present=true
+governing_name=Liquid release
+governing_cause=blocked_outlet
+governing_phase=liquid
+governing_relief_rate_kg_per_s=5.0
+required_area_m2=1.5325215271438418E-4
+required_area_in2=0.23754131178991908
+recommended_orifice=F
+selected_area_in2=0.307
+selected_orifice_capacity_kg_per_s=6.462033860272482
+capacity_adequate=true
+acceptance_present=true
+acceptance_peak_pressure_bara=22.0
+acceptance_allowable_pressure_bara=22.0
+acceptance_accumulation_fraction=1.1
+acceptance_margin_bara=0.0
+accepted=true
+acceptance_basis=110% of MAWP (20.00 bara x 1.10) for Blocked outlet, single device
+message_count=0
+
+study_two_phase
+scenario_count=1
+governing_present=true
+governing_name=Two phase release
+governing_cause=blocked_outlet
+governing_phase=two_phase
+governing_relief_rate_kg_per_s=1.0
+required_area_m2=1.3583252875593678E-5
+required_area_in2=0.021054084065338333
+recommended_orifice=D
+selected_area_in2=0.11
+selected_orifice_capacity_kg_per_s=5.224639535903379
+capacity_adequate=true
+acceptance_present=true
+acceptance_peak_pressure_bara=22.0
+acceptance_allowable_pressure_bara=22.0
+acceptance_accumulation_fraction=1.1
+acceptance_margin_bara=0.0
+accepted=true
+acceptance_basis=110% of MAWP (20.00 bara x 1.10) for Blocked outlet, single device
+message_count=0
+
+study_no_credible
+scenario_count=1
+governing_present=false
+required_area_m2=NaN
+required_area_in2=NaN
+recommended_orifice=null
+selected_area_in2=NaN
+selected_orifice_capacity_kg_per_s=NaN
+capacity_adequate=false
+acceptance_present=false
+message_count=1
+message0=No credible relief scenario defined; nothing to size
+
+study_zero_rate
+scenario_count=1
+governing_present=true
+governing_name=Zero rate
+governing_cause=blocked_outlet
+governing_phase=vapour
+governing_relief_rate_kg_per_s=0.0
+required_area_m2=NaN
+required_area_in2=NaN
+recommended_orifice=null
+selected_area_in2=NaN
+selected_orifice_capacity_kg_per_s=NaN
+capacity_adequate=false
+acceptance_present=true
+acceptance_peak_pressure_bara=22.0
+acceptance_allowable_pressure_bara=22.0
+acceptance_accumulation_fraction=1.1
+acceptance_margin_bara=0.0
+accepted=true
+acceptance_basis=110% of MAWP (20.00 bara x 1.10) for Blocked outlet, single device
+message_count=1
+message0=Governing relief rate is zero; relief device cannot be sized
+
+study_capacity_shortfall
+scenario_count=1
+governing_present=true
+governing_name=Capacity shortfall
+governing_cause=blocked_outlet
+governing_phase=vapour
+governing_relief_rate_kg_per_s=1000.0
+required_area_m2=0.24149798146623763
+required_area_in2=374.3226199179082
+recommended_orifice=T
+selected_area_in2=26.0
+selected_orifice_capacity_kg_per_s=69.45880002042622
+capacity_adequate=false
+acceptance_present=true
+acceptance_peak_pressure_bara=22.0
+acceptance_allowable_pressure_bara=22.0
+acceptance_accumulation_fraction=1.1
+acceptance_margin_bara=0.0
+accepted=true
+acceptance_basis=110% of MAWP (20.00 bara x 1.10) for Blocked outlet, single device
+message_count=1
+message0=Required relief area exceeds the largest standard orifice; multiple or larger relief devices are required
+
+study_acceptance_fail
+scenario_count=1
+governing_present=true
+governing_name=Blocked outlet gas
+governing_cause=blocked_outlet
+governing_phase=vapour
+governing_relief_rate_kg_per_s=2.0
+required_area_m2=0.00107372901624407
+required_area_in2=1.664283303744916
+recommended_orifice=K
+selected_area_in2=1.838
+selected_orifice_capacity_kg_per_s=2.208758563958663
+capacity_adequate=true
+acceptance_present=true
+acceptance_peak_pressure_bara=11.0
+acceptance_allowable_pressure_bara=8.8
+acceptance_accumulation_fraction=1.1
+acceptance_margin_bara=-2.1999999999999993
+accepted=false
+acceptance_basis=110% of MAWP (8.00 bara x 1.10) for Blocked outlet, single device
+message_count=1
+message0=Relieving pressure exceeds the allowable accumulated pressure: 110% of MAWP (8.00 bara x 1.10) for Blocked outlet, single device
+
+study_fire
+scenario_count=1
+governing_present=true
+governing_name=Fire case
+governing_cause=fire
+governing_phase=vapour
+governing_relief_rate_kg_per_s=2.0
+required_area_m2=4.39087239029523E-4
+required_area_in2=0.680586581668924
+recommended_orifice=H
+selected_area_in2=0.785
+selected_orifice_capacity_kg_per_s=2.306833608370694
+capacity_adequate=true
+acceptance_present=true
+acceptance_peak_pressure_bara=24.2
+acceptance_allowable_pressure_bara=24.2
+acceptance_accumulation_fraction=1.21
+acceptance_margin_bara=0.0
+accepted=true
+acceptance_basis=121% of MAWP (20.00 bara x 1.21) for Fire
+message_count=0
+
+study_empty
+scenario_count=0
+governing_present=false
+required_area_m2=NaN
+required_area_in2=NaN
+recommended_orifice=null
+selected_area_in2=NaN
+selected_orifice_capacity_kg_per_s=NaN
+capacity_adequate=false
+acceptance_present=false
+message_count=1
+message0=No credible relief scenario defined; nothing to size
+

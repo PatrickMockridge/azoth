@@ -214,6 +214,19 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `crates/azoth-process/tests/pfp_demand.rs` asserts it against the capture, and
         # `test_cross_impl` compares it on both results.
         "pfp_required",
+        # The relief loads' assumption strings, a `vector_string` with no slot in
+        # `TestCase`. `crates/azoth-process/tests/blocked_outlet_relief.rs` asserts the
+        # fallback rows' strings against the capture, and `test_cross_impl` compares the
+        # tuple on both results.
+        "assumptions",
+        # The study's message strings, a `vector_string` for the same reason.
+        # `crates/azoth-process/tests/overpressure_protection_study.rs` asserts them, and
+        # `test_cross_impl` compares the tuple.
+        "messages",
+        # The study's capacity verdict, a boolean with no slot in `TestCase`; the model's own
+        # test asserts it against the capture and `test_cross_impl` compares it. The study's
+        # `accepted` is the acceptance id's own flag, already declared below.
+        "capacity_adequate",
         # `deluge_nozzle_layout`'s three flags, booleans with no slot in `TestCase`.
         # `crates/azoth-process/tests/deluge_nozzle_layout.rs` asserts them against the
         # capture, and `test_cross_impl` compares them on both results.

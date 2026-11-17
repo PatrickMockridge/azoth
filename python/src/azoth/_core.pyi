@@ -517,6 +517,26 @@ class MapCurvePoint(TypedDict):
     head: float
     efficiency: float
 
+class OverpressureScenario(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    cause: str
+    phase: str
+    relief_rate: float
+    relief_temperature: float | None
+    molar_mass: float | None
+    compressibility: float | None
+    specific_heat_ratio: float | None
+    density: float | None
+    viscosity: float | None
+    gas_mass_fraction: float | None
+    gas_density: float | None
+    liquid_density: float | None
+    latent_heat: float | None
+    liquid_heat_capacity: float | None
+    credible: bool | None
+
 class PipeFitting(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -3092,6 +3112,18 @@ class BleveResult:
     warnings: list[Warning]
 
 @final
+class BlockedOutletReliefResult:
+    name: str
+    relief_rate: Qty
+    phase: str
+    relief_temperature: Qty
+    molar_mass: Qty
+    compressibility: float
+    specific_heat_ratio: float
+    assumptions: list[str]
+    warnings: list[Warning]
+
+@final
 class BlowdownPressureProfileResult:
     pressure_absolute: Qty
     pressure_gauge: Qty
@@ -3103,6 +3135,18 @@ class BowTieResult:
     mitigated_frequency_per_year: float
     total_rrf: float
     max_severity: float
+    warnings: list[Warning]
+
+@final
+class CheckValveLeakReliefResult:
+    name: str
+    relief_rate: Qty
+    phase: str
+    relief_temperature: Qty
+    molar_mass: Qty
+    compressibility: float
+    specific_heat_ratio: float
+    assumptions: list[str]
     warnings: list[Warning]
 
 @final
@@ -3190,6 +3234,18 @@ class CompressorResult:
 class ConsequenceAnalysisResult:
     outcomes: list[ConsequenceOutcomeResult]
     individual_fatality_risk_per_year: float
+    warnings: list[Warning]
+
+@final
+class ControlValveFailureReliefResult:
+    name: str
+    relief_rate: Qty
+    phase: str
+    relief_temperature: Qty
+    molar_mass: Qty
+    compressibility: float
+    specific_heat_ratio: float
+    assumptions: list[str]
     warnings: list[Warning]
 
 @final
@@ -3834,6 +3890,26 @@ class OverpressureAcceptanceResult:
     warnings: list[Warning]
 
 @final
+class OverpressureProtectionStudyResult:
+    governing_name: str | None
+    governing_cause: str | None
+    governing_phase: str | None
+    governing_relief_rate: Qty | None
+    required_area: Qty | None
+    required_area_in2: float | None
+    recommended_orifice: str | None
+    selected_area_in2: float | None
+    selected_orifice_capacity: Qty | None
+    capacity_adequate: bool
+    acceptance_peak_pressure: Qty | None
+    acceptance_allowable_pressure: Qty | None
+    acceptance_accumulation_factor: float | None
+    acceptance_margin: Qty | None
+    accepted: bool | None
+    messages: list[str]
+    warnings: list[Warning]
+
+@final
 class PackedColumnResult:
     tray_temperature: list[Qty]
     tray_pressure: list[Qty]
@@ -4464,6 +4540,18 @@ class Tr3001ComplianceResult:
     review_count: float
     fail_count: float
     compliant: bool
+    warnings: list[Warning]
+
+@final
+class TubeRuptureReliefResult:
+    name: str
+    relief_rate: Qty
+    phase: str
+    relief_temperature: Qty
+    molar_mass: Qty
+    compressibility: float
+    specific_heat_ratio: float
+    assumptions: list[str]
     warnings: list[Warning]
 
 @final
@@ -6877,6 +6965,14 @@ def bleve(
     distance: float | None = None,
     target_flux: float | None = None,
 ) -> BleveResult: ...
+def blocked_outlet_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    inflow_rate: float,
+    relief_pressure: float,
+    relief_temperature: float,
+    scenario_name: str | None = None,
+) -> BlockedOutletReliefResult: ...
 def blowdown_pressure_profile(
     points: list[BlowdownProfilePoint],
     time: float,
@@ -6888,6 +6984,17 @@ def bow_tie(
     consequences: list[BowTieConsequence],
     barriers: list[BowTieBarrier],
 ) -> BowTieResult: ...
+def check_valve_leak_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    nominal_diameter: float,
+    upstream_pressure: float,
+    leak_area_fraction: float | None = None,
+    upstream_temperature: float | None = None,
+    downstream_pressure: float | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> CheckValveLeakReliefResult: ...
 def component_splitter(
     components: list[str],
     feed_n: float,
@@ -6934,6 +7041,18 @@ def consequence_analysis(
     receiver_distance: float,
     outcomes: list[ConsequenceOutcomeSpec],
 ) -> ConsequenceAnalysisResult: ...
+def control_valve_failure_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    upstream_pressure: float,
+    upstream_temperature: float | None = None,
+    downstream_pressure: float | None = None,
+    effective_area: float | None = None,
+    cv: float | None = None,
+    cv_erosion_margin: float | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> ControlValveFailureReliefResult: ...
 def cooler(
     components: list[str],
     inlet_n: float,
@@ -7459,6 +7578,13 @@ def overpressure_acceptance(
     cause: str,
     multiple_devices: bool,
 ) -> OverpressureAcceptanceResult: ...
+def overpressure_protection_study(
+    mawp: float,
+    scenarios: list[OverpressureScenario],
+    relief_set_pressure: float | None = None,
+    back_pressure: float | None = None,
+    multiple_devices: bool | None = None,
+) -> OverpressureProtectionStudyResult: ...
 def packed_column(
     components: list[str],
     feed_n: float,
@@ -7994,6 +8120,17 @@ def tr3001_compliance(
     acceptance_accepted: bool | None = None,
     accumulation_fraction: float | None = None,
 ) -> Tr3001ComplianceResult: ...
+def tube_rupture_relief(
+    components: list[str],
+    mole_fractions: list[float],
+    tube_inner_diameter: float,
+    high_pressure: float,
+    number_of_open_ends: float | None = None,
+    high_temperature: float | None = None,
+    low_pressure: float | None = None,
+    discharge_coefficient: float | None = None,
+    scenario_name: str | None = None,
+) -> TubeRuptureReliefResult: ...
 def turbo_expander_compressor(
     expander_components: list[str],
     compressor_components: list[str],

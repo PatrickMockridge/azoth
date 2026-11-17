@@ -1,0 +1,96 @@
+id = "process.blocked_outlet_relief"
+name = "Blocked outlet relief"
+kind = "procedure"
+assumptions = [
+    "**the relief rate is the maximum credible inflow**, TR3001 SR-26460's safe and simple basis; this cause computes no orifice flow.",
+    "**the relieving-fluid properties are a TP flash at the stated pressure and temperature**: `getKappa`, the molar mass, `Z` and the phase.",
+    "**`specific_heat_ratio` is NeqSim's `getKappa`, the isentropic exponent `-Cp/Cv V/P dPdV`**, not `getGamma`'s plain `Cp/Cv`; `validation/neqsim/captures/process_blocked_outlet_relief.tsv` prints both beside each state, 1.27958 against 1.33194 on the gas row.",
+    "**the fluid is required and is evaluated at the relieving conditions.** A declared fluid here carries no state of its own, so the pressure and temperature are inputs; the class's explicit k/M path, for a caller with no fluid, is outside this id and the declaration is the statement.",
+    "**a non-physical kappa or molar mass falls back** to 1.3 or 0.020 kg/mol with the class's own warning string, carried in `assumptions`; a non-positive `Z` silently becomes 1.0. A failed flash falls back to default vapour properties with its warning.",
+    "**the density the class computes is read by no formula** and is not published. The phase is `two_phase` above one phase, `vapour` when a gas phase exists, else `liquid`.",
+    "**the class's assumption strings are published in order**, and its warning strings are appended to them as the class appends them.",
+]
+references = [
+    "TR3001. Overpressure protection, the blocked-outlet cause and SR-26460.",
+    "API STD 521 (7th edition, 2020). Pressure-relieving and depressuring systems, section 4.4.2.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/overpressure/BlockedOutletRelief.java` is the port source.",
+    "`validation/neqsim/captures/process_blocked_outlet_relief.tsv` - a gas, a liquid and a two-phase fluid, the no-fluid branch, a zero inflow and a negative inflow.",
+]
+[source]
+standard = "NeqSim process/safety/overpressure/BlockedOutletRelief.java"
+edition = "Its `calculate` with a fluid supplied, through `ReliefFluidState.evaluate`."
+[algorithm]
+scheme = "blocked_outlet_full_inflow"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.components]
+type = "components"
+description = "the fluid's substances, by name, resolved against the component databank. The fluid is required: the relieving properties are a flash of it.\n"
+[inputs.mole_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the fluid's overall composition, summing to one.\n"
+[inputs.inflow_rate]
+unit = "kg/s"
+description = "the maximum credible inflow to the protected item, at least zero. **It is the relief rate**, the class's own basis.\n"
+[inputs.relief_pressure]
+unit = "Pa"
+description = "the relieving pressure the fluid is flashed at, absolute and above zero.\n"
+[inputs.relief_temperature]
+unit = "K"
+description = "the relieving temperature the fluid is flashed at, above zero.\n"
+[inputs.scenario_name]
+type = "string"
+optional = true
+description = "the scenario name carried on the result. Absent is the class's own `Blocked outlet`.\n"
+[outputs]
+[outputs.name]
+type = "string"
+description = "the scenario name, echoed.\n"
+[outputs.relief_rate]
+unit = "kg/s"
+description = "the inflow rate, which is the relief rate.\n"
+[outputs.phase]
+type = "enum"
+values = ["vapour", "liquid", "two_phase"]
+description = "the relieving phase the flash classified.\n"
+[outputs.relief_temperature]
+unit = "K"
+description = "the relieving temperature, echoed.\n"
+[outputs.molar_mass]
+unit = "kg/mol"
+description = "the relieving fluid's molar mass.\n"
+[outputs.compressibility]
+unit = "dimensionless"
+description = "the relieving fluid's `Z`.\n"
+[outputs.specific_heat_ratio]
+unit = "dimensionless"
+description = "the relieving fluid's `getKappa`, the isentropic exponent.\n"
+[outputs.assumptions]
+type = "vector_string"
+length = "one per assumption"
+description = "the class's assumption strings in order, with its warning strings appended.\n"
+[[valid_range]]
+quantity = "inflow_rate"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a zero inflow is a defined screening state; the class warns and answers zero for it"
+[[valid_range]]
+quantity = "relief_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure must be positive"
+[[valid_range]]
+quantity = "relief_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature must be positive"
+[implementations]
+python = "azoth.process.blocked_outlet_relief"
+rust = "azoth_process::blocked_outlet_relief"
