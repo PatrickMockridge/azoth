@@ -2114,6 +2114,48 @@ impl From<&azoth_process::models::pipe_fire_rupture::PipeFireRupturePoint>
     }
 }
 
+/// one row per finding, in the class's order and with its duplicates.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RegisterFinding"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRegisterFinding {
+    /// which record the finding is about.
+    #[pyo3(get)]
+    pub scope: String,
+    /// the record's id; the register's own finding carries the register id.
+    #[pyo3(get)]
+    pub subject_id: String,
+    /// the rule the row violates.
+    #[pyo3(get)]
+    pub rule: String,
+}
+
+#[pymethods]
+impl PyRegisterFinding {
+    fn __repr__(&self) -> String {
+        format!(
+            "RegisterFinding(scope={}, subject_id={}, rule={})",
+            self.scope, self.subject_id, self.rule
+        )
+    }
+}
+
+impl From<&azoth_process::models::barrier_register_validation::RegisterFinding>
+    for PyRegisterFinding
+{
+    fn from(row: &azoth_process::models::barrier_register_validation::RegisterFinding) -> Self {
+        Self {
+            scope: row.scope.as_str().to_string(),
+            subject_id: row.subject_id.clone(),
+            rule: row.rule.as_str().to_string(),
+        }
+    }
+}
+
 /// one row per input row, in caller order.
 #[pyclass(
     frozen,
@@ -2262,6 +2304,130 @@ impl From<&azoth_eos::results::RemediationOptionRow> for PyRemediationOptionRow 
     }
 }
 
+/// one row per assessment, the coverage result first and then each item in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ReviewAssessment"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyReviewAssessment {
+    /// the item the assessment belongs to; `CLAUSE10-COVERAGE` for the coverage result.
+    #[pyo3(get)]
+    pub function_id: String,
+    /// the stable requirement identifier, e.g. `PSS-10.1-ROLE`.
+    #[pyo3(get)]
+    pub requirement_id: String,
+    /// the clause, e.g. `10.4.7`, or the class's literal label (`Safety lifecycle`, `Operational evidence`, `Evidence quality`).
+    #[pyo3(get)]
+    pub clause: String,
+    /// the assessment's status.
+    #[pyo3(get)]
+    pub status: String,
+    /// the class's severity band; a pass and an info are low, a not-applicable row is low.
+    #[pyo3(get)]
+    pub severity: String,
+}
+
+#[pymethods]
+impl PyReviewAssessment {
+    fn __repr__(&self) -> String {
+        format!(
+            "ReviewAssessment(function_id={}, requirement_id={}, clause={}, status={}, severity={})",
+            self.function_id, self.requirement_id, self.clause, self.status, self.severity
+        )
+    }
+}
+
+impl From<&azoth_process::models::s001_clause10_review::ReviewAssessment> for PyReviewAssessment {
+    fn from(row: &azoth_process::models::s001_clause10_review::ReviewAssessment) -> Self {
+        Self {
+            function_id: row.function_id.clone(),
+            requirement_id: row.requirement_id.clone(),
+            clause: row.clause.clone(),
+            status: row.status.as_str().to_string(),
+            severity: row.severity.as_str().to_string(),
+        }
+    }
+}
+
+/// the five coverage rows of the synthetic result.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ReviewCoverage"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyReviewCoverage {
+    /// the type token the coverage row is about.
+    #[pyo3(get)]
+    pub function_type: String,
+    /// pass when an item's type or evidence matches, else warning.
+    #[pyo3(get)]
+    pub status: String,
+}
+
+#[pymethods]
+impl PyReviewCoverage {
+    fn __repr__(&self) -> String {
+        format!(
+            "ReviewCoverage(function_type={}, status={})",
+            self.function_type, self.status
+        )
+    }
+}
+
+impl From<&azoth_process::models::s001_clause10_review::ReviewCoverage> for PyReviewCoverage {
+    fn from(row: &azoth_process::models::s001_clause10_review::ReviewCoverage) -> Self {
+        Self {
+            function_type: row.function_type.as_str().to_string(),
+            status: row.status.as_str().to_string(),
+        }
+    }
+}
+
+/// one verdict per result: the coverage result first, then the items in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ReviewVerdict"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyReviewVerdict {
+    /// the result's function id.
+    #[pyo3(get)]
+    pub function_id: String,
+    /// the result's verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// the class's confidence, from 0.15 upwards and capped at 1.0; the coverage result is 1.0.
+    #[pyo3(get)]
+    pub confidence: f64,
+}
+
+#[pymethods]
+impl PyReviewVerdict {
+    fn __repr__(&self) -> String {
+        format!(
+            "ReviewVerdict(function_id={}, verdict={}, confidence={})",
+            self.function_id, self.verdict, self.confidence
+        )
+    }
+}
+
+impl From<&azoth_process::models::s001_clause10_review::ReviewVerdict> for PyReviewVerdict {
+    fn from(row: &azoth_process::models::s001_clause10_review::ReviewVerdict) -> Self {
+        Self {
+            function_id: row.function_id.clone(),
+            verdict: row.verdict.as_str().to_string(),
+            confidence: row.confidence,
+        }
+    }
+}
+
 /// one row per input row, in caller order.
 #[pyclass(
     frozen,
@@ -2363,6 +2529,101 @@ impl From<&azoth_process::models::risk_matrix::RiskAssessmentRow> for PyRiskAsse
             risk_level: row.risk_level.as_str().to_string(),
             cost_per_failure: row.cost_per_failure,
             annual_risk_cost: row.annual_risk_cost,
+        }
+    }
+}
+
+/// one row per classified equipment, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SafeChartItem"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySafeChartItem {
+    /// the equipment name.
+    #[pyo3(get)]
+    pub equipment: String,
+    /// the SAFE-table category the class assigned.
+    #[pyo3(get)]
+    pub category: String,
+    /// the number of required devices.
+    #[pyo3(get)]
+    pub required_count: f64,
+    /// the number of declared-present devices, including devices the table does not require.
+    #[pyo3(get)]
+    pub present_count: f64,
+    /// the number of required devices that are not present.
+    #[pyo3(get)]
+    pub missing_count: f64,
+    /// whether the missing set is empty.
+    #[pyo3(get)]
+    pub complete: bool,
+}
+
+#[pymethods]
+impl PySafeChartItem {
+    fn __repr__(&self) -> String {
+        format!(
+            "SafeChartItem(equipment={}, category={}, required_count={}, present_count={}, missing_count={}, complete={:?})",
+            self.equipment,
+            self.category,
+            self.required_count,
+            self.present_count,
+            self.missing_count,
+            self.complete
+        )
+    }
+}
+
+impl From<&azoth_process::models::api14c_safe_chart::SafeChartItem> for PySafeChartItem {
+    fn from(row: &azoth_process::models::api14c_safe_chart::SafeChartItem) -> Self {
+        Self {
+            equipment: row.equipment.clone(),
+            category: row.category.as_str().to_string(),
+            required_count: row.required_count,
+            present_count: row.present_count,
+            missing_count: row.missing_count,
+            complete: row.complete,
+        }
+    }
+}
+
+/// one row per missing device, in equipment caller order and device declaration order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SafeChartMissingDevice"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySafeChartMissingDevice {
+    /// the equipment name.
+    #[pyo3(get)]
+    pub equipment: String,
+    /// the missing protective device.
+    #[pyo3(get)]
+    pub device: String,
+}
+
+#[pymethods]
+impl PySafeChartMissingDevice {
+    fn __repr__(&self) -> String {
+        format!(
+            "SafeChartMissingDevice(equipment={}, device={})",
+            self.equipment, self.device
+        )
+    }
+}
+
+impl From<&azoth_process::models::api14c_safe_chart::SafeChartMissingDevice>
+    for PySafeChartMissingDevice
+{
+    fn from(row: &azoth_process::models::api14c_safe_chart::SafeChartMissingDevice) -> Self {
+        Self {
+            equipment: row.equipment.clone(),
+            device: row.device.as_str().to_string(),
         }
     }
 }

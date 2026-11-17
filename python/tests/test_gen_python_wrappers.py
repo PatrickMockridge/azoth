@@ -101,7 +101,11 @@ BINDING = REPO_ROOT / "crates" / "azoth-python" / "src"
 #: hand wrapper, which is the same reason every entry above is here.
 #: 67 -> 68 when `process.pipe_fire_rupture_material` brought its optional `curve` for the
 #: same reason.
-KNOWN_HAND_WRITTEN = 68
+#: 68 -> 71 when the three safety-review worksheets brought optional record lists:
+#: `process.api14c_safe_chart`, `process.barrier_register_validation` and
+#: `process.s001_clause10_review`. The S-001 secondary-pressure screen is derived - its
+#: inputs are scalars - so the count moves by three.
+KNOWN_HAND_WRITTEN = 71
 
 
 def _tools_module(name: str) -> ModuleType:

@@ -119,14 +119,17 @@ describe("the catalogue", () => {
     // listed, plus the two relief ids upstream files elsewhere; every scalar-shaped one can run
     // as a scenario, and the bow-tie has its own view.
     const safetyCalcs = catalogue.safety ?? [];
-    expect(safetyCalcs).toHaveLength(52);
+    expect(safetyCalcs).toHaveLength(56);
     expect(new Set(safetyCalcs.map((entry) => entry.family))).toEqual(
       new Set([
+        "api14c",
+        "barrier",
         "dispersion",
         "fire",
         "firewater",
         "hazid",
         "overpressure",
+        "processsafetysystem",
         "qra",
         "release",
         "risk",
@@ -155,18 +158,19 @@ describe("the catalogue", () => {
       "process.probit",
       "process.psv_fire_sizing",
       "process.psv_sizing",
+      "process.s001_secondary_pressure_protection",
       "process.safety_instrumented_function",
       "process.toxic_library",
       "process.vce",
     ]);
-    expect(native.filter((entry) => entry.form !== undefined)).toHaveLength(21);
+    expect(native.filter((entry) => entry.form !== undefined)).toHaveLength(22);
     expect(safetyCalcs.find((entry) => entry.id === "process.bow_tie")?.form).toBeUndefined();
     for (const entry of native) {
       expect(entry.purpose.trim(), `${entry.id} has no purpose`).not.toBe("");
       expect(entry.purpose.length).toBeLessThanOrEqual(300);
     }
     const listed = safetyCalcs.filter((entry) => !entry.native);
-    expect(listed).toHaveLength(30);
+    expect(listed).toHaveLength(33);
     for (const entry of listed) {
       expect(entry.refusal, `${entry.id} has no refusal`).toBeTruthy();
       expect(entry.form, `${entry.id} has a form but no arm`).toBeUndefined();

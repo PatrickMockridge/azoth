@@ -8,12 +8,12 @@ the mapping, so an agent can tell "validated" from "placeholder" at a glance.
 
 ## What is `azoth`-basis, and what is still a placeholder
 
-A skill whose `calculation_basis` is `azoth` drives the validated library. Nineteen
+A skill whose `calculation_basis` is `azoth` drives the validated library. Twenty
 are: the four `library/` skills, four under `eos/`, four under `flow-assurance/`,
-two under `hydraulics/`, two under `process/` and one under `thermal/`, driving the
-98 calculations and 232 models the library implements.
+two under `hydraulics/`, two under `process/`, one under `safety/` and one under `thermal/`,
+driving the 98 calculations and 236 models the library implements.
 
-The remaining 71 are placeholders — 43 `screening`, 18 `advisory` and 10
+The remaining 70 are placeholders — 42 `screening`, 18 `advisory` and 10
 `data-retrieval` — and each `screening` one names **what would back it**,
 which is a tranche where a tranche covers the physics and a named family where none does:
 
@@ -25,7 +25,7 @@ which is a tranche where a tranche covers the physics and a named family where n
   `statistics/`, `automation`, `standards/` and `fluidmechanics/` *beyond* P12, so a skill
   whose physics belongs to one of those names the family rather than the nearest
   P-number. 16 are mechanical design (vibration, noise, wall thickness, flexibility,
-  seals, turbines, vessel sizing), 9 are `safety/`, 3 `statistics/`, 3
+  seals, turbines, vessel sizing), 8 are `safety/`, 3 `statistics/`, 3
   `automation`, 2 `standards/` and 1 `fluidmechanics/`.
 - **What is a unit operation and a flowsheet away** — `azoth-teg-dehydration-modeling`
   keeps the P11 label, because P11's palette is the tranche that built the absorber,

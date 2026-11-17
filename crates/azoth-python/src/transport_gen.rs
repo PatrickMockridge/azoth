@@ -22,10 +22,11 @@ use crate::record_outputs_gen::{
     PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIncrementalZoneRow,
     PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
     PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyNaceIssueRow, PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyRiskAssessmentRow, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue, PySterileRadius,
-    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
+    PyNaceIssueRow, PyPipeFireRupturePoint, PyRegisterFinding, PyReliefDisposalRow,
+    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
+    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
     PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
@@ -14142,6 +14143,68 @@ impl From<&azoth_process::models::anti_surge_recycle::AntiSurgeRecycleResult>
         }
     }
 }
+/// Result of `process.api14c_safe_chart`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Api14cSafeChartResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyApi14cSafeChartResult {
+    /// one row per classified equipment, in caller order.
+    #[pyo3(get)]
+    pub items: Vec<PySafeChartItem>,
+    /// one row per missing device, in equipment caller order and device declaration order.
+    #[pyo3(get)]
+    pub missing_devices: Vec<PySafeChartMissingDevice>,
+    /// the number of classified equipment rows.
+    #[pyo3(get)]
+    pub equipment_count: f64,
+    /// the total number of missing devices across the chart.
+    #[pyo3(get)]
+    pub missing_count: f64,
+    /// whether every chart row is complete; true for an empty chart.
+    #[pyo3(get)]
+    pub complete: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyApi14cSafeChartResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Api14cSafeChartResult(items={:?}, missing_devices={:?}, equipment_count={:?}, missing_count={:?}, complete={:?}, {} warning(s))",
+            self.items,
+            self.missing_devices,
+            self.equipment_count,
+            self.missing_count,
+            self.complete,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::api14c_safe_chart::Api14cSafeChartResult>
+    for PyApi14cSafeChartResult
+{
+    fn from(r: &azoth_process::models::api14c_safe_chart::Api14cSafeChartResult) -> Self {
+        Self {
+            items: r.items.iter().map(PySafeChartItem::from).collect(),
+            missing_devices: r
+                .missing_devices
+                .iter()
+                .map(PySafeChartMissingDevice::from)
+                .collect(),
+            equipment_count: r.equipment_count,
+            missing_count: r.missing_count,
+            complete: r.complete,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.api537_flare_flame_model`, transported.
 #[pyclass(
     frozen,
@@ -14265,6 +14328,56 @@ impl From<&azoth_process::models::api537_flare_flame_model::Api537FlareFlameMode
                 magnitude_si: r.equivalent_flame_temperature.value,
                 unit: "K".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.barrier_register_validation`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BarrierRegisterValidationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBarrierRegisterValidationResult {
+    /// one row per finding, in the class's order and with its duplicates.
+    #[pyo3(get)]
+    pub findings: Vec<PyRegisterFinding>,
+    /// the number of findings.
+    #[pyo3(get)]
+    pub finding_count: f64,
+    /// whether the register has no findings.
+    #[pyo3(get)]
+    pub valid: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBarrierRegisterValidationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BarrierRegisterValidationResult(findings={:?}, finding_count={:?}, valid={:?}, {} warning(s))",
+            self.findings,
+            self.finding_count,
+            self.valid,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::barrier_register_validation::BarrierRegisterValidationResult>
+    for PyBarrierRegisterValidationResult
+{
+    fn from(
+        r: &azoth_process::models::barrier_register_validation::BarrierRegisterValidationResult,
+    ) -> Self {
+        Self {
+            findings: r.findings.iter().map(PyRegisterFinding::from).collect(),
+            finding_count: r.finding_count,
+            valid: r.valid,
             warnings: transport(&r.warnings),
         }
     }
@@ -22784,6 +22897,175 @@ impl From<&azoth_process::models::risk_matrix::RiskMatrixResult> for PyRiskMatri
                 .map(PyRiskAssessmentRow::from)
                 .collect(),
             total_annual_risk_cost: r.total_annual_risk_cost,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.s001_clause10_review`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "S001Clause10ReviewResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyS001Clause10ReviewResult {
+    /// one row per assessment, the coverage result first and then each item in caller order.
+    #[pyo3(get)]
+    pub assessments: Vec<PyReviewAssessment>,
+    /// one verdict per result: the coverage result first, then the items in caller order.
+    #[pyo3(get)]
+    pub verdicts: Vec<PyReviewVerdict>,
+    /// the five coverage rows of the synthetic result.
+    #[pyo3(get)]
+    pub coverage: Vec<PyReviewCoverage>,
+    /// the report's verdict: any fail, else any pass-with-warnings, else pass.
+    #[pyo3(get)]
+    pub overall_verdict: String,
+    /// the number of results, the coverage result included.
+    #[pyo3(get)]
+    pub item_count: f64,
+    /// the number of results whose verdict is fail.
+    #[pyo3(get)]
+    pub failed_item_count: f64,
+    /// the number of results whose verdict is pass-with-warnings.
+    #[pyo3(get)]
+    pub warning_item_count: f64,
+    /// the total number of assessments.
+    #[pyo3(get)]
+    pub assessment_count: f64,
+    /// the number of failing assessments.
+    #[pyo3(get)]
+    pub fail_assessment_count: f64,
+    /// the number of warning assessments.
+    #[pyo3(get)]
+    pub warning_assessment_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyS001Clause10ReviewResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "S001Clause10ReviewResult(assessments={:?}, verdicts={:?}, coverage={:?}, overall_verdict={:?}, item_count={:?}, failed_item_count={:?}, warning_item_count={:?}, assessment_count={:?}, fail_assessment_count={:?}, warning_assessment_count={:?}, {} warning(s))",
+            self.assessments,
+            self.verdicts,
+            self.coverage,
+            self.overall_verdict,
+            self.item_count,
+            self.failed_item_count,
+            self.warning_item_count,
+            self.assessment_count,
+            self.fail_assessment_count,
+            self.warning_assessment_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::s001_clause10_review::S001Clause10ReviewResult>
+    for PyS001Clause10ReviewResult
+{
+    fn from(r: &azoth_process::models::s001_clause10_review::S001Clause10ReviewResult) -> Self {
+        Self {
+            assessments: r.assessments.iter().map(PyReviewAssessment::from).collect(),
+            verdicts: r.verdicts.iter().map(PyReviewVerdict::from).collect(),
+            coverage: r.coverage.iter().map(PyReviewCoverage::from).collect(),
+            overall_verdict: r.overall_verdict.as_str().to_string(),
+            item_count: r.item_count,
+            failed_item_count: r.failed_item_count,
+            warning_item_count: r.warning_item_count,
+            assessment_count: r.assessment_count,
+            fail_assessment_count: r.fail_assessment_count,
+            warning_assessment_count: r.warning_assessment_count,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.s001_secondary_pressure_protection`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "S001SecondaryPressureProtectionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyS001SecondaryPressureProtectionResult {
+    /// the resolved target frequency, stated or from the band. **Absent when the band cannot resolve**: a missing or non-positive pressure basis with no stated target.
+    #[pyo3(get)]
+    pub target_frequency_per_year: Option<f64>,
+    /// whether all three pressures are finite and positive.
+    #[pyo3(get)]
+    pub pressure_basis_complete: bool,
+    /// whether the test pressure is at or above the design pressure; vacuous-true without a basis.
+    #[pyo3(get)]
+    pub test_pressure_valid: bool,
+    /// whether the event pressure is at or below the test pressure; vacuous-true without a basis.
+    #[pyo3(get)]
+    pub pressure_within_test: bool,
+    /// whether the demand and the resolved target are configured.
+    #[pyo3(get)]
+    pub frequency_configured: bool,
+    /// whether the demand is at or below the target; vacuous-true when unconfigured.
+    #[pyo3(get)]
+    pub frequency_criterion_met: bool,
+    /// whether relief leakage has been assessed.
+    #[pyo3(get)]
+    pub leakage_assessed: bool,
+    /// whether the leakage is routed to a safe location.
+    #[pyo3(get)]
+    pub leakage_routed_safe: bool,
+    /// whether a proof-test interval is stated.
+    #[pyo3(get)]
+    pub proof_test_configured: bool,
+    /// whether the interval is at most twelve months; vacuous-true when unconfigured.
+    #[pyo3(get)]
+    pub proof_test_criterion_met: bool,
+    /// whether every criterion is met.
+    #[pyo3(get)]
+    pub acceptable: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyS001SecondaryPressureProtectionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "S001SecondaryPressureProtectionResult(target_frequency_per_year={:?}, pressure_basis_complete={:?}, test_pressure_valid={:?}, pressure_within_test={:?}, frequency_configured={:?}, frequency_criterion_met={:?}, leakage_assessed={:?}, leakage_routed_safe={:?}, proof_test_configured={:?}, proof_test_criterion_met={:?}, acceptable={:?}, {} warning(s))",
+            self.target_frequency_per_year,
+            self.pressure_basis_complete,
+            self.test_pressure_valid,
+            self.pressure_within_test,
+            self.frequency_configured,
+            self.frequency_criterion_met,
+            self.leakage_assessed,
+            self.leakage_routed_safe,
+            self.proof_test_configured,
+            self.proof_test_criterion_met,
+            self.acceptable,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult> for PyS001SecondaryPressureProtectionResult {
+    fn from(r: &azoth_process::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult) -> Self {
+        Self {
+            target_frequency_per_year: r.target_frequency_per_year,
+            pressure_basis_complete: r.pressure_basis_complete,
+            test_pressure_valid: r.test_pressure_valid,
+            pressure_within_test: r.pressure_within_test,
+            frequency_configured: r.frequency_configured,
+            frequency_criterion_met: r.frequency_criterion_met,
+            leakage_assessed: r.leakage_assessed,
+            leakage_routed_safe: r.leakage_routed_safe,
+            proof_test_configured: r.proof_test_configured,
+            proof_test_criterion_met: r.proof_test_criterion_met,
+            acceptable: r.acceptable,
             warnings: transport(&r.warnings),
         }
     }

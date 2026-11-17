@@ -2760,6 +2760,104 @@ def _mah_bow_tie_skeleton(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _api14c_safe_chart(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.api14c_safe_chart`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.api14c_safe_chart import api14c_safe_chart as evaluate
+
+    present = inputs.get("present_devices")
+    assume_complete = inputs.get("assume_complete")
+    result = evaluate(
+        list(inputs.get("equipment", ())),
+        None if present is None else list(present),
+        None if assume_complete is None else bool(assume_complete),
+    )
+    layers = {
+        "equipment_count": result.equipment_count,
+        "gap_count": result.missing_count,
+    }
+    for index, item in enumerate(result.items):
+        layers[f"item{index}_required_count"] = item.required_count
+        layers[f"item{index}_present_count"] = item.present_count
+        layers[f"item{index}_missing_count"] = item.missing_count
+    return layers
+
+
+def _barrier_register_validation(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.barrier_register_validation`'s layers, from the reference's arithmetic."""
+    from azoth.process.reference.barrier_register_validation import (
+        barrier_register_validation as evaluate,
+    )
+
+    def optional(name: str) -> list[dict[str, object]] | None:
+        value = inputs.get(name)
+        return None if value is None else list(value)
+
+    result = evaluate(
+        str(inputs["register_id"]),
+        optional("elements"),
+        optional("barriers"),
+        optional("standards"),
+        optional("links"),
+        optional("evidence"),
+    )
+    # The findings are rows held by the cases; the count is the one numeric layer.
+    return {"finding_count": result.finding_count}
+
+
+def _s001_secondary_pressure_protection(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.s001_secondary_pressure_protection`'s layers, from the reference."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.s001_secondary_pressure_protection import (
+        s001_secondary_pressure_protection as evaluate,
+    )
+
+    def optional(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    def optional_pressure(name: str) -> Any:
+        value = optional(name)
+        return None if value is None else quantity(value, "Pa")
+
+    def optional_flag(name: str) -> bool | None:
+        value = inputs.get(name)
+        return None if value is None else bool(value)
+
+    result = evaluate(
+        optional_pressure("maximum_event_pressure"),
+        optional_pressure("design_pressure"),
+        optional_pressure("test_pressure"),
+        optional("demand_frequency_per_year"),
+        optional("target_frequency_per_year"),
+        optional_flag("relief_leakage_assessed"),
+        optional_flag("relief_leakage_to_safe_location"),
+        optional("proof_test_interval_months"),
+    )
+    # The target is the one numeric output; the ten flags are held by the cases and the
+    # capture prints NaN where it is absent, which `float` would make uncomparable.
+    layers: dict[str, float] = {}
+    if result.target_frequency_per_year is not None:
+        layers["target_frequency_per_year"] = result.target_frequency_per_year
+    return layers
+
+
+def _s001_clause10_review(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.s001_clause10_review`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.s001_clause10_review import (
+        s001_clause10_review as evaluate,
+    )
+
+    def optional(name: str) -> list[dict[str, object]] | None:
+        value = inputs.get(name)
+        return None if value is None else list(value)
+
+    result = evaluate(optional("items"), optional("evidence"), optional("references"))
+    layers: dict[str, float] = {"result_count": float(len(result.verdicts))}
+    for index, row in enumerate(result.verdicts):
+        layers[f"result{index}_confidence"] = row.confidence
+    return layers
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3301,6 +3399,10 @@ DUMPERS: dict[str, Dumper] = {
     "process.fmea_worksheet": _fmea_worksheet,
     "process.hazop_consequence_population": _hazop_consequence_population,
     "process.mah_bow_tie_skeleton": _mah_bow_tie_skeleton,
+    "process.api14c_safe_chart": _api14c_safe_chart,
+    "process.barrier_register_validation": _barrier_register_validation,
+    "process.s001_secondary_pressure_protection": _s001_secondary_pressure_protection,
+    "process.s001_clause10_review": _s001_clause10_review,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -5271,6 +5373,92 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=7,
         identified_by=("#label", "mah_fire_explosion"),
     ),
+    # The SAFE chart's two cased states; the vocabularies, the eight table rows and the
+    # assuming-complete chart are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.api14c_safe_chart",
+        case="api14c_declared",
+        capture="process_api14c_safe_chart.tsv",
+        block=10,
+        identified_by=("#label", "api14c_chart_declared"),
+    ),
+    LayerCase(
+        model="process.api14c_safe_chart",
+        case="api14c_empty",
+        capture="process_api14c_safe_chart.tsv",
+        block=12,
+        identified_by=("#label", "api14c_chart_empty"),
+    ),
+    # The register's three cased states; the twenty-two fault blocks are declared in
+    # `UNCASED_ROWS`.
+    LayerCase(
+        model="process.barrier_register_validation",
+        case="br_valid",
+        capture="process_barrier_register_validation.tsv",
+        block=0,
+        identified_by=("#label", "br_valid"),
+    ),
+    LayerCase(
+        model="process.barrier_register_validation",
+        case="br_barrier_not_linked",
+        capture="process_barrier_register_validation.tsv",
+        block=22,
+        identified_by=("#label", "br_barrier_not_linked"),
+    ),
+    LayerCase(
+        model="process.barrier_register_validation",
+        case="br_shared_standard",
+        capture="process_barrier_register_validation.tsv",
+        block=24,
+        identified_by=("#label", "br_shared_standard"),
+    ),
+    # The S-001 screen's four cased states; the other eleven blocks are declared in
+    # `UNCASED_ROWS`. The target is the only numeric layer, so the missing-basis block
+    # shares no key with a dump and stays uncased.
+    LayerCase(
+        model="process.s001_secondary_pressure_protection",
+        case="s001_band_below_design",
+        capture="process_s001_secondary_pressure_protection.tsv",
+        block=0,
+        identified_by=("#label", "s001_band_below_design"),
+    ),
+    LayerCase(
+        model="process.s001_secondary_pressure_protection",
+        case="s001_complete_pass",
+        capture="process_s001_secondary_pressure_protection.tsv",
+        block=4,
+        identified_by=("#label", "s001_complete_pass"),
+    ),
+    LayerCase(
+        model="process.s001_secondary_pressure_protection",
+        case="s001_event_above_test",
+        capture="process_s001_secondary_pressure_protection.tsv",
+        block=5,
+        identified_by=("#label", "s001_event_above_test"),
+    ),
+    LayerCase(
+        model="process.s001_secondary_pressure_protection",
+        case="s001_band_above_design",
+        capture="process_s001_secondary_pressure_protection.tsv",
+        block=1,
+        identified_by=("#label", "s001_band_above_design"),
+    ),
+    # The review's two cased states; the other eleven blocks are declared in
+    # `UNCASED_ROWS`. The result count and the confidences are the numeric layers.
+    LayerCase(
+        model="process.s001_clause10_review",
+        case="cl10_example",
+        capture="process_s001_clause10_review.tsv",
+        block=0,
+        identified_by=("#label", "cl10_example"),
+    ),
+    LayerCase(
+        model="process.s001_clause10_review",
+        case="cl10_secondary_fail",
+        capture="process_s001_clause10_review.tsv",
+        block=1,
+        identified_by=("#label", "cl10_secondary_fail"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -7036,6 +7224,18 @@ UNCASED_ROWS: dict[str, int] = {
     "process_hazop_consequence_population.tsv": 9,
     # The skeleton's eleven: the ten uncased categories and the null refusal.
     "process_mah_bow_tie_skeleton.tsv": 11,
+    # The chart's eleven: the two vocabularies, the eight table rows and the
+    # assuming-complete chart.
+    "process_api14c_safe_chart.tsv": 11,
+    # The register's twenty-two: the rule-per-register blocks and the linked-twice state.
+    "process_barrier_register_validation.tsv": 22,
+    # The S-001 screen's eleven: the other two bands, the other leakage states, the proof
+    # intervals and the empty criteria.
+    "process_s001_secondary_pressure_protection.tsv": 11,
+    # The review's eleven: the two other class-test states, the empty input and item, the
+    # utility states, the gated and alias items, the duplicate id, the first-alias parse and
+    # the coercion.
+    "process_s001_clause10_review.tsv": 11,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

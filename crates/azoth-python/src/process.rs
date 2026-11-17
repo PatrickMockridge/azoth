@@ -817,6 +817,179 @@ pub fn map_turbo_expander_compressor(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// `process.api14c_safe_chart` - the API 14C SAFE chart.
+///
+/// The class-name classifier, the required-device table and the missing set.
+/// `present_devices` is optional: absent is no declarations.
+#[pyfunction]
+#[pyo3(signature = (equipment, present_devices = None, assume_complete = None))]
+#[pyo3(text_signature = "(equipment, present_devices=None, assume_complete=None)")]
+pub fn api14c_safe_chart(
+    py: Python<'_>,
+    equipment: Option<Vec<crate::records_gen::SafeChartEquipment>>,
+    present_devices: Option<Vec<crate::records_gen::SafeChartPresentDevice>>,
+    assume_complete: Option<bool>,
+) -> PyResult<crate::transport_gen::PyApi14cSafeChartResult> {
+    let equipment_records: Vec<azoth_process::models::api14c_safe_chart::SafeChartEquipment> =
+        equipment
+            .unwrap_or_default()
+            .into_iter()
+            .map(
+                |row| azoth_process::models::api14c_safe_chart::SafeChartEquipment {
+                    equipment: row.equipment,
+                    unit_class: row.unit_class,
+                },
+            )
+            .collect();
+    let present_records = present_devices.map(|rows| {
+        rows.into_iter()
+            .map(
+                |row| azoth_process::models::api14c_safe_chart::SafeChartPresentDevice {
+                    equipment: row.equipment,
+                    device: row.device,
+                },
+            )
+            .collect::<Vec<_>>()
+    });
+    azoth_process::models::api14c_safe_chart::api14c_safe_chart(
+        Some(&equipment_records),
+        present_records.as_deref(),
+        assume_complete,
+    )
+    .map(|r| crate::transport_gen::PyApi14cSafeChartResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// `process.barrier_register_validation` - the barrier register's rule review.
+///
+/// The register, element, barrier and standard rules, with the class's iteration quirks.
+#[pyfunction]
+#[pyo3(signature = (register_id, elements = None, barriers = None, standards = None, links = None, evidence = None))]
+#[pyo3(
+    text_signature = "(register_id, elements=None, barriers=None, standards=None, links=None, evidence=None)"
+)]
+pub fn barrier_register_validation(
+    py: Python<'_>,
+    register_id: &str,
+    elements: Option<Vec<crate::records_gen::BarrierElement>>,
+    barriers: Option<Vec<crate::records_gen::BarrierRow>>,
+    standards: Option<Vec<crate::records_gen::PerformanceStandardRow>>,
+    links: Option<Vec<crate::records_gen::ElementBarrierLink>>,
+    evidence: Option<Vec<crate::records_gen::RegisterEvidence>>,
+) -> PyResult<crate::transport_gen::PyBarrierRegisterValidationResult> {
+    use azoth_process::models::barrier_register_validation as brv;
+    let elements = elements.map(|rows| {
+        rows.into_iter()
+            .map(|row| brv::BarrierElement {
+                id: row.id,
+                tag: row.tag,
+                name: row.name,
+                element_type: row.element_type,
+            })
+            .collect::<Vec<_>>()
+    });
+    let barriers = barriers.map(|rows| {
+        rows.into_iter()
+            .map(|row| brv::BarrierRow {
+                id: row.id,
+                name: row.name,
+                description: row.description,
+                barrier_type: row.barrier_type,
+                status: row.status,
+                pfd: row.pfd,
+                effectiveness: row.effectiveness,
+                performance_standard_id: row.performance_standard_id,
+                equipment_tag_count: row.equipment_tag_count,
+            })
+            .collect::<Vec<_>>()
+    });
+    let standards = standards.map(|rows| {
+        rows.into_iter()
+            .map(|row| brv::PerformanceStandardRow {
+                id: row.id,
+                safety_function: row.safety_function,
+                target_pfd: row.target_pfd,
+                required_availability: row.required_availability,
+                proof_test_interval_hours: row.proof_test_interval_hours,
+                acceptance_criteria_count: row.acceptance_criteria_count,
+            })
+            .collect::<Vec<_>>()
+    });
+    let links = links.map(|rows| {
+        rows.into_iter()
+            .map(|row| brv::ElementBarrierLink {
+                element_id: row.element_id,
+                barrier_id: row.barrier_id,
+            })
+            .collect::<Vec<_>>()
+    });
+    let evidence = evidence.map(|rows| {
+        rows.into_iter()
+            .map(|row| brv::RegisterEvidence {
+                owner_kind: row.owner_kind,
+                owner_id: row.owner_id,
+                document_id: row.document_id,
+                source_reference: row.source_reference,
+                excerpt: row.excerpt,
+            })
+            .collect::<Vec<_>>()
+    });
+    brv::barrier_register_validation(
+        register_id,
+        elements.as_deref(),
+        barriers.as_deref(),
+        standards.as_deref(),
+        links.as_deref(),
+        evidence.as_deref(),
+    )
+    .map(|r| crate::transport_gen::PyBarrierRegisterValidationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// `process.s001_clause10_review` - the NORSOK S-001 Clause 10 review.
+///
+/// The fifteen checks, the coverage result, the confidence and the verdict cascade.
+#[pyfunction]
+#[pyo3(signature = (items = None, evidence = None, references = None))]
+#[pyo3(text_signature = "(items=None, evidence=None, references=None)")]
+pub fn s001_clause10_review(
+    py: Python<'_>,
+    items: Option<Vec<crate::records_gen::ReviewItem>>,
+    evidence: Option<Vec<crate::records_gen::ReviewEvidence>>,
+    references: Option<Vec<crate::records_gen::ReviewReference>>,
+) -> PyResult<crate::transport_gen::PyS001Clause10ReviewResult> {
+    use azoth_process::models::s001_clause10_review as review;
+    let items = items.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::ReviewItem {
+                function_id: row.function_id,
+                function_type: row.function_type,
+                equipment_tag: row.equipment_tag,
+            })
+            .collect::<Vec<_>>()
+    });
+    let evidence = evidence.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::ReviewEvidence {
+                function_id: row.function_id,
+                key: row.key,
+                value: row.value,
+            })
+            .collect::<Vec<_>>()
+    });
+    let references = references.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::ReviewReference {
+                function_id: row.function_id,
+                reference: row.reference,
+            })
+            .collect::<Vec<_>>()
+    });
+    review::s001_clause10_review(items.as_deref(), evidence.as_deref(), references.as_deref())
+        .map(|r| crate::transport_gen::PyS001Clause10ReviewResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// `process.absorption_column` - the tray absorber as a registered id.
 ///
 /// **The column's own profile shape with the class's own product names**, and two inlets where

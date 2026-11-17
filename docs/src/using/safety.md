@@ -11,9 +11,9 @@ derived and never saved: a scenario's answer is the last calculate's, and a scen
 inputs changed says its answer is out of date.
 
 The **Overview** lists the study's bow-ties and scenarios, every diagnostic the study carries,
-and the whole safety surface grouped by family. Twenty-one scenario models across five
-families — fire, dispersion, firewater, overpressure and risk — and the bow-tie run inside
-this interface. The rest — the models that take a fluid or a table of rows, and the rupture,
+and the whole safety surface grouped by family. Twenty-two scenario models across six
+families — fire, dispersion, firewater, overpressure, process safety systems and risk — and the
+bow-tie run inside this interface. The rest — the models that take a fluid or a table of rows, and the rupture,
 release and QRA families — are listed with links to their manual pages; they are not runnable
 here yet. The four thermo-bound relief loads and the overpressure protection study are in that
 list: they take a fluid or a scenario table, and the library reaches them.
@@ -110,7 +110,10 @@ class's warning strings as a vector output, and the basket test takes a record l
 rupture models take records too, and their manual pages state the inputs, the range and the
 worked example. The four HAZID worksheets are record-shaped as well: the template returns its
 deviation rows, the FMEA returns the ranked rows, the consequence population returns the
-populated rows, and the MAH skeleton returns its three catalogues.
+populated rows, and the MAH skeleton returns its three catalogues. The three safety-review
+worksheets are record-shaped as well: the API 14C SAFE chart returns its rows and missing
+devices, the barrier register returns its findings, and the Clause 10 review returns its
+assessments, verdicts and coverage.
 
 ## Units
 
@@ -137,7 +140,7 @@ route has no call that replaces it.
 
 ## What is not here yet
 
-The record-shaped models in the five decks stay listed and refused; rupture, release and QRA
+The record-shaped models in the six decks stay listed and refused; rupture, release and QRA
 have no native view, and their manual pages state the inputs, the range and the worked
 example. The HAZOP worksheet, a printable safety report and a flux-versus-distance chart are
 not built. A scenario runs one model, not a bundle of models for one release.

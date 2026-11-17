@@ -59,6 +59,14 @@ const COPY: Record<
       "Each scenario holds one relief or overpressure model's inputs and its last answer: an area, an acceptance, a margin or a verdict.",
     step: "Add a fire-case relief, a relief-valve sizing, an acceptance check or a pipeline protection screen.",
   },
+  processsafetysystem: {
+    title: "Process safety system models",
+    heading: "Process safety system scenarios",
+    search: "Search process safety system models",
+    blurb:
+      "Each scenario holds one process safety system model's inputs and its last answer: a resolved target frequency, the pressure checks and the acceptability verdict.",
+    step: "Add a NORSOK S-001 secondary-pressure protection screen.",
+  },
   risk: {
     title: "Risk and SIL models",
     heading: "Risk scenarios",

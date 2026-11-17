@@ -1,0 +1,276 @@
+api14c_devices
+device_psh=Pressure Safety High
+device_psl=Pressure Safety Low
+device_lsh=Level Safety High
+device_lsl=Level Safety Low
+device_tsh=Temperature Safety High
+device_tsl=Temperature Safety Low
+device_usv=Underwater / subsurface safety valve
+device_sdv=Shutdown valve (ESV)
+device_bdv=Blowdown valve
+device_psv=Pressure safety valve / relief valve
+device_fsv=Flow safety valve (check valve)
+device_fire=Fire detection
+device_gas=Combustible gas detection
+
+api14c_categories
+category_pressure_vessel=Pressure vessel - separator / scrubber / KO drum
+category_atmospheric_vessel=Atmospheric or low-pressure tank
+category_fired_vessel=Fired vessel - heater / boiler
+category_pipeline_segment=Pipeline segment
+category_compressor=Compressor
+category_pump=Pump
+category_heat_exchanger=Heat exchanger
+category_wellhead=Wellhead / Christmas tree
+
+api14c_table_pressure_vessel
+required=psh,psl,lsh,lsl,sdv,psv
+required_count=6
+
+api14c_table_atmospheric_vessel
+required=lsh,psv,fsv
+required_count=3
+
+api14c_table_fired_vessel
+required=psh,lsl,tsh,sdv,bdv,psv,fire
+required_count=7
+
+api14c_table_pipeline_segment
+required=psh,psl,sdv,fsv
+required_count=4
+
+api14c_table_compressor
+required=psh,psl,tsh,sdv,bdv,psv
+required_count=6
+
+api14c_table_pump
+required=psh,sdv,psv,fsv
+required_count=4
+
+api14c_table_heat_exchanger
+required=psh,tsh,psv
+required_count=3
+
+api14c_table_wellhead
+required=psh,psl,usv,sdv,psv
+required_count=5
+
+api14c_chart_declared
+equipment_count=9
+item0_equipment=V-101
+item0_category=pressure_vessel
+item0_required=psh,psl,lsh,lsl,sdv,psv
+item0_present=psh,psv
+item0_missing=psl,lsh,lsl,sdv
+item0_required_count=6
+item0_present_count=2
+item0_missing_count=4
+item0_complete=false
+item1_equipment=SCR-101
+item1_category=pressure_vessel
+item1_required=psh,psl,lsh,lsl,sdv,psv
+item1_present=
+item1_missing=psh,psl,lsh,lsl,sdv,psv
+item1_required_count=6
+item1_present_count=0
+item1_missing_count=6
+item1_complete=false
+item2_equipment=T-101
+item2_category=atmospheric_vessel
+item2_required=lsh,psv,fsv
+item2_present=
+item2_missing=lsh,psv,fsv
+item2_required_count=3
+item2_present_count=0
+item2_missing_count=3
+item2_complete=false
+item3_equipment=H-101
+item3_category=fired_vessel
+item3_required=psh,lsl,tsh,sdv,bdv,psv,fire
+item3_present=
+item3_missing=psh,lsl,tsh,sdv,bdv,psv,fire
+item3_required_count=7
+item3_present_count=0
+item3_missing_count=7
+item3_complete=false
+item4_equipment=PL-101
+item4_category=pipeline_segment
+item4_required=psh,psl,sdv,fsv
+item4_present=
+item4_missing=psh,psl,sdv,fsv
+item4_required_count=4
+item4_present_count=0
+item4_missing_count=4
+item4_complete=false
+item5_equipment=K-101
+item5_category=compressor
+item5_required=psh,psl,tsh,sdv,bdv,psv
+item5_present=
+item5_missing=psh,psl,tsh,sdv,bdv,psv
+item5_required_count=6
+item5_present_count=0
+item5_missing_count=6
+item5_complete=false
+item6_equipment=P-101
+item6_category=pump
+item6_required=psh,sdv,psv,fsv
+item6_present=
+item6_missing=psh,sdv,psv,fsv
+item6_required_count=4
+item6_present_count=0
+item6_missing_count=4
+item6_complete=false
+item7_equipment=E-101
+item7_category=heat_exchanger
+item7_required=psh,tsh,psv
+item7_present=
+item7_missing=psh,tsh,psv
+item7_required_count=3
+item7_present_count=0
+item7_missing_count=3
+item7_complete=false
+item8_equipment=W-101
+item8_category=wellhead
+item8_required=psh,psl,usv,sdv,psv
+item8_present=
+item8_missing=psh,psl,usv,sdv,psv
+item8_required_count=5
+item8_present_count=0
+item8_missing_count=5
+item8_complete=false
+complete=false
+gap_count=42
+gap0=V-101: missing LSL (Level Safety Low)
+gap1=V-101: missing PSL (Pressure Safety Low)
+gap2=V-101: missing LSH (Level Safety High)
+gap3=V-101: missing SDV (Shutdown valve (ESV))
+gap4=SCR-101: missing PSH (Pressure Safety High)
+gap5=SCR-101: missing LSL (Level Safety Low)
+gap6=SCR-101: missing PSL (Pressure Safety Low)
+gap7=SCR-101: missing LSH (Level Safety High)
+gap8=SCR-101: missing PSV (Pressure safety valve / relief valve)
+gap9=SCR-101: missing SDV (Shutdown valve (ESV))
+gap10=T-101: missing FSV (Flow safety valve (check valve))
+gap11=T-101: missing LSH (Level Safety High)
+gap12=T-101: missing PSV (Pressure safety valve / relief valve)
+gap13=H-101: missing BDV (Blowdown valve)
+gap14=H-101: missing TSH (Temperature Safety High)
+gap15=H-101: missing PSH (Pressure Safety High)
+gap16=H-101: missing LSL (Level Safety Low)
+gap17=H-101: missing PSV (Pressure safety valve / relief valve)
+gap18=H-101: missing FIRE (Fire detection)
+gap19=H-101: missing SDV (Shutdown valve (ESV))
+gap20=PL-101: missing FSV (Flow safety valve (check valve))
+gap21=PL-101: missing PSH (Pressure Safety High)
+gap22=PL-101: missing PSL (Pressure Safety Low)
+gap23=PL-101: missing SDV (Shutdown valve (ESV))
+gap24=K-101: missing BDV (Blowdown valve)
+gap25=K-101: missing TSH (Temperature Safety High)
+gap26=K-101: missing PSH (Pressure Safety High)
+gap27=K-101: missing PSL (Pressure Safety Low)
+gap28=K-101: missing PSV (Pressure safety valve / relief valve)
+gap29=K-101: missing SDV (Shutdown valve (ESV))
+gap30=P-101: missing FSV (Flow safety valve (check valve))
+gap31=P-101: missing PSH (Pressure Safety High)
+gap32=P-101: missing PSV (Pressure safety valve / relief valve)
+gap33=P-101: missing SDV (Shutdown valve (ESV))
+gap34=E-101: missing TSH (Temperature Safety High)
+gap35=E-101: missing PSH (Pressure Safety High)
+gap36=E-101: missing PSV (Pressure safety valve / relief valve)
+gap37=W-101: missing PSH (Pressure Safety High)
+gap38=W-101: missing PSL (Pressure Safety Low)
+gap39=W-101: missing PSV (Pressure safety valve / relief valve)
+gap40=W-101: missing SDV (Shutdown valve (ESV))
+gap41=W-101: missing USV (Underwater / subsurface safety valve)
+
+api14c_chart_complete
+equipment_count=9
+item0_equipment=V-101
+item0_category=pressure_vessel
+item0_required=psh,psl,lsh,lsl,sdv,psv
+item0_present=psh,psl,lsh,lsl,sdv,psv
+item0_missing=
+item0_required_count=6
+item0_present_count=6
+item0_missing_count=0
+item0_complete=true
+item1_equipment=SCR-101
+item1_category=pressure_vessel
+item1_required=psh,psl,lsh,lsl,sdv,psv
+item1_present=psh,psl,lsh,lsl,sdv,psv
+item1_missing=
+item1_required_count=6
+item1_present_count=6
+item1_missing_count=0
+item1_complete=true
+item2_equipment=T-101
+item2_category=atmospheric_vessel
+item2_required=lsh,psv,fsv
+item2_present=lsh,psv,fsv
+item2_missing=
+item2_required_count=3
+item2_present_count=3
+item2_missing_count=0
+item2_complete=true
+item3_equipment=H-101
+item3_category=fired_vessel
+item3_required=psh,lsl,tsh,sdv,bdv,psv,fire
+item3_present=psh,lsl,tsh,sdv,bdv,psv,fire
+item3_missing=
+item3_required_count=7
+item3_present_count=7
+item3_missing_count=0
+item3_complete=true
+item4_equipment=PL-101
+item4_category=pipeline_segment
+item4_required=psh,psl,sdv,fsv
+item4_present=psh,psl,sdv,fsv
+item4_missing=
+item4_required_count=4
+item4_present_count=4
+item4_missing_count=0
+item4_complete=true
+item5_equipment=K-101
+item5_category=compressor
+item5_required=psh,psl,tsh,sdv,bdv,psv
+item5_present=psh,psl,tsh,sdv,bdv,psv
+item5_missing=
+item5_required_count=6
+item5_present_count=6
+item5_missing_count=0
+item5_complete=true
+item6_equipment=P-101
+item6_category=pump
+item6_required=psh,sdv,psv,fsv
+item6_present=psh,sdv,psv,fsv
+item6_missing=
+item6_required_count=4
+item6_present_count=4
+item6_missing_count=0
+item6_complete=true
+item7_equipment=E-101
+item7_category=heat_exchanger
+item7_required=psh,tsh,psv
+item7_present=psh,tsh,psv
+item7_missing=
+item7_required_count=3
+item7_present_count=3
+item7_missing_count=0
+item7_complete=true
+item8_equipment=W-101
+item8_category=wellhead
+item8_required=psh,psl,usv,sdv,psv
+item8_present=psh,psl,usv,sdv,psv
+item8_missing=
+item8_required_count=5
+item8_present_count=5
+item8_missing_count=0
+item8_complete=true
+complete=true
+gap_count=0
+
+api14c_chart_empty
+equipment_count=0
+complete=true
+gap_count=0
+

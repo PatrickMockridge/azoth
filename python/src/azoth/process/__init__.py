@@ -22,7 +22,9 @@ from azoth.core.result import (
     AbsorptionColumnResult,
     ActiveFireProtectionScreeningResult,
     AntiSurgeRecycleResult,
+    Api14cSafeChartResult,
     Api537FlareFlameModelResult,
+    BarrierRegisterValidationResult,
     BasketTestRegressionResult,
     BleveResult,
     BlockedOutletReliefResult,
@@ -84,6 +86,8 @@ from azoth.core.result import (
     RateBasedPackedColumnResult,
     ReliefDisposalNetworkResult,
     RiskMatrixResult,
+    S001Clause10ReviewResult,
+    S001SecondaryPressureProtectionResult,
     SafetyInstrumentedFunctionResult,
     SelfHeatingInductionResult,
     SemenovSelfHeatingResult,
@@ -129,7 +133,9 @@ __all__ = [
     "absorption_column",
     "active_fire_protection_screening",
     "anti_surge_recycle",
+    "api14c_safe_chart",
     "api537_flare_flame_model",
+    "barrier_register_validation",
     "bleve",
     "blowdown_pressure_profile",
     "bow_tie",
@@ -185,6 +191,8 @@ __all__ = [
     "relief_disposal_network",
     "risk_matrix",
     "run_flowsheet",
+    "s001_clause10_review",
+    "s001_secondary_pressure_protection",
     "safety_instrumented_function",
     "separator",
     "separator_capacity_assessment",
@@ -285,6 +293,10 @@ _VESSEL_RUPTURE = "process.vessel_rupture"
 _SEMENOV_SELF_HEATING = "process.semenov_self_heating"
 _SELF_HEATING_INDUCTION = "process.self_heating_induction"
 _BASKET_TEST_REGRESSION = "process.basket_test_regression"
+_API14C_SAFE_CHART = "process.api14c_safe_chart"
+_BARRIER_REGISTER_VALIDATION = "process.barrier_register_validation"
+_S001_CLAUSE10_REVIEW = "process.s001_clause10_review"
+_S001_SECONDARY_PRESSURE_PROTECTION = "process.s001_secondary_pressure_protection"
 _HAZOP_TEMPLATE = "process.hazop_template"
 _FMEA_WORKSHEET = "process.fmea_worksheet"
 _HAZOP_CONSEQUENCE_POPULATION = "process.hazop_consequence_population"
@@ -2536,6 +2548,56 @@ def bow_tie(
     )
 
 
+def s001_clause10_review(
+    items: list[dict[str, object]] | None = None,
+    evidence: list[dict[str, object]] | None = None,
+    references: list[dict[str, object]] | None = None,
+) -> S001Clause10ReviewResult:
+    """The NORSOK S-001 Clause 10 review.
+
+    **Fifteen checks over normalized evidence, a coverage result and a verdict cascade.**
+    The rows carry the requirement id, clause, status and severity; the messages and
+    recommendation prose are presentation and are not part of the result.
+
+    See :func:`azoth.process.reference.s001_clause10_review`.
+    """
+    return resolve(_S001_CLAUSE10_REVIEW)(  # type: ignore[no-any-return]
+        items=items,
+        evidence=evidence,
+        references=references,
+    )
+
+
+def s001_secondary_pressure_protection(
+    maximum_event_pressure: float | None = None,
+    design_pressure: float | None = None,
+    test_pressure: float | None = None,
+    demand_frequency_per_year: float | None = None,
+    target_frequency_per_year: float | None = None,
+    relief_leakage_assessed: bool | None = None,
+    relief_leakage_to_safe_location: bool | None = None,
+    proof_test_interval_months: float | None = None,
+) -> S001SecondaryPressureProtectionResult:
+    """The NORSOK S-001 secondary-pressure screen.
+
+    **The pressure band's default target, the test and event pressure checks, the
+    demand-versus-target test and the leakage and proof-test criteria.** The two leakage
+    flags are true-only; an absent proof-test interval is not a failure of its criterion.
+
+    See :func:`azoth.process.reference.s001_secondary_pressure_protection`.
+    """
+    return resolve(_S001_SECONDARY_PRESSURE_PROTECTION)(  # type: ignore[no-any-return]
+        maximum_event_pressure=maximum_event_pressure,
+        design_pressure=design_pressure,
+        test_pressure=test_pressure,
+        demand_frequency_per_year=demand_frequency_per_year,
+        target_frequency_per_year=target_frequency_per_year,
+        relief_leakage_assessed=relief_leakage_assessed,
+        relief_leakage_to_safe_location=relief_leakage_to_safe_location,
+        proof_test_interval_months=proof_test_interval_months,
+    )
+
+
 def safety_instrumented_function(
     pfd_average: float,
     claimed_sil: float,
@@ -3213,6 +3275,52 @@ def hazardous_area(
         ambient_density=ambient_density,
         safety_factor=safety_factor,
         release_grade=release_grade,
+    )
+
+
+def api14c_safe_chart(
+    equipment: list[dict[str, object]] | None = None,
+    present_devices: list[dict[str, object]] | None = None,
+    assume_complete: bool | None = None,
+) -> Api14cSafeChartResult:
+    """The API 14C SAFE chart: the required devices against the declared ones.
+
+    **The class-name classifier, the eight-category table and the missing set.** An
+    unclassified row is omitted, an undeclared equipment has an empty present set, and the
+    assuming-complete mode ignores declarations.
+
+    See :func:`azoth.process.reference.api14c_safe_chart`.
+    """
+    return resolve(_API14C_SAFE_CHART)(  # type: ignore[no-any-return]
+        equipment=equipment,
+        present_devices=present_devices,
+        assume_complete=assume_complete,
+    )
+
+
+def barrier_register_validation(
+    register_id: str,
+    elements: list[dict[str, object]] | None = None,
+    barriers: list[dict[str, object]] | None = None,
+    standards: list[dict[str, object]] | None = None,
+    links: list[dict[str, object]] | None = None,
+    evidence: list[dict[str, object]] | None = None,
+) -> BarrierRegisterValidationResult:
+    """The barrier register's consistency findings.
+
+    **The register, element, barrier and performance-standard rules**, with the class's
+    iteration quirks: a linked barrier is validated once per element, an unlinked barrier
+    gets only the linkage finding, and a shared standard is validated once per barrier.
+
+    See :func:`azoth.process.reference.barrier_register_validation`.
+    """
+    return resolve(_BARRIER_REGISTER_VALIDATION)(  # type: ignore[no-any-return]
+        register_id=register_id,
+        elements=elements,
+        barriers=barriers,
+        standards=standards,
+        links=links,
+        evidence=evidence,
     )
 
 

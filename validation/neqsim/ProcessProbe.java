@@ -144,6 +144,14 @@
 //       > captures/process_hazop_consequence_population.tsv
 //     java -cp .:neqsim-118d9af.jar ProcessProbe mah_bow_tie_skeleton \
 //       > captures/process_mah_bow_tie_skeleton.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe api14c_safe_chart \
+//       > captures/process_api14c_safe_chart.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe barrier_register_validation \
+//       > captures/process_barrier_register_validation.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe s001_secondary_pressure_protection \
+//       > captures/process_s001_secondary_pressure_protection.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe s001_clause10_review \
+//       > captures/process_s001_clause10_review.tsv
 
 import neqsim.process.equipment.stream.Stream;
 import neqsim.process.equipment.util.AccelerationMethod;
@@ -153,6 +161,16 @@ import neqsim.thermo.system.SystemPrEos;
 import neqsim.thermo.system.SystemSrkEos;
 import neqsim.thermodynamicoperations.ThermodynamicOperations;
 import neqsim.process.safety.BoundaryConditions;
+import neqsim.process.safety.api14c.Api14cDeviceType;
+import neqsim.process.safety.api14c.Api14cEquipmentCategory;
+import neqsim.process.safety.api14c.Api14cSafeChartBuilder;
+import neqsim.process.safety.api14c.Api14cSafeChartItem;
+import neqsim.process.safety.api14c.Api14cSafetyAnalysisTable;
+import neqsim.process.safety.barrier.BarrierRegister;
+import neqsim.process.safety.barrier.DocumentEvidence;
+import neqsim.process.safety.barrier.PerformanceStandard;
+import neqsim.process.safety.barrier.SafetyBarrier;
+import neqsim.process.safety.barrier.SafetyCriticalElement;
 import neqsim.process.safety.dispersion.GasDispersionAnalyzer;
 import neqsim.process.safety.dispersion.GasDispersionResult;
 import neqsim.process.safety.dispersion.GaussianPlume;
@@ -177,6 +195,14 @@ import neqsim.process.safety.firewater.FireMonitorCoverage;
 import neqsim.process.safety.firewater.FireWaterCoverageAssessment;
 import neqsim.process.safety.firewater.FireWaterCoverageAssessment.Verdict;
 import neqsim.process.safety.firewater.FireWaterDemandCalculator;
+import neqsim.process.safety.processsafetysystem.ProcessSafetySystemAssessment;
+import neqsim.process.safety.processsafetysystem.ProcessSafetySystemReviewEngine;
+import neqsim.process.safety.processsafetysystem.ProcessSafetySystemReviewInput;
+import neqsim.process.safety.processsafetysystem.ProcessSafetySystemReviewItem;
+import neqsim.process.safety.processsafetysystem.ProcessSafetySystemReviewReport;
+import neqsim.process.safety.processsafetysystem.ProcessSafetySystemReviewResult;
+import neqsim.process.safety.processsafetysystem.S001SecondaryPressureProtectionCriteria;
+import neqsim.process.safety.processsafetysystem.S001SecondaryPressureProtectionResult;
 import neqsim.process.safety.qra.ConsequenceAnalysisEngine;
 import neqsim.process.safety.release.HomogeneousEquilibriumReleaseModel;
 import neqsim.process.safety.release.LeakModel;
@@ -527,6 +553,18 @@ public class ProcessProbe {
         break;
       case "mah_bow_tie_skeleton":
         mahBowTieSkeletonRows();
+        break;
+      case "api14c_safe_chart":
+        api14cSafeChartRows();
+        break;
+      case "barrier_register_validation":
+        barrierRegisterValidationRows();
+        break;
+      case "s001_secondary_pressure_protection":
+        s001SecondaryPressureProtectionRows();
+        break;
+      case "s001_clause10_review":
+        s001Clause10ReviewRows();
         break;
       case "pipe_fire_rupture":
         pipeFireRuptureRows();
@@ -16794,5 +16832,559 @@ public class ProcessProbe {
       System.out.println("message=" + ex.getMessage());
     }
     System.out.println();
+  }
+
+  // ---- API 14C SAFE chart -------------------------------------------------
+
+  static String api14cDeviceList(java.util.Set<Api14cDeviceType> devices) {
+    StringBuilder out = new StringBuilder();
+    for (Api14cDeviceType device : Api14cSafetyAnalysisTable.deviceOrder()) {
+      if (devices.contains(device)) {
+        if (out.length() > 0) {
+          out.append(',');
+        }
+        out.append(device.name().toLowerCase(java.util.Locale.ROOT));
+      }
+    }
+    return out.toString();
+  }
+
+  static void printApi14cItem(String prefix, Api14cSafeChartItem item) {
+    System.out.println(prefix + "equipment=" + item.getEquipmentName());
+    System.out.println(
+        prefix + "category=" + item.getCategory().name().toLowerCase(java.util.Locale.ROOT));
+    System.out.println(prefix + "required=" + api14cDeviceList(item.getRequired()));
+    System.out.println(prefix + "present=" + api14cDeviceList(item.getPresent()));
+    System.out.println(prefix + "missing=" + api14cDeviceList(item.getMissing()));
+    System.out.println(prefix + "required_count=" + item.getRequired().size());
+    System.out.println(prefix + "present_count=" + item.getPresent().size());
+    System.out.println(prefix + "missing_count=" + item.getMissing().size());
+    System.out.println(prefix + "complete=" + item.isComplete());
+  }
+
+  static void printApi14cChart(String label, Api14cSafeChartBuilder builder) {
+    System.out.println(label);
+    System.out.println("equipment_count=" + builder.getItems().size());
+    for (int i = 0; i < builder.getItems().size(); i++) {
+      printApi14cItem("item" + i + "_", builder.getItems().get(i));
+    }
+    System.out.println("complete=" + builder.isComplete());
+    java.util.List<String> gaps = builder.getGaps();
+    System.out.println("gap_count=" + gaps.size());
+    for (int i = 0; i < gaps.size(); i++) {
+      System.out.println("gap" + i + "=" + gaps.get(i));
+    }
+    System.out.println();
+  }
+
+  static void api14cSafeChartRows() {
+    System.out.println("api14c_devices");
+    for (Api14cDeviceType device : Api14cSafetyAnalysisTable.deviceOrder()) {
+      System.out.println("device_" + device.name().toLowerCase(java.util.Locale.ROOT) + "="
+          + device.getDescription());
+    }
+    System.out.println();
+
+    System.out.println("api14c_categories");
+    for (Api14cEquipmentCategory category : Api14cEquipmentCategory.values()) {
+      System.out.println("category_" + category.name().toLowerCase(java.util.Locale.ROOT) + "="
+          + category.getDescription());
+    }
+    System.out.println();
+
+    for (Api14cEquipmentCategory category : Api14cEquipmentCategory.values()) {
+      java.util.Set<Api14cDeviceType> required =
+          Api14cSafetyAnalysisTable.getRequiredDevices(category);
+      System.out.println("api14c_table_" + category.name().toLowerCase(java.util.Locale.ROOT));
+      System.out.println("required=" + api14cDeviceList(required));
+      System.out.println("required_count=" + required.size());
+      System.out.println();
+    }
+
+    ProcessSystem process = new ProcessSystem();
+    process.add(new Stream("feed"));
+    process.add(new neqsim.process.equipment.separator.Separator("V-101"));
+    process.add(new neqsim.process.equipment.separator.GasScrubber("SCR-101"));
+    process.add(new neqsim.process.equipment.tank.Tank("T-101"));
+    process.add(new neqsim.process.equipment.heatexchanger.FiredHeater("H-101"));
+    process.add(new neqsim.process.equipment.pipeline.PipeBeggsAndBrills("PL-101"));
+    process.add(new neqsim.process.equipment.compressor.Compressor("K-101"));
+    process.add(new neqsim.process.equipment.pump.Pump("P-101"));
+    process.add(new neqsim.process.equipment.heatexchanger.Cooler("E-101"));
+    process.add(new neqsim.process.equipment.reservoir.WellFlow("W-101"));
+
+    Api14cSafeChartBuilder declared = new Api14cSafeChartBuilder()
+        .declarePresent("V-101", java.util.EnumSet.of(Api14cDeviceType.PSH, Api14cDeviceType.PSV))
+        .build(process);
+    printApi14cChart("api14c_chart_declared", declared);
+
+    Api14cSafeChartBuilder complete = new Api14cSafeChartBuilder().buildAssumingComplete(process);
+    printApi14cChart("api14c_chart_complete", complete);
+
+    Api14cSafeChartBuilder empty = new Api14cSafeChartBuilder().build(new ProcessSystem());
+    printApi14cChart("api14c_chart_empty", empty);
+  }
+
+  // ---- Barrier register validation ----------------------------------------
+
+  static DocumentEvidence barrierEvidence(String id) {
+    return new DocumentEvidence(id, "SRS-" + id, "Safety requirement", "A", "4.2", 12,
+        "references/" + id + ".pdf", "Evidence excerpt " + id + ".", 0.9);
+  }
+
+  static PerformanceStandard barrierStandard(String id) {
+    return new PerformanceStandard(id).setTitle("Performance standard " + id)
+        .setSafetyFunction("Isolate the protected equipment")
+        .setDemandMode(PerformanceStandard.DemandMode.LOW_DEMAND).setTargetPfd(1.0e-3)
+        .setRequiredAvailability(0.995).setProofTestIntervalHours(8760.0).setResponseTimeSeconds(2.0)
+        .addAcceptanceCriterion("Final elements close within two seconds.")
+        .addEvidence(barrierEvidence("E-S-" + id));
+  }
+
+  static SafetyBarrier barrier(String id, PerformanceStandard standard) {
+    return new SafetyBarrier(id).setName("Barrier " + id)
+        .setDescription("Prevents the overpressure scenario")
+        .setType(SafetyBarrier.BarrierType.PREVENTION)
+        .setStatus(SafetyBarrier.BarrierStatus.AVAILABLE)
+        .setSafetyFunction("Isolate the protected equipment").setOwner("Instrument").setPfd(1.0e-3)
+        .addEquipmentTag("V-101").setPerformanceStandard(standard)
+        .addEvidence(barrierEvidence("E-B-" + id));
+  }
+
+  static SafetyCriticalElement barrierElement(String id, SafetyBarrier... barriers) {
+    SafetyCriticalElement element =
+        new SafetyCriticalElement(id).setTag("V-101").setName("Protected equipment")
+            .setType(SafetyCriticalElement.ElementType.PROCESS_EQUIPMENT).addEquipmentTag("V-101");
+    for (SafetyBarrier value : barriers) {
+      element.addBarrier(value);
+    }
+    return element;
+  }
+
+  static void printBarrierValidation(String label, BarrierRegister register) {
+    System.out.println(label);
+    java.util.List<String> findings = register.validate();
+    System.out.println("finding_count=" + findings.size());
+    for (int i = 0; i < findings.size(); i++) {
+      System.out.println("finding" + i + "=" + findings.get(i));
+    }
+    System.out.println();
+  }
+
+  static void barrierValidationBlock(String label, String registerId,
+      SafetyCriticalElement element, SafetyBarrier barrier) {
+    BarrierRegister register = new BarrierRegister(registerId);
+    if (element != null) {
+      register.addSafetyCriticalElement(element);
+    }
+    if (barrier != null) {
+      register.addBarrier(barrier);
+    }
+    printBarrierValidation(label, register);
+  }
+
+  static void barrierRegisterValidationRows() {
+    PerformanceStandard validStandard = barrierStandard("PS-HIPPS-001");
+    SafetyBarrier valid = barrier("B-HIPPS-001", validStandard);
+    barrierValidationBlock("br_valid", "BR-001", barrierElement("SCE-V-101", valid), valid);
+
+    SafetyBarrier idBarrier = barrier("B-ID", validStandard);
+    barrierValidationBlock("br_register_id_missing", "", barrierElement("SCE-V-101", idBarrier),
+        idBarrier);
+
+    barrierValidationBlock("br_register_empty", "BR-EMPTY", null, null);
+
+    SafetyBarrier elementIdBarrier = barrier("B-EL-ID", validStandard);
+    barrierValidationBlock("br_element_id_missing", "BR-001",
+        barrierElement("", elementIdBarrier), elementIdBarrier);
+
+    SafetyBarrier untaggedElementBarrier = barrier("B-EL-TAG", validStandard);
+    SafetyCriticalElement untaggedElement =
+        new SafetyCriticalElement("SCE-002").setType(SafetyCriticalElement.ElementType.PROCESS_EQUIPMENT)
+            .addBarrier(untaggedElementBarrier);
+    printBarrierValidation("br_element_tag_or_name_missing",
+        new BarrierRegister("BR-001").addSafetyCriticalElement(untaggedElement)
+            .addBarrier(untaggedElementBarrier));
+
+    SafetyCriticalElement noBarrierElement =
+        new SafetyCriticalElement("SCE-003").setTag("V-101").setName("No barriers");
+    printBarrierValidation("br_element_no_barriers",
+        new BarrierRegister("BR-001").addSafetyCriticalElement(noBarrierElement));
+
+    SafetyBarrier untraceableBarrier =
+        new SafetyBarrier("B-004").setName("Untraceable").setDescription("No evidence")
+            .setStatus(SafetyBarrier.BarrierStatus.AVAILABLE).setPfd(0.01)
+            .addEquipmentTag("V-101");
+    printBarrierValidation("br_element_no_traceable_evidence",
+        new BarrierRegister("BR-001")
+            .addSafetyCriticalElement(barrierElement("SCE-004", untraceableBarrier))
+            .addBarrier(untraceableBarrier));
+
+    SafetyBarrier noIdBarrier = barrier("", validStandard);
+    barrierValidationBlock("br_barrier_id_missing", "BR-001",
+        barrierElement("SCE-005", noIdBarrier), noIdBarrier);
+
+    SafetyBarrier unnamedBarrier = barrier("B-005", validStandard).setName("").setDescription("");
+    barrierValidationBlock("br_barrier_name_or_description_missing", "BR-001",
+        barrierElement("SCE-006", unnamedBarrier), unnamedBarrier);
+
+    SafetyBarrier highPfdBarrier =
+        barrier("B-006", validStandard).setPfd(1.5).setEffectiveness(0.9);
+    barrierValidationBlock("br_barrier_pfd_out_of_range", "BR-001",
+        barrierElement("SCE-007", highPfdBarrier), highPfdBarrier);
+
+    SafetyBarrier highEffectivenessBarrier =
+        barrier("B-007", validStandard).setPfd(0.01).setEffectiveness(1.5);
+    barrierValidationBlock("br_barrier_effectiveness_out_of_range", "BR-001",
+        barrierElement("SCE-008", highEffectivenessBarrier), highEffectivenessBarrier);
+
+    SafetyBarrier unknownStatusBarrier =
+        barrier("B-008", validStandard).setStatus(SafetyBarrier.BarrierStatus.UNKNOWN);
+    barrierValidationBlock("br_barrier_status_unknown", "BR-001",
+        barrierElement("SCE-009", unknownStatusBarrier), unknownStatusBarrier);
+
+    SafetyBarrier untaggedBarrier = new SafetyBarrier("B-009").setName("No equipment tag")
+        .setDescription("No equipment tag").setStatus(SafetyBarrier.BarrierStatus.AVAILABLE)
+        .setPfd(0.01).setPerformanceStandard(validStandard)
+        .addEvidence(barrierEvidence("E-B-009"));
+    barrierValidationBlock("br_barrier_no_equipment_tag", "BR-001",
+        barrierElement("SCE-010", untaggedBarrier), untaggedBarrier);
+
+    SafetyBarrier noStandardBarrier = new SafetyBarrier("B-010").setName("No standard")
+        .setDescription("No performance standard").setStatus(SafetyBarrier.BarrierStatus.AVAILABLE)
+        .setPfd(0.01).addEquipmentTag("V-101").addEvidence(barrierEvidence("E-B-010"));
+    barrierValidationBlock("br_barrier_no_performance_standard", "BR-001",
+        barrierElement("SCE-011", noStandardBarrier), noStandardBarrier);
+
+    PerformanceStandard bareStandard = new PerformanceStandard("PS-BARE")
+        .setSafetyFunction("Bare standard").setTargetPfd(1.0e-3).setRequiredAvailability(0.99)
+        .setProofTestIntervalHours(8760.0).setResponseTimeSeconds(2.0)
+        .addAcceptanceCriterion("Final elements close within two seconds.");
+    SafetyBarrier bareBarrier = new SafetyBarrier("B-011").setName("Bare barrier")
+        .setDescription("No traceable evidence").setStatus(SafetyBarrier.BarrierStatus.AVAILABLE)
+        .setPfd(0.01).addEquipmentTag("V-101").setPerformanceStandard(bareStandard);
+    barrierValidationBlock("br_barrier_no_traceable_evidence", "BR-001",
+        barrierElement("SCE-012", bareBarrier), bareBarrier);
+
+    PerformanceStandard noIdStandard = new PerformanceStandard("")
+        .setSafetyFunction("Standard without id").setTargetPfd(1.0e-3)
+        .setRequiredAvailability(0.99).setProofTestIntervalHours(8760.0)
+        .setResponseTimeSeconds(2.0).addAcceptanceCriterion("Criterion.")
+        .addEvidence(barrierEvidence("E-S-NOID"));
+    SafetyBarrier noIdStandardBarrier = barrier("B-012", noIdStandard);
+    barrierValidationBlock("br_standard_id_missing", "BR-001",
+        barrierElement("SCE-013", noIdStandardBarrier), noIdStandardBarrier);
+
+    PerformanceStandard noFunctionStandard = new PerformanceStandard("PS-NOFUNC")
+        .setTitle("Standard without safety function").setTargetPfd(1.0e-3)
+        .setRequiredAvailability(0.99).setProofTestIntervalHours(8760.0)
+        .setResponseTimeSeconds(2.0).addAcceptanceCriterion("Criterion.")
+        .addEvidence(barrierEvidence("E-S-NOFUNC"));
+    SafetyBarrier noFunctionBarrier = barrier("B-013", noFunctionStandard);
+    barrierValidationBlock("br_standard_safety_function_missing", "BR-001",
+        barrierElement("SCE-014", noFunctionBarrier), noFunctionBarrier);
+
+    PerformanceStandard zeroPfdStandard = barrierStandard("PS-ZEROPFD").setTargetPfd(0.0);
+    SafetyBarrier zeroPfdBarrier = barrier("B-014", zeroPfdStandard);
+    barrierValidationBlock("br_standard_target_pfd_out_of_range", "BR-001",
+        barrierElement("SCE-015", zeroPfdBarrier), zeroPfdBarrier);
+
+    PerformanceStandard highAvailabilityStandard =
+        barrierStandard("PS-AVAIL").setRequiredAvailability(1.5);
+    SafetyBarrier highAvailabilityBarrier = barrier("B-015", highAvailabilityStandard);
+    barrierValidationBlock("br_standard_required_availability_out_of_range", "BR-001",
+        barrierElement("SCE-016", highAvailabilityBarrier), highAvailabilityBarrier);
+
+    PerformanceStandard zeroProofStandard =
+        barrierStandard("PS-PROOF").setProofTestIntervalHours(0.0);
+    SafetyBarrier zeroProofBarrier = barrier("B-016", zeroProofStandard);
+    barrierValidationBlock("br_standard_proof_test_interval_not_positive", "BR-001",
+        barrierElement("SCE-017", zeroProofBarrier), zeroProofBarrier);
+
+    PerformanceStandard noCriteriaStandard = new PerformanceStandard("PS-NOCRIT")
+        .setSafetyFunction("Standard without acceptance criteria").setTargetPfd(1.0e-3)
+        .setRequiredAvailability(0.99).setProofTestIntervalHours(8760.0)
+        .setResponseTimeSeconds(2.0).addEvidence(barrierEvidence("E-S-NOCRIT"));
+    SafetyBarrier noCriteriaBarrier = barrier("B-017", noCriteriaStandard);
+    barrierValidationBlock("br_standard_no_acceptance_criteria", "BR-001",
+        barrierElement("SCE-018", noCriteriaBarrier), noCriteriaBarrier);
+
+    PerformanceStandard noEvidenceStandard = new PerformanceStandard("PS-NOEVID")
+        .setSafetyFunction("Standard without evidence").setTargetPfd(1.0e-3)
+        .setRequiredAvailability(0.99).setProofTestIntervalHours(8760.0)
+        .setResponseTimeSeconds(2.0).addAcceptanceCriterion("Criterion.");
+    SafetyBarrier noEvidenceBarrier = barrier("B-018", noEvidenceStandard);
+    barrierValidationBlock("br_standard_no_traceable_evidence", "BR-001",
+        barrierElement("SCE-019", noEvidenceBarrier), noEvidenceBarrier);
+
+    SafetyBarrier unlinked = barrier("B-UNLINKED", validStandard);
+    printBarrierValidation("br_barrier_not_linked",
+        new BarrierRegister("BR-001").addBarrier(unlinked));
+
+    SafetyBarrier twice =
+        barrier("B-TWICE", validStandard).setStatus(SafetyBarrier.BarrierStatus.UNKNOWN);
+    BarrierRegister twiceRegister = new BarrierRegister("BR-001")
+        .addSafetyCriticalElement(barrierElement("SCE-020", twice))
+        .addSafetyCriticalElement(barrierElement("SCE-021", twice)).addBarrier(twice);
+    printBarrierValidation("br_linked_twice", twiceRegister);
+
+    PerformanceStandard sharedStandard = new PerformanceStandard("PS-SHARED")
+        .setSafetyFunction("Standard shared by two barriers").setTargetPfd(1.0e-3)
+        .setRequiredAvailability(0.99).setProofTestIntervalHours(8760.0)
+        .setResponseTimeSeconds(2.0).addEvidence(barrierEvidence("E-S-SHARED"));
+    SafetyBarrier sharedOne = barrier("B-SHARED-1", sharedStandard);
+    SafetyBarrier sharedTwo = barrier("B-SHARED-2", sharedStandard);
+    BarrierRegister sharedRegister = new BarrierRegister("BR-001")
+        .addSafetyCriticalElement(barrierElement("SCE-022", sharedOne, sharedTwo))
+        .addBarrier(sharedOne).addBarrier(sharedTwo);
+    printBarrierValidation("br_shared_standard", sharedRegister);
+  }
+
+  // ---- NORSOK S-001 secondary pressure protection -------------------------
+
+  static S001SecondaryPressureProtectionResult s001State(Double event, Double design, Double test,
+      Double demand, Double target, Boolean assessed, Boolean safe, Double proof) {
+    S001SecondaryPressureProtectionCriteria criteria = new S001SecondaryPressureProtectionCriteria();
+    if (event != null) {
+      criteria.setMaximumEventPressureBara(event);
+    }
+    if (design != null) {
+      criteria.setDesignPressureBara(design);
+    }
+    if (test != null) {
+      criteria.setTestPressureBara(test);
+    }
+    if (demand != null) {
+      criteria.setDemandFrequencyPerYear(demand);
+    }
+    if (target != null) {
+      criteria.setTargetFrequencyPerYear(target);
+    }
+    if (assessed != null) {
+      criteria.setReliefLeakageAssessed(assessed);
+    }
+    if (safe != null) {
+      criteria.setReliefLeakageToSafeLocation(safe);
+    }
+    if (proof != null) {
+      criteria.setProofTestIntervalMonths(proof);
+    }
+    return criteria.evaluate();
+  }
+
+  static String s001Key(String key) {
+    StringBuilder out = new StringBuilder();
+    for (char character : key.toCharArray()) {
+      if (Character.isUpperCase(character)) {
+        out.append('_').append(Character.toLowerCase(character));
+      } else {
+        out.append(character);
+      }
+    }
+    return out.toString();
+  }
+
+  static void printS001(String label, S001SecondaryPressureProtectionResult result) {
+    System.out.println(label);
+    for (java.util.Map.Entry<String, Object> entry : result.toMap().entrySet()) {
+      System.out.println(s001Key(entry.getKey()) + "=" + entry.getValue());
+    }
+    System.out.println();
+  }
+
+  static void s001SecondaryPressureProtectionRows() {
+    printS001("s001_band_below_design", s001State(90.0, 100.0, 150.0, null, null, null, null, null));
+    printS001("s001_band_above_design", s001State(120.0, 100.0, 150.0, null, null, null, null, null));
+    printS001("s001_band_above_test", s001State(175.0, 100.0, 150.0, null, null, null, null, null));
+    printS001("s001_band_above_two_design",
+        s001State(201.0, 100.0, 150.0, null, null, null, null, null));
+
+    printS001("s001_complete_pass",
+        s001State(120.0, 100.0, 150.0, 1.0e-4, null, true, true, 6.0));
+    printS001("s001_event_above_test",
+        s001State(175.0, 100.0, 150.0, 1.0e-5, null, true, true, 6.0));
+    printS001("s001_missing_basis",
+        s001State(null, null, null, 1.0e-3, null, true, true, 6.0));
+    printS001("s001_leakage_null",
+        s001State(120.0, 100.0, 150.0, 1.0e-4, null, null, null, 6.0));
+    printS001("s001_leakage_false",
+        s001State(120.0, 100.0, 150.0, 1.0e-4, null, false, false, 6.0));
+    printS001("s001_explicit_target",
+        s001State(90.0, 100.0, 150.0, 1.0e-5, 1.0e-6, true, true, 6.0));
+    printS001("s001_proof_six",
+        s001State(120.0, 100.0, 150.0, 1.0e-4, null, true, true, 6.0));
+    printS001("s001_proof_thirteen",
+        s001State(120.0, 100.0, 150.0, 1.0e-4, null, true, true, 13.0));
+    printS001("s001_proof_negative",
+        s001State(120.0, 100.0, 150.0, 1.0e-4, null, true, true, -6.0));
+    printS001("s001_proof_zero",
+        s001State(120.0, 100.0, 150.0, 1.0e-4, null, true, true, 0.0));
+    printS001("s001_empty", s001State(null, null, null, null, null, null, null, null));
+  }
+
+  // ---- NORSOK S-001 Clause 10 review --------------------------------------
+
+  static ProcessSafetySystemReviewItem baseReviewItem(String functionId, String functionType) {
+    return new ProcessSafetySystemReviewItem().setFunctionId(functionId).setFunctionType(functionType)
+        .setEquipmentTag("V-100").addSourceReference("synthetic C&E")
+        .addSourceReference("synthetic SRS").put("processSafetyRoleDefined", true)
+        .put("hazidHazopLopaCompleted", true).put("srsDefinesRequiredFunctions", true)
+        .put("sisEsdFgsDesignImplemented", true).put("verificationTestingOperationConfirmed", true)
+        .put("interfacesDefined", true).put("protectionLayersDocumented", true)
+        .put("designBasisDocumented", true).put("processSafetyPrinciplesDocumented", true)
+        .put("bypassManagementDocumented", true).put("requiredUtilitiesIdentified", true)
+        .put("utilityDependent", true).put("failSafeOnUtilityLoss", true)
+        .put("survivabilityRequirementDocumented", true).put("requiredSurvivabilityTimeMin", 30.0)
+        .put("survivabilityTimeMin", 60.0).put("tagreaderSource", "synthetic instrument data")
+        .put("overrideActive", false).put("proofTestOverdue", false).put("tripDemandFailures", 0.0);
+  }
+
+  static ProcessSafetySystemReviewInput reviewInput(String projectName,
+      ProcessSafetySystemReviewItem... items) {
+    ProcessSafetySystemReviewInput input =
+        new ProcessSafetySystemReviewInput().setProjectName(projectName);
+    for (ProcessSafetySystemReviewItem item : items) {
+      input.addItem(item);
+    }
+    return input;
+  }
+
+  static void printReview(String label, ProcessSafetySystemReviewInput input) {
+    System.out.println(label);
+    ProcessSafetySystemReviewReport report = new ProcessSafetySystemReviewEngine().evaluate(input);
+    System.out.println("overall_verdict=" + report.getOverallVerdict());
+    System.out.println("result_count=" + report.getResults().size());
+    for (int r = 0; r < report.getResults().size(); r++) {
+      ProcessSafetySystemReviewResult result = report.getResults().get(r);
+      java.util.Map<String, Object> resultMap = result.toMap();
+      String prefix = "result" + r + "_";
+      System.out.println(prefix + "function_id=" + result.getItem().getFunctionId());
+      System.out.println(prefix + "function_type=" + result.getItem().getFunctionType());
+      System.out.println(prefix + "verdict=" + resultMap.get("verdict"));
+      System.out.println(prefix + "confidence=" + resultMap.get("confidence"));
+      System.out.println(prefix + "assessment_count=" + result.getAssessments().size());
+      for (int a = 0; a < result.getAssessments().size(); a++) {
+        ProcessSafetySystemAssessment assessment = result.getAssessments().get(a);
+        java.util.Map<String, Object> map = assessment.toMap();
+        String head = prefix + "assessment" + a + "_";
+        System.out.println(head + "requirement_id=" + map.get("requirementId"));
+        System.out.println(head + "clause=" + map.get("clause"));
+        System.out.println(head + "status=" + map.get("status"));
+        System.out.println(head + "severity=" + map.get("severity"));
+      }
+    }
+    System.out.println();
+  }
+
+  static void printReviewCoercion() {
+    ProcessSafetySystemReviewItem item = new ProcessSafetySystemReviewItem().setFunctionId("COERCE");
+    item.put("nanKey", "NaN");
+    item.put("infinityKey", "Infinity");
+    item.put("spacedKey", " 1.5 ");
+    item.put("suffixKey", "1.5f");
+    item.put("blankKey", "");
+    item.put("yesKey", "yes");
+    item.put("zeroKey", "0");
+    item.put("maybeKey", "maybe");
+    System.out.println("cl10_coercion");
+    System.out.println("nan_value=" + item.getDouble(-1.0, "nanKey"));
+    System.out.println("infinity_value=" + item.getDouble(-1.0, "infinityKey"));
+    System.out.println("spaced_value=" + item.getDouble(-1.0, "spacedKey"));
+    System.out.println("suffix_value=" + item.getDouble(-1.0, "suffixKey"));
+    System.out.println("blank_value=" + item.getDouble(-1.0, "blankKey"));
+    System.out.println("missing_value=" + item.getDouble(-1.0, "missingKey"));
+    System.out.println("yes_value=" + item.getBooleanObject("yesKey"));
+    System.out.println("zero_value=" + item.getBooleanObject("zeroKey"));
+    System.out.println("maybe_value=" + item.getBooleanObject("maybeKey"));
+    System.out.println("missing_flag=" + item.getBooleanObject("missingFlag"));
+    System.out.println();
+  }
+
+  static void s001Clause10ReviewRows() {
+    printReview("cl10_example", reviewInput("Synthetic Clause 10 review",
+        baseReviewItem("PSD-1001", "PSD").put("shutdownActionDefined", true)
+            .put("psdValveFailsSafe", true).put("psdValveIsolationAdequate", true)
+            .put("requiredResponseTimeSeconds", 30.0).put("actualResponseTimeSeconds", 18.0)
+            .put("logicSolverCertified", true).put("logicSolverIndependent", true)
+            .put("causeAndEffectTested", true).put("psdIndependentFromControl", true)
+            .put("manualShutdownAvailable", true),
+        baseReviewItem("PSV-1001", "PSV").put("psvSizingBasisDocumented", true)
+            .put("reliefScenarioDocumented", true).put("protectedEquipmentDocumented", true)
+            .put("requiredReliefLoadKgPerS", 10.0).put("psvCapacityKgPerS", 14.0),
+        baseReviewItem("PAHH-1001", "ALARM").put("alarmActionDefined", true)
+            .put("alarmSetpointDocumented", true).put("operatorResponseTimeSeconds", 120.0)
+            .put("availableOperatorResponseTimeSeconds", 300.0)
+            .put("requiredResponseTimeSeconds", 300.0).put("actualResponseTimeSeconds", 120.0),
+        baseReviewItem("SIF-1001", "SECONDARY_PRESSURE_PROTECTION")
+            .put("logicSolverCertified", true).put("logicSolverIndependent", true)
+            .put("causeAndEffectTested", true).put("maximumEventPressureBara", 120.0)
+            .put("designPressureBara", 100.0).put("testPressureBara", 150.0)
+            .put("demandFrequencyPerYear", 1.0e-4).put("reliefLeakageAssessed", true)
+            .put("reliefLeakageToSafeLocation", true).put("proofTestIntervalMonths", 6.0)
+            .put("requiredResponseTimeSeconds", 10.0).put("actualResponseTimeSeconds", 5.0)));
+
+    printReview("cl10_secondary_fail", reviewInput("Secondary pressure protection fail case",
+        baseReviewItem("SIF-HP-001", "SECONDARY_PRESSURE_PROTECTION")
+            .put("logicSolverCertified", true).put("logicSolverIndependent", true)
+            .put("causeAndEffectTested", true).put("maximumEventPressureBara", 175.0)
+            .put("designPressureBara", 100.0).put("testPressureBara", 150.0)
+            .put("demandFrequencyPerYear", 1.0e-3).put("reliefLeakageAssessed", true)
+            .put("reliefLeakageToSafeLocation", true).put("proofTestIntervalMonths", 6.0)
+            .put("requiredResponseTimeSeconds", 10.0).put("actualResponseTimeSeconds", 5.0)));
+
+    printReview("cl10_bypass", reviewInput("Instrument data fail case",
+        baseReviewItem("PSD-1002", "PSD").put("shutdownActionDefined", true)
+            .put("psdValveFailsSafe", true).put("psdValveIsolationAdequate", true)
+            .put("requiredResponseTimeSeconds", 30.0).put("actualResponseTimeSeconds", 18.0)
+            .put("logicSolverCertified", true).put("logicSolverIndependent", true)
+            .put("causeAndEffectTested", true).put("psdIndependentFromControl", true)
+            .put("manualShutdownAvailable", true).put("bypassActive", true)));
+
+    printReview("cl10_lifecycle_fail", reviewInput("Lifecycle fail case",
+        baseReviewItem("SIF-VERIFY-001", "SIF").put("logicSolverCertified", true)
+            .put("logicSolverIndependent", true).put("causeAndEffectTested", true)
+            .put("requiredResponseTimeSeconds", 10.0).put("actualResponseTimeSeconds", 5.0)
+            .put("verificationTestingOperationConfirmed", false)));
+
+    printReview("cl10_empty_input", reviewInput("Empty review"));
+
+    printReview("cl10_empty_item", reviewInput("Empty item",
+        new ProcessSafetySystemReviewItem().setFunctionId("EMPTY-001").setFunctionType("OTHER")));
+
+    printReview("cl10_utility_false",
+        reviewInput("Utility false", baseReviewItem("UTIL-001", "OTHER")
+            .put("utilityDependent", false)));
+
+    printReview("cl10_utility_missing", reviewInput("Utility missing",
+        new ProcessSafetySystemReviewItem().setFunctionId("UTIL-002").setFunctionType("OTHER")
+            .put("requiredUtilitiesIdentified", true)));
+
+    printReview("cl10_gated", reviewInput("Gated checks",
+        new ProcessSafetySystemReviewItem().setFunctionId("OTHER-001").setFunctionType("OTHER")
+            .put("processSafetyRoleDefined", true).put("interfacesDefined", true)
+            .put("hazidHazopLopaCompleted", true).put("srsDefinesRequiredFunctions", true)
+            .put("sisEsdFgsDesignImplemented", true)
+            .put("verificationTestingOperationConfirmed", true)
+            .put("protectionLayersDocumented", true).put("designBasisDocumented", true)
+            .put("processSafetyPrinciplesDocumented", true).put("bypassManagementDocumented", true)
+            .put("requiredUtilitiesIdentified", true).put("failSafeOnUtilityLoss", true)
+            .put("survivabilityRequirementDocumented", true)
+            .put("requiredSurvivabilityTimeMin", 30.0).put("survivabilityTimeMin", 60.0)
+            .addSourceReference("synthetic evidence")));
+
+    printReview("cl10_alias", reviewInput("Alias resolution",
+        new ProcessSafetySystemReviewItem().setFunctionId("ALIAS-001").setFunctionType("OTHER")
+            .put("roleDefined", true).put("interfacesDefined", true)));
+
+    printReview("cl10_duplicate_id", reviewInput("Duplicate id",
+        baseReviewItem("DUP-001", "PSD").put("shutdownActionDefined", true),
+        baseReviewItem("DUP-001", "PSV").put("psvSizingBasisDocumented", true)));
+
+    printReview("cl10_first_alias", reviewInput("First alias present",
+        baseReviewItem("PSV-ALIAS", "PSV").put("psvSizingBasisDocumented", true)
+            .put("protectedEquipmentDocumented", true).put("requiredReliefLoadKgPerS", "not-a-number")
+            .put("reliefLoadKgPerS", 10.0).put("psvCapacityKgPerS", 14.0)));
+
+    printReviewCoercion();
   }
 }

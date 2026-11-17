@@ -1,9 +1,9 @@
 /**
  * The safety study's overview.
  *
- * **What this workspace can run, and what it can only point at.** Five fire models and the
- * bow-tie are native here; the other ten families are listed with their manual pages, because
- * a card that ran nothing would be a promise the workspace does not keep.
+ * **What this workspace can run, and what it can only point at.** The scenario decks and the
+ * bow-tie run here; every other family is listed with its manual pages, because a card that
+ * ran nothing would be a promise the workspace does not keep.
  */
 
 import { calcManualUrl } from "../../manual";
@@ -11,11 +11,14 @@ import type { Catalogue, SafetyEnvelope } from "../../wire/types";
 import type { SafetyView, ScenarioView } from "./views";
 
 const FAMILIES: { id: string; label: string }[] = [
+  { id: "api14c", label: "API 14C" },
+  { id: "barrier", label: "Barriers" },
   { id: "dispersion", label: "Dispersion" },
   { id: "fire", label: "Fire and explosion" },
   { id: "firewater", label: "Firewater" },
   { id: "hazid", label: "Hazard identification" },
   { id: "overpressure", label: "Overpressure and relief" },
+  { id: "processsafetysystem", label: "Process safety systems" },
   { id: "qra", label: "Quantitative risk" },
   { id: "release", label: "Release" },
   { id: "risk", label: "Risk and SIL" },
@@ -43,6 +46,11 @@ const SCENARIO_CARDS: { id: ScenarioView; label: string; blurb: string }[] = [
     id: "overpressure",
     label: "Relief scenarios",
     blurb: "Fire-case relief, relief-valve sizing, acceptance and pipeline protection.",
+  },
+  {
+    id: "processsafetysystem",
+    label: "Process safety systems",
+    blurb: "The NORSOK S-001 secondary-pressure protection screen.",
   },
   {
     id: "risk",

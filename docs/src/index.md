@@ -330,7 +330,9 @@ Five sections, and the difference between them is the point:
 - [`process.absorption_column`](./process/absorption_column.md) — Absorption column
 - [`process.active_fire_protection_screening`](./process/active_fire_protection_screening.md) — Active fire protection screening
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
+- [`process.api14c_safe_chart`](./process/api14c_safe_chart.md) — API 14C SAFE chart
 - [`process.api537_flare_flame_model`](./process/api537_flare_flame_model.md) — API 537 flare flame model
+- [`process.barrier_register_validation`](./process/barrier_register_validation.md) — Barrier register validation
 - [`process.basket_test_regression`](./process/basket_test_regression.md) — Basket-test regression
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation
 - [`process.blocked_outlet_relief`](./process/blocked_outlet_relief.md) — Blocked outlet relief
@@ -392,6 +394,8 @@ Five sections, and the difference between them is the point:
 - [`process.rate_based_packed_column`](./process/rate_based_packed_column.md) — Rate-based packed column
 - [`process.relief_disposal_network`](./process/relief_disposal_network.md) — Relief disposal network
 - [`process.risk_matrix`](./process/risk_matrix.md) — Risk matrix
+- [`process.s001_clause10_review`](./process/s001_clause10_review.md) — NORSOK S-001 Clause 10 review
+- [`process.s001_secondary_pressure_protection`](./process/s001_secondary_pressure_protection.md) — NORSOK S-001 secondary pressure protection
 - [`process.safety_instrumented_function`](./process/safety_instrumented_function.md) — Safety instrumented function
 - [`process.self_heating_induction`](./process/self_heating_induction.md) — Self-heating induction time
 - [`process.semenov_self_heating`](./process/semenov_self_heating.md) — Semenov self-heating

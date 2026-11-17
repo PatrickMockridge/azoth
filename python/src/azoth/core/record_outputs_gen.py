@@ -774,6 +774,20 @@ class PipeFireRupturePoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class RegisterFinding:
+    """one row per finding, in the class's order and with its duplicates."""
+
+    #: which record the finding is about.
+    scope: str
+
+    #: the record's id; the register's own finding carries the register id.
+    subject_id: str
+
+    #: the rule the row violates.
+    rule: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ReliefDisposalRow:
     """one row per input row, in caller order."""
 
@@ -832,6 +846,51 @@ class RemediationOptionRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class ReviewAssessment:
+    """one row per assessment, the coverage result first and then each item in caller order."""
+
+    #: the item the assessment belongs to; `CLAUSE10-COVERAGE` for the coverage result.
+    function_id: str
+
+    #: the stable requirement identifier, e.g. `PSS-10.1-ROLE`.
+    requirement_id: str
+
+    #: the clause, e.g. `10.4.7`, or the class's literal label (`Safety lifecycle`, `Operational evidence`, `Evidence quality`).
+    clause: str
+
+    #: the assessment's status.
+    status: str
+
+    #: the class's severity band; a pass and an info are low, a not-applicable row is low.
+    severity: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ReviewCoverage:
+    """the five coverage rows of the synthetic result."""
+
+    #: the type token the coverage row is about.
+    function_type: str
+
+    #: pass when an item's type or evidence matches, else warning.
+    status: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ReviewVerdict:
+    """one verdict per result: the coverage result first, then the items in caller order."""
+
+    #: the result's function id.
+    function_id: str
+
+    #: the result's verdict.
+    verdict: str
+
+    #: the class's confidence, from 0.15 upwards and capped at 1.0; the coverage result is 1.0.
+    confidence: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class RiskAssessmentRow:
     """one row per input row, in caller order."""
 
@@ -879,6 +938,40 @@ class RiskAssessmentRow:
 
     #: `cost_per_failure failures_per_year`, in the same currency per year.
     annual_risk_cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SafeChartItem:
+    """one row per classified equipment, in caller order."""
+
+    #: the equipment name.
+    equipment: str
+
+    #: the SAFE-table category the class assigned.
+    category: str
+
+    #: the number of required devices.
+    required_count: float
+
+    #: the number of declared-present devices, including devices the table does not require.
+    present_count: float
+
+    #: the number of required devices that are not present.
+    missing_count: float
+
+    #: whether the missing set is empty.
+    complete: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SafeChartMissingDevice:
+    """one row per missing device, in equipment caller order and device declaration order."""
+
+    #: the equipment name.
+    equipment: str
+
+    #: the missing protective device.
+    device: str
 
 
 @dataclass(frozen=True, slots=True, eq=False)

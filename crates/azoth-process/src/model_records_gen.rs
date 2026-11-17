@@ -14,7 +14,9 @@ use azoth_core::{CalcResult, Warning};
 use crate::models::absorption_column::AbsorptionColumnResult;
 use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult;
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
+use crate::models::api14c_safe_chart::Api14cSafeChartResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
+use crate::models::barrier_register_validation::BarrierRegisterValidationResult;
 use crate::models::basket_test_regression::BasketTestRegressionResult;
 use crate::models::bleve::BleveResult;
 use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
@@ -76,6 +78,8 @@ use crate::models::pump::PumpResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
+use crate::models::s001_clause10_review::S001Clause10ReviewResult;
+use crate::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
 use crate::models::self_heating_induction::SelfHeatingInductionResult;
 use crate::models::semenov_self_heating::SemenovSelfHeatingResult;
@@ -179,6 +183,22 @@ impl CalcResult for AntiSurgeRecycleResult {
     }
 }
 
+impl CalcResult for Api14cSafeChartResult {
+    const CALC_ID: &'static str = "process.api14c_safe_chart";
+    const FIELDS: &'static [&'static str] = &[
+        "items",
+        "missing_devices",
+        "equipment_count",
+        "missing_count",
+        "complete",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for Api537FlareFlameModelResult {
     const CALC_ID: &'static str = "process.api537_flare_flame_model";
     const FIELDS: &'static [&'static str] = &[
@@ -197,6 +217,15 @@ impl CalcResult for Api537FlareFlameModelResult {
         "equivalent_flame_temperature",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for BarrierRegisterValidationResult {
+    const CALC_ID: &'static str = "process.barrier_register_validation";
+    const FIELDS: &'static [&'static str] = &["findings", "finding_count", "valid", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -1778,6 +1807,49 @@ impl CalcResult for ReliefDisposalNetworkResult {
 impl CalcResult for RiskMatrixResult {
     const CALC_ID: &'static str = "process.risk_matrix";
     const FIELDS: &'static [&'static str] = &["assessments", "total_annual_risk_cost", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for S001Clause10ReviewResult {
+    const CALC_ID: &'static str = "process.s001_clause10_review";
+    const FIELDS: &'static [&'static str] = &[
+        "assessments",
+        "verdicts",
+        "coverage",
+        "overall_verdict",
+        "item_count",
+        "failed_item_count",
+        "warning_item_count",
+        "assessment_count",
+        "fail_assessment_count",
+        "warning_assessment_count",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for S001SecondaryPressureProtectionResult {
+    const CALC_ID: &'static str = "process.s001_secondary_pressure_protection";
+    const FIELDS: &'static [&'static str] = &[
+        "target_frequency_per_year",
+        "pressure_basis_complete",
+        "test_pressure_valid",
+        "pressure_within_test",
+        "frequency_configured",
+        "frequency_criterion_met",
+        "leakage_assessed",
+        "leakage_routed_safe",
+        "proof_test_configured",
+        "proof_test_criterion_met",
+        "acceptable",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

@@ -484,6 +484,12 @@ NON_UNIT_MODELS = {
     "process.fmea_worksheet": "the FMEA RPN ranking over rows, not a unit",
     "process.hazop_consequence_population": "the consequence-catalogue fill over rows, not a unit",
     "process.mah_bow_tie_skeleton": "the ISO 17776 MAH catalogue lookup, not a unit",
+    "process.api14c_safe_chart": "the API 14C SAFE-chart table over equipment rows, not a unit",
+    "process.barrier_register_validation": "the barrier-register rules over rows, not a unit",
+    "process.s001_secondary_pressure_protection": (
+        "the S-001 clause 10.4.7 screen over scalars, not a unit"
+    ),
+    "process.s001_clause10_review": ("the Clause 10 rule review over normalized rows, not a unit"),
 }
 
 

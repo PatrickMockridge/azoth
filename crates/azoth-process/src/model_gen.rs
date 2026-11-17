@@ -4,7 +4,9 @@
 //!   - specs/models/process/absorption_column.toml
 //!   - specs/models/process/active_fire_protection_screening.toml
 //!   - specs/models/process/anti_surge_recycle.toml
+//!   - specs/models/process/api14c_safe_chart.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
+//!   - specs/models/process/barrier_register_validation.toml
 //!   - specs/models/process/basket_test_regression.toml
 //!   - specs/models/process/bleve.toml
 //!   - specs/models/process/blocked_outlet_relief.toml
@@ -66,6 +68,8 @@
 //!   - specs/models/process/rate_based_packed_column.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
+//!   - specs/models/process/s001_clause10_review.toml
+//!   - specs/models/process/s001_secondary_pressure_protection.toml
 //!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/self_heating_induction.toml
 //!   - specs/models/process/semenov_self_heating.toml
@@ -4533,6 +4537,866 @@ pub static ANTI_SURGE_RECYCLE_SPEC: ModelSpec = ModelSpec {
     cases: ANTI_SURGE_RECYCLE_CASES,
 };
 
+static API14C_SAFE_CHART_CHECKS: &[SpecCheck] = &[];
+
+static API14C_SAFE_CHART_CASES: &[TestCase] = &[
+    TestCase {
+        id: "api14c_declared",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("equipment_count", 9.0), ("missing_count", 42.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "equipment",
+                &[
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("feed"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Stream"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Separator"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("GasScrubber"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("T-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Tank"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("FiredHeater"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("PipeBeggsAndBrills"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Compressor"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Pump"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("E-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Cooler"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("WellFlow"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "present_devices",
+                &[
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "items",
+                &[
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("pressure_vessel"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(2.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("pressure_vessel"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("T-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("atmospheric_vessel"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("fired_vessel"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(7.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(7.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("pipeline_segment"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("compressor"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("pump"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("E-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("heat_exchanger"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("wellhead"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "missing_devices",
+                &[
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("T-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("T-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("T-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("fsv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("tsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("bdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("fire"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("fsv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("tsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("bdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("fsv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("E-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("E-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("tsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("E-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("usv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "api14c_empty",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[("assume_complete", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("equipment_count", 0.0), ("missing_count", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static API14C_SAFE_CHART_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "api14c_safe_chart",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.api14c_safe_chart`.
+pub static API14C_SAFE_CHART_SPEC: ModelSpec = ModelSpec {
+    id: "process.api14c_safe_chart",
+    kind: "procedure",
+    algorithm: Some(&API14C_SAFE_CHART_ALGORITHM),
+    checks: API14C_SAFE_CHART_CHECKS,
+    cases: API14C_SAFE_CHART_CASES,
+};
+
 static API537_FLARE_FLAME_MODEL_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -5291,6 +6155,547 @@ pub static API537_FLARE_FLAME_MODEL_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&API537_FLARE_FLAME_MODEL_ALGORITHM),
     checks: API537_FLARE_FLAME_MODEL_CHECKS,
     cases: API537_FLARE_FLAME_MODEL_CASES,
+};
+
+static BARRIER_REGISTER_VALIDATION_CHECKS: &[SpecCheck] = &[];
+
+static BARRIER_REGISTER_VALIDATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "br_valid",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("register_id", "BR-001")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("finding_count", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-V-101"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Protected equipment"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("process_equipment"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-HIPPS-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Barrier B-HIPPS-001"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Prevents the overpressure scenario"),
+                    },
+                    RecordField {
+                        name: "barrier_type",
+                        value: FieldValue::Name("prevention"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "effectiveness",
+                        value: FieldValue::Number(0.999),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-HIPPS-001"),
+                    },
+                    RecordField {
+                        name: "equipment_tag_count",
+                        value: FieldValue::Number(1.0),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-HIPPS-001"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Isolate the protected equipment"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.995),
+                    },
+                    RecordField {
+                        name: "proof_test_interval_hours",
+                        value: FieldValue::Number(8760.0),
+                    },
+                    RecordField {
+                        name: "acceptance_criteria_count",
+                        value: FieldValue::Number(1.0),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-V-101"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-HIPPS-001"),
+                    },
+                ]],
+            ),
+            (
+                "evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "owner_kind",
+                            value: FieldValue::Name("standard"),
+                        },
+                        RecordField {
+                            name: "owner_id",
+                            value: FieldValue::Name("PS-HIPPS-001"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("SRS-E-S-PS-HIPPS-001"),
+                        },
+                        RecordField {
+                            name: "source_reference",
+                            value: FieldValue::Name("references/E-S-PS-HIPPS-001.pdf"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("Evidence excerpt E-S-PS-HIPPS-001."),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "owner_kind",
+                            value: FieldValue::Name("barrier"),
+                        },
+                        RecordField {
+                            name: "owner_id",
+                            value: FieldValue::Name("B-HIPPS-001"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("SRS-E-B-B-HIPPS-001"),
+                        },
+                        RecordField {
+                            name: "source_reference",
+                            value: FieldValue::Name("references/E-B-B-HIPPS-001.pdf"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("Evidence excerpt E-B-B-HIPPS-001."),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "br_shared_standard",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("register_id", "BR-001")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("finding_count", 2.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-022"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Protected equipment"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("process_equipment"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[
+                    &[
+                        RecordField {
+                            name: "id",
+                            value: FieldValue::Name("B-SHARED-1"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Barrier B-SHARED-1"),
+                        },
+                        RecordField {
+                            name: "description",
+                            value: FieldValue::Name("Prevents the overpressure scenario"),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("available"),
+                        },
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.001),
+                        },
+                        RecordField {
+                            name: "effectiveness",
+                            value: FieldValue::Number(0.999),
+                        },
+                        RecordField {
+                            name: "performance_standard_id",
+                            value: FieldValue::Name("PS-SHARED"),
+                        },
+                        RecordField {
+                            name: "equipment_tag_count",
+                            value: FieldValue::Number(1.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "id",
+                            value: FieldValue::Name("B-SHARED-2"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Barrier B-SHARED-2"),
+                        },
+                        RecordField {
+                            name: "description",
+                            value: FieldValue::Name("Prevents the overpressure scenario"),
+                        },
+                        RecordField {
+                            name: "barrier_type",
+                            value: FieldValue::Name("prevention"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("available"),
+                        },
+                        RecordField {
+                            name: "pfd",
+                            value: FieldValue::Number(0.001),
+                        },
+                        RecordField {
+                            name: "effectiveness",
+                            value: FieldValue::Number(0.999),
+                        },
+                        RecordField {
+                            name: "performance_standard_id",
+                            value: FieldValue::Name("PS-SHARED"),
+                        },
+                        RecordField {
+                            name: "equipment_tag_count",
+                            value: FieldValue::Number(1.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-SHARED"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Standard shared by two barriers"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "proof_test_interval_hours",
+                        value: FieldValue::Number(8760.0),
+                    },
+                    RecordField {
+                        name: "acceptance_criteria_count",
+                        value: FieldValue::Number(0.0),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[
+                    &[
+                        RecordField {
+                            name: "element_id",
+                            value: FieldValue::Name("SCE-022"),
+                        },
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-SHARED-1"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "element_id",
+                            value: FieldValue::Name("SCE-022"),
+                        },
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-SHARED-2"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "owner_kind",
+                            value: FieldValue::Name("standard"),
+                        },
+                        RecordField {
+                            name: "owner_id",
+                            value: FieldValue::Name("PS-SHARED"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("SRS-E-S-SHARED"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("Evidence excerpt E-S-SHARED."),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "owner_kind",
+                            value: FieldValue::Name("barrier"),
+                        },
+                        RecordField {
+                            name: "owner_id",
+                            value: FieldValue::Name("B-SHARED-1"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("SRS-E-B-SHARED-1"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("Evidence excerpt E-B-SHARED-1."),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "owner_kind",
+                            value: FieldValue::Name("barrier"),
+                        },
+                        RecordField {
+                            name: "owner_id",
+                            value: FieldValue::Name("B-SHARED-2"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("SRS-E-B-SHARED-2"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("Evidence excerpt E-B-SHARED-2."),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[(
+            "findings",
+            &[
+                &[
+                    RecordField {
+                        name: "scope",
+                        value: FieldValue::Name("standard"),
+                    },
+                    RecordField {
+                        name: "subject_id",
+                        value: FieldValue::Name("PS-SHARED"),
+                    },
+                    RecordField {
+                        name: "rule",
+                        value: FieldValue::Name("standard_no_acceptance_criteria"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "scope",
+                        value: FieldValue::Name("standard"),
+                    },
+                    RecordField {
+                        name: "subject_id",
+                        value: FieldValue::Name("PS-SHARED"),
+                    },
+                    RecordField {
+                        name: "rule",
+                        value: FieldValue::Name("standard_no_acceptance_criteria"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "br_barrier_not_linked",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("register_id", "BR-001")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("finding_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "barriers",
+            &[&[
+                RecordField {
+                    name: "id",
+                    value: FieldValue::Name("B-UNLINKED"),
+                },
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Barrier B-UNLINKED"),
+                },
+                RecordField {
+                    name: "description",
+                    value: FieldValue::Name("Prevents the overpressure scenario"),
+                },
+                RecordField {
+                    name: "barrier_type",
+                    value: FieldValue::Name("prevention"),
+                },
+                RecordField {
+                    name: "status",
+                    value: FieldValue::Name("available"),
+                },
+                RecordField {
+                    name: "pfd",
+                    value: FieldValue::Number(0.001),
+                },
+                RecordField {
+                    name: "effectiveness",
+                    value: FieldValue::Number(0.999),
+                },
+                RecordField {
+                    name: "performance_standard_id",
+                    value: FieldValue::Name("PS-HIPPS-001"),
+                },
+                RecordField {
+                    name: "equipment_tag_count",
+                    value: FieldValue::Number(1.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "findings",
+            &[&[
+                RecordField {
+                    name: "scope",
+                    value: FieldValue::Name("barrier"),
+                },
+                RecordField {
+                    name: "subject_id",
+                    value: FieldValue::Name("B-UNLINKED"),
+                },
+                RecordField {
+                    name: "rule",
+                    value: FieldValue::Name("barrier_not_linked_to_element"),
+                },
+            ]],
+        )],
+    },
+];
+
+static BARRIER_REGISTER_VALIDATION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "barrier_register_validation",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.barrier_register_validation`.
+pub static BARRIER_REGISTER_VALIDATION_SPEC: ModelSpec = ModelSpec {
+    id: "process.barrier_register_validation",
+    kind: "procedure",
+    algorithm: Some(&BARRIER_REGISTER_VALIDATION_ALGORITHM),
+    checks: BARRIER_REGISTER_VALIDATION_CHECKS,
+    cases: BARRIER_REGISTER_VALIDATION_CASES,
 };
 
 static BASKET_TEST_REGRESSION_CHECKS: &[SpecCheck] = &[SpecCheck {
@@ -66691,6 +68096,2704 @@ pub static RISK_MATRIX_SPEC: ModelSpec = ModelSpec {
     cases: RISK_MATRIX_CASES,
 };
 
+static S001_CLAUSE10_REVIEW_CHECKS: &[SpecCheck] = &[];
+
+static S001_CLAUSE10_REVIEW_CASES: &[TestCase] = &[
+    TestCase {
+        id: "cl10_example",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("item_count", 5.0),
+            ("failed_item_count", 0.0),
+            ("warning_item_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("overall_verdict", "pass")],
+        records: &[
+            (
+                "items",
+                &[
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "function_type",
+                            value: FieldValue::Name("PSD"),
+                        },
+                        RecordField {
+                            name: "equipment_tag",
+                            value: FieldValue::Name("V-100"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "function_type",
+                            value: FieldValue::Name("PSV"),
+                        },
+                        RecordField {
+                            name: "equipment_tag",
+                            value: FieldValue::Name("V-100"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "function_type",
+                            value: FieldValue::Name("ALARM"),
+                        },
+                        RecordField {
+                            name: "equipment_tag",
+                            value: FieldValue::Name("V-100"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "function_type",
+                            value: FieldValue::Name("SECONDARY_PRESSURE_PROTECTION"),
+                        },
+                        RecordField {
+                            name: "equipment_tag",
+                            value: FieldValue::Name("V-100"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("processSafetyRoleDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hazidHazopLopaCompleted"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("srsDefinesRequiredFunctions"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("sisEsdFgsDesignImplemented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("verificationTestingOperationConfirmed"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("interfacesDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("protectionLayersDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("designBasisDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("processSafetyPrinciplesDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("bypassManagementDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredUtilitiesIdentified"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("utilityDependent"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("failSafeOnUtilityLoss"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("survivabilityRequirementDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredSurvivabilityTimeMin"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("30.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("survivabilityTimeMin"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("60.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("tagreaderSource"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("synthetic instrument data"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("overrideActive"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("proofTestOverdue"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("tripDemandFailures"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("0.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("shutdownActionDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("psdValveFailsSafe"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("psdValveIsolationAdequate"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredResponseTimeSeconds"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("30.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("actualResponseTimeSeconds"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("18.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("logicSolverCertified"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("logicSolverIndependent"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("causeAndEffectTested"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("psdIndependentFromControl"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("manualShutdownAvailable"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("processSafetyRoleDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hazidHazopLopaCompleted"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("srsDefinesRequiredFunctions"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("sisEsdFgsDesignImplemented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("verificationTestingOperationConfirmed"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("interfacesDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("protectionLayersDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("designBasisDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("processSafetyPrinciplesDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("bypassManagementDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredUtilitiesIdentified"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("utilityDependent"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("failSafeOnUtilityLoss"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("survivabilityRequirementDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredSurvivabilityTimeMin"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("30.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("survivabilityTimeMin"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("60.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("tagreaderSource"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("synthetic instrument data"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("overrideActive"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("proofTestOverdue"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("tripDemandFailures"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("0.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("psvSizingBasisDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("reliefScenarioDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("protectedEquipmentDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredReliefLoadKgPerS"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("10.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("psvCapacityKgPerS"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("14.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("processSafetyRoleDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hazidHazopLopaCompleted"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("srsDefinesRequiredFunctions"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("sisEsdFgsDesignImplemented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("verificationTestingOperationConfirmed"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("interfacesDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("protectionLayersDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("designBasisDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("processSafetyPrinciplesDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("bypassManagementDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredUtilitiesIdentified"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("utilityDependent"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("failSafeOnUtilityLoss"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("survivabilityRequirementDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredSurvivabilityTimeMin"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("30.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("survivabilityTimeMin"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("60.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("tagreaderSource"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("synthetic instrument data"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("overrideActive"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("proofTestOverdue"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("tripDemandFailures"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("0.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("alarmActionDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("alarmSetpointDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("operatorResponseTimeSeconds"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("120.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("availableOperatorResponseTimeSeconds"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("300.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredResponseTimeSeconds"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("300.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("actualResponseTimeSeconds"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("120.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("processSafetyRoleDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hazidHazopLopaCompleted"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("srsDefinesRequiredFunctions"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("sisEsdFgsDesignImplemented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("verificationTestingOperationConfirmed"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("interfacesDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("protectionLayersDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("designBasisDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("processSafetyPrinciplesDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("bypassManagementDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredUtilitiesIdentified"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("utilityDependent"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("failSafeOnUtilityLoss"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("survivabilityRequirementDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredSurvivabilityTimeMin"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("30.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("survivabilityTimeMin"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("60.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("tagreaderSource"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("synthetic instrument data"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("overrideActive"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("proofTestOverdue"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("tripDemandFailures"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("0.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("logicSolverCertified"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("logicSolverIndependent"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("causeAndEffectTested"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("maximumEventPressureBara"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("120.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("designPressureBara"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("100.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("testPressureBara"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("150.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("demandFrequencyPerYear"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("1.0E-4"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("reliefLeakageAssessed"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("reliefLeakageToSafeLocation"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("proofTestIntervalMonths"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("6.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredResponseTimeSeconds"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("10.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("actualResponseTimeSeconds"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("5.0"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "references",
+                &[
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "reference",
+                            value: FieldValue::Name("synthetic C&E"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSD-1001"),
+                        },
+                        RecordField {
+                            name: "reference",
+                            value: FieldValue::Name("synthetic SRS"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "reference",
+                            value: FieldValue::Name("synthetic C&E"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PSV-1001"),
+                        },
+                        RecordField {
+                            name: "reference",
+                            value: FieldValue::Name("synthetic SRS"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "reference",
+                            value: FieldValue::Name("synthetic C&E"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("PAHH-1001"),
+                        },
+                        RecordField {
+                            name: "reference",
+                            value: FieldValue::Name("synthetic SRS"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "reference",
+                            value: FieldValue::Name("synthetic C&E"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-1001"),
+                        },
+                        RecordField {
+                            name: "reference",
+                            value: FieldValue::Name("synthetic SRS"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[(
+            "verdicts",
+            &[
+                &[
+                    RecordField {
+                        name: "function_id",
+                        value: FieldValue::Name("CLAUSE10-COVERAGE"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "function_id",
+                        value: FieldValue::Name("PSD-1001"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "function_id",
+                        value: FieldValue::Name("PSV-1001"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(0.85),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "function_id",
+                        value: FieldValue::Name("PAHH-1001"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(0.85),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "function_id",
+                        value: FieldValue::Name("SIF-1001"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "cl10_secondary_fail",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("item_count", 2.0),
+            ("failed_item_count", 1.0),
+            ("warning_item_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("overall_verdict", "fail")],
+        records: &[
+            (
+                "items",
+                &[&[
+                    RecordField {
+                        name: "function_id",
+                        value: FieldValue::Name("SIF-HP-001"),
+                    },
+                    RecordField {
+                        name: "function_type",
+                        value: FieldValue::Name("SECONDARY_PRESSURE_PROTECTION"),
+                    },
+                    RecordField {
+                        name: "equipment_tag",
+                        value: FieldValue::Name("V-100"),
+                    },
+                ]],
+            ),
+            (
+                "evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("processSafetyRoleDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hazidHazopLopaCompleted"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("srsDefinesRequiredFunctions"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("sisEsdFgsDesignImplemented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("verificationTestingOperationConfirmed"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("interfacesDefined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("protectionLayersDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("designBasisDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("processSafetyPrinciplesDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("bypassManagementDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredUtilitiesIdentified"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("utilityDependent"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("failSafeOnUtilityLoss"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("survivabilityRequirementDocumented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredSurvivabilityTimeMin"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("30.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("survivabilityTimeMin"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("60.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("tagreaderSource"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("synthetic instrument data"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("overrideActive"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("proofTestOverdue"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("tripDemandFailures"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("0.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("logicSolverCertified"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("logicSolverIndependent"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("causeAndEffectTested"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("maximumEventPressureBara"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("175.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("designPressureBara"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("100.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("testPressureBara"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("150.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("demandFrequencyPerYear"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("1.0E-3"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("reliefLeakageAssessed"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("reliefLeakageToSafeLocation"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("proofTestIntervalMonths"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("6.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("requiredResponseTimeSeconds"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("10.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("actualResponseTimeSeconds"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("5.0"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "references",
+                &[
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "reference",
+                            value: FieldValue::Name("synthetic C&E"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "function_id",
+                            value: FieldValue::Name("SIF-HP-001"),
+                        },
+                        RecordField {
+                            name: "reference",
+                            value: FieldValue::Name("synthetic SRS"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[(
+            "verdicts",
+            &[
+                &[
+                    RecordField {
+                        name: "function_id",
+                        value: FieldValue::Name("CLAUSE10-COVERAGE"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass_with_warnings"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "function_id",
+                        value: FieldValue::Name("SIF-HP-001"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("fail"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+static S001_CLAUSE10_REVIEW_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "norsok_s001_clause10_review",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.s001_clause10_review`.
+pub static S001_CLAUSE10_REVIEW_SPEC: ModelSpec = ModelSpec {
+    id: "process.s001_clause10_review",
+    kind: "procedure",
+    algorithm: Some(&S001_CLAUSE10_REVIEW_ALGORITHM),
+    checks: S001_CLAUSE10_REVIEW_CHECKS,
+    cases: S001_CLAUSE10_REVIEW_CASES,
+};
+
+static S001_SECONDARY_PRESSURE_PROTECTION_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "maximum_event_pressure",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative pressure is not a basis",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "design_pressure",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative pressure is not a basis",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "test_pressure",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative pressure is not a basis",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "demand_frequency_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative annual frequency is not a demand",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "target_frequency_per_year",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a negative annual frequency is not a target",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "proof_test_interval_months",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class's `<= 12` test passes zero and negative intervals; a proof-test interval must be positive, and the capture keeps the class's answer at -6 and 0 as the divergence evidence",
+        },
+    },
+];
+
+static S001_SECONDARY_PRESSURE_PROTECTION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "s001_band_below_design",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("maximum_event_pressure", 9000000.0),
+            ("design_pressure", 10000000.0),
+            ("test_pressure", 15000000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("target_frequency_per_year", 0.01)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "s001_band_above_design",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("maximum_event_pressure", 12000000.0),
+            ("design_pressure", 10000000.0),
+            ("test_pressure", 15000000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("target_frequency_per_year", 0.001)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "s001_band_above_test",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("maximum_event_pressure", 17500000.0),
+            ("design_pressure", 10000000.0),
+            ("test_pressure", 15000000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("target_frequency_per_year", 0.0001)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "s001_band_above_two_design",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("maximum_event_pressure", 20100000.0),
+            ("design_pressure", 10000000.0),
+            ("test_pressure", 15000000.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("target_frequency_per_year", 1e-05)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "s001_complete_pass",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("maximum_event_pressure", 12000000.0),
+            ("design_pressure", 10000000.0),
+            ("test_pressure", 15000000.0),
+            ("demand_frequency_per_year", 0.0001),
+            ("proof_test_interval_months", 6.0),
+        ],
+        flags: &[
+            ("relief_leakage_assessed", true),
+            ("relief_leakage_to_safe_location", true),
+        ],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("target_frequency_per_year", 0.001)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "s001_event_above_test",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("maximum_event_pressure", 17500000.0),
+            ("design_pressure", 10000000.0),
+            ("test_pressure", 15000000.0),
+            ("demand_frequency_per_year", 1e-05),
+            ("proof_test_interval_months", 6.0),
+        ],
+        flags: &[
+            ("relief_leakage_assessed", true),
+            ("relief_leakage_to_safe_location", true),
+        ],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("target_frequency_per_year", 0.0001)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "s001_missing_basis",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("demand_frequency_per_year", 0.001),
+            ("proof_test_interval_months", 6.0),
+        ],
+        flags: &[
+            ("relief_leakage_assessed", true),
+            ("relief_leakage_to_safe_location", true),
+        ],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static S001_SECONDARY_PRESSURE_PROTECTION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "norsok_s001_secondary_pressure_protection",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.s001_secondary_pressure_protection`.
+pub static S001_SECONDARY_PRESSURE_PROTECTION_SPEC: ModelSpec = ModelSpec {
+    id: "process.s001_secondary_pressure_protection",
+    kind: "procedure",
+    algorithm: Some(&S001_SECONDARY_PRESSURE_PROTECTION_ALGORITHM),
+    checks: S001_SECONDARY_PRESSURE_PROTECTION_CHECKS,
+    cases: S001_SECONDARY_PRESSURE_PROTECTION_CASES,
+};
+
 static SAFETY_INSTRUMENTED_FUNCTION_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -78863,7 +82966,9 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &ABSORPTION_COLUMN_SPEC,
     &ACTIVE_FIRE_PROTECTION_SCREENING_SPEC,
     &ANTI_SURGE_RECYCLE_SPEC,
+    &API14C_SAFE_CHART_SPEC,
     &API537_FLARE_FLAME_MODEL_SPEC,
+    &BARRIER_REGISTER_VALIDATION_SPEC,
     &BASKET_TEST_REGRESSION_SPEC,
     &BLEVE_SPEC,
     &BLOCKED_OUTLET_RELIEF_SPEC,
@@ -78925,6 +83030,8 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &RATE_BASED_PACKED_COLUMN_SPEC,
     &RELIEF_DISPOSAL_NETWORK_SPEC,
     &RISK_MATRIX_SPEC,
+    &S001_CLAUSE10_REVIEW_SPEC,
+    &S001_SECONDARY_PRESSURE_PROTECTION_SPEC,
     &SAFETY_INSTRUMENTED_FUNCTION_SPEC,
     &SELF_HEATING_INDUCTION_SPEC,
     &SEMENOV_SELF_HEATING_SPEC,

@@ -422,6 +422,26 @@ fn the_nog070_case_runs_through_the_dispatch() {
 }
 
 #[test]
+fn the_s001_secondary_pressure_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.s001_secondary_pressure_protection",
+        &json!({
+            "maximum_event_pressure": 1.2e7,
+            "design_pressure": 1.0e7,
+            "test_pressure": 1.5e7,
+            "demand_frequency_per_year": 1.0e-4,
+            "relief_leakage_assessed": true,
+            "relief_leakage_to_safe_location": true,
+            "proof_test_interval_months": 6.0,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "target_frequency_per_year") - 1.0e-3).abs() < 1e-12);
+    assert_eq!(outputs.outputs["pressure_basis_complete"], json!(true));
+    assert_eq!(outputs.outputs["acceptable"], json!(true));
+}
+
+#[test]
 fn the_sif_case_runs_through_the_dispatch() {
     let outcome = dispatch::run(
         "process.safety_instrumented_function",

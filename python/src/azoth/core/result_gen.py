@@ -53,9 +53,15 @@ from azoth.core.record_outputs_gen import (
     MinimalCutSet,
     NaceIssueRow,
     PipeFireRupturePoint,
+    RegisterFinding,
     ReliefDisposalRow,
     RemediationOptionRow,
+    ReviewAssessment,
+    ReviewCoverage,
+    ReviewVerdict,
     RiskAssessmentRow,
+    SafeChartItem,
+    SafeChartMissingDevice,
     ScaleControlRiskRow,
     ScaleControlRow,
     ScenarioChangeRow,
@@ -84,6 +90,7 @@ from azoth.core.result_base import (
     HydrateRiskLevel,
     HydrateStructure,
     MultiflashSeedPath,
+    OverallVerdict,
     Phase,
     PlusModel,
     ReliefPhase,
@@ -5678,6 +5685,31 @@ class AntiSurgeRecycleResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class Api14cSafeChartResult(_HasWarnings):
+    """Result of ``process.api14c_safe_chart``."""
+
+    CALC_ID: ClassVar[str] = "process.api14c_safe_chart"
+
+    #: one row per classified equipment, in caller order.
+    items: tuple[SafeChartItem, ...]
+
+    #: one row per missing device, in equipment caller order and device declaration order.
+    missing_devices: tuple[SafeChartMissingDevice, ...]
+
+    #: the number of classified equipment rows.
+    equipment_count: float
+
+    #: the total number of missing devices across the chart.
+    missing_count: float
+
+    #: whether every chart row is complete; true for an empty chart.
+    complete: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class Api537FlareFlameModelResult(_HasWarnings):
     """Result of ``process.api537_flare_flame_model``."""
 
@@ -5721,6 +5753,25 @@ class Api537FlareFlameModelResult(_HasWarnings):
 
     #: `(radiative_power / (pi max(0.12 flame_length, 0.1) flame_length) / sigma)^0.25`; zero when the flame surface is zero.
     equivalent_flame_temperature: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class BarrierRegisterValidationResult(_HasWarnings):
+    """Result of ``process.barrier_register_validation``."""
+
+    CALC_ID: ClassVar[str] = "process.barrier_register_validation"
+
+    #: one row per finding, in the class's order and with its duplicates.
+    findings: tuple[RegisterFinding, ...]
+
+    #: the number of findings.
+    finding_count: float
+
+    #: whether the register has no findings.
+    valid: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -9139,6 +9190,89 @@ class RiskMatrixResult(_HasWarnings):
 
     #: the sum of the annual costs.
     total_annual_risk_cost: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class S001Clause10ReviewResult(_HasWarnings):
+    """Result of ``process.s001_clause10_review``."""
+
+    CALC_ID: ClassVar[str] = "process.s001_clause10_review"
+
+    #: one row per assessment, the coverage result first and then each item in caller order.
+    assessments: tuple[ReviewAssessment, ...]
+
+    #: one verdict per result: the coverage result first, then the items in caller order.
+    verdicts: tuple[ReviewVerdict, ...]
+
+    #: the five coverage rows of the synthetic result.
+    coverage: tuple[ReviewCoverage, ...]
+
+    #: the report's verdict: any fail, else any pass-with-warnings, else pass.
+    overall_verdict: OverallVerdict
+
+    #: the number of results, the coverage result included.
+    item_count: float
+
+    #: the number of results whose verdict is fail.
+    failed_item_count: float
+
+    #: the number of results whose verdict is pass-with-warnings.
+    warning_item_count: float
+
+    #: the total number of assessments.
+    assessment_count: float
+
+    #: the number of failing assessments.
+    fail_assessment_count: float
+
+    #: the number of warning assessments.
+    warning_assessment_count: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class S001SecondaryPressureProtectionResult(_HasWarnings):
+    """Result of ``process.s001_secondary_pressure_protection``."""
+
+    CALC_ID: ClassVar[str] = "process.s001_secondary_pressure_protection"
+
+    #: the resolved target frequency, stated or from the band. **Absent when the band cannot resolve**: a missing or non-positive pressure basis with no stated target.
+    target_frequency_per_year: float | None
+
+    #: whether all three pressures are finite and positive.
+    pressure_basis_complete: bool
+
+    #: whether the test pressure is at or above the design pressure; vacuous-true without a basis.
+    test_pressure_valid: bool
+
+    #: whether the event pressure is at or below the test pressure; vacuous-true without a basis.
+    pressure_within_test: bool
+
+    #: whether the demand and the resolved target are configured.
+    frequency_configured: bool
+
+    #: whether the demand is at or below the target; vacuous-true when unconfigured.
+    frequency_criterion_met: bool
+
+    #: whether relief leakage has been assessed.
+    leakage_assessed: bool
+
+    #: whether the leakage is routed to a safe location.
+    leakage_routed_safe: bool
+
+    #: whether a proof-test interval is stated.
+    proof_test_configured: bool
+
+    #: whether the interval is at most twelve months; vacuous-true when unconfigured.
+    proof_test_criterion_met: bool
+
+    #: whether every criterion is met.
+    acceptable: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]

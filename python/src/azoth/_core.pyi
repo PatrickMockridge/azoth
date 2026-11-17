@@ -404,10 +404,68 @@ class CompressorSurgePoint(TypedDict):
     flow: float
     head: float
 
+class SafeChartEquipment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    equipment: str
+    unit_class: str
+
+class SafeChartPresentDevice(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    equipment: str
+    device: str
+
 class FlareTargetFlux(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
     flux: float
+
+class BarrierElement(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    tag: str | None
+    name: str | None
+    element_type: str
+
+class BarrierRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    name: str | None
+    description: str | None
+    barrier_type: str
+    status: str
+    pfd: float | None
+    effectiveness: float | None
+    performance_standard_id: str | None
+    equipment_tag_count: float
+
+class PerformanceStandardRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    safety_function: str | None
+    target_pfd: float | None
+    required_availability: float | None
+    proof_test_interval_hours: float | None
+    acceptance_criteria_count: float
+
+class ElementBarrierLink(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    element_id: str
+    barrier_id: str
+
+class RegisterEvidence(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    owner_kind: str
+    owner_id: str
+    document_id: str | None
+    source_reference: str | None
+    excerpt: str | None
 
 class BasketTestPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -613,6 +671,26 @@ class RiskEquipment(TypedDict):
     mttr_hours: float
     production_loss_percent: float
     production_loss_kg_per_hr: float
+
+class ReviewItem(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    function_id: str
+    function_type: str | None
+    equipment_tag: str | None
+
+class ReviewEvidence(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    function_id: str
+    key: str
+    value: str | None
+
+class ReviewReference(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    function_id: str
+    reference: str
 
 class EfficiencyPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -896,11 +974,37 @@ class WaterMixingResult:
     si_feco3: float | None
 
 @final
+class SafeChartItem:
+    """one row per classified equipment, in caller order."""
+
+    equipment: str
+    category: str
+    required_count: float
+    present_count: float
+    missing_count: float
+    complete: bool
+
+@final
+class SafeChartMissingDevice:
+    """one row per missing device, in equipment caller order and device declaration order."""
+
+    equipment: str
+    device: str
+
+@final
 class SterileRadius:
     """one row per target flux, in the caller's order."""
 
     flux: Qty
     radius: Qty
+
+@final
+class RegisterFinding:
+    """one row per finding, in the class's order and with its duplicates."""
+
+    scope: str
+    subject_id: str
+    rule: str
 
 @final
 class ConsequenceOutcomeResult:
@@ -1140,6 +1244,31 @@ class RiskAssessmentRow:
     risk_level: str
     cost_per_failure: float
     annual_risk_cost: float
+
+@final
+class ReviewAssessment:
+    """one row per assessment, the coverage result first and then each item in caller order."""
+
+    function_id: str
+    requirement_id: str
+    clause: str
+    status: str
+    severity: str
+
+@final
+class ReviewVerdict:
+    """one verdict per result: the coverage result first, then the items in caller order."""
+
+    function_id: str
+    verdict: str
+    confidence: float
+
+@final
+class ReviewCoverage:
+    """the five coverage rows of the synthetic result."""
+
+    function_type: str
+    status: str
 
 @final
 class SelfHeatingTimePoint:
@@ -3185,6 +3314,15 @@ class AntiSurgeRecycleResult:
     warnings: list[Warning]
 
 @final
+class Api14cSafeChartResult:
+    items: list[SafeChartItem]
+    missing_devices: list[SafeChartMissingDevice]
+    equipment_count: float
+    missing_count: float
+    complete: bool
+    warnings: list[Warning]
+
+@final
 class Api537FlareFlameModelResult:
     heat_release: Qty
     radiative_power: Qty
@@ -3199,6 +3337,13 @@ class Api537FlareFlameModelResult:
     sound_power_level: float
     sound_pressure_level: float
     equivalent_flame_temperature: Qty
+    warnings: list[Warning]
+
+@final
+class BarrierRegisterValidationResult:
+    findings: list[RegisterFinding]
+    finding_count: float
+    valid: bool
     warnings: list[Warning]
 
 @final
@@ -4379,6 +4524,35 @@ class ReliefDisposalNetworkResult:
 class RiskMatrixResult:
     assessments: list[RiskAssessmentRow]
     total_annual_risk_cost: float
+    warnings: list[Warning]
+
+@final
+class S001Clause10ReviewResult:
+    assessments: list[ReviewAssessment]
+    verdicts: list[ReviewVerdict]
+    coverage: list[ReviewCoverage]
+    overall_verdict: str
+    item_count: float
+    failed_item_count: float
+    warning_item_count: float
+    assessment_count: float
+    fail_assessment_count: float
+    warning_assessment_count: float
+    warnings: list[Warning]
+
+@final
+class S001SecondaryPressureProtectionResult:
+    target_frequency_per_year: float | None
+    pressure_basis_complete: bool
+    test_pressure_valid: bool
+    pressure_within_test: bool
+    frequency_configured: bool
+    frequency_criterion_met: bool
+    leakage_assessed: bool
+    leakage_routed_safe: bool
+    proof_test_configured: bool
+    proof_test_criterion_met: bool
+    acceptable: bool
     warnings: list[Warning]
 
 @final
@@ -7136,6 +7310,11 @@ def anti_surge_recycle(
     tolerance: float | None = None,
     max_iterations: float | None = None,
 ) -> AntiSurgeRecycleResult: ...
+def api14c_safe_chart(
+    equipment: list[SafeChartEquipment] | None = None,
+    present_devices: list[SafeChartPresentDevice] | None = None,
+    assume_complete: bool | None = None,
+) -> Api14cSafeChartResult: ...
 def api537_flare_flame_model(
     mass_flow: float,
     heat_of_combustion: float,
@@ -7149,6 +7328,14 @@ def api537_flare_flame_model(
     transmissivity: float | None = None,
     acoustic_efficiency: float | None = None,
 ) -> Api537FlareFlameModelResult: ...
+def barrier_register_validation(
+    register_id: str,
+    elements: list[BarrierElement] | None = None,
+    barriers: list[BarrierRow] | None = None,
+    standards: list[PerformanceStandardRow] | None = None,
+    links: list[ElementBarrierLink] | None = None,
+    evidence: list[RegisterEvidence] | None = None,
+) -> BarrierRegisterValidationResult: ...
 def basket_test_regression(
     points: list[BasketTestPoint],
     effective_conductivity: float | None = None,
@@ -8067,6 +8254,21 @@ def risk_matrix(
     product_price_per_kg: float | None = None,
     downtime_cost_per_hour: float | None = None,
 ) -> RiskMatrixResult: ...
+def s001_clause10_review(
+    items: list[ReviewItem] | None = None,
+    evidence: list[ReviewEvidence] | None = None,
+    references: list[ReviewReference] | None = None,
+) -> S001Clause10ReviewResult: ...
+def s001_secondary_pressure_protection(
+    maximum_event_pressure: float | None = None,
+    design_pressure: float | None = None,
+    test_pressure: float | None = None,
+    demand_frequency_per_year: float | None = None,
+    target_frequency_per_year: float | None = None,
+    relief_leakage_assessed: bool | None = None,
+    relief_leakage_to_safe_location: bool | None = None,
+    proof_test_interval_months: float | None = None,
+) -> S001SecondaryPressureProtectionResult: ...
 def safety_instrumented_function(
     pfd_average: float,
     claimed_sil: float,

@@ -16,7 +16,9 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.absorption_column`](./absorption_column.md) | `direct composition` | NeqSim process/equipment/absorber/AbsorptionColumn.java |
 | [`process.active_fire_protection_screening`](./active_fire_protection_screening.md) | `closed_form_active_fire_protection_screening` | NeqSim process/safety/firewater/ActiveFireProtectionScreening.java |
 | [`process.anti_surge_recycle`](./anti_surge_recycle.md) | `damped_fixed_point_recycle` | NeqSim process/equipment/compressor/AntiSurgeRecycleCalculator.java |
+| [`process.api14c_safe_chart`](./api14c_safe_chart.md) | `api14c_safe_chart` | NeqSim process/safety/api14c/Api14cSafeChartBuilder.java |
 | [`process.api537_flare_flame_model`](./api537_flare_flame_model.md) | `closed_form_flare_flame_and_radiation` | NeqSim process/safety/fire/Api537FlareFlameModel.java |
+| [`process.barrier_register_validation`](./barrier_register_validation.md) | `barrier_register_validation` | NeqSim process/safety/barrier/BarrierRegister.java |
 | [`process.basket_test_regression`](./basket_test_regression.md) | `basket_least_squares` | NeqSim process/safety/selfheating/BasketTestRegression.java |
 | [`process.bleve`](./bleve.md) | `ccps_fireball_point_source` | NeqSim process/safety/fire/BLEVECalculator.java |
 | [`process.blocked_outlet_relief`](./blocked_outlet_relief.md) | `blocked_outlet_full_inflow` | NeqSim process/safety/overpressure/BlockedOutletRelief.java |
@@ -78,6 +80,8 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.rate_based_packed_column`](./rate_based_packed_column.md) | `counter_current_fixed_point_profile` | NeqSim process/equipment/distillation/RateBasedPackedColumn.java |
 | [`process.relief_disposal_network`](./relief_disposal_network.md) | `closed_form_relief_disposal_network` | NeqSim process/safety/overpressure/ReliefDisposalNetwork.java |
 | [`process.risk_matrix`](./risk_matrix.md) | `closed_form_risk_matrix` | NeqSim process/safety/risk/RiskMatrix.java |
+| [`process.s001_clause10_review`](./s001_clause10_review.md) | `norsok_s001_clause10_review` | NeqSim process/safety/processsafetysystem/ProcessSafetySystemReviewEngine.java |
+| [`process.s001_secondary_pressure_protection`](./s001_secondary_pressure_protection.md) | `norsok_s001_secondary_pressure_protection` | NeqSim process/safety/processsafetysystem/S001SecondaryPressureProtectionCriteria.java |
 | [`process.safety_instrumented_function`](./safety_instrumented_function.md) | `closed_form_safety_instrumented_function` | NeqSim process/safety/risk/sis/SafetyInstrumentedFunction.java |
 | [`process.self_heating_induction`](./self_heating_induction.md) | `explicit_euler_induction` | NeqSim process/safety/selfheating/SelfHeatingInductionSolver.java |
 | [`process.semenov_self_heating`](./semenov_self_heating.md) | `semenov_criticality` | NeqSim process/safety/selfheating/SemenovSelfHeatingAnalyzer.java |
