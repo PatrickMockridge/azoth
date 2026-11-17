@@ -22438,6 +22438,88 @@ impl From<&azoth_process::models::safety_instrumented_function::SafetyInstrument
         }
     }
 }
+/// Result of `process.semenov_self_heating`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SemenovSelfHeatingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySemenovSelfHeatingResult {
+    /// the Semenov criticality parameter at the ambient temperature.
+    #[pyo3(get)]
+    pub psi: f64,
+    /// the critical parameter, `1/e`.
+    #[pyo3(get)]
+    pub psi_crit: f64,
+    /// `psi / psi_crit`.
+    #[pyo3(get)]
+    pub psi_ratio: f64,
+    /// the ambient temperature at which `psi` reaches `1/e`; absent when it cannot be bracketed between 150 K and 2000 K.
+    #[pyo3(get)]
+    pub critical_temperature: Option<PyQty>,
+    /// `critical_temperature - ambient_temperature`; absent with the critical temperature. Positive is subcritical.
+    #[pyo3(get)]
+    pub temperature_margin: Option<PyQty>,
+    /// `R Ta^2/E`, the steady self-heating excess at criticality.
+    #[pyo3(get)]
+    pub critical_temperature_rise: PyQty,
+    /// the screening verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// the class's warning strings, in the order it appends them.
+    #[pyo3(get)]
+    pub messages: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySemenovSelfHeatingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SemenovSelfHeatingResult(psi={:?}, psi_crit={:?}, psi_ratio={:?}, critical_temperature={:?}, temperature_margin={:?}, critical_temperature_rise={:?}, verdict={:?}, messages={:?}, {} warning(s))",
+            self.psi,
+            self.psi_crit,
+            self.psi_ratio,
+            self.critical_temperature,
+            self.temperature_margin,
+            self.critical_temperature_rise,
+            self.verdict,
+            self.messages,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::semenov_self_heating::SemenovSelfHeatingResult>
+    for PySemenovSelfHeatingResult
+{
+    fn from(r: &azoth_process::models::semenov_self_heating::SemenovSelfHeatingResult) -> Self {
+        Self {
+            psi: r.psi,
+            psi_crit: r.psi_crit,
+            psi_ratio: r.psi_ratio,
+            critical_temperature: r.critical_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            temperature_margin: r.temperature_margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            critical_temperature_rise: PyQty {
+                magnitude_si: r.critical_temperature_rise.value,
+                unit: "K".to_string(),
+            },
+            verdict: r.verdict.as_str().to_string(),
+            messages: r.messages.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.separator`, transported.
 #[pyclass(
     frozen,

@@ -4234,6 +4234,18 @@ class SafetyInstrumentedFunctionResult:
     warnings: list[Warning]
 
 @final
+class SemenovSelfHeatingResult:
+    psi: float
+    psi_crit: float
+    psi_ratio: float
+    critical_temperature: Qty | None
+    temperature_margin: Qty | None
+    critical_temperature_rise: Qty
+    verdict: str
+    messages: list[str]
+    warnings: list[Warning]
+
+@final
 class SeparatorResult:
     vapour_n: Qty
     vapour_z: list[float]
@@ -7862,6 +7874,15 @@ def safety_instrumented_function(
     mttr_hours: float | None = None,
     base_availability: float | None = None,
 ) -> SafetyInstrumentedFunctionResult: ...
+def semenov_self_heating(
+    volume: float,
+    surface_area: float,
+    heat_transfer_coefficient: float,
+    activation_energy: float,
+    volumetric_pre_factor: float,
+    ambient_temperature: float,
+    marginal_ratio: float | None = None,
+) -> SemenovSelfHeatingResult: ...
 def separator(
     components: list[str],
     feed_n: float,

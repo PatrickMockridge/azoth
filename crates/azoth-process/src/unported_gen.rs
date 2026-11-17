@@ -61,6 +61,7 @@
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/safety_instrumented_function.toml
+//!   - specs/models/process/semenov_self_heating.toml
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml

@@ -293,6 +293,8 @@ from azoth.core.result import (
     ScenarioChangeRow,
     ScenarioIndexRow,
     SchwartzentruberAlphaResult,
+    SelfHeatingVerdict,
+    SemenovSelfHeatingResult,
     SeparatorCapacityAssessmentResult,
     SeparatorPerformanceResult,
     SeparatorResult,
@@ -662,6 +664,7 @@ __all__ = [
     "scale_remediation_advisor",
     "scale_saturation_ratio",
     "schwartzentruber_alpha",
+    "semenov_self_heating",
     "separator",
     "separator_capacity_assessment",
     "separator_performance",
@@ -7991,6 +7994,31 @@ def safety_instrumented_function(pfd_average: float, claimed_sil: float, unmitig
         pfd_1oo2=result.pfd_1oo2,
         pfd_2oo3=result.pfd_2oo3,
         availability_with_spurious_trips=result.availability_with_spurious_trips,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def semenov_self_heating(volume: Q, surface_area: Q, heat_transfer_coefficient: Q, activation_energy: Q, volumetric_pre_factor: float, ambient_temperature: Q, marginal_ratio: float | None=None) -> SemenovSelfHeatingResult:
+    """``process.semenov_self_heating``, computed in Rust."""
+    spec = _models_gen.model("process.semenov_self_heating")
+    result = _core.semenov_self_heating(
+        input_to_si(spec, "volume", volume),
+        input_to_si(spec, "surface_area", surface_area),
+        input_to_si(spec, "heat_transfer_coefficient", heat_transfer_coefficient),
+        input_to_si(spec, "activation_energy", activation_energy),
+        volumetric_pre_factor,
+        input_to_si(spec, "ambient_temperature", ambient_temperature),
+        None if marginal_ratio is None else marginal_ratio,
+    )
+    return SemenovSelfHeatingResult(
+        psi=result.psi,
+        psi_crit=result.psi_crit,
+        psi_ratio=result.psi_ratio,
+        critical_temperature=None if result.critical_temperature is None else from_si(result.critical_temperature.magnitude_si, result.critical_temperature.unit),
+        temperature_margin=None if result.temperature_margin is None else from_si(result.temperature_margin.magnitude_si, result.temperature_margin.unit),
+        critical_temperature_rise=from_si(result.critical_temperature_rise.magnitude_si, result.critical_temperature_rise.unit),
+        verdict=SelfHeatingVerdict(result.verdict),
+        messages=tuple(result.messages),
         warnings=_warnings(result.warnings),
     )
 

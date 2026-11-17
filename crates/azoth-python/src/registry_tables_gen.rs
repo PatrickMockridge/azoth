@@ -301,6 +301,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.relief_disposal_network" => azoth_process::models::relief_disposal_network::ReliefDisposalNetworkResult::FIELDS.to_vec(),
         "process.risk_matrix" => azoth_process::models::risk_matrix::RiskMatrixResult::FIELDS.to_vec(),
         "process.safety_instrumented_function" => azoth_process::models::safety_instrumented_function::SafetyInstrumentedFunctionResult::FIELDS.to_vec(),
+        "process.semenov_self_heating" => azoth_process::models::semenov_self_heating::SemenovSelfHeatingResult::FIELDS.to_vec(),
         "process.separator" => azoth_process::models::separator::SeparatorResult::FIELDS.to_vec(),
         "process.separator_capacity_assessment" => azoth_process::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult::FIELDS.to_vec(),
         "process.separator_performance" => azoth_process::models::separator_performance::SeparatorPerformanceResult::FIELDS.to_vec(),

@@ -116,6 +116,24 @@ class ReliefPhase(StrEnum):
     TWO_PHASE = "two_phase"
 
 
+class SelfHeatingGeometry(StrEnum):
+    """The body shape a Frank-Kamenetskii screen names."""
+
+    SLAB = "slab"
+    INFINITE_CYLINDER = "infinite_cylinder"
+    SPHERE = "sphere"
+    CUBE = "cube"
+    EQUICYLINDER = "equicylinder"
+
+
+class SelfHeatingVerdict(StrEnum):
+    """The self-heating criticality verdict."""
+
+    SUBCRITICAL = "subcritical"
+    MARGINAL = "marginal"
+    SELF_IGNITION = "self_ignition"
+
+
 class RuptureStatus(StrEnum):
     """Whether the accumulated strain crossed its limit."""
 

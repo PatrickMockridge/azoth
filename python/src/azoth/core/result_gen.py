@@ -82,6 +82,7 @@ from azoth.core.result_base import (
     ReliefPhase,
     RootStructure,
     RuptureStatus,
+    SelfHeatingVerdict,
     StabilityVerdict,
     Sts0131PressureCategory,
     SupplyVerdict,
@@ -8996,6 +8997,40 @@ class SafetyInstrumentedFunctionResult(_HasWarnings):
 
     #: `base (1 - rate mttr / 8760)`; absent when the base availability or the MTTR is absent.
     availability_with_spurious_trips: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SemenovSelfHeatingResult(_HasWarnings):
+    """Result of ``process.semenov_self_heating``."""
+
+    CALC_ID: ClassVar[str] = "process.semenov_self_heating"
+
+    #: the Semenov criticality parameter at the ambient temperature.
+    psi: float
+
+    #: the critical parameter, `1/e`.
+    psi_crit: float
+
+    #: `psi / psi_crit`.
+    psi_ratio: float
+
+    #: the ambient temperature at which `psi` reaches `1/e`; absent when it cannot be bracketed between 150 K and 2000 K.
+    critical_temperature: Q | None
+
+    #: `critical_temperature - ambient_temperature`; absent with the critical temperature. Positive is subcritical.
+    temperature_margin: Q | None
+
+    #: `R Ta^2/E`, the steady self-heating excess at criticality.
+    critical_temperature_rise: Q
+
+    #: the screening verdict.
+    verdict: SelfHeatingVerdict
+
+    #: the class's warning strings, in the order it appends them.
+    messages: tuple[str, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

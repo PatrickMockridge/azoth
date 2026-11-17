@@ -300,6 +300,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyReliefDisposalNetworkResult>()?;
     m.add_class::<crate::transport_gen::PyRiskMatrixResult>()?;
     m.add_class::<crate::transport_gen::PySafetyInstrumentedFunctionResult>()?;
+    m.add_class::<crate::transport_gen::PySemenovSelfHeatingResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorCapacityAssessmentResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorPerformanceResult>()?;
@@ -1043,6 +1044,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::risk_matrix, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::safety_instrumented_function,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::semenov_self_heating,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator, m)?)?;

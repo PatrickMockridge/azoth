@@ -3106,6 +3106,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'process.semenov_self_heating': {
+        "calc_id": 'process.semenov_self_heating',
+        "name": 'Semenov self-heating',
+        "spec": {'path': 'specs/models/process/semenov_self_heating.toml', 'sha256': 'd54ec316336e63f7315623f3b4092d3b4df827cb01f8712efb295c65f97ab379'},
+        "code": [{'path': 'python/src/azoth/process/reference/semenov_self_heating.py', 'sha256': '33bea41bc202749b257eb3a1690a082f7169b87f5280528201a5e243e8143051'}, {'path': 'crates/azoth-process/src/models/semenov_self_heating.rs', 'sha256': '723afd053eec84121644512e2119f0c8bf1db5d83d4136fe0fb4327a9bb242e2'}],
+        "source": 'NeqSim process/safety/selfheating/SemenovSelfHeatingAnalyzer.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 7,
+        "tests_skipped": 0,
+    },
     'process.separator': {
         "calc_id": 'process.separator',
         "name": 'Separator',

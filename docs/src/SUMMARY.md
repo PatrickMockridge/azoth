@@ -295,6 +295,7 @@
   - [Relief disposal network](./process/relief_disposal_network.md)
   - [Risk matrix](./process/risk_matrix.md)
   - [Safety instrumented function](./process/safety_instrumented_function.md)
+  - [Semenov self-heating](./process/semenov_self_heating.md)
   - [Separator](./process/separator.md)
   - [Separator capacity assessment](./process/separator_capacity_assessment.md)
   - [Separator performance calculator](./process/separator_performance.md)

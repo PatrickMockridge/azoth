@@ -7496,6 +7496,38 @@ pub fn safety_instrumented_function(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Semenov self-heating.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (volume, surface_area, heat_transfer_coefficient, activation_energy, volumetric_pre_factor, ambient_temperature, marginal_ratio))]
+#[pyo3(
+    text_signature = "(volume, surface_area, heat_transfer_coefficient, activation_energy, volumetric_pre_factor, ambient_temperature, marginal_ratio)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn semenov_self_heating(
+    py: Python<'_>,
+    volume: f64,
+    surface_area: f64,
+    heat_transfer_coefficient: f64,
+    activation_energy: f64,
+    volumetric_pre_factor: f64,
+    ambient_temperature: f64,
+    marginal_ratio: Option<f64>,
+) -> PyResult<crate::transport_gen::PySemenovSelfHeatingResult> {
+    azoth_process::models::semenov_self_heating::semenov_self_heating(
+        cubic_meters(volume),
+        square_meters(surface_area),
+        watts_per_square_meter_kelvin(heat_transfer_coefficient),
+        joules_per_mole(activation_energy),
+        volumetric_pre_factor,
+        kelvins(ambient_temperature),
+        marginal_ratio,
+    )
+    .map(|r| crate::transport_gen::PySemenovSelfHeatingResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Separator.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

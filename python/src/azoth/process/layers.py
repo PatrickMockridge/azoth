@@ -2532,6 +2532,35 @@ def _blocked_outlet_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _semenov_self_heating(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.semenov_self_heating`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.semenov_self_heating import (
+        semenov_self_heating as evaluate,
+    )
+
+    result = evaluate(
+        quantity(float(inputs["volume"]), "m**3"),
+        quantity(float(inputs["surface_area"]), "m**2"),
+        quantity(float(inputs["heat_transfer_coefficient"]), "W/(m**2*K)"),
+        quantity(float(inputs["activation_energy"]), "J/mol"),
+        float(inputs["volumetric_pre_factor"]),
+        quantity(float(inputs["ambient_temperature"]), "K"),
+        None if inputs.get("marginal_ratio") is None else float(inputs["marginal_ratio"]),
+    )
+    layers = {
+        "psi": result.psi,
+        "psi_crit": result.psi_crit,
+        "psi_ratio": result.psi_ratio,
+        "critical_temperature_rise_k": result.critical_temperature_rise.to("K").magnitude,
+    }
+    if result.critical_temperature is not None:
+        layers["critical_temperature_k"] = result.critical_temperature.to("K").magnitude
+    if result.temperature_margin is not None:
+        layers["temperature_margin_k"] = result.temperature_margin.to("K").magnitude
+    return layers
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3065,6 +3094,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.jet_fire": _jet_fire,
     "process.pfp_demand": _pfp_demand,
     "process.blocked_outlet_relief": _blocked_outlet_relief,
+    "process.semenov_self_heating": _semenov_self_heating,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -4768,6 +4798,57 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_blocked_outlet_relief.tsv",
         block=7,
         identified_by=("#label", "bo_zero_inflow"),
+    ),
+    # The Semenov screen: every block is a case, from the reported critical temperature
+    # through the failed bracket.
+    LayerCase(
+        model="process.semenov_self_heating",
+        case="semenov_base",
+        capture="process_semenov_self_heating.tsv",
+        block=0,
+        identified_by=("#label", "semenov_base"),
+    ),
+    LayerCase(
+        model="process.semenov_self_heating",
+        case="semenov_at_critical",
+        capture="process_semenov_self_heating.tsv",
+        block=1,
+        identified_by=("#label", "semenov_at_critical"),
+    ),
+    LayerCase(
+        model="process.semenov_self_heating",
+        case="semenov_subcritical",
+        capture="process_semenov_self_heating.tsv",
+        block=2,
+        identified_by=("#label", "semenov_subcritical"),
+    ),
+    LayerCase(
+        model="process.semenov_self_heating",
+        case="semenov_ignition",
+        capture="process_semenov_self_heating.tsv",
+        block=3,
+        identified_by=("#label", "semenov_ignition"),
+    ),
+    LayerCase(
+        model="process.semenov_self_heating",
+        case="semenov_bulky",
+        capture="process_semenov_self_heating.tsv",
+        block=4,
+        identified_by=("#label", "semenov_bulky"),
+    ),
+    LayerCase(
+        model="process.semenov_self_heating",
+        case="semenov_marginal_ratio",
+        capture="process_semenov_self_heating.tsv",
+        block=5,
+        identified_by=("#label", "semenov_marginal_ratio"),
+    ),
+    LayerCase(
+        model="process.semenov_self_heating",
+        case="semenov_not_bracketed",
+        capture="process_semenov_self_heating.tsv",
+        block=6,
+        identified_by=("#label", "semenov_not_bracketed"),
     ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(

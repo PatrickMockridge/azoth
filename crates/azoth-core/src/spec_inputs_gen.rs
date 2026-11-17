@@ -282,6 +282,7 @@
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/safety_instrumented_function.toml
+//!   - specs/models/process/semenov_self_heating.toml
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml
@@ -4564,6 +4565,33 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.safety_instrumented_function",
         "base_availability",
+        "dimensionless",
+    ),
+    ("process.semenov_self_heating", "volume", "volume"),
+    ("process.semenov_self_heating", "surface_area", "area"),
+    (
+        "process.semenov_self_heating",
+        "heat_transfer_coefficient",
+        "heat_transfer",
+    ),
+    (
+        "process.semenov_self_heating",
+        "activation_energy",
+        "molar_energy",
+    ),
+    (
+        "process.semenov_self_heating",
+        "volumetric_pre_factor",
+        "dimensionless",
+    ),
+    (
+        "process.semenov_self_heating",
+        "ambient_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.semenov_self_heating",
+        "marginal_ratio",
         "dimensionless",
     ),
     ("process.separator", "feed_n", "molar_flow"),

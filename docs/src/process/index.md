@@ -73,6 +73,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.relief_disposal_network`](./relief_disposal_network.md) | `closed_form_relief_disposal_network` | NeqSim process/safety/overpressure/ReliefDisposalNetwork.java |
 | [`process.risk_matrix`](./risk_matrix.md) | `closed_form_risk_matrix` | NeqSim process/safety/risk/RiskMatrix.java |
 | [`process.safety_instrumented_function`](./safety_instrumented_function.md) | `closed_form_safety_instrumented_function` | NeqSim process/safety/risk/sis/SafetyInstrumentedFunction.java |
+| [`process.semenov_self_heating`](./semenov_self_heating.md) | `semenov_criticality` | NeqSim process/safety/selfheating/SemenovSelfHeatingAnalyzer.java |
 | [`process.separator`](./separator.md) | `direct composition` | NeqSim process/equipment/separator/Separator.java |
 | [`process.separator_capacity_assessment`](./separator_capacity_assessment.md) | `direct composition` | NeqSim process/equipment/separator/SeparatorCapacityAssessment.java |
 | [`process.separator_performance`](./separator_performance.md) | `direct composition` | NeqSim process/equipment/separator/entrainment/SeparatorPerformanceCalculator.java |

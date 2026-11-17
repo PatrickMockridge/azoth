@@ -5044,6 +5044,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.semenov_self_heating",
+        name: "Semenov self-heating",
+        family: "selfheating",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation returns a table of rows, which this workspace does not yet draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.sil_verification",
         name: "SIL verification",
         family: "risk",

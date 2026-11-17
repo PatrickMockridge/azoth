@@ -71,6 +71,7 @@ use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
+use crate::models::semenov_self_heating::SemenovSelfHeatingResult;
 use crate::models::separator::SeparatorResult;
 use crate::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult;
 use crate::models::separator_performance::SeparatorPerformanceResult;
@@ -1693,6 +1694,25 @@ impl CalcResult for SafetyInstrumentedFunctionResult {
         "pfd_1oo2",
         "pfd_2oo3",
         "availability_with_spurious_trips",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SemenovSelfHeatingResult {
+    const CALC_ID: &'static str = "process.semenov_self_heating";
+    const FIELDS: &'static [&'static str] = &[
+        "psi",
+        "psi_crit",
+        "psi_ratio",
+        "critical_temperature",
+        "temperature_margin",
+        "critical_temperature_rise",
+        "verdict",
+        "messages",
         "warnings",
     ];
 

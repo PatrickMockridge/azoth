@@ -1,0 +1,162 @@
+model = "process.semenov_self_heating"
+
+[[cases]]
+id = "semenov_base"
+tolerance = 1.0e-9
+source = "The class test's V = 0.01 m3, S = 0.3 m2, h = 10 W/(m2 K), E = 110 kJ/mol and P = 5e13 W/m3 at 400 K. From `validation/neqsim/captures/process_semenov_self_heating.tsv` (`semenov_base`)."
+[cases.inputs]
+volume = 0.01
+surface_area = 0.3
+heat_transfer_coefficient = 10.0
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+ambient_temperature = 400.0
+[cases.expected]
+psi = 5.9571938659084104e-5
+psi_crit = 0.36787944117144233
+psi_ratio = 1.6193331834306522e-4
+critical_temperature = 558.7418280541897
+temperature_margin = 158.74182805418968
+critical_temperature_rise = 12.093763808
+verdict = "subcritical"
+messages = [
+    "Semenov theory assumes a spatially uniform body temperature (small Biot number); use PorousMediaSelfHeatingAnalyzer when internal conduction controls",
+]
+
+[[cases]]
+id = "semenov_at_critical"
+tolerance = 1.0e-9
+source = "The reported critical temperature itself: `psi_ratio` is one to the bisection's residue, so the class screens its own critical state as a self-ignition. From (`semenov_at_critical`)."
+[cases.inputs]
+volume = 0.01
+surface_area = 0.3
+heat_transfer_coefficient = 10.0
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+ambient_temperature = 558.7418280541897
+[cases.expected]
+psi = 0.36787958709277085
+psi_crit = 0.36787944117144233
+psi_ratio = 1.0000003966552957
+critical_temperature = 558.7418280541897
+temperature_margin = 0.0
+critical_temperature_rise = 23.597384475704725
+verdict = "self_ignition"
+messages = [
+    "Semenov theory assumes a spatially uniform body temperature (small Biot number); use PorousMediaSelfHeatingAnalyzer when internal conduction controls",
+]
+
+[[cases]]
+id = "semenov_subcritical"
+tolerance = 1.0e-9
+source = "Forty kelvin below the critical temperature: subcritical with a 40 K positive margin. From (`semenov_subcritical`)."
+[cases.inputs]
+volume = 0.01
+surface_area = 0.3
+heat_transfer_coefficient = 10.0
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+ambient_temperature = 518.7418280541897
+[cases.expected]
+psi = 0.06875202264898164
+psi_crit = 0.36787944117144233
+psi_ratio = 0.1868873738365315
+critical_temperature = 558.7418280541897
+temperature_margin = 40.0
+critical_temperature_rise = 20.33967626471597
+verdict = "subcritical"
+messages = [
+    "Semenov theory assumes a spatially uniform body temperature (small Biot number); use PorousMediaSelfHeatingAnalyzer when internal conduction controls",
+]
+
+[[cases]]
+id = "semenov_ignition"
+tolerance = 1.0e-9
+source = "Ten kelvin above the critical temperature: self-ignition with a negative margin. From (`semenov_ignition`)."
+[cases.inputs]
+volume = 0.01
+surface_area = 0.3
+heat_transfer_coefficient = 10.0
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+ambient_temperature = 568.7418280541897
+[cases.expected]
+psi = 0.5384002175319397
+psi_crit = 0.36787944117144233
+psi_ratio = 1.4635235277554686
+critical_temperature = 558.7418280541897
+temperature_margin = -10.0
+critical_temperature_rise = 24.449604540351917
+verdict = "self_ignition"
+messages = [
+    "Semenov theory assumes a spatially uniform body temperature (small Biot number); use PorousMediaSelfHeatingAnalyzer when internal conduction controls",
+]
+
+[[cases]]
+id = "semenov_bulky"
+tolerance = 1.0e-9
+source = "The same volume against 0.2 m2 at 450 K: less surface per unit volume raises psi fivefold and lowers the critical temperature. From (`semenov_bulky`)."
+[cases.inputs]
+volume = 0.01
+surface_area = 0.2
+heat_transfer_coefficient = 10.0
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+ambient_temperature = 450.0
+[cases.expected]
+psi = 0.0027851925786484223
+psi_crit = 0.36787944117144233
+psi_ratio = 0.007570938375298996
+critical_temperature = 548.491645604372
+temperature_margin = 98.49164560437202
+critical_temperature_rise = 15.3061698195
+verdict = "subcritical"
+messages = [
+    "Semenov theory assumes a spatially uniform body temperature (small Biot number); use PorousMediaSelfHeatingAnalyzer when internal conduction controls",
+]
+
+[[cases]]
+id = "semenov_marginal_ratio"
+tolerance = 1.0e-9
+source = "Five kelvin below the critical temperature with a 0.8 marginal ratio: `psi_ratio` 0.822 is inside the band, so the verdict is marginal rather than subcritical. From (`semenov_marginal_ratio`)."
+[cases.inputs]
+volume = 0.01
+surface_area = 0.3
+heat_transfer_coefficient = 10.0
+activation_energy = 110000.0
+volumetric_pre_factor = 5.0e13
+ambient_temperature = 553.7418280541897
+marginal_ratio = 0.8
+[cases.expected]
+psi = 0.3024549866634328
+psi_crit = 0.36787944117144233
+psi_ratio = 0.8221578941740322
+critical_temperature = 558.7418280541897
+temperature_margin = 5.0
+critical_temperature_rise = 23.176943395166134
+verdict = "marginal"
+messages = [
+    "Semenov theory assumes a spatially uniform body temperature (small Biot number); use PorousMediaSelfHeatingAnalyzer when internal conduction controls",
+]
+
+[[cases]]
+id = "semenov_not_bracketed"
+tolerance = 1.0e-9
+source = "A 1 kJ/mol activation energy: `psi` is already above critical at 150 K, so the bisection cannot bracket a critical temperature and both it and the margin are absent. From (`semenov_not_bracketed`)."
+[cases.inputs]
+volume = 0.01
+surface_area = 0.3
+heat_transfer_coefficient = 10.0
+activation_energy = 1000.0
+volumetric_pre_factor = 5.0e13
+ambient_temperature = 400.0
+[cases.expected]
+psi = 92749276.72605176
+psi_crit = 0.36787944117144233
+psi_ratio = 252118673.52714595
+critical_temperature_rise = 1330.31401888
+verdict = "self_ignition"
+messages = [
+    "Critical ambient temperature could not be bracketed between 150.0 K and 2000.0 K; check the kinetic parameters",
+    "Semenov theory assumes a spatially uniform body temperature (small Biot number); use PorousMediaSelfHeatingAnalyzer when internal conduction controls",
+]

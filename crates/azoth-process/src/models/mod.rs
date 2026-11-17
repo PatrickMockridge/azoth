@@ -91,6 +91,8 @@ pub mod rate_based_packed_column;
 pub mod relief_disposal_network;
 pub mod risk_matrix;
 pub mod safety_instrumented_function;
+pub mod selfheating;
+pub mod semenov_self_heating;
 pub mod separator;
 pub mod separator_capacity_assessment;
 pub mod separator_performance;
@@ -202,6 +204,8 @@ pub use risk_matrix::{
 pub use safety_instrumented_function::{
     SafetyInstrumentedFunctionResult, safety_instrumented_function,
 };
+pub use selfheating::{SelfHeatingGeometry, SelfHeatingVerdict};
+pub use semenov_self_heating::{SemenovSelfHeatingResult, semenov_self_heating};
 pub use separator::{SeparatorResult, separator};
 pub use separator_capacity_assessment::{
     SeparatorCapacityAssessmentResult, separator_capacity_assessment,

@@ -1,0 +1,125 @@
+id = "process.semenov_self_heating"
+name = "Semenov self-heating"
+kind = "procedure"
+assumptions = [
+    "**the Semenov limit is a thermally thin body**: internal gradients are negligible and the surface film carries the whole heat-loss resistance. `process.porous_media_self_heating` is the conduction-controlled limit.",
+    "**the parameter is `psi = E V P exp(-E/(R Ta)) / (h S R Ta^2)`**, evaluated in logarithmic form, and `psi_crit` is `1/e`.",
+    "**the critical temperature is a bisection on [150, 2000] K with a 1e-4 K tolerance and a 200-iteration cap.** It is absent when `psi(150)` is already above critical or `psi(2000)` below it. At the returned temperature `psi_ratio` is one to the bisection's residue, so that state screens as self-ignition.",
+    "**the verdict is `psi_ratio > 1` self-ignition and `psi_ratio >= marginal_ratio` marginal**, so the critical state is a self-ignition and the marginal band is inclusive at its lower edge.",
+    "**`critical_temperature_rise` is `R Ta^2/E`**, the steady self-heating excess at criticality in kelvin, which is only tens of kelvin for a typical organic oxidation.",
+    "**the class's warning strings are published in order in `messages`**: the bracket failure when it happens, then the spatial-uniformity note, which is always present.",
+]
+references = [
+    "Semenov, N. N. (1928). Zur Theorie des Verbrennungsprozesses. Zeitschrift fur Physik 48.",
+    "Bowes, P. C. (1984). Self-Heating: Evaluating and Controlling the Hazards. HMSO.",
+    "Babrauskas, V. (2003). Ignition Handbook. Fire Science Publishers.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/selfheating/SemenovSelfHeatingAnalyzer.java` is the port source.",
+    "`validation/neqsim/captures/process_semenov_self_heating.tsv` - the class test's state, its reported critical temperature, a subcritical and a marginal state, a bulky body and a failed bracket.",
+]
+[source]
+standard = "NeqSim process/safety/selfheating/SemenovSelfHeatingAnalyzer.java"
+edition = "Its `analyze`: the Semenov criticality parameter, the critical-temperature bisection and the verdict."
+[algorithm]
+scheme = "semenov_criticality"
+convergence = "absolute"
+tolerance = 1.0e-4
+max_iterations = 200
+[inputs]
+[inputs.volume]
+unit = "m**3"
+description = "the reacting volume, above zero.\n"
+[inputs.surface_area]
+unit = "m**2"
+description = "the heat-loss surface area, above zero.\n"
+[inputs.heat_transfer_coefficient]
+unit = "W/(m**2*K)"
+description = "the external heat-transfer coefficient that governs surface cooling, above zero.\n"
+[inputs.activation_energy]
+unit = "J/mol"
+description = "the apparent activation energy of the self-heating reaction, above zero.\n"
+[inputs.volumetric_pre_factor]
+unit = "dimensionless"
+description = "`P = A Q rho`, the volumetric heat-release pre-exponential factor **in W/m3**, above zero. Declared dimensionless because the vocabulary has no such unit.\n"
+[inputs.ambient_temperature]
+unit = "K"
+description = "the surrounding temperature, absolute and above zero.\n"
+[inputs.marginal_ratio]
+unit = "dimensionless"
+optional = true
+description = "the ratio of `psi` to `psi_crit` at which a subcritical state is reported marginal, strictly between zero and one. **Absent is 0.7.**\n"
+[outputs]
+[outputs.psi]
+unit = "dimensionless"
+description = "the Semenov criticality parameter at the ambient temperature.\n"
+[outputs.psi_crit]
+unit = "dimensionless"
+description = "the critical parameter, `1/e`.\n"
+[outputs.psi_ratio]
+unit = "dimensionless"
+description = "`psi / psi_crit`.\n"
+[outputs.critical_temperature]
+unit = "K"
+optional = true
+description = "the ambient temperature at which `psi` reaches `1/e`; absent when it cannot be bracketed between 150 K and 2000 K.\n"
+[outputs.temperature_margin]
+unit = "K"
+optional = true
+description = "`critical_temperature - ambient_temperature`; absent with the critical temperature. Positive is subcritical.\n"
+[outputs.critical_temperature_rise]
+unit = "K"
+description = "`R Ta^2/E`, the steady self-heating excess at criticality.\n"
+[outputs.verdict]
+type = "enum"
+values = ["subcritical", "marginal", "self_ignition"]
+description = "the screening verdict.\n"
+[outputs.messages]
+type = "vector_string"
+length = "one per message"
+description = "the class's warning strings, in the order it appends them.\n"
+[[valid_range]]
+quantity = "volume"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a reacting volume is positive"
+[[valid_range]]
+quantity = "surface_area"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a heat-loss area is positive"
+[[valid_range]]
+quantity = "heat_transfer_coefficient"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive coefficient"
+[[valid_range]]
+quantity = "activation_energy"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive activation energy"
+[[valid_range]]
+quantity = "volumetric_pre_factor"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive pre-factor"
+[[valid_range]]
+quantity = "ambient_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "marginal_ratio"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = false
+severity = "error"
+rationale = "the class accepts a ratio strictly between zero and one"
+[implementations]
+python = "azoth.process.semenov_self_heating"
+rust = "azoth_process::semenov_self_heating"

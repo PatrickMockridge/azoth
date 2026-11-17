@@ -79,6 +79,7 @@ from azoth.core.result import (
     ReliefDisposalNetworkResult,
     RiskMatrixResult,
     SafetyInstrumentedFunctionResult,
+    SemenovSelfHeatingResult,
     SeparatorCapacityAssessmentResult,
     SeparatorPerformanceResult,
     SeparatorResult,
@@ -273,6 +274,7 @@ _BLOWDOWN_PRESSURE_PROFILE = "process.blowdown_pressure_profile"
 _PIPE_FIRE_RUPTURE = "process.pipe_fire_rupture"
 _PIPE_FIRE_RUPTURE_MATERIAL = "process.pipe_fire_rupture_material"
 _VESSEL_RUPTURE = "process.vessel_rupture"
+_SEMENOV_SELF_HEATING = "process.semenov_self_heating"
 
 
 def validate(flowsheet: str, palette_dir: str = "specs/unit_ops") -> list[str]:
@@ -3384,6 +3386,35 @@ def manifold(
         feed_p=feed_p,
         feed_t=feed_t,
         split_factors=split_factors,
+    )
+
+
+def semenov_self_heating(
+    volume: Q,
+    surface_area: Q,
+    heat_transfer_coefficient: Q,
+    activation_energy: Q,
+    volumetric_pre_factor: float,
+    ambient_temperature: Q,
+    marginal_ratio: float | None = None,
+) -> SemenovSelfHeatingResult:
+    """The Semenov criticality screen for a thermally thin body.
+
+    **`psi` is compared with `1/e`**: below the marginal band the body is subcritical, inside
+    it marginal, and above it the body is predicted to self-ignite. The critical ambient
+    temperature is a bisection and is absent when it cannot be bracketed; the critical rise
+    is `R Ta^2/E`.
+
+    See :func:`azoth.process.reference.semenov_self_heating`.
+    """
+    return resolve(_SEMENOV_SELF_HEATING)(  # type: ignore[no-any-return]
+        volume=volume,
+        surface_area=surface_area,
+        heat_transfer_coefficient=heat_transfer_coefficient,
+        activation_energy=activation_energy,
+        volumetric_pre_factor=volumetric_pre_factor,
+        ambient_temperature=ambient_temperature,
+        marginal_ratio=marginal_ratio,
     )
 
 

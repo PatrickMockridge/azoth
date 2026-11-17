@@ -387,6 +387,7 @@ Five sections, and the difference between them is the point:
 - [`process.relief_disposal_network`](./process/relief_disposal_network.md) — Relief disposal network
 - [`process.risk_matrix`](./process/risk_matrix.md) — Risk matrix
 - [`process.safety_instrumented_function`](./process/safety_instrumented_function.md) — Safety instrumented function
+- [`process.semenov_self_heating`](./process/semenov_self_heating.md) — Semenov self-heating
 - [`process.separator`](./process/separator.md) — Separator
 - [`process.separator_capacity_assessment`](./process/separator_capacity_assessment.md) — Separator capacity assessment
 - [`process.separator_performance`](./process/separator_performance.md) — Separator performance calculator
