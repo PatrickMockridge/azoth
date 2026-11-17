@@ -369,6 +369,7 @@ Five sections, and the difference between them is the point:
 - [`process.jet_fire`](./process/jet_fire.md) — Jet fire radiation
 - [`process.leak_blowdown`](./process/leak_blowdown.md) — Vessel leak blowdown
 - [`process.lopa`](./process/lopa.md) — Layer of protection analysis
+- [`process.mah_bow_tie_skeleton`](./process/mah_bow_tie_skeleton.md) — MAH bow-tie skeleton
 - [`process.manifold`](./process/manifold.md) — Manifold
 - [`process.map_turbo_expander_compressor`](./process/map_turbo_expander_compressor.md) — Map turbo-expander compressor
 - [`process.mixer`](./process/mixer.md) — Mixer

@@ -306,3 +306,149 @@ def is_placeholder(value: str | None) -> bool:
         return True
     trimmed = value.strip()
     return trimmed == "" or trimmed.upper() == "TBD"
+
+
+#: The eleven ISO 17776 categories: ``(description, threats, consequences, barriers)``.
+MAH_CATALOGUE: dict[str, tuple[str, tuple[str, ...], tuple[str, ...], tuple[str, ...]]] = {
+    "topside_hydrocarbon_release": (
+        "Topside hydrocarbon release",
+        (
+            "Corrosion failure",
+            "Erosion failure",
+            "Mechanical impact",
+            "Operator error",
+            "Process upset",
+        ),
+        ("Jet fire", "Pool fire", "VCE / flash fire", "Toxic exposure"),
+        (
+            "Process containment",
+            "ESD / SDV isolation",
+            "Blowdown",
+            "Gas detection",
+            "Fire detection",
+            "Deluge",
+            "PFP",
+            "Emergency response",
+        ),
+    ),
+    "riser_leak": (
+        "Riser or sub-sea pipeline leak",
+        (
+            "CO2 corrosion",
+            "Fatigue / VIV",
+            "Anchor / dropped object",
+            "External impact",
+            "Material defect",
+        ),
+        ("Sub-sea release", "Topside escalation", "Pollution"),
+        (
+            "ESV / SSIV",
+            "Topside ESD",
+            "Corrosion inhibition",
+            "Inline inspection",
+            "Riser monitoring",
+        ),
+    ),
+    "well_blowout": (
+        "Uncontrolled well blowout",
+        (
+            "Loss of primary barrier",
+            "Loss of secondary barrier",
+            "Annulus integrity loss",
+        ),
+        ("Uncontrolled release", "Fire / explosion", "Loss of well"),
+        (
+            "Casing",
+            "Cement",
+            "DHSV",
+            "Wellhead",
+            "Christmas tree",
+            "BOP",
+            "Well intervention procedures",
+        ),
+    ),
+    "structural_collapse": (
+        "Structural collapse",
+        ("Fatigue crack growth", "Overload", "Foundation failure", "Corrosion"),
+        ("Loss of life", "Total loss of installation"),
+        (
+            "Design margins",
+            "Inspection",
+            "Monitoring",
+            "Weight control",
+            "Subsidence monitoring",
+        ),
+    ),
+    "dropped_object": (
+        "Dropped object impact",
+        ("Lifting equipment failure", "Procedure failure", "Wind / motion"),
+        (
+            "Impact on personnel",
+            "Damage to safety critical equipment",
+            "Riser damage",
+        ),
+        (
+            "Lifting procedures",
+            "Crane integrity",
+            "Drop-zone barriers",
+            "Helideck arrangement",
+        ),
+    ),
+    "helicopter_loss": (
+        "Helicopter loss",
+        ("Mechanical failure", "Weather", "Pilot error", "Bird strike"),
+        ("Loss of life", "Helideck fire"),
+        ("Helideck design", "Foam system", "Helideck fire team", "Operating limits"),
+    ),
+    "ship_collision": (
+        "Passing or attendant vessel collision",
+        ("Drifting vessel", "Powered vessel", "Loss of position keeping"),
+        ("Structural damage", "Riser rupture", "Topside escalation"),
+        ("Radar / AIS", "500 m zone monitoring", "Standby vessel", "Hull design margins"),
+    ),
+    "fire_explosion": (
+        "Process fire / explosion",
+        ("Hydrocarbon ignition", "Hot work", "Electrical fault", "Lightning strike"),
+        ("Personnel injury", "Equipment damage", "Escalation"),
+        (
+            "Hazardous area classification",
+            "Ignition control",
+            "Gas detection",
+            "Fire detection",
+            "PFP",
+            "Blast walls",
+        ),
+    ),
+    "toxic_release": (
+        "Toxic substance release",
+        ("H2S in production", "Mercury", "MEG / amines"),
+        ("Personnel exposure", "Environmental impact"),
+        ("H2S removal", "Mercury removal", "Personal monitors", "Escape masks", "Ventilation"),
+    ),
+    "loss_of_buoyancy": (
+        "Loss of buoyancy or stability",
+        (
+            "Compartment flooding",
+            "Ballast system failure",
+            "Storm overload",
+            "Mooring failure",
+        ),
+        ("Capsize", "Loss of installation"),
+        (
+            "Compartmentation",
+            "Ballast control",
+            "Mooring redundancy",
+            "Damage stability margins",
+        ),
+    ),
+    "extreme_weather": (
+        "Extreme weather beyond design",
+        ("100-yr storm exceedance", "Hurricane", "Sea-ice / iceberg"),
+        (
+            "Structural overload",
+            "Loss of station keeping",
+            "Operational shutdown",
+        ),
+        ("Met-ocean monitoring", "Weather operational limits", "Disconnection procedures (turret)"),
+    ),
+}

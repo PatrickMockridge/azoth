@@ -43,6 +43,7 @@
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
 //!   - specs/models/process/lopa.toml
+//!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mixer.toml
@@ -48788,6 +48789,251 @@ pub static LOPA_SPEC: ModelSpec = ModelSpec {
     cases: LOPA_CASES,
 };
 
+static MAH_BOW_TIE_SKELETON_CHECKS: &[SpecCheck] = &[];
+
+static MAH_BOW_TIE_SKELETON_CASES: &[TestCase] = &[TestCase {
+    id: "mah_fire_explosion",
+    kind: "case",
+    property: None,
+    status: "active",
+    skip_reason: None,
+    tolerance: 1e-12,
+    numbers: &[],
+    flags: &[],
+    lists: &[],
+    strings: &[("mah_type", "fire_explosion")],
+    vectors: &[],
+    matrices: &[],
+    expected: &[
+        ("threat_count", 4.0),
+        ("consequence_count", 3.0),
+        ("barrier_count", 6.0),
+    ],
+    expected_vectors: &[],
+    expected_strings: &[],
+    records: &[],
+    expected_records: &[
+        (
+            "threats",
+            &[
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("T1"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Hydrocarbon ignition"),
+                    },
+                    RecordField {
+                        name: "frequency_per_year",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("T2"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Hot work"),
+                    },
+                    RecordField {
+                        name: "frequency_per_year",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("T3"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Electrical fault"),
+                    },
+                    RecordField {
+                        name: "frequency_per_year",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("T4"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Lightning strike"),
+                    },
+                    RecordField {
+                        name: "frequency_per_year",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+            ],
+        ),
+        (
+            "consequences",
+            &[
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("C1"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Personnel injury"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(4.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("C2"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Equipment damage"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(4.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("C3"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Escalation"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(4.0),
+                    },
+                ],
+            ],
+        ),
+        (
+            "barriers",
+            &[
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B1"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Hazardous area classification"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B2"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Ignition control"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B3"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Gas detection"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B4"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Fire detection"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B5"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("PFP"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B6"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Blast walls"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+            ],
+        ),
+    ],
+}];
+
+static MAH_BOW_TIE_SKELETON_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "mah_bow_tie_catalogue",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.mah_bow_tie_skeleton`.
+pub static MAH_BOW_TIE_SKELETON_SPEC: ModelSpec = ModelSpec {
+    id: "process.mah_bow_tie_skeleton",
+    kind: "procedure",
+    algorithm: Some(&MAH_BOW_TIE_SKELETON_ALGORITHM),
+    checks: MAH_BOW_TIE_SKELETON_CHECKS,
+    cases: MAH_BOW_TIE_SKELETON_CASES,
+};
+
 static MANIFOLD_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -78656,6 +78902,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &JET_FIRE_SPEC,
     &LEAK_BLOWDOWN_SPEC,
     &LOPA_SPEC,
+    &MAH_BOW_TIE_SKELETON_SPEC,
     &MANIFOLD_SPEC,
     &MAP_TURBO_EXPANDER_COMPRESSOR_SPEC,
     &MIXER_SPEC,

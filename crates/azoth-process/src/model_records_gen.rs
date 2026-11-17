@@ -53,6 +53,7 @@ use crate::models::hem_release::HemReleaseResult;
 use crate::models::jet_fire::JetFireResult;
 use crate::models::leak_blowdown::LeakBlowdownResult;
 use crate::models::lopa::LopaResult;
+use crate::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult;
 use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mixer::MixerResult;
@@ -1206,6 +1207,23 @@ impl CalcResult for LopaResult {
         "layer_contributions",
         "sts0131_pressure_category",
         "sts0131_target_frequency_per_year",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for MahBowTieSkeletonResult {
+    const CALC_ID: &'static str = "process.mah_bow_tie_skeleton";
+    const FIELDS: &'static [&'static str] = &[
+        "threats",
+        "consequences",
+        "barriers",
+        "threat_count",
+        "consequence_count",
+        "barrier_count",
         "warnings",
     ];
 

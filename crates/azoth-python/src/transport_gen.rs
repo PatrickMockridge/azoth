@@ -21,10 +21,11 @@ use crate::record_outputs_gen::{
     PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
     PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIncrementalZoneRow,
     PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
-    PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow, PyPipeFireRupturePoint,
-    PyReliefDisposalRow, PyRemediationOptionRow, PyRiskAssessmentRow, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
+    PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
+    PyNaceIssueRow, PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyRiskAssessmentRow, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue, PySterileRadius,
+    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
     PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
@@ -19666,6 +19667,69 @@ impl From<&azoth_process::models::lopa::LopaResult> for PyLopaResult {
                 .collect(),
             sts0131_pressure_category: r.sts0131_pressure_category.map(|v| v.as_str().to_string()),
             sts0131_target_frequency_per_year: r.sts0131_target_frequency_per_year,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.mah_bow_tie_skeleton`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MahBowTieSkeletonResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMahBowTieSkeletonResult {
+    /// the catalogue's default threats, in their order.
+    #[pyo3(get)]
+    pub threats: Vec<PyMahThreat>,
+    /// the catalogue's default consequences, in their order.
+    #[pyo3(get)]
+    pub consequences: Vec<PyMahConsequence>,
+    /// the catalogue's default barrier classes, in their order.
+    #[pyo3(get)]
+    pub barriers: Vec<PyMahBarrier>,
+    /// the number of threats.
+    #[pyo3(get)]
+    pub threat_count: f64,
+    /// the number of consequences.
+    #[pyo3(get)]
+    pub consequence_count: f64,
+    /// the number of barrier classes.
+    #[pyo3(get)]
+    pub barrier_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyMahBowTieSkeletonResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "MahBowTieSkeletonResult(threats={:?}, consequences={:?}, barriers={:?}, threat_count={:?}, consequence_count={:?}, barrier_count={:?}, {} warning(s))",
+            self.threats,
+            self.consequences,
+            self.barriers,
+            self.threat_count,
+            self.consequence_count,
+            self.barrier_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult>
+    for PyMahBowTieSkeletonResult
+{
+    fn from(r: &azoth_process::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult) -> Self {
+        Self {
+            threats: r.threats.iter().map(PyMahThreat::from).collect(),
+            consequences: r.consequences.iter().map(PyMahConsequence::from).collect(),
+            barriers: r.barriers.iter().map(PyMahBarrier::from).collect(),
+            threat_count: r.threat_count,
+            consequence_count: r.consequence_count,
+            barrier_count: r.barrier_count,
             warnings: transport(&r.warnings),
         }
     }

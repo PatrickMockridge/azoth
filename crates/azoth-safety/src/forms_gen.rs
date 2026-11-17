@@ -2591,6 +2591,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.mah_bow_tie_skeleton",
+        name: "MAH bow-tie skeleton",
+        family: "hazid",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation returns a table of rows, which this workspace does not yet draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.nog070_sil_determination",
         name: "NOG 070 SIL determination",
         family: "risk",

@@ -55,6 +55,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.jet_fire`](./jet_fire.md) | `api521_point_source_wayne_transmissivity` | NeqSim process/safety/fire/JetFireModel.java |
 | [`process.leak_blowdown`](./leak_blowdown.md) | `explicit_euler_isentropic_blowdown` | NeqSim process/safety/release/LeakModel.java |
 | [`process.lopa`](./lopa.md) | `closed_form_lopa` | NeqSim process/safety/risk/sis/LOPAResult.java |
+| [`process.mah_bow_tie_skeleton`](./mah_bow_tie_skeleton.md) | `mah_bow_tie_catalogue` | NeqSim process/safety/hazid/MahBowTieBuilder.java |
 | [`process.manifold`](./manifold.md) | `direct composition` | NeqSim process/equipment/manifold/Manifold.java |
 | [`process.map_turbo_expander_compressor`](./map_turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/MapTurboExpanderCompressor.java |
 | [`process.mixer`](./mixer.md) | `direct composition` | NeqSim process/equipment/mixer/Mixer.java |

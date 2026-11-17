@@ -61,6 +61,7 @@ from azoth.core.result import (
     JetFireResult,
     LeakBlowdownResult,
     LopaResult,
+    MahBowTieSkeletonResult,
     ManifoldResult,
     MapTurboExpanderResult,
     MixerResult,
@@ -287,6 +288,7 @@ _BASKET_TEST_REGRESSION = "process.basket_test_regression"
 _HAZOP_TEMPLATE = "process.hazop_template"
 _FMEA_WORKSHEET = "process.fmea_worksheet"
 _HAZOP_CONSEQUENCE_POPULATION = "process.hazop_consequence_population"
+_MAH_BOW_TIE_SKELETON = "process.mah_bow_tie_skeleton"
 
 
 def validate(flowsheet: str, palette_dir: str = "specs/unit_ops") -> list[str]:
@@ -3264,6 +3266,19 @@ def hazop_consequence_population(
     return resolve(_HAZOP_CONSEQUENCE_POPULATION)(  # type: ignore[no-any-return]
         deviations=deviations,
         equipment_type=equipment_type,
+    )
+
+
+def mah_bow_tie_skeleton(mah_type: str) -> MahBowTieSkeletonResult:
+    """The ISO 17776 threats, consequences and barrier classes for one MAH type.
+
+    **The placeholders are `0.001` a year, a severity of `4` and a PFD of `0.01`.** The
+    skeleton is the input to :func:`bow_tie`, which computes the frequency; this id does not.
+
+    See :func:`azoth.process.reference.mah_bow_tie_skeleton`.
+    """
+    return resolve(_MAH_BOW_TIE_SKELETON)(  # type: ignore[no-any-return]
+        mah_type=mah_type,
     )
 
 

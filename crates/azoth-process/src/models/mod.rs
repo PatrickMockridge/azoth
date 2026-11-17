@@ -73,6 +73,7 @@ pub mod hem_release;
 pub mod jet_fire;
 pub mod leak_blowdown;
 pub mod lopa;
+pub mod mah_bow_tie_skeleton;
 pub mod manifold;
 pub mod map_turbo_expander_compressor;
 pub mod mixer;
@@ -184,6 +185,9 @@ pub use jet_fire::{JetFireResult, jet_fire};
 pub use leak_blowdown::{LeakBlowdownResult, leak_blowdown};
 pub use lopa::{
     LopaLayerContribution, LopaProtectionLayer, LopaResult, Sts0131PressureCategory, lopa,
+};
+pub use mah_bow_tie_skeleton::{
+    MahBarrier, MahBowTieSkeletonResult, MahConsequence, MahThreat, mah_bow_tie_skeleton,
 };
 pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};

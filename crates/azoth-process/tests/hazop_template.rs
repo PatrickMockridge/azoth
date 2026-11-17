@@ -103,11 +103,7 @@ fn the_seed_table_selects_by_equipment_type() {
     let pipe = grid(&[], Some("PipeBeggsAndBrills"));
     assert_eq!(
         pairs(&pipe),
-        vec![
-            ("no", "flow"),
-            ("less", "flow"),
-            ("less", "pressure"),
-        ]
+        vec![("no", "flow"), ("less", "flow"), ("less", "pressure"),]
     );
 
     let default = grid(&[], Some("Stream"));

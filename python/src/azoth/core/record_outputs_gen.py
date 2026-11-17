@@ -649,6 +649,48 @@ class LopaLayerContribution:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MahBarrier:
+    """the catalogue's default barrier classes, in their order."""
+
+    #: the row id, `B1` and upwards.
+    id: str
+
+    #: the barrier class.
+    description: str
+
+    #: the placeholder probability of failure on demand, `0.01`.
+    pfd: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MahConsequence:
+    """the catalogue's default consequences, in their order."""
+
+    #: the row id, `C1` and upwards.
+    id: str
+
+    #: the consequence.
+    description: str
+
+    #: the placeholder severity, `4` on the class's 1-to-5 scale.
+    severity: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MahThreat:
+    """the catalogue's default threats, in their order."""
+
+    #: the row id, `T1` and upwards.
+    id: str
+
+    #: the threat.
+    description: str
+
+    #: the placeholder frequency, `0.001` in 1/year; the vocabulary has no year unit, so the value crosses unconverted.
+    frequency_per_year: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class MineralEquilibriumRow:
     """The registered minerals, in the class's order; a mineral whose ion is below the registration floor is absent rather than zero."""
 

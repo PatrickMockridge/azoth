@@ -6968,6 +6968,21 @@ pub fn lopa(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// MAH bow-tie skeleton.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (mah_type))]
+#[pyo3(text_signature = "(mah_type)")]
+pub fn mah_bow_tie_skeleton(
+    py: Python<'_>,
+    mah_type: &str,
+) -> PyResult<crate::transport_gen::PyMahBowTieSkeletonResult> {
+    azoth_process::models::mah_bow_tie_skeleton::mah_bow_tie_skeleton(mah_type)
+        .map(|r| crate::transport_gen::PyMahBowTieSkeletonResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Manifold.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

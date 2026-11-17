@@ -586,9 +586,271 @@ pub(crate) fn recommendation_for(chosen: &ChosenMapping) -> String {
             chosen.standard
         )
     } else {
-        format!("Quantify with {} per {}", chosen.calculator, chosen.standard)
+        format!(
+            "Quantify with {} per {}",
+            chosen.calculator, chosen.standard
+        )
     }
 }
+
+/// An ISO 17776 major accident hazard category.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum MahType {
+    TopsideHydrocarbonRelease,
+    RiserLeak,
+    WellBlowout,
+    StructuralCollapse,
+    DroppedObject,
+    HelicopterLoss,
+    ShipCollision,
+    FireExplosion,
+    ToxicRelease,
+    LossOfBuoyancy,
+    ExtremeWeather,
+}
+
+/// The class's default threats, consequences and barrier classes for one MAH.
+pub(crate) struct MahEntry {
+    pub threats: &'static [&'static str],
+    pub consequences: &'static [&'static str],
+    pub barriers: &'static [&'static str],
+}
+
+impl MahType {
+    pub(crate) fn parse(value: &str) -> Result<Self> {
+        Ok(match value {
+            "topside_hydrocarbon_release" => Self::TopsideHydrocarbonRelease,
+            "riser_leak" => Self::RiserLeak,
+            "well_blowout" => Self::WellBlowout,
+            "structural_collapse" => Self::StructuralCollapse,
+            "dropped_object" => Self::DroppedObject,
+            "helicopter_loss" => Self::HelicopterLoss,
+            "ship_collision" => Self::ShipCollision,
+            "fire_explosion" => Self::FireExplosion,
+            "toxic_release" => Self::ToxicRelease,
+            "loss_of_buoyancy" => Self::LossOfBuoyancy,
+            "extreme_weather" => Self::ExtremeWeather,
+            _ => {
+                return Err(AzothError::invalid_input(
+                    "mah_type",
+                    format!(
+                        "`{value}` is not `topside_hydrocarbon_release`, `riser_leak`, \
+                         `well_blowout`, `structural_collapse`, `dropped_object`, \
+                         `helicopter_loss`, `ship_collision`, `fire_explosion`, `toxic_release`, \
+                         `loss_of_buoyancy` or `extreme_weather`"
+                    ),
+                ));
+            }
+        })
+    }
+
+    /// The class's catalogue entry.
+    #[must_use]
+    pub(crate) fn entry(self) -> &'static MahEntry {
+        match self {
+            Self::TopsideHydrocarbonRelease => &TOPSIDE_HYDROCARBON_RELEASE,
+            Self::RiserLeak => &RISER_LEAK,
+            Self::WellBlowout => &WELL_BLOWOUT,
+            Self::StructuralCollapse => &STRUCTURAL_COLLAPSE,
+            Self::DroppedObject => &DROPPED_OBJECT,
+            Self::HelicopterLoss => &HELICOPTER_LOSS,
+            Self::ShipCollision => &SHIP_COLLISION,
+            Self::FireExplosion => &FIRE_EXPLOSION,
+            Self::ToxicRelease => &TOXIC_RELEASE,
+            Self::LossOfBuoyancy => &LOSS_OF_BUOYANCY,
+            Self::ExtremeWeather => &EXTREME_WEATHER,
+        }
+    }
+}
+
+const TOPSIDE_HYDROCARBON_RELEASE: MahEntry = MahEntry {
+    threats: &[
+        "Corrosion failure",
+        "Erosion failure",
+        "Mechanical impact",
+        "Operator error",
+        "Process upset",
+    ],
+    consequences: &[
+        "Jet fire",
+        "Pool fire",
+        "VCE / flash fire",
+        "Toxic exposure",
+    ],
+    barriers: &[
+        "Process containment",
+        "ESD / SDV isolation",
+        "Blowdown",
+        "Gas detection",
+        "Fire detection",
+        "Deluge",
+        "PFP",
+        "Emergency response",
+    ],
+};
+
+const RISER_LEAK: MahEntry = MahEntry {
+    threats: &[
+        "CO2 corrosion",
+        "Fatigue / VIV",
+        "Anchor / dropped object",
+        "External impact",
+        "Material defect",
+    ],
+    consequences: &["Sub-sea release", "Topside escalation", "Pollution"],
+    barriers: &[
+        "ESV / SSIV",
+        "Topside ESD",
+        "Corrosion inhibition",
+        "Inline inspection",
+        "Riser monitoring",
+    ],
+};
+
+const WELL_BLOWOUT: MahEntry = MahEntry {
+    threats: &[
+        "Loss of primary barrier",
+        "Loss of secondary barrier",
+        "Annulus integrity loss",
+    ],
+    consequences: &["Uncontrolled release", "Fire / explosion", "Loss of well"],
+    barriers: &[
+        "Casing",
+        "Cement",
+        "DHSV",
+        "Wellhead",
+        "Christmas tree",
+        "BOP",
+        "Well intervention procedures",
+    ],
+};
+
+const STRUCTURAL_COLLAPSE: MahEntry = MahEntry {
+    threats: &[
+        "Fatigue crack growth",
+        "Overload",
+        "Foundation failure",
+        "Corrosion",
+    ],
+    consequences: &["Loss of life", "Total loss of installation"],
+    barriers: &[
+        "Design margins",
+        "Inspection",
+        "Monitoring",
+        "Weight control",
+        "Subsidence monitoring",
+    ],
+};
+
+const DROPPED_OBJECT: MahEntry = MahEntry {
+    threats: &[
+        "Lifting equipment failure",
+        "Procedure failure",
+        "Wind / motion",
+    ],
+    consequences: &[
+        "Impact on personnel",
+        "Damage to safety critical equipment",
+        "Riser damage",
+    ],
+    barriers: &[
+        "Lifting procedures",
+        "Crane integrity",
+        "Drop-zone barriers",
+        "Helideck arrangement",
+    ],
+};
+
+const HELICOPTER_LOSS: MahEntry = MahEntry {
+    threats: &[
+        "Mechanical failure",
+        "Weather",
+        "Pilot error",
+        "Bird strike",
+    ],
+    consequences: &["Loss of life", "Helideck fire"],
+    barriers: &[
+        "Helideck design",
+        "Foam system",
+        "Helideck fire team",
+        "Operating limits",
+    ],
+};
+
+const SHIP_COLLISION: MahEntry = MahEntry {
+    threats: &[
+        "Drifting vessel",
+        "Powered vessel",
+        "Loss of position keeping",
+    ],
+    consequences: &["Structural damage", "Riser rupture", "Topside escalation"],
+    barriers: &[
+        "Radar / AIS",
+        "500 m zone monitoring",
+        "Standby vessel",
+        "Hull design margins",
+    ],
+};
+
+const FIRE_EXPLOSION: MahEntry = MahEntry {
+    threats: &[
+        "Hydrocarbon ignition",
+        "Hot work",
+        "Electrical fault",
+        "Lightning strike",
+    ],
+    consequences: &["Personnel injury", "Equipment damage", "Escalation"],
+    barriers: &[
+        "Hazardous area classification",
+        "Ignition control",
+        "Gas detection",
+        "Fire detection",
+        "PFP",
+        "Blast walls",
+    ],
+};
+
+const TOXIC_RELEASE: MahEntry = MahEntry {
+    threats: &["H2S in production", "Mercury", "MEG / amines"],
+    consequences: &["Personnel exposure", "Environmental impact"],
+    barriers: &[
+        "H2S removal",
+        "Mercury removal",
+        "Personal monitors",
+        "Escape masks",
+        "Ventilation",
+    ],
+};
+
+const LOSS_OF_BUOYANCY: MahEntry = MahEntry {
+    threats: &[
+        "Compartment flooding",
+        "Ballast system failure",
+        "Storm overload",
+        "Mooring failure",
+    ],
+    consequences: &["Capsize", "Loss of installation"],
+    barriers: &[
+        "Compartmentation",
+        "Ballast control",
+        "Mooring redundancy",
+        "Damage stability margins",
+    ],
+};
+
+const EXTREME_WEATHER: MahEntry = MahEntry {
+    threats: &["100-yr storm exceedance", "Hurricane", "Sea-ice / iceberg"],
+    consequences: &[
+        "Structural overload",
+        "Loss of station keeping",
+        "Operational shutdown",
+    ],
+    barriers: &[
+        "Met-ocean monitoring",
+        "Weather operational limits",
+        "Disconnection procedures (turret)",
+    ],
+};
 
 #[cfg(test)]
 mod tests {

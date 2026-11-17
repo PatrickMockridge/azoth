@@ -1073,6 +1073,30 @@ class LopaLayerContribution:
     rrf: float | None
 
 @final
+class MahThreat:
+    """the catalogue's default threats, in their order."""
+
+    id: str
+    description: str
+    frequency_per_year: float
+
+@final
+class MahConsequence:
+    """the catalogue's default consequences, in their order."""
+
+    id: str
+    description: str
+    severity: float
+
+@final
+class MahBarrier:
+    """the catalogue's default barrier classes, in their order."""
+
+    id: str
+    description: str
+    pfd: float
+
+@final
 class PipeFireRupturePoint:
     """one row per marching step, in time order, ending at the rupture step when one is found."""
 
@@ -3939,6 +3963,16 @@ class LopaResult:
     layer_contributions: list[LopaLayerContribution]
     sts0131_pressure_category: str | None
     sts0131_target_frequency_per_year: float | None
+    warnings: list[Warning]
+
+@final
+class MahBowTieSkeletonResult:
+    threats: list[MahThreat]
+    consequences: list[MahConsequence]
+    barriers: list[MahBarrier]
+    threat_count: float
+    consequence_count: float
+    barrier_count: float
     warnings: list[Warning]
 
 @final
@@ -7696,6 +7730,7 @@ def lopa(
     design_pressure: float | None = None,
     test_pressure: float | None = None,
 ) -> LopaResult: ...
+def mah_bow_tie_skeleton(mah_type: str) -> MahBowTieSkeletonResult: ...
 def manifold(
     components: list[str],
     feed_n: list[float],

@@ -1,0 +1,80 @@
+id = "process.mah_bow_tie_skeleton"
+name = "MAH bow-tie skeleton"
+kind = "procedure"
+assumptions = [
+    "**the catalogue is the eleven ISO 17776 major accident hazard categories**, each with the class's default threats, consequences and barrier classes; the descriptions are the catalogue's own strings.",
+    "**the rows are identified `T1...`, `C1...` and `B1...`**, in the catalogue's order, which is the class's constructor order.",
+    "**the placeholders are `0.001` per year for every threat, `4` for every consequence severity and `0.01` for every barrier PFD**, the class's three constants; they are a workshop starting point, not evidence.",
+    "**the counts are the catalogue lengths**, and the skeleton is the input to `process.bow_tie`, which computes the frequency; this id does not.",
+    "**an unknown type is refused**; the class's null check is the wrapper's enum typing here, and `toJson` is presentation and not carried.",
+]
+references = [
+    "ISO 17776:2016. Petroleum and natural gas industries - Offshore production installations - Major accident hazard management during the design of new installations.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/hazid/MahBowTieBuilder.java` and `MahCatalogue.java` are the port source.",
+    "`validation/neqsim/captures/process_mah_bow_tie_skeleton.tsv` - all eleven categories with their rows and constants, and the null refusal.",
+]
+[source]
+standard = "NeqSim process/safety/hazid/MahBowTieBuilder.java"
+edition = "Its `build` and the `MahCatalogue` lists it reads; the `BowTieModel` arithmetic is `process.bow_tie`'s."
+[algorithm]
+scheme = "mah_bow_tie_catalogue"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.mah_type]
+type = "enum"
+values = ["topside_hydrocarbon_release", "riser_leak", "well_blowout", "structural_collapse", "dropped_object", "helicopter_loss", "ship_collision", "fire_explosion", "toxic_release", "loss_of_buoyancy", "extreme_weather"]
+description = "the ISO 17776 major accident hazard category.\n"
+[outputs]
+[outputs.threats]
+type = "record_list"
+row_type = "MahThreat"
+description = "the catalogue's default threats, in their order.\n"
+[outputs.threats.fields.id]
+type = "string"
+description = "the row id, `T1` and upwards.\n"
+[outputs.threats.fields.description]
+type = "string"
+description = "the threat.\n"
+[outputs.threats.fields.frequency_per_year]
+unit = "dimensionless"
+description = "the placeholder frequency, `0.001` in 1/year; the vocabulary has no year unit, so the value crosses unconverted.\n"
+[outputs.consequences]
+type = "record_list"
+row_type = "MahConsequence"
+description = "the catalogue's default consequences, in their order.\n"
+[outputs.consequences.fields.id]
+type = "string"
+description = "the row id, `C1` and upwards.\n"
+[outputs.consequences.fields.description]
+type = "string"
+description = "the consequence.\n"
+[outputs.consequences.fields.severity]
+unit = "dimensionless"
+description = "the placeholder severity, `4` on the class's 1-to-5 scale.\n"
+[outputs.barriers]
+type = "record_list"
+row_type = "MahBarrier"
+description = "the catalogue's default barrier classes, in their order.\n"
+[outputs.barriers.fields.id]
+type = "string"
+description = "the row id, `B1` and upwards.\n"
+[outputs.barriers.fields.description]
+type = "string"
+description = "the barrier class.\n"
+[outputs.barriers.fields.pfd]
+unit = "dimensionless"
+description = "the placeholder probability of failure on demand, `0.01`.\n"
+[outputs.threat_count]
+unit = "dimensionless"
+description = "the number of threats.\n"
+[outputs.consequence_count]
+unit = "dimensionless"
+description = "the number of consequences.\n"
+[outputs.barrier_count]
+unit = "dimensionless"
+description = "the number of barrier classes.\n"
+[implementations]
+python = "azoth.process.mah_bow_tie_skeleton"
+rust = "azoth_process::mah_bow_tie_skeleton"

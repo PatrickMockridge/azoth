@@ -277,6 +277,7 @@
   - [Jet fire radiation](./process/jet_fire.md)
   - [Vessel leak blowdown](./process/leak_blowdown.md)
   - [Layer of protection analysis](./process/lopa.md)
+  - [MAH bow-tie skeleton](./process/mah_bow_tie_skeleton.md)
   - [Manifold](./process/manifold.md)
   - [Map turbo-expander compressor](./process/map_turbo_expander_compressor.md)
   - [Mixer](./process/mixer.md)

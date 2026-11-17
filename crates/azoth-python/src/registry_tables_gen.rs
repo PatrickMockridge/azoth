@@ -283,6 +283,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.jet_fire" => azoth_process::models::jet_fire::JetFireResult::FIELDS.to_vec(),
         "process.leak_blowdown" => azoth_process::models::leak_blowdown::LeakBlowdownResult::FIELDS.to_vec(),
         "process.lopa" => azoth_process::models::lopa::LopaResult::FIELDS.to_vec(),
+        "process.mah_bow_tie_skeleton" => azoth_process::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult::FIELDS.to_vec(),
         "process.manifold" => azoth_process::models::manifold::ManifoldResult::FIELDS.to_vec(),
         "process.map_turbo_expander_compressor" => azoth_process::models::map_turbo_expander_compressor::MapTurboExpanderResult::FIELDS.to_vec(),
         "process.mixer" => azoth_process::models::mixer::MixerResult::FIELDS.to_vec(),

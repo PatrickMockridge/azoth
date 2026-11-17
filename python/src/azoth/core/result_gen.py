@@ -46,6 +46,9 @@ from azoth.core.record_outputs_gen import (
     LeakBlowdownDiagnostic,
     LeakBlowdownPoint,
     LopaLayerContribution,
+    MahBarrier,
+    MahConsequence,
+    MahThreat,
     MineralEquilibriumRow,
     MinimalCutSet,
     NaceIssueRow,
@@ -7934,6 +7937,34 @@ class LopaResult(_HasWarnings):
 
     #: the target frequency the band asks for, in 1/year; absent with the category.
     sts0131_target_frequency_per_year: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MahBowTieSkeletonResult(_HasWarnings):
+    """Result of ``process.mah_bow_tie_skeleton``."""
+
+    CALC_ID: ClassVar[str] = "process.mah_bow_tie_skeleton"
+
+    #: the catalogue's default threats, in their order.
+    threats: tuple[MahThreat, ...]
+
+    #: the catalogue's default consequences, in their order.
+    consequences: tuple[MahConsequence, ...]
+
+    #: the catalogue's default barrier classes, in their order.
+    barriers: tuple[MahBarrier, ...]
+
+    #: the number of threats.
+    threat_count: float
+
+    #: the number of consequences.
+    consequence_count: float
+
+    #: the number of barrier classes.
+    barrier_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

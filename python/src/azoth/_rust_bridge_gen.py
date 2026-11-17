@@ -188,6 +188,10 @@ from azoth.core.result import (
     LopaLayerContribution,
     LopaResult,
     LumpingResult,
+    MahBarrier,
+    MahBowTieSkeletonResult,
+    MahConsequence,
+    MahThreat,
     ManifoldResult,
     MapTurboExpanderResult,
     MasonSaxenaConductivityResult,
@@ -581,6 +585,7 @@ __all__ = [
     "lmtd_correction_factor",
     "lopa",
     "lumping",
+    "mah_bow_tie_skeleton",
     "manifold",
     "map_turbo_expander_compressor",
     "mason_saxena_conductivity",
@@ -7252,6 +7257,22 @@ def lopa(initiating_event_frequency_per_year: float, target_frequency_per_year: 
         layer_contributions=tuple(LopaLayerContribution(name=c.name, pfd=c.pfd, frequency_before_per_year=c.frequency_before_per_year, frequency_after_per_year=c.frequency_after_per_year, contribution_per_year=c.contribution_per_year, rrf=c.rrf) for c in result.layer_contributions),
         sts0131_pressure_category=None if result.sts0131_pressure_category is None else Sts0131PressureCategory(result.sts0131_pressure_category),
         sts0131_target_frequency_per_year=result.sts0131_target_frequency_per_year,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def mah_bow_tie_skeleton(mah_type: str) -> MahBowTieSkeletonResult:
+    """``process.mah_bow_tie_skeleton``, computed in Rust."""
+    result = _core.mah_bow_tie_skeleton(
+        mah_type,
+    )
+    return MahBowTieSkeletonResult(
+        threats=tuple(MahThreat(id=c.id, description=c.description, frequency_per_year=c.frequency_per_year) for c in result.threats),
+        consequences=tuple(MahConsequence(id=c.id, description=c.description, severity=c.severity) for c in result.consequences),
+        barriers=tuple(MahBarrier(id=c.id, description=c.description, pfd=c.pfd) for c in result.barriers),
+        threat_count=result.threat_count,
+        consequence_count=result.consequence_count,
+        barrier_count=result.barrier_count,
         warnings=_warnings(result.warnings),
     )
 

@@ -1753,6 +1753,126 @@ impl From<&azoth_process::models::lopa::LopaLayerContribution> for PyLopaLayerCo
     }
 }
 
+/// the catalogue's default barrier classes, in their order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MahBarrier"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMahBarrier {
+    /// the row id, `B1` and upwards.
+    #[pyo3(get)]
+    pub id: String,
+    /// the barrier class.
+    #[pyo3(get)]
+    pub description: String,
+    /// the placeholder probability of failure on demand, `0.01`.
+    #[pyo3(get)]
+    pub pfd: f64,
+}
+
+#[pymethods]
+impl PyMahBarrier {
+    fn __repr__(&self) -> String {
+        format!(
+            "MahBarrier(id={}, description={}, pfd={})",
+            self.id, self.description, self.pfd
+        )
+    }
+}
+
+impl From<&azoth_process::models::mah_bow_tie_skeleton::MahBarrier> for PyMahBarrier {
+    fn from(row: &azoth_process::models::mah_bow_tie_skeleton::MahBarrier) -> Self {
+        Self {
+            id: row.id.clone(),
+            description: row.description.clone(),
+            pfd: row.pfd,
+        }
+    }
+}
+
+/// the catalogue's default consequences, in their order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MahConsequence"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMahConsequence {
+    /// the row id, `C1` and upwards.
+    #[pyo3(get)]
+    pub id: String,
+    /// the consequence.
+    #[pyo3(get)]
+    pub description: String,
+    /// the placeholder severity, `4` on the class's 1-to-5 scale.
+    #[pyo3(get)]
+    pub severity: f64,
+}
+
+#[pymethods]
+impl PyMahConsequence {
+    fn __repr__(&self) -> String {
+        format!(
+            "MahConsequence(id={}, description={}, severity={})",
+            self.id, self.description, self.severity
+        )
+    }
+}
+
+impl From<&azoth_process::models::mah_bow_tie_skeleton::MahConsequence> for PyMahConsequence {
+    fn from(row: &azoth_process::models::mah_bow_tie_skeleton::MahConsequence) -> Self {
+        Self {
+            id: row.id.clone(),
+            description: row.description.clone(),
+            severity: row.severity,
+        }
+    }
+}
+
+/// the catalogue's default threats, in their order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MahThreat"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMahThreat {
+    /// the row id, `T1` and upwards.
+    #[pyo3(get)]
+    pub id: String,
+    /// the threat.
+    #[pyo3(get)]
+    pub description: String,
+    /// the placeholder frequency, `0.001` in 1/year; the vocabulary has no year unit, so the value crosses unconverted.
+    #[pyo3(get)]
+    pub frequency_per_year: f64,
+}
+
+#[pymethods]
+impl PyMahThreat {
+    fn __repr__(&self) -> String {
+        format!(
+            "MahThreat(id={}, description={}, frequency_per_year={})",
+            self.id, self.description, self.frequency_per_year
+        )
+    }
+}
+
+impl From<&azoth_process::models::mah_bow_tie_skeleton::MahThreat> for PyMahThreat {
+    fn from(row: &azoth_process::models::mah_bow_tie_skeleton::MahThreat) -> Self {
+        Self {
+            id: row.id.clone(),
+            description: row.description.clone(),
+            frequency_per_year: row.frequency_per_year,
+        }
+    }
+}
+
 /// The registered minerals, in the class's order; a mineral whose ion is below the registration floor is absent rather than zero.
 #[pyclass(
     frozen,
