@@ -215,6 +215,7 @@ from azoth.core.result import (
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
     OrificeFlowResult,
+    OverallVerdict,
     OverpressureAcceptanceResult,
     OverpressureProtectionStudyResult,
     PackedColumnResult,
@@ -284,6 +285,9 @@ from azoth.core.result import (
     ReliefDisposalRow,
     ReliefPhase,
     RemediationOptionRow,
+    ReviewAssessment,
+    ReviewCoverage,
+    ReviewVerdict,
     ReynoldsNumberResult,
     RiskAssessmentRow,
     RiskMatrixResult,
@@ -291,6 +295,7 @@ from azoth.core.result import (
     RkDepartureResult,
     RootStructure,
     RuptureStatus,
+    S001Clause10ReviewResult,
     S001SecondaryPressureProtectionResult,
     SafeChartItem,
     SafeChartMissingDevice,
@@ -680,6 +685,7 @@ __all__ = [
     "risk_matrix",
     "rk_alpha_ab",
     "rk_departure",
+    "s001_clause10_review",
     "s001_secondary_pressure_protection",
     "safety_instrumented_function",
     "saft_vr_mie_phase",
@@ -8148,6 +8154,29 @@ def risk_matrix(equipment: list[dict[str, object]], product_price_per_kg: float 
     return RiskMatrixResult(
         assessments=tuple(RiskAssessmentRow(name=c.name, failures_per_year=c.failures_per_year, mtbf_hours=c.mtbf_hours, mttr_hours=c.mttr_hours, expected_downtime_hours_per_year=c.expected_downtime_hours_per_year, probability_category=c.probability_category, probability_level=c.probability_level, production_loss_percent=c.production_loss_percent, production_loss_kg_hr=from_si(c.production_loss_kg_hr.magnitude_si, c.production_loss_kg_hr.unit), consequence_category=c.consequence_category, consequence_level=c.consequence_level, risk_score=c.risk_score, risk_level=c.risk_level, cost_per_failure=c.cost_per_failure, annual_risk_cost=c.annual_risk_cost) for c in result.assessments),
         total_annual_risk_cost=result.total_annual_risk_cost,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def s001_clause10_review(items: list[dict[str, object]] | None=None, evidence: list[dict[str, object]] | None=None, references: list[dict[str, object]] | None=None) -> S001Clause10ReviewResult:
+    """``process.s001_clause10_review``, computed in Rust."""
+    spec = _models_gen.model("process.s001_clause10_review")
+    result = _core.s001_clause10_review(
+        None if items is None else input_records_to_si(spec, "items", items),
+        None if evidence is None else input_records_to_si(spec, "evidence", evidence),
+        None if references is None else input_records_to_si(spec, "references", references),
+    )
+    return S001Clause10ReviewResult(
+        assessments=tuple(ReviewAssessment(function_id=c.function_id, requirement_id=c.requirement_id, clause=c.clause, status=c.status, severity=c.severity) for c in result.assessments),
+        verdicts=tuple(ReviewVerdict(function_id=c.function_id, verdict=c.verdict, confidence=c.confidence) for c in result.verdicts),
+        coverage=tuple(ReviewCoverage(function_type=c.function_type, status=c.status) for c in result.coverage),
+        overall_verdict=OverallVerdict(result.overall_verdict),
+        item_count=result.item_count,
+        failed_item_count=result.failed_item_count,
+        warning_item_count=result.warning_item_count,
+        assessment_count=result.assessment_count,
+        fail_assessment_count=result.fail_assessment_count,
+        warning_assessment_count=result.warning_assessment_count,
         warnings=_warnings(result.warnings),
     )
 

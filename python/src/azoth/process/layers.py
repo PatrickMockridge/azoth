@@ -2841,6 +2841,23 @@ def _s001_secondary_pressure_protection(inputs: Mapping[str, Any]) -> dict[str, 
     return layers
 
 
+def _s001_clause10_review(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.s001_clause10_review`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.s001_clause10_review import (
+        s001_clause10_review as evaluate,
+    )
+
+    def optional(name: str) -> list[dict[str, object]] | None:
+        value = inputs.get(name)
+        return None if value is None else list(value)
+
+    result = evaluate(optional("items"), optional("evidence"), optional("references"))
+    layers: dict[str, float] = {"result_count": float(len(result.verdicts))}
+    for index, row in enumerate(result.verdicts):
+        layers[f"result{index}_confidence"] = row.confidence
+    return layers
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3385,6 +3402,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.api14c_safe_chart": _api14c_safe_chart,
     "process.barrier_register_validation": _barrier_register_validation,
     "process.s001_secondary_pressure_protection": _s001_secondary_pressure_protection,
+    "process.s001_clause10_review": _s001_clause10_review,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -5425,6 +5443,22 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=1,
         identified_by=("#label", "s001_band_above_design"),
     ),
+    # The review's two cased states; the other eleven blocks are declared in
+    # `UNCASED_ROWS`. The result count and the confidences are the numeric layers.
+    LayerCase(
+        model="process.s001_clause10_review",
+        case="cl10_example",
+        capture="process_s001_clause10_review.tsv",
+        block=0,
+        identified_by=("#label", "cl10_example"),
+    ),
+    LayerCase(
+        model="process.s001_clause10_review",
+        case="cl10_secondary_fail",
+        capture="process_s001_clause10_review.tsv",
+        block=1,
+        identified_by=("#label", "cl10_secondary_fail"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -7198,6 +7232,10 @@ UNCASED_ROWS: dict[str, int] = {
     # The S-001 screen's eleven: the other two bands, the other leakage states, the proof
     # intervals and the empty criteria.
     "process_s001_secondary_pressure_protection.tsv": 11,
+    # The review's eleven: the two other class-test states, the empty input and item, the
+    # utility states, the gated and alias items, the duplicate id, the first-alias parse and
+    # the coercion.
+    "process_s001_clause10_review.tsv": 11,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

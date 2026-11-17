@@ -23,10 +23,11 @@ use crate::record_outputs_gen::{
     PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
     PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
     PyNaceIssueRow, PyPipeFireRupturePoint, PyRegisterFinding, PyReliefDisposalRow,
-    PyRemediationOptionRow, PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice,
-    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
-    PySelfHeatingTimePoint, PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySubFraction,
-    PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
+    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
+    PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -22896,6 +22897,89 @@ impl From<&azoth_process::models::risk_matrix::RiskMatrixResult> for PyRiskMatri
                 .map(PyRiskAssessmentRow::from)
                 .collect(),
             total_annual_risk_cost: r.total_annual_risk_cost,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.s001_clause10_review`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "S001Clause10ReviewResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyS001Clause10ReviewResult {
+    /// one row per assessment, the coverage result first and then each item in caller order.
+    #[pyo3(get)]
+    pub assessments: Vec<PyReviewAssessment>,
+    /// one verdict per result: the coverage result first, then the items in caller order.
+    #[pyo3(get)]
+    pub verdicts: Vec<PyReviewVerdict>,
+    /// the five coverage rows of the synthetic result.
+    #[pyo3(get)]
+    pub coverage: Vec<PyReviewCoverage>,
+    /// the report's verdict: any fail, else any pass-with-warnings, else pass.
+    #[pyo3(get)]
+    pub overall_verdict: String,
+    /// the number of results, the coverage result included.
+    #[pyo3(get)]
+    pub item_count: f64,
+    /// the number of results whose verdict is fail.
+    #[pyo3(get)]
+    pub failed_item_count: f64,
+    /// the number of results whose verdict is pass-with-warnings.
+    #[pyo3(get)]
+    pub warning_item_count: f64,
+    /// the total number of assessments.
+    #[pyo3(get)]
+    pub assessment_count: f64,
+    /// the number of failing assessments.
+    #[pyo3(get)]
+    pub fail_assessment_count: f64,
+    /// the number of warning assessments.
+    #[pyo3(get)]
+    pub warning_assessment_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyS001Clause10ReviewResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "S001Clause10ReviewResult(assessments={:?}, verdicts={:?}, coverage={:?}, overall_verdict={:?}, item_count={:?}, failed_item_count={:?}, warning_item_count={:?}, assessment_count={:?}, fail_assessment_count={:?}, warning_assessment_count={:?}, {} warning(s))",
+            self.assessments,
+            self.verdicts,
+            self.coverage,
+            self.overall_verdict,
+            self.item_count,
+            self.failed_item_count,
+            self.warning_item_count,
+            self.assessment_count,
+            self.fail_assessment_count,
+            self.warning_assessment_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::s001_clause10_review::S001Clause10ReviewResult>
+    for PyS001Clause10ReviewResult
+{
+    fn from(r: &azoth_process::models::s001_clause10_review::S001Clause10ReviewResult) -> Self {
+        Self {
+            assessments: r.assessments.iter().map(PyReviewAssessment::from).collect(),
+            verdicts: r.verdicts.iter().map(PyReviewVerdict::from).collect(),
+            coverage: r.coverage.iter().map(PyReviewCoverage::from).collect(),
+            overall_verdict: r.overall_verdict.as_str().to_string(),
+            item_count: r.item_count,
+            failed_item_count: r.failed_item_count,
+            warning_item_count: r.warning_item_count,
+            assessment_count: r.assessment_count,
+            fail_assessment_count: r.fail_assessment_count,
+            warning_assessment_count: r.warning_assessment_count,
             warnings: transport(&r.warnings),
         }
     }

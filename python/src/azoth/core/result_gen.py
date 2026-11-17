@@ -56,6 +56,9 @@ from azoth.core.record_outputs_gen import (
     RegisterFinding,
     ReliefDisposalRow,
     RemediationOptionRow,
+    ReviewAssessment,
+    ReviewCoverage,
+    ReviewVerdict,
     RiskAssessmentRow,
     SafeChartItem,
     SafeChartMissingDevice,
@@ -87,6 +90,7 @@ from azoth.core.result_base import (
     HydrateRiskLevel,
     HydrateStructure,
     MultiflashSeedPath,
+    OverallVerdict,
     Phase,
     PlusModel,
     ReliefPhase,
@@ -9186,6 +9190,46 @@ class RiskMatrixResult(_HasWarnings):
 
     #: the sum of the annual costs.
     total_annual_risk_cost: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class S001Clause10ReviewResult(_HasWarnings):
+    """Result of ``process.s001_clause10_review``."""
+
+    CALC_ID: ClassVar[str] = "process.s001_clause10_review"
+
+    #: one row per assessment, the coverage result first and then each item in caller order.
+    assessments: tuple[ReviewAssessment, ...]
+
+    #: one verdict per result: the coverage result first, then the items in caller order.
+    verdicts: tuple[ReviewVerdict, ...]
+
+    #: the five coverage rows of the synthetic result.
+    coverage: tuple[ReviewCoverage, ...]
+
+    #: the report's verdict: any fail, else any pass-with-warnings, else pass.
+    overall_verdict: OverallVerdict
+
+    #: the number of results, the coverage result included.
+    item_count: float
+
+    #: the number of results whose verdict is fail.
+    failed_item_count: float
+
+    #: the number of results whose verdict is pass-with-warnings.
+    warning_item_count: float
+
+    #: the total number of assessments.
+    assessment_count: float
+
+    #: the number of failing assessments.
+    fail_assessment_count: float
+
+    #: the number of warning assessments.
+    warning_assessment_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

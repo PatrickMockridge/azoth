@@ -1,0 +1,140 @@
+id = "process.s001_clause10_review"
+name = "NORSOK S-001 Clause 10 review"
+kind = "procedure"
+assumptions = [
+    "**the checks run per item in the class's order**: safety lifecycle, role and interfaces, means of protection, process-safety principles, PSD valves, PSV protection, alarm actions, response time, logic solver, secondary pressure protection, utility dependencies, PSD principles, survivability, operational evidence and evidence quality.",
+    "**the lifecycle, role, means-of-protection and principles checks are not gated**; PSD valves and PSD principles require a PSD item, PSV a PSV item, alarms an alarm item, the logic solver a logic item, the secondary-pressure check a secondary-pressure item and the response time an action or instrumented item, each diagnosed from `function_type` substrings and evidence keys. A gated check that does not apply is one `not_applicable` row.",
+    "**every boolean requirement is tri-state**: absent is a `warning` at `high`, false is a `fail` at `critical`, true is a `pass` at `low`. A numeric comparison with a missing side is a `warning` at `medium`; a failed comparison carries the check's own severity (capacity and secondary pressure `critical`, times and the survivability minimum `high`).",
+    "**the operational-evidence check is gated on any of seven instrument keys** and answers `info` without them; a bypass or override fails at `high`, an overdue proof test or a failed demand warns at `medium`, and otherwise it passes. The utility-loss check is required only when `utility_dependent` is true; false and absent both answer `info`.",
+    "**a synthetic `CLAUSE10-COVERAGE` verdict is first**, then one verdict per item. Its five coverage rows are `pass` when any item's type or evidence matches PSD, PSV, ALARM, SIF or secondary pressure protection, else `warning`.",
+    "**an item's verdict is `fail` if any assessment failed, else `pass_with_warnings` if any warned, else `pass`**; the overall verdict is the same cascade over the coverage result and every item. Confidence starts at `0.15` and adds `0.20` for references, `0.15` for a design or scenario basis, `0.10` for any of three lifecycle booleans, `0.15` for a response-time key, `0.15` for a logic-solver, PSV-capacity or event-pressure key, and `0.10` for an instrument-data key, capped at `1.0`.",
+    "**the messages, recommendations and detail maps are presentation**: the rows carry the requirement id, clause, status and severity, the stable contract.",
+    "**an alias set resolves at its first present key**: a present but unparseable value yields the default rather than falling through to the next alias. The value string follows Java's coercion: `Double.parseDouble` on a trimmed string (accepting `NaN`, the infinities and a trailing `f`/`d`) and the six boolean tokens `true/yes/y/1` and `false/no/n/0`.",
+    "**the JSON adapter is caller state**: the key aliases, the nested-map flattening, the `functionId` merging and the STID/tagreader arrays are not carried. The id takes one row per function id and refuses a duplicate id or key, and a reference or evidence row naming no item.",
+]
+references = [
+    "NORSOK S-001:2020+AC:2021, clause 10. Safety functions and safety systems.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/processsafetysystem/ProcessSafetySystemReviewEngine.java` is the port source.",
+    "`validation/neqsim/captures/process_s001_clause10_review.tsv` - the complete example, the four class-test states, the empty input and item, utility false and missing, a gated item, an alias-only item, a duplicate id, a first-alias parse failure and the value-coercion block.",
+]
+[source]
+standard = "NeqSim process/safety/processsafetysystem/ProcessSafetySystemReviewEngine.java"
+edition = "Its `evaluate`, the fifteen `check*` methods, `evaluateCoverage` and `calculateConfidence`."
+[algorithm]
+scheme = "norsok_s001_clause10_review"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.items]
+type = "record_list"
+row_type = "ReviewItem"
+optional = true
+description = "the functions under review, in caller order. **Absent is an empty review**, which still answers the coverage result.\n"
+[inputs.items.fields.function_id]
+type = "string"
+description = "the function id, the item's identity. A duplicate id is refused.\n"
+[inputs.items.fields.function_type]
+type = "string"
+optional = true
+description = "the free-form function type, which gates the checks by lower-case substring.\n"
+[inputs.items.fields.equipment_tag]
+type = "string"
+optional = true
+description = "the protected equipment tag, informational.\n"
+[inputs.evidence]
+type = "record_list"
+row_type = "ReviewEvidence"
+optional = true
+description = "the item evidence as key-value rows, in caller order. **Absent is no evidence.** A duplicate (`function_id`, `key`) is refused.\n"
+[inputs.evidence.fields.function_id]
+type = "string"
+description = "the function id the evidence belongs to; it must name an item.\n"
+[inputs.evidence.fields.key]
+type = "string"
+description = "the evidence key, exact case, one of the aliases the checks read.\n"
+[inputs.evidence.fields.value]
+type = "string"
+optional = true
+description = "the value, coerced by key: Java's `Double.parseDouble` for a numeric key and the six boolean tokens for a boolean key. **Absent is a present but unparseable value**; a parse failure yields the default at that key.\n"
+[inputs.references]
+type = "record_list"
+row_type = "ReviewReference"
+optional = true
+description = "the technical-document references, in caller order. **Absent is none**; an empty list warns on evidence quality.\n"
+[inputs.references.fields.function_id]
+type = "string"
+description = "the function id the reference belongs to; it must name an item.\n"
+[inputs.references.fields.reference]
+type = "string"
+description = "the reference text.\n"
+[outputs]
+[outputs.assessments]
+type = "record_list"
+description = "one row per assessment, the coverage result first and then each item in caller order.\n"
+[outputs.assessments.fields.function_id]
+type = "string"
+description = "the item the assessment belongs to; `CLAUSE10-COVERAGE` for the coverage result.\n"
+[outputs.assessments.fields.requirement_id]
+type = "string"
+description = "the stable requirement identifier, e.g. `PSS-10.1-ROLE`.\n"
+[outputs.assessments.fields.clause]
+type = "string"
+description = "the clause, e.g. `10.4.7`, or the class's literal label (`Safety lifecycle`, `Operational evidence`, `Evidence quality`).\n"
+[outputs.assessments.fields.status]
+type = "enum"
+values = ["pass", "warning", "fail", "info", "not_applicable"]
+description = "the assessment's status.\n"
+[outputs.assessments.fields.severity]
+type = "enum"
+values = ["low", "medium", "high", "critical"]
+description = "the class's severity band; a pass and an info are low, a not-applicable row is low.\n"
+[outputs.verdicts]
+type = "record_list"
+description = "one verdict per result: the coverage result first, then the items in caller order.\n"
+[outputs.verdicts.fields.function_id]
+type = "string"
+description = "the result's function id.\n"
+[outputs.verdicts.fields.verdict]
+type = "enum"
+values = ["pass", "pass_with_warnings", "fail"]
+description = "the result's verdict.\n"
+[outputs.verdicts.fields.confidence]
+unit = "dimensionless"
+description = "the class's confidence, from 0.15 upwards and capped at 1.0; the coverage result is 1.0.\n"
+[outputs.coverage]
+type = "record_list"
+description = "the five coverage rows of the synthetic result.\n"
+[outputs.coverage.fields.function_type]
+type = "enum"
+values = ["psd", "psv", "alarm", "sif", "secondary_pressure_protection"]
+description = "the type token the coverage row is about.\n"
+[outputs.coverage.fields.status]
+type = "enum"
+values = ["pass", "warning"]
+description = "pass when an item's type or evidence matches, else warning.\n"
+[outputs.overall_verdict]
+type = "enum"
+values = ["pass", "pass_with_warnings", "fail"]
+description = "the report's verdict: any fail, else any pass-with-warnings, else pass.\n"
+[outputs.item_count]
+unit = "dimensionless"
+description = "the number of results, the coverage result included.\n"
+[outputs.failed_item_count]
+unit = "dimensionless"
+description = "the number of results whose verdict is fail.\n"
+[outputs.warning_item_count]
+unit = "dimensionless"
+description = "the number of results whose verdict is pass-with-warnings.\n"
+[outputs.assessment_count]
+unit = "dimensionless"
+description = "the total number of assessments.\n"
+[outputs.fail_assessment_count]
+unit = "dimensionless"
+description = "the number of failing assessments.\n"
+[outputs.warning_assessment_count]
+unit = "dimensionless"
+description = "the number of warning assessments.\n"
+[implementations]
+python = "azoth.process.s001_clause10_review"
+rust = "azoth_process::s001_clause10_review"

@@ -686,6 +686,37 @@ pub struct ReliefContribution {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct ReviewEvidence {
+    #[pyo3(item)]
+    pub function_id: String,
+    #[pyo3(item)]
+    pub key: String,
+    #[pyo3(item)]
+    pub value: Option<String>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct ReviewItem {
+    #[pyo3(item)]
+    pub function_id: String,
+    #[pyo3(item)]
+    pub function_type: Option<String>,
+    #[pyo3(item)]
+    pub equipment_tag: Option<String>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct ReviewReference {
+    #[pyo3(item)]
+    pub function_id: String,
+    #[pyo3(item)]
+    pub reference: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct RiskEquipment {
     #[pyo3(item)]
     pub name: String,

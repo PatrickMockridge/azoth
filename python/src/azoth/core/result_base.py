@@ -157,6 +157,14 @@ class Sts0131PressureCategory(StrEnum):
     ABOVE_TWO_TIMES_DESIGN_PRESSURE = "above_two_times_design_pressure"
 
 
+class OverallVerdict(StrEnum):
+    """The NORSOK S-001 Clause 10 review's overall verdict."""
+
+    PASS = "pass"
+    PASS_WITH_WARNINGS = "pass_with_warnings"
+    FAIL = "fail"
+
+
 class CooldownVerdict(StrEnum):
     """The screening verdict a surface-cooldown analysis reports."""
 

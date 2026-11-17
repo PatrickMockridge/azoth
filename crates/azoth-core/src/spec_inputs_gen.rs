@@ -289,6 +289,7 @@
 //!   - specs/models/process/rate_based_packed_column.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
+//!   - specs/models/process/s001_clause10_review.toml
 //!   - specs/models/process/s001_secondary_pressure_protection.toml
 //!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/self_heating_induction.toml

@@ -307,6 +307,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyRateBasedPackedColumnResult>()?;
     m.add_class::<crate::transport_gen::PyReliefDisposalNetworkResult>()?;
     m.add_class::<crate::transport_gen::PyRiskMatrixResult>()?;
+    m.add_class::<crate::transport_gen::PyS001Clause10ReviewResult>()?;
     m.add_class::<crate::transport_gen::PyS001SecondaryPressureProtectionResult>()?;
     m.add_class::<crate::transport_gen::PySafetyInstrumentedFunctionResult>()?;
     m.add_class::<crate::transport_gen::PySelfHeatingInductionResult>()?;
@@ -386,6 +387,9 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyRegisterFinding>()?;
     m.add_class::<crate::record_outputs_gen::PyReliefDisposalRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyReviewAssessment>()?;
+    m.add_class::<crate::record_outputs_gen::PyReviewCoverage>()?;
+    m.add_class::<crate::record_outputs_gen::PyReviewVerdict>()?;
     m.add_class::<crate::record_outputs_gen::PyRiskAssessmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PySafeChartItem>()?;
     m.add_class::<crate::record_outputs_gen::PySafeChartMissingDevice>()?;
@@ -1085,6 +1089,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::risk_matrix, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::process::s001_clause10_review, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::s001_secondary_pressure_protection,
         m

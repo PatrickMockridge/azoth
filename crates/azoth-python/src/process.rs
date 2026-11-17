@@ -946,6 +946,50 @@ pub fn barrier_register_validation(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// `process.s001_clause10_review` - the NORSOK S-001 Clause 10 review.
+///
+/// The fifteen checks, the coverage result, the confidence and the verdict cascade.
+#[pyfunction]
+#[pyo3(signature = (items = None, evidence = None, references = None))]
+#[pyo3(text_signature = "(items=None, evidence=None, references=None)")]
+pub fn s001_clause10_review(
+    py: Python<'_>,
+    items: Option<Vec<crate::records_gen::ReviewItem>>,
+    evidence: Option<Vec<crate::records_gen::ReviewEvidence>>,
+    references: Option<Vec<crate::records_gen::ReviewReference>>,
+) -> PyResult<crate::transport_gen::PyS001Clause10ReviewResult> {
+    use azoth_process::models::s001_clause10_review as review;
+    let items = items.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::ReviewItem {
+                function_id: row.function_id,
+                function_type: row.function_type,
+                equipment_tag: row.equipment_tag,
+            })
+            .collect::<Vec<_>>()
+    });
+    let evidence = evidence.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::ReviewEvidence {
+                function_id: row.function_id,
+                key: row.key,
+                value: row.value,
+            })
+            .collect::<Vec<_>>()
+    });
+    let references = references.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::ReviewReference {
+                function_id: row.function_id,
+                reference: row.reference,
+            })
+            .collect::<Vec<_>>()
+    });
+    review::s001_clause10_review(items.as_deref(), evidence.as_deref(), references.as_deref())
+        .map(|r| crate::transport_gen::PyS001Clause10ReviewResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// `process.absorption_column` - the tray absorber as a registered id.
 ///
 /// **The column's own profile shape with the class's own product names**, and two inlets where

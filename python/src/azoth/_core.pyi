@@ -672,6 +672,26 @@ class RiskEquipment(TypedDict):
     production_loss_percent: float
     production_loss_kg_per_hr: float
 
+class ReviewItem(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    function_id: str
+    function_type: str | None
+    equipment_tag: str | None
+
+class ReviewEvidence(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    function_id: str
+    key: str
+    value: str | None
+
+class ReviewReference(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    function_id: str
+    reference: str
+
 class EfficiencyPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1224,6 +1244,31 @@ class RiskAssessmentRow:
     risk_level: str
     cost_per_failure: float
     annual_risk_cost: float
+
+@final
+class ReviewAssessment:
+    """one row per assessment, the coverage result first and then each item in caller order."""
+
+    function_id: str
+    requirement_id: str
+    clause: str
+    status: str
+    severity: str
+
+@final
+class ReviewVerdict:
+    """one verdict per result: the coverage result first, then the items in caller order."""
+
+    function_id: str
+    verdict: str
+    confidence: float
+
+@final
+class ReviewCoverage:
+    """the five coverage rows of the synthetic result."""
+
+    function_type: str
+    status: str
 
 @final
 class SelfHeatingTimePoint:
@@ -4479,6 +4524,20 @@ class ReliefDisposalNetworkResult:
 class RiskMatrixResult:
     assessments: list[RiskAssessmentRow]
     total_annual_risk_cost: float
+    warnings: list[Warning]
+
+@final
+class S001Clause10ReviewResult:
+    assessments: list[ReviewAssessment]
+    verdicts: list[ReviewVerdict]
+    coverage: list[ReviewCoverage]
+    overall_verdict: OverallVerdict
+    item_count: float
+    failed_item_count: float
+    warning_item_count: float
+    assessment_count: float
+    fail_assessment_count: float
+    warning_assessment_count: float
     warnings: list[Warning]
 
 @final
@@ -8195,6 +8254,11 @@ def risk_matrix(
     product_price_per_kg: float | None = None,
     downtime_cost_per_hour: float | None = None,
 ) -> RiskMatrixResult: ...
+def s001_clause10_review(
+    items: list[ReviewItem] | None = None,
+    evidence: list[ReviewEvidence] | None = None,
+    references: list[ReviewReference] | None = None,
+) -> S001Clause10ReviewResult: ...
 def s001_secondary_pressure_protection(
     maximum_event_pressure: float | None = None,
     design_pressure: float | None = None,

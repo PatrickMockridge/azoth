@@ -78,6 +78,7 @@ use crate::models::pump::PumpResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
+use crate::models::s001_clause10_review::S001Clause10ReviewResult;
 use crate::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
 use crate::models::self_heating_induction::SelfHeatingInductionResult;
@@ -1806,6 +1807,27 @@ impl CalcResult for ReliefDisposalNetworkResult {
 impl CalcResult for RiskMatrixResult {
     const CALC_ID: &'static str = "process.risk_matrix";
     const FIELDS: &'static [&'static str] = &["assessments", "total_annual_risk_cost", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for S001Clause10ReviewResult {
+    const CALC_ID: &'static str = "process.s001_clause10_review";
+    const FIELDS: &'static [&'static str] = &[
+        "assessments",
+        "verdicts",
+        "coverage",
+        "overall_verdict",
+        "item_count",
+        "failed_item_count",
+        "warning_item_count",
+        "assessment_count",
+        "fail_assessment_count",
+        "warning_assessment_count",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

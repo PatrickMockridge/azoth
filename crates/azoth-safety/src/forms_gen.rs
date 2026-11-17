@@ -4812,6 +4812,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.s001_clause10_review",
+        name: "NORSOK S-001 Clause 10 review",
+        family: "processsafetysystem",
+        sub_interface: Some("processsafetysystem"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.s001_secondary_pressure_protection",
         name: "NORSOK S-001 secondary pressure protection",
         family: "processsafetysystem",

@@ -86,6 +86,7 @@ from azoth.core.result import (
     RateBasedPackedColumnResult,
     ReliefDisposalNetworkResult,
     RiskMatrixResult,
+    S001Clause10ReviewResult,
     S001SecondaryPressureProtectionResult,
     SafetyInstrumentedFunctionResult,
     SelfHeatingInductionResult,
@@ -190,6 +191,7 @@ __all__ = [
     "relief_disposal_network",
     "risk_matrix",
     "run_flowsheet",
+    "s001_clause10_review",
     "s001_secondary_pressure_protection",
     "safety_instrumented_function",
     "separator",
@@ -293,6 +295,7 @@ _SELF_HEATING_INDUCTION = "process.self_heating_induction"
 _BASKET_TEST_REGRESSION = "process.basket_test_regression"
 _API14C_SAFE_CHART = "process.api14c_safe_chart"
 _BARRIER_REGISTER_VALIDATION = "process.barrier_register_validation"
+_S001_CLAUSE10_REVIEW = "process.s001_clause10_review"
 _S001_SECONDARY_PRESSURE_PROTECTION = "process.s001_secondary_pressure_protection"
 _HAZOP_TEMPLATE = "process.hazop_template"
 _FMEA_WORKSHEET = "process.fmea_worksheet"
@@ -2542,6 +2545,26 @@ def bow_tie(
         threats=threats,
         consequences=consequences,
         barriers=barriers,
+    )
+
+
+def s001_clause10_review(
+    items: list[dict[str, object]] | None = None,
+    evidence: list[dict[str, object]] | None = None,
+    references: list[dict[str, object]] | None = None,
+) -> S001Clause10ReviewResult:
+    """The NORSOK S-001 Clause 10 review.
+
+    **Fifteen checks over normalized evidence, a coverage result and a verdict cascade.**
+    The rows carry the requirement id, clause, status and severity; the messages and
+    recommendation prose are presentation and are not part of the result.
+
+    See :func:`azoth.process.reference.s001_clause10_review`.
+    """
+    return resolve(_S001_CLAUSE10_REVIEW)(  # type: ignore[no-any-return]
+        items=items,
+        evidence=evidence,
+        references=references,
     )
 
 
