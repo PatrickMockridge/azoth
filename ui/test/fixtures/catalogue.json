@@ -26965,7 +26965,7 @@
         ],
         "provenance": {
           "python_sha256": "553ecec1633708b8fcef6fbe61e97505d46dbd9bf76cb67ed022bb1a73102a65",
-          "rust_sha256": "3d7f283cdc9f26ef7828186f8c175d646a1c84b52b7106827c28af6ccdc87d4c",
+          "rust_sha256": "cf016d03c7009cee57d257a564ed60ccaf43c966f145e196af8fd476d5a8eaf2",
           "spec_sha256": "44cbe4e54cdcd0d734061b318d33dad8418d41904379fae266535e1103528593",
           "tests_active": 7,
           "tests_skipped": 0,

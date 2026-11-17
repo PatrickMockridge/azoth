@@ -215,7 +215,7 @@ fn validate_standard(
         }
     }
     if let Some(availability) = standard.required_availability {
-        if !availability.is_nan() && (availability < 0.0 || availability > 1.0) {
+        if !availability.is_nan() && !(0.0..=1.0).contains(&availability) {
             push_finding(
                 findings,
                 FindingScope::Standard,

@@ -51,6 +51,7 @@ fn bara(pressure: Option<Pressure>) -> Option<f64> {
 ///
 /// # Errors
 /// `InvalidInput` for a negative pressure or frequency, or a non-positive proof-test interval.
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared input list.
 pub fn s001_secondary_pressure_protection(
     maximum_event_pressure: Option<Pressure>,
     design_pressure: Option<Pressure>,

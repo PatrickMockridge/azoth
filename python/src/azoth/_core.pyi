@@ -4531,7 +4531,7 @@ class S001Clause10ReviewResult:
     assessments: list[ReviewAssessment]
     verdicts: list[ReviewVerdict]
     coverage: list[ReviewCoverage]
-    overall_verdict: OverallVerdict
+    overall_verdict: str
     item_count: float
     failed_item_count: float
     warning_item_count: float

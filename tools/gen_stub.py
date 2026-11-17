@@ -474,6 +474,7 @@ ENUMS = {
     "ReliefPhase",
     "SelfHeatingGeometry",
     "SelfHeatingVerdict",
+    "OverallVerdict",
 }
 
 

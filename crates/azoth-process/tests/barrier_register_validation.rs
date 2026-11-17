@@ -286,7 +286,7 @@ fn each_barrier_rule_is_reported() {
         let result = run(
             "BR-001",
             Some(&elements),
-            Some(&[barrier.clone()]),
+            Some(std::slice::from_ref(&barrier)),
             Some(&standards),
             Some(&links),
             Some(&evidence),
@@ -359,7 +359,7 @@ fn each_standard_rule_is_reported() {
             "BR-001",
             Some(&elements),
             Some(&[barrier]),
-            Some(&[standard_row.clone()]),
+            Some(std::slice::from_ref(&standard_row)),
             Some(&links),
             Some(&evidence),
         );
