@@ -51,6 +51,7 @@ from azoth.core.result import (
     GaussianPlumeResult,
     GibbsReactorResult,
     HazardousAreaResult,
+    HazopTemplateResult,
     HeaterResult,
     HeatExchangerResult,
     HeavyGasDispersionResult,
@@ -281,6 +282,7 @@ _VESSEL_RUPTURE = "process.vessel_rupture"
 _SEMENOV_SELF_HEATING = "process.semenov_self_heating"
 _SELF_HEATING_INDUCTION = "process.self_heating_induction"
 _BASKET_TEST_REGRESSION = "process.basket_test_regression"
+_HAZOP_TEMPLATE = "process.hazop_template"
 
 
 def validate(flowsheet: str, palette_dir: str = "specs/unit_ops") -> list[str]:
@@ -3205,6 +3207,24 @@ def hazardous_area(
         ambient_density=ambient_density,
         safety_factor=safety_factor,
         release_grade=release_grade,
+    )
+
+
+def hazop_template(
+    grid_parameters: list[dict[str, object]],
+    equipment_type: str | None = None,
+) -> HazopTemplateResult:
+    """The deviation grid a HAZOP node starts from.
+
+    **Seven guide words per parameter**, in the class's order, then the equipment-type seed
+    set when a type is stated. Every generated cell is ``TBD`` and the recommendation is
+    absent; an empty parameter list is the class's no-argument grid.
+
+    See :func:`azoth.process.reference.hazop_template`.
+    """
+    return resolve(_HAZOP_TEMPLATE)(  # type: ignore[no-any-return]
+        grid_parameters=grid_parameters,
+        equipment_type=equipment_type,
     )
 
 

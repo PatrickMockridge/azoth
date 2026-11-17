@@ -33,6 +33,7 @@
 //!   - specs/models/process/gaussian_plume.toml
 //!   - specs/models/process/gibbs_reactor.toml
 //!   - specs/models/process/hazardous_area.toml
+//!   - specs/models/process/hazop_template.toml
 //!   - specs/models/process/heat_exchanger.toml
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
@@ -35203,6 +35204,668 @@ pub static HAZARDOUS_AREA_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&HAZARDOUS_AREA_ALGORITHM),
     checks: HAZARDOUS_AREA_CHECKS,
     cases: HAZARDOUS_AREA_CASES,
+};
+
+static HAZOP_TEMPLATE_CHECKS: &[SpecCheck] = &[];
+
+static HAZOP_TEMPLATE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "ht_grid_two_params",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("deviation_count", 14.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "grid_parameters",
+            &[
+                &[RecordField {
+                    name: "parameter",
+                    value: FieldValue::Name("flow"),
+                }],
+                &[RecordField {
+                    name: "parameter",
+                    value: FieldValue::Name("pressure"),
+                }],
+            ],
+        )],
+        expected_records: &[(
+            "deviations",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("reverse"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("as_well_as"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("part_of"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("other_than"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("reverse"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("as_well_as"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("part_of"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("other_than"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "ht_grid_and_seed",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("equipment_type", "Separator")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("deviation_count", 12.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "grid_parameters",
+            &[&[RecordField {
+                name: "parameter",
+                value: FieldValue::Name("flow"),
+            }]],
+        )],
+        expected_records: &[(
+            "deviations",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("level"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("level"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("reverse"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("as_well_as"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("part_of"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("other_than"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+static HAZOP_TEMPLATE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "hazop_deviation_grid",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.hazop_template`.
+pub static HAZOP_TEMPLATE_SPEC: ModelSpec = ModelSpec {
+    id: "process.hazop_template",
+    kind: "procedure",
+    algorithm: Some(&HAZOP_TEMPLATE_ALGORITHM),
+    checks: HAZOP_TEMPLATE_CHECKS,
+    cases: HAZOP_TEMPLATE_CASES,
 };
 
 static HEAT_EXCHANGER_CHECKS: &[SpecCheck] = &[
@@ -77049,6 +77712,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &GAUSSIAN_PLUME_SPEC,
     &GIBBS_REACTOR_SPEC,
     &HAZARDOUS_AREA_SPEC,
+    &HAZOP_TEMPLATE_SPEC,
     &HEAT_EXCHANGER_SPEC,
     &HEATER_SPEC,
     &HEAVY_GAS_DISPERSION_SPEC,

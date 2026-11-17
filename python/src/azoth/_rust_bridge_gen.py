@@ -136,6 +136,8 @@ from azoth.core.result import (
     HaalandResult,
     HaydukMinhasDiffusivityResult,
     HazardousAreaResult,
+    HazopTemplateDeviation,
+    HazopTemplateResult,
     HeaterInstrument,
     HeaterMechanicalType,
     HeaterResult,
@@ -540,6 +542,7 @@ __all__ = [
     "gt_surface_tension_simple",
     "hayduk_minhas_diffusivity",
     "hazardous_area",
+    "hazop_template",
     "heat_exchanger",
     "heat_of_vaporization",
     "heater",
@@ -6846,6 +6849,20 @@ def hazardous_area(mass_flow: Q, exit_density: Q, exit_velocity: Q, lfl_volume_f
         hazardous_distance=from_si(result.hazardous_distance.magnitude_si, result.hazardous_distance.unit),
         release_grade=result.release_grade,
         zone_classification=result.zone_classification,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def hazop_template(grid_parameters: list[dict[str, object]], equipment_type: str | None=None) -> HazopTemplateResult:
+    """``process.hazop_template``, computed in Rust."""
+    spec = _models_gen.model("process.hazop_template")
+    result = _core.hazop_template(
+        input_records_to_si(spec, "grid_parameters", grid_parameters),
+        equipment_type,
+    )
+    return HazopTemplateResult(
+        deviations=tuple(HazopTemplateDeviation(guide_word=c.guide_word, parameter=c.parameter, cause=c.cause, consequence=c.consequence, safeguard=c.safeguard, recommendation=c.recommendation) for c in result.deviations),
+        deviation_count=result.deviation_count,
         warnings=_warnings(result.warnings),
     )
 

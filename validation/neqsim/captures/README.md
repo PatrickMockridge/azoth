@@ -2706,7 +2706,9 @@ fourteen rows; no parameters give an empty worksheet; every generated cell is `T
 recommendation is absent. The seed table is one row set per equipment branch - separator or
 scrubber (five rows), compressor or expander (four), pump (three), valve (three), the
 heat-exchanger words (three), pipe or pipeline (three), and everything else, including a
-Stream, the four-row default. The match is a lower-case substring test in that order.
+Stream, the four-row default. The match is a lower-case substring test in that order. The
+last block seeds the separator and then appends the FLOW grid - **the seed rows first**,
+which is the one order the class's own API produces.
 
 `process_fmea_worksheet.tsv` is `FMEAWorksheet` on the class test's two entries, a tie, a
 threshold equal to an RPN, an empty worksheet and the S/O/D refusals.

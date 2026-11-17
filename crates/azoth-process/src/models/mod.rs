@@ -62,6 +62,8 @@ pub mod gas_scrubber;
 pub mod gaussian_plume;
 pub mod gibbs_reactor;
 pub mod hazardous_area;
+pub mod hazid;
+pub mod hazop_template;
 pub mod heat_exchanger;
 pub mod heater;
 pub mod heavy_gas_dispersion;
@@ -163,6 +165,10 @@ pub use gas_scrubber::{GasScrubberResult, gas_scrubber};
 pub use gaussian_plume::{GaussianPlumeResult, gaussian_plume};
 pub use gibbs_reactor::{GibbsReactorResult, gibbs_reactor};
 pub use hazardous_area::{HazardousAreaResult, hazardous_area};
+pub use hazid::{HazopGuideWord, HazopParameter};
+pub use hazop_template::{
+    HazopGridParameter, HazopTemplateDeviation, HazopTemplateResult, hazop_template,
+};
 pub use heat_exchanger::{HeatExchangerResult, heat_exchanger};
 pub use heater::{HeaterResult, heater};
 pub use heavy_gas_dispersion::{HeavyGasDispersionResult, heavy_gas_dispersion};

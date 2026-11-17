@@ -16520,7 +16520,8 @@ public class ProcessProbe {
     process.add(pump);
     process.add(pipe);
 
-    for (HAZOPTemplate node : HAZOPTemplate.fromProcessSystem(process)) {
+    List<HAZOPTemplate> nodes = HAZOPTemplate.fromProcessSystem(process);
+    for (HAZOPTemplate node : nodes) {
       String type = node.getEquipmentType();
       System.out.println("ht_seed_" + type.toLowerCase(java.util.Locale.ROOT));
       System.out.println("equipment_type=" + type);
@@ -16529,6 +16530,22 @@ public class ProcessProbe {
         printHazopDeviation("deviation" + i + "_", node.getDeviations().get(i));
       }
       System.out.println();
+    }
+
+    // The one order the class's own API produces for both arms: the node is seeded by
+    // `fromProcessSystem`, then the caller appends a grid.
+    for (HAZOPTemplate node : nodes) {
+      if ("Separator".equals(node.getEquipmentType())) {
+        node.generateGrid(HAZOPTemplate.Parameter.FLOW);
+        System.out.println("ht_seed_separator_then_grid");
+        System.out.println("equipment_type=Separator");
+        System.out.println("deviation_count=" + node.getDeviations().size());
+        for (int i = 0; i < node.getDeviations().size(); i++) {
+          printHazopDeviation("deviation" + i + "_", node.getDeviations().get(i));
+        }
+        System.out.println();
+        break;
+      }
     }
   }
 

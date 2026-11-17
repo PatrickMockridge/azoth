@@ -6625,6 +6625,31 @@ pub fn hazardous_area(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// HAZOP template.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (grid_parameters, equipment_type))]
+#[pyo3(text_signature = "(grid_parameters, equipment_type)")]
+pub fn hazop_template(
+    py: Python<'_>,
+    grid_parameters: Vec<crate::records_gen::HazopGridParameter>,
+    equipment_type: Option<&str>,
+) -> PyResult<crate::transport_gen::PyHazopTemplateResult> {
+    let grid_parameters_records: Vec<azoth_process::models::hazop_template::HazopGridParameter> =
+        grid_parameters
+            .into_iter()
+            .map(
+                |row| azoth_process::models::hazop_template::HazopGridParameter {
+                    parameter: row.parameter,
+                },
+            )
+            .collect();
+    azoth_process::models::hazop_template::hazop_template(&grid_parameters_records, equipment_type)
+        .map(|r| crate::transport_gen::PyHazopTemplateResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Heater.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

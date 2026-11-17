@@ -508,6 +508,11 @@ class ProtectedObject(TypedDict):
     surface_area: float
     application_rate: float
 
+class HazopGridParameter(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    parameter: str
+
 class LopaProtectionLayer(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -899,6 +904,17 @@ class MinimalCutSet:
 
     members: str
     cardinality: float
+
+@final
+class HazopTemplateDeviation:
+    """the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order."""
+
+    guide_word: str
+    parameter: str
+    cause: str
+    consequence: str
+    safeguard: str
+    recommendation: str | None
 
 @final
 class HeatExchangerMechanicalType:
@@ -3676,6 +3692,12 @@ class HazardousAreaResult:
     hazardous_distance: Qty
     release_grade: str
     zone_classification: str
+    warnings: list[Warning]
+
+@final
+class HazopTemplateResult:
+    deviations: list[HazopTemplateDeviation]
+    deviation_count: float
     warnings: list[Warning]
 
 @final
@@ -7463,6 +7485,10 @@ def hazardous_area(
     safety_factor: float | None = None,
     release_grade: str | None = None,
 ) -> HazardousAreaResult: ...
+def hazop_template(
+    grid_parameters: list[HazopGridParameter],
+    equipment_type: str | None = None,
+) -> HazopTemplateResult: ...
 def heat_exchanger(
     hot_components: list[str],
     cold_components: list[str],

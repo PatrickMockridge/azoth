@@ -234,6 +234,29 @@ class FlowlineScaleSegment:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class HazopTemplateDeviation:
+    """the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order."""
+
+    #: the guide word.
+    guide_word: str
+
+    #: the process parameter.
+    parameter: str
+
+    #: the hypothesised cause, `TBD` for a generated row.
+    cause: str
+
+    #: the consequence if no protection acts, `TBD` for a generated row.
+    consequence: str
+
+    #: the existing safeguard, `TBD` for a generated row.
+    safeguard: str
+
+    #: the new recommendation; absent for every generated row, which is the class's null.
+    recommendation: str | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class HeatExchangerMechanicalType:
     """the five candidates in the class's enum order; empty when the design did not run."""
 

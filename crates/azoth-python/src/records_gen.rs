@@ -317,6 +317,13 @@ pub struct FluidComponent {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct HazopGridParameter {
+    #[pyo3(item)]
+    pub parameter: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct IncrementalZoneInput {
     #[pyo3(item)]
     pub zone_name: String,

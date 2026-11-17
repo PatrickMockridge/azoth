@@ -32,6 +32,7 @@ from azoth.core.record_outputs_gen import (
     EquilibriumSoundSpeedSample,
     EventTreeOutcome,
     FlowlineScaleSegment,
+    HazopTemplateDeviation,
     HeaterInstrument,
     HeaterMechanicalType,
     HeatExchangerMechanicalType,
@@ -7345,6 +7346,22 @@ class HazardousAreaResult(_HasWarnings):
 
     #: the class's zone label: `Zone 0`, `Zone 1` or `Zone 2`.
     zone_classification: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class HazopTemplateResult(_HasWarnings):
+    """Result of ``process.hazop_template``."""
+
+    CALC_ID: ClassVar[str] = "process.hazop_template"
+
+    #: the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order.
+    deviations: tuple[HazopTemplateDeviation, ...]
+
+    #: the number of rows.
+    deviation_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

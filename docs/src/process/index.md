@@ -45,6 +45,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.gaussian_plume`](./gaussian_plume.md) | `briggs_pasquill_gifford_two_image_gaussian` | NeqSim process/safety/dispersion/GaussianPlume.java |
 | [`process.gibbs_reactor`](./gibbs_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/GibbsReactor.java |
 | [`process.hazardous_area`](./hazardous_area.md) | `iec_60079_10_1_jet_axial_decay` | NeqSim process/safety/dispersion/HazardousAreaCalculator.java |
+| [`process.hazop_template`](./hazop_template.md) | `hazop_deviation_grid` | NeqSim process/safety/hazid/HAZOPTemplate.java |
 | [`process.heat_exchanger`](./heat_exchanger.md) | `direct composition` | NeqSim process/equipment/heatexchanger/HeatExchanger.java |
 | [`process.heater`](./heater.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Heater.java |
 | [`process.heavy_gas_dispersion`](./heavy_gas_dispersion.md) | `britter_mcquaid_continuous_dense_gas` | NeqSim process/safety/dispersion/HeavyGasDispersion.java |

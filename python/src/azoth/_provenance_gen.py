@@ -2798,6 +2798,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 6,
         "tests_skipped": 0,
     },
+    'process.hazop_template': {
+        "calc_id": 'process.hazop_template',
+        "name": 'HAZOP template',
+        "spec": {'path': 'specs/models/process/hazop_template.toml', 'sha256': 'f1b5144f593b609df4cc9f3f08aa166bb16afc27f7b285a2b9d75af40fbec2fc'},
+        "code": [{'path': 'python/src/azoth/process/reference/hazop_template.py', 'sha256': '0373455a3bed26d56cc234cc1f7e996024465b351dc97cddb807b6f621acd097'}, {'path': 'crates/azoth-process/src/models/hazop_template.rs', 'sha256': '45c62842c5287aac951c519de651aa06e0c985cdc5d671d55f469b9c1914b3fd'}],
+        "source": 'NeqSim process/safety/hazid/HAZOPTemplate.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 2,
+        "tests_skipped": 0,
+    },
     'process.heat_exchanger': {
         "calc_id": 'process.heat_exchanger',
         "name": 'Heat exchanger',

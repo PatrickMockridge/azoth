@@ -625,6 +625,65 @@ impl From<&azoth_eos::results::FlowlineScaleSegment> for PyFlowlineScaleSegment 
     }
 }
 
+/// the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "HazopTemplateDeviation"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyHazopTemplateDeviation {
+    /// the guide word.
+    #[pyo3(get)]
+    pub guide_word: String,
+    /// the process parameter.
+    #[pyo3(get)]
+    pub parameter: String,
+    /// the hypothesised cause, `TBD` for a generated row.
+    #[pyo3(get)]
+    pub cause: String,
+    /// the consequence if no protection acts, `TBD` for a generated row.
+    #[pyo3(get)]
+    pub consequence: String,
+    /// the existing safeguard, `TBD` for a generated row.
+    #[pyo3(get)]
+    pub safeguard: String,
+    /// the new recommendation; absent for every generated row, which is the class's null.
+    #[pyo3(get)]
+    pub recommendation: Option<String>,
+}
+
+#[pymethods]
+impl PyHazopTemplateDeviation {
+    fn __repr__(&self) -> String {
+        format!(
+            "HazopTemplateDeviation(guide_word={}, parameter={}, cause={}, consequence={}, safeguard={}, recommendation={:?})",
+            self.guide_word,
+            self.parameter,
+            self.cause,
+            self.consequence,
+            self.safeguard,
+            self.recommendation
+        )
+    }
+}
+
+impl From<&azoth_process::models::hazop_template::HazopTemplateDeviation>
+    for PyHazopTemplateDeviation
+{
+    fn from(row: &azoth_process::models::hazop_template::HazopTemplateDeviation) -> Self {
+        Self {
+            guide_word: row.guide_word.as_str().to_string(),
+            parameter: row.parameter.as_str().to_string(),
+            cause: row.cause.clone(),
+            consequence: row.consequence.clone(),
+            safeguard: row.safeguard.clone(),
+            recommendation: row.recommendation.clone(),
+        }
+    }
+}
+
 /// the five candidates in the class's enum order; empty when the design did not run.
 #[pyclass(
     frozen,

@@ -2690,6 +2690,20 @@ def _basket_test_regression(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _hazop_template(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.hazop_template`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.hazop_template import hazop_template as evaluate
+
+    equipment = inputs.get("equipment_type")
+    result = evaluate(
+        list(inputs["grid_parameters"]),
+        None if equipment is None else str(equipment),
+    )
+    # The rows are strings and are compared by `test_model_cases`; the count is the one
+    # numeric interior the capture prints.
+    return {"deviation_count": result.deviation_count}
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3227,6 +3241,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.porous_media_self_heating": _porous_media_self_heating,
     "process.self_heating_induction": _self_heating_induction,
     "process.basket_test_regression": _basket_test_regression,
+    "process.hazop_template": _hazop_template,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -5140,6 +5155,23 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=3,
         identified_by=("#label", "basket_two_points"),
     ),
+    # The template's two arms: the two-parameter grid, and a seeded separator with the FLOW
+    # grid appended. The other ten blocks - the single grid, the empty grid, the manual row
+    # and the seven seed branches - are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.hazop_template",
+        case="ht_grid_two_params",
+        capture="process_hazop_template.tsv",
+        block=0,
+        identified_by=("#label", "ht_grid_two_params"),
+    ),
+    LayerCase(
+        model="process.hazop_template",
+        case="ht_grid_and_seed",
+        capture="process_hazop_template.tsv",
+        block=11,
+        identified_by=("#label", "ht_seed_separator_then_grid"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -6894,6 +6926,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_self_heating_induction.tsv": 1,
     # The two fits the class refuses: a single point and equal temperatures.
     "process_basket_test_regression.tsv": 2,
+    # The template's ten: the one-parameter grid, the empty grid, the manual row and the
+    # seven equipment seed blocks. The rows are strings; the cases hold them.
+    "process_hazop_template.tsv": 10,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

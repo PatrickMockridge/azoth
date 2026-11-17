@@ -17,14 +17,15 @@ use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
     PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEventTreeOutcome,
-    PyFlowlineScaleSegment, PyHeatExchangerMechanicalType, PyHeaterInstrument,
-    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
-    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow,
-    PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow, PyRiskAssessmentRow,
-    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
-    PySelfHeatingTimePoint, PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySubFraction,
-    PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyFlowlineScaleSegment, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
+    PyHydrateRiskPoint, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
+    PyLeakBlowdownPoint, PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet,
+    PyNaceIssueRow, PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyRiskAssessmentRow, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue, PySterileRadius,
+    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
+    PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -18319,6 +18320,51 @@ impl From<&azoth_process::models::hazardous_area::HazardousAreaResult> for PyHaz
             },
             release_grade: r.release_grade.clone(),
             zone_classification: r.zone_classification.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.hazop_template`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "HazopTemplateResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyHazopTemplateResult {
+    /// the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order.
+    #[pyo3(get)]
+    pub deviations: Vec<PyHazopTemplateDeviation>,
+    /// the number of rows.
+    #[pyo3(get)]
+    pub deviation_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyHazopTemplateResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "HazopTemplateResult(deviations={:?}, deviation_count={:?}, {} warning(s))",
+            self.deviations,
+            self.deviation_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::hazop_template::HazopTemplateResult> for PyHazopTemplateResult {
+    fn from(r: &azoth_process::models::hazop_template::HazopTemplateResult) -> Self {
+        Self {
+            deviations: r
+                .deviations
+                .iter()
+                .map(PyHazopTemplateDeviation::from)
+                .collect(),
+            deviation_count: r.deviation_count,
             warnings: transport(&r.warnings),
         }
     }
