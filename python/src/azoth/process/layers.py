@@ -2690,6 +2690,76 @@ def _basket_test_regression(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _hazop_template(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.hazop_template`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.hazop_template import hazop_template as evaluate
+
+    equipment = inputs.get("equipment_type")
+    result = evaluate(
+        list(inputs["grid_parameters"]),
+        None if equipment is None else str(equipment),
+    )
+    # The rows are strings and are compared by `test_model_cases`; the count is the one
+    # numeric interior the capture prints.
+    return {"deviation_count": result.deviation_count}
+
+
+def _fmea_worksheet(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.fmea_worksheet`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.fmea_worksheet import fmea_worksheet as evaluate
+
+    result = evaluate(list(inputs["entries"]), float(inputs["rpn_threshold"]))
+    layers = {
+        "entry_count": result.entry_count,
+        "above_count": float(len(result.entries_above_threshold)),
+    }
+    if result.highest_rpn is not None:
+        layers["highest_rpn"] = result.highest_rpn
+    for index, row in enumerate(result.ranked_entries):
+        layers[f"ranked{index}_rpn"] = row.rpn
+    for index, row in enumerate(result.entries_above_threshold):
+        layers[f"above{index}_rpn"] = row.rpn
+    return layers
+
+
+def _hazop_consequence_population(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.hazop_consequence_population`'s layers, from the reference's arithmetic."""
+    from azoth.process.reference.hazop_consequence_population import (
+        hazop_consequence_population as evaluate,
+    )
+
+    equipment = inputs.get("equipment_type")
+    result = evaluate(
+        list(inputs["deviations"]),
+        None if equipment is None else str(equipment),
+    )
+    return {
+        "deviation_count": float(len(result.populated)),
+        "mapped_count": result.mapped_count,
+    }
+
+
+def _mah_bow_tie_skeleton(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.mah_bow_tie_skeleton`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.mah_bow_tie_skeleton import (
+        mah_bow_tie_skeleton as evaluate,
+    )
+
+    result = evaluate(str(inputs["mah_type"]))
+    layers = {
+        "threat_count": result.threat_count,
+        "consequence_count": result.consequence_count,
+        "barrier_count": result.barrier_count,
+    }
+    for index, threat in enumerate(result.threats):
+        layers[f"threat{index}_frequency_per_year"] = threat.frequency_per_year
+    for index, consequence in enumerate(result.consequences):
+        layers[f"consequence{index}_severity"] = consequence.severity
+    for index, barrier in enumerate(result.barriers):
+        layers[f"barrier{index}_pfd"] = barrier.pfd
+    return layers
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3227,6 +3297,10 @@ DUMPERS: dict[str, Dumper] = {
     "process.porous_media_self_heating": _porous_media_self_heating,
     "process.self_heating_induction": _self_heating_induction,
     "process.basket_test_regression": _basket_test_regression,
+    "process.hazop_template": _hazop_template,
+    "process.fmea_worksheet": _fmea_worksheet,
+    "process.hazop_consequence_population": _hazop_consequence_population,
+    "process.mah_bow_tie_skeleton": _mah_bow_tie_skeleton,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -5140,6 +5214,63 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=3,
         identified_by=("#label", "basket_two_points"),
     ),
+    # The template's two arms: the two-parameter grid, and a seeded separator with the FLOW
+    # grid appended. The other ten blocks - the single grid, the empty grid, the manual row
+    # and the seven seed branches - are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.hazop_template",
+        case="ht_grid_two_params",
+        capture="process_hazop_template.tsv",
+        block=0,
+        identified_by=("#label", "ht_grid_two_params"),
+    ),
+    LayerCase(
+        model="process.hazop_template",
+        case="ht_grid_and_seed",
+        capture="process_hazop_template.tsv",
+        block=11,
+        identified_by=("#label", "ht_seed_separator_then_grid"),
+    ),
+    # The worksheet's two cased states; the inclusive-threshold block, the empty worksheet
+    # and the four refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.fmea_worksheet",
+        case="fmea_class_test",
+        capture="process_fmea_worksheet.tsv",
+        block=0,
+        identified_by=("#label", "fw_class_test"),
+    ),
+    LayerCase(
+        model="process.fmea_worksheet",
+        case="fmea_tie_and_inclusive_threshold",
+        capture="process_fmea_worksheet.tsv",
+        block=1,
+        identified_by=("#label", "fw_tie"),
+    ),
+    # The population's two cased nodes; the catalogue, the flow sweep, the two lookups, the
+    # separator, valve, stream and preserved nodes and the empty node are uncased.
+    LayerCase(
+        model="process.hazop_consequence_population",
+        case="hp_manual_node",
+        capture="process_hazop_consequence_population.tsv",
+        block=4,
+        identified_by=("#label", "hp_populate_manual"),
+    ),
+    LayerCase(
+        model="process.hazop_consequence_population",
+        case="hp_compressor_node",
+        capture="process_hazop_consequence_population.tsv",
+        block=5,
+        identified_by=("#label", "hp_populate_compressor"),
+    ),
+    # The MAH skeleton's one cased category; the other ten and the null refusal are uncased.
+    LayerCase(
+        model="process.mah_bow_tie_skeleton",
+        case="mah_fire_explosion",
+        capture="process_mah_bow_tie_skeleton.tsv",
+        block=7,
+        identified_by=("#label", "mah_fire_explosion"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -6894,6 +7025,17 @@ UNCASED_ROWS: dict[str, int] = {
     "process_self_heating_induction.tsv": 1,
     # The two fits the class refuses: a single point and equal temperatures.
     "process_basket_test_regression.tsv": 2,
+    # The template's ten: the one-parameter grid, the empty grid, the manual row and the
+    # seven equipment seed blocks. The rows are strings; the cases hold them.
+    "process_hazop_template.tsv": 10,
+    # The worksheet's six: the inclusive-threshold block, the empty worksheet and the four
+    # refusals. The empty list is not a case state.
+    "process_fmea_worksheet.tsv": 6,
+    # The population's nine: the whole catalogue, the flow sweep, the two lookups, the
+    # separator, valve, stream and preserved nodes and the empty node.
+    "process_hazop_consequence_population.tsv": 9,
+    # The skeleton's eleven: the ten uncased categories and the null refusal.
+    "process_mah_bow_tie_skeleton.tsv": 11,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

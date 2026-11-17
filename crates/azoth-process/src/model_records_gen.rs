@@ -38,11 +38,14 @@ use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
 use crate::models::fire_water_demand::FireWaterDemandResult;
 use crate::models::flare::FlareResult;
+use crate::models::fmea_worksheet::FmeaWorksheetResult;
 use crate::models::gas_dispersion::GasDispersionResult;
 use crate::models::gas_scrubber::GasScrubberResult;
 use crate::models::gaussian_plume::GaussianPlumeResult;
 use crate::models::gibbs_reactor::GibbsReactorResult;
 use crate::models::hazardous_area::HazardousAreaResult;
+use crate::models::hazop_consequence_population::HazopConsequencePopulationResult;
+use crate::models::hazop_template::HazopTemplateResult;
 use crate::models::heat_exchanger::HeatExchangerResult;
 use crate::models::heater::HeaterResult;
 use crate::models::heavy_gas_dispersion::HeavyGasDispersionResult;
@@ -50,6 +53,7 @@ use crate::models::hem_release::HemReleaseResult;
 use crate::models::jet_fire::JetFireResult;
 use crate::models::leak_blowdown::LeakBlowdownResult;
 use crate::models::lopa::LopaResult;
+use crate::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult;
 use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mixer::MixerResult;
@@ -788,6 +792,21 @@ impl CalcResult for FlareResult {
     }
 }
 
+impl CalcResult for FmeaWorksheetResult {
+    const CALC_ID: &'static str = "process.fmea_worksheet";
+    const FIELDS: &'static [&'static str] = &[
+        "ranked_entries",
+        "entries_above_threshold",
+        "highest_rpn",
+        "entry_count",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for GasDispersionResult {
     const CALC_ID: &'static str = "process.gas_dispersion";
     const FIELDS: &'static [&'static str] = &[
@@ -941,6 +960,24 @@ impl CalcResult for HazardousAreaResult {
         "zone_classification",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for HazopConsequencePopulationResult {
+    const CALC_ID: &'static str = "process.hazop_consequence_population";
+    const FIELDS: &'static [&'static str] = &["populated", "mapped_count", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for HazopTemplateResult {
+    const CALC_ID: &'static str = "process.hazop_template";
+    const FIELDS: &'static [&'static str] = &["deviations", "deviation_count", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -1170,6 +1207,23 @@ impl CalcResult for LopaResult {
         "layer_contributions",
         "sts0131_pressure_category",
         "sts0131_target_frequency_per_year",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for MahBowTieSkeletonResult {
+    const CALC_ID: &'static str = "process.mah_bow_tie_skeleton";
+    const FIELDS: &'static [&'static str] = &[
+        "threats",
+        "consequences",
+        "barriers",
+        "threat_count",
+        "consequence_count",
+        "barrier_count",
         "warnings",
     ];
 

@@ -1,0 +1,70 @@
+id = "process.hazop_template"
+name = "HAZOP template"
+kind = "procedure"
+assumptions = [
+    "**the grid runs parameter by parameter and, inside each parameter, the seven guide words in enum order**: NO, MORE, LESS, REVERSE, AS_WELL_AS, PART_OF, OTHER_THAN. Two parameters give fourteen rows.",
+    "**every grid row is `TBD` in cause, consequence and safeguard, with an absent recommendation**, the class's placeholder state; an empty parameter list is its no-argument `generateGrid()`.",
+    "**the seed table is selected by a lower-case substring test in the class's order**: separator or scrubber (five rows), compressor or expander (four), pump (three), valve (three), the heat-exchanger words (three), pipe (three), and everything else, which includes a Stream, the four-row default.",
+    "**the seed rows come first**: `fromProcessSystem` seeds a process-derived node, and only then can the caller append a grid, which is the one order the class's own API produces.",
+    "**`fromProcessSystem`'s flowsheet walk is caller state**: it only names the nodes and reads the units' simple class names, so the id takes the equipment type the caller already has. An absent type runs no seed arm; a stated one, including a blank, runs the selection.",
+    "**`addDeviation` is caller state and `report` is presentation**, so the id takes the equipment type and the grid parameters and answers with the generated rows.",
+    "**an empty deviation list is a state the class answers**; a case cannot state an empty row list, so it is capture evidence and a hand test.",
+]
+references = [
+    "IEC 61882:2016. Hazard and operability studies (HAZOP studies) - Application guide.",
+    "CCPS (2008). Guidelines for Hazard Evaluation Procedures, 3rd Ed.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/hazid/HAZOPTemplate.java` is the port source.",
+    "`validation/neqsim/captures/process_hazop_template.tsv` - the two- and one-parameter grids, the empty grid, the manual row and each equipment seed branch.",
+]
+[source]
+standard = "NeqSim process/safety/hazid/HAZOPTemplate.java"
+edition = "Its `generateGrid` and the `seedDeviations` table `fromProcessSystem` applies."
+[algorithm]
+scheme = "hazop_deviation_grid"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.grid_parameters]
+type = "record_list"
+row_type = "HazopGridParameter"
+description = "the parameters the grid is generated for, in caller order. An empty list is the class's no-argument `generateGrid()`.\n"
+[inputs.grid_parameters.fields.parameter]
+type = "enum"
+values = ["flow", "pressure", "temperature", "level", "composition", "reaction"]
+description = "the process parameter whose seven guide-word rows are generated.\n"
+[inputs.equipment_type]
+type = "string"
+optional = true
+description = "the unit's simple class name or category, matched by lower-case substring. **Absent runs no seed arm**; a stated value, including a blank one, runs the class's seed selection, whose last branch is the default set.\n"
+[outputs]
+[outputs.deviations]
+type = "record_list"
+description = "the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order.\n"
+[outputs.deviations.fields.guide_word]
+type = "enum"
+values = ["no", "more", "less", "reverse", "as_well_as", "part_of", "other_than"]
+description = "the guide word.\n"
+[outputs.deviations.fields.parameter]
+type = "enum"
+values = ["flow", "pressure", "temperature", "level", "composition", "reaction"]
+description = "the process parameter.\n"
+[outputs.deviations.fields.cause]
+type = "string"
+description = "the hypothesised cause, `TBD` for a generated row.\n"
+[outputs.deviations.fields.consequence]
+type = "string"
+description = "the consequence if no protection acts, `TBD` for a generated row.\n"
+[outputs.deviations.fields.safeguard]
+type = "string"
+description = "the existing safeguard, `TBD` for a generated row.\n"
+[outputs.deviations.fields.recommendation]
+type = "string"
+optional = true
+description = "the new recommendation; absent for every generated row, which is the class's null.\n"
+[outputs.deviation_count]
+unit = "dimensionless"
+description = "the number of rows.\n"
+[implementations]
+python = "azoth.process.hazop_template"
+rust = "azoth_process::hazop_template"

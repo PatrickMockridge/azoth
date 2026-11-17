@@ -111,6 +111,8 @@ from azoth.core.result import (
     FlowlineScaleSegment,
     FlowRegime,
     FluidBasis,
+    FmeaRankedEntry,
+    FmeaWorksheetResult,
     FoulingModelResult,
     FreezingPointResult,
     FrictionTheoryConductivityResult,
@@ -136,6 +138,10 @@ from azoth.core.result import (
     HaalandResult,
     HaydukMinhasDiffusivityResult,
     HazardousAreaResult,
+    HazopConsequencePopulationResult,
+    HazopPopulationRow,
+    HazopTemplateDeviation,
+    HazopTemplateResult,
     HeaterInstrument,
     HeaterMechanicalType,
     HeaterResult,
@@ -182,6 +188,10 @@ from azoth.core.result import (
     LopaLayerContribution,
     LopaResult,
     LumpingResult,
+    MahBarrier,
+    MahBowTieSkeletonResult,
+    MahConsequence,
+    MahThreat,
     ManifoldResult,
     MapTurboExpanderResult,
     MasonSaxenaConductivityResult,
@@ -514,6 +524,7 @@ __all__ = [
     "firozabadi_ramley_interface_tension",
     "flare",
     "flowline_scale_profile",
+    "fmea_worksheet",
     "fouling_model",
     "freezing_point",
     "friction_factor_colebrook",
@@ -540,6 +551,8 @@ __all__ = [
     "gt_surface_tension_simple",
     "hayduk_minhas_diffusivity",
     "hazardous_area",
+    "hazop_consequence_population",
+    "hazop_template",
     "heat_exchanger",
     "heat_of_vaporization",
     "heater",
@@ -572,6 +585,7 @@ __all__ = [
     "lmtd_correction_factor",
     "lopa",
     "lumping",
+    "mah_bow_tie_skeleton",
     "manifold",
     "map_turbo_expander_compressor",
     "mason_saxena_conductivity",
@@ -6613,6 +6627,22 @@ def flare(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, i
     )
 
 
+def fmea_worksheet(entries: list[dict[str, object]], rpn_threshold: float) -> FmeaWorksheetResult:
+    """``process.fmea_worksheet``, computed in Rust."""
+    spec = _models_gen.model("process.fmea_worksheet")
+    result = _core.fmea_worksheet(
+        input_records_to_si(spec, "entries", entries),
+        rpn_threshold,
+    )
+    return FmeaWorksheetResult(
+        ranked_entries=tuple(FmeaRankedEntry(component=c.component, failure_mode=c.failure_mode, severity=c.severity, occurrence=c.occurrence, detection=c.detection, rpn=c.rpn, mitigation=c.mitigation) for c in result.ranked_entries),
+        entries_above_threshold=tuple(FmeaRankedEntry(component=c.component, failure_mode=c.failure_mode, severity=c.severity, occurrence=c.occurrence, detection=c.detection, rpn=c.rpn, mitigation=c.mitigation) for c in result.entries_above_threshold),
+        highest_rpn=result.highest_rpn,
+        entry_count=result.entry_count,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def gas_dispersion(components: list[str], composition: list[float], mass_release_rate: Q, ambient_temperature: Q | None=None, atmospheric_pressure: Q | None=None, wind_speed: Q | None=None, pasquill_stability_class: str | None=None, surface_roughness: Q | None=None, offshore: bool | None=None, release_height: Q | None=None, model_selection: str | None=None, lower_flammable_limit: float | None=None, flammable_endpoint_fraction_of_lfl: float | None=None, toxic_component: str | None=None, toxic_threshold: float | None=None) -> GasDispersionResult:
     """``process.gas_dispersion``, computed in Rust."""
     spec = _models_gen.model("process.gas_dispersion")
@@ -6846,6 +6876,34 @@ def hazardous_area(mass_flow: Q, exit_density: Q, exit_velocity: Q, lfl_volume_f
         hazardous_distance=from_si(result.hazardous_distance.magnitude_si, result.hazardous_distance.unit),
         release_grade=result.release_grade,
         zone_classification=result.zone_classification,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def hazop_consequence_population(deviations: list[dict[str, object]], equipment_type: str | None=None) -> HazopConsequencePopulationResult:
+    """``process.hazop_consequence_population``, computed in Rust."""
+    spec = _models_gen.model("process.hazop_consequence_population")
+    result = _core.hazop_consequence_population(
+        input_records_to_si(spec, "deviations", deviations),
+        equipment_type,
+    )
+    return HazopConsequencePopulationResult(
+        populated=tuple(HazopPopulationRow(guide_word=c.guide_word, parameter=c.parameter, cause=c.cause, consequence=c.consequence, safeguard=c.safeguard, recommendation=c.recommendation) for c in result.populated),
+        mapped_count=result.mapped_count,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def hazop_template(grid_parameters: list[dict[str, object]], equipment_type: str | None=None) -> HazopTemplateResult:
+    """``process.hazop_template``, computed in Rust."""
+    spec = _models_gen.model("process.hazop_template")
+    result = _core.hazop_template(
+        input_records_to_si(spec, "grid_parameters", grid_parameters),
+        equipment_type,
+    )
+    return HazopTemplateResult(
+        deviations=tuple(HazopTemplateDeviation(guide_word=c.guide_word, parameter=c.parameter, cause=c.cause, consequence=c.consequence, safeguard=c.safeguard, recommendation=c.recommendation) for c in result.deviations),
+        deviation_count=result.deviation_count,
         warnings=_warnings(result.warnings),
     )
 
@@ -7199,6 +7257,22 @@ def lopa(initiating_event_frequency_per_year: float, target_frequency_per_year: 
         layer_contributions=tuple(LopaLayerContribution(name=c.name, pfd=c.pfd, frequency_before_per_year=c.frequency_before_per_year, frequency_after_per_year=c.frequency_after_per_year, contribution_per_year=c.contribution_per_year, rrf=c.rrf) for c in result.layer_contributions),
         sts0131_pressure_category=None if result.sts0131_pressure_category is None else Sts0131PressureCategory(result.sts0131_pressure_category),
         sts0131_target_frequency_per_year=result.sts0131_target_frequency_per_year,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def mah_bow_tie_skeleton(mah_type: str) -> MahBowTieSkeletonResult:
+    """``process.mah_bow_tie_skeleton``, computed in Rust."""
+    result = _core.mah_bow_tie_skeleton(
+        mah_type,
+    )
+    return MahBowTieSkeletonResult(
+        threats=tuple(MahThreat(id=c.id, description=c.description, frequency_per_year=c.frequency_per_year) for c in result.threats),
+        consequences=tuple(MahConsequence(id=c.id, description=c.description, severity=c.severity) for c in result.consequences),
+        barriers=tuple(MahBarrier(id=c.id, description=c.description, pfd=c.pfd) for c in result.barriers),
+        threat_count=result.threat_count,
+        consequence_count=result.consequence_count,
+        barrier_count=result.barrier_count,
         warnings=_warnings(result.warnings),
     )
 

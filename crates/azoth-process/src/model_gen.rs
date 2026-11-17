@@ -28,11 +28,14 @@
 //!   - specs/models/process/fire_water_coverage_assessment.toml
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
+//!   - specs/models/process/fmea_worksheet.toml
 //!   - specs/models/process/gas_dispersion.toml
 //!   - specs/models/process/gas_scrubber.toml
 //!   - specs/models/process/gaussian_plume.toml
 //!   - specs/models/process/gibbs_reactor.toml
 //!   - specs/models/process/hazardous_area.toml
+//!   - specs/models/process/hazop_consequence_population.toml
+//!   - specs/models/process/hazop_template.toml
 //!   - specs/models/process/heat_exchanger.toml
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
@@ -40,6 +43,7 @@
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
 //!   - specs/models/process/lopa.toml
+//!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mixer.toml
@@ -32272,6 +32276,496 @@ pub static FLARE_SPEC: ModelSpec = ModelSpec {
     cases: FLARE_CASES,
 };
 
+static FMEA_WORKSHEET_CHECKS: &[SpecCheck] = &[];
+
+static FMEA_WORKSHEET_CASES: &[TestCase] = &[
+    TestCase {
+        id: "fmea_class_test",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("rpn_threshold", 110.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("highest_rpn", 120.0), ("entry_count", 2.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "entries",
+            &[
+                &[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("Bearing"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("Wear"),
+                    },
+                    RecordField {
+                        name: "effect",
+                        value: FieldValue::Name("Vibration"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("Lub failure"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(6.0),
+                    },
+                    RecordField {
+                        name: "mitigation",
+                        value: FieldValue::Name("VIB monitor"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("Seal"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("Leak"),
+                    },
+                    RecordField {
+                        name: "effect",
+                        value: FieldValue::Name("HC release"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("Aging"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(9.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "mitigation",
+                        value: FieldValue::Name("Online seal monitor"),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[
+            (
+                "ranked_entries",
+                &[
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("Bearing"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("Wear"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(120.0),
+                        },
+                        RecordField {
+                            name: "mitigation",
+                            value: FieldValue::Name("VIB monitor"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("Seal"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("Leak"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(9.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(108.0),
+                        },
+                        RecordField {
+                            name: "mitigation",
+                            value: FieldValue::Name("Online seal monitor"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "entries_above_threshold",
+                &[&[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("Bearing"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("Wear"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(6.0),
+                    },
+                    RecordField {
+                        name: "rpn",
+                        value: FieldValue::Number(120.0),
+                    },
+                    RecordField {
+                        name: "mitigation",
+                        value: FieldValue::Name("VIB monitor"),
+                    },
+                ]],
+            ),
+        ],
+    },
+    TestCase {
+        id: "fmea_tie_and_inclusive_threshold",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("rpn_threshold", 120.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("highest_rpn", 120.0), ("entry_count", 3.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "entries",
+            &[
+                &[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("wear"),
+                    },
+                    RecordField {
+                        name: "effect",
+                        value: FieldValue::Name("vibration"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("lubrication"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(6.0),
+                    },
+                    RecordField {
+                        name: "mitigation",
+                        value: FieldValue::Name("monitor A"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("leak"),
+                    },
+                    RecordField {
+                        name: "effect",
+                        value: FieldValue::Name("release"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("aging"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(6.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "component",
+                        value: FieldValue::Name("C"),
+                    },
+                    RecordField {
+                        name: "failure_mode",
+                        value: FieldValue::Name("plug"),
+                    },
+                    RecordField {
+                        name: "effect",
+                        value: FieldValue::Name("stop"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("debris"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "occurrence",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "detection",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "mitigation",
+                        value: FieldValue::Name("strainer"),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[
+            (
+                "ranked_entries",
+                &[
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("wear"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(120.0),
+                        },
+                        RecordField {
+                            name: "mitigation",
+                            value: FieldValue::Name("monitor A"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("leak"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(120.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("C"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("plug"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(2.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(24.0),
+                        },
+                        RecordField {
+                            name: "mitigation",
+                            value: FieldValue::Name("strainer"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "entries_above_threshold",
+                &[
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("wear"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(120.0),
+                        },
+                        RecordField {
+                            name: "mitigation",
+                            value: FieldValue::Name("monitor A"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "component",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_mode",
+                            value: FieldValue::Name("leak"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "occurrence",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "detection",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "rpn",
+                            value: FieldValue::Number(120.0),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+];
+
+static FMEA_WORKSHEET_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "fmea_rpn",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.fmea_worksheet`.
+pub static FMEA_WORKSHEET_SPEC: ModelSpec = ModelSpec {
+    id: "process.fmea_worksheet",
+    kind: "procedure",
+    algorithm: Some(&FMEA_WORKSHEET_ALGORITHM),
+    checks: FMEA_WORKSHEET_CHECKS,
+    cases: FMEA_WORKSHEET_CASES,
+};
+
 static GAS_DISPERSION_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -35203,6 +35697,1110 @@ pub static HAZARDOUS_AREA_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&HAZARDOUS_AREA_ALGORITHM),
     checks: HAZARDOUS_AREA_CHECKS,
     cases: HAZARDOUS_AREA_CASES,
+};
+
+static HAZOP_CONSEQUENCE_POPULATION_CHECKS: &[SpecCheck] = &[];
+
+static HAZOP_CONSEQUENCE_POPULATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "hp_manual_node",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("mapped_count", 2.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "deviations",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("as_well_as"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("level"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "populated",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "Overpressure of equipment beyond MAWP from blocked outlet, gas blow-by or settle-out",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name(
+                            "Pressure safety valve (PSV) and/or high-integrity pressure protection system (HIPPS)",
+                        ),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name(
+                            "Quantify with ReliefValveSizing, SettleOutPressureAnalyzer, GasBlowbyAnalyzer per API 520 / API 521",
+                        ),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "Pump deadhead — blocked discharge causing temperature rise and shutoff overpressure",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("Minimum-flow recycle line, low-flow trip"),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name("Quantify with PumpDeadheadAnalyzer per API 610"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("as_well_as"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("level"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "hp_compressor_node",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("equipment_type", "Compressor")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("mapped_count", 4.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "deviations",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("reverse"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "populated",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "Loss of forward flow can drive a running compressor into surge or recycle heating",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name(
+                            "Anti-surge recycle, low-flow trip and discharge check valve",
+                        ),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name(
+                            "Quantify with getUtilizationSnapshot (surge constraint) and compressor performance-chart review per API 617",
+                        ),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("reverse"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "Reverse flow can cause compressor backspin, surge and mechanical damage",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name(
+                            "Discharge check valve, anti-surge recycle and reverse-rotation protection",
+                        ),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name(
+                            "Quantify with Compressor performance-chart and transient check-valve review per API 617",
+                        ),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "MORE FLOW on compressor equipment has topology-dependent causes and consequences; facilitator confirmation required",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name(
+                            "Confirm applicable alarms, trips, isolation, relief and operating safeguards in the HAZOP workshop",
+                        ),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name(
+                            "Facilitator confirmation required: review causes, consequence pathways, safeguards and calculation basis per IEC 61882 / CCPS",
+                        ),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name(
+                            "Vacuum collapse of a vessel from cooling, draining or blocked make-up gas",
+                        ),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("Vacuum breaker / vacuum relief valve"),
+                    },
+                    RecordField {
+                        name: "recommendation",
+                        value: FieldValue::Name(
+                            "Quantify with VacuumCollapseAnalyzer per API 521 / ASME BPVC",
+                        ),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+static HAZOP_CONSEQUENCE_POPULATION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "hazop_consequence_catalogue",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.hazop_consequence_population`.
+pub static HAZOP_CONSEQUENCE_POPULATION_SPEC: ModelSpec = ModelSpec {
+    id: "process.hazop_consequence_population",
+    kind: "procedure",
+    algorithm: Some(&HAZOP_CONSEQUENCE_POPULATION_ALGORITHM),
+    checks: HAZOP_CONSEQUENCE_POPULATION_CHECKS,
+    cases: HAZOP_CONSEQUENCE_POPULATION_CASES,
+};
+
+static HAZOP_TEMPLATE_CHECKS: &[SpecCheck] = &[];
+
+static HAZOP_TEMPLATE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "ht_grid_two_params",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("deviation_count", 14.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "grid_parameters",
+            &[
+                &[RecordField {
+                    name: "parameter",
+                    value: FieldValue::Name("flow"),
+                }],
+                &[RecordField {
+                    name: "parameter",
+                    value: FieldValue::Name("pressure"),
+                }],
+            ],
+        )],
+        expected_records: &[(
+            "deviations",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("reverse"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("as_well_as"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("part_of"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("other_than"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("reverse"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("as_well_as"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("part_of"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("other_than"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "ht_grid_and_seed",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("equipment_type", "Separator")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("deviation_count", 12.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "grid_parameters",
+            &[&[RecordField {
+                name: "parameter",
+                value: FieldValue::Name("flow"),
+            }]],
+        )],
+        expected_records: &[(
+            "deviations",
+            &[
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("level"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("level"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("pressure"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("no"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("more"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("less"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("reverse"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("as_well_as"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("part_of"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "guide_word",
+                        value: FieldValue::Name("other_than"),
+                    },
+                    RecordField {
+                        name: "parameter",
+                        value: FieldValue::Name("flow"),
+                    },
+                    RecordField {
+                        name: "cause",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "consequence",
+                        value: FieldValue::Name("TBD"),
+                    },
+                    RecordField {
+                        name: "safeguard",
+                        value: FieldValue::Name("TBD"),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+static HAZOP_TEMPLATE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "hazop_deviation_grid",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.hazop_template`.
+pub static HAZOP_TEMPLATE_SPEC: ModelSpec = ModelSpec {
+    id: "process.hazop_template",
+    kind: "procedure",
+    algorithm: Some(&HAZOP_TEMPLATE_ALGORITHM),
+    checks: HAZOP_TEMPLATE_CHECKS,
+    cases: HAZOP_TEMPLATE_CASES,
 };
 
 static HEAT_EXCHANGER_CHECKS: &[SpecCheck] = &[
@@ -47189,6 +48787,251 @@ pub static LOPA_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&LOPA_ALGORITHM),
     checks: LOPA_CHECKS,
     cases: LOPA_CASES,
+};
+
+static MAH_BOW_TIE_SKELETON_CHECKS: &[SpecCheck] = &[];
+
+static MAH_BOW_TIE_SKELETON_CASES: &[TestCase] = &[TestCase {
+    id: "mah_fire_explosion",
+    kind: "case",
+    property: None,
+    status: "active",
+    skip_reason: None,
+    tolerance: 1e-12,
+    numbers: &[],
+    flags: &[],
+    lists: &[],
+    strings: &[("mah_type", "fire_explosion")],
+    vectors: &[],
+    matrices: &[],
+    expected: &[
+        ("threat_count", 4.0),
+        ("consequence_count", 3.0),
+        ("barrier_count", 6.0),
+    ],
+    expected_vectors: &[],
+    expected_strings: &[],
+    records: &[],
+    expected_records: &[
+        (
+            "threats",
+            &[
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("T1"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Hydrocarbon ignition"),
+                    },
+                    RecordField {
+                        name: "frequency_per_year",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("T2"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Hot work"),
+                    },
+                    RecordField {
+                        name: "frequency_per_year",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("T3"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Electrical fault"),
+                    },
+                    RecordField {
+                        name: "frequency_per_year",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("T4"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Lightning strike"),
+                    },
+                    RecordField {
+                        name: "frequency_per_year",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+            ],
+        ),
+        (
+            "consequences",
+            &[
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("C1"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Personnel injury"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(4.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("C2"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Equipment damage"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(4.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("C3"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Escalation"),
+                    },
+                    RecordField {
+                        name: "severity",
+                        value: FieldValue::Number(4.0),
+                    },
+                ],
+            ],
+        ),
+        (
+            "barriers",
+            &[
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B1"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Hazardous area classification"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B2"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Ignition control"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B3"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Gas detection"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B4"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Fire detection"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B5"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("PFP"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B6"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Blast walls"),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.01),
+                    },
+                ],
+            ],
+        ),
+    ],
+}];
+
+static MAH_BOW_TIE_SKELETON_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "mah_bow_tie_catalogue",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.mah_bow_tie_skeleton`.
+pub static MAH_BOW_TIE_SKELETON_SPEC: ModelSpec = ModelSpec {
+    id: "process.mah_bow_tie_skeleton",
+    kind: "procedure",
+    algorithm: Some(&MAH_BOW_TIE_SKELETON_ALGORITHM),
+    checks: MAH_BOW_TIE_SKELETON_CHECKS,
+    cases: MAH_BOW_TIE_SKELETON_CASES,
 };
 
 static MANIFOLD_CHECKS: &[SpecCheck] = &[
@@ -77044,11 +78887,14 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &FIRE_WATER_COVERAGE_ASSESSMENT_SPEC,
     &FIRE_WATER_DEMAND_SPEC,
     &FLARE_SPEC,
+    &FMEA_WORKSHEET_SPEC,
     &GAS_DISPERSION_SPEC,
     &GAS_SCRUBBER_SPEC,
     &GAUSSIAN_PLUME_SPEC,
     &GIBBS_REACTOR_SPEC,
     &HAZARDOUS_AREA_SPEC,
+    &HAZOP_CONSEQUENCE_POPULATION_SPEC,
+    &HAZOP_TEMPLATE_SPEC,
     &HEAT_EXCHANGER_SPEC,
     &HEATER_SPEC,
     &HEAVY_GAS_DISPERSION_SPEC,
@@ -77056,6 +78902,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &JET_FIRE_SPEC,
     &LEAK_BLOWDOWN_SPEC,
     &LOPA_SPEC,
+    &MAH_BOW_TIE_SKELETON_SPEC,
     &MANIFOLD_SPEC,
     &MAP_TURBO_EXPANDER_COMPRESSOR_SPEC,
     &MIXER_SPEC,

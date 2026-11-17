@@ -1,0 +1,30 @@
+model = "process.mah_bow_tie_skeleton"
+[[cases]]
+id = "mah_fire_explosion"
+tolerance = 1.0e-12
+source = "The fire/explosion category: four threats, three consequences and six barrier classes at the placeholders. From `validation/neqsim/captures/process_mah_bow_tie_skeleton.tsv` (`mah_fire_explosion`)."
+[cases.inputs]
+mah_type = "fire_explosion"
+[cases.expected]
+threats = [
+  { id = "T1", description = "Hydrocarbon ignition", frequency_per_year = 0.001 },
+  { id = "T2", description = "Hot work", frequency_per_year = 0.001 },
+  { id = "T3", description = "Electrical fault", frequency_per_year = 0.001 },
+  { id = "T4", description = "Lightning strike", frequency_per_year = 0.001 },
+]
+consequences = [
+  { id = "C1", description = "Personnel injury", severity = 4.0 },
+  { id = "C2", description = "Equipment damage", severity = 4.0 },
+  { id = "C3", description = "Escalation", severity = 4.0 },
+]
+barriers = [
+  { id = "B1", description = "Hazardous area classification", pfd = 0.01 },
+  { id = "B2", description = "Ignition control", pfd = 0.01 },
+  { id = "B3", description = "Gas detection", pfd = 0.01 },
+  { id = "B4", description = "Fire detection", pfd = 0.01 },
+  { id = "B5", description = "PFP", pfd = 0.01 },
+  { id = "B6", description = "Blast walls", pfd = 0.01 },
+]
+threat_count = 4.0
+consequence_count = 3.0
+barrier_count = 6.0

@@ -6369,6 +6369,35 @@ pub fn flare(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// FMEA worksheet.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (entries, rpn_threshold))]
+#[pyo3(text_signature = "(entries, rpn_threshold)")]
+pub fn fmea_worksheet(
+    py: Python<'_>,
+    entries: Vec<crate::records_gen::FmeaEntry>,
+    rpn_threshold: f64,
+) -> PyResult<crate::transport_gen::PyFmeaWorksheetResult> {
+    let entries_records: Vec<azoth_process::models::fmea_worksheet::FmeaEntry> = entries
+        .into_iter()
+        .map(|row| azoth_process::models::fmea_worksheet::FmeaEntry {
+            component: row.component,
+            failure_mode: row.failure_mode,
+            effect: row.effect,
+            cause: row.cause,
+            severity: row.severity,
+            occurrence: row.occurrence,
+            detection: row.detection,
+            mitigation: row.mitigation,
+        })
+        .collect();
+    azoth_process::models::fmea_worksheet::fmea_worksheet(&entries_records, rpn_threshold)
+        .map(|r| crate::transport_gen::PyFmeaWorksheetResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Gas dispersion screening.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6625,6 +6654,65 @@ pub fn hazardous_area(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// HAZOP consequence population.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (deviations, equipment_type))]
+#[pyo3(text_signature = "(deviations, equipment_type)")]
+pub fn hazop_consequence_population(
+    py: Python<'_>,
+    deviations: Vec<crate::records_gen::HazopDeviationInput>,
+    equipment_type: Option<&str>,
+) -> PyResult<crate::transport_gen::PyHazopConsequencePopulationResult> {
+    let deviations_records: Vec<
+        azoth_process::models::hazop_consequence_population::HazopDeviationInput,
+    > = deviations
+        .into_iter()
+        .map(
+            |row| azoth_process::models::hazop_consequence_population::HazopDeviationInput {
+                guide_word: row.guide_word,
+                parameter: row.parameter,
+                cause: row.cause,
+                consequence: row.consequence,
+                safeguard: row.safeguard,
+                recommendation: row.recommendation,
+            },
+        )
+        .collect();
+    azoth_process::models::hazop_consequence_population::hazop_consequence_population(
+        &deviations_records,
+        equipment_type,
+    )
+    .map(|r| crate::transport_gen::PyHazopConsequencePopulationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// HAZOP template.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (grid_parameters, equipment_type))]
+#[pyo3(text_signature = "(grid_parameters, equipment_type)")]
+pub fn hazop_template(
+    py: Python<'_>,
+    grid_parameters: Vec<crate::records_gen::HazopGridParameter>,
+    equipment_type: Option<&str>,
+) -> PyResult<crate::transport_gen::PyHazopTemplateResult> {
+    let grid_parameters_records: Vec<azoth_process::models::hazop_template::HazopGridParameter> =
+        grid_parameters
+            .into_iter()
+            .map(
+                |row| azoth_process::models::hazop_template::HazopGridParameter {
+                    parameter: row.parameter,
+                },
+            )
+            .collect();
+    azoth_process::models::hazop_template::hazop_template(&grid_parameters_records, equipment_type)
+        .map(|r| crate::transport_gen::PyHazopTemplateResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Heater.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6878,6 +6966,21 @@ pub fn lopa(
     )
     .map(|r| crate::transport_gen::PyLopaResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
+}
+
+/// MAH bow-tie skeleton.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (mah_type))]
+#[pyo3(text_signature = "(mah_type)")]
+pub fn mah_bow_tie_skeleton(
+    py: Python<'_>,
+    mah_type: &str,
+) -> PyResult<crate::transport_gen::PyMahBowTieSkeletonResult> {
+    azoth_process::models::mah_bow_tie_skeleton::mah_bow_tie_skeleton(mah_type)
+        .map(|r| crate::transport_gen::PyMahBowTieSkeletonResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
 }
 
 /// Manifold.

@@ -480,6 +480,10 @@ NON_UNIT_MODELS = {
     "process.psv_fire_sizing": "the API 521 fire-case sizing over scalars, not a unit",
     "process.psv_sizing": "the API 520 relief-orifice arithmetic over scalars, not a unit",
     "process.vce": "the explosion overpressure over scalars, not a unit",
+    "process.hazop_template": "the HAZOP deviation grid over an equipment type, not a unit",
+    "process.fmea_worksheet": "the FMEA RPN ranking over rows, not a unit",
+    "process.hazop_consequence_population": "the consequence-catalogue fill over rows, not a unit",
+    "process.mah_bow_tie_skeleton": "the ISO 17776 MAH catalogue lookup, not a unit",
 }
 
 

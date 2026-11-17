@@ -1,0 +1,44 @@
+model = "process.fmea_worksheet"
+[[cases]]
+id = "fmea_class_test"
+tolerance = 1.0e-12
+source = "`HAZOPFMEATest.fmeaRPNCalculatedAndSorted`: 120 ahead of 108, and a threshold of 110 keeps one. From `validation/neqsim/captures/process_fmea_worksheet.tsv` (`fw_class_test`)."
+[cases.inputs]
+entries = [
+  { component = "Bearing", failure_mode = "Wear", effect = "Vibration", cause = "Lub failure", severity = 5.0, occurrence = 4.0, detection = 6.0, mitigation = "VIB monitor" },
+  { component = "Seal", failure_mode = "Leak", effect = "HC release", cause = "Aging", severity = 9.0, occurrence = 3.0, detection = 4.0, mitigation = "Online seal monitor" },
+]
+rpn_threshold = 110.0
+[cases.expected]
+ranked_entries = [
+  { component = "Bearing", failure_mode = "Wear", severity = 5.0, occurrence = 4.0, detection = 6.0, rpn = 120.0, mitigation = "VIB monitor" },
+  { component = "Seal", failure_mode = "Leak", severity = 9.0, occurrence = 3.0, detection = 4.0, rpn = 108.0, mitigation = "Online seal monitor" },
+]
+entries_above_threshold = [
+  { component = "Bearing", failure_mode = "Wear", severity = 5.0, occurrence = 4.0, detection = 6.0, rpn = 120.0, mitigation = "VIB monitor" },
+]
+highest_rpn = 120.0
+entry_count = 2.0
+[[cases]]
+id = "fmea_tie_and_inclusive_threshold"
+tolerance = 1.0e-12
+source = "Two equal RPNs keep caller order, and a threshold equal to the RPN includes it. From (`fw_tie`)."
+[cases.inputs]
+entries = [
+  { component = "A", failure_mode = "wear", effect = "vibration", cause = "lubrication", severity = 5.0, occurrence = 4.0, detection = 6.0, mitigation = "monitor A" },
+  { component = "B", failure_mode = "leak", effect = "release", cause = "aging", severity = 4.0, occurrence = 5.0, detection = 6.0 },
+  { component = "C", failure_mode = "plug", effect = "stop", cause = "debris", severity = 2.0, occurrence = 3.0, detection = 4.0, mitigation = "strainer" },
+]
+rpn_threshold = 120.0
+[cases.expected]
+ranked_entries = [
+  { component = "A", failure_mode = "wear", severity = 5.0, occurrence = 4.0, detection = 6.0, rpn = 120.0, mitigation = "monitor A" },
+  { component = "B", failure_mode = "leak", severity = 4.0, occurrence = 5.0, detection = 6.0, rpn = 120.0 },
+  { component = "C", failure_mode = "plug", severity = 2.0, occurrence = 3.0, detection = 4.0, rpn = 24.0, mitigation = "strainer" },
+]
+entries_above_threshold = [
+  { component = "A", failure_mode = "wear", severity = 5.0, occurrence = 4.0, detection = 6.0, rpn = 120.0, mitigation = "monitor A" },
+  { component = "B", failure_mode = "leak", severity = 4.0, occurrence = 5.0, detection = 6.0, rpn = 120.0 },
+]
+highest_rpn = 120.0
+entry_count = 3.0

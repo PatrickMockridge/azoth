@@ -267,11 +267,14 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyFireWaterCoverageAssessmentResult>()?;
     m.add_class::<crate::transport_gen::PyFireWaterDemandResult>()?;
     m.add_class::<crate::transport_gen::PyFlareResult>()?;
+    m.add_class::<crate::transport_gen::PyFmeaWorksheetResult>()?;
     m.add_class::<crate::transport_gen::PyGasDispersionResult>()?;
     m.add_class::<crate::transport_gen::PyGasScrubberResult>()?;
     m.add_class::<crate::transport_gen::PyGaussianPlumeResult>()?;
     m.add_class::<crate::transport_gen::PyGibbsReactorResult>()?;
     m.add_class::<crate::transport_gen::PyHazardousAreaResult>()?;
+    m.add_class::<crate::transport_gen::PyHazopConsequencePopulationResult>()?;
+    m.add_class::<crate::transport_gen::PyHazopTemplateResult>()?;
     m.add_class::<crate::transport_gen::PyHeatExchangerResult>()?;
     m.add_class::<crate::transport_gen::PyHeaterResult>()?;
     m.add_class::<crate::transport_gen::PyHeavyGasDispersionResult>()?;
@@ -279,6 +282,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyJetFireResult>()?;
     m.add_class::<crate::transport_gen::PyLeakBlowdownResult>()?;
     m.add_class::<crate::transport_gen::PyLopaResult>()?;
+    m.add_class::<crate::transport_gen::PyMahBowTieSkeletonResult>()?;
     m.add_class::<crate::transport_gen::PyManifoldResult>()?;
     m.add_class::<crate::transport_gen::PyMapTurboExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyMixerResult>()?;
@@ -355,6 +359,9 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyEquilibriumSoundSpeedSample>()?;
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
     m.add_class::<crate::record_outputs_gen::PyFlowlineScaleSegment>()?;
+    m.add_class::<crate::record_outputs_gen::PyFmeaRankedEntry>()?;
+    m.add_class::<crate::record_outputs_gen::PyHazopPopulationRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyHazopTemplateDeviation>()?;
     m.add_class::<crate::record_outputs_gen::PyHeatExchangerMechanicalType>()?;
     m.add_class::<crate::record_outputs_gen::PyHeaterInstrument>()?;
     m.add_class::<crate::record_outputs_gen::PyHeaterMechanicalType>()?;
@@ -366,6 +373,9 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyLeakBlowdownDiagnostic>()?;
     m.add_class::<crate::record_outputs_gen::PyLeakBlowdownPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyLopaLayerContribution>()?;
+    m.add_class::<crate::record_outputs_gen::PyMahBarrier>()?;
+    m.add_class::<crate::record_outputs_gen::PyMahConsequence>()?;
+    m.add_class::<crate::record_outputs_gen::PyMahThreat>()?;
     m.add_class::<crate::record_outputs_gen::PyMineralEquilibriumRow>()?;
     m.add_class::<crate::record_outputs_gen::PyMinimalCutSet>()?;
     m.add_class::<crate::record_outputs_gen::PyNaceIssueRow>()?;
@@ -990,11 +1000,17 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::process::fire_water_demand, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::flare, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::fmea_worksheet, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_dispersion, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_scrubber, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gaussian_plume, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gibbs_reactor, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::hazardous_area, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::hazop_consequence_population,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::hazop_template, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::heat_exchanger, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::heater, m)?)?;
     m.add_function(wrap_pyfunction!(
@@ -1005,6 +1021,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::jet_fire, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::leak_blowdown, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::lopa, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::mah_bow_tie_skeleton,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::manifold, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::process::map_turbo_expander_compressor,

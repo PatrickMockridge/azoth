@@ -625,6 +625,186 @@ impl From<&azoth_eos::results::FlowlineScaleSegment> for PyFlowlineScaleSegment 
     }
 }
 
+/// the entries with `RPN >= rpn_threshold`, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FmeaRankedEntry"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFmeaRankedEntry {
+    /// the component or item analysed, echoed.
+    #[pyo3(get)]
+    pub component: String,
+    /// the failure mode, echoed.
+    #[pyo3(get)]
+    pub failure_mode: String,
+    /// the severity score, echoed.
+    #[pyo3(get)]
+    pub severity: f64,
+    /// the occurrence score, echoed.
+    #[pyo3(get)]
+    pub occurrence: f64,
+    /// the detection score, echoed.
+    #[pyo3(get)]
+    pub detection: f64,
+    /// `S O D`, a whole number in `[1, 1000]`.
+    #[pyo3(get)]
+    pub rpn: f64,
+    /// the recommended mitigation, echoed; absent when it is.
+    #[pyo3(get)]
+    pub mitigation: Option<String>,
+}
+
+#[pymethods]
+impl PyFmeaRankedEntry {
+    fn __repr__(&self) -> String {
+        format!(
+            "FmeaRankedEntry(component={}, failure_mode={}, severity={}, occurrence={}, detection={}, rpn={}, mitigation={:?})",
+            self.component,
+            self.failure_mode,
+            self.severity,
+            self.occurrence,
+            self.detection,
+            self.rpn,
+            self.mitigation
+        )
+    }
+}
+
+impl From<&azoth_process::models::fmea_worksheet::FmeaRankedEntry> for PyFmeaRankedEntry {
+    fn from(row: &azoth_process::models::fmea_worksheet::FmeaRankedEntry) -> Self {
+        Self {
+            component: row.component.clone(),
+            failure_mode: row.failure_mode.clone(),
+            severity: row.severity,
+            occurrence: row.occurrence,
+            detection: row.detection,
+            rpn: row.rpn,
+            mitigation: row.mitigation.clone(),
+        }
+    }
+}
+
+/// the populated rows, one per input row and in its order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "HazopPopulationRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyHazopPopulationRow {
+    /// the guide word.
+    #[pyo3(get)]
+    pub guide_word: String,
+    /// the process parameter.
+    #[pyo3(get)]
+    pub parameter: String,
+    /// the hypothesised cause, echoed.
+    #[pyo3(get)]
+    pub cause: String,
+    /// the consequence, mapped when the source cell was a placeholder.
+    #[pyo3(get)]
+    pub consequence: String,
+    /// the safeguard, mapped when the source cell was a placeholder.
+    #[pyo3(get)]
+    pub safeguard: String,
+    /// the recommendation, cited when the source cell was a placeholder; absent only when the row has no mapping and stated none.
+    #[pyo3(get)]
+    pub recommendation: Option<String>,
+}
+
+#[pymethods]
+impl PyHazopPopulationRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "HazopPopulationRow(guide_word={}, parameter={}, cause={}, consequence={}, safeguard={}, recommendation={:?})",
+            self.guide_word,
+            self.parameter,
+            self.cause,
+            self.consequence,
+            self.safeguard,
+            self.recommendation
+        )
+    }
+}
+
+impl From<&azoth_process::models::hazop_consequence_population::HazopPopulationRow>
+    for PyHazopPopulationRow
+{
+    fn from(row: &azoth_process::models::hazop_consequence_population::HazopPopulationRow) -> Self {
+        Self {
+            guide_word: row.guide_word.as_str().to_string(),
+            parameter: row.parameter.as_str().to_string(),
+            cause: row.cause.clone(),
+            consequence: row.consequence.clone(),
+            safeguard: row.safeguard.clone(),
+            recommendation: row.recommendation.clone(),
+        }
+    }
+}
+
+/// the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "HazopTemplateDeviation"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyHazopTemplateDeviation {
+    /// the guide word.
+    #[pyo3(get)]
+    pub guide_word: String,
+    /// the process parameter.
+    #[pyo3(get)]
+    pub parameter: String,
+    /// the hypothesised cause, `TBD` for a generated row.
+    #[pyo3(get)]
+    pub cause: String,
+    /// the consequence if no protection acts, `TBD` for a generated row.
+    #[pyo3(get)]
+    pub consequence: String,
+    /// the existing safeguard, `TBD` for a generated row.
+    #[pyo3(get)]
+    pub safeguard: String,
+    /// the new recommendation; absent for every generated row, which is the class's null.
+    #[pyo3(get)]
+    pub recommendation: Option<String>,
+}
+
+#[pymethods]
+impl PyHazopTemplateDeviation {
+    fn __repr__(&self) -> String {
+        format!(
+            "HazopTemplateDeviation(guide_word={}, parameter={}, cause={}, consequence={}, safeguard={}, recommendation={:?})",
+            self.guide_word,
+            self.parameter,
+            self.cause,
+            self.consequence,
+            self.safeguard,
+            self.recommendation
+        )
+    }
+}
+
+impl From<&azoth_process::models::hazop_template::HazopTemplateDeviation>
+    for PyHazopTemplateDeviation
+{
+    fn from(row: &azoth_process::models::hazop_template::HazopTemplateDeviation) -> Self {
+        Self {
+            guide_word: row.guide_word.as_str().to_string(),
+            parameter: row.parameter.as_str().to_string(),
+            cause: row.cause.clone(),
+            consequence: row.consequence.clone(),
+            safeguard: row.safeguard.clone(),
+            recommendation: row.recommendation.clone(),
+        }
+    }
+}
+
 /// the five candidates in the class's enum order; empty when the design did not run.
 #[pyclass(
     frozen,
@@ -1569,6 +1749,126 @@ impl From<&azoth_process::models::lopa::LopaLayerContribution> for PyLopaLayerCo
             frequency_after_per_year: row.frequency_after_per_year,
             contribution_per_year: row.contribution_per_year,
             rrf: row.rrf,
+        }
+    }
+}
+
+/// the catalogue's default barrier classes, in their order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MahBarrier"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMahBarrier {
+    /// the row id, `B1` and upwards.
+    #[pyo3(get)]
+    pub id: String,
+    /// the barrier class.
+    #[pyo3(get)]
+    pub description: String,
+    /// the placeholder probability of failure on demand, `0.01`.
+    #[pyo3(get)]
+    pub pfd: f64,
+}
+
+#[pymethods]
+impl PyMahBarrier {
+    fn __repr__(&self) -> String {
+        format!(
+            "MahBarrier(id={}, description={}, pfd={})",
+            self.id, self.description, self.pfd
+        )
+    }
+}
+
+impl From<&azoth_process::models::mah_bow_tie_skeleton::MahBarrier> for PyMahBarrier {
+    fn from(row: &azoth_process::models::mah_bow_tie_skeleton::MahBarrier) -> Self {
+        Self {
+            id: row.id.clone(),
+            description: row.description.clone(),
+            pfd: row.pfd,
+        }
+    }
+}
+
+/// the catalogue's default consequences, in their order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MahConsequence"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMahConsequence {
+    /// the row id, `C1` and upwards.
+    #[pyo3(get)]
+    pub id: String,
+    /// the consequence.
+    #[pyo3(get)]
+    pub description: String,
+    /// the placeholder severity, `4` on the class's 1-to-5 scale.
+    #[pyo3(get)]
+    pub severity: f64,
+}
+
+#[pymethods]
+impl PyMahConsequence {
+    fn __repr__(&self) -> String {
+        format!(
+            "MahConsequence(id={}, description={}, severity={})",
+            self.id, self.description, self.severity
+        )
+    }
+}
+
+impl From<&azoth_process::models::mah_bow_tie_skeleton::MahConsequence> for PyMahConsequence {
+    fn from(row: &azoth_process::models::mah_bow_tie_skeleton::MahConsequence) -> Self {
+        Self {
+            id: row.id.clone(),
+            description: row.description.clone(),
+            severity: row.severity,
+        }
+    }
+}
+
+/// the catalogue's default threats, in their order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MahThreat"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMahThreat {
+    /// the row id, `T1` and upwards.
+    #[pyo3(get)]
+    pub id: String,
+    /// the threat.
+    #[pyo3(get)]
+    pub description: String,
+    /// the placeholder frequency, `0.001` in 1/year; the vocabulary has no year unit, so the value crosses unconverted.
+    #[pyo3(get)]
+    pub frequency_per_year: f64,
+}
+
+#[pymethods]
+impl PyMahThreat {
+    fn __repr__(&self) -> String {
+        format!(
+            "MahThreat(id={}, description={}, frequency_per_year={})",
+            self.id, self.description, self.frequency_per_year
+        )
+    }
+}
+
+impl From<&azoth_process::models::mah_bow_tie_skeleton::MahThreat> for PyMahThreat {
+    fn from(row: &azoth_process::models::mah_bow_tie_skeleton::MahThreat) -> Self {
+        Self {
+            id: row.id.clone(),
+            description: row.description.clone(),
+            frequency_per_year: row.frequency_per_year,
         }
     }
 }

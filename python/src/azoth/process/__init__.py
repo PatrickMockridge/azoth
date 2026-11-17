@@ -46,11 +46,14 @@ from azoth.core.result import (
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
     FlareResult,
+    FmeaWorksheetResult,
     GasDispersionResult,
     GasScrubberResult,
     GaussianPlumeResult,
     GibbsReactorResult,
     HazardousAreaResult,
+    HazopConsequencePopulationResult,
+    HazopTemplateResult,
     HeaterResult,
     HeatExchangerResult,
     HeavyGasDispersionResult,
@@ -58,6 +61,7 @@ from azoth.core.result import (
     JetFireResult,
     LeakBlowdownResult,
     LopaResult,
+    MahBowTieSkeletonResult,
     ManifoldResult,
     MapTurboExpanderResult,
     MixerResult,
@@ -281,6 +285,10 @@ _VESSEL_RUPTURE = "process.vessel_rupture"
 _SEMENOV_SELF_HEATING = "process.semenov_self_heating"
 _SELF_HEATING_INDUCTION = "process.self_heating_induction"
 _BASKET_TEST_REGRESSION = "process.basket_test_regression"
+_HAZOP_TEMPLATE = "process.hazop_template"
+_FMEA_WORKSHEET = "process.fmea_worksheet"
+_HAZOP_CONSEQUENCE_POPULATION = "process.hazop_consequence_population"
+_MAH_BOW_TIE_SKELETON = "process.mah_bow_tie_skeleton"
 
 
 def validate(flowsheet: str, palette_dir: str = "specs/unit_ops") -> list[str]:
@@ -3205,6 +3213,72 @@ def hazardous_area(
         ambient_density=ambient_density,
         safety_factor=safety_factor,
         release_grade=release_grade,
+    )
+
+
+def hazop_template(
+    grid_parameters: list[dict[str, object]],
+    equipment_type: str | None = None,
+) -> HazopTemplateResult:
+    """The deviation grid a HAZOP node starts from.
+
+    **Seven guide words per parameter**, in the class's order, then the equipment-type seed
+    set when a type is stated. Every generated cell is ``TBD`` and the recommendation is
+    absent; an empty parameter list is the class's no-argument grid.
+
+    See :func:`azoth.process.reference.hazop_template`.
+    """
+    return resolve(_HAZOP_TEMPLATE)(  # type: ignore[no-any-return]
+        grid_parameters=grid_parameters,
+        equipment_type=equipment_type,
+    )
+
+
+def fmea_worksheet(
+    entries: list[dict[str, object]],
+    rpn_threshold: float,
+) -> FmeaWorksheetResult:
+    """The RPN ranking and the entries at or above a threshold.
+
+    **`RPN = S O D`**, ranked descending and stable for a tie. The threshold filter is
+    inclusive and keeps caller order; S, O and D are whole numbers in ``[1, 10]``.
+
+    See :func:`azoth.process.reference.fmea_worksheet`.
+    """
+    return resolve(_FMEA_WORKSHEET)(  # type: ignore[no-any-return]
+        entries=entries,
+        rpn_threshold=rpn_threshold,
+    )
+
+
+def hazop_consequence_population(
+    deviations: list[dict[str, object]],
+    equipment_type: str | None = None,
+) -> HazopConsequencePopulationResult:
+    """The consequence, safeguard and calculator citation that fill a node's TBD cells.
+
+    **Eleven generic mappings and six equipment-specific flow mappings.** A flow deviation
+    with no equipment entry gets the neutral fallback, which requires facilitator
+    confirmation; only null, blank or ``TBD`` cells are filled.
+
+    See :func:`azoth.process.reference.hazop_consequence_population`.
+    """
+    return resolve(_HAZOP_CONSEQUENCE_POPULATION)(  # type: ignore[no-any-return]
+        deviations=deviations,
+        equipment_type=equipment_type,
+    )
+
+
+def mah_bow_tie_skeleton(mah_type: str) -> MahBowTieSkeletonResult:
+    """The ISO 17776 threats, consequences and barrier classes for one MAH type.
+
+    **The placeholders are `0.001` a year, a severity of `4` and a PFD of `0.01`.** The
+    skeleton is the input to :func:`bow_tie`, which computes the frequency; this id does not.
+
+    See :func:`azoth.process.reference.mah_bow_tie_skeleton`.
+    """
+    return resolve(_MAH_BOW_TIE_SKELETON)(  # type: ignore[no-any-return]
+        mah_type=mah_type,
     )
 
 

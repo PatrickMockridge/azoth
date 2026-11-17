@@ -57,11 +57,15 @@ pub mod fire_monitor_coverage;
 pub mod fire_water_coverage_assessment;
 pub mod fire_water_demand;
 pub mod flare;
+pub mod fmea_worksheet;
 pub mod gas_dispersion;
 pub mod gas_scrubber;
 pub mod gaussian_plume;
 pub mod gibbs_reactor;
 pub mod hazardous_area;
+pub mod hazid;
+pub mod hazop_consequence_population;
+pub mod hazop_template;
 pub mod heat_exchanger;
 pub mod heater;
 pub mod heavy_gas_dispersion;
@@ -69,6 +73,7 @@ pub mod hem_release;
 pub mod jet_fire;
 pub mod leak_blowdown;
 pub mod lopa;
+pub mod mah_bow_tie_skeleton;
 pub mod manifold;
 pub mod map_turbo_expander_compressor;
 pub mod mixer;
@@ -158,11 +163,20 @@ pub use fire_water_coverage_assessment::{
 };
 pub use fire_water_demand::{FireWaterDemandResult, ProtectedObject, fire_water_demand};
 pub use flare::{FlareResult, flare};
+pub use fmea_worksheet::{FmeaEntry, FmeaRankedEntry, FmeaWorksheetResult, fmea_worksheet};
 pub use gas_dispersion::{GasDispersionResult, gas_dispersion};
 pub use gas_scrubber::{GasScrubberResult, gas_scrubber};
 pub use gaussian_plume::{GaussianPlumeResult, gaussian_plume};
 pub use gibbs_reactor::{GibbsReactorResult, gibbs_reactor};
 pub use hazardous_area::{HazardousAreaResult, hazardous_area};
+pub use hazid::{HazopGuideWord, HazopParameter};
+pub use hazop_consequence_population::{
+    HazopConsequencePopulationResult, HazopDeviationInput, HazopPopulationRow,
+    hazop_consequence_population,
+};
+pub use hazop_template::{
+    HazopGridParameter, HazopTemplateDeviation, HazopTemplateResult, hazop_template,
+};
 pub use heat_exchanger::{HeatExchangerResult, heat_exchanger};
 pub use heater::{HeaterResult, heater};
 pub use heavy_gas_dispersion::{HeavyGasDispersionResult, heavy_gas_dispersion};
@@ -171,6 +185,9 @@ pub use jet_fire::{JetFireResult, jet_fire};
 pub use leak_blowdown::{LeakBlowdownResult, leak_blowdown};
 pub use lopa::{
     LopaLayerContribution, LopaProtectionLayer, LopaResult, Sts0131PressureCategory, lopa,
+};
+pub use mah_bow_tie_skeleton::{
+    MahBarrier, MahBowTieSkeletonResult, MahConsequence, MahThreat, mah_bow_tie_skeleton,
 };
 pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};

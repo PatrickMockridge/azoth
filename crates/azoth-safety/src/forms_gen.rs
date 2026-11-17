@@ -1666,6 +1666,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.fmea_worksheet",
+        name: "FMEA worksheet",
+        family: "hazid",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.gas_dispersion",
         name: "Gas dispersion screening",
         family: "dispersion",
@@ -2147,6 +2159,30 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.hazop_consequence_population",
+        name: "HAZOP consequence population",
+        family: "hazid",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.hazop_template",
+        name: "HAZOP template",
+        family: "hazid",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.heavy_gas_dispersion",
         name: "Heavy-gas dispersion",
         family: "dispersion",
@@ -2551,6 +2587,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         native: false,
         refusal: Some(
             "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.mah_bow_tie_skeleton",
+        name: "MAH bow-tie skeleton",
+        family: "hazid",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation returns a table of rows, which this workspace does not yet draw",
         ),
         form: None,
     },

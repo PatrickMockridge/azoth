@@ -2687,3 +2687,71 @@ The four-point fit recovers E = 109999.99971 J/mol, P = 5.0000023e13 W/m3 and
 `r^2 = 0.99999999999994`; without a conductivity P is `NaN` with the class's warning; a
 two-point fit is exact with `r^2 = 1.0` and the recommendation warning. Fewer than two
 points and equal critical temperatures are refused with the class's messages.
+
+## The HAZID worksheets
+
+`process_hazop_template.tsv` is `HAZOPTemplate.generateGrid` over two parameters, one
+parameter and none, the manual row from the class test, and the seed table
+`fromProcessSystem` applies, read off a flowsheet with one unit of each branch (a Stream,
+a ThrottlingValve, a Separator, a Compressor, a Cooler, a Pump and a PipeBeggsAndBrills).
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe hazop_template \
+  > captures/process_hazop_template.tsv
+```
+
+The grid runs **parameter by parameter, and inside each parameter the seven guide words in
+enum order**: NO, MORE, LESS, REVERSE, AS_WELL_AS, PART_OF, OTHER_THAN. Two parameters give
+fourteen rows; no parameters give an empty worksheet; every generated cell is `TBD` and the
+recommendation is absent. The seed table is one row set per equipment branch - separator or
+scrubber (five rows), compressor or expander (four), pump (three), valve (three), the
+heat-exchanger words (three), pipe or pipeline (three), and everything else, including a
+Stream, the four-row default. The match is a lower-case substring test in that order. The
+last block seeds the separator and then appends the FLOW grid - **the seed rows first**,
+which is the one order the class's own API produces.
+
+`process_fmea_worksheet.tsv` is `FMEAWorksheet` on the class test's two entries, a tie, a
+threshold equal to an RPN, an empty worksheet and the S/O/D refusals.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe fmea_worksheet \
+  > captures/process_fmea_worksheet.tsv
+```
+
+`RPN = S O D`: the class test ranks 120 ahead of 108 and a threshold of 110 keeps one. **Two
+entries with the same RPN keep caller order** - `Collections.sort` is stable - and a
+threshold equal to an RPN includes it. S, O or D outside `[1, 10]` is refused with
+`S, O, D must each be in [1, 10]`.
+
+`process_hazop_consequence_population.tsv` is `HazopConsequenceAutoPopulator`: the whole
+catalogue, every equipment category against every flow guide word, a non-flow fallback, the
+manual lookup, and six populated nodes (a manual node, a compressor, a separator, a valve, a
+stream, a preserved row) plus an empty node.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe hazop_consequence_population \
+  > captures/process_hazop_consequence_population.tsv
+```
+
+There are **eleven generic mappings and six equipment-specific ones**, seventeen in the
+catalogue. A flow deviation with no equipment entry receives the neutral fallback - `"<GUIDE>
+FLOW on <category> equipment has topology-dependent causes and consequences; facilitator
+confirmation required"` - and its recommendation begins `Facilitator confirmation required:`;
+a non-flow deviation falls back to the generic table. Only null, blank or `TBD` cells are
+filled: a row with existing text is copied unchanged. The equipment category is a lower-case
+substring test in the order stream, valve, pump, compressor or expander, separator or
+scrubber, the heat-exchanger words, pipe, else other.
+
+`process_mah_bow_tie_skeleton.tsv` is `MahBowTieBuilder.build` over all eleven ISO 17776 MAH
+types, with the null-type refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe mah_bow_tie_skeleton \
+  > captures/process_mah_bow_tie_skeleton.tsv
+```
+
+Each type carries its default threats, consequences and barrier classes with ids `T1...`,
+`C1...` and `B1...`, a threat frequency of `0.001` per year, a consequence severity of `4`
+and a barrier PFD of `0.01`. The counts run from two to five threats, two to four
+consequences and three to eight barriers. The skeleton is the input to `process.bow_tie`;
+it does not compute the risk.

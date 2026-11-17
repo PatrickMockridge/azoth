@@ -1,0 +1,88 @@
+id = "process.hazop_consequence_population"
+name = "HAZOP consequence population"
+kind = "procedure"
+assumptions = [
+    "**the catalogue is eleven generic mappings and six equipment-specific flow mappings**; a manual node, one with no equipment type or a blank one, reads the generic table only.",
+    "**the equipment category is a lower-case substring test in the class's order**: stream, valve, pump, compressor or expander, separator or scrubber, the heat-exchanger words, pipe, else other.",
+    "**a deviation on categorised equipment takes its equipment-specific entry when one exists; otherwise a flow deviation takes the neutral fallback and a non-flow deviation the generic entry.**",
+    "**the neutral fallback reads `<GUIDE> FLOW on <category> equipment has topology-dependent causes and consequences; facilitator confirmation required`**, with `IEC 61882 / CCPS` as its standard and the class's review text as its calculator and safeguard.",
+    "**only a null, blank or `TBD` cell is filled**, trimmed and case-insensitive; a cell with content is preserved, and the cause is always copied unchanged.",
+    "**the recommendation is `Quantify with <calculator> per <standard>`**, or `Facilitator confirmation required: ... per <standard>` for a neutral fallback; a row with no mapping is copied unchanged and does not count as mapped.",
+    "**`quantify` reads a solved flowsheet's outlet temperature** and compares it with a per-unit-resolved limit (default 150 degC discharge, -46 degC MDMT), which the workspace has no flowsheet seam to reach. `report` and `toJson` are presentation.",
+]
+references = [
+    "IEC 61882:2016. Hazard and operability studies (HAZOP studies) - Application guide.",
+    "API 521. Pressure-relieving and Depressuring Systems. API 520. Sizing, Selection, and Installation of Pressure-relieving Devices.",
+    "CCPS (2008). Guidelines for Hazard Evaluation Procedures, 3rd Ed.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/hazid/HazopConsequenceAutoPopulator.java` is the port source.",
+    "`validation/neqsim/captures/process_hazop_consequence_population.tsv` - the whole catalogue, every category against every flow guide word, the non-flow fallback, a manual node, six populated nodes and an empty node.",
+]
+[source]
+standard = "NeqSim process/safety/hazid/HazopConsequenceAutoPopulator.java"
+edition = "Its `mappingFor`, the two catalogues, the neutral flow fallback, `populate` and the two cell-fill rules."
+[algorithm]
+scheme = "hazop_consequence_catalogue"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.deviations]
+type = "record_list"
+row_type = "HazopDeviationInput"
+description = "the deviation rows in caller order; one output row per input row. An empty list is a state the class answers.\n"
+[inputs.deviations.fields.guide_word]
+type = "enum"
+values = ["no", "more", "less", "reverse", "as_well_as", "part_of", "other_than"]
+description = "the guide word.\n"
+[inputs.deviations.fields.parameter]
+type = "enum"
+values = ["flow", "pressure", "temperature", "level", "composition", "reaction"]
+description = "the process parameter.\n"
+[inputs.deviations.fields.cause]
+type = "string"
+description = "the hypothesised cause, copied unchanged.\n"
+[inputs.deviations.fields.consequence]
+type = "string"
+description = "the consequence cell, filled only when null, blank or `TBD`.\n"
+[inputs.deviations.fields.safeguard]
+type = "string"
+description = "the safeguard cell, filled only when null, blank or `TBD`.\n"
+[inputs.deviations.fields.recommendation]
+type = "string"
+optional = true
+description = "the recommendation cell, filled only when null, blank or `TBD`.\n"
+[inputs.equipment_type]
+type = "string"
+optional = true
+description = "the unit's simple class name or category, matched by lower-case substring. **Absent or blank is a manual, equipment-neutral node**, which reads the generic table only.\n"
+[outputs]
+[outputs.populated]
+type = "record_list"
+description = "the populated rows, one per input row and in its order.\n"
+[outputs.populated.fields.guide_word]
+type = "enum"
+values = ["no", "more", "less", "reverse", "as_well_as", "part_of", "other_than"]
+description = "the guide word.\n"
+[outputs.populated.fields.parameter]
+type = "enum"
+values = ["flow", "pressure", "temperature", "level", "composition", "reaction"]
+description = "the process parameter.\n"
+[outputs.populated.fields.cause]
+type = "string"
+description = "the hypothesised cause, echoed.\n"
+[outputs.populated.fields.consequence]
+type = "string"
+description = "the consequence, mapped when the source cell was a placeholder.\n"
+[outputs.populated.fields.safeguard]
+type = "string"
+description = "the safeguard, mapped when the source cell was a placeholder.\n"
+[outputs.populated.fields.recommendation]
+type = "string"
+optional = true
+description = "the recommendation, cited when the source cell was a placeholder; absent only when the row has no mapping and stated none.\n"
+[outputs.mapped_count]
+unit = "dimensionless"
+description = "the number of rows a catalogue mapping was found for, the neutral fallback included.\n"
+[implementations]
+python = "azoth.process.hazop_consequence_population"
+rust = "azoth_process::hazop_consequence_population"

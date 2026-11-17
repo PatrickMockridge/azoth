@@ -508,6 +508,33 @@ class ProtectedObject(TypedDict):
     surface_area: float
     application_rate: float
 
+class FmeaEntry(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    component: str
+    failure_mode: str
+    effect: str
+    cause: str
+    severity: float
+    occurrence: float
+    detection: float
+    mitigation: str | None
+
+class HazopDeviationInput(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    guide_word: str
+    parameter: str
+    cause: str
+    consequence: str
+    safeguard: str
+    recommendation: str | None
+
+class HazopGridParameter(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    parameter: str
+
 class LopaProtectionLayer(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -901,6 +928,40 @@ class MinimalCutSet:
     cardinality: float
 
 @final
+class FmeaRankedEntry:
+    """the entries with `RPN >= rpn_threshold`, in caller order."""
+
+    component: str
+    failure_mode: str
+    severity: float
+    occurrence: float
+    detection: float
+    rpn: float
+    mitigation: str | None
+
+@final
+class HazopPopulationRow:
+    """the populated rows, one per input row and in its order."""
+
+    guide_word: str
+    parameter: str
+    cause: str
+    consequence: str
+    safeguard: str
+    recommendation: str | None
+
+@final
+class HazopTemplateDeviation:
+    """the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order."""
+
+    guide_word: str
+    parameter: str
+    cause: str
+    consequence: str
+    safeguard: str
+    recommendation: str | None
+
+@final
 class HeatExchangerMechanicalType:
     """the five candidates in the class's enum order; empty when the design did not run."""
 
@@ -1010,6 +1071,30 @@ class LopaLayerContribution:
     frequency_after_per_year: float
     contribution_per_year: float
     rrf: float | None
+
+@final
+class MahThreat:
+    """the catalogue's default threats, in their order."""
+
+    id: str
+    description: str
+    frequency_per_year: float
+
+@final
+class MahConsequence:
+    """the catalogue's default consequences, in their order."""
+
+    id: str
+    description: str
+    severity: float
+
+@final
+class MahBarrier:
+    """the catalogue's default barrier classes, in their order."""
+
+    id: str
+    description: str
+    pfd: float
 
 @final
 class PipeFireRupturePoint:
@@ -3555,6 +3640,14 @@ class FlareResult:
     warnings: list[Warning]
 
 @final
+class FmeaWorksheetResult:
+    ranked_entries: list[FmeaRankedEntry]
+    entries_above_threshold: list[FmeaRankedEntry]
+    highest_rpn: float | None
+    entry_count: float
+    warnings: list[Warning]
+
+@final
 class GasDispersionResult:
     selected_model: str
     mass_release_rate: Qty
@@ -3676,6 +3769,18 @@ class HazardousAreaResult:
     hazardous_distance: Qty
     release_grade: str
     zone_classification: str
+    warnings: list[Warning]
+
+@final
+class HazopConsequencePopulationResult:
+    populated: list[HazopPopulationRow]
+    mapped_count: float
+    warnings: list[Warning]
+
+@final
+class HazopTemplateResult:
+    deviations: list[HazopTemplateDeviation]
+    deviation_count: float
     warnings: list[Warning]
 
 @final
@@ -3858,6 +3963,16 @@ class LopaResult:
     layer_contributions: list[LopaLayerContribution]
     sts0131_pressure_category: str | None
     sts0131_target_frequency_per_year: float | None
+    warnings: list[Warning]
+
+@final
+class MahBowTieSkeletonResult:
+    threats: list[MahThreat]
+    consequences: list[MahConsequence]
+    barriers: list[MahBarrier]
+    threat_count: float
+    consequence_count: float
+    barrier_count: float
     warnings: list[Warning]
 
 @final
@@ -7370,6 +7485,7 @@ def flare(
     design_mass_flow_capacity: float | None = None,
     design_molar_flow_capacity: float | None = None,
 ) -> FlareResult: ...
+def fmea_worksheet(entries: list[FmeaEntry], rpn_threshold: float) -> FmeaWorksheetResult: ...
 def gas_dispersion(
     components: list[str],
     composition: list[float],
@@ -7463,6 +7579,14 @@ def hazardous_area(
     safety_factor: float | None = None,
     release_grade: str | None = None,
 ) -> HazardousAreaResult: ...
+def hazop_consequence_population(
+    deviations: list[HazopDeviationInput],
+    equipment_type: str | None = None,
+) -> HazopConsequencePopulationResult: ...
+def hazop_template(
+    grid_parameters: list[HazopGridParameter],
+    equipment_type: str | None = None,
+) -> HazopTemplateResult: ...
 def heat_exchanger(
     hot_components: list[str],
     cold_components: list[str],
@@ -7606,6 +7730,7 @@ def lopa(
     design_pressure: float | None = None,
     test_pressure: float | None = None,
 ) -> LopaResult: ...
+def mah_bow_tie_skeleton(mah_type: str) -> MahBowTieSkeletonResult: ...
 def manifold(
     components: list[str],
     feed_n: list[float],

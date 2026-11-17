@@ -108,7 +108,9 @@ with the refusal its shape earns rather than given a field it cannot express.
 `process.api537_flare_flame_model` takes a flux table; the four self-heating ids publish the
 class's warning strings as a vector output, and the basket test takes a record list. The four
 rupture models take records too, and their manual pages state the inputs, the range and the
-worked example.
+worked example. The four HAZID worksheets are record-shaped as well: the template returns its
+deviation rows, the FMEA returns the ranked rows, the consequence population returns the
+populated rows, and the MAH skeleton returns its three catalogues.
 
 ## Units
 

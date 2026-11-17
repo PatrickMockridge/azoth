@@ -32,6 +32,9 @@ from azoth.core.record_outputs_gen import (
     EquilibriumSoundSpeedSample,
     EventTreeOutcome,
     FlowlineScaleSegment,
+    FmeaRankedEntry,
+    HazopPopulationRow,
+    HazopTemplateDeviation,
     HeaterInstrument,
     HeaterMechanicalType,
     HeatExchangerMechanicalType,
@@ -43,6 +46,9 @@ from azoth.core.record_outputs_gen import (
     LeakBlowdownDiagnostic,
     LeakBlowdownPoint,
     LopaLayerContribution,
+    MahBarrier,
+    MahConsequence,
+    MahThreat,
     MineralEquilibriumRow,
     MinimalCutSet,
     NaceIssueRow,
@@ -6989,6 +6995,28 @@ class FlareResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class FmeaWorksheetResult(_HasWarnings):
+    """Result of ``process.fmea_worksheet``."""
+
+    CALC_ID: ClassVar[str] = "process.fmea_worksheet"
+
+    #: the entries by descending RPN; caller order for a tie.
+    ranked_entries: tuple[FmeaRankedEntry, ...]
+
+    #: the entries with `RPN >= rpn_threshold`, in caller order.
+    entries_above_threshold: tuple[FmeaRankedEntry, ...]
+
+    #: the largest RPN; absent on an empty worksheet.
+    highest_rpn: float | None
+
+    #: the number of entries.
+    entry_count: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class GasDispersionResult(_HasWarnings):
     """Result of ``process.gas_dispersion``."""
 
@@ -7345,6 +7373,38 @@ class HazardousAreaResult(_HasWarnings):
 
     #: the class's zone label: `Zone 0`, `Zone 1` or `Zone 2`.
     zone_classification: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class HazopConsequencePopulationResult(_HasWarnings):
+    """Result of ``process.hazop_consequence_population``."""
+
+    CALC_ID: ClassVar[str] = "process.hazop_consequence_population"
+
+    #: the populated rows, one per input row and in its order.
+    populated: tuple[HazopPopulationRow, ...]
+
+    #: the number of rows a catalogue mapping was found for, the neutral fallback included.
+    mapped_count: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class HazopTemplateResult(_HasWarnings):
+    """Result of ``process.hazop_template``."""
+
+    CALC_ID: ClassVar[str] = "process.hazop_template"
+
+    #: the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order.
+    deviations: tuple[HazopTemplateDeviation, ...]
+
+    #: the number of rows.
+    deviation_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -7877,6 +7937,34 @@ class LopaResult(_HasWarnings):
 
     #: the target frequency the band asks for, in 1/year; absent with the category.
     sts0131_target_frequency_per_year: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MahBowTieSkeletonResult(_HasWarnings):
+    """Result of ``process.mah_bow_tie_skeleton``."""
+
+    CALC_ID: ClassVar[str] = "process.mah_bow_tie_skeleton"
+
+    #: the catalogue's default threats, in their order.
+    threats: tuple[MahThreat, ...]
+
+    #: the catalogue's default consequences, in their order.
+    consequences: tuple[MahConsequence, ...]
+
+    #: the catalogue's default barrier classes, in their order.
+    barriers: tuple[MahBarrier, ...]
+
+    #: the number of threats.
+    threat_count: float
+
+    #: the number of consequences.
+    consequence_count: float
+
+    #: the number of barrier classes.
+    barrier_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

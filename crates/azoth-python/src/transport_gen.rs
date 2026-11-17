@@ -17,14 +17,16 @@ use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
     PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEventTreeOutcome,
-    PyFlowlineScaleSegment, PyHeatExchangerMechanicalType, PyHeaterInstrument,
-    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
-    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyLopaLayerContribution, PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow,
-    PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow, PyRiskAssessmentRow,
-    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
-    PySelfHeatingTimePoint, PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySubFraction,
-    PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
+    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
+    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIncrementalZoneRow,
+    PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
+    PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
+    PyNaceIssueRow, PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyRiskAssessmentRow, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue, PySterileRadius,
+    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
+    PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -17405,6 +17407,65 @@ impl From<&azoth_process::models::flare::FlareResult> for PyFlareResult {
         }
     }
 }
+/// Result of `process.fmea_worksheet`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FmeaWorksheetResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFmeaWorksheetResult {
+    /// the entries by descending RPN; caller order for a tie.
+    #[pyo3(get)]
+    pub ranked_entries: Vec<PyFmeaRankedEntry>,
+    /// the entries with `RPN >= rpn_threshold`, in caller order.
+    #[pyo3(get)]
+    pub entries_above_threshold: Vec<PyFmeaRankedEntry>,
+    /// the largest RPN; absent on an empty worksheet.
+    #[pyo3(get)]
+    pub highest_rpn: Option<f64>,
+    /// the number of entries.
+    #[pyo3(get)]
+    pub entry_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFmeaWorksheetResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FmeaWorksheetResult(ranked_entries={:?}, entries_above_threshold={:?}, highest_rpn={:?}, entry_count={:?}, {} warning(s))",
+            self.ranked_entries,
+            self.entries_above_threshold,
+            self.highest_rpn,
+            self.entry_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::fmea_worksheet::FmeaWorksheetResult> for PyFmeaWorksheetResult {
+    fn from(r: &azoth_process::models::fmea_worksheet::FmeaWorksheetResult) -> Self {
+        Self {
+            ranked_entries: r
+                .ranked_entries
+                .iter()
+                .map(PyFmeaRankedEntry::from)
+                .collect(),
+            entries_above_threshold: r
+                .entries_above_threshold
+                .iter()
+                .map(PyFmeaRankedEntry::from)
+                .collect(),
+            highest_rpn: r.highest_rpn,
+            entry_count: r.entry_count,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.gas_dispersion`, transported.
 #[pyclass(
     frozen,
@@ -18319,6 +18380,96 @@ impl From<&azoth_process::models::hazardous_area::HazardousAreaResult> for PyHaz
             },
             release_grade: r.release_grade.clone(),
             zone_classification: r.zone_classification.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.hazop_consequence_population`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "HazopConsequencePopulationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyHazopConsequencePopulationResult {
+    /// the populated rows, one per input row and in its order.
+    #[pyo3(get)]
+    pub populated: Vec<PyHazopPopulationRow>,
+    /// the number of rows a catalogue mapping was found for, the neutral fallback included.
+    #[pyo3(get)]
+    pub mapped_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyHazopConsequencePopulationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "HazopConsequencePopulationResult(populated={:?}, mapped_count={:?}, {} warning(s))",
+            self.populated,
+            self.mapped_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::hazop_consequence_population::HazopConsequencePopulationResult>
+    for PyHazopConsequencePopulationResult
+{
+    fn from(
+        r: &azoth_process::models::hazop_consequence_population::HazopConsequencePopulationResult,
+    ) -> Self {
+        Self {
+            populated: r.populated.iter().map(PyHazopPopulationRow::from).collect(),
+            mapped_count: r.mapped_count,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.hazop_template`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "HazopTemplateResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyHazopTemplateResult {
+    /// the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order.
+    #[pyo3(get)]
+    pub deviations: Vec<PyHazopTemplateDeviation>,
+    /// the number of rows.
+    #[pyo3(get)]
+    pub deviation_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyHazopTemplateResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "HazopTemplateResult(deviations={:?}, deviation_count={:?}, {} warning(s))",
+            self.deviations,
+            self.deviation_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::hazop_template::HazopTemplateResult> for PyHazopTemplateResult {
+    fn from(r: &azoth_process::models::hazop_template::HazopTemplateResult) -> Self {
+        Self {
+            deviations: r
+                .deviations
+                .iter()
+                .map(PyHazopTemplateDeviation::from)
+                .collect(),
+            deviation_count: r.deviation_count,
             warnings: transport(&r.warnings),
         }
     }
@@ -19516,6 +19667,69 @@ impl From<&azoth_process::models::lopa::LopaResult> for PyLopaResult {
                 .collect(),
             sts0131_pressure_category: r.sts0131_pressure_category.map(|v| v.as_str().to_string()),
             sts0131_target_frequency_per_year: r.sts0131_target_frequency_per_year,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.mah_bow_tie_skeleton`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MahBowTieSkeletonResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMahBowTieSkeletonResult {
+    /// the catalogue's default threats, in their order.
+    #[pyo3(get)]
+    pub threats: Vec<PyMahThreat>,
+    /// the catalogue's default consequences, in their order.
+    #[pyo3(get)]
+    pub consequences: Vec<PyMahConsequence>,
+    /// the catalogue's default barrier classes, in their order.
+    #[pyo3(get)]
+    pub barriers: Vec<PyMahBarrier>,
+    /// the number of threats.
+    #[pyo3(get)]
+    pub threat_count: f64,
+    /// the number of consequences.
+    #[pyo3(get)]
+    pub consequence_count: f64,
+    /// the number of barrier classes.
+    #[pyo3(get)]
+    pub barrier_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyMahBowTieSkeletonResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "MahBowTieSkeletonResult(threats={:?}, consequences={:?}, barriers={:?}, threat_count={:?}, consequence_count={:?}, barrier_count={:?}, {} warning(s))",
+            self.threats,
+            self.consequences,
+            self.barriers,
+            self.threat_count,
+            self.consequence_count,
+            self.barrier_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult>
+    for PyMahBowTieSkeletonResult
+{
+    fn from(r: &azoth_process::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult) -> Self {
+        Self {
+            threats: r.threats.iter().map(PyMahThreat::from).collect(),
+            consequences: r.consequences.iter().map(PyMahConsequence::from).collect(),
+            barriers: r.barriers.iter().map(PyMahBarrier::from).collect(),
+            threat_count: r.threat_count,
+            consequence_count: r.consequence_count,
+            barrier_count: r.barrier_count,
             warnings: transport(&r.warnings),
         }
     }

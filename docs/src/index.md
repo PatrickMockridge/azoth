@@ -354,11 +354,14 @@ Five sections, and the difference between them is the point:
 - [`process.fire_water_coverage_assessment`](./process/fire_water_coverage_assessment.md) — Fire-water coverage assessment
 - [`process.fire_water_demand`](./process/fire_water_demand.md) — Fire-water demand
 - [`process.flare`](./process/flare.md) — Flare
+- [`process.fmea_worksheet`](./process/fmea_worksheet.md) — FMEA worksheet
 - [`process.gas_dispersion`](./process/gas_dispersion.md) — Gas dispersion screening
 - [`process.gas_scrubber`](./process/gas_scrubber.md) — Gas scrubber
 - [`process.gaussian_plume`](./process/gaussian_plume.md) — Gaussian plume dispersion
 - [`process.gibbs_reactor`](./process/gibbs_reactor.md) — Gibbs reactor
 - [`process.hazardous_area`](./process/hazardous_area.md) — Hazardous-area classification
+- [`process.hazop_consequence_population`](./process/hazop_consequence_population.md) — HAZOP consequence population
+- [`process.hazop_template`](./process/hazop_template.md) — HAZOP template
 - [`process.heat_exchanger`](./process/heat_exchanger.md) — Heat exchanger
 - [`process.heater`](./process/heater.md) — Heater
 - [`process.heavy_gas_dispersion`](./process/heavy_gas_dispersion.md) — Heavy-gas dispersion
@@ -366,6 +369,7 @@ Five sections, and the difference between them is the point:
 - [`process.jet_fire`](./process/jet_fire.md) — Jet fire radiation
 - [`process.leak_blowdown`](./process/leak_blowdown.md) — Vessel leak blowdown
 - [`process.lopa`](./process/lopa.md) — Layer of protection analysis
+- [`process.mah_bow_tie_skeleton`](./process/mah_bow_tie_skeleton.md) — MAH bow-tie skeleton
 - [`process.manifold`](./process/manifold.md) — Manifold
 - [`process.map_turbo_expander_compressor`](./process/map_turbo_expander_compressor.md) — Map turbo-expander compressor
 - [`process.mixer`](./process/mixer.md) — Mixer

@@ -1,0 +1,126 @@
+fw_class_test
+entry_count=2
+ranked0_component=Bearing
+ranked0_failure_mode=Wear
+ranked0_effect=Vibration
+ranked0_cause=Lub failure
+ranked0_severity=5
+ranked0_occurrence=4
+ranked0_detection=6
+ranked0_rpn=120
+ranked0_mitigation=VIB monitor
+ranked1_component=Seal
+ranked1_failure_mode=Leak
+ranked1_effect=HC release
+ranked1_cause=Aging
+ranked1_severity=9
+ranked1_occurrence=3
+ranked1_detection=4
+ranked1_rpn=108
+ranked1_mitigation=Online seal monitor
+threshold=110
+above_count=1
+above0_component=Bearing
+above0_failure_mode=Wear
+above0_effect=Vibration
+above0_cause=Lub failure
+above0_severity=5
+above0_occurrence=4
+above0_detection=6
+above0_rpn=120
+above0_mitigation=VIB monitor
+
+fw_tie
+entry_count=3
+ranked0_component=A
+ranked0_failure_mode=wear
+ranked0_effect=vibration
+ranked0_cause=lubrication
+ranked0_severity=5
+ranked0_occurrence=4
+ranked0_detection=6
+ranked0_rpn=120
+ranked0_mitigation=monitor A
+ranked1_component=B
+ranked1_failure_mode=leak
+ranked1_effect=release
+ranked1_cause=aging
+ranked1_severity=4
+ranked1_occurrence=5
+ranked1_detection=6
+ranked1_rpn=120
+ranked1_mitigation=null
+ranked2_component=C
+ranked2_failure_mode=plug
+ranked2_effect=stop
+ranked2_cause=debris
+ranked2_severity=2
+ranked2_occurrence=3
+ranked2_detection=4
+ranked2_rpn=24
+ranked2_mitigation=strainer
+threshold=120
+above_count=2
+above0_component=A
+above0_failure_mode=wear
+above0_effect=vibration
+above0_cause=lubrication
+above0_severity=5
+above0_occurrence=4
+above0_detection=6
+above0_rpn=120
+above0_mitigation=monitor A
+above1_component=B
+above1_failure_mode=leak
+above1_effect=release
+above1_cause=aging
+above1_severity=4
+above1_occurrence=5
+above1_detection=6
+above1_rpn=120
+above1_mitigation=null
+
+fw_threshold_boundary
+entry_count=1
+ranked0_component=D
+ranked0_failure_mode=crack
+ranked0_effect=burst
+ranked0_cause=fatigue
+ranked0_severity=10
+ranked0_occurrence=10
+ranked0_detection=10
+ranked0_rpn=1000
+ranked0_mitigation=null
+threshold=1000
+above_count=1
+above0_component=D
+above0_failure_mode=crack
+above0_effect=burst
+above0_cause=fatigue
+above0_severity=10
+above0_occurrence=10
+above0_detection=10
+above0_rpn=1000
+above0_mitigation=null
+
+fw_empty
+entry_count=0
+threshold=100
+above_count=0
+
+fw_refuse_severity_zero
+refused=true
+message=S, O, D must each be in [1, 10]
+
+fw_refuse_severity_eleven
+refused=true
+message=S, O, D must each be in [1, 10]
+
+fw_refuse_occurrence_zero
+refused=true
+message=S, O, D must each be in [1, 10]
+
+fw_refuse_detection_eleven
+refused=true
+message=S, O, D must each be in [1, 10]
+

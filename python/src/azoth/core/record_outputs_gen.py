@@ -234,6 +234,78 @@ class FlowlineScaleSegment:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class FmeaRankedEntry:
+    """the entries with `RPN >= rpn_threshold`, in caller order."""
+
+    #: the component or item analysed, echoed.
+    component: str
+
+    #: the failure mode, echoed.
+    failure_mode: str
+
+    #: the severity score, echoed.
+    severity: float
+
+    #: the occurrence score, echoed.
+    occurrence: float
+
+    #: the detection score, echoed.
+    detection: float
+
+    #: `S O D`, a whole number in `[1, 1000]`.
+    rpn: float
+
+    #: the recommended mitigation, echoed; absent when it is.
+    mitigation: str | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class HazopPopulationRow:
+    """the populated rows, one per input row and in its order."""
+
+    #: the guide word.
+    guide_word: str
+
+    #: the process parameter.
+    parameter: str
+
+    #: the hypothesised cause, echoed.
+    cause: str
+
+    #: the consequence, mapped when the source cell was a placeholder.
+    consequence: str
+
+    #: the safeguard, mapped when the source cell was a placeholder.
+    safeguard: str
+
+    #: the recommendation, cited when the source cell was a placeholder; absent only when the row has no mapping and stated none.
+    recommendation: str | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class HazopTemplateDeviation:
+    """the generated rows: the seed rows in the class's order when a type is stated, then the grid rows in caller and guide-word order."""
+
+    #: the guide word.
+    guide_word: str
+
+    #: the process parameter.
+    parameter: str
+
+    #: the hypothesised cause, `TBD` for a generated row.
+    cause: str
+
+    #: the consequence if no protection acts, `TBD` for a generated row.
+    consequence: str
+
+    #: the existing safeguard, `TBD` for a generated row.
+    safeguard: str
+
+    #: the new recommendation; absent for every generated row, which is the class's null.
+    recommendation: str | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class HeatExchangerMechanicalType:
     """the five candidates in the class's enum order; empty when the design did not run."""
 
@@ -574,6 +646,48 @@ class LopaLayerContribution:
 
     #: `1 / PFD`; absent at a zero PFD, where the class answers `+Infinity`.
     rrf: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MahBarrier:
+    """the catalogue's default barrier classes, in their order."""
+
+    #: the row id, `B1` and upwards.
+    id: str
+
+    #: the barrier class.
+    description: str
+
+    #: the placeholder probability of failure on demand, `0.01`.
+    pfd: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MahConsequence:
+    """the catalogue's default consequences, in their order."""
+
+    #: the row id, `C1` and upwards.
+    id: str
+
+    #: the consequence.
+    description: str
+
+    #: the placeholder severity, `4` on the class's 1-to-5 scale.
+    severity: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MahThreat:
+    """the catalogue's default threats, in their order."""
+
+    #: the row id, `T1` and upwards.
+    id: str
+
+    #: the threat.
+    description: str
+
+    #: the placeholder frequency, `0.001` in 1/year; the vocabulary has no year unit, so the value crosses unconverted.
+    frequency_per_year: float
 
 
 @dataclass(frozen=True, slots=True, eq=False)

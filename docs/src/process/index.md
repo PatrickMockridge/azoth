@@ -40,11 +40,14 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.fire_water_coverage_assessment`](./fire_water_coverage_assessment.md) | `closed_form_fire_water_coverage_assessment` | NeqSim process/safety/firewater/FireWaterCoverageAssessment.java |
 | [`process.fire_water_demand`](./fire_water_demand.md) | `closed_form_fire_water_demand` | NeqSim process/safety/firewater/FireWaterDemandCalculator.java |
 | [`process.flare`](./flare.md) | `direct composition` | NeqSim process/equipment/flare/Flare.java |
+| [`process.fmea_worksheet`](./fmea_worksheet.md) | `fmea_rpn` | NeqSim process/safety/hazid/FMEAWorksheet.java |
 | [`process.gas_dispersion`](./gas_dispersion.md) | `pasquill_gifford_or_britter_mcquaid_screening` | NeqSim process/safety/dispersion/GasDispersionAnalyzer.java |
 | [`process.gas_scrubber`](./gas_scrubber.md) | `direct composition` | NeqSim process/equipment/separator/GasScrubber.java |
 | [`process.gaussian_plume`](./gaussian_plume.md) | `briggs_pasquill_gifford_two_image_gaussian` | NeqSim process/safety/dispersion/GaussianPlume.java |
 | [`process.gibbs_reactor`](./gibbs_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/GibbsReactor.java |
 | [`process.hazardous_area`](./hazardous_area.md) | `iec_60079_10_1_jet_axial_decay` | NeqSim process/safety/dispersion/HazardousAreaCalculator.java |
+| [`process.hazop_consequence_population`](./hazop_consequence_population.md) | `hazop_consequence_catalogue` | NeqSim process/safety/hazid/HazopConsequenceAutoPopulator.java |
+| [`process.hazop_template`](./hazop_template.md) | `hazop_deviation_grid` | NeqSim process/safety/hazid/HAZOPTemplate.java |
 | [`process.heat_exchanger`](./heat_exchanger.md) | `direct composition` | NeqSim process/equipment/heatexchanger/HeatExchanger.java |
 | [`process.heater`](./heater.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Heater.java |
 | [`process.heavy_gas_dispersion`](./heavy_gas_dispersion.md) | `britter_mcquaid_continuous_dense_gas` | NeqSim process/safety/dispersion/HeavyGasDispersion.java |
@@ -52,6 +55,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.jet_fire`](./jet_fire.md) | `api521_point_source_wayne_transmissivity` | NeqSim process/safety/fire/JetFireModel.java |
 | [`process.leak_blowdown`](./leak_blowdown.md) | `explicit_euler_isentropic_blowdown` | NeqSim process/safety/release/LeakModel.java |
 | [`process.lopa`](./lopa.md) | `closed_form_lopa` | NeqSim process/safety/risk/sis/LOPAResult.java |
+| [`process.mah_bow_tie_skeleton`](./mah_bow_tie_skeleton.md) | `mah_bow_tie_catalogue` | NeqSim process/safety/hazid/MahBowTieBuilder.java |
 | [`process.manifold`](./manifold.md) | `direct composition` | NeqSim process/equipment/manifold/Manifold.java |
 | [`process.map_turbo_expander_compressor`](./map_turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/MapTurboExpanderCompressor.java |
 | [`process.mixer`](./mixer.md) | `direct composition` | NeqSim process/equipment/mixer/Mixer.java |

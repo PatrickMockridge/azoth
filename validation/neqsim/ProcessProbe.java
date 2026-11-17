@@ -136,6 +136,14 @@
 //       > captures/process_active_fire_protection_screening.tsv
 //     java -cp .:neqsim-118d9af.jar ProcessProbe api537_flare_flame \
 //       > captures/process_api537_flare_flame.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe hazop_template \
+//       > captures/process_hazop_template.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe fmea_worksheet \
+//       > captures/process_fmea_worksheet.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe hazop_consequence_population \
+//       > captures/process_hazop_consequence_population.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe mah_bow_tie_skeleton \
+//       > captures/process_mah_bow_tie_skeleton.tsv
 
 import neqsim.process.equipment.stream.Stream;
 import neqsim.process.equipment.util.AccelerationMethod;
@@ -226,6 +234,12 @@ import neqsim.process.safety.selfheating.SelfHeatingInductionSolver;
 import neqsim.process.safety.selfheating.SelfHeatingTimePoint;
 import neqsim.process.safety.selfheating.SemenovSelfHeatingAnalyzer;
 import neqsim.process.safety.selfheating.SemenovSelfHeatingResult;
+import neqsim.process.safety.hazid.FMEAWorksheet;
+import neqsim.process.safety.hazid.HAZOPTemplate;
+import neqsim.process.safety.hazid.HazopConsequenceAutoPopulator;
+import neqsim.process.safety.hazid.HazopConsequenceMapping;
+import neqsim.process.safety.hazid.MahBowTieBuilder;
+import neqsim.process.safety.hazid.MahType;
 import neqsim.process.util.fire.ReliefValveSizing;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -501,6 +515,18 @@ public class ProcessProbe {
         break;
       case "basket_test_regression":
         basketTestRegressionRows();
+        break;
+      case "hazop_template":
+        hazopTemplateRows();
+        break;
+      case "fmea_worksheet":
+        fmeaWorksheetRows();
+        break;
+      case "hazop_consequence_population":
+        hazopConsequencePopulationRows();
+        break;
+      case "mah_bow_tie_skeleton":
+        mahBowTieSkeletonRows();
         break;
       case "pipe_fire_rupture":
         pipeFireRuptureRows();
@@ -16402,6 +16428,368 @@ public class ProcessProbe {
           .addPoint(SelfHeatingGeometry.CUBE, 0.1, "m", 150.0, "C").regress();
       System.out.println("refused=false");
     } catch (IllegalStateException ex) {
+      System.out.println("refused=true");
+      System.out.println("message=" + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void hazopTemplateRows() {
+    // `HAZOPFMEATest.hazopGridGeneratesAllCombinations`: 7 guide words x 2 parameters.
+    hazopGridRow("ht_grid_two_params", new HAZOPTemplate.Parameter[] {
+        HAZOPTemplate.Parameter.FLOW, HAZOPTemplate.Parameter.PRESSURE});
+    // One parameter, for the guide-word order.
+    hazopGridRow("ht_grid_flow", new HAZOPTemplate.Parameter[] {HAZOPTemplate.Parameter.FLOW});
+    // `generateGrid()` with no parameters is a state the class answers.
+    hazopGridRow("ht_grid_empty", new HAZOPTemplate.Parameter[] {});
+
+    // `HAZOPFMEATest.hazopDocumentationPatternAddsDeviationAndReports`: the manual row.
+    HAZOPTemplate manual = new HAZOPTemplate("Node-1", "Pump P-101 inlet");
+    manual.addDeviation(HAZOPTemplate.GuideWord.MORE, HAZOPTemplate.Parameter.FLOW,
+        "Upstream pump runaway", "Liquid carry-over to flare KO drum",
+        "FT-101 high-flow alarm; BDV on overpressure", "Add HIPPS interlock");
+    System.out.println("ht_manual_row");
+    System.out.println("deviation_count=" + manual.getDeviations().size());
+    printHazopDeviation("deviation0_", manual.getDeviations().get(0));
+    System.out.println();
+
+    hazopSeedRows();
+  }
+
+  static void hazopGridRow(String label, HAZOPTemplate.Parameter[] parameters) {
+    HAZOPTemplate node = new HAZOPTemplate("node", "design intent");
+    node.generateGrid(parameters);
+    System.out.println(label);
+    System.out.println("deviation_count=" + node.getDeviations().size());
+    for (int i = 0; i < node.getDeviations().size(); i++) {
+      printHazopDeviation("deviation" + i + "_", node.getDeviations().get(i));
+    }
+    System.out.println();
+  }
+
+  static void printHazopDeviation(String prefix, HAZOPTemplate.HAZOPDeviation deviation) {
+    System.out.println(prefix + "guide_word="
+        + deviation.guideWord.name().toLowerCase(java.util.Locale.ROOT));
+    System.out.println(prefix + "parameter="
+        + deviation.parameter.name().toLowerCase(java.util.Locale.ROOT));
+    System.out.println(prefix + "cause=" + deviation.cause);
+    System.out.println(prefix + "consequence=" + deviation.consequence);
+    System.out.println(prefix + "safeguard=" + deviation.safeguard);
+    System.out.println(
+        prefix + "recommendation=" + (deviation.recommendation == null ? "null" : deviation.recommendation));
+  }
+
+  static void hazopSeedRows() {
+    // `HAZOPFromProcessSystemTest`'s flowsheet plus a pump on the liquid leg and a pipe.
+    SystemInterface fluid = new SystemSrkEos(298.15, 60.0);
+    fluid.addComponent("methane", 0.9);
+    fluid.addComponent("ethane", 0.1);
+    fluid.setMixingRule("classic");
+
+    Stream feed = new Stream("feed", fluid);
+    feed.setFlowRate(100.0, "kg/hr");
+    feed.setTemperature(25.0, "C");
+    feed.setPressure(60.0, "bara");
+    neqsim.process.equipment.valve.ThrottlingValve valve =
+        new neqsim.process.equipment.valve.ThrottlingValve("inlet-valve", feed);
+    valve.setOutletPressure(50.0);
+    neqsim.process.equipment.separator.Separator separator =
+        new neqsim.process.equipment.separator.Separator("hp-separator", valve.getOutletStream());
+    neqsim.process.equipment.compressor.Compressor compressor =
+        new neqsim.process.equipment.compressor.Compressor("export-compressor",
+            separator.getGasOutStream());
+    compressor.setOutletPressure(120.0);
+    neqsim.process.equipment.heatexchanger.Cooler cooler =
+        new neqsim.process.equipment.heatexchanger.Cooler("export-cooler",
+            compressor.getOutletStream());
+    cooler.setOutletTemperature(313.15);
+    neqsim.process.equipment.pump.Pump pump =
+        new neqsim.process.equipment.pump.Pump("feed-pump", separator.getLiquidOutStream());
+    neqsim.process.equipment.pipeline.PipeBeggsAndBrills pipe =
+        new neqsim.process.equipment.pipeline.PipeBeggsAndBrills("export-pipe",
+            cooler.getOutletStream());
+    pipe.setDiameter(0.2);
+    pipe.setLength(10.0);
+
+    ProcessSystem process = new ProcessSystem();
+    process.add(feed);
+    process.add(valve);
+    process.add(separator);
+    process.add(compressor);
+    process.add(cooler);
+    process.add(pump);
+    process.add(pipe);
+
+    List<HAZOPTemplate> nodes = HAZOPTemplate.fromProcessSystem(process);
+    for (HAZOPTemplate node : nodes) {
+      String type = node.getEquipmentType();
+      System.out.println("ht_seed_" + type.toLowerCase(java.util.Locale.ROOT));
+      System.out.println("equipment_type=" + type);
+      System.out.println("deviation_count=" + node.getDeviations().size());
+      for (int i = 0; i < node.getDeviations().size(); i++) {
+        printHazopDeviation("deviation" + i + "_", node.getDeviations().get(i));
+      }
+      System.out.println();
+    }
+
+    // The one order the class's own API produces for both arms: the node is seeded by
+    // `fromProcessSystem`, then the caller appends a grid.
+    for (HAZOPTemplate node : nodes) {
+      if ("Separator".equals(node.getEquipmentType())) {
+        node.generateGrid(HAZOPTemplate.Parameter.FLOW);
+        System.out.println("ht_seed_separator_then_grid");
+        System.out.println("equipment_type=Separator");
+        System.out.println("deviation_count=" + node.getDeviations().size());
+        for (int i = 0; i < node.getDeviations().size(); i++) {
+          printHazopDeviation("deviation" + i + "_", node.getDeviations().get(i));
+        }
+        System.out.println();
+        break;
+      }
+    }
+  }
+
+  static void fmeaWorksheetRows() {
+    // `HAZOPFMEATest.fmeaRPNCalculatedAndSorted`.
+    FMEAWorksheet classTest = new FMEAWorksheet("Compressor K-100");
+    classTest.addEntry("Bearing", "Wear", "Vibration", "Lub failure", 5, 4, 6, "VIB monitor");
+    classTest.addEntry("Seal", "Leak", "HC release", "Aging", 9, 3, 4, "Online seal monitor");
+    printFmea("fw_class_test", classTest, 110);
+
+    // Two equal RPNs: `Collections.sort` is stable, so caller order survives.
+    FMEAWorksheet tie = new FMEAWorksheet("Tie");
+    tie.addEntry("A", "wear", "vibration", "lubrication", 5, 4, 6, "monitor A");
+    tie.addEntry("B", "leak", "release", "aging", 4, 5, 6, null);
+    tie.addEntry("C", "plug", "stop", "debris", 2, 3, 4, "strainer");
+    printFmea("fw_tie", tie, 120);
+
+    // A threshold equal to an RPN is inclusive.
+    FMEAWorksheet boundary = new FMEAWorksheet("Boundary");
+    boundary.addEntry("D", "crack", "burst", "fatigue", 10, 10, 10, null);
+    printFmea("fw_threshold_boundary", boundary, 1000);
+
+    // An empty worksheet is a state the class answers.
+    printFmea("fw_empty", new FMEAWorksheet("Empty"), 100);
+
+    fmeaRefusal("fw_refuse_severity_zero", 0, 5, 5);
+    fmeaRefusal("fw_refuse_severity_eleven", 11, 5, 5);
+    fmeaRefusal("fw_refuse_occurrence_zero", 5, 0, 5);
+    fmeaRefusal("fw_refuse_detection_eleven", 5, 5, 11);
+  }
+
+  static void printFmea(String label, FMEAWorksheet worksheet, int threshold) {
+    System.out.println(label);
+    List<FMEAWorksheet.FMEAEntry> ranked = worksheet.sortedByRPN();
+    System.out.println("entry_count=" + ranked.size());
+    for (int i = 0; i < ranked.size(); i++) {
+      printFmeaEntry("ranked" + i + "_", ranked.get(i));
+    }
+    System.out.println("threshold=" + threshold);
+    List<FMEAWorksheet.FMEAEntry> above = worksheet.entriesAboveRPN(threshold);
+    System.out.println("above_count=" + above.size());
+    for (int i = 0; i < above.size(); i++) {
+      printFmeaEntry("above" + i + "_", above.get(i));
+    }
+    System.out.println();
+  }
+
+  static void printFmeaEntry(String prefix, FMEAWorksheet.FMEAEntry entry) {
+    System.out.println(prefix + "component=" + entry.component);
+    System.out.println(prefix + "failure_mode=" + entry.failureMode);
+    System.out.println(prefix + "effect=" + entry.effect);
+    System.out.println(prefix + "cause=" + entry.cause);
+    System.out.println(prefix + "severity=" + entry.severity);
+    System.out.println(prefix + "occurrence=" + entry.occurrence);
+    System.out.println(prefix + "detection=" + entry.detection);
+    System.out.println(prefix + "rpn=" + entry.rpn());
+    System.out.println(prefix + "mitigation=" + (entry.mitigation == null ? "null" : entry.mitigation));
+  }
+
+  static void fmeaRefusal(String label, int severity, int occurrence, int detection) {
+    System.out.println(label);
+    try {
+      new FMEAWorksheet("x").addEntry("component", "mode", "effect", "cause", severity, occurrence,
+          detection, null);
+      System.out.println("refused=false");
+    } catch (IllegalArgumentException ex) {
+      System.out.println("refused=true");
+      System.out.println("message=" + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void hazopConsequencePopulationRows() {
+    HazopConsequenceAutoPopulator populator = new HazopConsequenceAutoPopulator();
+
+    // The whole catalogue, generic entries first then the equipment-specific ones.
+    List<HazopConsequenceMapping> catalogue = populator.catalogue();
+    System.out.println("hp_catalogue");
+    System.out.println("mapping_count=" + catalogue.size());
+    for (int i = 0; i < catalogue.size(); i++) {
+      printMapping("mapping" + i + "_", catalogue.get(i));
+    }
+    System.out.println();
+
+    // Every equipment category against every flow guide word: the equipment entry where one exists,
+    // the neutral fallback everywhere else.
+    String[] equipmentTypes = {"Stream", "Valve", "Pump", "Compressor", "Separator", "Cooler",
+        "Pipe", "Reactor"};
+    System.out.println("hp_flow_lookups");
+    for (String equipmentType : equipmentTypes) {
+      for (HAZOPTemplate.GuideWord guideWord : HAZOPTemplate.GuideWord.values()) {
+        HazopConsequenceMapping mapping =
+            populator.mappingFor(guideWord, HAZOPTemplate.Parameter.FLOW, equipmentType);
+        String label =
+            "flow_" + equipmentType.toLowerCase(java.util.Locale.ROOT) + "_"
+                + guideWord.name().toLowerCase(java.util.Locale.ROOT);
+        System.out.println(label + "_found=" + (mapping != null));
+        if (mapping != null) {
+          System.out.println(label + "_category="
+              + mapping.getEquipmentCategory().name().toLowerCase(java.util.Locale.ROOT));
+          System.out.println(label + "_consequence=" + mapping.getConsequenceMechanism());
+          System.out.println(label + "_calculator=" + mapping.getRecommendedCalculator());
+          System.out.println(label + "_facilitator=" + mapping.isFacilitatorConfirmationRequired());
+        }
+      }
+    }
+    System.out.println();
+
+    // A non-flow deviation on equipment without an equipment entry falls back to the generic table.
+    System.out.println("hp_nonflow_fallback");
+    printMapping("hp_nonflow_fallback_",
+        populator.mappingFor(HAZOPTemplate.GuideWord.LESS, HAZOPTemplate.Parameter.PRESSURE,
+            "Compressor"));
+    System.out.println();
+    // A manual, equipment-neutral node keeps the generic table.
+    System.out.println("hp_manual_lookup");
+    printMapping("hp_manual_lookup_",
+        populator.mappingFor(HAZOPTemplate.GuideWord.NO, HAZOPTemplate.Parameter.FLOW, null));
+    System.out.println();
+
+    // Populate a manual node: two mapped cells, one with no mapping.
+    HAZOPTemplate manual = new HAZOPTemplate("manual", "Facilitator-defined design intent");
+    manual.addDeviation(HAZOPTemplate.GuideWord.MORE, HAZOPTemplate.Parameter.PRESSURE, "TBD",
+        "TBD", "TBD", null);
+    manual.addDeviation(HAZOPTemplate.GuideWord.NO, HAZOPTemplate.Parameter.FLOW, "TBD", "TBD",
+        "TBD", null);
+    manual.addDeviation(HAZOPTemplate.GuideWord.AS_WELL_AS, HAZOPTemplate.Parameter.LEVEL, "TBD",
+        "TBD", "TBD", null);
+    printPopulated("hp_populate_manual", populator, manual);
+
+    // A compressor: equipment-specific NO FLOW and REVERSE FLOW, a neutral MORE FLOW, and a generic
+    // LESS PRESSURE.
+    HAZOPTemplate compressor = new HAZOPTemplate("node", "design intent", "Compressor");
+    compressor.addDeviation(HAZOPTemplate.GuideWord.NO, HAZOPTemplate.Parameter.FLOW, "TBD",
+        "TBD", "TBD", null);
+    compressor.addDeviation(HAZOPTemplate.GuideWord.REVERSE, HAZOPTemplate.Parameter.FLOW, "TBD",
+        "TBD", "TBD", null);
+    compressor.addDeviation(HAZOPTemplate.GuideWord.MORE, HAZOPTemplate.Parameter.FLOW, "TBD",
+        "TBD", "TBD", null);
+    compressor.addDeviation(HAZOPTemplate.GuideWord.LESS, HAZOPTemplate.Parameter.PRESSURE, "TBD",
+        "TBD", "TBD", null);
+    printPopulated("hp_populate_compressor", populator, compressor);
+
+    // A separator's NO FLOW is the neutral fallback, not the pump mapping.
+    HAZOPTemplate separator = new HAZOPTemplate("node", "design intent", "Separator");
+    separator.addDeviation(HAZOPTemplate.GuideWord.NO, HAZOPTemplate.Parameter.FLOW, "TBD", "TBD",
+        "TBD", null);
+    printPopulated("hp_populate_separator", populator, separator);
+
+    // A valve's MORE FLOW is an equipment entry; a stream's is another.
+    HAZOPTemplate valve = new HAZOPTemplate("node", "design intent", "ThrottlingValve");
+    valve.addDeviation(HAZOPTemplate.GuideWord.MORE, HAZOPTemplate.Parameter.FLOW, "TBD", "TBD",
+        "TBD", null);
+    printPopulated("hp_populate_valve", populator, valve);
+    HAZOPTemplate stream = new HAZOPTemplate("node", "design intent", "Stream");
+    stream.addDeviation(HAZOPTemplate.GuideWord.MORE, HAZOPTemplate.Parameter.FLOW, "TBD", "TBD",
+        "TBD", null);
+    printPopulated("hp_populate_stream", populator, stream);
+
+    // A pump's NO FLOW is the equipment entry, and a filled cell is preserved.
+    HAZOPTemplate pump = new HAZOPTemplate("node", "design intent", "Pump");
+    pump.addDeviation(HAZOPTemplate.GuideWord.NO, HAZOPTemplate.Parameter.FLOW, "Closed discharge valve",
+        "Custom consequence text", "Existing safeguard", "Existing recommendation");
+    printPopulated("hp_populate_preserved", populator, pump);
+
+    // An empty deviation list is a state the class answers.
+    printPopulated("hp_populate_empty", populator, new HAZOPTemplate("node", "design intent"));
+  }
+
+  static void printMapping(String prefix, HazopConsequenceMapping mapping) {
+    System.out.println(prefix + "found=" + (mapping != null));
+    if (mapping == null) {
+      return;
+    }
+    System.out.println(prefix + "guide_word="
+        + mapping.getGuideWord().name().toLowerCase(java.util.Locale.ROOT));
+    System.out.println(prefix + "parameter="
+        + mapping.getParameter().name().toLowerCase(java.util.Locale.ROOT));
+    System.out.println(prefix + "equipment_category="
+        + mapping.getEquipmentCategory().name().toLowerCase(java.util.Locale.ROOT));
+    System.out.println(prefix + "consequence=" + mapping.getConsequenceMechanism());
+    System.out.println(prefix + "recommended_calculator=" + mapping.getRecommendedCalculator());
+    System.out.println(prefix + "standard_reference=" + mapping.getStandardReference());
+    System.out.println(prefix + "typical_safeguard=" + mapping.getTypicalSafeguard());
+    System.out.println(
+        prefix + "facilitator_confirmation_required=" + mapping.isFacilitatorConfirmationRequired());
+  }
+
+  static void printPopulated(String label, HazopConsequenceAutoPopulator populator,
+      HAZOPTemplate source) {
+    HAZOPTemplate populated = populator.populate(source);
+    int mapped = 0;
+    for (HAZOPTemplate.HAZOPDeviation deviation : source.getDeviations()) {
+      if (populator.mappingFor(deviation.guideWord, deviation.parameter, source.getEquipmentType())
+          != null) {
+        mapped++;
+      }
+    }
+    System.out.println(label);
+    System.out.println(
+        "equipment_type=" + (source.getEquipmentType() == null ? "null" : source.getEquipmentType()));
+    System.out.println("deviation_count=" + populated.getDeviations().size());
+    System.out.println("mapped_count=" + mapped);
+    for (int i = 0; i < populated.getDeviations().size(); i++) {
+      printHazopDeviation("deviation" + i + "_", populated.getDeviations().get(i));
+    }
+    System.out.println();
+  }
+
+  static void mahBowTieSkeletonRows() {
+    for (MahType type : MahType.values()) {
+      String label = "mah_" + type.name().toLowerCase(java.util.Locale.ROOT);
+      BowTieModel model = MahBowTieBuilder.build(type);
+      System.out.println(label);
+      System.out.println("description=" + type.getDescription());
+      System.out.println("threat_count=" + model.getThreats().size());
+      for (int i = 0; i < model.getThreats().size(); i++) {
+        BowTieModel.Threat threat = model.getThreats().get(i);
+        System.out.println("threat" + i + "_id=" + threat.getId());
+        System.out.println("threat" + i + "_description=" + threat.getDescription());
+        System.out.println("threat" + i + "_frequency_per_year=" + threat.getFrequency());
+      }
+      System.out.println("consequence_count=" + model.getConsequences().size());
+      for (int i = 0; i < model.getConsequences().size(); i++) {
+        BowTieModel.Consequence consequence = model.getConsequences().get(i);
+        System.out.println("consequence" + i + "_id=" + consequence.getId());
+        System.out.println("consequence" + i + "_description=" + consequence.getDescription());
+        System.out.println("consequence" + i + "_severity=" + consequence.getSeverity());
+      }
+      System.out.println("barrier_count=" + model.getBarriers().size());
+      for (int i = 0; i < model.getBarriers().size(); i++) {
+        BowTieModel.Barrier barrier = model.getBarriers().get(i);
+        System.out.println("barrier" + i + "_id=" + barrier.getId());
+        System.out.println("barrier" + i + "_description=" + barrier.getDescription());
+        System.out.println("barrier" + i + "_pfd=" + barrier.getPfd());
+      }
+      System.out.println();
+    }
+
+    System.out.println("mah_null_type");
+    try {
+      MahBowTieBuilder.build(null);
+      System.out.println("refused=false");
+    } catch (IllegalArgumentException ex) {
       System.out.println("refused=true");
       System.out.println("message=" + ex.getMessage());
     }

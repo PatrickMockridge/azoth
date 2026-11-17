@@ -28,11 +28,14 @@
 //!   - specs/models/process/fire_water_coverage_assessment.toml
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
+//!   - specs/models/process/fmea_worksheet.toml
 //!   - specs/models/process/gas_dispersion.toml
 //!   - specs/models/process/gas_scrubber.toml
 //!   - specs/models/process/gaussian_plume.toml
 //!   - specs/models/process/gibbs_reactor.toml
 //!   - specs/models/process/hazardous_area.toml
+//!   - specs/models/process/hazop_consequence_population.toml
+//!   - specs/models/process/hazop_template.toml
 //!   - specs/models/process/heat_exchanger.toml
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
@@ -40,6 +43,7 @@
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
 //!   - specs/models/process/lopa.toml
+//!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mixer.toml
