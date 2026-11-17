@@ -3793,6 +3793,18 @@ class FmeaWorksheetResult:
     warnings: list[Warning]
 
 @final
+class GasBlowbyResult:
+    choked: bool
+    critical_pressure_ratio: float
+    actual_pressure_ratio: float
+    blowby_mass_rate: Qty
+    blowby_std_vol_rate: Qty
+    relief_margin: Qty | None
+    relief_adequate: bool
+    verdict: str
+    warnings: list[Warning]
+
+@final
 class GasDispersionResult:
     selected_model: str
     mass_release_rate: Qty
@@ -7673,6 +7685,16 @@ def flare(
     design_molar_flow_capacity: float | None = None,
 ) -> FlareResult: ...
 def fmea_worksheet(entries: list[FmeaEntry], rpn_threshold: float) -> FmeaWorksheetResult: ...
+def gas_blowby(
+    upstream_pressure: float,
+    upstream_temperature: float,
+    downstream_pressure: float,
+    restriction_area: float,
+    specific_heat_ratio: float,
+    molar_mass: float,
+    discharge_coefficient: float | None = None,
+    downstream_relief_capacity: float | None = None,
+) -> GasBlowbyResult: ...
 def gas_dispersion(
     components: list[str],
     composition: list[float],

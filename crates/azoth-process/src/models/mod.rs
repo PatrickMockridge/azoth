@@ -60,6 +60,7 @@ pub mod fire_water_coverage_assessment;
 pub mod fire_water_demand;
 pub mod flare;
 pub mod fmea_worksheet;
+pub mod gas_blowby;
 pub mod gas_dispersion;
 pub mod gas_scrubber;
 pub mod gaussian_plume;
@@ -177,6 +178,7 @@ pub use fire_water_coverage_assessment::{
 pub use fire_water_demand::{FireWaterDemandResult, ProtectedObject, fire_water_demand};
 pub use flare::{FlareResult, flare};
 pub use fmea_worksheet::{FmeaEntry, FmeaRankedEntry, FmeaWorksheetResult, fmea_worksheet};
+pub use gas_blowby::{BlowbyVerdict, GasBlowbyResult, gas_blowby};
 pub use gas_dispersion::{GasDispersionResult, gas_dispersion};
 pub use gas_scrubber::{GasScrubberResult, gas_scrubber};
 pub use gaussian_plume::{GaussianPlumeResult, gaussian_plume};

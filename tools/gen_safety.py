@@ -44,6 +44,7 @@ FAMILY = re.compile(r"process/safety/([A-Za-z0-9_]+)/")
 EXTRA_FAMILIES = {
     "process.psv_sizing": "overpressure",
     "process.psv_fire_sizing": "overpressure",
+    "process.gas_blowby": "equipmentsafety",
 }
 
 #: The ids a scenario can run: every safety model whose inputs and outputs are all scalar,
@@ -56,6 +57,7 @@ NATIVE_SCENARIOS = (
     "process.fire_case_relief",
     "process.fire_monitor_coverage",
     "process.fire_water_coverage_assessment",
+    "process.gas_blowby",
     "process.gaussian_plume",
     "process.hazardous_area",
     "process.heavy_gas_dispersion",
@@ -98,6 +100,7 @@ PURPOSES = {
     "process.fire_case_relief": "The fire-case relief rate from the wetted area or vessel geometry, the heat input and the latent heat.",
     "process.fire_monitor_coverage": "The monitor flow, swept area, wind drift and the effective density against its requirement.",
     "process.fire_water_coverage_assessment": "The coverage gap, flow deficit and the supply adequacy verdict against the required pressure margin.",
+    "process.gas_blowby": "The choked or subcritical blowby rate through an open restriction and whether a stated relief capacity absorbs it.",
     "process.gaussian_plume": "Ground-level concentration at a downwind point and the distance to a target concentration, from a Gaussian plume.",
     "process.hazardous_area": "The notional source diameter, the mass-fraction LFL, the de-rated hazardous distance and the zone.",
     "process.heavy_gas_dispersion": "The signed reduced gravity, the Britter parameter and the distance to a concentration ratio.",

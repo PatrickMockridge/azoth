@@ -205,6 +205,10 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `test_cross_impl` compares them on both results.
         "choked",
         "gas_valve",
+        # `gas_blowby`'s relief verdict, a boolean with no slot in `TestCase`.
+        # `crates/azoth-process/tests/gas_blowby.rs` asserts it against the capture, and
+        # `test_cross_impl` compares it on both results.
+        "relief_adequate",
         # `gas_dispersion`'s two endpoint predicates, booleans with no slot in `TestCase`.
         # `crates/azoth-process/tests/gas_dispersion.rs` asserts them against the capture,
         # and `test_cross_impl` compares them on both results.

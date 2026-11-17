@@ -2776,6 +2776,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 2,
         "tests_skipped": 0,
     },
+    'process.gas_blowby': {
+        "calc_id": 'process.gas_blowby',
+        "name": 'Gas blowby through a restriction',
+        "spec": {'path': 'specs/models/process/gas_blowby.toml', 'sha256': '0753873c56532ae68772fb36c4e4f8b320df315f40522ffa521134f7796f2cf4'},
+        "code": [{'path': 'python/src/azoth/process/reference/gas_blowby.py', 'sha256': 'aad99a1adf3b4ef54671456af56a8d9148f66fe00d97885eb0d3b8be40350a52'}, {'path': 'crates/azoth-process/src/models/gas_blowby.rs', 'sha256': 'c49e0aeb68981afb8c38f75654e9d3253e8df49eccd333405736edcd8a18031e'}],
+        "source": 'NeqSim process/safety/blowby/GasBlowbyAnalyzer.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'process.gas_dispersion': {
         "calc_id": 'process.gas_dispersion',
         "name": 'Gas dispersion screening',

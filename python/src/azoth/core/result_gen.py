@@ -78,6 +78,7 @@ from azoth.core.record_outputs_gen import (
 )
 from azoth.core.result_base import (
     BeggsBrillRegime,
+    BlowbyVerdict,
     CooldownVerdict,
     CorrosionSeverity,
     EmulsionType,
@@ -7062,6 +7063,40 @@ class FmeaWorksheetResult(_HasWarnings):
 
     #: the number of entries.
     entry_count: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class GasBlowbyResult(_HasWarnings):
+    """Result of ``process.gas_blowby``."""
+
+    CALC_ID: ClassVar[str] = "process.gas_blowby"
+
+    #: whether the flow is choked at the stated pressure ratio.
+    choked: bool
+
+    #: `(2/(k+1))^(k/(k-1))`, the pressure ratio at and below which the flow is choked.
+    critical_pressure_ratio: float
+
+    #: `p2/p1`.
+    actual_pressure_ratio: float
+
+    #: the blowby mass rate through the restriction, choked or subcritical.
+    blowby_mass_rate: Q
+
+    #: the same rate as a standard volume flow at 288.15 K and 101325 Pa.
+    blowby_std_vol_rate: Q
+
+    #: `capacity - blowby_mass_rate`; **absent when no capacity is stated**.
+    relief_margin: Q | None
+
+    #: whether the stated capacity is at least the blowby rate; false when no capacity is stated.
+    relief_adequate: bool
+
+    #: the class's verdict: no capacity, adequate, or inadequate.
+    verdict: BlowbyVerdict
 
     #: Caveats.
     warnings: tuple[Warning, ...]

@@ -17579,6 +17579,86 @@ impl From<&azoth_process::models::fmea_worksheet::FmeaWorksheetResult> for PyFme
         }
     }
 }
+/// Result of `process.gas_blowby`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GasBlowbyResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGasBlowbyResult {
+    /// whether the flow is choked at the stated pressure ratio.
+    #[pyo3(get)]
+    pub choked: bool,
+    /// `(2/(k+1))^(k/(k-1))`, the pressure ratio at and below which the flow is choked.
+    #[pyo3(get)]
+    pub critical_pressure_ratio: f64,
+    /// `p2/p1`.
+    #[pyo3(get)]
+    pub actual_pressure_ratio: f64,
+    /// the blowby mass rate through the restriction, choked or subcritical.
+    #[pyo3(get)]
+    pub blowby_mass_rate: PyQty,
+    /// the same rate as a standard volume flow at 288.15 K and 101325 Pa.
+    #[pyo3(get)]
+    pub blowby_std_vol_rate: PyQty,
+    /// `capacity - blowby_mass_rate`; **absent when no capacity is stated**.
+    #[pyo3(get)]
+    pub relief_margin: Option<PyQty>,
+    /// whether the stated capacity is at least the blowby rate; false when no capacity is stated.
+    #[pyo3(get)]
+    pub relief_adequate: bool,
+    /// the class's verdict: no capacity, adequate, or inadequate.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyGasBlowbyResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "GasBlowbyResult(choked={:?}, critical_pressure_ratio={:?}, actual_pressure_ratio={:?}, blowby_mass_rate={:?}, blowby_std_vol_rate={:?}, relief_margin={:?}, relief_adequate={:?}, verdict={:?}, {} warning(s))",
+            self.choked,
+            self.critical_pressure_ratio,
+            self.actual_pressure_ratio,
+            self.blowby_mass_rate,
+            self.blowby_std_vol_rate,
+            self.relief_margin,
+            self.relief_adequate,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::gas_blowby::GasBlowbyResult> for PyGasBlowbyResult {
+    fn from(r: &azoth_process::models::gas_blowby::GasBlowbyResult) -> Self {
+        Self {
+            choked: r.choked,
+            critical_pressure_ratio: r.critical_pressure_ratio,
+            actual_pressure_ratio: r.actual_pressure_ratio,
+            blowby_mass_rate: PyQty {
+                magnitude_si: r.blowby_mass_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            blowby_std_vol_rate: PyQty {
+                magnitude_si: r.blowby_std_vol_rate.value,
+                unit: "m**3/s".to_string(),
+            },
+            relief_margin: r.relief_margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            relief_adequate: r.relief_adequate,
+            verdict: r.verdict.as_str().to_string(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.gas_dispersion`, transported.
 #[pyclass(
     frozen,

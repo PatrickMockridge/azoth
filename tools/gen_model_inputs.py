@@ -442,6 +442,7 @@ NON_UNIT_MODELS = {
     "process.hem_release": "a release source term is a calculation over a fluid, not a unit",
     "process.pfp_demand": "the PFP demand screen over scalars, not a unit",
     "process.fire_case_relief": "the fire-case relief load over scalars, not a unit",
+    "process.gas_blowby": "the choked/subcritical blowby rate over scalars, not a unit",
     "process.blocked_outlet_relief": "the blocked-outlet relief load over a fluid, not a unit",
     "process.control_valve_failure_relief": "the fail-open relief load over a fluid, not a unit",
     "process.check_valve_leak_relief": "the check-valve leak load over a fluid, not a unit",

@@ -43,6 +43,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.fire_water_demand`](./fire_water_demand.md) | `closed_form_fire_water_demand` | NeqSim process/safety/firewater/FireWaterDemandCalculator.java |
 | [`process.flare`](./flare.md) | `direct composition` | NeqSim process/equipment/flare/Flare.java |
 | [`process.fmea_worksheet`](./fmea_worksheet.md) | `fmea_rpn` | NeqSim process/safety/hazid/FMEAWorksheet.java |
+| [`process.gas_blowby`](./gas_blowby.md) | `isentropic_nozzle_blowby` | NeqSim process/safety/blowby/GasBlowbyAnalyzer.java |
 | [`process.gas_dispersion`](./gas_dispersion.md) | `pasquill_gifford_or_britter_mcquaid_screening` | NeqSim process/safety/dispersion/GasDispersionAnalyzer.java |
 | [`process.gas_scrubber`](./gas_scrubber.md) | `direct composition` | NeqSim process/equipment/separator/GasScrubber.java |
 | [`process.gaussian_plume`](./gaussian_plume.md) | `briggs_pasquill_gifford_two_image_gaussian` | NeqSim process/safety/dispersion/GaussianPlume.java |

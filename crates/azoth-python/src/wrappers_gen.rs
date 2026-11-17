@@ -6398,6 +6398,40 @@ pub fn fmea_worksheet(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Gas blowby through a restriction.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (upstream_pressure, upstream_temperature, downstream_pressure, restriction_area, specific_heat_ratio, molar_mass, discharge_coefficient, downstream_relief_capacity))]
+#[pyo3(
+    text_signature = "(upstream_pressure, upstream_temperature, downstream_pressure, restriction_area, specific_heat_ratio, molar_mass, discharge_coefficient, downstream_relief_capacity)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn gas_blowby(
+    py: Python<'_>,
+    upstream_pressure: f64,
+    upstream_temperature: f64,
+    downstream_pressure: f64,
+    restriction_area: f64,
+    specific_heat_ratio: f64,
+    molar_mass: f64,
+    discharge_coefficient: Option<f64>,
+    downstream_relief_capacity: Option<f64>,
+) -> PyResult<crate::transport_gen::PyGasBlowbyResult> {
+    azoth_process::models::gas_blowby::gas_blowby(
+        pascals(upstream_pressure),
+        kelvins(upstream_temperature),
+        pascals(downstream_pressure),
+        square_meters(restriction_area),
+        specific_heat_ratio,
+        kilograms_per_mole(molar_mass),
+        discharge_coefficient,
+        downstream_relief_capacity.map(kilograms_per_second),
+    )
+    .map(|r| crate::transport_gen::PyGasBlowbyResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Gas dispersion screening.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

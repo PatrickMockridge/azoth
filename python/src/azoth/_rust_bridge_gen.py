@@ -35,6 +35,7 @@ from azoth.core.result import (
     BeggsBrillSegmentResult,
     BleveResult,
     BlockedOutletReliefResult,
+    BlowbyVerdict,
     BlowdownPressureProfileResult,
     BoilingHeatTransferResult,
     BowTieResult,
@@ -122,6 +123,7 @@ from azoth.core.result import (
     FullerSchettlerGiddingsDiffusivityResult,
     FurstElectrolyteMod2004PhaseResult,
     FurstElectrolytePhaseResult,
+    GasBlowbyResult,
     GasDispersionResult,
     GasScrubberResult,
     GaussianPlumeResult,
@@ -548,6 +550,7 @@ __all__ = [
     "fuller_schettler_giddings_diffusivity",
     "furst_electrolyte_mod2004_phase",
     "furst_electrolyte_phase",
+    "gas_blowby",
     "gas_dispersion",
     "gas_scrubber",
     "gaussian_plume",
@@ -6691,6 +6694,32 @@ def fmea_worksheet(entries: list[dict[str, object]], rpn_threshold: float) -> Fm
         entries_above_threshold=tuple(FmeaRankedEntry(component=c.component, failure_mode=c.failure_mode, severity=c.severity, occurrence=c.occurrence, detection=c.detection, rpn=c.rpn, mitigation=c.mitigation) for c in result.entries_above_threshold),
         highest_rpn=result.highest_rpn,
         entry_count=result.entry_count,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def gas_blowby(upstream_pressure: Q, upstream_temperature: Q, downstream_pressure: Q, restriction_area: Q, specific_heat_ratio: float, molar_mass: Q, discharge_coefficient: float | None=None, downstream_relief_capacity: Q | None=None) -> GasBlowbyResult:
+    """``process.gas_blowby``, computed in Rust."""
+    spec = _models_gen.model("process.gas_blowby")
+    result = _core.gas_blowby(
+        input_to_si(spec, "upstream_pressure", upstream_pressure),
+        input_to_si(spec, "upstream_temperature", upstream_temperature),
+        input_to_si(spec, "downstream_pressure", downstream_pressure),
+        input_to_si(spec, "restriction_area", restriction_area),
+        specific_heat_ratio,
+        input_to_si(spec, "molar_mass", molar_mass),
+        None if discharge_coefficient is None else discharge_coefficient,
+        None if downstream_relief_capacity is None else input_to_si(spec, "downstream_relief_capacity", downstream_relief_capacity),
+    )
+    return GasBlowbyResult(
+        choked=result.choked,
+        critical_pressure_ratio=result.critical_pressure_ratio,
+        actual_pressure_ratio=result.actual_pressure_ratio,
+        blowby_mass_rate=from_si(result.blowby_mass_rate.magnitude_si, result.blowby_mass_rate.unit),
+        blowby_std_vol_rate=from_si(result.blowby_std_vol_rate.magnitude_si, result.blowby_std_vol_rate.unit),
+        relief_margin=None if result.relief_margin is None else from_si(result.relief_margin.magnitude_si, result.relief_margin.unit),
+        relief_adequate=result.relief_adequate,
+        verdict=BlowbyVerdict(result.verdict),
         warnings=_warnings(result.warnings),
     )
 

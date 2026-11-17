@@ -31,6 +31,7 @@
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
 //!   - specs/models/process/fmea_worksheet.toml
+//!   - specs/models/process/gas_blowby.toml
 //!   - specs/models/process/gas_dispersion.toml
 //!   - specs/models/process/gas_scrubber.toml
 //!   - specs/models/process/gaussian_plume.toml

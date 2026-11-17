@@ -252,6 +252,7 @@
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
 //!   - specs/models/process/fmea_worksheet.toml
+//!   - specs/models/process/gas_blowby.toml
 //!   - specs/models/process/gas_dispersion.toml
 //!   - specs/models/process/gas_scrubber.toml
 //!   - specs/models/process/gaussian_plume.toml
@@ -3433,6 +3434,26 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.flare", "design_mass_flow_capacity", "mass_rate"),
     ("process.flare", "design_molar_flow_capacity", "molar_flow"),
     ("process.fmea_worksheet", "rpn_threshold", "dimensionless"),
+    ("process.gas_blowby", "upstream_pressure", "pressure"),
+    (
+        "process.gas_blowby",
+        "upstream_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.gas_blowby", "downstream_pressure", "pressure"),
+    ("process.gas_blowby", "restriction_area", "area"),
+    ("process.gas_blowby", "specific_heat_ratio", "dimensionless"),
+    ("process.gas_blowby", "molar_mass", "molar_mass"),
+    (
+        "process.gas_blowby",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.gas_blowby",
+        "downstream_relief_capacity",
+        "mass_rate",
+    ),
     ("process.gas_dispersion", "composition", "dimensionless"),
     ("process.gas_dispersion", "mass_release_rate", "mass_rate"),
     (

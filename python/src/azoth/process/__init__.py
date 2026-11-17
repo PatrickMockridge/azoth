@@ -49,6 +49,7 @@ from azoth.core.result import (
     FireWaterDemandResult,
     FlareResult,
     FmeaWorksheetResult,
+    GasBlowbyResult,
     GasDispersionResult,
     GasScrubberResult,
     GaussianPlumeResult,
@@ -157,6 +158,7 @@ __all__ = [
     "fire_water_demand",
     "flare",
     "forms",
+    "gas_blowby",
     "gas_dispersion",
     "gas_scrubber",
     "gaussian_plume",
@@ -256,6 +258,7 @@ _HEM_RELEASE = "process.hem_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
+_GAS_BLOWBY = "process.gas_blowby"
 _GAS_DISPERSION = "process.gas_dispersion"
 _GAUSSIAN_PLUME = "process.gaussian_plume"
 _HAZARDOUS_AREA = "process.hazardous_area"
@@ -3415,6 +3418,37 @@ def toxic_library(
         molar_mass=molar_mass,
         temperature=temperature,
         pressure=pressure,
+    )
+
+
+def gas_blowby(
+    upstream_pressure: Q,
+    upstream_temperature: Q,
+    downstream_pressure: Q,
+    restriction_area: Q,
+    specific_heat_ratio: float,
+    molar_mass: Q,
+    discharge_coefficient: float | None = None,
+    downstream_relief_capacity: Q | None = None,
+) -> GasBlowbyResult:
+    """The blowby rate through an open restriction and the relief verdict.
+
+    The isentropic nozzle forms: the flow is choked at or below the critical ratio and the
+    slower subcritical form applies above it. The standard volume is at **288.15 K and
+    101325 Pa - 15 C, not 0 C**. A stated capacity at least the blowby rate is adequate; a
+    missing capacity publishes no relief data rather than a zero capacity.
+
+    See :func:`azoth.process.reference.gas_blowby`.
+    """
+    return resolve(_GAS_BLOWBY)(  # type: ignore[no-any-return]
+        upstream_pressure=upstream_pressure,
+        upstream_temperature=upstream_temperature,
+        downstream_pressure=downstream_pressure,
+        restriction_area=restriction_area,
+        specific_heat_ratio=specific_heat_ratio,
+        molar_mass=molar_mass,
+        discharge_coefficient=discharge_coefficient,
+        downstream_relief_capacity=downstream_relief_capacity,
     )
 
 

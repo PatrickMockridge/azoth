@@ -1630,6 +1630,44 @@ def _fire_monitor_coverage(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _gas_blowby(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.gas_blowby`'s layers, from the reference's arithmetic.
+
+    The verdict and the adequacy flag are the model's own words, asserted by its test and
+    the cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.gas_blowby import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["upstream_pressure"]), "Pa"),
+        quantity(float(inputs["upstream_temperature"]), "K"),
+        quantity(float(inputs["downstream_pressure"]), "Pa"),
+        quantity(float(inputs["restriction_area"]), "m**2"),
+        float(inputs["specific_heat_ratio"]),
+        quantity(float(inputs["molar_mass"]), "kg/mol"),
+        discharge_coefficient=(
+            None
+            if inputs.get("discharge_coefficient") is None
+            else float(inputs["discharge_coefficient"])
+        ),
+        downstream_relief_capacity=optional("downstream_relief_capacity", "kg/s"),
+    )
+    dumped = {
+        "critical_pressure_ratio": solution.critical_pressure_ratio,
+        "actual_pressure_ratio": solution.actual_pressure_ratio,
+        "blowby_mass_rate_kg_per_hr": solution.mass_rate * 3600.0,
+        "blowby_std_vol_rate_sm3_per_hr": solution.std_vol_rate * 3600.0,
+    }
+    if solution.relief_margin is not None:
+        dumped["relief_margin_kg_per_hr"] = solution.relief_margin * 3600.0
+    return dumped
+
+
 def _fire_water_coverage_assessment(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.fire_water_coverage_assessment`'s layers, from the reference's arithmetic.
 
@@ -3416,6 +3454,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.deluge_nozzle_layout": _deluge_nozzle_layout,
     "process.fire_monitor_coverage": _fire_monitor_coverage,
     "process.fire_water_coverage_assessment": _fire_water_coverage_assessment,
+    "process.gas_blowby": _gas_blowby,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.fault_tree": _fault_tree,
@@ -4472,6 +4511,16 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_monitor_coverage.tsv",
         block=8,
         identified_by=("#label", "fmc_characteristic_dimension"),
+    ),
+    # Gas blowby's one: the choked state the class's first test states. The five further
+    # cases are the subcritical, boundary, zero-margin and no-capacity states; the unit
+    # aliases and the diameter setter are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.gas_blowby",
+        case="choked_adequate",
+        capture="process_gas_blowby.tsv",
+        block=0,
+        identified_by=("#label", "blowby_choked_adequate"),
     ),
     # The coverage assessment's five: the class's four tests and the coverage gap with the
     # supply in hand. The unset-supply state and the five refusals are uncased.
@@ -7279,6 +7328,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_deluge_nozzle_layout.tsv": 8,
     # The monitor coverage's eleven: the constructor and each setter's refusal.
     "process_fire_monitor_coverage.tsv": 11,
+    # Gas blowby's two: the unit-string aliases and the restriction-diameter setter, both
+    # the choked state restated. The six refusal states are hand tests.
+    "process_gas_blowby.tsv": 2,
     # The coverage assessment's six: the unset-supply state, where the class's NaN defaults
     # read as feasible, and the constructor and setter refusals.
     "process_fire_water_coverage_assessment.tsv": 6,

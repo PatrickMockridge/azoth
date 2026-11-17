@@ -41,6 +41,7 @@ use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentRe
 use crate::models::fire_water_demand::FireWaterDemandResult;
 use crate::models::flare::FlareResult;
 use crate::models::fmea_worksheet::FmeaWorksheetResult;
+use crate::models::gas_blowby::GasBlowbyResult;
 use crate::models::gas_dispersion::GasDispersionResult;
 use crate::models::gas_scrubber::GasScrubberResult;
 use crate::models::gaussian_plume::GaussianPlumeResult;
@@ -828,6 +829,25 @@ impl CalcResult for FmeaWorksheetResult {
         "entries_above_threshold",
         "highest_rpn",
         "entry_count",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for GasBlowbyResult {
+    const CALC_ID: &'static str = "process.gas_blowby";
+    const FIELDS: &'static [&'static str] = &[
+        "choked",
+        "critical_pressure_ratio",
+        "actual_pressure_ratio",
+        "blowby_mass_rate",
+        "blowby_std_vol_rate",
+        "relief_margin",
+        "relief_adequate",
+        "verdict",
         "warnings",
     ];
 

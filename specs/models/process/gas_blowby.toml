@@ -1,0 +1,132 @@
+id = "process.gas_blowby"
+name = "Gas blowby through a restriction"
+kind = "procedure"
+assumptions = [
+    "**the critical ratio is `(2/(k+1))^(k/(k-1))` and the flow is choked when `p2/p1` is at or below it**; equality is choked.",
+    "**the choked rate is `Cd A p1 sqrt(k M/(R T1) (2/(k+1))^((k+1)/(k-1)))`** with `R = 8.314462618`.",
+    "**the subcritical rate is `Cd A p1 sqrt(2 M/(R T1) k/(k-1) [r^(2/k) - r^((k+1)/k)])`** with `r = p2/p1`.",
+    "**the standard volume is at 288.15 K and 101325 Pa** - 15 C, not 0 C - and is `(mdot/M) R 288.15/101325`.",
+    "**a relief margin of zero is adequate**, and a missing capacity publishes `no_relief_data` with `relief_adequate` false and an absent margin.",
+    "**the discharge coefficient defaults to 0.85.** `k` and the molar mass are stated because the class's gas-derived values are not carried; its fallbacks of 1.3 and 0.018 kg/mol are recorded, not reproduced.",
+    "**a downstream pressure at or above the upstream pressure is refused**, as the class throws; the standard state is 15 C.",
+]
+references = [
+    "API STD 520 Part I (2020). Sizing, Selection, and Installation of Pressure-relieving Devices in Refineries.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/blowby/GasBlowbyAnalyzer.java` is the port source.",
+    "`validation/neqsim/captures/process_gas_blowby.tsv` - the choked and subcritical states, the critical-ratio boundary, a zero margin, the no-capacity state and the unit aliases.",
+]
+[source]
+standard = "NeqSim process/safety/blowby/GasBlowbyAnalyzer.java"
+edition = "Its `analyze`: the critical ratio, the two nozzle forms, the standard volume and the relief verdict."
+[algorithm]
+scheme = "isentropic_nozzle_blowby"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.upstream_pressure]
+unit = "Pa"
+description = "the high-pressure source pressure, absolute, above zero.\n"
+[inputs.upstream_temperature]
+unit = "K"
+description = "the upstream temperature, above absolute zero.\n"
+[inputs.downstream_pressure]
+unit = "Pa"
+description = "the low-pressure protected system's pressure, absolute, at least zero and **below the upstream pressure**.\n"
+[inputs.restriction_area]
+unit = "m**2"
+description = "the effective flow area of the fully open restriction, above zero. A diameter is the caller's `pi d^2/4`.\n"
+[inputs.specific_heat_ratio]
+unit = "dimensionless"
+description = "the gas specific-heat ratio `Cp/Cv`, above one.\n"
+[inputs.molar_mass]
+unit = "kg/mol"
+description = "the gas molar mass, above zero.\n"
+[inputs.discharge_coefficient]
+unit = "dimensionless"
+optional = true
+description = "the restriction's discharge coefficient in `(0, 1]`. **Absent is 0.85**, the class's default.\n"
+[inputs.downstream_relief_capacity]
+unit = "kg/s"
+optional = true
+description = "the downstream relief capacity available to absorb the blowby, at least zero. **Absent publishes no relief data** rather than a zero capacity.\n"
+[outputs]
+[outputs.choked]
+type = "boolean"
+description = "whether the flow is choked at the stated pressure ratio.\n"
+[outputs.critical_pressure_ratio]
+unit = "dimensionless"
+description = "`(2/(k+1))^(k/(k-1))`, the pressure ratio at and below which the flow is choked.\n"
+[outputs.actual_pressure_ratio]
+unit = "dimensionless"
+description = "`p2/p1`.\n"
+[outputs.blowby_mass_rate]
+unit = "kg/s"
+description = "the blowby mass rate through the restriction, choked or subcritical.\n"
+[outputs.blowby_std_vol_rate]
+unit = "m**3/s"
+description = "the same rate as a standard volume flow at 288.15 K and 101325 Pa.\n"
+[outputs.relief_margin]
+unit = "kg/s"
+optional = true
+description = "`capacity - blowby_mass_rate`; **absent when no capacity is stated**.\n"
+[outputs.relief_adequate]
+type = "boolean"
+description = "whether the stated capacity is at least the blowby rate; false when no capacity is stated.\n"
+[outputs.verdict]
+type = "enum"
+values = ["no_relief_data", "relief_adequate", "relief_inadequate"]
+description = "the class's verdict: no capacity, adequate, or inadequate.\n"
+[[valid_range]]
+quantity = "upstream_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive upstream pressure"
+[[valid_range]]
+quantity = "upstream_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive temperature"
+[[valid_range]]
+quantity = "downstream_pressure"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative downstream pressure"
+[[valid_range]]
+quantity = "restriction_area"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive restriction area"
+[[valid_range]]
+quantity = "specific_heat_ratio"
+min = 1
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a specific-heat ratio at or below one"
+[[valid_range]]
+quantity = "molar_mass"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive molar mass"
+[[valid_range]]
+quantity = "discharge_coefficient"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class refuses a discharge coefficient outside (0, 1]"
+[[valid_range]]
+quantity = "downstream_relief_capacity"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative relief capacity"
+[implementations]
+python = "azoth.process.gas_blowby"
+rust = "azoth_process::gas_blowby"
