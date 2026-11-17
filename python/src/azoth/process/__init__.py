@@ -1106,7 +1106,7 @@ def pool_fire(
 
 
 def porous_media_self_heating(
-    geometry: str | None,
+    geometry: str,
     characteristic_dimension: Q,
     effective_conductivity: Q,
     activation_energy: Q,
@@ -1137,7 +1137,7 @@ def porous_media_self_heating(
 
 
 def self_heating_induction(
-    geometry: str | None,
+    geometry: str,
     characteristic_dimension: Q,
     effective_conductivity: Q,
     volumetric_heat_capacity: float,

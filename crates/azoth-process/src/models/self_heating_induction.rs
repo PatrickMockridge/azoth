@@ -114,7 +114,7 @@ fn decimate(history: &mut Vec<SelfHeatingTimePoint>) {
 /// ignition rise or maximum time.
 #[allow(clippy::too_many_arguments)] // one argument per declared input
 pub fn self_heating_induction(
-    geometry: Option<&str>,
+    geometry: &str,
     characteristic_dimension: Length,
     effective_conductivity: ThermalConductivity,
     volumetric_heat_capacity: f64,
@@ -146,10 +146,7 @@ pub fn self_heating_induction(
         &mut warnings,
     )?;
 
-    let shape = match geometry {
-        Some(value) => SelfHeatingGeometry::parse(value)?,
-        None => SelfHeatingGeometry::Slab,
-    };
+    let shape = SelfHeatingGeometry::parse(geometry)?;
     if !shape.one_dimensional() {
         return Err(AzothError::invalid_input(
             "geometry",

@@ -70,7 +70,7 @@ def _decimate(history: list[SelfHeatingTimePoint]) -> None:
 
 
 def self_heating_induction(
-    geometry: str | None,
+    geometry: str,
     characteristic_dimension: Q,
     effective_conductivity: Q,
     volumetric_heat_capacity: float,
@@ -127,7 +127,7 @@ def self_heating_induction(
         warnings,
     )
 
-    shape = "slab" if geometry is None else str(geometry)
+    shape = str(geometry)
     if shape not in GEOMETRIES:
         raise InvalidInputError(
             "geometry",

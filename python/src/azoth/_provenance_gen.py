@@ -3032,8 +3032,8 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.porous_media_self_heating': {
         "calc_id": 'process.porous_media_self_heating',
         "name": 'Porous media self-heating',
-        "spec": {'path': 'specs/models/process/porous_media_self_heating.toml', 'sha256': '5e97a0731294382816ae99ec6ac76a54dfb5c347c2ffe9b94874e888abc138b7'},
-        "code": [{'path': 'python/src/azoth/process/reference/porous_media_self_heating.py', 'sha256': 'fc9559a14f0098f7e61fa9ee9647e9b8b2413485d5314c75537b791ce9dcf020'}, {'path': 'crates/azoth-process/src/models/porous_media_self_heating.rs', 'sha256': 'a36d22bca64c0e2a4dca4eb746c6dbb83ad87c05ce34f376c665ff445c78a40a'}],
+        "spec": {'path': 'specs/models/process/porous_media_self_heating.toml', 'sha256': '9f419e1f3c7181c592436883503e2493eb16f80845c9c7f124d7d5cae2343cb9'},
+        "code": [{'path': 'python/src/azoth/process/reference/porous_media_self_heating.py', 'sha256': '58142c78b9580fe392ed00bac6c106a80ded1e043b3ba76a7eb8ad5a0f4c9871'}, {'path': 'crates/azoth-process/src/models/porous_media_self_heating.rs', 'sha256': '586751c98883610b4561658f85efdd1d56f903935a02f9e53afd36c01215f0b0'}],
         "source": 'NeqSim process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.java',
         "verification": 'partially_verified',
         "validation_cases": 0,
@@ -3131,8 +3131,8 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.self_heating_induction': {
         "calc_id": 'process.self_heating_induction',
         "name": 'Self-heating induction time',
-        "spec": {'path': 'specs/models/process/self_heating_induction.toml', 'sha256': '41bf0716a3f2c1aa3025ef53df4c509a3ad262ce625ebc189d8838bf0bf12c67'},
-        "code": [{'path': 'python/src/azoth/process/reference/self_heating_induction.py', 'sha256': '14694afba85e32b509bc7611ece7c676c4b87cd463c83289c4a997f0d8279e7c'}, {'path': 'crates/azoth-process/src/models/self_heating_induction.rs', 'sha256': 'ae7b7d5b27c8f4af0bba91e4e643095bd2e2b266dafb3a484437aaa2aa9ed4e8'}],
+        "spec": {'path': 'specs/models/process/self_heating_induction.toml', 'sha256': 'c7a0323880fa1ccd54e2078688eb41c5157bc2173e810af113bf23f9c23987f0'},
+        "code": [{'path': 'python/src/azoth/process/reference/self_heating_induction.py', 'sha256': 'aa9909772555015b3b33944ea5073312cd3c896924e4e5d060c7fb2a793d4261'}, {'path': 'crates/azoth-process/src/models/self_heating_induction.rs', 'sha256': 'b2bbf502b5597b23d00a1f9c7f1be686acb340d922bbc2835be1fb923135232b'}],
         "source": 'NeqSim process/safety/selfheating/SelfHeatingInductionSolver.java',
         "verification": 'partially_verified',
         "validation_cases": 0,

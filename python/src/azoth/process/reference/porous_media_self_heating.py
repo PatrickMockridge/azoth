@@ -40,7 +40,7 @@ def _spec() -> dict[str, Any]:
 
 
 def porous_media_self_heating(
-    geometry: str | None,
+    geometry: str,
     characteristic_dimension: Q,
     effective_conductivity: Q,
     activation_energy: Q,
@@ -76,7 +76,7 @@ def porous_media_self_heating(
         warnings,
     )
 
-    shape = "slab" if geometry is None else str(geometry)
+    shape = str(geometry)
     if shape not in GEOMETRIES:
         raise InvalidInputError(
             "geometry",

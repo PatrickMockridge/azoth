@@ -29,8 +29,7 @@ max_iterations = 200
 [inputs.geometry]
 type = "enum"
 values = ["slab", "infinite_cylinder", "sphere", "cube", "equicylinder"]
-optional = true
-description = "the body shape, which selects the critical parameter. **Absent is `slab`.**\n"
+description = "the body shape, which selects the critical parameter. The class defaults to `slab`; this id states it.\n"
 [inputs.characteristic_dimension]
 unit = "m"
 description = "the shape's characteristic half-dimension: the half-thickness for a slab or cube, the radius for a cylinder, sphere or equicylinder. Above zero.\n"

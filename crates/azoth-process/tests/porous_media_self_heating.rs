@@ -21,7 +21,7 @@ fn close(actual: f64, expected: f64, what: &str) {
 
 #[allow(clippy::too_many_arguments)]
 fn porous(
-    geometry: Option<&str>,
+    geometry: &str,
     dimension: f64,
     conductivity: f64,
     energy: f64,
@@ -45,16 +45,7 @@ fn porous(
 
 #[test]
 fn the_slab_reproduces_the_capture() {
-    let result = porous(
-        Some("slab"),
-        0.05,
-        0.09,
-        110_000.0,
-        5.0e13,
-        430.0,
-        None,
-        None,
-    );
+    let result = porous("slab", 0.05, 0.09, 110_000.0, 5.0e13, 430.0, None, None);
     close(result.delta, 0.004_317_180_673_554_722, "delta");
     close(result.delta_crit, 0.878, "delta_crit");
     close(result.delta_ratio, 0.004_917_062_270_563_465, "the ratio");
@@ -93,7 +84,7 @@ fn the_slab_reproduces_the_capture() {
 #[test]
 fn the_five_shapes_carry_their_own_critical_values() {
     let cylinder = porous(
-        Some("infinite_cylinder"),
+        "infinite_cylinder",
         0.05,
         0.09,
         110_000.0,
@@ -118,16 +109,7 @@ fn the_five_shapes_carry_their_own_critical_values() {
         "cylinder critical dimension",
     );
 
-    let sphere = porous(
-        Some("sphere"),
-        0.05,
-        0.09,
-        110_000.0,
-        5.0e13,
-        430.0,
-        None,
-        None,
-    );
+    let sphere = porous("sphere", 0.05, 0.09, 110_000.0, 5.0e13, 430.0, None, None);
     close(sphere.delta_crit, 3.322, "sphere delta_crit");
     close(
         sphere.critical_temperature.expect("a bracket").value,
@@ -135,16 +117,7 @@ fn the_five_shapes_carry_their_own_critical_values() {
         "sphere critical temperature",
     );
 
-    let cube = porous(
-        Some("cube"),
-        0.05,
-        0.09,
-        110_000.0,
-        5.0e13,
-        430.0,
-        None,
-        None,
-    );
+    let cube = porous("cube", 0.05, 0.09, 110_000.0, 5.0e13, 430.0, None, None);
     close(cube.delta_crit, 2.52, "cube delta_crit");
     close(
         cube.critical_dimension.value,
@@ -153,7 +126,7 @@ fn the_five_shapes_carry_their_own_critical_values() {
     );
 
     let equicylinder = porous(
-        Some("equicylinder"),
+        "equicylinder",
         0.05,
         0.09,
         110_000.0,
@@ -173,7 +146,7 @@ fn the_five_shapes_carry_their_own_critical_values() {
 #[test]
 fn the_critical_dimension_state_screens_marginal() {
     let result = porous(
-        Some("slab"),
+        "slab",
         0.713_045_346_929_867_9,
         0.09,
         110_000.0,
@@ -201,7 +174,7 @@ fn the_critical_dimension_state_screens_marginal() {
 #[test]
 fn the_thin_marginal_and_thick_layers_move_the_verdict() {
     let thin = porous(
-        Some("slab"),
+        "slab",
         0.178_261_336_732_466_97,
         0.09,
         110_000.0,
@@ -219,7 +192,7 @@ fn the_thin_marginal_and_thick_layers_move_the_verdict() {
     );
 
     let near = porous(
-        Some("slab"),
+        "slab",
         0.677_393_079_583_374_5,
         0.09,
         110_000.0,
@@ -237,7 +210,7 @@ fn the_thin_marginal_and_thick_layers_move_the_verdict() {
     );
 
     let thick = porous(
-        Some("slab"),
+        "slab",
         1.426_090_693_859_735_7,
         0.09,
         110_000.0,
@@ -258,7 +231,7 @@ fn the_thin_marginal_and_thick_layers_move_the_verdict() {
 #[test]
 fn the_pipe_insulation_flag_forces_the_slab_and_records_its_note() {
     let result = porous(
-        Some("cube"),
+        "cube",
         0.05,
         0.09,
         110_000.0,
@@ -294,7 +267,7 @@ fn the_pipe_insulation_flag_forces_the_slab_and_records_its_note() {
 
 #[test]
 fn a_failed_bracket_answers_absent() {
-    let result = porous(Some("slab"), 0.05, 0.09, 1000.0, 5.0e13, 430.0, None, None);
+    let result = porous("slab", 0.05, 0.09, 1000.0, 5.0e13, 430.0, None, None);
     close(result.delta, 683_003_410.343_874_6, "delta");
     close(result.delta_ratio, 777_908_212.236_759_2, "the ratio");
     assert_eq!(result.critical_temperature, None);
@@ -319,7 +292,7 @@ fn a_failed_bracket_answers_absent() {
 fn an_unknown_geometry_is_refused() {
     assert!(
         porous_media_self_heating(
-            Some("trapezoid"),
+            "trapezoid",
             meters(0.05),
             watts_per_meter_kelvin(0.09),
             joules_per_mole(110_000.0),

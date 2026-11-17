@@ -2569,7 +2569,7 @@ def _porous_media_self_heating(inputs: Mapping[str, Any]) -> dict[str, float]:
     )
 
     result = evaluate(
-        None if inputs.get("geometry") is None else str(inputs["geometry"]),
+        str(inputs["geometry"]),
         quantity(float(inputs["characteristic_dimension"]), "m"),
         quantity(float(inputs["effective_conductivity"]), "W/(m*K)"),
         quantity(float(inputs["activation_energy"]), "J/mol"),
@@ -2607,7 +2607,7 @@ def _self_heating_induction(inputs: Mapping[str, Any]) -> dict[str, float]:
         return None if value is None else quantity(float(value), unit)
 
     result = evaluate(
-        None if inputs.get("geometry") is None else str(inputs["geometry"]),
+        str(inputs["geometry"]),
         quantity(float(inputs["characteristic_dimension"]), "m"),
         quantity(float(inputs["effective_conductivity"]), "W/(m*K)"),
         float(inputs["volumetric_heat_capacity"]),

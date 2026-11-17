@@ -77,7 +77,7 @@ pub struct PorousMediaSelfHeatingResult {
 /// (0, 1).
 #[allow(clippy::too_many_arguments)] // one argument per declared input
 pub fn porous_media_self_heating(
-    geometry: Option<&str>,
+    geometry: &str,
     characteristic_dimension: Length,
     effective_conductivity: ThermalConductivity,
     activation_energy: MolarEnergy,
@@ -103,10 +103,7 @@ pub fn porous_media_self_heating(
     )?;
 
     let insulation = pipe_insulation_screening.unwrap_or(false);
-    let shape = match geometry {
-        Some(value) => SelfHeatingGeometry::parse(value)?,
-        None => SelfHeatingGeometry::Slab,
-    };
+    let shape = SelfHeatingGeometry::parse(geometry)?;
     let shape = if insulation {
         SelfHeatingGeometry::Slab
     } else {

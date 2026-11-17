@@ -7697,7 +7697,7 @@ def pool_fire(pool_diameter: Q, burn_rate: Q, air_density: float | None=None, di
     )
 
 
-def porous_media_self_heating(geometry: str | None, characteristic_dimension: Q, effective_conductivity: Q, activation_energy: Q, volumetric_pre_factor: float, boundary_temperature: Q, marginal_ratio: float | None=None, pipe_insulation_screening: bool | None=None) -> PorousMediaSelfHeatingResult:
+def porous_media_self_heating(geometry: str, characteristic_dimension: Q, effective_conductivity: Q, activation_energy: Q, volumetric_pre_factor: float, boundary_temperature: Q, marginal_ratio: float | None=None, pipe_insulation_screening: bool | None=None) -> PorousMediaSelfHeatingResult:
     """``process.porous_media_self_heating``, computed in Rust."""
     spec = _models_gen.model("process.porous_media_self_heating")
     result = _core.porous_media_self_heating(
@@ -8061,7 +8061,7 @@ def safety_instrumented_function(pfd_average: float, claimed_sil: float, unmitig
     )
 
 
-def self_heating_induction(geometry: str | None, characteristic_dimension: Q, effective_conductivity: Q, volumetric_heat_capacity: float, activation_energy: Q, volumetric_pre_factor: float, boundary_temperature: Q, initial_temperature: Q | None=None, ignition_rise: Q | None=None, max_time: Q | None=None, node_count: float | None=None) -> SelfHeatingInductionResult:
+def self_heating_induction(geometry: str, characteristic_dimension: Q, effective_conductivity: Q, volumetric_heat_capacity: float, activation_energy: Q, volumetric_pre_factor: float, boundary_temperature: Q, initial_temperature: Q | None=None, ignition_rise: Q | None=None, max_time: Q | None=None, node_count: float | None=None) -> SelfHeatingInductionResult:
     """``process.self_heating_induction``, computed in Rust."""
     spec = _models_gen.model("process.self_heating_induction")
     result = _core.self_heating_induction(

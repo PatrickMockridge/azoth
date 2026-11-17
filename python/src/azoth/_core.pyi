@@ -7827,12 +7827,12 @@ def pool_fire(
     target_flux: float | None = None,
 ) -> PoolFireResult: ...
 def porous_media_self_heating(
+    geometry: str,
     characteristic_dimension: float,
     effective_conductivity: float,
     activation_energy: float,
     volumetric_pre_factor: float,
     boundary_temperature: float,
-    geometry: str | None = None,
     marginal_ratio: float | None = None,
     pipe_insulation_screening: bool | None = None,
 ) -> PorousMediaSelfHeatingResult: ...
@@ -7954,13 +7954,13 @@ def safety_instrumented_function(
     base_availability: float | None = None,
 ) -> SafetyInstrumentedFunctionResult: ...
 def self_heating_induction(
+    geometry: str,
     characteristic_dimension: float,
     effective_conductivity: float,
     volumetric_heat_capacity: float,
     activation_energy: float,
     volumetric_pre_factor: float,
     boundary_temperature: float,
-    geometry: str | None = None,
     initial_temperature: float | None = None,
     ignition_rise: float | None = None,
     max_time: float | None = None,

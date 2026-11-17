@@ -27,7 +27,7 @@ not an equation, and both implementations read it from here.
 
 | Name | Unit | Description |
 |---|---|---|
-| `geometry` | slab / infinite_cylinder / sphere / cube / equicylinder | *Optional.* the body shape, which selects the critical parameter. **Absent is `slab`.** |
+| `geometry` | slab / infinite_cylinder / sphere / cube / equicylinder | the body shape, which selects the critical parameter. The class defaults to `slab`; this id states it. |
 | `characteristic_dimension` | m | the shape's characteristic half-dimension: the half-thickness for a slab or cube, the radius for a cylinder, sphere or equicylinder. Above zero. |
 | `effective_conductivity` | W/(m*K) | the effective thermal conductivity of the wetted porous body, above zero. |
 | `activation_energy` | J/mol | the apparent activation energy of the self-heating reaction, above zero. |

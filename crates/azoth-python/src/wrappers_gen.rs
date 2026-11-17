@@ -7318,7 +7318,7 @@ pub fn pool_fire(
 #[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
 pub fn porous_media_self_heating(
     py: Python<'_>,
-    geometry: Option<&str>,
+    geometry: &str,
     characteristic_dimension: f64,
     effective_conductivity: f64,
     activation_energy: f64,
@@ -7571,7 +7571,7 @@ pub fn safety_instrumented_function(
 #[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
 pub fn self_heating_induction(
     py: Python<'_>,
-    geometry: Option<&str>,
+    geometry: &str,
     characteristic_dimension: f64,
     effective_conductivity: f64,
     volumetric_heat_capacity: f64,

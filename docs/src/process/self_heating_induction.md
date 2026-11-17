@@ -27,7 +27,7 @@ not an equation, and both implementations read it from here.
 
 | Name | Unit | Description |
 |---|---|---|
-| `geometry` | slab / infinite_cylinder / sphere | *Optional.* the one-dimensional body shape. **Absent is `slab`.** |
+| `geometry` | slab / infinite_cylinder / sphere | the one-dimensional body shape. The class defaults to `slab`; this id states it. |
 | `characteristic_dimension` | m | the half-thickness for a slab, the radius for a cylinder or sphere, above zero. |
 | `effective_conductivity` | W/(m*K) | the effective thermal conductivity of the wetted porous body, above zero. |
 | `volumetric_heat_capacity` | dimensionless | `rho c`, the volumetric heat capacity **in J/(m3 K)**, above zero. Declared dimensionless because the vocabulary has no such unit. |

@@ -28,8 +28,7 @@ max_iterations = 20000000
 [inputs.geometry]
 type = "enum"
 values = ["slab", "infinite_cylinder", "sphere"]
-optional = true
-description = "the one-dimensional body shape. **Absent is `slab`.**\n"
+description = "the one-dimensional body shape. The class defaults to `slab`; this id states it.\n"
 [inputs.characteristic_dimension]
 unit = "m"
 description = "the half-thickness for a slab, the radius for a cylinder or sphere, above zero.\n"

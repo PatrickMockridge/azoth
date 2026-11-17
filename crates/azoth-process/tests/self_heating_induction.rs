@@ -24,7 +24,7 @@ fn induction(boundary: f64) -> SelfHeatingInductionResult {
 
 fn induction_on(geometry: &str, boundary: f64, initial: Option<f64>) -> SelfHeatingInductionResult {
     self_heating_induction(
-        Some(geometry),
+        geometry,
         meters(0.05),
         watts_per_meter_kelvin(0.09),
         1.8e5,
@@ -207,7 +207,7 @@ fn the_near_critical_run_reaches_a_steady_profile() {
 fn a_non_one_dimensional_geometry_is_refused() {
     assert!(
         self_heating_induction(
-            Some("cube"),
+            "cube",
             meters(0.05),
             watts_per_meter_kelvin(0.09),
             1.8e5,
@@ -227,7 +227,7 @@ fn a_non_one_dimensional_geometry_is_refused() {
 fn a_node_count_below_five_is_refused() {
     assert!(
         self_heating_induction(
-            Some("slab"),
+            "slab",
             meters(0.05),
             watts_per_meter_kelvin(0.09),
             1.8e5,
