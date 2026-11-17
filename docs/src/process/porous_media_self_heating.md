@@ -94,6 +94,16 @@ not an equation, and both implementations read it from here.
 | `porous_not_bracketed` | geometry = slab, characteristic_dimension = 0.05, effective_conductivity = 0.09, activation_energy = 1000.0, volumetric_pre_factor = 50000000000000.0, boundary_temperature = 430.0 | geometry = slab, delta = 683003410.3438746, delta_crit = 0.878, delta_ratio = 777908212.2367592, critical_dimension = 1.7926926017313195e-06, dimension_margin = -0.04999820730739827, fk_temperature_scale = 1537.3441380682, verdict = self_ignition, messages = ['Critical ambient temperature could not be bracketed between 150.0 K and 2000.0 K; check the kinetic parameters', 'Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls'] |
 | `porous_kinetics_combined` | geometry = slab, characteristic_dimension = 0.05, effective_conductivity = 0.09, activation_energy = 110000.0, volumetric_pre_factor = 1e+18, boundary_temperature = 430.0 | geometry = slab, delta = 86.34361347109436, delta_crit = 0.878, delta_ratio = 98.3412454112692, critical_temperature = 371.1026705801487, critical_dimension = 0.005041992001076242, temperature_margin = -58.8973294198513, dimension_margin = -0.04495800799892376, fk_temperature_scale = 13.975855800620002, verdict = self_ignition, messages = ['Frank-Kamenetskii theory assumes a uniform boundary temperature, conduction-controlled heat loss (large Biot number) and negligible reactant consumption; use SemenovSelfHeatingAnalyzer when surface cooling controls'] |
 
+## How far this is checked
+**`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.
+
+- Tests: 12 declared, every one run
+- External check: no external validation case names it
+
+The same account travels with every result this returns: `result.provenance`
+carries the status, the spec and both kernels with a SHA-256 of each, and which
+declared checks *that call* could not evaluate.
+
 ## References
 
 - Frank-Kamenetskii, D. A. (1969). Diffusion and Heat Transfer in Chemical Kinetics, 2nd ed.

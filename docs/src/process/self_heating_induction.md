@@ -91,6 +91,16 @@ not an equation, and both implementations read it from here.
 | `induction_preheated` | geometry = slab, characteristic_dimension = 0.05, effective_conductivity = 0.09, volumetric_heat_capacity = 180000.0, activation_energy = 110000.0, volumetric_pre_factor = 50000000000000.0, boundary_temperature = 548.3451326191425, initial_temperature = 588.3451326191425, max_time = 432000.0, node_count = 21 | geometry = slab, characteristic_dimension = 0.05, boundary_temperature = 548.3451326191425, initial_temperature = 588.3451326191425, ignition_rise = 100.0, ignited = True, induction_time = 564.8931706053196, peak_temperature = 648.7411765738602, peak_temperature_rise = 100.3960439547177, steady_state_reached = False, simulated_time = 564.8931706053196 |
 | `induction_near_critical` | geometry = slab, characteristic_dimension = 0.05, effective_conductivity = 0.09, volumetric_heat_capacity = 180000.0, activation_energy = 110000.0, volumetric_pre_factor = 50000000000000.0, boundary_temperature = 528.8451326191425, max_time = 432000.0, node_count = 21 | geometry = slab, characteristic_dimension = 0.05, boundary_temperature = 528.8451326191425, initial_temperature = 528.8451326191425, ignition_rise = 100.0, ignited = False, peak_temperature = 550.7226242103998, peak_temperature_rise = 21.87749159125724, steady_state_reached = True, simulated_time = 83837.50000000001, messages = ['A steady temperature profile was reached, so the body is subcritical at this boundary temperature'] |
 
+## How far this is checked
+**`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.
+
+- Tests: 6 declared, every one run
+- External check: no external validation case names it
+
+The same account travels with every result this returns: `result.provenance`
+carries the status, the spec and both kernels with a SHA-256 of each, and which
+declared checks *that call* could not evaluate.
+
 ## References
 
 - Frank-Kamenetskii, D. A. (1969). Diffusion and Heat Transfer in Chemical Kinetics, 2nd ed.

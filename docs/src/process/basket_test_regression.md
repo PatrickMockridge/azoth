@@ -66,6 +66,16 @@ not an equation, and both implementations read it from here.
 | `basket_missing_conductivity` | points = [{'geometry': 'cube', 'characteristic_dimension': 0.025, 'critical_temperature': 591.2940539419651}, {'geometry': 'cube', 'characteristic_dimension': 0.05, 'critical_temperature': 553.7372328341007}, {'geometry': 'cube', 'characteristic_dimension': 0.1, 'critical_temperature': 520.8462618291378}] | point_count = 3.0, slope = -13229.958597530644, intercept = 43.441228577023196, r_squared = 0.9999999999998586, activation_energy = 109999.99619685624, conductivity_provided = False, messages = ['Effective thermal conductivity not supplied; the volumetric heat-release pre-factor could not be separated from the regression intercept'] |
 | `basket_two_points` | points = [{'geometry': 'cube', 'characteristic_dimension': 0.025, 'critical_temperature': 591.2940539419651}, {'geometry': 'cube', 'characteristic_dimension': 0.1, 'critical_temperature': 520.8462618291378}], effective_conductivity = 0.09 | point_count = 2.0, slope = -13229.958589203492, intercept = 43.441228890499836, r_squared = 1.0, activation_energy = 109999.99612762046, volumetric_pre_factor = 50000001672746.55, effective_conductivity = 0.09, conductivity_provided = True, messages = ['Only 2 basket sizes supplied; at least 3 are recommended for a defensible fit and a meaningful coefficient of determination'] |
 
+## How far this is checked
+**`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.
+
+- Tests: 4 declared, every one run
+- External check: no external validation case names it
+
+The same account travels with every result this returns: `result.provenance`
+carries the status, the spec and both kernels with a SHA-256 of each, and which
+declared checks *that call* could not evaluate.
+
 ## References
 
 - EN 15188. Determination of the spontaneous ignition behaviour of dust accumulations.
