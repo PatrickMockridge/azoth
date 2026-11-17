@@ -4,6 +4,7 @@
 //!   - specs/models/process/absorption_column.toml
 //!   - specs/models/process/active_fire_protection_screening.toml
 //!   - specs/models/process/anti_surge_recycle.toml
+//!   - specs/models/process/api14c_safe_chart.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/basket_test_regression.toml
 //!   - specs/models/process/bleve.toml
@@ -4531,6 +4532,866 @@ pub static ANTI_SURGE_RECYCLE_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&ANTI_SURGE_RECYCLE_ALGORITHM),
     checks: ANTI_SURGE_RECYCLE_CHECKS,
     cases: ANTI_SURGE_RECYCLE_CASES,
+};
+
+static API14C_SAFE_CHART_CHECKS: &[SpecCheck] = &[];
+
+static API14C_SAFE_CHART_CASES: &[TestCase] = &[
+    TestCase {
+        id: "api14c_declared",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("equipment_count", 9.0), ("missing_count", 42.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "equipment",
+                &[
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("feed"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Stream"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Separator"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("GasScrubber"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("T-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Tank"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("FiredHeater"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("PipeBeggsAndBrills"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Compressor"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Pump"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("E-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("Cooler"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "unit_class",
+                            value: FieldValue::Name("WellFlow"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "present_devices",
+                &[
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "items",
+                &[
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("pressure_vessel"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(2.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("pressure_vessel"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("T-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("atmospheric_vessel"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("fired_vessel"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(7.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(7.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("pipeline_segment"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("compressor"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(6.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("pump"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("E-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("heat_exchanger"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(3.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("wellhead"),
+                        },
+                        RecordField {
+                            name: "required_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "present_count",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "missing_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "complete",
+                            value: FieldValue::Flag(false),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "missing_devices",
+                &[
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("SCR-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("T-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("T-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("T-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("fsv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("lsl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("tsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("bdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("H-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("fire"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("PL-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("fsv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("tsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("bdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("K-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("fsv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("E-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("E-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("tsh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("E-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psh"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psl"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("usv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("sdv"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "equipment",
+                            value: FieldValue::Name("W-101"),
+                        },
+                        RecordField {
+                            name: "device",
+                            value: FieldValue::Name("psv"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "api14c_empty",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[("assume_complete", true)],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("equipment_count", 0.0), ("missing_count", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static API14C_SAFE_CHART_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "api14c_safe_chart",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.api14c_safe_chart`.
+pub static API14C_SAFE_CHART_SPEC: ModelSpec = ModelSpec {
+    id: "process.api14c_safe_chart",
+    kind: "procedure",
+    algorithm: Some(&API14C_SAFE_CHART_ALGORITHM),
+    checks: API14C_SAFE_CHART_CHECKS,
+    cases: API14C_SAFE_CHART_CASES,
 };
 
 static API537_FLARE_FLAME_MODEL_CHECKS: &[SpecCheck] = &[
@@ -78863,6 +79724,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &ABSORPTION_COLUMN_SPEC,
     &ACTIVE_FIRE_PROTECTION_SCREENING_SPEC,
     &ANTI_SURGE_RECYCLE_SPEC,
+    &API14C_SAFE_CHART_SPEC,
     &API537_FLARE_FLAME_MODEL_SPEC,
     &BASKET_TEST_REGRESSION_SPEC,
     &BLEVE_SPEC,

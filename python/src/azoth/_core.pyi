@@ -404,6 +404,18 @@ class CompressorSurgePoint(TypedDict):
     flow: float
     head: float
 
+class SafeChartEquipment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    equipment: str
+    unit_class: str
+
+class SafeChartPresentDevice(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    equipment: str
+    device: str
+
 class FlareTargetFlux(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -894,6 +906,24 @@ class WaterMixingResult:
     si_srso4: float | None
     si_caso4: float | None
     si_feco3: float | None
+
+@final
+class SafeChartItem:
+    """one row per classified equipment, in caller order."""
+
+    equipment: str
+    category: str
+    required_count: float
+    present_count: float
+    missing_count: float
+    complete: bool
+
+@final
+class SafeChartMissingDevice:
+    """one row per missing device, in equipment caller order and device declaration order."""
+
+    equipment: str
+    device: str
 
 @final
 class SterileRadius:
@@ -3182,6 +3212,15 @@ class AntiSurgeRecycleResult:
     surge_flow: Qty
     control_flow: Qty
     distance_to_surge: float
+    warnings: list[Warning]
+
+@final
+class Api14cSafeChartResult:
+    items: list[SafeChartItem]
+    missing_devices: list[SafeChartMissingDevice]
+    equipment_count: float
+    missing_count: float
+    complete: bool
     warnings: list[Warning]
 
 @final
@@ -7136,6 +7175,11 @@ def anti_surge_recycle(
     tolerance: float | None = None,
     max_iterations: float | None = None,
 ) -> AntiSurgeRecycleResult: ...
+def api14c_safe_chart(
+    equipment: list[SafeChartEquipment] | None = None,
+    present_devices: list[SafeChartPresentDevice] | None = None,
+    assume_complete: bool | None = None,
+) -> Api14cSafeChartResult: ...
 def api537_flare_flame_model(
     mass_flow: float,
     heat_of_combustion: float,

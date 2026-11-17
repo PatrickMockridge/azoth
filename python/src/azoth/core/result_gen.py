@@ -56,6 +56,8 @@ from azoth.core.record_outputs_gen import (
     ReliefDisposalRow,
     RemediationOptionRow,
     RiskAssessmentRow,
+    SafeChartItem,
+    SafeChartMissingDevice,
     ScaleControlRiskRow,
     ScaleControlRow,
     ScenarioChangeRow,
@@ -5672,6 +5674,31 @@ class AntiSurgeRecycleResult(_HasWarnings):
 
     #: `getDistanceToSurge()` at the final machine state: the inlet flow over the surge flow less one.
     distance_to_surge: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class Api14cSafeChartResult(_HasWarnings):
+    """Result of ``process.api14c_safe_chart``."""
+
+    CALC_ID: ClassVar[str] = "process.api14c_safe_chart"
+
+    #: one row per classified equipment, in caller order.
+    items: tuple[SafeChartItem, ...]
+
+    #: one row per missing device, in equipment caller order and device declaration order.
+    missing_devices: tuple[SafeChartMissingDevice, ...]
+
+    #: the number of classified equipment rows.
+    equipment_count: float
+
+    #: the total number of missing devices across the chart.
+    missing_count: float
+
+    #: whether every chart row is complete; true for an empty chart.
+    complete: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]

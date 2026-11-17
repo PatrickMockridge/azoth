@@ -1,0 +1,98 @@
+id = "process.api14c_safe_chart"
+name = "API 14C SAFE chart"
+kind = "procedure"
+assumptions = [
+    "**the required set per category is API RP 14C / ISO 10418 Appendix A's table**: pressure vessel `PSH PSL LSH LSL PSV SDV`; atmospheric vessel `LSH PSV FSV`; fired vessel `PSH TSH LSL PSV SDV BDV FIRE`; pipeline segment `PSH PSL SDV FSV`; compressor `PSH PSL TSH SDV BDV PSV`; pump `PSH SDV PSV FSV`; heat exchanger `PSH PSV TSH`; wellhead `PSH PSL USV SDV PSV`.",
+    "**the class stores each set in a `HashSet`**, so it fixes no order. The rows are published in the device enum's declaration order, the class's own `deviceOrder()`.",
+    "**the category is a lower-case substring test on the unit's Java simple class name, first match wins**: scrubber, separator, flashdrum, knockout, or both flash and drum; tank; heater, furnace or reformer; pipe, flowline or riser; compressor or expander; pump; heatexchanger, cooler, condenser, reboiler or aircooler; well; else the row is skipped. `&&` binds before `||`, so `Flash` alone and `Drum` alone do not classify.",
+    "**an undeclared equipment has an empty present set**, so every required device is missing; extra declared devices are counted in the present set and are not required rows. `missing = required - present`.",
+    "**`assume_complete` sets present equal to required and ignores the declarations**, the class's `buildAssumingComplete`.",
+    "**`build(ProcessSystem)` is caller state**: it reads only each unit's name and class simple name, so the id takes `(equipment, unit_class)` rows. The markdown and JSON exports and the gap sentences are presentation.",
+]
+references = [
+    "API RP 14C. Analysis, Design, Installation, and Testing of Safety Systems for Offshore Production Facilities.",
+    "ISO 10418. Petroleum, petrochemical and natural gas industries - Offshore production installations - Analysis, design, installation and testing of basic surface process safety systems.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/api14c/Api14cSafeChartBuilder.java`, `Api14cSafetyAnalysisTable.java` and the two enums are the port source.",
+    "`validation/neqsim/captures/process_api14c_safe_chart.tsv` - the device and category vocabularies, the whole table in device order, one unit of each classification branch, the declared, assuming-complete and empty charts.",
+]
+[source]
+standard = "NeqSim process/safety/api14c/Api14cSafeChartBuilder.java"
+edition = "Its `classify`, `build`, `buildAssumingComplete` and the `Api14cSafetyAnalysisTable` table."
+[algorithm]
+scheme = "api14c_safe_chart"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.equipment]
+type = "record_list"
+row_type = "SafeChartEquipment"
+optional = true
+description = "the equipment in caller order. A row whose class does not classify is omitted from the chart. **Absent is an empty chart.**\n"
+[inputs.equipment.fields.equipment]
+type = "string"
+description = "the equipment name or tag.\n"
+[inputs.equipment.fields.unit_class]
+type = "string"
+description = "the unit's simple class name or category, matched by lower-case substring.\n"
+[inputs.present_devices]
+type = "record_list"
+row_type = "SafeChartPresentDevice"
+optional = true
+description = "the devices declared present, one row per device. **Absent is no declarations**, which leaves every required device missing for an undeclared equipment.\n"
+[inputs.present_devices.fields.equipment]
+type = "string"
+description = "the equipment name the declaration applies to.\n"
+[inputs.present_devices.fields.device]
+type = "enum"
+values = ["psh", "psl", "lsh", "lsl", "tsh", "tsl", "usv", "sdv", "bdv", "psv", "fsv", "fire", "gas"]
+description = "the protective device.\n"
+[inputs.assume_complete]
+type = "boolean"
+optional = true
+description = "the class's `buildAssumingComplete` mode: every classified equipment has its required set present and the declarations are ignored. **Absent is false.**\n"
+[outputs]
+[outputs.items]
+type = "record_list"
+description = "one row per classified equipment, in caller order.\n"
+[outputs.items.fields.equipment]
+type = "string"
+description = "the equipment name.\n"
+[outputs.items.fields.category]
+type = "enum"
+values = ["pressure_vessel", "atmospheric_vessel", "fired_vessel", "pipeline_segment", "compressor", "pump", "heat_exchanger", "wellhead"]
+description = "the SAFE-table category the class assigned.\n"
+[outputs.items.fields.required_count]
+unit = "dimensionless"
+description = "the number of required devices.\n"
+[outputs.items.fields.present_count]
+unit = "dimensionless"
+description = "the number of declared-present devices, including devices the table does not require.\n"
+[outputs.items.fields.missing_count]
+unit = "dimensionless"
+description = "the number of required devices that are not present.\n"
+[outputs.items.fields.complete]
+type = "boolean"
+description = "whether the missing set is empty.\n"
+[outputs.missing_devices]
+type = "record_list"
+description = "one row per missing device, in equipment caller order and device declaration order.\n"
+[outputs.missing_devices.fields.equipment]
+type = "string"
+description = "the equipment name.\n"
+[outputs.missing_devices.fields.device]
+type = "enum"
+values = ["psh", "psl", "lsh", "lsl", "tsh", "tsl", "usv", "sdv", "bdv", "psv", "fsv", "fire", "gas"]
+description = "the missing protective device.\n"
+[outputs.equipment_count]
+unit = "dimensionless"
+description = "the number of classified equipment rows.\n"
+[outputs.missing_count]
+unit = "dimensionless"
+description = "the total number of missing devices across the chart.\n"
+[outputs.complete]
+type = "boolean"
+description = "whether every chart row is complete; true for an empty chart.\n"
+[implementations]
+python = "azoth.process.api14c_safe_chart"
+rust = "azoth_process::api14c_safe_chart"

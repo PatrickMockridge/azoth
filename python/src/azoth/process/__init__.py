@@ -22,6 +22,7 @@ from azoth.core.result import (
     AbsorptionColumnResult,
     ActiveFireProtectionScreeningResult,
     AntiSurgeRecycleResult,
+    Api14cSafeChartResult,
     Api537FlareFlameModelResult,
     BasketTestRegressionResult,
     BleveResult,
@@ -129,6 +130,7 @@ __all__ = [
     "absorption_column",
     "active_fire_protection_screening",
     "anti_surge_recycle",
+    "api14c_safe_chart",
     "api537_flare_flame_model",
     "bleve",
     "blowdown_pressure_profile",
@@ -285,6 +287,7 @@ _VESSEL_RUPTURE = "process.vessel_rupture"
 _SEMENOV_SELF_HEATING = "process.semenov_self_heating"
 _SELF_HEATING_INDUCTION = "process.self_heating_induction"
 _BASKET_TEST_REGRESSION = "process.basket_test_regression"
+_API14C_SAFE_CHART = "process.api14c_safe_chart"
 _HAZOP_TEMPLATE = "process.hazop_template"
 _FMEA_WORKSHEET = "process.fmea_worksheet"
 _HAZOP_CONSEQUENCE_POPULATION = "process.hazop_consequence_population"
@@ -3213,6 +3216,26 @@ def hazardous_area(
         ambient_density=ambient_density,
         safety_factor=safety_factor,
         release_grade=release_grade,
+    )
+
+
+def api14c_safe_chart(
+    equipment: list[dict[str, object]] | None = None,
+    present_devices: list[dict[str, object]] | None = None,
+    assume_complete: bool | None = None,
+) -> Api14cSafeChartResult:
+    """The API 14C SAFE chart: the required devices against the declared ones.
+
+    **The class-name classifier, the eight-category table and the missing set.** An
+    unclassified row is omitted, an undeclared equipment has an empty present set, and the
+    assuming-complete mode ignores declarations.
+
+    See :func:`azoth.process.reference.api14c_safe_chart`.
+    """
+    return resolve(_API14C_SAFE_CHART)(  # type: ignore[no-any-return]
+        equipment=equipment,
+        present_devices=present_devices,
+        assume_complete=assume_complete,
     )
 
 

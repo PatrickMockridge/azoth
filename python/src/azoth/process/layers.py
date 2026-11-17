@@ -2760,6 +2760,28 @@ def _mah_bow_tie_skeleton(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _api14c_safe_chart(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.api14c_safe_chart`'s layers, from the reference's own arithmetic."""
+    from azoth.process.reference.api14c_safe_chart import api14c_safe_chart as evaluate
+
+    present = inputs.get("present_devices")
+    assume_complete = inputs.get("assume_complete")
+    result = evaluate(
+        list(inputs.get("equipment", ())),
+        None if present is None else list(present),
+        None if assume_complete is None else bool(assume_complete),
+    )
+    layers = {
+        "equipment_count": result.equipment_count,
+        "gap_count": result.missing_count,
+    }
+    for index, item in enumerate(result.items):
+        layers[f"item{index}_required_count"] = item.required_count
+        layers[f"item{index}_present_count"] = item.present_count
+        layers[f"item{index}_missing_count"] = item.missing_count
+    return layers
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -3301,6 +3323,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.fmea_worksheet": _fmea_worksheet,
     "process.hazop_consequence_population": _hazop_consequence_population,
     "process.mah_bow_tie_skeleton": _mah_bow_tie_skeleton,
+    "process.api14c_safe_chart": _api14c_safe_chart,
     "process.check_valve_leak_relief": _check_valve_leak_relief,
     "process.control_valve_failure_relief": _control_valve_failure_relief,
     "process.tube_rupture_relief": _tube_rupture_relief,
@@ -5271,6 +5294,22 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=7,
         identified_by=("#label", "mah_fire_explosion"),
     ),
+    # The SAFE chart's two cased states; the vocabularies, the eight table rows and the
+    # assuming-complete chart are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.api14c_safe_chart",
+        case="api14c_declared",
+        capture="process_api14c_safe_chart.tsv",
+        block=10,
+        identified_by=("#label", "api14c_chart_declared"),
+    ),
+    LayerCase(
+        model="process.api14c_safe_chart",
+        case="api14c_empty",
+        capture="process_api14c_safe_chart.tsv",
+        block=12,
+        identified_by=("#label", "api14c_chart_empty"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -7036,6 +7075,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_hazop_consequence_population.tsv": 9,
     # The skeleton's eleven: the ten uncased categories and the null refusal.
     "process_mah_bow_tie_skeleton.tsv": 11,
+    # The chart's eleven: the two vocabularies, the eight table rows and the
+    # assuming-complete chart.
+    "process_api14c_safe_chart.tsv": 11,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

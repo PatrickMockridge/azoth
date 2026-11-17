@@ -23,9 +23,9 @@ use crate::record_outputs_gen::{
     PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
     PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
     PyNaceIssueRow, PyPipeFireRupturePoint, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyRiskAssessmentRow, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue, PySterileRadius,
-    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
+    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
     PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
@@ -14138,6 +14138,68 @@ impl From<&azoth_process::models::anti_surge_recycle::AntiSurgeRecycleResult>
                 unit: "m**3/h".to_string(),
             },
             distance_to_surge: r.distance_to_surge,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.api14c_safe_chart`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Api14cSafeChartResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyApi14cSafeChartResult {
+    /// one row per classified equipment, in caller order.
+    #[pyo3(get)]
+    pub items: Vec<PySafeChartItem>,
+    /// one row per missing device, in equipment caller order and device declaration order.
+    #[pyo3(get)]
+    pub missing_devices: Vec<PySafeChartMissingDevice>,
+    /// the number of classified equipment rows.
+    #[pyo3(get)]
+    pub equipment_count: f64,
+    /// the total number of missing devices across the chart.
+    #[pyo3(get)]
+    pub missing_count: f64,
+    /// whether every chart row is complete; true for an empty chart.
+    #[pyo3(get)]
+    pub complete: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyApi14cSafeChartResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Api14cSafeChartResult(items={:?}, missing_devices={:?}, equipment_count={:?}, missing_count={:?}, complete={:?}, {} warning(s))",
+            self.items,
+            self.missing_devices,
+            self.equipment_count,
+            self.missing_count,
+            self.complete,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::api14c_safe_chart::Api14cSafeChartResult>
+    for PyApi14cSafeChartResult
+{
+    fn from(r: &azoth_process::models::api14c_safe_chart::Api14cSafeChartResult) -> Self {
+        Self {
+            items: r.items.iter().map(PySafeChartItem::from).collect(),
+            missing_devices: r
+                .missing_devices
+                .iter()
+                .map(PySafeChartMissingDevice::from)
+                .collect(),
+            equipment_count: r.equipment_count,
+            missing_count: r.missing_count,
+            complete: r.complete,
             warnings: transport(&r.warnings),
         }
     }

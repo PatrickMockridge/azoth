@@ -2479,6 +2479,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 3,
         "tests_skipped": 0,
     },
+    'process.api14c_safe_chart': {
+        "calc_id": 'process.api14c_safe_chart',
+        "name": 'API 14C SAFE chart',
+        "spec": {'path': 'specs/models/process/api14c_safe_chart.toml', 'sha256': 'a32b53a98e86b1614e0c48371e64da0e93c4a977cf42b22967b8f27206bd8eda'},
+        "code": [{'path': 'python/src/azoth/process/reference/api14c_safe_chart.py', 'sha256': 'eecdad619f2a0e70db1e32bb44711c0bc0f22188368b1997a1ee8bae8a0b3dbe'}, {'path': 'crates/azoth-process/src/models/api14c_safe_chart.rs', 'sha256': 'df36bbe0b083115a731570f358611848ebce36e5bf077a66a744c655ef50f6d8'}],
+        "source": 'NeqSim process/safety/api14c/Api14cSafeChartBuilder.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 2,
+        "tests_skipped": 0,
+    },
     'process.api537_flare_flame_model': {
         "calc_id": 'process.api537_flare_flame_model',
         "name": 'API 537 flare flame model',

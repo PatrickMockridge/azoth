@@ -4,6 +4,7 @@
 //!   - specs/models/process/absorption_column.toml
 //!   - specs/models/process/active_fire_protection_screening.toml
 //!   - specs/models/process/anti_surge_recycle.toml
+//!   - specs/models/process/api14c_safe_chart.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
 //!   - specs/models/process/basket_test_regression.toml
 //!   - specs/models/process/bleve.toml

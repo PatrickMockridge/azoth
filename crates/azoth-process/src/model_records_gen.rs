@@ -14,6 +14,7 @@ use azoth_core::{CalcResult, Warning};
 use crate::models::absorption_column::AbsorptionColumnResult;
 use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult;
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
+use crate::models::api14c_safe_chart::Api14cSafeChartResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
 use crate::models::basket_test_regression::BasketTestRegressionResult;
 use crate::models::bleve::BleveResult;
@@ -171,6 +172,22 @@ impl CalcResult for AntiSurgeRecycleResult {
         "surge_flow",
         "control_flow",
         "distance_to_surge",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for Api14cSafeChartResult {
+    const CALC_ID: &'static str = "process.api14c_safe_chart";
+    const FIELDS: &'static [&'static str] = &[
+        "items",
+        "missing_devices",
+        "equipment_count",
+        "missing_count",
+        "complete",
         "warnings",
     ];
 

@@ -244,6 +244,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.absorption_column" => azoth_process::models::absorption_column::AbsorptionColumnResult::FIELDS.to_vec(),
         "process.active_fire_protection_screening" => azoth_process::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult::FIELDS.to_vec(),
         "process.anti_surge_recycle" => azoth_process::models::anti_surge_recycle::AntiSurgeRecycleResult::FIELDS.to_vec(),
+        "process.api14c_safe_chart" => azoth_process::models::api14c_safe_chart::Api14cSafeChartResult::FIELDS.to_vec(),
         "process.api537_flare_flame_model" => azoth_process::models::api537_flare_flame_model::Api537FlareFlameModelResult::FIELDS.to_vec(),
         "process.basket_test_regression" => azoth_process::models::basket_test_regression::BasketTestRegressionResult::FIELDS.to_vec(),
         "process.bleve" => azoth_process::models::bleve::BleveResult::FIELDS.to_vec(),

@@ -624,6 +624,24 @@ pub struct RiskEquipment {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct SafeChartEquipment {
+    #[pyo3(item)]
+    pub equipment: String,
+    #[pyo3(item)]
+    pub unit_class: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct SafeChartPresentDevice {
+    #[pyo3(item)]
+    pub equipment: String,
+    #[pyo3(item)]
+    pub device: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct ScaleInhibitor {
     #[pyo3(item)]
     pub scale_type: String,

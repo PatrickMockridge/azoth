@@ -2367,6 +2367,101 @@ impl From<&azoth_process::models::risk_matrix::RiskAssessmentRow> for PyRiskAsse
     }
 }
 
+/// one row per classified equipment, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SafeChartItem"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySafeChartItem {
+    /// the equipment name.
+    #[pyo3(get)]
+    pub equipment: String,
+    /// the SAFE-table category the class assigned.
+    #[pyo3(get)]
+    pub category: String,
+    /// the number of required devices.
+    #[pyo3(get)]
+    pub required_count: f64,
+    /// the number of declared-present devices, including devices the table does not require.
+    #[pyo3(get)]
+    pub present_count: f64,
+    /// the number of required devices that are not present.
+    #[pyo3(get)]
+    pub missing_count: f64,
+    /// whether the missing set is empty.
+    #[pyo3(get)]
+    pub complete: bool,
+}
+
+#[pymethods]
+impl PySafeChartItem {
+    fn __repr__(&self) -> String {
+        format!(
+            "SafeChartItem(equipment={}, category={}, required_count={}, present_count={}, missing_count={}, complete={:?})",
+            self.equipment,
+            self.category,
+            self.required_count,
+            self.present_count,
+            self.missing_count,
+            self.complete
+        )
+    }
+}
+
+impl From<&azoth_process::models::api14c_safe_chart::SafeChartItem> for PySafeChartItem {
+    fn from(row: &azoth_process::models::api14c_safe_chart::SafeChartItem) -> Self {
+        Self {
+            equipment: row.equipment.clone(),
+            category: row.category.as_str().to_string(),
+            required_count: row.required_count,
+            present_count: row.present_count,
+            missing_count: row.missing_count,
+            complete: row.complete,
+        }
+    }
+}
+
+/// one row per missing device, in equipment caller order and device declaration order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SafeChartMissingDevice"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySafeChartMissingDevice {
+    /// the equipment name.
+    #[pyo3(get)]
+    pub equipment: String,
+    /// the missing protective device.
+    #[pyo3(get)]
+    pub device: String,
+}
+
+#[pymethods]
+impl PySafeChartMissingDevice {
+    fn __repr__(&self) -> String {
+        format!(
+            "SafeChartMissingDevice(equipment={}, device={})",
+            self.equipment, self.device
+        )
+    }
+}
+
+impl From<&azoth_process::models::api14c_safe_chart::SafeChartMissingDevice>
+    for PySafeChartMissingDevice
+{
+    fn from(row: &azoth_process::models::api14c_safe_chart::SafeChartMissingDevice) -> Self {
+        Self {
+            equipment: row.equipment.clone(),
+            device: row.device.as_str().to_string(),
+        }
+    }
+}
+
 /// The inhibited risk index, one row per scale in the same order.
 #[pyclass(
     frozen,

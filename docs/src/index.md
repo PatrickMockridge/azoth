@@ -330,6 +330,7 @@ Five sections, and the difference between them is the point:
 - [`process.absorption_column`](./process/absorption_column.md) — Absorption column
 - [`process.active_fire_protection_screening`](./process/active_fire_protection_screening.md) — Active fire protection screening
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
+- [`process.api14c_safe_chart`](./process/api14c_safe_chart.md) — API 14C SAFE chart
 - [`process.api537_flare_flame_model`](./process/api537_flare_flame_model.md) — API 537 flare flame model
 - [`process.basket_test_regression`](./process/basket_test_regression.md) — Basket-test regression
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation

@@ -410,6 +410,10 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # compares it on the design-capacities row, and `test_cross_impl` compares it on both
         # results.
         "overloaded",
+        # `api14c_safe_chart`'s chart verdict, a boolean with no slot in `TestCase`.
+        # `crates/azoth-process/tests/api14c_safe_chart.rs` asserts it against the capture,
+        # and `test_cross_impl` compares it on both results.
+        "complete",
     }
 )
 

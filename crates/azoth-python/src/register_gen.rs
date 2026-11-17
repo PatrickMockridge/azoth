@@ -243,6 +243,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyAbsorptionColumnResult>()?;
     m.add_class::<crate::transport_gen::PyActiveFireProtectionScreeningResult>()?;
     m.add_class::<crate::transport_gen::PyAntiSurgeRecycleResult>()?;
+    m.add_class::<crate::transport_gen::PyApi14cSafeChartResult>()?;
     m.add_class::<crate::transport_gen::PyApi537FlareFlameModelResult>()?;
     m.add_class::<crate::transport_gen::PyBasketTestRegressionResult>()?;
     m.add_class::<crate::transport_gen::PyBleveResult>()?;
@@ -383,6 +384,8 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyReliefDisposalRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRiskAssessmentRow>()?;
+    m.add_class::<crate::record_outputs_gen::PySafeChartItem>()?;
+    m.add_class::<crate::record_outputs_gen::PySafeChartMissingDevice>()?;
     m.add_class::<crate::record_outputs_gen::PyScaleControlRiskRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScaleControlRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioChangeRow>()?;
@@ -940,6 +943,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::anti_surge_recycle,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::process::api14c_safe_chart, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::api537_flare_flame_model,
         m

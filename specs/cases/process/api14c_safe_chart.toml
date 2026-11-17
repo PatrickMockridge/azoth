@@ -1,0 +1,91 @@
+model = "process.api14c_safe_chart"
+[[cases]]
+id = "api14c_declared"
+tolerance = 1.0e-12
+source = "One unit of each classification branch, a Stream skipped, and V-101 declared present PSH and PSV. From `validation/neqsim/captures/process_api14c_safe_chart.tsv` (`api14c_chart_declared`)."
+[cases.inputs]
+equipment = [
+  { equipment = "feed", unit_class = "Stream" },
+  { equipment = "V-101", unit_class = "Separator" },
+  { equipment = "SCR-101", unit_class = "GasScrubber" },
+  { equipment = "T-101", unit_class = "Tank" },
+  { equipment = "H-101", unit_class = "FiredHeater" },
+  { equipment = "PL-101", unit_class = "PipeBeggsAndBrills" },
+  { equipment = "K-101", unit_class = "Compressor" },
+  { equipment = "P-101", unit_class = "Pump" },
+  { equipment = "E-101", unit_class = "Cooler" },
+  { equipment = "W-101", unit_class = "WellFlow" },
+]
+present_devices = [
+  { equipment = "V-101", device = "psh" },
+  { equipment = "V-101", device = "psv" },
+]
+[cases.expected]
+equipment_count = 9.0
+missing_count = 42.0
+complete = false
+items = [
+  { equipment = "V-101", category = "pressure_vessel", required_count = 6.0, present_count = 2.0, missing_count = 4.0, complete = false },
+  { equipment = "SCR-101", category = "pressure_vessel", required_count = 6.0, present_count = 0.0, missing_count = 6.0, complete = false },
+  { equipment = "T-101", category = "atmospheric_vessel", required_count = 3.0, present_count = 0.0, missing_count = 3.0, complete = false },
+  { equipment = "H-101", category = "fired_vessel", required_count = 7.0, present_count = 0.0, missing_count = 7.0, complete = false },
+  { equipment = "PL-101", category = "pipeline_segment", required_count = 4.0, present_count = 0.0, missing_count = 4.0, complete = false },
+  { equipment = "K-101", category = "compressor", required_count = 6.0, present_count = 0.0, missing_count = 6.0, complete = false },
+  { equipment = "P-101", category = "pump", required_count = 4.0, present_count = 0.0, missing_count = 4.0, complete = false },
+  { equipment = "E-101", category = "heat_exchanger", required_count = 3.0, present_count = 0.0, missing_count = 3.0, complete = false },
+  { equipment = "W-101", category = "wellhead", required_count = 5.0, present_count = 0.0, missing_count = 5.0, complete = false },
+]
+missing_devices = [
+  { equipment = "V-101", device = "psl" },
+  { equipment = "V-101", device = "lsh" },
+  { equipment = "V-101", device = "lsl" },
+  { equipment = "V-101", device = "sdv" },
+  { equipment = "SCR-101", device = "psh" },
+  { equipment = "SCR-101", device = "psl" },
+  { equipment = "SCR-101", device = "lsh" },
+  { equipment = "SCR-101", device = "lsl" },
+  { equipment = "SCR-101", device = "sdv" },
+  { equipment = "SCR-101", device = "psv" },
+  { equipment = "T-101", device = "lsh" },
+  { equipment = "T-101", device = "psv" },
+  { equipment = "T-101", device = "fsv" },
+  { equipment = "H-101", device = "psh" },
+  { equipment = "H-101", device = "lsl" },
+  { equipment = "H-101", device = "tsh" },
+  { equipment = "H-101", device = "sdv" },
+  { equipment = "H-101", device = "bdv" },
+  { equipment = "H-101", device = "psv" },
+  { equipment = "H-101", device = "fire" },
+  { equipment = "PL-101", device = "psh" },
+  { equipment = "PL-101", device = "psl" },
+  { equipment = "PL-101", device = "sdv" },
+  { equipment = "PL-101", device = "fsv" },
+  { equipment = "K-101", device = "psh" },
+  { equipment = "K-101", device = "psl" },
+  { equipment = "K-101", device = "tsh" },
+  { equipment = "K-101", device = "sdv" },
+  { equipment = "K-101", device = "bdv" },
+  { equipment = "K-101", device = "psv" },
+  { equipment = "P-101", device = "psh" },
+  { equipment = "P-101", device = "sdv" },
+  { equipment = "P-101", device = "psv" },
+  { equipment = "P-101", device = "fsv" },
+  { equipment = "E-101", device = "psh" },
+  { equipment = "E-101", device = "tsh" },
+  { equipment = "E-101", device = "psv" },
+  { equipment = "W-101", device = "psh" },
+  { equipment = "W-101", device = "psl" },
+  { equipment = "W-101", device = "usv" },
+  { equipment = "W-101", device = "sdv" },
+  { equipment = "W-101", device = "psv" },
+]
+[[cases]]
+id = "api14c_empty"
+tolerance = 1.0e-12
+source = "The empty chart: no equipment and the assuming-complete mode. From (`api14c_chart_empty`)."
+[cases.inputs]
+assume_complete = true
+[cases.expected]
+equipment_count = 0.0
+missing_count = 0.0
+complete = true

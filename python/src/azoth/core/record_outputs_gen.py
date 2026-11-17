@@ -882,6 +882,40 @@ class RiskAssessmentRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SafeChartItem:
+    """one row per classified equipment, in caller order."""
+
+    #: the equipment name.
+    equipment: str
+
+    #: the SAFE-table category the class assigned.
+    category: str
+
+    #: the number of required devices.
+    required_count: float
+
+    #: the number of declared-present devices, including devices the table does not require.
+    present_count: float
+
+    #: the number of required devices that are not present.
+    missing_count: float
+
+    #: whether the missing set is empty.
+    complete: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SafeChartMissingDevice:
+    """one row per missing device, in equipment caller order and device declaration order."""
+
+    #: the equipment name.
+    equipment: str
+
+    #: the missing protective device.
+    device: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ScaleControlRiskRow:
     """The inhibited risk index, one row per scale in the same order."""
 

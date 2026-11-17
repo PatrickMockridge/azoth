@@ -16,6 +16,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.absorption_column`](./absorption_column.md) | `direct composition` | NeqSim process/equipment/absorber/AbsorptionColumn.java |
 | [`process.active_fire_protection_screening`](./active_fire_protection_screening.md) | `closed_form_active_fire_protection_screening` | NeqSim process/safety/firewater/ActiveFireProtectionScreening.java |
 | [`process.anti_surge_recycle`](./anti_surge_recycle.md) | `damped_fixed_point_recycle` | NeqSim process/equipment/compressor/AntiSurgeRecycleCalculator.java |
+| [`process.api14c_safe_chart`](./api14c_safe_chart.md) | `api14c_safe_chart` | NeqSim process/safety/api14c/Api14cSafeChartBuilder.java |
 | [`process.api537_flare_flame_model`](./api537_flare_flame_model.md) | `closed_form_flare_flame_and_radiation` | NeqSim process/safety/fire/Api537FlareFlameModel.java |
 | [`process.basket_test_regression`](./basket_test_regression.md) | `basket_least_squares` | NeqSim process/safety/selfheating/BasketTestRegression.java |
 | [`process.bleve`](./bleve.md) | `ccps_fireball_point_source` | NeqSim process/safety/fire/BLEVECalculator.java |

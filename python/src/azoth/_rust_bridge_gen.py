@@ -22,6 +22,7 @@ from azoth.core.result import (
     AmmoniaPhaseResult,
     AntiSurgeRecycleResult,
     AntoineVaporPressureResult,
+    Api14cSafeChartResult,
     Api537FlareFlameModelResult,
     AppliedStandardRow,
     AqueousViscosityResult,
@@ -288,6 +289,8 @@ from azoth.core.result import (
     RkDepartureResult,
     RootStructure,
     RuptureStatus,
+    SafeChartItem,
+    SafeChartMissingDevice,
     SafetyInstrumentedFunctionResult,
     SaftVrMiePhaseResult,
     SaltPrecipitationResult,
@@ -452,6 +455,7 @@ __all__ = [
     "ammonia_phase",
     "anti_surge_recycle",
     "antoine_vapor_pressure",
+    "api14c_safe_chart",
     "api537_flare_flame_model",
     "aqueous_viscosity",
     "argon_solid_phase",
@@ -5720,6 +5724,24 @@ def anti_surge_recycle(components: list[str], feed_n: Q, feed_z: list[float], fe
         surge_flow=from_si(result.surge_flow.magnitude_si, result.surge_flow.unit),
         control_flow=from_si(result.control_flow.magnitude_si, result.control_flow.unit),
         distance_to_surge=result.distance_to_surge,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def api14c_safe_chart(equipment: list[dict[str, object]] | None=None, present_devices: list[dict[str, object]] | None=None, assume_complete: bool | None=None) -> Api14cSafeChartResult:
+    """``process.api14c_safe_chart``, computed in Rust."""
+    spec = _models_gen.model("process.api14c_safe_chart")
+    result = _core.api14c_safe_chart(
+        None if equipment is None else input_records_to_si(spec, "equipment", equipment),
+        None if present_devices is None else input_records_to_si(spec, "present_devices", present_devices),
+        assume_complete,
+    )
+    return Api14cSafeChartResult(
+        items=tuple(SafeChartItem(equipment=c.equipment, category=c.category, required_count=c.required_count, present_count=c.present_count, missing_count=c.missing_count, complete=c.complete) for c in result.items),
+        missing_devices=tuple(SafeChartMissingDevice(equipment=c.equipment, device=c.device) for c in result.missing_devices),
+        equipment_count=result.equipment_count,
+        missing_count=result.missing_count,
+        complete=result.complete,
         warnings=_warnings(result.warnings),
     )
 

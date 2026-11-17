@@ -817,6 +817,49 @@ pub fn map_turbo_expander_compressor(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// `process.api14c_safe_chart` - the API 14C SAFE chart.
+///
+/// The class-name classifier, the required-device table and the missing set.
+/// `present_devices` is optional: absent is no declarations.
+#[pyfunction]
+#[pyo3(signature = (equipment, present_devices = None, assume_complete = None))]
+#[pyo3(text_signature = "(equipment, present_devices=None, assume_complete=None)")]
+pub fn api14c_safe_chart(
+    py: Python<'_>,
+    equipment: Option<Vec<crate::records_gen::SafeChartEquipment>>,
+    present_devices: Option<Vec<crate::records_gen::SafeChartPresentDevice>>,
+    assume_complete: Option<bool>,
+) -> PyResult<crate::transport_gen::PyApi14cSafeChartResult> {
+    let equipment_records: Vec<azoth_process::models::api14c_safe_chart::SafeChartEquipment> =
+        equipment
+            .unwrap_or_default()
+            .into_iter()
+            .map(
+                |row| azoth_process::models::api14c_safe_chart::SafeChartEquipment {
+                    equipment: row.equipment,
+                    unit_class: row.unit_class,
+                },
+            )
+            .collect();
+    let present_records = present_devices.map(|rows| {
+        rows.into_iter()
+            .map(
+                |row| azoth_process::models::api14c_safe_chart::SafeChartPresentDevice {
+                    equipment: row.equipment,
+                    device: row.device,
+                },
+            )
+            .collect::<Vec<_>>()
+    });
+    azoth_process::models::api14c_safe_chart::api14c_safe_chart(
+        Some(&equipment_records),
+        present_records.as_deref(),
+        assume_complete,
+    )
+    .map(|r| crate::transport_gen::PyApi14cSafeChartResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// `process.absorption_column` - the tray absorber as a registered id.
 ///
 /// **The column's own profile shape with the class's own product names**, and two inlets where
