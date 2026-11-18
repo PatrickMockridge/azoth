@@ -348,6 +348,7 @@ Five sections, and the difference between them is the point:
 - [`process.cooler`](./process/cooler.md) — Cooler
 - [`process.deluge_nozzle_layout`](./process/deluge_nozzle_layout.md) — Deluge nozzle layout
 - [`process.distillation_column`](./process/distillation_column.md) — Distillation column
+- [`process.dynamic_psv_sizing`](./process/dynamic_psv_sizing.md) — Dynamic PSV sizing
 - [`process.ejector`](./process/ejector.md) — Ejector
 - [`process.escalation_graph`](./process/escalation_graph.md) — Escalation graph analysis
 - [`process.event_tree`](./process/event_tree.md) — Event tree

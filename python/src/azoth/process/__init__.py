@@ -40,6 +40,7 @@ from azoth.core.result import (
     CoolerResult,
     DelugeNozzleLayoutResult,
     DistillationColumnResult,
+    DynamicPsvSizingResult,
     EjectorResult,
     EscalationGraphResult,
     EventTreeResult,
@@ -308,6 +309,7 @@ _PROBIT = "process.probit"
 _PSV_FIRE_SIZING = "process.psv_fire_sizing"
 _PSV_SIZING = "process.psv_sizing"
 _PSV_VALVE = "process.psv_valve"
+_DYNAMIC_PSV_SIZING = "process.dynamic_psv_sizing"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
@@ -3990,6 +3992,50 @@ def psv_valve(
         compressibility=compressibility,
         was_open=was_open,
         prior_cycle_count=prior_cycle_count,
+    )
+
+
+def dynamic_psv_sizing(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: Q,
+    initial_p: Q,
+    vessel_volume: Q,
+    fire_heat_input: Q,
+    set_pressure: Q,
+    overpressure_fraction: float,
+    back_pressure: Q,
+    blowdown_fraction: float | None = None,
+    discharge_coefficient: float | None = None,
+    latent_heat: float | None = None,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+    initial_pressure_fraction: float | None = None,
+) -> DynamicPsvSizingResult:
+    """The steady API 521 area and the dynamically required area for a cycling PSV.
+
+    The dynamic march is an ideal-gas lumped vessel seeded from one TP flash; its start
+    pressure is ``set_pressure x initial_pressure_fraction``, so the fluid's stated
+    pressure enters only through the flash and the compressibility.
+
+    See :func:`azoth.process.reference.dynamic_psv_sizing`.
+    """
+    return resolve(_DYNAMIC_PSV_SIZING)(  # type: ignore[no-any-return]
+        components=components,
+        initial_z=initial_z,
+        initial_t=initial_t,
+        initial_p=initial_p,
+        vessel_volume=vessel_volume,
+        fire_heat_input=fire_heat_input,
+        set_pressure=set_pressure,
+        overpressure_fraction=overpressure_fraction,
+        back_pressure=back_pressure,
+        blowdown_fraction=blowdown_fraction,
+        discharge_coefficient=discharge_coefficient,
+        latent_heat=latent_heat,
+        time_step=time_step,
+        max_time=max_time,
+        initial_pressure_fraction=initial_pressure_fraction,
     )
 
 

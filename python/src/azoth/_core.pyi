@@ -3721,6 +3721,16 @@ class DistillationColumnResult:
     warnings: list[Warning]
 
 @final
+class DynamicPsvSizingResult:
+    steady_required_area: Qty
+    dynamic_required_area: Qty
+    oversizing_ratio: float | None
+    allowable_pressure: Qty
+    peak_dynamic_pressure: Qty
+    steady_relief_rate: Qty
+    warnings: list[Warning]
+
+@final
 class EjectorResult:
     outlet_n: Qty
     outlet_z: list[float]
@@ -7820,6 +7830,23 @@ def distillation_column(
     material_grade: str | None = None,
     max_operation_pressure: float | None = None,
 ) -> DistillationColumnResult: ...
+def dynamic_psv_sizing(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: float,
+    initial_p: float,
+    vessel_volume: float,
+    fire_heat_input: float,
+    set_pressure: float,
+    overpressure_fraction: float,
+    back_pressure: float,
+    blowdown_fraction: float | None = None,
+    discharge_coefficient: float | None = None,
+    latent_heat: float | None = None,
+    time_step: float | None = None,
+    max_time: float | None = None,
+    initial_pressure_fraction: float | None = None,
+) -> DynamicPsvSizingResult: ...
 def ejector(
     motive_components: list[str],
     suction_components: list[str],

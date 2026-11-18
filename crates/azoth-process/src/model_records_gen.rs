@@ -32,6 +32,7 @@ use crate::models::control_valve_failure_relief::ControlValveFailureReliefResult
 use crate::models::cooler::CoolerResult;
 use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::distillation_column::DistillationColumnResult;
+use crate::models::dynamic_psv_sizing::DynamicPsvSizingResult;
 use crate::models::ejector::EjectorResult;
 use crate::models::escalation_graph::EscalationGraphResult;
 use crate::models::event_tree::EventTreeResult;
@@ -595,6 +596,23 @@ impl CalcResult for DistillationColumnResult {
         "reboiler_duty_kw",
         "condenser_duty_kw",
         "material_grade",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for DynamicPsvSizingResult {
+    const CALC_ID: &'static str = "process.dynamic_psv_sizing";
+    const FIELDS: &'static [&'static str] = &[
+        "steady_required_area",
+        "dynamic_required_area",
+        "oversizing_ratio",
+        "allowable_pressure",
+        "peak_dynamic_pressure",
+        "steady_relief_rate",
         "warnings",
     ];
 

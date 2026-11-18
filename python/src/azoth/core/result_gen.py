@@ -6543,6 +6543,34 @@ class DistillationColumnResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class DynamicPsvSizingResult(_HasWarnings):
+    """Result of ``process.dynamic_psv_sizing``."""
+
+    CALC_ID: ClassVar[str] = "process.dynamic_psv_sizing"
+
+    #: the steady API 521 required orifice area.
+    steady_required_area: Q
+
+    #: the dynamically required orifice area.
+    dynamic_required_area: Q
+
+    #: the steady-to-dynamic oversizing; absent only at a zero dynamic area.
+    oversizing_ratio: float | None
+
+    #: the allowable accumulated pressure `set_pressure (1 + overpressure_fraction)`.
+    allowable_pressure: Q
+
+    #: the peak vessel pressure at the dynamically required area.
+    peak_dynamic_pressure: Q
+
+    #: the steady relief rate `fire_heat_input / latent_heat`.
+    steady_relief_rate: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class EjectorResult(_HasWarnings):
     """Result of ``process.ejector``."""
 

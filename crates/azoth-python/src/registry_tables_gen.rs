@@ -262,6 +262,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.cooler" => azoth_process::models::cooler::CoolerResult::FIELDS.to_vec(),
         "process.deluge_nozzle_layout" => azoth_process::models::deluge_nozzle_layout::DelugeNozzleLayoutResult::FIELDS.to_vec(),
         "process.distillation_column" => azoth_process::models::distillation_column::DistillationColumnResult::FIELDS.to_vec(),
+        "process.dynamic_psv_sizing" => azoth_process::models::dynamic_psv_sizing::DynamicPsvSizingResult::FIELDS.to_vec(),
         "process.ejector" => azoth_process::models::ejector::EjectorResult::FIELDS.to_vec(),
         "process.escalation_graph" => azoth_process::models::escalation_graph::EscalationGraphResult::FIELDS.to_vec(),
         "process.event_tree" => azoth_process::models::event_tree::EventTreeResult::FIELDS.to_vec(),

@@ -256,6 +256,7 @@
   - [Cooler](./process/cooler.md)
   - [Deluge nozzle layout](./process/deluge_nozzle_layout.md)
   - [Distillation column](./process/distillation_column.md)
+  - [Dynamic PSV sizing](./process/dynamic_psv_sizing.md)
   - [Ejector](./process/ejector.md)
   - [Escalation graph analysis](./process/escalation_graph.md)
   - [Event tree](./process/event_tree.md)

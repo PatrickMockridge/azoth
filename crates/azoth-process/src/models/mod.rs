@@ -51,6 +51,7 @@ pub mod control_valve_failure_relief;
 pub mod cooler;
 pub mod deluge_nozzle_layout;
 pub mod distillation_column;
+pub mod dynamic_psv_sizing;
 pub mod ejector;
 pub mod escalation_graph;
 pub mod event_tree;
@@ -186,6 +187,7 @@ pub use deluge_nozzle_layout::{
     DelugeNozzleLayoutResult, GoverningCriterion, deluge_nozzle_layout,
 };
 pub use distillation_column::{DistillationColumnResult, distillation_column};
+pub use dynamic_psv_sizing::{DynamicPsvSizingResult, dynamic_psv_sizing};
 pub use ejector::{EjectorResult, ejector};
 pub use escalation_graph::{
     EscalationExposure, EscalationGraphResult, EscalationItem, EscalationItemResult,

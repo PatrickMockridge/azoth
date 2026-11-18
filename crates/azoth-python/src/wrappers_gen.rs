@@ -6178,6 +6178,54 @@ pub fn distillation_column(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Dynamic PSV sizing.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, initial_z, initial_t, initial_p, vessel_volume, fire_heat_input, set_pressure, overpressure_fraction, back_pressure, blowdown_fraction, discharge_coefficient, latent_heat, time_step, max_time, initial_pressure_fraction))]
+#[pyo3(
+    text_signature = "(components, initial_z, initial_t, initial_p, vessel_volume, fire_heat_input, set_pressure, overpressure_fraction, back_pressure, blowdown_fraction, discharge_coefficient, latent_heat, time_step, max_time, initial_pressure_fraction)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn dynamic_psv_sizing(
+    py: Python<'_>,
+    components: Vec<String>,
+    initial_z: Vec<f64>,
+    initial_t: f64,
+    initial_p: f64,
+    vessel_volume: f64,
+    fire_heat_input: f64,
+    set_pressure: f64,
+    overpressure_fraction: f64,
+    back_pressure: f64,
+    blowdown_fraction: Option<f64>,
+    discharge_coefficient: Option<f64>,
+    latent_heat: Option<f64>,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+    initial_pressure_fraction: Option<f64>,
+) -> PyResult<crate::transport_gen::PyDynamicPsvSizingResult> {
+    azoth_process::models::dynamic_psv_sizing::dynamic_psv_sizing(
+        &components,
+        &initial_z,
+        kelvins(initial_t),
+        pascals(initial_p),
+        cubic_meters(vessel_volume),
+        watts(fire_heat_input),
+        pascals(set_pressure),
+        overpressure_fraction,
+        pascals(back_pressure),
+        blowdown_fraction,
+        discharge_coefficient,
+        latent_heat,
+        time_step.map(seconds),
+        max_time.map(seconds),
+        initial_pressure_fraction,
+    )
+    .map(|r| crate::transport_gen::PyDynamicPsvSizingResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Escalation graph analysis.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

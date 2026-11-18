@@ -243,6 +243,7 @@
 //!   - specs/models/process/cooler.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/distillation_column.toml
+//!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/escalation_graph.toml
 //!   - specs/models/process/event_tree.toml
@@ -3276,6 +3277,40 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.distillation_column",
         "max_operation_pressure",
         "pressure",
+    ),
+    ("process.dynamic_psv_sizing", "initial_z", "dimensionless"),
+    (
+        "process.dynamic_psv_sizing",
+        "initial_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.dynamic_psv_sizing", "initial_p", "pressure"),
+    ("process.dynamic_psv_sizing", "vessel_volume", "volume"),
+    ("process.dynamic_psv_sizing", "fire_heat_input", "power"),
+    ("process.dynamic_psv_sizing", "set_pressure", "pressure"),
+    (
+        "process.dynamic_psv_sizing",
+        "overpressure_fraction",
+        "dimensionless",
+    ),
+    ("process.dynamic_psv_sizing", "back_pressure", "pressure"),
+    (
+        "process.dynamic_psv_sizing",
+        "blowdown_fraction",
+        "dimensionless",
+    ),
+    (
+        "process.dynamic_psv_sizing",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.dynamic_psv_sizing", "latent_heat", "dimensionless"),
+    ("process.dynamic_psv_sizing", "time_step", "time"),
+    ("process.dynamic_psv_sizing", "max_time", "time"),
+    (
+        "process.dynamic_psv_sizing",
+        "initial_pressure_fraction",
+        "dimensionless",
     ),
     ("process.ejector", "motive_n", "molar_flow"),
     ("process.ejector", "motive_z", "dimensionless"),

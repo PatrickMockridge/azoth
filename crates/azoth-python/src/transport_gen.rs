@@ -16226,6 +16226,84 @@ impl From<&azoth_process::models::distillation_column::DistillationColumnResult>
         }
     }
 }
+/// Result of `process.dynamic_psv_sizing`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DynamicPsvSizingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDynamicPsvSizingResult {
+    /// the steady API 521 required orifice area.
+    #[pyo3(get)]
+    pub steady_required_area: PyQty,
+    /// the dynamically required orifice area.
+    #[pyo3(get)]
+    pub dynamic_required_area: PyQty,
+    /// the steady-to-dynamic oversizing; absent only at a zero dynamic area.
+    #[pyo3(get)]
+    pub oversizing_ratio: Option<f64>,
+    /// the allowable accumulated pressure `set_pressure (1 + overpressure_fraction)`.
+    #[pyo3(get)]
+    pub allowable_pressure: PyQty,
+    /// the peak vessel pressure at the dynamically required area.
+    #[pyo3(get)]
+    pub peak_dynamic_pressure: PyQty,
+    /// the steady relief rate `fire_heat_input / latent_heat`.
+    #[pyo3(get)]
+    pub steady_relief_rate: PyQty,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDynamicPsvSizingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DynamicPsvSizingResult(steady_required_area={:?}, dynamic_required_area={:?}, oversizing_ratio={:?}, allowable_pressure={:?}, peak_dynamic_pressure={:?}, steady_relief_rate={:?}, {} warning(s))",
+            self.steady_required_area,
+            self.dynamic_required_area,
+            self.oversizing_ratio,
+            self.allowable_pressure,
+            self.peak_dynamic_pressure,
+            self.steady_relief_rate,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::dynamic_psv_sizing::DynamicPsvSizingResult>
+    for PyDynamicPsvSizingResult
+{
+    fn from(r: &azoth_process::models::dynamic_psv_sizing::DynamicPsvSizingResult) -> Self {
+        Self {
+            steady_required_area: PyQty {
+                magnitude_si: r.steady_required_area.value,
+                unit: "m**2".to_string(),
+            },
+            dynamic_required_area: PyQty {
+                magnitude_si: r.dynamic_required_area.value,
+                unit: "m**2".to_string(),
+            },
+            oversizing_ratio: r.oversizing_ratio,
+            allowable_pressure: PyQty {
+                magnitude_si: r.allowable_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            peak_dynamic_pressure: PyQty {
+                magnitude_si: r.peak_dynamic_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            steady_relief_rate: PyQty {
+                magnitude_si: r.steady_relief_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.ejector`, transported.
 #[pyclass(
     frozen,

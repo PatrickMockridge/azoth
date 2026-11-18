@@ -89,6 +89,7 @@ from azoth.core.result import (
     DewPressureResult,
     DewTemperatureResult,
     DistillationColumnResult,
+    DynamicPsvSizingResult,
     EffectiveDiffusionResult,
     EjectorResult,
     ElectrolyteCpaStatoilPhaseResult,
@@ -546,6 +547,7 @@ __all__ = [
     "dew_pressure",
     "dew_temperature",
     "distillation_column",
+    "dynamic_psv_sizing",
     "effective_diffusion",
     "ejector",
     "electrolyte_cpa_statoil_phase",
@@ -6379,6 +6381,37 @@ def distillation_column(components: list[str], feed_n: Q, feed_z: list[float], f
         reboiler_duty_kw=from_si(result.reboiler_duty_kw.magnitude_si, result.reboiler_duty_kw.unit),
         condenser_duty_kw=from_si(result.condenser_duty_kw.magnitude_si, result.condenser_duty_kw.unit),
         material_grade=result.material_grade,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def dynamic_psv_sizing(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, fire_heat_input: Q, set_pressure: Q, overpressure_fraction: float, back_pressure: Q, blowdown_fraction: float | None=None, discharge_coefficient: float | None=None, latent_heat: float | None=None, time_step: Q | None=None, max_time: Q | None=None, initial_pressure_fraction: float | None=None) -> DynamicPsvSizingResult:
+    """``process.dynamic_psv_sizing``, computed in Rust."""
+    spec = _models_gen.model("process.dynamic_psv_sizing")
+    result = _core.dynamic_psv_sizing(
+        list(components),
+        list(initial_z),
+        input_to_si(spec, "initial_t", initial_t),
+        input_to_si(spec, "initial_p", initial_p),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "fire_heat_input", fire_heat_input),
+        input_to_si(spec, "set_pressure", set_pressure),
+        overpressure_fraction,
+        input_to_si(spec, "back_pressure", back_pressure),
+        None if blowdown_fraction is None else blowdown_fraction,
+        None if discharge_coefficient is None else discharge_coefficient,
+        None if latent_heat is None else latent_heat,
+        None if time_step is None else input_to_si(spec, "time_step", time_step),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+        None if initial_pressure_fraction is None else initial_pressure_fraction,
+    )
+    return DynamicPsvSizingResult(
+        steady_required_area=from_si(result.steady_required_area.magnitude_si, result.steady_required_area.unit),
+        dynamic_required_area=from_si(result.dynamic_required_area.magnitude_si, result.dynamic_required_area.unit),
+        oversizing_ratio=result.oversizing_ratio,
+        allowable_pressure=from_si(result.allowable_pressure.magnitude_si, result.allowable_pressure.unit),
+        peak_dynamic_pressure=from_si(result.peak_dynamic_pressure.magnitude_si, result.peak_dynamic_pressure.unit),
+        steady_relief_rate=from_si(result.steady_relief_rate.magnitude_si, result.steady_relief_rate.unit),
         warnings=_warnings(result.warnings),
     )
 

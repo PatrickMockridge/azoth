@@ -1821,6 +1821,46 @@ def _psv_valve(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _dynamic_psv_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.dynamic_psv_sizing`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.dynamic_psv_sizing import _evaluate
+
+    def optional(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    def optional_quantity(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["initial_z"]],
+        quantity(float(inputs["initial_t"]), "K"),
+        quantity(float(inputs["initial_p"]), "Pa"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["fire_heat_input"]), "W"),
+        quantity(float(inputs["set_pressure"]), "Pa"),
+        float(inputs["overpressure_fraction"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        optional("blowdown_fraction"),
+        optional("discharge_coefficient"),
+        optional("latent_heat"),
+        optional_quantity("time_step", "s"),
+        optional_quantity("max_time", "s"),
+        optional("initial_pressure_fraction"),
+    )
+    return {
+        "steady_required_area_m2": solution.steady_required_area,
+        "dynamic_required_area_m2": solution.dynamic_required_area,
+        "oversizing_ratio": solution.oversizing_ratio or 0.0,
+        "allowable_pressure_pa": solution.allowable_pressure,
+        "peak_dynamic_pressure_pa": solution.peak_dynamic_pressure,
+        "steady_relief_rate_kg_s": solution.steady_relief_rate,
+    }
+
+
 def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.inherent_safety`'s layers, from the reference's arithmetic."""
     from azoth.process.reference.inherent_safety import _evaluate
@@ -3902,6 +3942,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.escalation_graph": _escalation_graph,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.psv_valve": _psv_valve,
+    "process.dynamic_psv_sizing": _dynamic_psv_sizing,
     "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.sts0131_gate": _sts0131_gate,
@@ -5031,6 +5072,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_psv_valve.tsv",
         block=1,
         identified_by=("#label", "valve_pops_at_set"),
+    ),
+    # The dynamic sizing's one: the 50 bara gas. The low-pressure state and the two refusals
+    # are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.dynamic_psv_sizing",
+        case="fifty_bara_gas",
+        capture="process_dynamic_psv_sizing.tsv",
+        block=0,
+        identified_by=("#label", "dpsv_50bara"),
     ),
     # STS-0131's one: the PSV margin at equality. The five further cases, the seven
     # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
@@ -7945,6 +7995,7 @@ UNCASED_ROWS: dict[str, int] = {
     # Inherent safety's four: the zero and boundary states and the two refusals.
     "process_inherent_safety.tsv": 4,
     "process_psv_valve.tsv": 16,
+    "process_dynamic_psv_sizing.tsv": 3,
     # ALARP's eight: the five further states, the empty audit and the two refusals.
     "process_alarp_audit.tsv": 8,
     # Escalation's eight: the six further states and the two refusals.

@@ -43,6 +43,66 @@ fn require_finite(name: &'static str, value: f64) -> Result<()> {
     }
 }
 
+/// The latch and the flow, over SI values, shared with the dynamic sizing study.
+///
+/// Returns `(open, cycle_count, mass_flow)`. The caller has already applied the class's
+/// guards; this is the arithmetic alone.
+#[allow(clippy::too_many_arguments)] // one parameter per quantity the class reads
+pub(crate) fn step(
+    set_pressure: f64,
+    blowdown_fraction: f64,
+    discharge_coefficient: f64,
+    orifice_area: f64,
+    back_pressure: f64,
+    upstream_pressure: f64,
+    upstream_temperature: f64,
+    molar_mass: f64,
+    heat_capacity_ratio: f64,
+    compressibility: f64,
+    was_open: bool,
+    prior_cycle_count: f64,
+) -> (bool, f64, f64) {
+    let reseat = set_pressure * (1.0 - blowdown_fraction);
+    let mut open = was_open;
+    let mut cycle_count = prior_cycle_count;
+    if !open && upstream_pressure >= set_pressure {
+        open = true;
+        cycle_count += 1.0;
+    } else if open && upstream_pressure <= reseat {
+        open = false;
+    }
+
+    let mut mass_flow = 0.0;
+    if open {
+        let gamma = heat_capacity_ratio;
+        let critical_ratio = (2.0 / (gamma + 1.0)).powf(gamma / (gamma - 1.0));
+        let pressure_ratio = back_pressure / upstream_pressure;
+        mass_flow = if pressure_ratio <= critical_ratio {
+            discharge_coefficient
+                * orifice_area
+                * upstream_pressure
+                * (gamma * molar_mass / (compressibility * GAS_CONSTANT * upstream_temperature))
+                    .sqrt()
+                * (2.0 / (gamma + 1.0)).powf((gamma + 1.0) / (2.0 * (gamma - 1.0)))
+        } else {
+            let mut term = (2.0 * gamma / (gamma - 1.0))
+                * (pressure_ratio.powf(2.0 / gamma) - pressure_ratio.powf((gamma + 1.0) / gamma));
+            if term < 0.0 {
+                term = 0.0;
+            }
+            discharge_coefficient
+                * orifice_area
+                * upstream_pressure
+                * (molar_mass / (compressibility * GAS_CONSTANT * upstream_temperature)).sqrt()
+                * term.sqrt()
+        };
+        if mass_flow < 0.0 || mass_flow.is_nan() {
+            mass_flow = 0.0;
+        }
+    }
+    (open, cycle_count, mass_flow)
+}
+
 /// One step of the PSV latch and its relieving flow.
 ///
 /// # Errors
@@ -162,46 +222,20 @@ pub fn psv_valve(
         ));
     }
 
-    let reseat = set_pressure.value * (1.0 - blowdown_fraction);
-    let mut open = was_open.unwrap_or(false);
-    let mut cycle_count = prior_cycle_count;
-    if !open && upstream_pressure.value >= set_pressure.value {
-        open = true;
-        cycle_count += 1.0;
-    } else if open && upstream_pressure.value <= reseat {
-        open = false;
-    }
-
-    let mut mass_flow = 0.0;
-    if open {
-        let gamma = heat_capacity_ratio;
-        let critical_ratio = (2.0 / (gamma + 1.0)).powf(gamma / (gamma - 1.0));
-        let pressure_ratio = back_pressure.value / upstream_pressure.value;
-        mass_flow = if pressure_ratio <= critical_ratio {
-            discharge_coefficient
-                * orifice_area.value
-                * upstream_pressure.value
-                * (gamma * molar_mass.value
-                    / (compressibility * GAS_CONSTANT * upstream_temperature.value))
-                    .sqrt()
-                * (2.0 / (gamma + 1.0)).powf((gamma + 1.0) / (2.0 * (gamma - 1.0)))
-        } else {
-            let mut term = (2.0 * gamma / (gamma - 1.0))
-                * (pressure_ratio.powf(2.0 / gamma) - pressure_ratio.powf((gamma + 1.0) / gamma));
-            if term < 0.0 {
-                term = 0.0;
-            }
-            discharge_coefficient
-                * orifice_area.value
-                * upstream_pressure.value
-                * (molar_mass.value / (compressibility * GAS_CONSTANT * upstream_temperature.value))
-                    .sqrt()
-                * term.sqrt()
-        };
-        if mass_flow < 0.0 || mass_flow.is_nan() {
-            mass_flow = 0.0;
-        }
-    }
+    let (open, cycle_count, mass_flow) = step(
+        set_pressure.value,
+        blowdown_fraction,
+        discharge_coefficient,
+        orifice_area.value,
+        back_pressure.value,
+        upstream_pressure.value,
+        upstream_temperature.value,
+        molar_mass.value,
+        heat_capacity_ratio,
+        compressibility,
+        was_open.unwrap_or(false),
+        prior_cycle_count,
+    );
 
     Ok(PsvValveResult {
         open,

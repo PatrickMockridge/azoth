@@ -175,8 +175,8 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # liquid-line FIV screens; 343: the acoustic-induced vibration screen; 344: the
     # side-branch pulsation screen; 345: the NORSOK P-002 point checks; 346: the STS-0131
     # gate; 347: the inherent-safety index; 348: the ALARP audit; 349: the escalation graph;
-    # 350: the PSV latch.
-    assert len(registered) == 350
+    # 350: the PSV latch; 351: the dynamic PSV sizing.
+    assert len(registered) == 351
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

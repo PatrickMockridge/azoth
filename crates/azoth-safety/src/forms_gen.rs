@@ -1127,6 +1127,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.dynamic_psv_sizing",
+        name: "Dynamic PSV sizing",
+        family: "depressurization",
+        sub_interface: Some("depressurization"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a fluid as input, which a scenario does not yet provide",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.escalation_graph",
         name: "Escalation graph analysis",
         family: "safetyassessment",
