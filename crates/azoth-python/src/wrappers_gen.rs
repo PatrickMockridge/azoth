@@ -8315,6 +8315,37 @@ pub fn splitter(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// STS-0131 acceptance gate.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (checks))]
+#[pyo3(text_signature = "(checks)")]
+pub fn sts0131_gate(
+    py: Python<'_>,
+    checks: Vec<crate::records_gen::Sts0131CheckRow>,
+) -> PyResult<crate::transport_gen::PySts0131GateResult> {
+    let checks_records: Vec<azoth_process::models::sts0131_gate::Sts0131CheckRow> = checks
+        .into_iter()
+        .map(|row| azoth_process::models::sts0131_gate::Sts0131CheckRow {
+            check_type: row.check_type,
+            name: row.name,
+            acceptable: row.acceptable,
+            required_area: row.required_area.map(square_meters),
+            selected_area: row.selected_area.map(square_meters),
+            required_margin: row.required_margin,
+            minimum_wall_temperature: row.minimum_wall_temperature.map(kelvins),
+            design_mdmt: row.design_mdmt.map(kelvins),
+            rupture_predicted: row.rupture_predicted,
+            sil_compliant: row.sil_compliant,
+            custom_ok: row.custom_ok,
+        })
+        .collect();
+    azoth_process::models::sts0131_gate::sts0131_gate(&checks_records)
+        .map(|r| crate::transport_gen::PySts0131GateResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Tank.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

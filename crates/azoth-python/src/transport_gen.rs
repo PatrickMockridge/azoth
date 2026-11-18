@@ -27,8 +27,8 @@ use crate::record_outputs_gen::{
     PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
     PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
     PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
-    PyWaterMixingResult, PyZoneRatingRow,
+    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -25844,6 +25844,56 @@ impl From<&azoth_process::models::stripping_column::StrippingColumnResult>
                 unit: "kW".to_string(),
             },
             material_grade: r.material_grade.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.sts0131_gate`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Sts0131GateResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySts0131GateResult {
+    /// one row per check, in the caller's order.
+    #[pyo3(get)]
+    pub findings: Vec<PySts0131FindingResult>,
+    /// whether no finding fails.
+    #[pyo3(get)]
+    pub acceptable: bool,
+    /// the number of failing findings.
+    #[pyo3(get)]
+    pub failure_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySts0131GateResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Sts0131GateResult(findings={:?}, acceptable={:?}, failure_count={:?}, {} warning(s))",
+            self.findings,
+            self.acceptable,
+            self.failure_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::sts0131_gate::Sts0131GateResult> for PySts0131GateResult {
+    fn from(r: &azoth_process::models::sts0131_gate::Sts0131GateResult) -> Self {
+        Self {
+            findings: r
+                .findings
+                .iter()
+                .map(PySts0131FindingResult::from)
+                .collect(),
+            acceptable: r.acceptable,
+            failure_count: r.failure_count,
             warnings: transport(&r.warnings),
         }
     }

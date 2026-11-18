@@ -124,6 +124,7 @@ pub mod sil_verification;
 pub mod splitter;
 pub mod stirred_tank_reactor;
 pub mod stripping_column;
+pub mod sts0131_gate;
 pub mod tank;
 pub mod three_phase_separator;
 pub mod throttling_valve;
@@ -299,6 +300,10 @@ pub use sil_verification::{
 pub use splitter::{SplitterResult, splitter};
 pub use stirred_tank_reactor::{StirredTankReactorResult, stirred_tank_reactor};
 pub use stripping_column::{StrippingColumnResult, stripping_column};
+pub use sts0131_gate::{
+    Sts0131CheckRow, Sts0131CheckType, Sts0131FindingResult, Sts0131GateResult, Sts0131Severity,
+    sts0131_gate,
+};
 pub use tank::{TankResult, tank};
 pub use three_phase_separator::{ThreePhaseSeparatorResult, three_phase_separator};
 pub use throttling_valve::{ThrottlingValveResult, throttling_valve};

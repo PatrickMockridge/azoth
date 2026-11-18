@@ -822,6 +822,33 @@ pub struct SourceRow {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct Sts0131CheckRow {
+    #[pyo3(item)]
+    pub check_type: String,
+    #[pyo3(item)]
+    pub name: Option<String>,
+    #[pyo3(item)]
+    pub acceptable: Option<bool>,
+    #[pyo3(item)]
+    pub required_area: Option<f64>,
+    #[pyo3(item)]
+    pub selected_area: Option<f64>,
+    #[pyo3(item)]
+    pub required_margin: Option<f64>,
+    #[pyo3(item)]
+    pub minimum_wall_temperature: Option<f64>,
+    #[pyo3(item)]
+    pub design_mdmt: Option<f64>,
+    #[pyo3(item)]
+    pub rupture_predicted: Option<bool>,
+    #[pyo3(item)]
+    pub sil_compliant: Option<bool>,
+    #[pyo3(item)]
+    pub custom_ok: Option<bool>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct Tr3001Scenario {
     #[pyo3(item)]
     pub cause: String,

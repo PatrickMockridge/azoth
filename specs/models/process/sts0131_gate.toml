@@ -1,0 +1,118 @@
+id = "process.sts0131_gate"
+name = "STS-0131 acceptance gate"
+kind = "procedure"
+assumptions = [
+    "**each row is one check**, and only the checks the caller states produce findings; the gate is acceptable when none fails.",
+    "**the PSV margin is `(selected - required)/required`** and passes at or above the stated margin, so equality passes; both areas must be positive, as the class throws otherwise.",
+    "**the MDMT check passes when `minimum_wall_temperature >= design_mdmt`**; the class compares in degrees Celsius and the comparison is the same in kelvin.",
+    "**the trapped-liquid check passes when no rupture is predicted**, and the SIL check when the caller's compliance flag is set.",
+    "**the class declares a `WARNING` severity and no builder emits it**, so the findings are pass or fail alone.",
+    "**a row states only the field its check reads**; the kernel refuses a row carrying another check's field, a name on a built-in check, or a missing value.",
+    "**the class's finding messages are presentation**; the rows carry the check type, the severity and the PSV margin.",
+    "**the gate reads only the boolean each upstream result class exposes**: `isAcceptable`, `isRupturePredicted` and `isCompliant`.",
+]
+references = [
+    "Equinor STS-0131. Safety technology - supplementary requirements.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/compliance/Sts0131Gate.java` is the port source.",
+    "`validation/neqsim/captures/process_sts0131_gate.tsv` - the empty gate, each check passing and failing, a mixed gate and the area refusal.",
+]
+[source]
+standard = "NeqSim process/safety/compliance/Sts0131Gate.java"
+edition = "Its six `add...` methods, `isAcceptable` and `countFailures`."
+[algorithm]
+scheme = "sts0131_acceptance_gate"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.checks]
+type = "record_list"
+row_type = "Sts0131CheckRow"
+description = "the checks, in caller order; each states the field its check type reads.\n"
+[inputs.checks.fields.check_type]
+type = "enum"
+values = [
+    "depressurisation",
+    "psv_sizing_margin",
+    "mdmt",
+    "trapped_liquid_rupture",
+    "sil",
+    "custom",
+]
+description = "the STS-0131 check.\n"
+[inputs.checks.fields.name]
+type = "string"
+optional = true
+description = "the custom check's name; a built-in check has its own.\n"
+[inputs.checks.fields.acceptable]
+type = "boolean"
+optional = true
+description = "the depressurisation result's acceptance; read by that check.\n"
+[inputs.checks.fields.required_area]
+unit = "m**2"
+optional = true
+description = "the required PSV orifice area, above zero; read by the PSV margin check.\n"
+[inputs.checks.fields.selected_area]
+unit = "m**2"
+optional = true
+description = "the selected PSV orifice area, above zero; read by the PSV margin check.\n"
+[inputs.checks.fields.required_margin]
+unit = "dimensionless"
+optional = true
+description = "the required area margin as a fraction; read by the PSV margin check.\n"
+[inputs.checks.fields.minimum_wall_temperature]
+unit = "K"
+optional = true
+description = "the minimum wall metal temperature reached; read by the MDMT check.\n"
+[inputs.checks.fields.design_mdmt]
+unit = "K"
+optional = true
+description = "the design MDMT; read by the MDMT check.\n"
+[inputs.checks.fields.rupture_predicted]
+type = "boolean"
+optional = true
+description = "the trapped-liquid rupture result's prediction; read by that check.\n"
+[inputs.checks.fields.sil_compliant]
+type = "boolean"
+optional = true
+description = "the NOG 070 SIL determination's compliance; read by the SIL check.\n"
+[inputs.checks.fields.custom_ok]
+type = "boolean"
+optional = true
+description = "the custom check's pass flag; read by that check.\n"
+[outputs]
+[outputs.findings]
+type = "record_list"
+description = "one row per check, in the caller's order.\n"
+[outputs.findings.fields.check_type]
+type = "enum"
+values = [
+    "depressurisation",
+    "psv_sizing_margin",
+    "mdmt",
+    "trapped_liquid_rupture",
+    "sil",
+    "custom",
+]
+description = "the check.\n"
+[outputs.findings.fields.severity]
+type = "enum"
+values = ["pass", "warning", "fail"]
+description = "the finding's severity; the class emits no warning.\n"
+[outputs.findings.fields.name]
+type = "string"
+optional = true
+description = "the custom check's name; absent for a built-in check.\n"
+[outputs.findings.fields.margin]
+unit = "dimensionless"
+optional = true
+description = "the PSV area margin; absent for every other check.\n"
+[outputs.acceptable]
+type = "boolean"
+description = "whether no finding fails.\n"
+[outputs.failure_count]
+unit = "dimensionless"
+description = "the number of failing findings.\n"
+[implementations]
+python = "azoth.process.sts0131_gate"
+rust = "azoth_process::sts0131_gate"

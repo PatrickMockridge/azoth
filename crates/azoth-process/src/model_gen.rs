@@ -91,6 +91,7 @@
 //!   - specs/models/process/splitter.toml
 //!   - specs/models/process/stirred_tank_reactor.toml
 //!   - specs/models/process/stripping_column.toml
+//!   - specs/models/process/sts0131_gate.toml
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml
@@ -80204,6 +80205,298 @@ pub static STRIPPING_COLUMN_SPEC: ModelSpec = ModelSpec {
     cases: STRIPPING_COLUMN_CASES,
 };
 
+static STS0131_GATE_CHECKS: &[SpecCheck] = &[];
+
+static STS0131_GATE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "psv_equal",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[&[
+                RecordField {
+                    name: "check_type",
+                    value: FieldValue::Name("psv_sizing_margin"),
+                },
+                RecordField {
+                    name: "required_area",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "selected_area",
+                    value: FieldValue::Number(1.1),
+                },
+                RecordField {
+                    name: "required_margin",
+                    value: FieldValue::Number(0.1),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "psv_below",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[&[
+                RecordField {
+                    name: "check_type",
+                    value: FieldValue::Name("psv_sizing_margin"),
+                },
+                RecordField {
+                    name: "required_area",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "selected_area",
+                    value: FieldValue::Number(1.05),
+                },
+                RecordField {
+                    name: "required_margin",
+                    value: FieldValue::Number(0.1),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "mdmt_equal",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[&[
+                RecordField {
+                    name: "check_type",
+                    value: FieldValue::Name("mdmt"),
+                },
+                RecordField {
+                    name: "minimum_wall_temperature",
+                    value: FieldValue::Number(233.15),
+                },
+                RecordField {
+                    name: "design_mdmt",
+                    value: FieldValue::Number(233.15),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "mdmt_below",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[&[
+                RecordField {
+                    name: "check_type",
+                    value: FieldValue::Name("mdmt"),
+                },
+                RecordField {
+                    name: "minimum_wall_temperature",
+                    value: FieldValue::Number(228.15),
+                },
+                RecordField {
+                    name: "design_mdmt",
+                    value: FieldValue::Number(233.15),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pass_throughs",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[
+                &[
+                    RecordField {
+                        name: "check_type",
+                        value: FieldValue::Name("depressurisation"),
+                    },
+                    RecordField {
+                        name: "acceptable",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check_type",
+                        value: FieldValue::Name("trapped_liquid_rupture"),
+                    },
+                    RecordField {
+                        name: "rupture_predicted",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check_type",
+                        value: FieldValue::Name("sil"),
+                    },
+                    RecordField {
+                        name: "sil_compliant",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "mixed",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[
+                &[
+                    RecordField {
+                        name: "check_type",
+                        value: FieldValue::Name("depressurisation"),
+                    },
+                    RecordField {
+                        name: "acceptable",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check_type",
+                        value: FieldValue::Name("psv_sizing_margin"),
+                    },
+                    RecordField {
+                        name: "required_area",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "selected_area",
+                        value: FieldValue::Number(1.1),
+                    },
+                    RecordField {
+                        name: "required_margin",
+                        value: FieldValue::Number(0.1),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "check_type",
+                        value: FieldValue::Name("custom"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("custom"),
+                    },
+                    RecordField {
+                        name: "custom_ok",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static STS0131_GATE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "sts0131_acceptance_gate",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.sts0131_gate`.
+pub static STS0131_GATE_SPEC: ModelSpec = ModelSpec {
+    id: "process.sts0131_gate",
+    kind: "procedure",
+    algorithm: Some(&STS0131_GATE_ALGORITHM),
+    checks: STS0131_GATE_CHECKS,
+    cases: STS0131_GATE_CASES,
+};
+
 static TANK_CHECKS: &[SpecCheck] = &[SpecCheck {
     on_input: true,
     check: RangeCheck {
@@ -86868,6 +87161,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &SPLITTER_SPEC,
     &STIRRED_TANK_REACTOR_SPEC,
     &STRIPPING_COLUMN_SPEC,
+    &STS0131_GATE_SPEC,
     &TANK_SPEC,
     &THREE_PHASE_SEPARATOR_SPEC,
     &THROTTLING_VALVE_SPEC,

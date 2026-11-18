@@ -73,6 +73,7 @@ from azoth.core.record_outputs_gen import (
     SilIssue,
     SterileRadius,
     StreamScaleMineralRow,
+    Sts0131FindingResult,
     SubFraction,
     Tr3001Finding,
     VesselRuptureStep,
@@ -10419,6 +10420,25 @@ class StrippingColumnResult(_HasWarnings):
 
     #: `getMaterialGrade()`, carried and reported.
     material_grade: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class Sts0131GateResult(_HasWarnings):
+    """Result of ``process.sts0131_gate``."""
+
+    CALC_ID: ClassVar[str] = "process.sts0131_gate"
+
+    #: one row per check, in the caller's order.
+    findings: tuple[Sts0131FindingResult, ...]
+
+    #: whether no finding fails.
+    acceptable: bool
+
+    #: the number of failing findings.
+    failure_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

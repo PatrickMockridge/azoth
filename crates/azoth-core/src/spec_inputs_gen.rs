@@ -312,6 +312,7 @@
 //!   - specs/models/process/splitter.toml
 //!   - specs/models/process/stirred_tank_reactor.toml
 //!   - specs/models/process/stripping_column.toml
+//!   - specs/models/process/sts0131_gate.toml
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml

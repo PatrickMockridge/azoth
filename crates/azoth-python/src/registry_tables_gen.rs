@@ -331,6 +331,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.splitter" => azoth_process::models::splitter::SplitterResult::FIELDS.to_vec(),
         "process.stirred_tank_reactor" => azoth_process::models::stirred_tank_reactor::StirredTankReactorResult::FIELDS.to_vec(),
         "process.stripping_column" => azoth_process::models::stripping_column::StrippingColumnResult::FIELDS.to_vec(),
+        "process.sts0131_gate" => azoth_process::models::sts0131_gate::Sts0131GateResult::FIELDS.to_vec(),
         "process.tank" => azoth_process::models::tank::TankResult::FIELDS.to_vec(),
         "process.three_phase_separator" => azoth_process::models::three_phase_separator::ThreePhaseSeparatorResult::FIELDS.to_vec(),
         "process.throttling_valve" => azoth_process::models::throttling_valve::ThrottlingValveResult::FIELDS.to_vec(),

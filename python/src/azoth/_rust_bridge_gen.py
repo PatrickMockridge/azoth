@@ -368,6 +368,8 @@ from azoth.core.result import (
     StreamScaleAnalyzerResult,
     StreamScaleMineralRow,
     StrippingColumnResult,
+    Sts0131FindingResult,
+    Sts0131GateResult,
     Sts0131PressureCategory,
     SubFraction,
     SupplyVerdict,
@@ -758,6 +760,7 @@ __all__ = [
     "stirred_tank_reactor",
     "stream_scale_analyzer",
     "stripping_column",
+    "sts0131_gate",
     "surf_cooldown",
     "tank",
     "tbp_closure",
@@ -9024,6 +9027,20 @@ def stripping_column(stripping_gas_components: list[str], rich_liquid_components
         reboiler_duty_kw=from_si(result.reboiler_duty_kw.magnitude_si, result.reboiler_duty_kw.unit),
         condenser_duty_kw=from_si(result.condenser_duty_kw.magnitude_si, result.condenser_duty_kw.unit),
         material_grade=result.material_grade,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def sts0131_gate(checks: list[dict[str, object]]) -> Sts0131GateResult:
+    """``process.sts0131_gate``, computed in Rust."""
+    spec = _models_gen.model("process.sts0131_gate")
+    result = _core.sts0131_gate(
+        input_records_to_si(spec, "checks", checks),
+    )
+    return Sts0131GateResult(
+        findings=tuple(Sts0131FindingResult(check_type=c.check_type, severity=c.severity, name=c.name, margin=c.margin) for c in result.findings),
+        acceptable=result.acceptable,
+        failure_count=result.failure_count,
         warnings=_warnings(result.warnings),
     )
 

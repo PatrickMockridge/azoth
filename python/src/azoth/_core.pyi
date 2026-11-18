@@ -721,6 +721,21 @@ class SettleOutCompartment(TypedDict):
     pressure: float
     temperature: float
 
+class Sts0131CheckRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    check_type: str
+    name: str | None
+    acceptable: bool | None
+    required_area: float | None
+    selected_area: float | None
+    required_margin: float | None
+    minimum_wall_temperature: float | None
+    design_mdmt: float | None
+    rupture_predicted: bool | None
+    sil_compliant: bool | None
+    custom_ok: bool | None
+
 class Tr3001Scenario(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1339,6 +1354,15 @@ class SilIssue:
 
     severity: str
     category: str
+
+@final
+class Sts0131FindingResult:
+    """one row per check, in the caller's order."""
+
+    check_type: str
+    severity: str
+    name: str | None
+    margin: float | None
 
 @final
 class Tr3001Finding:
@@ -5001,6 +5025,13 @@ class StrippingColumnResult:
     reboiler_duty_kw: Qty
     condenser_duty_kw: Qty
     material_grade: str
+    warnings: list[Warning]
+
+@final
+class Sts0131GateResult:
+    findings: list[Sts0131FindingResult]
+    acceptable: bool
+    failure_count: float
     warnings: list[Warning]
 
 @final
@@ -8762,6 +8793,7 @@ def stripping_column(
     material_grade: str | None = None,
     max_operation_pressure: float | None = None,
 ) -> StrippingColumnResult: ...
+def sts0131_gate(checks: list[Sts0131CheckRow]) -> Sts0131GateResult: ...
 def tank(
     components: list[str],
     feed_n: list[float],

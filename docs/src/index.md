@@ -417,6 +417,7 @@ Five sections, and the difference between them is the point:
 - [`process.splitter`](./process/splitter.md) — Splitter
 - [`process.stirred_tank_reactor`](./process/stirred_tank_reactor.md) — Stirred-tank reactor
 - [`process.stripping_column`](./process/stripping_column.md) — Stripping column
+- [`process.sts0131_gate`](./process/sts0131_gate.md) — STS-0131 acceptance gate
 - [`process.tank`](./process/tank.md) — Tank
 - [`process.three_phase_separator`](./process/three_phase_separator.md) — Three-phase separator
 - [`process.throttling_valve`](./process/throttling_valve.md) — Throttling valve

@@ -1141,6 +1141,23 @@ class StreamScaleMineralRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class Sts0131FindingResult:
+    """one row per check, in the caller's order."""
+
+    #: the check.
+    check_type: str
+
+    #: the finding's severity; the class emits no warning.
+    severity: str
+
+    #: the custom check's name; absent for a built-in check.
+    name: str | None
+
+    #: the PSV area margin; absent for every other check.
+    margin: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SubFraction:
     """The sub-fractions, in ascending sorting key. A lump that states no boiling point sorts by its molar mass, so the order is by key and not by the lumps' order."""
 

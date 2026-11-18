@@ -330,6 +330,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PySplitterResult>()?;
     m.add_class::<crate::transport_gen::PyStirredTankReactorResult>()?;
     m.add_class::<crate::transport_gen::PyStrippingColumnResult>()?;
+    m.add_class::<crate::transport_gen::PySts0131GateResult>()?;
     m.add_class::<crate::transport_gen::PyTankResult>()?;
     m.add_class::<crate::transport_gen::PyThreePhaseSeparatorResult>()?;
     m.add_class::<crate::transport_gen::PyThrottlingValveResult>()?;
@@ -415,6 +416,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PySilIssue>()?;
     m.add_class::<crate::record_outputs_gen::PySterileRadius>()?;
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
+    m.add_class::<crate::record_outputs_gen::PySts0131FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
     m.add_class::<crate::record_outputs_gen::PyTr3001Finding>()?;
     m.add_class::<crate::record_outputs_gen::PyVesselRuptureStep>()?;
@@ -1156,6 +1158,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::splitter, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::stirred_tank_reactor, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::stripping_column, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::sts0131_gate, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::tank, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::three_phase_separator,

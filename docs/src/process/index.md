@@ -103,6 +103,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.splitter`](./splitter.md) | `direct composition` | NeqSim process/equipment/splitter/Splitter.java |
 | [`process.stirred_tank_reactor`](./stirred_tank_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/StirredTankReactor.java |
 | [`process.stripping_column`](./stripping_column.md) | `direct composition` | NeqSim process/equipment/absorber/StrippingColumn.java |
+| [`process.sts0131_gate`](./sts0131_gate.md) | `sts0131_acceptance_gate` | NeqSim process/safety/compliance/Sts0131Gate.java |
 | [`process.tank`](./tank.md) | `direct composition` | NeqSim process/equipment/tank/Tank.java |
 | [`process.three_phase_separator`](./three_phase_separator.md) | `direct composition` | NeqSim process/equipment/separator/ThreePhaseSeparator.java |
 | [`process.throttling_valve`](./throttling_valve.md) | `direct composition` | NeqSim process/equipment/valve/ThrottlingValve.java |

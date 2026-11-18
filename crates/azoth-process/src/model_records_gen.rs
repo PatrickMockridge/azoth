@@ -101,6 +101,7 @@ use crate::models::sil_verification::SilVerificationResult;
 use crate::models::splitter::SplitterResult;
 use crate::models::stirred_tank_reactor::StirredTankReactorResult;
 use crate::models::stripping_column::StrippingColumnResult;
+use crate::models::sts0131_gate::Sts0131GateResult;
 use crate::models::tank::TankResult;
 use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
@@ -2393,6 +2394,16 @@ impl CalcResult for StrippingColumnResult {
         "material_grade",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for Sts0131GateResult {
+    const CALC_ID: &'static str = "process.sts0131_gate";
+    const FIELDS: &'static [&'static str] =
+        &["findings", "acceptable", "failure_count", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

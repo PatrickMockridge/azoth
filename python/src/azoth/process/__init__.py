@@ -109,6 +109,7 @@ from azoth.core.result import (
     SplitterResult,
     StirredTankReactorResult,
     StrippingColumnResult,
+    Sts0131GateResult,
     TankResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
@@ -222,6 +223,7 @@ __all__ = [
     "splitter",
     "stirred_tank_reactor",
     "stripping_column",
+    "sts0131_gate",
     "tank",
     "three_phase_separator",
     "throttling_valve",
@@ -273,6 +275,7 @@ _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
 _NORSOK_P002_COMPLIANCE = "process.norsok_p002_compliance"
+_STS0131_GATE = "process.sts0131_gate"
 _MDMT = "process.mdmt"
 _PIPING_FIV_GAS = "process.piping_fiv_gas"
 _PIPING_FIV_LIQUID = "process.piping_fiv_liquid"
@@ -1889,6 +1892,22 @@ def norsok_p002_compliance(
     See :func:`azoth.process.reference.norsok_p002_compliance`.
     """
     return resolve(_NORSOK_P002_COMPLIANCE)(  # type: ignore[no-any-return]
+        checks=checks,
+    )
+
+
+def sts0131_gate(
+    checks: list[dict[str, object]],
+) -> Sts0131GateResult:
+    """The STS-0131 gate's findings and its overall acceptability.
+
+    The PSV margin passes at or above its required value; the MDMT check passes at or above
+    the design MDMT; the trapped-liquid check passes when no rupture is predicted. A row
+    states only the field its check reads.
+
+    See :func:`azoth.process.reference.sts0131_gate`.
+    """
+    return resolve(_STS0131_GATE)(  # type: ignore[no-any-return]
         checks=checks,
     )
 

@@ -325,6 +325,7 @@
   - [Splitter](./process/splitter.md)
   - [Stirred-tank reactor](./process/stirred_tank_reactor.md)
   - [Stripping column](./process/stripping_column.md)
+  - [STS-0131 acceptance gate](./process/sts0131_gate.md)
   - [Tank](./process/tank.md)
   - [Three-phase separator](./process/three_phase_separator.md)
   - [Throttling valve](./process/throttling_valve.md)

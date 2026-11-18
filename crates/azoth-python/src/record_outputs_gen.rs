@@ -3147,6 +3147,50 @@ impl From<&azoth_eos::results::StreamScaleMineralRow> for PyStreamScaleMineralRo
     }
 }
 
+/// one row per check, in the caller's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Sts0131FindingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySts0131FindingResult {
+    /// the check.
+    #[pyo3(get)]
+    pub check_type: String,
+    /// the finding's severity; the class emits no warning.
+    #[pyo3(get)]
+    pub severity: String,
+    /// the custom check's name; absent for a built-in check.
+    #[pyo3(get)]
+    pub name: Option<String>,
+    /// the PSV area margin; absent for every other check.
+    #[pyo3(get)]
+    pub margin: Option<f64>,
+}
+
+#[pymethods]
+impl PySts0131FindingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Sts0131FindingResult(check_type={}, severity={}, name={:?}, margin={:?})",
+            self.check_type, self.severity, self.name, self.margin
+        )
+    }
+}
+
+impl From<&azoth_process::models::sts0131_gate::Sts0131FindingResult> for PySts0131FindingResult {
+    fn from(row: &azoth_process::models::sts0131_gate::Sts0131FindingResult) -> Self {
+        Self {
+            check_type: row.check_type.as_str().to_string(),
+            severity: row.severity.as_str().to_string(),
+            name: row.name.clone(),
+            margin: row.margin,
+        }
+    }
+}
+
 /// The sub-fractions, in ascending sorting key. A lump that states no boiling point sorts by its molar mass, so the order is by key and not by the lumps' order.
 #[pyclass(
     frozen,
