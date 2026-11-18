@@ -21,6 +21,7 @@ from __future__ import annotations
 from azoth.core.record_outputs_gen import *  # noqa: F403
 from azoth.core.result_base import LAMINAR_MAX as LAMINAR_MAX
 from azoth.core.result_base import TURBULENT_MIN as TURBULENT_MIN
+from azoth.core.result_base import AlarpVerdict as AlarpVerdict
 from azoth.core.result_base import BeggsBrillRegime as BeggsBrillRegime
 from azoth.core.result_base import BlowbyVerdict as BlowbyVerdict
 from azoth.core.result_base import CooldownVerdict as CooldownVerdict
@@ -29,6 +30,7 @@ from azoth.core.result_base import DeadheadVerdict as DeadheadVerdict
 from azoth.core.result_base import EmulsionType as EmulsionType
 from azoth.core.result_base import ErosionRiskLevel as ErosionRiskLevel
 from azoth.core.result_base import FeSMorphology as FeSMorphology
+from azoth.core.result_base import FivLikelihood as FivLikelihood
 from azoth.core.result_base import FlowRegime as FlowRegime
 from azoth.core.result_base import FluidBasis as FluidBasis
 from azoth.core.result_base import GoverningCriterion as GoverningCriterion
@@ -37,6 +39,7 @@ from azoth.core.result_base import HydrateRiskLevel as HydrateRiskLevel
 from azoth.core.result_base import HydrateStructure as HydrateStructure
 from azoth.core.result_base import MultiflashSeedPath as MultiflashSeedPath
 from azoth.core.result_base import OverallVerdict as OverallVerdict
+from azoth.core.result_base import P002Criterion as P002Criterion
 from azoth.core.result_base import Phase as Phase
 from azoth.core.result_base import PlusModel as PlusModel
 from azoth.core.result_base import ReliefPhase as ReliefPhase
@@ -47,7 +50,9 @@ from azoth.core.result_base import SelfHeatingGeometry as SelfHeatingGeometry
 from azoth.core.result_base import SelfHeatingVerdict as SelfHeatingVerdict
 from azoth.core.result_base import SettleOutVerdict as SettleOutVerdict
 from azoth.core.result_base import StabilityVerdict as StabilityVerdict
+from azoth.core.result_base import Sts0131CheckType as Sts0131CheckType
 from azoth.core.result_base import Sts0131PressureCategory as Sts0131PressureCategory
+from azoth.core.result_base import Sts0131Severity as Sts0131Severity
 from azoth.core.result_base import SupplyVerdict as SupplyVerdict
 from azoth.core.result_base import TpMultiflashSeed as TpMultiflashSeed
 from azoth.core.result_base import VacuumVerdict as VacuumVerdict

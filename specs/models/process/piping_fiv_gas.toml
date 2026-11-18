@@ -1,0 +1,124 @@
+id = "process.piping_fiv_gas"
+name = "Gas-line flow-induced vibration screening"
+kind = "procedure"
+assumptions = [
+    "**the likelihood is `rho v^2 / 50000 * D/t factor * branch factor * pulsation * support`**, with the D/t factor floored at one for a ratio at or below 40.",
+    "**the pulsation factor is clamped to `[1, 4]` and the support-quality factor to `[1, 3]`**; the clamps are silent in the class, and the applied values are published.",
+    "**the bands are exclusive upward**: below 0.3 low, below 0.5 medium, below 1.0 high, else very high.",
+    "**the branch factor is `1 + 0.15 n`**, where n is the number of small-bore connections.",
+    "**the bands are the AVIFF screening categories**; the class's recommendation text is presentation.",
+    "**negative density, velocity or branch count are refused**, as the class throws, and a non-positive diameter or wall is refused too.",
+]
+references = [
+    "Energy Institute. Guidelines for the Avoidance of Vibration Induced Fatigue Failure in Process Pipework (AVIFF), 2nd edition.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/vibration/PipingFivScreening.java` (`screenGas`) is the port source.",
+    "`validation/neqsim/captures/process_piping_fiv_gas.tsv` - the band boundaries, the D/t factor, the branch factor and both clamp ends.",
+]
+[source]
+standard = "NeqSim process/safety/vibration/PipingFivScreening.java"
+edition = "Its `screenGas` and `bandFor`."
+[algorithm]
+scheme = "aviff_gas_likelihood_of_failure"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.density]
+unit = "kg/m**3"
+description = "the gas density at line conditions, non-negative.\n"
+[inputs.velocity]
+unit = "m/s"
+description = "the gas velocity at line conditions, non-negative.\n"
+[inputs.outside_diameter]
+unit = "m"
+description = "the pipe outside diameter, above zero.\n"
+[inputs.wall_thickness]
+unit = "m"
+description = "the pipe wall thickness, above zero.\n"
+[inputs.branch_count]
+unit = "dimensionless"
+description = "the number of small-bore connections, a whole number at least zero.\n"
+[inputs.pulsation_factor]
+unit = "dimensionless"
+description = "the pulsation source factor, 1 for steady service to 4 for a reciprocating compressor's near field; clamped to `[1, 4]`.\n"
+[inputs.support_quality_factor]
+unit = "dimensionless"
+description = "the support-quality factor, 1 for good supports to 3 for poor ones; clamped to `[1, 3]`.\n"
+[outputs]
+[outputs.lof]
+unit = "dimensionless"
+description = "the normalised likelihood of failure.\n"
+[outputs.likelihood]
+type = "enum"
+values = ["low", "medium", "high", "very_high"]
+description = "the AVIFF likelihood band.\n"
+[outputs.rho_v2]
+unit = "Pa"
+description = "the gas momentum flux `rho v^2`.\n"
+[outputs.d_overt]
+unit = "dimensionless"
+description = "the outside-diameter-to-wall-thickness ratio.\n"
+[outputs.d_overt_factor]
+unit = "dimensionless"
+description = "the D/t factor, floored at one for a ratio at or below 40.\n"
+[outputs.branch_factor]
+unit = "dimensionless"
+description = "the branch factor `1 + 0.15 n`.\n"
+[outputs.pulsation_factor_applied]
+unit = "dimensionless"
+description = "the pulsation factor after the clamp.\n"
+[outputs.support_quality_factor_applied]
+unit = "dimensionless"
+description = "the support-quality factor after the clamp.\n"
+[outputs.energy_term]
+unit = "dimensionless"
+description = "the momentum flux normalised by 50000 Pa.\n"
+[[valid_range]]
+quantity = "density"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative density"
+[[valid_range]]
+quantity = "velocity"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative velocity"
+[[valid_range]]
+quantity = "outside_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive outside diameter"
+[[valid_range]]
+quantity = "wall_thickness"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive wall thickness"
+[[valid_range]]
+quantity = "branch_count"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative branch count"
+[[valid_range]]
+quantity = "pulsation_factor"
+min = 1
+min_inclusive = true
+max = 4
+max_inclusive = true
+severity = "warning"
+rationale = "the class clamps the pulsation factor to [1, 4] rather than refusing it"
+[[valid_range]]
+quantity = "support_quality_factor"
+min = 1
+min_inclusive = true
+max = 3
+max_inclusive = true
+severity = "warning"
+rationale = "the class clamps the support-quality factor to [1, 3] rather than refusing it"
+[implementations]
+python = "azoth.process.piping_fiv_gas"
+rust = "azoth_process::piping_fiv_gas"

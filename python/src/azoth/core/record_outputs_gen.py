@@ -24,6 +24,20 @@ class ActivityCoefficientRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class AlarpEvaluationResult:
+    """one row per measure, in caller order."""
+
+    #: the measure's description.
+    description: str
+
+    #: the implied cost of averting a fatality, in NOK; absent where the class answers infinity.
+    icaf: float | None
+
+    #: the ALARP verdict.
+    verdict: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class AppliedStandardRow:
     """The standards the design pipeline applied."""
 
@@ -188,6 +202,14 @@ class EquilibriumSoundSpeedSample:
 
     #: the vapour fraction where the sample is two-phase.
     vapour_fraction: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EscalationItemResult:
+    """the largest propagation over every registered item, in the items order."""
+
+    #: the failed item's identifier.
+    item_id: str
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -742,6 +764,20 @@ class NaceIssueRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class P002FindingResult:
+    """one row per check, in the caller's order."""
+
+    #: the segment, equipment or item the check is about.
+    name: str
+
+    #: the criterion checked.
+    criterion: str
+
+    #: whether the value is at or below the limit, or the caller's flag for a recorded check.
+    compliant: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PipeFireRupturePoint:
     """one row per marching step, in time order, ending at the rupture step when one is found."""
 
@@ -771,6 +807,35 @@ class PipeFireRupturePoint:
 
     #: the step's temperature-dependent rupture strain limit.
     rupture_strain_limit: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PulsationModeResult:
+    """one row per evaluated acoustic mode, in mode order."""
+
+    #: the mode index n, zero for the fundamental.
+    mode_index: float
+
+    #: the acoustic eigenfrequency.
+    frequency: Q
+
+    #: the lower lock-in envelope, `0.8 f_n`.
+    envelope_low: Q
+
+    #: the upper lock-in envelope, `1.2 f_n`.
+    envelope_high: Q
+
+    #: whether the shedding frequency is inside this mode's envelope.
+    locked_in: bool
+
+    #: the main-line velocity that places the shedding frequency on this mode.
+    resonance_velocity: Q
+
+    #: the lower velocity of this mode's lock-in band.
+    resonance_velocity_low: Q
+
+    #: the upper velocity of this mode's lock-in band.
+    resonance_velocity_high: Q
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -1095,6 +1160,23 @@ class StreamScaleMineralRow:
 
     #: the precipitated mass times the aqueous throughput.
     scale_rate: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class Sts0131FindingResult:
+    """one row per check, in the caller's order."""
+
+    #: the check.
+    check_type: str
+
+    #: the finding's severity; the class emits no warning.
+    severity: str
+
+    #: the custom check's name; absent for a built-in check.
+    name: str | None
+
+    #: the PSV area margin; absent for every other check.
+    margin: float | None
 
 
 @dataclass(frozen=True, slots=True, eq=False)

@@ -390,6 +390,13 @@ class WaterAnalysis(TypedDict):
     pressure: float
     co2_partial_pressure: float
 
+class AlarpMeasure(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    description: str
+    risk_reduction_per_year: float
+    annualised_cost: float
+
 class CompressorCurvePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -532,6 +539,19 @@ class ConsequenceOutcomeSpec(TypedDict):
     temperature: float | None
     pressure: float | None
 
+class EscalationItem(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    item_id: str
+    failure_threshold: float
+
+class EscalationExposure(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    source: str
+    target: str
+    load: float
+
 class EventTreeBranch(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -608,6 +628,21 @@ class MapCurvePoint(TypedDict):
     flow: float
     head: float
     efficiency: float
+
+class P002CheckRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    criterion: str
+    mach_number: float | None
+    mach_limit: float | None
+    momentum_flux: float | None
+    momentum_flux_limit: float | None
+    vent_velocity: float | None
+    vent_velocity_limit: float | None
+    carry_over_fraction: float | None
+    carry_over_limit: float | None
+    recorded_ok: bool | None
 
 class OverpressureScenario(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -705,6 +740,21 @@ class SettleOutCompartment(TypedDict):
     volume: float
     pressure: float
     temperature: float
+
+class Sts0131CheckRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    check_type: str
+    name: str | None
+    acceptable: bool | None
+    required_area: float | None
+    selected_area: float | None
+    required_margin: float | None
+    minimum_wall_temperature: float | None
+    design_mdmt: float | None
+    rupture_predicted: bool | None
+    sil_compliant: bool | None
+    custom_ok: bool | None
 
 class Tr3001Scenario(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -982,6 +1032,14 @@ class WaterMixingResult:
     si_feco3: float | None
 
 @final
+class AlarpEvaluationResult:
+    """one row per measure, in caller order."""
+
+    description: str
+    icaf: float | None
+    verdict: str
+
+@final
 class SafeChartItem:
     """one row per classified equipment, in caller order."""
 
@@ -1025,6 +1083,12 @@ class ConsequenceOutcomeResult:
     fatality_frequency_per_year: float
 
 @final
+class EscalationItemResult:
+    """the largest propagation over every registered item, in the items order."""
+
+    item_id: str
+
+@final
 class EventTreeOutcome:
     """one row per leaf, in the class's bit order: `2^n` rows, or one when there are no branches."""
 
@@ -1038,6 +1102,19 @@ class MinimalCutSet:
 
     members: str
     cardinality: float
+
+@final
+class PulsationModeResult:
+    """one row per evaluated acoustic mode, in mode order."""
+
+    mode_index: float
+    frequency: Qty
+    envelope_low: Qty
+    envelope_high: Qty
+    locked_in: bool
+    resonance_velocity: Qty
+    resonance_velocity_low: Qty
+    resonance_velocity_high: Qty
 
 @final
 class FmeaRankedEntry:
@@ -1209,6 +1286,14 @@ class MahBarrier:
     pfd: float
 
 @final
+class P002FindingResult:
+    """one row per check, in the caller's order."""
+
+    name: str
+    criterion: str
+    compliant: bool
+
+@final
 class PipeFireRupturePoint:
     """one row per marching step, in time order, ending at the rupture step when one is found."""
 
@@ -1303,6 +1388,15 @@ class SilIssue:
 
     severity: str
     category: str
+
+@final
+class Sts0131FindingResult:
+    """one row per check, in the caller's order."""
+
+    check_type: str
+    severity: str
+    name: str | None
+    margin: float | None
 
 @final
 class Tr3001Finding:
@@ -3313,11 +3407,28 @@ class AbsorptionColumnResult:
     warnings: list[Warning]
 
 @final
+class AcousticInducedVibrationResult:
+    pwl: float
+    allowable_pwl: float
+    margin: float
+    likelihood: str
+    pressure_drop_ratio: float
+    d_overt: float
+    warnings: list[Warning]
+
+@final
 class ActiveFireProtectionScreeningResult:
     water_extinguishing: bool
     blowdown_faster_than_failure: bool
     blowdown_margin: Qty
     selective_protection_saving_fraction: float
+    warnings: list[Warning]
+
+@final
+class AlarpAuditResult:
+    evaluations: list[AlarpEvaluationResult]
+    threshold: float
+    measure_count: float
     warnings: list[Warning]
 
 @final
@@ -3641,6 +3752,15 @@ class EjectorResult:
     warnings: list[Warning]
 
 @final
+class EscalationGraphResult:
+    failed_items: list[EscalationItemResult]
+    failure_count: float
+    any_escalation: bool
+    worst_case_items: list[EscalationItemResult]
+    worst_case_count: float
+    warnings: list[Warning]
+
+@final
 class EventTreeResult:
     outcomes: list[EventTreeOutcome]
     warnings: list[Warning]
@@ -3801,6 +3921,22 @@ class FlareResult:
     mass_utilization: float | None
     molar_utilization: float | None
     overloaded: bool | None
+    warnings: list[Warning]
+
+@final
+class FlowInducedPulsationResult:
+    likelihood: str
+    any_mode_locked_in: bool
+    shedding_frequency: Qty
+    lowest_resonance_velocity: Qty
+    effective_width: Qty
+    diameter_ratio: float
+    rho_v2: Qty
+    energy_term: float
+    coupling_factor: float
+    mode_weight: float
+    severity: float
+    modes: list[PulsationModeResult]
     warnings: list[Warning]
 
 @final
@@ -4107,6 +4243,11 @@ class HemReleaseResult:
     warnings: list[Warning]
 
 @final
+class InherentSafetyResult:
+    overall_index: float
+    warnings: list[Warning]
+
+@final
 class JetFireResult:
     total_radiative_power: Qty
     transmissivity: float | None
@@ -4204,6 +4345,13 @@ class Nog070SilDeterminationResult:
     achieved_sil: float
     compliant: bool
     required_pfd_reduction_factor: float | None
+    warnings: list[Warning]
+
+@final
+class NorsokP002ComplianceResult:
+    findings: list[P002FindingResult]
+    compliant: bool
+    non_compliant_count: float
     warnings: list[Warning]
 
 @final
@@ -4344,6 +4492,30 @@ class PipelinePressureProtectionResult:
     barrier2_adequate: bool
     protection_adequate: bool
     verdict: str
+    warnings: list[Warning]
+
+@final
+class PipingFivGasResult:
+    lof: float
+    likelihood: str
+    rho_v2: Qty
+    d_overt: float
+    d_overt_factor: float
+    branch_factor: float
+    pulsation_factor_applied: float
+    support_quality_factor_applied: float
+    energy_term: float
+    warnings: list[Warning]
+
+@final
+class PipingFivLiquidResult:
+    lof: float
+    likelihood: str
+    d_overt: float
+    d_overt_factor: float
+    branch_factor: float
+    support_quality_factor_applied: float
+    energy_term: float
     warnings: list[Warning]
 
 @final
@@ -4908,6 +5080,13 @@ class StrippingColumnResult:
     reboiler_duty_kw: Qty
     condenser_duty_kw: Qty
     material_grade: str
+    warnings: list[Warning]
+
+@final
+class Sts0131GateResult:
+    findings: list[Sts0131FindingResult]
+    acceptable: bool
+    failure_count: float
     warnings: list[Warning]
 
 @final
@@ -7378,6 +7557,15 @@ def absorption_column(
     material_grade: str | None = None,
     max_operation_pressure: float | None = None,
 ) -> AbsorptionColumnResult: ...
+def acoustic_induced_vibration_screening(
+    mass_flow: float,
+    upstream_pressure: float,
+    downstream_pressure: float,
+    temperature: float,
+    molecular_weight: float,
+    outside_diameter: float,
+    wall_thickness: float,
+) -> AcousticInducedVibrationResult: ...
 def active_fire_protection_screening(
     scenario: str,
     blowdown_time_to_target: float,
@@ -7385,6 +7573,11 @@ def active_fire_protection_screening(
     dedicated_object_demand: float,
     general_area_demand: float,
 ) -> ActiveFireProtectionScreeningResult: ...
+def alarp_audit(
+    measures: list[AlarpMeasure],
+    value_of_statistical_life: float | None = None,
+    disproportion_factor: float | None = None,
+) -> AlarpAuditResult: ...
 def anti_surge_recycle(
     components: list[str],
     feed_n: float,
@@ -7637,6 +7830,11 @@ def ejector(
     mixing_efficiency: float,
     diffuser_efficiency: float,
 ) -> EjectorResult: ...
+def escalation_graph(
+    items: list[EscalationItem],
+    exposures: list[EscalationExposure],
+    initiator: str,
+) -> EscalationGraphResult: ...
 def event_tree(
     initiating_frequency_per_year: float,
     branches: list[EventTreeBranch],
@@ -7762,6 +7960,18 @@ def flare(
     design_mass_flow_capacity: float | None = None,
     design_molar_flow_capacity: float | None = None,
 ) -> FlareResult: ...
+def flow_induced_pulsation_screening(
+    acoustic_length: float,
+    branch_internal_diameter: float,
+    run_internal_diameter: float,
+    main_line_velocity: float,
+    main_line_density: float,
+    speed_of_sound: float,
+    edge_radius: float | None = None,
+    termination: str | None = None,
+    strouhal_number: float | None = None,
+    mode_count: float | None = None,
+) -> FlowInducedPulsationResult: ...
 def fmea_worksheet(entries: list[FmeaEntry], rpn_threshold: float) -> FmeaWorksheetResult: ...
 def gas_blowby(
     upstream_pressure: float,
@@ -7987,6 +8197,12 @@ def hem_release(
     discharge_coefficient: float,
     back_pressure: float,
 ) -> HemReleaseResult: ...
+def inherent_safety(
+    substitute_score: float | None = None,
+    minimize_score: float | None = None,
+    moderate_score: float | None = None,
+    simplify_score: float | None = None,
+) -> InherentSafetyResult: ...
 def jet_fire(
     mass_flow: float,
     heat_of_combustion: float,
@@ -8071,6 +8287,7 @@ def nog070_sil_determination(
     pfd_average: float,
     minimum_sil: float | None = None,
 ) -> Nog070SilDeterminationResult: ...
+def norsok_p002_compliance(checks: list[P002CheckRow]) -> NorsokP002ComplianceResult: ...
 def overpressure_acceptance(
     peak_pressure: float,
     mawp: float,
@@ -8206,6 +8423,22 @@ def pipeline_pressure_protection(
     barrier1_setpoint: float,
     barrier2_setpoint: float,
 ) -> PipelinePressureProtectionResult: ...
+def piping_fiv_gas(
+    density: float,
+    velocity: float,
+    outside_diameter: float,
+    wall_thickness: float,
+    branch_count: float,
+    pulsation_factor: float,
+    support_quality_factor: float,
+) -> PipingFivGasResult: ...
+def piping_fiv_liquid(
+    velocity: float,
+    outside_diameter: float,
+    wall_thickness: float,
+    branch_count: float,
+    support_quality_factor: float,
+) -> PipingFivLiquidResult: ...
 def plug_flow_reactor(
     components: list[str],
     feed_n: float,
@@ -8631,6 +8864,7 @@ def stripping_column(
     material_grade: str | None = None,
     max_operation_pressure: float | None = None,
 ) -> StrippingColumnResult: ...
+def sts0131_gate(checks: list[Sts0131CheckRow]) -> Sts0131GateResult: ...
 def tank(
     components: list[str],
     feed_n: list[float],

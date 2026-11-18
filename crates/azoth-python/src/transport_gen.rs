@@ -14,20 +14,21 @@
 //! on any difference.
 
 use crate::record_outputs_gen::{
-    PyActivityCoefficientRow, PyAppliedStandardRow, PyBrineMixingPointRow,
+    PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
-    PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEventTreeOutcome,
-    PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
-    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
-    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIncrementalZoneRow,
-    PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
-    PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyNaceIssueRow, PyPipeFireRupturePoint, PyRegisterFinding, PyReliefDisposalRow,
-    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
-    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint,
-    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
-    PySubFraction, PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEscalationItemResult,
+    PyEventTreeOutcome, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
+    PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
+    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
+    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
+    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
+    PyMinimalCutSet, PyNaceIssueRow, PyP002FindingResult, PyPipeFireRupturePoint,
+    PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
+    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -14007,6 +14008,67 @@ impl From<&azoth_process::models::absorption_column::AbsorptionColumnResult>
         }
     }
 }
+/// Result of `process.acoustic_induced_vibration_screening`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "AcousticInducedVibrationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyAcousticInducedVibrationResult {
+    /// the sound power level, in dB.
+    #[pyo3(get)]
+    pub pwl: f64,
+    /// the design-line allowable sound power level, in dB.
+    #[pyo3(get)]
+    pub allowable_pwl: f64,
+    /// `pwl - allowable_pwl`, in dB; positive is an exceedance.
+    #[pyo3(get)]
+    pub margin: f64,
+    /// the AVIFF likelihood band from the margin.
+    #[pyo3(get)]
+    pub likelihood: String,
+    /// `(P1 - P2)/P1`.
+    #[pyo3(get)]
+    pub pressure_drop_ratio: f64,
+    /// the outside-diameter-to-wall-thickness ratio.
+    #[pyo3(get)]
+    pub d_overt: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyAcousticInducedVibrationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "AcousticInducedVibrationResult(pwl={:?}, allowable_pwl={:?}, margin={:?}, likelihood={:?}, pressure_drop_ratio={:?}, d_overt={:?}, {} warning(s))",
+            self.pwl,
+            self.allowable_pwl,
+            self.margin,
+            self.likelihood,
+            self.pressure_drop_ratio,
+            self.d_overt,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::acoustic_induced_vibration_screening::AcousticInducedVibrationResult> for PyAcousticInducedVibrationResult {
+    fn from(r: &azoth_process::models::acoustic_induced_vibration_screening::AcousticInducedVibrationResult) -> Self {
+        Self {
+            pwl: r.pwl,
+            allowable_pwl: r.allowable_pwl,
+            margin: r.margin,
+            likelihood: r.likelihood.as_str().to_string(),
+            pressure_drop_ratio: r.pressure_drop_ratio,
+            d_overt: r.d_overt,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.active_fire_protection_screening`, transported.
 #[pyclass(
     frozen,
@@ -14054,6 +14116,56 @@ impl From<&azoth_process::models::active_fire_protection_screening::ActiveFirePr
             blowdown_faster_than_failure: r.blowdown_faster_than_failure,
             blowdown_margin: PyQty { magnitude_si: r.blowdown_margin.value, unit: "s".to_string() },
             selective_protection_saving_fraction: r.selective_protection_saving_fraction,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.alarp_audit`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "AlarpAuditResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyAlarpAuditResult {
+    /// one row per measure, in caller order.
+    #[pyo3(get)]
+    pub evaluations: Vec<PyAlarpEvaluationResult>,
+    /// `value_of_statistical_life * disproportion_factor`, in NOK.
+    #[pyo3(get)]
+    pub threshold: f64,
+    /// the number of evaluated measures.
+    #[pyo3(get)]
+    pub measure_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyAlarpAuditResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "AlarpAuditResult(evaluations={:?}, threshold={:?}, measure_count={:?}, {} warning(s))",
+            self.evaluations,
+            self.threshold,
+            self.measure_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::alarp_audit::AlarpAuditResult> for PyAlarpAuditResult {
+    fn from(r: &azoth_process::models::alarp_audit::AlarpAuditResult) -> Self {
+        Self {
+            evaluations: r
+                .evaluations
+                .iter()
+                .map(PyAlarpEvaluationResult::from)
+                .collect(),
+            threshold: r.threshold,
+            measure_count: r.measure_count,
             warnings: transport(&r.warnings),
         }
     }
@@ -16358,6 +16470,72 @@ impl From<&azoth_process::models::ejector::EjectorResult> for PyEjectorResult {
         }
     }
 }
+/// Result of `process.escalation_graph`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EscalationGraphResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEscalationGraphResult {
+    /// the items that ultimately fail, including the initiator, in the items order.
+    #[pyo3(get)]
+    pub failed_items: Vec<PyEscalationItemResult>,
+    /// the number of failed items.
+    #[pyo3(get)]
+    pub failure_count: f64,
+    /// whether more than the initiator failed.
+    #[pyo3(get)]
+    pub any_escalation: bool,
+    /// the largest propagation over every registered item, in the items order.
+    #[pyo3(get)]
+    pub worst_case_items: Vec<PyEscalationItemResult>,
+    /// the number of items in the worst case.
+    #[pyo3(get)]
+    pub worst_case_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyEscalationGraphResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "EscalationGraphResult(failed_items={:?}, failure_count={:?}, any_escalation={:?}, worst_case_items={:?}, worst_case_count={:?}, {} warning(s))",
+            self.failed_items,
+            self.failure_count,
+            self.any_escalation,
+            self.worst_case_items,
+            self.worst_case_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::escalation_graph::EscalationGraphResult>
+    for PyEscalationGraphResult
+{
+    fn from(r: &azoth_process::models::escalation_graph::EscalationGraphResult) -> Self {
+        Self {
+            failed_items: r
+                .failed_items
+                .iter()
+                .map(PyEscalationItemResult::from)
+                .collect(),
+            failure_count: r.failure_count,
+            any_escalation: r.any_escalation,
+            worst_case_items: r
+                .worst_case_items
+                .iter()
+                .map(PyEscalationItemResult::from)
+                .collect(),
+            worst_case_count: r.worst_case_count,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.event_tree`, transported.
 #[pyclass(
     frozen,
@@ -17516,6 +17694,113 @@ impl From<&azoth_process::models::flare::FlareResult> for PyFlareResult {
             mass_utilization: r.mass_utilization,
             molar_utilization: r.molar_utilization,
             overloaded: r.overloaded,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.flow_induced_pulsation_screening`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FlowInducedPulsationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFlowInducedPulsationResult {
+    /// the AVIFF likelihood band.
+    #[pyo3(get)]
+    pub likelihood: String,
+    /// whether the shedding frequency is inside any mode's envelope.
+    #[pyo3(get)]
+    pub any_mode_locked_in: bool,
+    /// the vortex-shedding frequency.
+    #[pyo3(get)]
+    pub shedding_frequency: PyQty,
+    /// the lowest main-line velocity that places the shedding frequency on a mode.
+    #[pyo3(get)]
+    pub lowest_resonance_velocity: PyQty,
+    /// the branch-mouth effective width `pi d/4 + r`.
+    #[pyo3(get)]
+    pub effective_width: PyQty,
+    /// the branch-to-run diameter ratio.
+    #[pyo3(get)]
+    pub diameter_ratio: f64,
+    /// the main-line momentum flux `rho v^2`.
+    #[pyo3(get)]
+    pub rho_v2: PyQty,
+    /// the momentum flux normalised by 20000 Pa.
+    #[pyo3(get)]
+    pub energy_term: f64,
+    /// `min(1, (d/D_run)/0.5)`.
+    #[pyo3(get)]
+    pub coupling_factor: f64,
+    /// the strongest locked mode's `1/(2n+1)` weight, zero when none locks.
+    #[pyo3(get)]
+    pub mode_weight: f64,
+    /// the normalised severity of the excited mode.
+    #[pyo3(get)]
+    pub severity: f64,
+    /// one row per evaluated acoustic mode, in mode order.
+    #[pyo3(get)]
+    pub modes: Vec<PyPulsationModeResult>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFlowInducedPulsationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FlowInducedPulsationResult(likelihood={:?}, any_mode_locked_in={:?}, shedding_frequency={:?}, lowest_resonance_velocity={:?}, effective_width={:?}, diameter_ratio={:?}, rho_v2={:?}, energy_term={:?}, coupling_factor={:?}, mode_weight={:?}, severity={:?}, modes={:?}, {} warning(s))",
+            self.likelihood,
+            self.any_mode_locked_in,
+            self.shedding_frequency,
+            self.lowest_resonance_velocity,
+            self.effective_width,
+            self.diameter_ratio,
+            self.rho_v2,
+            self.energy_term,
+            self.coupling_factor,
+            self.mode_weight,
+            self.severity,
+            self.modes,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::flow_induced_pulsation_screening::FlowInducedPulsationResult>
+    for PyFlowInducedPulsationResult
+{
+    fn from(
+        r: &azoth_process::models::flow_induced_pulsation_screening::FlowInducedPulsationResult,
+    ) -> Self {
+        Self {
+            likelihood: r.likelihood.as_str().to_string(),
+            any_mode_locked_in: r.any_mode_locked_in,
+            shedding_frequency: PyQty {
+                magnitude_si: r.shedding_frequency.value,
+                unit: "1/s".to_string(),
+            },
+            lowest_resonance_velocity: PyQty {
+                magnitude_si: r.lowest_resonance_velocity.value,
+                unit: "m/s".to_string(),
+            },
+            effective_width: PyQty {
+                magnitude_si: r.effective_width.value,
+                unit: "m".to_string(),
+            },
+            diameter_ratio: r.diameter_ratio,
+            rho_v2: PyQty {
+                magnitude_si: r.rho_v2.value,
+                unit: "Pa".to_string(),
+            },
+            energy_term: r.energy_term,
+            coupling_factor: r.coupling_factor,
+            mode_weight: r.mode_weight,
+            severity: r.severity,
+            modes: r.modes.iter().map(PyPulsationModeResult::from).collect(),
             warnings: transport(&r.warnings),
         }
     }
@@ -19627,6 +19912,44 @@ impl From<&azoth_process::models::hem_release::HemReleaseResult> for PyHemReleas
         }
     }
 }
+/// Result of `process.inherent_safety`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "InherentSafetyResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyInherentSafetyResult {
+    /// the mean of the four pillar scores.
+    #[pyo3(get)]
+    pub overall_index: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyInherentSafetyResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "InherentSafetyResult(overall_index={:?}, {} warning(s))",
+            self.overall_index,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::inherent_safety::InherentSafetyResult>
+    for PyInherentSafetyResult
+{
+    fn from(r: &azoth_process::models::inherent_safety::InherentSafetyResult) -> Self {
+        Self {
+            overall_index: r.overall_index,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.jet_fire`, transported.
 #[pyclass(
     frozen,
@@ -20340,6 +20663,54 @@ impl From<&azoth_process::models::nog070_sil_determination::Nog070SilDeterminati
             achieved_sil: r.achieved_sil,
             compliant: r.compliant,
             required_pfd_reduction_factor: r.required_pfd_reduction_factor,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.norsok_p002_compliance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "NorsokP002ComplianceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyNorsokP002ComplianceResult {
+    /// one row per check, in the caller's order.
+    #[pyo3(get)]
+    pub findings: Vec<PyP002FindingResult>,
+    /// whether every finding is compliant.
+    #[pyo3(get)]
+    pub compliant: bool,
+    /// the number of non-compliant findings.
+    #[pyo3(get)]
+    pub non_compliant_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyNorsokP002ComplianceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "NorsokP002ComplianceResult(findings={:?}, compliant={:?}, non_compliant_count={:?}, {} warning(s))",
+            self.findings,
+            self.compliant,
+            self.non_compliant_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::norsok_p002_compliance::NorsokP002ComplianceResult>
+    for PyNorsokP002ComplianceResult
+{
+    fn from(r: &azoth_process::models::norsok_p002_compliance::NorsokP002ComplianceResult) -> Self {
+        Self {
+            findings: r.findings.iter().map(PyP002FindingResult::from).collect(),
+            compliant: r.compliant,
+            non_compliant_count: r.non_compliant_count,
             warnings: transport(&r.warnings),
         }
     }
@@ -21366,6 +21737,153 @@ impl From<&azoth_process::models::pipeline_pressure_protection::PipelinePressure
             barrier2_adequate: r.barrier2_adequate,
             protection_adequate: r.protection_adequate,
             verdict: r.verdict.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.piping_fiv_gas`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipingFivGasResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipingFivGasResult {
+    /// the normalised likelihood of failure.
+    #[pyo3(get)]
+    pub lof: f64,
+    /// the AVIFF likelihood band.
+    #[pyo3(get)]
+    pub likelihood: String,
+    /// the gas momentum flux `rho v^2`.
+    #[pyo3(get)]
+    pub rho_v2: PyQty,
+    /// the outside-diameter-to-wall-thickness ratio.
+    #[pyo3(get)]
+    pub d_overt: f64,
+    /// the D/t factor, floored at one for a ratio at or below 40.
+    #[pyo3(get)]
+    pub d_overt_factor: f64,
+    /// the branch factor `1 + 0.15 n`.
+    #[pyo3(get)]
+    pub branch_factor: f64,
+    /// the pulsation factor after the clamp.
+    #[pyo3(get)]
+    pub pulsation_factor_applied: f64,
+    /// the support-quality factor after the clamp.
+    #[pyo3(get)]
+    pub support_quality_factor_applied: f64,
+    /// the momentum flux normalised by 50000 Pa.
+    #[pyo3(get)]
+    pub energy_term: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPipingFivGasResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipingFivGasResult(lof={:?}, likelihood={:?}, rho_v2={:?}, d_overt={:?}, d_overt_factor={:?}, branch_factor={:?}, pulsation_factor_applied={:?}, support_quality_factor_applied={:?}, energy_term={:?}, {} warning(s))",
+            self.lof,
+            self.likelihood,
+            self.rho_v2,
+            self.d_overt,
+            self.d_overt_factor,
+            self.branch_factor,
+            self.pulsation_factor_applied,
+            self.support_quality_factor_applied,
+            self.energy_term,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::piping_fiv_gas::PipingFivGasResult> for PyPipingFivGasResult {
+    fn from(r: &azoth_process::models::piping_fiv_gas::PipingFivGasResult) -> Self {
+        Self {
+            lof: r.lof,
+            likelihood: r.likelihood.as_str().to_string(),
+            rho_v2: PyQty {
+                magnitude_si: r.rho_v2.value,
+                unit: "Pa".to_string(),
+            },
+            d_overt: r.d_overt,
+            d_overt_factor: r.d_overt_factor,
+            branch_factor: r.branch_factor,
+            pulsation_factor_applied: r.pulsation_factor_applied,
+            support_quality_factor_applied: r.support_quality_factor_applied,
+            energy_term: r.energy_term,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.piping_fiv_liquid`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipingFivLiquidResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipingFivLiquidResult {
+    /// the normalised likelihood of failure.
+    #[pyo3(get)]
+    pub lof: f64,
+    /// the AVIFF likelihood band.
+    #[pyo3(get)]
+    pub likelihood: String,
+    /// the outside-diameter-to-wall-thickness ratio.
+    #[pyo3(get)]
+    pub d_overt: f64,
+    /// the D/t factor, floored at one for a ratio at or below 40.
+    #[pyo3(get)]
+    pub d_overt_factor: f64,
+    /// the branch factor `1 + 0.10 n`.
+    #[pyo3(get)]
+    pub branch_factor: f64,
+    /// the support-quality factor after the clamp.
+    #[pyo3(get)]
+    pub support_quality_factor_applied: f64,
+    /// the velocity normalised by 6 m/s.
+    #[pyo3(get)]
+    pub energy_term: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPipingFivLiquidResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipingFivLiquidResult(lof={:?}, likelihood={:?}, d_overt={:?}, d_overt_factor={:?}, branch_factor={:?}, support_quality_factor_applied={:?}, energy_term={:?}, {} warning(s))",
+            self.lof,
+            self.likelihood,
+            self.d_overt,
+            self.d_overt_factor,
+            self.branch_factor,
+            self.support_quality_factor_applied,
+            self.energy_term,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::piping_fiv_liquid::PipingFivLiquidResult>
+    for PyPipingFivLiquidResult
+{
+    fn from(r: &azoth_process::models::piping_fiv_liquid::PipingFivLiquidResult) -> Self {
+        Self {
+            lof: r.lof,
+            likelihood: r.likelihood.as_str().to_string(),
+            d_overt: r.d_overt,
+            d_overt_factor: r.d_overt_factor,
+            branch_factor: r.branch_factor,
+            support_quality_factor_applied: r.support_quality_factor_applied,
+            energy_term: r.energy_term,
             warnings: transport(&r.warnings),
         }
     }
@@ -25480,6 +25998,56 @@ impl From<&azoth_process::models::stripping_column::StrippingColumnResult>
                 unit: "kW".to_string(),
             },
             material_grade: r.material_grade.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.sts0131_gate`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Sts0131GateResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySts0131GateResult {
+    /// one row per check, in the caller's order.
+    #[pyo3(get)]
+    pub findings: Vec<PySts0131FindingResult>,
+    /// whether no finding fails.
+    #[pyo3(get)]
+    pub acceptable: bool,
+    /// the number of failing findings.
+    #[pyo3(get)]
+    pub failure_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySts0131GateResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Sts0131GateResult(findings={:?}, acceptable={:?}, failure_count={:?}, {} warning(s))",
+            self.findings,
+            self.acceptable,
+            self.failure_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::sts0131_gate::Sts0131GateResult> for PySts0131GateResult {
+    fn from(r: &azoth_process::models::sts0131_gate::Sts0131GateResult) -> Self {
+        Self {
+            findings: r
+                .findings
+                .iter()
+                .map(PySts0131FindingResult::from)
+                .collect(),
+            acceptable: r.acceptable,
+            failure_count: r.failure_count,
             warnings: transport(&r.warnings),
         }
     }

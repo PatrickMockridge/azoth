@@ -1,0 +1,89 @@
+sts_empty
+acceptable=true
+failure_count=0
+
+sts_psv_equal
+acceptable=true
+failure_count=0
+finding0_check=PSV sizing margin
+finding0_severity=PASS
+
+sts_psv_below
+acceptable=false
+failure_count=1
+finding0_check=PSV sizing margin
+finding0_severity=FAIL
+
+sts_mdmt_equal
+acceptable=true
+failure_count=0
+finding0_check=MDMT
+finding0_severity=PASS
+
+sts_mdmt_below
+acceptable=false
+failure_count=1
+finding0_check=MDMT
+finding0_severity=FAIL
+
+sts_depressurisation_pass
+acceptable=true
+failure_count=0
+finding0_check=Depressurisation
+finding0_severity=PASS
+
+sts_depressurisation_fail
+acceptable=false
+failure_count=1
+finding0_check=Depressurisation
+finding0_severity=FAIL
+
+sts_trapped_pass
+acceptable=true
+failure_count=0
+finding0_check=Trapped liquid fire rupture
+finding0_severity=PASS
+
+sts_trapped_fail
+acceptable=false
+failure_count=1
+finding0_check=Trapped liquid fire rupture
+finding0_severity=FAIL
+
+sts_sil_pass
+acceptable=true
+failure_count=0
+finding0_check=NOG 070 SIL
+finding0_severity=PASS
+
+sts_sil_fail
+acceptable=false
+failure_count=1
+finding0_check=NOG 070 SIL
+finding0_severity=FAIL
+
+sts_custom_pass
+acceptable=true
+failure_count=0
+finding0_check=custom
+finding0_severity=PASS
+
+sts_custom_fail
+acceptable=false
+failure_count=1
+finding0_check=custom
+finding0_severity=FAIL
+
+sts_mixed
+acceptable=false
+failure_count=1
+finding0_check=Depressurisation
+finding0_severity=FAIL
+finding1_check=PSV sizing margin
+finding1_severity=PASS
+finding2_check=custom
+finding2_severity=PASS
+
+sts_area_refusal
+refusal=IllegalArgumentException: areas must be positive
+

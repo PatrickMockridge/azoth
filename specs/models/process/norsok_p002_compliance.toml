@@ -1,0 +1,112 @@
+id = "process.norsok_p002_compliance"
+name = "NORSOK P-002 point-check compliance"
+kind = "procedure"
+assumptions = [
+    "**each check is `value <= limit`**, so equality passes, and the defaults are 0.7 Mach, 200000 Pa and 100000 Pa of momentum flux, 60 m/s and 1e-3 volume fraction.",
+    "**the two recorded criteria read only a caller-supplied pass flag**: the class stores NaN for their value and limit, so there is nothing to compare.",
+    "**a row states only the field its criterion reads**; the kernel refuses a row carrying another criterion's value, a limit for a quantity it does not compare, or a pass flag on a numeric criterion.",
+    "**the findings preserve the caller's row order**, and a duplicated row is two findings.",
+    "**an empty check list is compliant with no findings**, as the class's own checker answers.",
+    "**a passing report covers only the supplied point checks**, not conformity with the whole standard; the class's own javadoc says so.",
+    "**the class's unit strings and messages are presentation**, and the value and limit are not republished: they are the caller's own numbers or the class's defaults.",
+]
+references = [
+    "NORSOK P-002:2014. Process system design.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/compliance/NorsokP002ComplianceChecker.java` is the port source.",
+    "`validation/neqsim/captures/process_norsok_p002_compliance.tsv` - all seven passing, all seven failing, equality, custom limits, the recorded checks and the empty checker.",
+]
+[source]
+standard = "NeqSim process/safety/compliance/NorsokP002ComplianceChecker.java"
+edition = "Its seven `check...` and `record...` methods, `isCompliant` and `countNonCompliant`."
+[algorithm]
+scheme = "norsok_p002_point_checks"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.checks]
+type = "record_list"
+row_type = "P002CheckRow"
+description = "the point checks, in caller order; each states the field its criterion reads.\n"
+[inputs.checks.fields.name]
+type = "string"
+description = "the segment, equipment or item the check is about.\n"
+[inputs.checks.fields.criterion]
+type = "enum"
+values = [
+    "flare_line_mach_07",
+    "blowdown_rho_v2",
+    "erosional_velocity",
+    "vent_gas_velocity",
+    "liquid_carry_over",
+    "depressurisation_valve_size",
+    "drain_slope_capacity",
+]
+description = "the NORSOK P-002 criterion checked.\n"
+[inputs.checks.fields.mach_number]
+unit = "dimensionless"
+optional = true
+description = "the flare-line gas Mach number, read by `flare_line_mach_07`.\n"
+[inputs.checks.fields.mach_limit]
+unit = "dimensionless"
+optional = true
+description = "the Mach limit; **absent is 0.7**.\n"
+[inputs.checks.fields.momentum_flux]
+unit = "Pa"
+optional = true
+description = "the momentum flux, read by `blowdown_rho_v2` and `erosional_velocity`.\n"
+[inputs.checks.fields.momentum_flux_limit]
+unit = "Pa"
+optional = true
+description = "the momentum-flux limit; **absent is 200000 Pa for blowdown and 100000 Pa for erosional**.\n"
+[inputs.checks.fields.vent_velocity]
+unit = "m/s"
+optional = true
+description = "the atmospheric vent gas velocity, read by `vent_gas_velocity`.\n"
+[inputs.checks.fields.vent_velocity_limit]
+unit = "m/s"
+optional = true
+description = "the vent-velocity limit; **absent is 60 m/s**.\n"
+[inputs.checks.fields.carry_over_fraction]
+unit = "dimensionless"
+optional = true
+description = "the separator's volumetric liquid carry-over fraction, read by `liquid_carry_over`.\n"
+[inputs.checks.fields.carry_over_limit]
+unit = "dimensionless"
+optional = true
+description = "the carry-over limit; **absent is 1e-3**.\n"
+[inputs.checks.fields.recorded_ok]
+type = "boolean"
+optional = true
+description = "the caller's pass flag for the two recorded criteria, which have no arithmetic.\n"
+[outputs]
+[outputs.findings]
+type = "record_list"
+description = "one row per check, in the caller's order.\n"
+[outputs.findings.fields.name]
+type = "string"
+description = "the segment, equipment or item the check is about.\n"
+[outputs.findings.fields.criterion]
+type = "enum"
+values = [
+    "flare_line_mach_07",
+    "blowdown_rho_v2",
+    "erosional_velocity",
+    "vent_gas_velocity",
+    "liquid_carry_over",
+    "depressurisation_valve_size",
+    "drain_slope_capacity",
+]
+description = "the criterion checked.\n"
+[outputs.findings.fields.compliant]
+type = "boolean"
+description = "whether the value is at or below the limit, or the caller's flag for a recorded check.\n"
+[outputs.compliant]
+type = "boolean"
+description = "whether every finding is compliant.\n"
+[outputs.non_compliant_count]
+unit = "dimensionless"
+description = "the number of non-compliant findings.\n"
+[implementations]
+python = "azoth.process.norsok_p002_compliance"
+rust = "azoth_process::norsok_p002_compliance"

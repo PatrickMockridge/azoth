@@ -46,6 +46,46 @@ impl From<&azoth_eos::results::ActivityCoefficientRow> for PyActivityCoefficient
     }
 }
 
+/// one row per measure, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "AlarpEvaluationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyAlarpEvaluationResult {
+    /// the measure's description.
+    #[pyo3(get)]
+    pub description: String,
+    /// the implied cost of averting a fatality, in NOK; absent where the class answers infinity.
+    #[pyo3(get)]
+    pub icaf: Option<f64>,
+    /// the ALARP verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+}
+
+#[pymethods]
+impl PyAlarpEvaluationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "AlarpEvaluationResult(description={}, icaf={:?}, verdict={})",
+            self.description, self.icaf, self.verdict
+        )
+    }
+}
+
+impl From<&azoth_process::models::alarp_audit::AlarpEvaluationResult> for PyAlarpEvaluationResult {
+    fn from(row: &azoth_process::models::alarp_audit::AlarpEvaluationResult) -> Self {
+        Self {
+            description: row.description.clone(),
+            icaf: row.icaf,
+            verdict: row.verdict.as_str().to_string(),
+        }
+    }
+}
+
 /// The standards the design pipeline applied.
 #[pyclass(
     frozen,
@@ -508,6 +548,37 @@ impl From<&azoth_eos::results::EquilibriumSoundSpeedSample> for PyEquilibriumSou
             },
             phase: row.phase.as_str().to_string(),
             vapour_fraction: row.vapour_fraction,
+        }
+    }
+}
+
+/// the largest propagation over every registered item, in the items order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EscalationItemResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEscalationItemResult {
+    /// the failed item's identifier.
+    #[pyo3(get)]
+    pub item_id: String,
+}
+
+#[pymethods]
+impl PyEscalationItemResult {
+    fn __repr__(&self) -> String {
+        format!("EscalationItemResult(item_id={})", self.item_id)
+    }
+}
+
+impl From<&azoth_process::models::escalation_graph::EscalationItemResult>
+    for PyEscalationItemResult
+{
+    fn from(row: &azoth_process::models::escalation_graph::EscalationItemResult) -> Self {
+        Self {
+            item_id: row.item_id.clone(),
         }
     }
 }
@@ -2019,6 +2090,48 @@ impl From<&azoth_thermal::results::NaceIssueRow> for PyNaceIssueRow {
     }
 }
 
+/// one row per check, in the caller's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "P002FindingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyP002FindingResult {
+    /// the segment, equipment or item the check is about.
+    #[pyo3(get)]
+    pub name: String,
+    /// the criterion checked.
+    #[pyo3(get)]
+    pub criterion: String,
+    /// whether the value is at or below the limit, or the caller's flag for a recorded check.
+    #[pyo3(get)]
+    pub compliant: bool,
+}
+
+#[pymethods]
+impl PyP002FindingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "P002FindingResult(name={}, criterion={}, compliant={:?})",
+            self.name, self.criterion, self.compliant
+        )
+    }
+}
+
+impl From<&azoth_process::models::norsok_p002_compliance::P002FindingResult>
+    for PyP002FindingResult
+{
+    fn from(row: &azoth_process::models::norsok_p002_compliance::P002FindingResult) -> Self {
+        Self {
+            name: row.name.clone(),
+            criterion: row.criterion.as_str().to_string(),
+            compliant: row.compliant,
+        }
+    }
+}
+
 /// one row per marching step, in time order, ending at the rupture step when one is found.
 #[pyclass(
     frozen,
@@ -2110,6 +2223,95 @@ impl From<&azoth_process::models::pipe_fire_rupture::PipeFireRupturePoint>
             },
             accumulated_strain: row.accumulated_strain,
             rupture_strain_limit: row.rupture_strain_limit,
+        }
+    }
+}
+
+/// one row per evaluated acoustic mode, in mode order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PulsationModeResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPulsationModeResult {
+    /// the mode index n, zero for the fundamental.
+    #[pyo3(get)]
+    pub mode_index: f64,
+    /// the acoustic eigenfrequency.
+    #[pyo3(get)]
+    pub frequency: PyQty,
+    /// the lower lock-in envelope, `0.8 f_n`.
+    #[pyo3(get)]
+    pub envelope_low: PyQty,
+    /// the upper lock-in envelope, `1.2 f_n`.
+    #[pyo3(get)]
+    pub envelope_high: PyQty,
+    /// whether the shedding frequency is inside this mode's envelope.
+    #[pyo3(get)]
+    pub locked_in: bool,
+    /// the main-line velocity that places the shedding frequency on this mode.
+    #[pyo3(get)]
+    pub resonance_velocity: PyQty,
+    /// the lower velocity of this mode's lock-in band.
+    #[pyo3(get)]
+    pub resonance_velocity_low: PyQty,
+    /// the upper velocity of this mode's lock-in band.
+    #[pyo3(get)]
+    pub resonance_velocity_high: PyQty,
+}
+
+#[pymethods]
+impl PyPulsationModeResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PulsationModeResult(mode_index={}, frequency={:?}, envelope_low={:?}, envelope_high={:?}, locked_in={:?}, resonance_velocity={:?}, resonance_velocity_low={:?}, resonance_velocity_high={:?})",
+            self.mode_index,
+            self.frequency,
+            self.envelope_low,
+            self.envelope_high,
+            self.locked_in,
+            self.resonance_velocity,
+            self.resonance_velocity_low,
+            self.resonance_velocity_high
+        )
+    }
+}
+
+impl From<&azoth_process::models::flow_induced_pulsation_screening::PulsationModeResult>
+    for PyPulsationModeResult
+{
+    fn from(
+        row: &azoth_process::models::flow_induced_pulsation_screening::PulsationModeResult,
+    ) -> Self {
+        Self {
+            mode_index: row.mode_index,
+            frequency: PyQty {
+                magnitude_si: row.frequency.value,
+                unit: "1/s".to_string(),
+            },
+            envelope_low: PyQty {
+                magnitude_si: row.envelope_low.value,
+                unit: "1/s".to_string(),
+            },
+            envelope_high: PyQty {
+                magnitude_si: row.envelope_high.value,
+                unit: "1/s".to_string(),
+            },
+            locked_in: row.locked_in,
+            resonance_velocity: PyQty {
+                magnitude_si: row.resonance_velocity.value,
+                unit: "m/s".to_string(),
+            },
+            resonance_velocity_low: PyQty {
+                magnitude_si: row.resonance_velocity_low.value,
+                unit: "m/s".to_string(),
+            },
+            resonance_velocity_high: PyQty {
+                magnitude_si: row.resonance_velocity_high.value,
+                unit: "m/s".to_string(),
+            },
         }
     }
 }
@@ -3012,6 +3214,50 @@ impl From<&azoth_eos::results::StreamScaleMineralRow> for PyStreamScaleMineralRo
                 magnitude_si: row.scale_rate.value,
                 unit: "kg/s".to_string(),
             },
+        }
+    }
+}
+
+/// one row per check, in the caller's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "Sts0131FindingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySts0131FindingResult {
+    /// the check.
+    #[pyo3(get)]
+    pub check_type: String,
+    /// the finding's severity; the class emits no warning.
+    #[pyo3(get)]
+    pub severity: String,
+    /// the custom check's name; absent for a built-in check.
+    #[pyo3(get)]
+    pub name: Option<String>,
+    /// the PSV area margin; absent for every other check.
+    #[pyo3(get)]
+    pub margin: Option<f64>,
+}
+
+#[pymethods]
+impl PySts0131FindingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "Sts0131FindingResult(check_type={}, severity={}, name={:?}, margin={:?})",
+            self.check_type, self.severity, self.name, self.margin
+        )
+    }
+}
+
+impl From<&azoth_process::models::sts0131_gate::Sts0131FindingResult> for PySts0131FindingResult {
+    fn from(row: &azoth_process::models::sts0131_gate::Sts0131FindingResult) -> Self {
+        Self {
+            check_type: row.check_type.as_str().to_string(),
+            severity: row.severity.as_str().to_string(),
+            name: row.name.clone(),
+            margin: row.margin,
         }
     }
 }

@@ -23,6 +23,7 @@ from typing import ClassVar
 
 from azoth.core.record_outputs_gen import (
     ActivityCoefficientRow,
+    AlarpEvaluationResult,
     AppliedStandardRow,
     BrineMixingPointRow,
     CharacterizationComponent,
@@ -30,6 +31,7 @@ from azoth.core.record_outputs_gen import (
     ConsequenceOutcomeResult,
     DepositionSegmentRow,
     EquilibriumSoundSpeedSample,
+    EscalationItemResult,
     EventTreeOutcome,
     FlowlineScaleSegment,
     FmeaRankedEntry,
@@ -52,7 +54,9 @@ from azoth.core.record_outputs_gen import (
     MineralEquilibriumRow,
     MinimalCutSet,
     NaceIssueRow,
+    P002FindingResult,
     PipeFireRupturePoint,
+    PulsationModeResult,
     RegisterFinding,
     ReliefDisposalRow,
     RemediationOptionRow,
@@ -71,6 +75,7 @@ from azoth.core.record_outputs_gen import (
     SilIssue,
     SterileRadius,
     StreamScaleMineralRow,
+    Sts0131FindingResult,
     SubFraction,
     Tr3001Finding,
     VesselRuptureStep,
@@ -86,6 +91,7 @@ from azoth.core.result_base import (
     EmulsionType,
     ErosionRiskLevel,
     FeSMorphology,
+    FivLikelihood,
     FlowRegime,
     FluidBasis,
     GoverningCriterion,
@@ -5635,6 +5641,34 @@ class AbsorptionColumnResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class AcousticInducedVibrationResult(_HasWarnings):
+    """Result of ``process.acoustic_induced_vibration_screening``."""
+
+    CALC_ID: ClassVar[str] = "process.acoustic_induced_vibration_screening"
+
+    #: the sound power level, in dB.
+    pwl: float
+
+    #: the design-line allowable sound power level, in dB.
+    allowable_pwl: float
+
+    #: `pwl - allowable_pwl`, in dB; positive is an exceedance.
+    margin: float
+
+    #: the AVIFF likelihood band from the margin.
+    likelihood: FivLikelihood
+
+    #: `(P1 - P2)/P1`.
+    pressure_drop_ratio: float
+
+    #: the outside-diameter-to-wall-thickness ratio.
+    d_overt: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ActiveFireProtectionScreeningResult(_HasWarnings):
     """Result of ``process.active_fire_protection_screening``."""
 
@@ -5651,6 +5685,25 @@ class ActiveFireProtectionScreeningResult(_HasWarnings):
 
     #: `1 - dedicated_object_demand / general_area_demand`.
     selective_protection_saving_fraction: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class AlarpAuditResult(_HasWarnings):
+    """Result of ``process.alarp_audit``."""
+
+    CALC_ID: ClassVar[str] = "process.alarp_audit"
+
+    #: one row per measure, in caller order.
+    evaluations: tuple[AlarpEvaluationResult, ...]
+
+    #: `value_of_statistical_life * disproportion_factor`, in NOK.
+    threshold: float
+
+    #: the number of evaluated measures.
+    measure_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -6581,6 +6634,31 @@ class EjectorResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class EscalationGraphResult(_HasWarnings):
+    """Result of ``process.escalation_graph``."""
+
+    CALC_ID: ClassVar[str] = "process.escalation_graph"
+
+    #: the items that ultimately fail, including the initiator, in the items order.
+    failed_items: tuple[EscalationItemResult, ...]
+
+    #: the number of failed items.
+    failure_count: float
+
+    #: whether more than the initiator failed.
+    any_escalation: bool
+
+    #: the largest propagation over every registered item, in the items order.
+    worst_case_items: tuple[EscalationItemResult, ...]
+
+    #: the number of items in the worst case.
+    worst_case_count: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class EventTreeResult(_HasWarnings):
     """Result of ``process.event_tree``."""
 
@@ -7046,6 +7124,52 @@ class FlareResult(_HasWarnings):
 
     #: `isOverloaded`: any present utilisation above `1 + 1e-6`. Absent until at least one utilisation exists.
     overloaded: bool | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FlowInducedPulsationResult(_HasWarnings):
+    """Result of ``process.flow_induced_pulsation_screening``."""
+
+    CALC_ID: ClassVar[str] = "process.flow_induced_pulsation_screening"
+
+    #: the AVIFF likelihood band.
+    likelihood: FivLikelihood
+
+    #: whether the shedding frequency is inside any mode's envelope.
+    any_mode_locked_in: bool
+
+    #: the vortex-shedding frequency.
+    shedding_frequency: Q
+
+    #: the lowest main-line velocity that places the shedding frequency on a mode.
+    lowest_resonance_velocity: Q
+
+    #: the branch-mouth effective width `pi d/4 + r`.
+    effective_width: Q
+
+    #: the branch-to-run diameter ratio.
+    diameter_ratio: float
+
+    #: the main-line momentum flux `rho v^2`.
+    rho_v2: Q
+
+    #: the momentum flux normalised by 20000 Pa.
+    energy_term: float
+
+    #: `min(1, (d/D_run)/0.5)`.
+    coupling_factor: float
+
+    #: the strongest locked mode's `1/(2n+1)` weight, zero when none locks.
+    mode_weight: float
+
+    #: the normalised severity of the excited mode.
+    severity: float
+
+    #: one row per evaluated acoustic mode, in mode order.
+    modes: tuple[PulsationModeResult, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -7935,6 +8059,19 @@ class HemReleaseResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class InherentSafetyResult(_HasWarnings):
+    """Result of ``process.inherent_safety``."""
+
+    CALC_ID: ClassVar[str] = "process.inherent_safety"
+
+    #: the mean of the four pillar scores.
+    overall_index: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class JetFireResult(_HasWarnings):
     """Result of ``process.jet_fire``."""
 
@@ -8211,6 +8348,25 @@ class Nog070SilDeterminationResult(_HasWarnings):
 
     #: `10^(minimum - achieved)`, published only when the SIF is not compliant.
     required_pfd_reduction_factor: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class NorsokP002ComplianceResult(_HasWarnings):
+    """Result of ``process.norsok_p002_compliance``."""
+
+    CALC_ID: ClassVar[str] = "process.norsok_p002_compliance"
+
+    #: one row per check, in the caller's order.
+    findings: tuple[P002FindingResult, ...]
+
+    #: whether every finding is compliant.
+    compliant: bool
+
+    #: the number of non-compliant findings.
+    non_compliant_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -8615,6 +8771,74 @@ class PipelinePressureProtectionResult(_HasWarnings):
 
     #: `FULLY_RATED`, `TWO_BARRIERS_REQUIRED` or `INSUFFICIENT`, the class's own spellings.
     verdict: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PipingFivGasResult(_HasWarnings):
+    """Result of ``process.piping_fiv_gas``."""
+
+    CALC_ID: ClassVar[str] = "process.piping_fiv_gas"
+
+    #: the normalised likelihood of failure.
+    lof: float
+
+    #: the AVIFF likelihood band.
+    likelihood: FivLikelihood
+
+    #: the gas momentum flux `rho v^2`.
+    rho_v2: Q
+
+    #: the outside-diameter-to-wall-thickness ratio.
+    d_overt: float
+
+    #: the D/t factor, floored at one for a ratio at or below 40.
+    d_overt_factor: float
+
+    #: the branch factor `1 + 0.15 n`.
+    branch_factor: float
+
+    #: the pulsation factor after the clamp.
+    pulsation_factor_applied: float
+
+    #: the support-quality factor after the clamp.
+    support_quality_factor_applied: float
+
+    #: the momentum flux normalised by 50000 Pa.
+    energy_term: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PipingFivLiquidResult(_HasWarnings):
+    """Result of ``process.piping_fiv_liquid``."""
+
+    CALC_ID: ClassVar[str] = "process.piping_fiv_liquid"
+
+    #: the normalised likelihood of failure.
+    lof: float
+
+    #: the AVIFF likelihood band.
+    likelihood: FivLikelihood
+
+    #: the outside-diameter-to-wall-thickness ratio.
+    d_overt: float
+
+    #: the D/t factor, floored at one for a ratio at or below 40.
+    d_overt_factor: float
+
+    #: the branch factor `1 + 0.10 n`.
+    branch_factor: float
+
+    #: the support-quality factor after the clamp.
+    support_quality_factor_applied: float
+
+    #: the velocity normalised by 6 m/s.
+    energy_term: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -10255,6 +10479,25 @@ class StrippingColumnResult(_HasWarnings):
 
     #: `getMaterialGrade()`, carried and reported.
     material_grade: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class Sts0131GateResult(_HasWarnings):
+    """Result of ``process.sts0131_gate``."""
+
+    CALC_ID: ClassVar[str] = "process.sts0131_gate"
+
+    #: one row per check, in the caller's order.
+    findings: tuple[Sts0131FindingResult, ...]
+
+    #: whether no finding fails.
+    acceptable: bool
+
+    #: the number of failing findings.
+    failure_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

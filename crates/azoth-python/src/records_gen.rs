@@ -11,6 +11,17 @@ use pyo3::prelude::*;
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct AlarpMeasure {
+    #[pyo3(item)]
+    pub description: String,
+    #[pyo3(item)]
+    pub risk_reduction_per_year: f64,
+    #[pyo3(item)]
+    pub annualised_cost: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct AssayCut {
     #[pyo3(item)]
     pub declared_fraction: f64,
@@ -245,6 +256,26 @@ pub struct ElementBarrierLink {
     pub element_id: String,
     #[pyo3(item)]
     pub barrier_id: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct EscalationExposure {
+    #[pyo3(item)]
+    pub source: String,
+    #[pyo3(item)]
+    pub target: String,
+    #[pyo3(item)]
+    pub load: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct EscalationItem {
+    #[pyo3(item)]
+    pub item_id: String,
+    #[pyo3(item)]
+    pub failure_threshold: f64,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
@@ -557,6 +588,33 @@ pub struct OverpressureScenario {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct P002CheckRow {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub criterion: String,
+    #[pyo3(item)]
+    pub mach_number: Option<f64>,
+    #[pyo3(item)]
+    pub mach_limit: Option<f64>,
+    #[pyo3(item)]
+    pub momentum_flux: Option<f64>,
+    #[pyo3(item)]
+    pub momentum_flux_limit: Option<f64>,
+    #[pyo3(item)]
+    pub vent_velocity: Option<f64>,
+    #[pyo3(item)]
+    pub vent_velocity_limit: Option<f64>,
+    #[pyo3(item)]
+    pub carry_over_fraction: Option<f64>,
+    #[pyo3(item)]
+    pub carry_over_limit: Option<f64>,
+    #[pyo3(item)]
+    pub recorded_ok: Option<bool>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct PerformanceStandardRow {
     #[pyo3(item)]
     pub id: String,
@@ -791,6 +849,33 @@ pub struct SourceRow {
     pub density: Option<f64>,
     #[pyo3(item)]
     pub boiling_point: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct Sts0131CheckRow {
+    #[pyo3(item)]
+    pub check_type: String,
+    #[pyo3(item)]
+    pub name: Option<String>,
+    #[pyo3(item)]
+    pub acceptable: Option<bool>,
+    #[pyo3(item)]
+    pub required_area: Option<f64>,
+    #[pyo3(item)]
+    pub selected_area: Option<f64>,
+    #[pyo3(item)]
+    pub required_margin: Option<f64>,
+    #[pyo3(item)]
+    pub minimum_wall_temperature: Option<f64>,
+    #[pyo3(item)]
+    pub design_mdmt: Option<f64>,
+    #[pyo3(item)]
+    pub rupture_predicted: Option<bool>,
+    #[pyo3(item)]
+    pub sil_compliant: Option<bool>,
+    #[pyo3(item)]
+    pub custom_ok: Option<bool>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

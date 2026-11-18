@@ -14,7 +14,9 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | Model | Scheme | Source |
 |---|---|---|
 | [`process.absorption_column`](./absorption_column.md) | `direct composition` | NeqSim process/equipment/absorber/AbsorptionColumn.java |
+| [`process.acoustic_induced_vibration_screening`](./acoustic_induced_vibration_screening.md) | `carucci_mueller_acoustic_vibration` | NeqSim process/safety/vibration/AcousticInducedVibrationScreening.java |
 | [`process.active_fire_protection_screening`](./active_fire_protection_screening.md) | `closed_form_active_fire_protection_screening` | NeqSim process/safety/firewater/ActiveFireProtectionScreening.java |
+| [`process.alarp_audit`](./alarp_audit.md) | `alarp_icaf_audit` | NeqSim process/safety/alarp/ALARPAuditReport.java |
 | [`process.anti_surge_recycle`](./anti_surge_recycle.md) | `damped_fixed_point_recycle` | NeqSim process/equipment/compressor/AntiSurgeRecycleCalculator.java |
 | [`process.api14c_safe_chart`](./api14c_safe_chart.md) | `api14c_safe_chart` | NeqSim process/safety/api14c/Api14cSafeChartBuilder.java |
 | [`process.api537_flare_flame_model`](./api537_flare_flame_model.md) | `closed_form_flare_flame_and_radiation` | NeqSim process/safety/fire/Api537FlareFlameModel.java |
@@ -33,6 +35,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.deluge_nozzle_layout`](./deluge_nozzle_layout.md) | `closed_form_deluge_nozzle_layout` | NeqSim process/safety/firewater/DelugeNozzleLayout.java |
 | [`process.distillation_column`](./distillation_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/DistillationColumn.java |
 | [`process.ejector`](./ejector.md) | `direct composition` | NeqSim process/equipment/ejector/Ejector.java |
+| [`process.escalation_graph`](./escalation_graph.md) | `domino_failure_propagation` | NeqSim process/safety/escalation/EscalationGraphAnalyzer.java |
 | [`process.event_tree`](./event_tree.md) | `full_binary_enumeration` | NeqSim process/safety/risk/eta/EventTreeAnalyzer.java |
 | [`process.expander`](./expander.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
 | [`process.fault_tree`](./fault_tree.md) | `recursive_gate_evaluation` | NeqSim process/safety/risk/fta/FaultTreeAnalyzer.java |
@@ -42,6 +45,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.fire_water_coverage_assessment`](./fire_water_coverage_assessment.md) | `closed_form_fire_water_coverage_assessment` | NeqSim process/safety/firewater/FireWaterCoverageAssessment.java |
 | [`process.fire_water_demand`](./fire_water_demand.md) | `closed_form_fire_water_demand` | NeqSim process/safety/firewater/FireWaterDemandCalculator.java |
 | [`process.flare`](./flare.md) | `direct composition` | NeqSim process/equipment/flare/Flare.java |
+| [`process.flow_induced_pulsation_screening`](./flow_induced_pulsation_screening.md) | `side_branch_acoustic_resonance` | NeqSim process/safety/vibration/FlowInducedPulsationScreening.java |
 | [`process.fmea_worksheet`](./fmea_worksheet.md) | `fmea_rpn` | NeqSim process/safety/hazid/FMEAWorksheet.java |
 | [`process.gas_blowby`](./gas_blowby.md) | `isentropic_nozzle_blowby` | NeqSim process/safety/blowby/GasBlowbyAnalyzer.java |
 | [`process.gas_dispersion`](./gas_dispersion.md) | `pasquill_gifford_or_britter_mcquaid_screening` | NeqSim process/safety/dispersion/GasDispersionAnalyzer.java |
@@ -55,6 +59,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.heater`](./heater.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Heater.java |
 | [`process.heavy_gas_dispersion`](./heavy_gas_dispersion.md) | `britter_mcquaid_continuous_dense_gas` | NeqSim process/safety/dispersion/HeavyGasDispersion.java |
 | [`process.hem_release`](./hem_release.md) | `log_pressure_scan_golden_section` | NeqSim process/safety/release/HomogeneousEquilibriumReleaseModel.java |
+| [`process.inherent_safety`](./inherent_safety.md) | `kletz_inherent_safety_index` | NeqSim process/safety/inherent/InherentSafetyEvaluator.java |
 | [`process.jet_fire`](./jet_fire.md) | `api521_point_source_wayne_transmissivity` | NeqSim process/safety/fire/JetFireModel.java |
 | [`process.leak_blowdown`](./leak_blowdown.md) | `explicit_euler_isentropic_blowdown` | NeqSim process/safety/release/LeakModel.java |
 | [`process.lopa`](./lopa.md) | `closed_form_lopa` | NeqSim process/safety/risk/sis/LOPAResult.java |
@@ -64,6 +69,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.mdmt`](./mdmt.md) | `ucs66_analytic_mdmt` | NeqSim process/safety/mdmt/MDMTCalculator.java |
 | [`process.mixer`](./mixer.md) | `direct composition` | NeqSim process/equipment/mixer/Mixer.java |
 | [`process.nog070_sil_determination`](./nog070_sil_determination.md) | `closed_form_nog070_sil_determination` | NeqSim process/safety/risk/sis/nog070/Nog070SilDetermination.java |
+| [`process.norsok_p002_compliance`](./norsok_p002_compliance.md) | `norsok_p002_point_checks` | NeqSim process/safety/compliance/NorsokP002ComplianceChecker.java |
 | [`process.overpressure_acceptance`](./overpressure_acceptance.md) | `closed_form_overpressure_acceptance` | NeqSim process/safety/overpressure/OverpressureAcceptanceChecker.java |
 | [`process.overpressure_protection_study`](./overpressure_protection_study.md) | `overpressure_protection_study` | NeqSim process/safety/overpressure/OverpressureProtectionStudy.java |
 | [`process.packed_column`](./packed_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/PackedColumn.java |
@@ -72,6 +78,8 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.pipe_fire_rupture`](./pipe_fire_rupture.md) | `strain_rate_pipe_fire_rupture` | NeqSim process/safety/rupture/PipeFireRuptureStudy.java |
 | [`process.pipe_fire_rupture_material`](./pipe_fire_rupture_material.md) | `sellars_tegart_pipe_material_curves` | NeqSim process/safety/rupture/PipeFireRuptureMaterial.java |
 | [`process.pipeline_pressure_protection`](./pipeline_pressure_protection.md) | `closed_form_pipeline_pressure_protection` | NeqSim process/safety/overpressure/PipelinePressureProtectionCalculator.java |
+| [`process.piping_fiv_gas`](./piping_fiv_gas.md) | `aviff_gas_likelihood_of_failure` | NeqSim process/safety/vibration/PipingFivScreening.java |
+| [`process.piping_fiv_liquid`](./piping_fiv_liquid.md) | `aviff_liquid_likelihood_of_failure` | NeqSim process/safety/vibration/PipingFivScreening.java |
 | [`process.plug_flow_reactor`](./plug_flow_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/PlugFlowReactor.java |
 | [`process.pool_fire`](./pool_fire.md) | `api521_mudan_pool_fire` | NeqSim process/safety/fire/PoolFireModel.java |
 | [`process.porous_media_self_heating`](./porous_media_self_heating.md) | `frank_kamenetskii_criticality` | NeqSim process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.java |
@@ -98,6 +106,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.splitter`](./splitter.md) | `direct composition` | NeqSim process/equipment/splitter/Splitter.java |
 | [`process.stirred_tank_reactor`](./stirred_tank_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/StirredTankReactor.java |
 | [`process.stripping_column`](./stripping_column.md) | `direct composition` | NeqSim process/equipment/absorber/StrippingColumn.java |
+| [`process.sts0131_gate`](./sts0131_gate.md) | `sts0131_acceptance_gate` | NeqSim process/safety/compliance/Sts0131Gate.java |
 | [`process.tank`](./tank.md) | `direct composition` | NeqSim process/equipment/tank/Tank.java |
 | [`process.three_phase_separator`](./three_phase_separator.md) | `direct composition` | NeqSim process/equipment/separator/ThreePhaseSeparator.java |
 | [`process.throttling_valve`](./throttling_valve.md) | `direct composition` | NeqSim process/equipment/valve/ThrottlingValve.java |

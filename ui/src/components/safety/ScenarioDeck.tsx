@@ -83,6 +83,22 @@ const COPY: Record<
       "Each scenario holds one risk or SIL model's inputs and its last answer: a SIL, a PFD arithmetic or a compliance verdict.",
     step: "Add a NOG 070 determination or an instrumented-function assessment.",
   },
+  safetyassessment: {
+    title: "Safety assessment models",
+    heading: "Safety assessment scenarios",
+    search: "Search safety assessment models",
+    blurb:
+      "Each scenario holds one safety assessment's inputs and its last answer: the four Kletz pillar scores and their mean index.",
+    step: "Add an inherent-safety evaluation.",
+  },
+  vibration: {
+    title: "Vibration models",
+    heading: "Vibration scenarios",
+    search: "Search vibration models",
+    blurb:
+      "Each scenario holds one vibration screen's inputs and its last answer: the likelihood of failure, the sound power level and its margin, and every contributing factor.",
+    step: "Add a gas or liquid flow-induced vibration screen or an acoustic-induced vibration screen.",
+  },
 };
 
 export function ScenarioDeck({

@@ -42,9 +42,9 @@ check("20 tools", withTools.tools.length === 20, `${withTools.tools.length}`);
 check("98 calculations", catalogue.calcs.length === 98, `${catalogue.calcs.length}`);
 const available = catalogue.calcs.filter((entry) => entry.available).length;
 check("94 a sheet can draw", available === 94, `${available}`);
-check("62 safety calculations", catalogue.safety.length === 62, `${catalogue.safety.length}`);
+check("71 safety calculations", catalogue.safety.length === 71, `${catalogue.safety.length}`);
 const nativeSafety = catalogue.safety.filter((entry) => entry.native).length;
-check("27 native safety ids", nativeSafety === 27, `${nativeSafety}`);
+check("31 native safety ids", nativeSafety === 31, `${nativeSafety}`);
 
 // 2. Opening the shipped document.
 const document = readFileSync("specs/flowsheets/demo.toml", "utf8");
@@ -159,5 +159,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.log(
-  "wasm smoke: OK (31 palette entries, 16 tools, 98 calculations, 62 safety ids, 27 native, 6 nodes, 43 values)",
+  "wasm smoke: OK (31 palette entries, 16 tools, 98 calculations, 71 safety ids, 31 native, 6 nodes, 43 values)",
 );

@@ -17,8 +17,11 @@ from azoth._registry_gen import spec as _spec_for
 from azoth.core.bridge_support import _association_spec, _count, _molar_masses, _si, _warnings
 from azoth.core.result import (
     AbsorptionColumnResult,
+    AcousticInducedVibrationResult,
     ActiveFireProtectionScreeningResult,
     ActivityCoefficientRow,
+    AlarpAuditResult,
+    AlarpEvaluationResult,
     AmmoniaPhaseResult,
     AntiSurgeRecycleResult,
     AntoineVaporPressureResult,
@@ -98,6 +101,8 @@ from azoth.core.result import (
     EquilibriumSoundSpeedSample,
     ErosionPredictionResult,
     ErosionRiskLevel,
+    EscalationGraphResult,
+    EscalationItemResult,
     EventTreeOutcome,
     EventTreeResult,
     ExpanderResult,
@@ -110,7 +115,9 @@ from azoth.core.result import (
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
     FirozabadiRamleyInterfaceTensionResult,
+    FivLikelihood,
     FlareResult,
+    FlowInducedPulsationResult,
     FlowlineScaleProfileResult,
     FlowlineScaleSegment,
     FlowRegime,
@@ -174,6 +181,7 @@ from azoth.core.result import (
     IdealGasCpResult,
     IncrementalZoneAnalysisResult,
     IncrementalZoneRow,
+    InherentSafetyResult,
     InterfacePropertiesResult,
     Iso6976Result,
     JetFireResult,
@@ -216,12 +224,14 @@ from azoth.core.result import (
     NaceIssueRow,
     NitricSulfuricAcidVaporPressureResult,
     Nog070SilDeterminationResult,
+    NorsokP002ComplianceResult,
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
     OrificeFlowResult,
     OverallVerdict,
     OverpressureAcceptanceResult,
     OverpressureProtectionStudyResult,
+    P002FindingResult,
     PackedColumnResult,
     PackingHydraulicsResult,
     PackingSizingResult,
@@ -240,6 +250,8 @@ from azoth.core.result import (
     PipelineCooldownResult,
     PipelinePressureProtectionResult,
     PipeResult,
+    PipingFivGasResult,
+    PipingFivLiquidResult,
     PitzerHydrateFormationPressureResult,
     PitzerHydrateFormationTemperatureResult,
     PitzerPhaseResult,
@@ -269,6 +281,7 @@ from azoth.core.result import (
     PtFlashResult,
     PtPhaseEnvelopeResult,
     PuFlashResult,
+    PulsationModeResult,
     PumpDeadheadResult,
     PumpPowerResult,
     PumpResult,
@@ -360,6 +373,8 @@ from azoth.core.result import (
     StreamScaleAnalyzerResult,
     StreamScaleMineralRow,
     StrippingColumnResult,
+    Sts0131FindingResult,
+    Sts0131GateResult,
     Sts0131PressureCategory,
     SubFraction,
     SupplyVerdict,
@@ -471,7 +486,9 @@ from azoth.eos.reference.molar_enthalpy_entropy import IdealGasModel
 
 __all__ = [
     "absorption_column",
+    "acoustic_induced_vibration_screening",
     "active_fire_protection_screening",
+    "alarp_audit",
     "ammonia_phase",
     "anti_surge_recycle",
     "antoine_vapor_pressure",
@@ -537,6 +554,7 @@ __all__ = [
     "equilibrium_constant",
     "equilibrium_sound_speed",
     "erosion_prediction",
+    "escalation_graph",
     "event_tree",
     "expander",
     "fault_tree",
@@ -548,6 +566,7 @@ __all__ = [
     "fire_water_demand",
     "firozabadi_ramley_interface_tension",
     "flare",
+    "flow_induced_pulsation_screening",
     "flowline_scale_profile",
     "fmea_worksheet",
     "fouling_model",
@@ -597,6 +616,7 @@ __all__ = [
     "iapws_saturation_pressure",
     "ideal_gas_cp",
     "incremental_zone_analysis",
+    "inherent_safety",
     "interface_properties",
     "iso6976",
     "jet_fire",
@@ -628,6 +648,7 @@ __all__ = [
     "multiflash_stability_test",
     "nitric_sulfuric_acid_vapor_pressure",
     "nog070_sil_determination",
+    "norsok_p002_compliance",
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
     "orifice_flow",
@@ -650,6 +671,8 @@ __all__ = [
     "pipe_fire_rupture_material",
     "pipeline_cooldown",
     "pipeline_pressure_protection",
+    "piping_fiv_gas",
+    "piping_fiv_liquid",
     "pitzer_hydrate_formation_pressure",
     "pitzer_hydrate_formation_temperature",
     "pitzer_phase",
@@ -745,6 +768,7 @@ __all__ = [
     "stirred_tank_reactor",
     "stream_scale_analyzer",
     "stripping_column",
+    "sts0131_gate",
     "surf_cooldown",
     "tank",
     "tbp_closure",
@@ -5707,6 +5731,29 @@ def absorption_column(gas_components: list[str], gas_n: Q, gas_z: list[float], g
     )
 
 
+def acoustic_induced_vibration_screening(mass_flow: Q, upstream_pressure: Q, downstream_pressure: Q, temperature: Q, molecular_weight: Q, outside_diameter: Q, wall_thickness: Q) -> AcousticInducedVibrationResult:
+    """``process.acoustic_induced_vibration_screening``, computed in Rust."""
+    spec = _models_gen.model("process.acoustic_induced_vibration_screening")
+    result = _core.acoustic_induced_vibration_screening(
+        input_to_si(spec, "mass_flow", mass_flow),
+        input_to_si(spec, "upstream_pressure", upstream_pressure),
+        input_to_si(spec, "downstream_pressure", downstream_pressure),
+        input_to_si(spec, "temperature", temperature),
+        input_to_si(spec, "molecular_weight", molecular_weight),
+        input_to_si(spec, "outside_diameter", outside_diameter),
+        input_to_si(spec, "wall_thickness", wall_thickness),
+    )
+    return AcousticInducedVibrationResult(
+        pwl=result.pwl,
+        allowable_pwl=result.allowable_pwl,
+        margin=result.margin,
+        likelihood=FivLikelihood(result.likelihood),
+        pressure_drop_ratio=result.pressure_drop_ratio,
+        d_overt=result.d_overt,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def active_fire_protection_screening(scenario: str, blowdown_time_to_target: Q, bare_steel_time_to_critical: Q, dedicated_object_demand: Q, general_area_demand: Q) -> ActiveFireProtectionScreeningResult:
     """``process.active_fire_protection_screening``, computed in Rust."""
     spec = _models_gen.model("process.active_fire_protection_screening")
@@ -5722,6 +5769,22 @@ def active_fire_protection_screening(scenario: str, blowdown_time_to_target: Q, 
         blowdown_faster_than_failure=result.blowdown_faster_than_failure,
         blowdown_margin=from_si(result.blowdown_margin.magnitude_si, result.blowdown_margin.unit),
         selective_protection_saving_fraction=result.selective_protection_saving_fraction,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def alarp_audit(measures: list[dict[str, object]], value_of_statistical_life: float | None=None, disproportion_factor: float | None=None) -> AlarpAuditResult:
+    """``process.alarp_audit``, computed in Rust."""
+    spec = _models_gen.model("process.alarp_audit")
+    result = _core.alarp_audit(
+        input_records_to_si(spec, "measures", measures),
+        None if value_of_statistical_life is None else value_of_statistical_life,
+        None if disproportion_factor is None else disproportion_factor,
+    )
+    return AlarpAuditResult(
+        evaluations=tuple(AlarpEvaluationResult(description=c.description, icaf=c.icaf, verdict=c.verdict) for c in result.evaluations),
+        threshold=result.threshold,
+        measure_count=result.measure_count,
         warnings=_warnings(result.warnings),
     )
 
@@ -6370,6 +6433,24 @@ def ejector(motive_components: list[str], motive_n: Q, motive_z: list[float], mo
     )
 
 
+def escalation_graph(items: list[dict[str, object]], exposures: list[dict[str, object]], initiator: str) -> EscalationGraphResult:
+    """``process.escalation_graph``, computed in Rust."""
+    spec = _models_gen.model("process.escalation_graph")
+    result = _core.escalation_graph(
+        input_records_to_si(spec, "items", items),
+        input_records_to_si(spec, "exposures", exposures),
+        initiator,
+    )
+    return EscalationGraphResult(
+        failed_items=tuple(EscalationItemResult(item_id=c.item_id) for c in result.failed_items),
+        failure_count=result.failure_count,
+        any_escalation=result.any_escalation,
+        worst_case_items=tuple(EscalationItemResult(item_id=c.item_id) for c in result.worst_case_items),
+        worst_case_count=result.worst_case_count,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def event_tree(initiating_frequency_per_year: float, branches: list[dict[str, object]]) -> EventTreeResult:
     """``process.event_tree``, computed in Rust."""
     spec = _models_gen.model("process.event_tree")
@@ -6693,6 +6774,38 @@ def flare(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, i
         mass_utilization=result.mass_utilization,
         molar_utilization=result.molar_utilization,
         overloaded=result.overloaded,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def flow_induced_pulsation_screening(acoustic_length: Q, branch_internal_diameter: Q, run_internal_diameter: Q, main_line_velocity: Q, main_line_density: Q, speed_of_sound: Q, edge_radius: Q | None=None, termination: str | None=None, strouhal_number: float | None=None, mode_count: float | None=None) -> FlowInducedPulsationResult:
+    """``process.flow_induced_pulsation_screening``, computed in Rust."""
+    spec = _models_gen.model("process.flow_induced_pulsation_screening")
+    result = _core.flow_induced_pulsation_screening(
+        input_to_si(spec, "acoustic_length", acoustic_length),
+        input_to_si(spec, "branch_internal_diameter", branch_internal_diameter),
+        input_to_si(spec, "run_internal_diameter", run_internal_diameter),
+        input_to_si(spec, "main_line_velocity", main_line_velocity),
+        input_to_si(spec, "main_line_density", main_line_density),
+        input_to_si(spec, "speed_of_sound", speed_of_sound),
+        None if edge_radius is None else input_to_si(spec, "edge_radius", edge_radius),
+        termination,
+        None if strouhal_number is None else strouhal_number,
+        None if mode_count is None else mode_count,
+    )
+    return FlowInducedPulsationResult(
+        likelihood=FivLikelihood(result.likelihood),
+        any_mode_locked_in=result.any_mode_locked_in,
+        shedding_frequency=from_si(result.shedding_frequency.magnitude_si, result.shedding_frequency.unit),
+        lowest_resonance_velocity=from_si(result.lowest_resonance_velocity.magnitude_si, result.lowest_resonance_velocity.unit),
+        effective_width=from_si(result.effective_width.magnitude_si, result.effective_width.unit),
+        diameter_ratio=result.diameter_ratio,
+        rho_v2=from_si(result.rho_v2.magnitude_si, result.rho_v2.unit),
+        energy_term=result.energy_term,
+        coupling_factor=result.coupling_factor,
+        mode_weight=result.mode_weight,
+        severity=result.severity,
+        modes=tuple(PulsationModeResult(mode_index=c.mode_index, frequency=from_si(c.frequency.magnitude_si, c.frequency.unit), envelope_low=from_si(c.envelope_low.magnitude_si, c.envelope_low.unit), envelope_high=from_si(c.envelope_high.magnitude_si, c.envelope_high.unit), locked_in=c.locked_in, resonance_velocity=from_si(c.resonance_velocity.magnitude_si, c.resonance_velocity.unit), resonance_velocity_low=from_si(c.resonance_velocity_low.magnitude_si, c.resonance_velocity_low.unit), resonance_velocity_high=from_si(c.resonance_velocity_high.magnitude_si, c.resonance_velocity_high.unit)) for c in result.modes),
         warnings=_warnings(result.warnings),
     )
 
@@ -7280,6 +7393,20 @@ def hem_release(components: list[str], upstream_z: list[float], upstream_t: Q, u
     )
 
 
+def inherent_safety(substitute_score: float | None=None, minimize_score: float | None=None, moderate_score: float | None=None, simplify_score: float | None=None) -> InherentSafetyResult:
+    """``process.inherent_safety``, computed in Rust."""
+    result = _core.inherent_safety(
+        None if substitute_score is None else substitute_score,
+        None if minimize_score is None else minimize_score,
+        None if moderate_score is None else moderate_score,
+        None if simplify_score is None else simplify_score,
+    )
+    return InherentSafetyResult(
+        overall_index=result.overall_index,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def jet_fire(mass_flow: Q, heat_of_combustion: float, radiative_fraction: float, relative_humidity: float | None=None, distance: Q | None=None, target_flux: Q | None=None) -> JetFireResult:
     """``process.jet_fire``, computed in Rust."""
     spec = _models_gen.model("process.jet_fire")
@@ -7496,6 +7623,20 @@ def nog070_sil_determination(sif_type: str, pfd_average: float, minimum_sil: flo
         achieved_sil=result.achieved_sil,
         compliant=result.compliant,
         required_pfd_reduction_factor=result.required_pfd_reduction_factor,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def norsok_p002_compliance(checks: list[dict[str, object]]) -> NorsokP002ComplianceResult:
+    """``process.norsok_p002_compliance``, computed in Rust."""
+    spec = _models_gen.model("process.norsok_p002_compliance")
+    result = _core.norsok_p002_compliance(
+        input_records_to_si(spec, "checks", checks),
+    )
+    return NorsokP002ComplianceResult(
+        findings=tuple(P002FindingResult(name=c.name, criterion=c.criterion, compliant=c.compliant) for c in result.findings),
+        compliant=result.compliant,
+        non_compliant_count=result.non_compliant_count,
         warnings=_warnings(result.warnings),
     )
 
@@ -7803,6 +7944,54 @@ def pipeline_pressure_protection(max_source_pressure: Q, design_pressure: Q, inc
         barrier2_adequate=result.barrier2_adequate,
         protection_adequate=result.protection_adequate,
         verdict=result.verdict,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def piping_fiv_gas(density: Q, velocity: Q, outside_diameter: Q, wall_thickness: Q, branch_count: float, pulsation_factor: float, support_quality_factor: float) -> PipingFivGasResult:
+    """``process.piping_fiv_gas``, computed in Rust."""
+    spec = _models_gen.model("process.piping_fiv_gas")
+    result = _core.piping_fiv_gas(
+        input_to_si(spec, "density", density),
+        input_to_si(spec, "velocity", velocity),
+        input_to_si(spec, "outside_diameter", outside_diameter),
+        input_to_si(spec, "wall_thickness", wall_thickness),
+        branch_count,
+        pulsation_factor,
+        support_quality_factor,
+    )
+    return PipingFivGasResult(
+        lof=result.lof,
+        likelihood=FivLikelihood(result.likelihood),
+        rho_v2=from_si(result.rho_v2.magnitude_si, result.rho_v2.unit),
+        d_overt=result.d_overt,
+        d_overt_factor=result.d_overt_factor,
+        branch_factor=result.branch_factor,
+        pulsation_factor_applied=result.pulsation_factor_applied,
+        support_quality_factor_applied=result.support_quality_factor_applied,
+        energy_term=result.energy_term,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def piping_fiv_liquid(velocity: Q, outside_diameter: Q, wall_thickness: Q, branch_count: float, support_quality_factor: float) -> PipingFivLiquidResult:
+    """``process.piping_fiv_liquid``, computed in Rust."""
+    spec = _models_gen.model("process.piping_fiv_liquid")
+    result = _core.piping_fiv_liquid(
+        input_to_si(spec, "velocity", velocity),
+        input_to_si(spec, "outside_diameter", outside_diameter),
+        input_to_si(spec, "wall_thickness", wall_thickness),
+        branch_count,
+        support_quality_factor,
+    )
+    return PipingFivLiquidResult(
+        lof=result.lof,
+        likelihood=FivLikelihood(result.likelihood),
+        d_overt=result.d_overt,
+        d_overt_factor=result.d_overt_factor,
+        branch_factor=result.branch_factor,
+        support_quality_factor_applied=result.support_quality_factor_applied,
+        energy_term=result.energy_term,
         warnings=_warnings(result.warnings),
     )
 
@@ -8894,6 +9083,20 @@ def stripping_column(stripping_gas_components: list[str], rich_liquid_components
         reboiler_duty_kw=from_si(result.reboiler_duty_kw.magnitude_si, result.reboiler_duty_kw.unit),
         condenser_duty_kw=from_si(result.condenser_duty_kw.magnitude_si, result.condenser_duty_kw.unit),
         material_grade=result.material_grade,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def sts0131_gate(checks: list[dict[str, object]]) -> Sts0131GateResult:
+    """``process.sts0131_gate``, computed in Rust."""
+    spec = _models_gen.model("process.sts0131_gate")
+    result = _core.sts0131_gate(
+        input_records_to_si(spec, "checks", checks),
+    )
+    return Sts0131GateResult(
+        findings=tuple(Sts0131FindingResult(check_type=c.check_type, severity=c.severity, name=c.name, margin=c.margin) for c in result.findings),
+        acceptable=result.acceptable,
+        failure_count=result.failure_count,
         warnings=_warnings(result.warnings),
     )
 

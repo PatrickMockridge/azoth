@@ -1,0 +1,69 @@
+model = "process.alarp_audit"
+[[cases]]
+id = "implement"
+tolerance = 1.0e-12
+source = "A 1e-3 per-year risk reduction at 10000 NOK per year has a 1e7 NOK ICAF, below the default 9e7 threshold. From `validation/neqsim/captures/process_alarp_audit.tsv` (`alarp_implement`)."
+[cases.inputs]
+measures = [
+  { description = "vent", risk_reduction_per_year = 1.0e-3, annualised_cost = 1.0e4 },
+]
+[cases.expected]
+threshold = 9.0e7
+measure_count = 1.0
+[[cases]]
+id = "reject"
+tolerance = 1.0e-12
+source = "The same risk reduction at 1e6 NOK per year is a 1e9 ICAF, above the threshold. From (`alarp_reject`)."
+[cases.inputs]
+measures = [
+  { description = "vent", risk_reduction_per_year = 1.0e-3, annualised_cost = 1.0e6 },
+]
+[cases.expected]
+threshold = 9.0e7
+measure_count = 1.0
+[[cases]]
+id = "threshold_equal"
+tolerance = 1.0e-12
+source = "A 9e7 ICAF is exactly the threshold and is implemented, because the comparison is inclusive. From (`alarp_threshold_equal`)."
+[cases.inputs]
+measures = [
+  { description = "vent", risk_reduction_per_year = 1.0e-3, annualised_cost = 9.0e4 },
+]
+[cases.expected]
+threshold = 9.0e7
+measure_count = 1.0
+[[cases]]
+id = "zero_risk"
+tolerance = 1.0e-12
+source = "A measure with no risk reduction has an infinite ICAF, published as absent and rejected. From (`alarp_zero_risk`)."
+[cases.inputs]
+measures = [
+  { description = "vent", risk_reduction_per_year = 0.0, annualised_cost = 0.0 },
+]
+[cases.expected]
+threshold = 9.0e7
+measure_count = 1.0
+[[cases]]
+id = "zero_cost"
+tolerance = 1.0e-12
+source = "A free measure has a zero ICAF and is implemented. From (`alarp_zero_cost`)."
+[cases.inputs]
+measures = [
+  { description = "vent", risk_reduction_per_year = 1.0e-3, annualised_cost = 0.0 },
+]
+[cases.expected]
+threshold = 9.0e7
+measure_count = 1.0
+[[cases]]
+id = "custom"
+tolerance = 1.0e-12
+source = "A 10 million VSL and a factor of 2 give a 2e7 threshold, and a 2e7 ICAF is at it. From (`alarp_custom`)."
+[cases.inputs]
+measures = [
+  { description = "vent", risk_reduction_per_year = 1.0e-3, annualised_cost = 2.0e4 },
+]
+value_of_statistical_life = 1.0e7
+disproportion_factor = 2.0
+[cases.expected]
+threshold = 2.0e7
+measure_count = 1.0

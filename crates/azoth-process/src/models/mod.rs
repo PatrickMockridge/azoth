@@ -31,7 +31,9 @@
 //! per outlet and `products_z` a matrix with one row per outlet.
 
 pub mod absorption_column;
+pub mod acoustic_induced_vibration_screening;
 pub mod active_fire_protection_screening;
+pub mod alarp_audit;
 pub mod anti_surge_recycle;
 pub mod api14c_safe_chart;
 pub mod api537_flare_flame_model;
@@ -50,6 +52,7 @@ pub mod cooler;
 pub mod deluge_nozzle_layout;
 pub mod distillation_column;
 pub mod ejector;
+pub mod escalation_graph;
 pub mod event_tree;
 pub mod expander;
 pub mod fault_tree;
@@ -59,6 +62,7 @@ pub mod fire_monitor_coverage;
 pub mod fire_water_coverage_assessment;
 pub mod fire_water_demand;
 pub mod flare;
+pub mod flow_induced_pulsation_screening;
 pub mod fmea_worksheet;
 pub mod gas_blowby;
 pub mod gas_dispersion;
@@ -73,6 +77,7 @@ pub mod heat_exchanger;
 pub mod heater;
 pub mod heavy_gas_dispersion;
 pub mod hem_release;
+pub mod inherent_safety;
 pub mod jet_fire;
 pub mod leak_blowdown;
 pub mod lopa;
@@ -82,6 +87,7 @@ pub mod map_turbo_expander_compressor;
 pub mod mdmt;
 pub mod mixer;
 pub mod nog070_sil_determination;
+pub mod norsok_p002_compliance;
 pub mod overpressure;
 pub mod overpressure_acceptance;
 pub mod overpressure_protection_study;
@@ -91,6 +97,8 @@ pub mod pipe;
 pub mod pipe_fire_rupture;
 pub mod pipe_fire_rupture_material;
 pub mod pipeline_pressure_protection;
+pub mod piping_fiv_gas;
+pub mod piping_fiv_liquid;
 pub mod plug_flow_reactor;
 pub mod pool_fire;
 pub mod porous_media_self_heating;
@@ -119,6 +127,7 @@ pub mod sil_verification;
 pub mod splitter;
 pub mod stirred_tank_reactor;
 pub mod stripping_column;
+pub mod sts0131_gate;
 pub mod tank;
 pub mod three_phase_separator;
 pub mod throttling_valve;
@@ -131,8 +140,14 @@ pub mod vce;
 pub mod vessel_rupture;
 
 pub use absorption_column::{AbsorptionColumnResult, absorption_column};
+pub use acoustic_induced_vibration_screening::{
+    AcousticInducedVibrationResult, acoustic_induced_vibration_screening,
+};
 pub use active_fire_protection_screening::{
     ActiveFireProtectionScreeningResult, active_fire_protection_screening,
+};
+pub use alarp_audit::{
+    AlarpAuditResult, AlarpEvaluationResult, AlarpMeasure, AlarpVerdict, alarp_audit,
 };
 pub use anti_surge_recycle::{AntiSurgeRecycleResult, anti_surge_recycle};
 pub use api14c_safe_chart::{
@@ -171,6 +186,10 @@ pub use deluge_nozzle_layout::{
 };
 pub use distillation_column::{DistillationColumnResult, distillation_column};
 pub use ejector::{EjectorResult, ejector};
+pub use escalation_graph::{
+    EscalationExposure, EscalationGraphResult, EscalationItem, EscalationItemResult,
+    escalation_graph,
+};
 pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_tree};
 pub use expander::{ExpanderResult, expander};
 pub use fault_tree::{FaultTreeNodeSpec, FaultTreeResult, MinimalCutSet, fault_tree};
@@ -182,6 +201,9 @@ pub use fire_water_coverage_assessment::{
 };
 pub use fire_water_demand::{FireWaterDemandResult, ProtectedObject, fire_water_demand};
 pub use flare::{FlareResult, flare};
+pub use flow_induced_pulsation_screening::{
+    FlowInducedPulsationResult, PulsationModeResult, flow_induced_pulsation_screening,
+};
 pub use fmea_worksheet::{FmeaEntry, FmeaRankedEntry, FmeaWorksheetResult, fmea_worksheet};
 pub use gas_blowby::{BlowbyVerdict, GasBlowbyResult, gas_blowby};
 pub use gas_dispersion::{GasDispersionResult, gas_dispersion};
@@ -201,6 +223,7 @@ pub use heat_exchanger::{HeatExchangerResult, heat_exchanger};
 pub use heater::{HeaterResult, heater};
 pub use heavy_gas_dispersion::{HeavyGasDispersionResult, heavy_gas_dispersion};
 pub use hem_release::{HemReleaseResult, hem_release};
+pub use inherent_safety::{InherentSafetyResult, inherent_safety};
 pub use jet_fire::{JetFireResult, jet_fire};
 pub use leak_blowdown::{LeakBlowdownResult, leak_blowdown};
 pub use lopa::{
@@ -214,6 +237,10 @@ pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expand
 pub use mdmt::{MdmtResult, mdmt};
 pub use mixer::{MixerResult, mixer};
 pub use nog070_sil_determination::{Nog070SilDeterminationResult, nog070_sil_determination};
+pub use norsok_p002_compliance::{
+    NorsokP002ComplianceResult, P002CheckRow, P002Criterion, P002FindingResult,
+    norsok_p002_compliance,
+};
 pub use overpressure_acceptance::{OverpressureAcceptanceResult, overpressure_acceptance};
 pub use overpressure_protection_study::{
     OverpressureProtectionStudyResult, OverpressureScenario, overpressure_protection_study,
@@ -230,6 +257,8 @@ pub use pipe_fire_rupture_material::{
 pub use pipeline_pressure_protection::{
     PipelinePressureProtectionResult, pipeline_pressure_protection,
 };
+pub use piping_fiv_gas::{FivLikelihood, PipingFivGasResult, piping_fiv_gas};
+pub use piping_fiv_liquid::{PipingFivLiquidResult, piping_fiv_liquid};
 pub use plug_flow_reactor::{PlugFlowReactorResult, plug_flow_reactor};
 pub use pool_fire::{PoolFireResult, pool_fire};
 pub use porous_media_self_heating::{PorousMediaSelfHeatingResult, porous_media_self_heating};
@@ -282,6 +311,10 @@ pub use sil_verification::{
 pub use splitter::{SplitterResult, splitter};
 pub use stirred_tank_reactor::{StirredTankReactorResult, stirred_tank_reactor};
 pub use stripping_column::{StrippingColumnResult, stripping_column};
+pub use sts0131_gate::{
+    Sts0131CheckRow, Sts0131CheckType, Sts0131FindingResult, Sts0131GateResult, Sts0131Severity,
+    sts0131_gate,
+};
 pub use tank::{TankResult, tank};
 pub use three_phase_separator::{ThreePhaseSeparatorResult, three_phase_separator};
 pub use throttling_valve::{ThrottlingValveResult, throttling_valve};

@@ -1,0 +1,181 @@
+id = "process.flow_induced_pulsation_screening"
+name = "Flow-induced pulsation screening"
+kind = "procedure"
+assumptions = [
+    "**the effective width is `pi d/4 + r`**, with r the tee's edge radius, not an area.",
+    "**a closed branch is a quarter-wave tube**, `f_n = (2n+1)c/(4L)`; an open one is a half-wave tube, `f_n = (n+1)c/(2L)`.",
+    "**a mode is locked in when the shedding frequency is inside `[0.8 f_n, 1.2 f_n]`**, both ends inclusive.",
+    "**only the strongest locked mode counts**: the weight is the largest `1/(2n+1)` over the locked modes, and zero when none locks.",
+    "**the severity is `rho v^2 / 20000 * min(1, (d/D_run)/0.5) * weight`**; a branch with no lock-in, or a severity below 0.05, is low. Above that the bands are 0.3 and 1.0.",
+    "**the lowest resonance velocity is the minimum over all evaluated modes**, not only the locked ones.",
+    "**the mode count is the caller's, five by default**; the class evaluates no further mode.",
+    "**the branch and termination names, and the recommendation text, are presentation**.",
+]
+references = [
+    "Energy Institute. Guidelines for the Avoidance of Vibration Induced Fatigue Failure in Process Pipework (AVIFF), 2nd edition.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/vibration/FlowInducedPulsationScreening.java` is the port source.",
+    "`validation/neqsim/captures/process_flow_induced_pulsation_screening.tsv` - closed and open branches, the lock-in envelope, the severity bands and the refusals.",
+]
+[source]
+standard = "NeqSim process/safety/vibration/FlowInducedPulsationScreening.java"
+edition = "Its `screen`, `eigenFrequency`, `effectiveWidth` and `bandFor`."
+[algorithm]
+scheme = "side_branch_acoustic_resonance"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.acoustic_length]
+unit = "m"
+description = "the centreline length from the tee to the first acoustic boundary, above zero.\n"
+[inputs.branch_internal_diameter]
+unit = "m"
+description = "the branch internal diameter, above zero.\n"
+[inputs.run_internal_diameter]
+unit = "m"
+description = "the main-line internal diameter, above zero.\n"
+[inputs.main_line_velocity]
+unit = "m/s"
+description = "the mean main-line velocity at line conditions, non-negative.\n"
+[inputs.main_line_density]
+unit = "kg/m**3"
+description = "the main-line density at line conditions, non-negative.\n"
+[inputs.speed_of_sound]
+unit = "m/s"
+description = "the speed of sound in the branch fluid, above zero.\n"
+[inputs.edge_radius]
+unit = "m"
+optional = true
+description = "the tee edge radius, at least zero; zero is a sharp-edged branch. **Absent is 0.**\n"
+[inputs.termination]
+type = "enum"
+values = ["closed", "open"]
+optional = true
+description = "the far end's acoustic termination. **Absent is `closed`.**\n"
+[inputs.strouhal_number]
+unit = "dimensionless"
+optional = true
+description = "the screening Strouhal number, above zero. **Absent is 0.37.**\n"
+[inputs.mode_count]
+unit = "dimensionless"
+optional = true
+description = "the number of acoustic modes to evaluate, a whole number at least one. **Absent is 5.**\n"
+[outputs]
+[outputs.likelihood]
+type = "enum"
+values = ["low", "medium", "high", "very_high"]
+description = "the AVIFF likelihood band.\n"
+[outputs.any_mode_locked_in]
+type = "boolean"
+description = "whether the shedding frequency is inside any mode's envelope.\n"
+[outputs.shedding_frequency]
+unit = "1/s"
+description = "the vortex-shedding frequency.\n"
+[outputs.lowest_resonance_velocity]
+unit = "m/s"
+description = "the lowest main-line velocity that places the shedding frequency on a mode.\n"
+[outputs.effective_width]
+unit = "m"
+description = "the branch-mouth effective width `pi d/4 + r`.\n"
+[outputs.diameter_ratio]
+unit = "dimensionless"
+description = "the branch-to-run diameter ratio.\n"
+[outputs.rho_v2]
+unit = "Pa"
+description = "the main-line momentum flux `rho v^2`.\n"
+[outputs.energy_term]
+unit = "dimensionless"
+description = "the momentum flux normalised by 20000 Pa.\n"
+[outputs.coupling_factor]
+unit = "dimensionless"
+description = "`min(1, (d/D_run)/0.5)`.\n"
+[outputs.mode_weight]
+unit = "dimensionless"
+description = "the strongest locked mode's `1/(2n+1)` weight, zero when none locks.\n"
+[outputs.severity]
+unit = "dimensionless"
+description = "the normalised severity of the excited mode.\n"
+[outputs.modes]
+type = "record_list"
+description = "one row per evaluated acoustic mode, in mode order.\n"
+[outputs.modes.fields.mode_index]
+unit = "dimensionless"
+description = "the mode index n, zero for the fundamental.\n"
+[outputs.modes.fields.frequency]
+unit = "1/s"
+description = "the acoustic eigenfrequency.\n"
+[outputs.modes.fields.envelope_low]
+unit = "1/s"
+description = "the lower lock-in envelope, `0.8 f_n`.\n"
+[outputs.modes.fields.envelope_high]
+unit = "1/s"
+description = "the upper lock-in envelope, `1.2 f_n`.\n"
+[outputs.modes.fields.locked_in]
+type = "boolean"
+description = "whether the shedding frequency is inside this mode's envelope.\n"
+[outputs.modes.fields.resonance_velocity]
+unit = "m/s"
+description = "the main-line velocity that places the shedding frequency on this mode.\n"
+[outputs.modes.fields.resonance_velocity_low]
+unit = "m/s"
+description = "the lower velocity of this mode's lock-in band.\n"
+[outputs.modes.fields.resonance_velocity_high]
+unit = "m/s"
+description = "the upper velocity of this mode's lock-in band.\n"
+[[valid_range]]
+quantity = "acoustic_length"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive acoustic length"
+[[valid_range]]
+quantity = "branch_internal_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive branch diameter"
+[[valid_range]]
+quantity = "edge_radius"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative edge radius"
+[[valid_range]]
+quantity = "run_internal_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive run diameter"
+[[valid_range]]
+quantity = "main_line_velocity"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative main-line velocity"
+[[valid_range]]
+quantity = "main_line_density"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative main-line density"
+[[valid_range]]
+quantity = "speed_of_sound"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive speed of sound"
+[[valid_range]]
+quantity = "strouhal_number"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive Strouhal number"
+[[valid_range]]
+quantity = "mode_count"
+min = 1
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses fewer than one mode"
+[implementations]
+python = "azoth.process.flow_induced_pulsation_screening"
+rust = "azoth_process::flow_induced_pulsation_screening"

@@ -223,7 +223,9 @@
 //!   - specs/calcs/hydraulics/reynolds_number.toml
 //!   - specs/calcs/hydraulics/tray_hydraulics.toml
 //!   - specs/models/process/absorption_column.toml
+//!   - specs/models/process/acoustic_induced_vibration_screening.toml
 //!   - specs/models/process/active_fire_protection_screening.toml
+//!   - specs/models/process/alarp_audit.toml
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api14c_safe_chart.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
@@ -242,6 +244,7 @@
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/distillation_column.toml
 //!   - specs/models/process/ejector.toml
+//!   - specs/models/process/escalation_graph.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
@@ -251,6 +254,7 @@
 //!   - specs/models/process/fire_water_coverage_assessment.toml
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
+//!   - specs/models/process/flow_induced_pulsation_screening.toml
 //!   - specs/models/process/fmea_worksheet.toml
 //!   - specs/models/process/gas_blowby.toml
 //!   - specs/models/process/gas_dispersion.toml
@@ -264,6 +268,7 @@
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
 //!   - specs/models/process/hem_release.toml
+//!   - specs/models/process/inherent_safety.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
 //!   - specs/models/process/lopa.toml
@@ -273,6 +278,7 @@
 //!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/nog070_sil_determination.toml
+//!   - specs/models/process/norsok_p002_compliance.toml
 //!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/overpressure_protection_study.toml
 //!   - specs/models/process/packed_column.toml
@@ -281,6 +287,8 @@
 //!   - specs/models/process/pipe_fire_rupture.toml
 //!   - specs/models/process/pipe_fire_rupture_material.toml
 //!   - specs/models/process/pipeline_pressure_protection.toml
+//!   - specs/models/process/piping_fiv_gas.toml
+//!   - specs/models/process/piping_fiv_liquid.toml
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/porous_media_self_heating.toml
@@ -307,6 +315,7 @@
 //!   - specs/models/process/splitter.toml
 //!   - specs/models/process/stirred_tank_reactor.toml
 //!   - specs/models/process/stripping_column.toml
+//!   - specs/models/process/sts0131_gate.toml
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml
@@ -2722,6 +2731,41 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "pressure",
     ),
     (
+        "process.acoustic_induced_vibration_screening",
+        "mass_flow",
+        "mass_rate",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "upstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "downstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "molecular_weight",
+        "molar_mass",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "outside_diameter",
+        "length",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "wall_thickness",
+        "length",
+    ),
+    (
         "process.active_fire_protection_screening",
         "blowdown_time_to_target",
         "time",
@@ -2740,6 +2784,16 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.active_fire_protection_screening",
         "general_area_demand",
         "volume_rate",
+    ),
+    (
+        "process.alarp_audit",
+        "value_of_statistical_life",
+        "dimensionless",
+    ),
+    (
+        "process.alarp_audit",
+        "disproportion_factor",
+        "dimensionless",
     ),
     ("process.anti_surge_recycle", "feed_n", "molar_flow"),
     ("process.anti_surge_recycle", "feed_z", "dimensionless"),
@@ -3438,6 +3492,51 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.flare", "design_heat_duty_capacity", "power"),
     ("process.flare", "design_mass_flow_capacity", "mass_rate"),
     ("process.flare", "design_molar_flow_capacity", "molar_flow"),
+    (
+        "process.flow_induced_pulsation_screening",
+        "acoustic_length",
+        "length",
+    ),
+    (
+        "process.flow_induced_pulsation_screening",
+        "branch_internal_diameter",
+        "length",
+    ),
+    (
+        "process.flow_induced_pulsation_screening",
+        "run_internal_diameter",
+        "length",
+    ),
+    (
+        "process.flow_induced_pulsation_screening",
+        "main_line_velocity",
+        "velocity",
+    ),
+    (
+        "process.flow_induced_pulsation_screening",
+        "main_line_density",
+        "mass_density",
+    ),
+    (
+        "process.flow_induced_pulsation_screening",
+        "speed_of_sound",
+        "velocity",
+    ),
+    (
+        "process.flow_induced_pulsation_screening",
+        "edge_radius",
+        "length",
+    ),
+    (
+        "process.flow_induced_pulsation_screening",
+        "strouhal_number",
+        "dimensionless",
+    ),
+    (
+        "process.flow_induced_pulsation_screening",
+        "mode_count",
+        "dimensionless",
+    ),
     ("process.fmea_worksheet", "rpn_threshold", "dimensionless"),
     ("process.gas_blowby", "upstream_pressure", "pressure"),
     (
@@ -3836,6 +3935,14 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "dimensionless",
     ),
     ("process.hem_release", "back_pressure", "pressure"),
+    (
+        "process.inherent_safety",
+        "substitute_score",
+        "dimensionless",
+    ),
+    ("process.inherent_safety", "minimize_score", "dimensionless"),
+    ("process.inherent_safety", "moderate_score", "dimensionless"),
+    ("process.inherent_safety", "simplify_score", "dimensionless"),
     ("process.jet_fire", "mass_flow", "mass_rate"),
     ("process.jet_fire", "heat_of_combustion", "dimensionless"),
     ("process.jet_fire", "radiative_fraction", "dimensionless"),
@@ -4326,6 +4433,30 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.pipeline_pressure_protection",
         "barrier2_setpoint",
         "pressure",
+    ),
+    ("process.piping_fiv_gas", "density", "mass_density"),
+    ("process.piping_fiv_gas", "velocity", "velocity"),
+    ("process.piping_fiv_gas", "outside_diameter", "length"),
+    ("process.piping_fiv_gas", "wall_thickness", "length"),
+    ("process.piping_fiv_gas", "branch_count", "dimensionless"),
+    (
+        "process.piping_fiv_gas",
+        "pulsation_factor",
+        "dimensionless",
+    ),
+    (
+        "process.piping_fiv_gas",
+        "support_quality_factor",
+        "dimensionless",
+    ),
+    ("process.piping_fiv_liquid", "velocity", "velocity"),
+    ("process.piping_fiv_liquid", "outside_diameter", "length"),
+    ("process.piping_fiv_liquid", "wall_thickness", "length"),
+    ("process.piping_fiv_liquid", "branch_count", "dimensionless"),
+    (
+        "process.piping_fiv_liquid",
+        "support_quality_factor",
+        "dimensionless",
     ),
     ("process.plug_flow_reactor", "feed_n", "molar_flow"),
     ("process.plug_flow_reactor", "feed_z", "dimensionless"),

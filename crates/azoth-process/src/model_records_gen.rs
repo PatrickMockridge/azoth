@@ -12,7 +12,9 @@
 use azoth_core::{CalcResult, Warning};
 
 use crate::models::absorption_column::AbsorptionColumnResult;
+use crate::models::acoustic_induced_vibration_screening::AcousticInducedVibrationResult;
 use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult;
+use crate::models::alarp_audit::AlarpAuditResult;
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::api14c_safe_chart::Api14cSafeChartResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
@@ -31,6 +33,7 @@ use crate::models::cooler::CoolerResult;
 use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::distillation_column::DistillationColumnResult;
 use crate::models::ejector::EjectorResult;
+use crate::models::escalation_graph::EscalationGraphResult;
 use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
 use crate::models::fault_tree::FaultTreeResult;
@@ -40,6 +43,7 @@ use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
 use crate::models::fire_water_demand::FireWaterDemandResult;
 use crate::models::flare::FlareResult;
+use crate::models::flow_induced_pulsation_screening::FlowInducedPulsationResult;
 use crate::models::fmea_worksheet::FmeaWorksheetResult;
 use crate::models::gas_blowby::GasBlowbyResult;
 use crate::models::gas_dispersion::GasDispersionResult;
@@ -53,6 +57,7 @@ use crate::models::heat_exchanger::HeatExchangerResult;
 use crate::models::heater::HeaterResult;
 use crate::models::heavy_gas_dispersion::HeavyGasDispersionResult;
 use crate::models::hem_release::HemReleaseResult;
+use crate::models::inherent_safety::InherentSafetyResult;
 use crate::models::jet_fire::JetFireResult;
 use crate::models::leak_blowdown::LeakBlowdownResult;
 use crate::models::lopa::LopaResult;
@@ -62,6 +67,7 @@ use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mdmt::MdmtResult;
 use crate::models::mixer::MixerResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
+use crate::models::norsok_p002_compliance::NorsokP002ComplianceResult;
 use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
 use crate::models::overpressure_protection_study::OverpressureProtectionStudyResult;
 use crate::models::packed_column::PackedColumnResult;
@@ -70,6 +76,8 @@ use crate::models::pipe::PipeResult;
 use crate::models::pipe_fire_rupture::PipeFireRuptureResult;
 use crate::models::pipe_fire_rupture_material::PipeFireRuptureMaterialResult;
 use crate::models::pipeline_pressure_protection::PipelinePressureProtectionResult;
+use crate::models::piping_fiv_gas::PipingFivGasResult;
+use crate::models::piping_fiv_liquid::PipingFivLiquidResult;
 use crate::models::plug_flow_reactor::PlugFlowReactorResult;
 use crate::models::pool_fire::PoolFireResult;
 use crate::models::porous_media_self_heating::PorousMediaSelfHeatingResult;
@@ -96,6 +104,7 @@ use crate::models::sil_verification::SilVerificationResult;
 use crate::models::splitter::SplitterResult;
 use crate::models::stirred_tank_reactor::StirredTankReactorResult;
 use crate::models::stripping_column::StrippingColumnResult;
+use crate::models::sts0131_gate::Sts0131GateResult;
 use crate::models::tank::TankResult;
 use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
@@ -155,6 +164,23 @@ impl CalcResult for AbsorptionColumnResult {
     }
 }
 
+impl CalcResult for AcousticInducedVibrationResult {
+    const CALC_ID: &'static str = "process.acoustic_induced_vibration_screening";
+    const FIELDS: &'static [&'static str] = &[
+        "pwl",
+        "allowable_pwl",
+        "margin",
+        "likelihood",
+        "pressure_drop_ratio",
+        "d_overt",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for ActiveFireProtectionScreeningResult {
     const CALC_ID: &'static str = "process.active_fire_protection_screening";
     const FIELDS: &'static [&'static str] = &[
@@ -164,6 +190,16 @@ impl CalcResult for ActiveFireProtectionScreeningResult {
         "selective_protection_saving_fraction",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for AlarpAuditResult {
+    const CALC_ID: &'static str = "process.alarp_audit";
+    const FIELDS: &'static [&'static str] =
+        &["evaluations", "threshold", "measure_count", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -604,6 +640,22 @@ impl CalcResult for EjectorResult {
     }
 }
 
+impl CalcResult for EscalationGraphResult {
+    const CALC_ID: &'static str = "process.escalation_graph";
+    const FIELDS: &'static [&'static str] = &[
+        "failed_items",
+        "failure_count",
+        "any_escalation",
+        "worst_case_items",
+        "worst_case_count",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for EventTreeResult {
     const CALC_ID: &'static str = "process.event_tree";
     const FIELDS: &'static [&'static str] = &["outcomes", "warnings"];
@@ -819,6 +871,29 @@ impl CalcResult for FlareResult {
         "mass_utilization",
         "molar_utilization",
         "overloaded",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FlowInducedPulsationResult {
+    const CALC_ID: &'static str = "process.flow_induced_pulsation_screening";
+    const FIELDS: &'static [&'static str] = &[
+        "likelihood",
+        "any_mode_locked_in",
+        "shedding_frequency",
+        "lowest_resonance_velocity",
+        "effective_width",
+        "diameter_ratio",
+        "rho_v2",
+        "energy_term",
+        "coupling_factor",
+        "mode_weight",
+        "severity",
+        "modes",
         "warnings",
     ];
 
@@ -1213,6 +1288,15 @@ impl CalcResult for HemReleaseResult {
     }
 }
 
+impl CalcResult for InherentSafetyResult {
+    const CALC_ID: &'static str = "process.inherent_safety";
+    const FIELDS: &'static [&'static str] = &["overall_index", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for JetFireResult {
     const CALC_ID: &'static str = "process.jet_fire";
     const FIELDS: &'static [&'static str] = &[
@@ -1366,6 +1450,16 @@ impl CalcResult for Nog070SilDeterminationResult {
         "required_pfd_reduction_factor",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for NorsokP002ComplianceResult {
+    const CALC_ID: &'static str = "process.norsok_p002_compliance";
+    const FIELDS: &'static [&'static str] =
+        &["findings", "compliant", "non_compliant_count", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -1560,6 +1654,44 @@ impl CalcResult for PipelinePressureProtectionResult {
         "barrier2_adequate",
         "protection_adequate",
         "verdict",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PipingFivGasResult {
+    const CALC_ID: &'static str = "process.piping_fiv_gas";
+    const FIELDS: &'static [&'static str] = &[
+        "lof",
+        "likelihood",
+        "rho_v2",
+        "d_overt",
+        "d_overt_factor",
+        "branch_factor",
+        "pulsation_factor_applied",
+        "support_quality_factor_applied",
+        "energy_term",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PipingFivLiquidResult {
+    const CALC_ID: &'static str = "process.piping_fiv_liquid";
+    const FIELDS: &'static [&'static str] = &[
+        "lof",
+        "likelihood",
+        "d_overt",
+        "d_overt_factor",
+        "branch_factor",
+        "support_quality_factor_applied",
+        "energy_term",
         "warnings",
     ];
 
@@ -2300,6 +2432,16 @@ impl CalcResult for StrippingColumnResult {
         "material_grade",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for Sts0131GateResult {
+    const CALC_ID: &'static str = "process.sts0131_gate";
+    const FIELDS: &'static [&'static str] =
+        &["findings", "acceptable", "failure_count", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

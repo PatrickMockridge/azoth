@@ -328,7 +328,9 @@ Five sections, and the difference between them is the point:
 *Models* — whose specs fix a procedure rather than an equation:
 
 - [`process.absorption_column`](./process/absorption_column.md) — Absorption column
+- [`process.acoustic_induced_vibration_screening`](./process/acoustic_induced_vibration_screening.md) — Acoustic-induced vibration screening
 - [`process.active_fire_protection_screening`](./process/active_fire_protection_screening.md) — Active fire protection screening
+- [`process.alarp_audit`](./process/alarp_audit.md) — ALARP measure audit
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
 - [`process.api14c_safe_chart`](./process/api14c_safe_chart.md) — API 14C SAFE chart
 - [`process.api537_flare_flame_model`](./process/api537_flare_flame_model.md) — API 537 flare flame model
@@ -347,6 +349,7 @@ Five sections, and the difference between them is the point:
 - [`process.deluge_nozzle_layout`](./process/deluge_nozzle_layout.md) — Deluge nozzle layout
 - [`process.distillation_column`](./process/distillation_column.md) — Distillation column
 - [`process.ejector`](./process/ejector.md) — Ejector
+- [`process.escalation_graph`](./process/escalation_graph.md) — Escalation graph analysis
 - [`process.event_tree`](./process/event_tree.md) — Event tree
 - [`process.expander`](./process/expander.md) — Expander
 - [`process.fault_tree`](./process/fault_tree.md) — Fault tree
@@ -356,6 +359,7 @@ Five sections, and the difference between them is the point:
 - [`process.fire_water_coverage_assessment`](./process/fire_water_coverage_assessment.md) — Fire-water coverage assessment
 - [`process.fire_water_demand`](./process/fire_water_demand.md) — Fire-water demand
 - [`process.flare`](./process/flare.md) — Flare
+- [`process.flow_induced_pulsation_screening`](./process/flow_induced_pulsation_screening.md) — Flow-induced pulsation screening
 - [`process.fmea_worksheet`](./process/fmea_worksheet.md) — FMEA worksheet
 - [`process.gas_blowby`](./process/gas_blowby.md) — Gas blowby through a restriction
 - [`process.gas_dispersion`](./process/gas_dispersion.md) — Gas dispersion screening
@@ -369,6 +373,7 @@ Five sections, and the difference between them is the point:
 - [`process.heater`](./process/heater.md) — Heater
 - [`process.heavy_gas_dispersion`](./process/heavy_gas_dispersion.md) — Heavy-gas dispersion
 - [`process.hem_release`](./process/hem_release.md) — Homogeneous-equilibrium orifice release
+- [`process.inherent_safety`](./process/inherent_safety.md) — Inherent-safety index
 - [`process.jet_fire`](./process/jet_fire.md) — Jet fire radiation
 - [`process.leak_blowdown`](./process/leak_blowdown.md) — Vessel leak blowdown
 - [`process.lopa`](./process/lopa.md) — Layer of protection analysis
@@ -378,6 +383,7 @@ Five sections, and the difference between them is the point:
 - [`process.mdmt`](./process/mdmt.md) — Minimum design metal temperature
 - [`process.mixer`](./process/mixer.md) — Mixer
 - [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
+- [`process.norsok_p002_compliance`](./process/norsok_p002_compliance.md) — NORSOK P-002 point-check compliance
 - [`process.overpressure_acceptance`](./process/overpressure_acceptance.md) — Overpressure acceptance
 - [`process.overpressure_protection_study`](./process/overpressure_protection_study.md) — Overpressure protection study
 - [`process.packed_column`](./process/packed_column.md) — Packed column
@@ -386,6 +392,8 @@ Five sections, and the difference between them is the point:
 - [`process.pipe_fire_rupture`](./process/pipe_fire_rupture.md) — Pipe fire rupture
 - [`process.pipe_fire_rupture_material`](./process/pipe_fire_rupture_material.md) — Pipe fire-rupture material
 - [`process.pipeline_pressure_protection`](./process/pipeline_pressure_protection.md) — Pipeline pressure protection
+- [`process.piping_fiv_gas`](./process/piping_fiv_gas.md) — Gas-line flow-induced vibration screening
+- [`process.piping_fiv_liquid`](./process/piping_fiv_liquid.md) — Liquid-line flow-induced vibration screening
 - [`process.plug_flow_reactor`](./process/plug_flow_reactor.md) — Plug-flow reactor
 - [`process.pool_fire`](./process/pool_fire.md) — Pool fire radiation
 - [`process.porous_media_self_heating`](./process/porous_media_self_heating.md) — Porous media self-heating
@@ -412,6 +420,7 @@ Five sections, and the difference between them is the point:
 - [`process.splitter`](./process/splitter.md) — Splitter
 - [`process.stirred_tank_reactor`](./process/stirred_tank_reactor.md) — Stirred-tank reactor
 - [`process.stripping_column`](./process/stripping_column.md) — Stripping column
+- [`process.sts0131_gate`](./process/sts0131_gate.md) — STS-0131 acceptance gate
 - [`process.tank`](./process/tank.md) — Tank
 - [`process.three_phase_separator`](./process/three_phase_separator.md) — Three-phase separator
 - [`process.throttling_valve`](./process/throttling_valve.md) — Throttling valve

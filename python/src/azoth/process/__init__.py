@@ -20,7 +20,9 @@ from azoth import _core
 from azoth._dispatch import resolve
 from azoth.core.result import (
     AbsorptionColumnResult,
+    AcousticInducedVibrationResult,
     ActiveFireProtectionScreeningResult,
+    AlarpAuditResult,
     AntiSurgeRecycleResult,
     Api14cSafeChartResult,
     Api537FlareFlameModelResult,
@@ -39,6 +41,7 @@ from azoth.core.result import (
     DelugeNozzleLayoutResult,
     DistillationColumnResult,
     EjectorResult,
+    EscalationGraphResult,
     EventTreeResult,
     ExpanderResult,
     FaultTreeResult,
@@ -48,6 +51,7 @@ from azoth.core.result import (
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
     FlareResult,
+    FlowInducedPulsationResult,
     FmeaWorksheetResult,
     GasBlowbyResult,
     GasDispersionResult,
@@ -61,6 +65,7 @@ from azoth.core.result import (
     HeatExchangerResult,
     HeavyGasDispersionResult,
     HemReleaseResult,
+    InherentSafetyResult,
     JetFireResult,
     LeakBlowdownResult,
     LopaResult,
@@ -70,6 +75,7 @@ from azoth.core.result import (
     MdmtResult,
     MixerResult,
     Nog070SilDeterminationResult,
+    NorsokP002ComplianceResult,
     OverpressureAcceptanceResult,
     OverpressureProtectionStudyResult,
     PackedColumnResult,
@@ -78,6 +84,8 @@ from azoth.core.result import (
     PipeFireRuptureResult,
     PipelinePressureProtectionResult,
     PipeResult,
+    PipingFivGasResult,
+    PipingFivLiquidResult,
     PlugFlowReactorResult,
     PoolFireResult,
     PorousMediaSelfHeatingResult,
@@ -104,6 +112,7 @@ from azoth.core.result import (
     SplitterResult,
     StirredTankReactorResult,
     StrippingColumnResult,
+    Sts0131GateResult,
     TankResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
@@ -137,7 +146,9 @@ __all__ = [
     "Stream",
     "TearResult",
     "absorption_column",
+    "acoustic_induced_vibration_screening",
     "active_fire_protection_screening",
+    "alarp_audit",
     "anti_surge_recycle",
     "api14c_safe_chart",
     "api537_flare_flame_model",
@@ -153,6 +164,7 @@ __all__ = [
     "deluge_nozzle_layout",
     "distillation_column",
     "ejector",
+    "escalation_graph",
     "event_tree",
     "expander",
     "fault_tree",
@@ -162,6 +174,7 @@ __all__ = [
     "fire_water_coverage_assessment",
     "fire_water_demand",
     "flare",
+    "flow_induced_pulsation_screening",
     "forms",
     "gas_blowby",
     "gas_dispersion",
@@ -173,6 +186,7 @@ __all__ = [
     "heater",
     "heavy_gas_dispersion",
     "hem_release",
+    "inherent_safety",
     "jet_fire",
     "leak_blowdown",
     "load_flowsheet",
@@ -182,6 +196,7 @@ __all__ = [
     "mdmt",
     "mixer",
     "nog070_sil_determination",
+    "norsok_p002_compliance",
     "overpressure_acceptance",
     "packed_column",
     "pfp_demand",
@@ -189,6 +204,8 @@ __all__ = [
     "pipe_fire_rupture",
     "pipe_fire_rupture_material",
     "pipeline_pressure_protection",
+    "piping_fiv_gas",
+    "piping_fiv_liquid",
     "plug_flow_reactor",
     "pool_fire",
     "probit",
@@ -212,6 +229,7 @@ __all__ = [
     "splitter",
     "stirred_tank_reactor",
     "stripping_column",
+    "sts0131_gate",
     "tank",
     "three_phase_separator",
     "throttling_valve",
@@ -248,6 +266,7 @@ _COMPRESSOR = "process.compressor"
 _CONSEQUENCE_ANALYSIS = "process.consequence_analysis"
 _CONTROL_VALVE_FAILURE_RELIEF = "process.control_valve_failure_relief"
 _ABSORPTION_COLUMN = "process.absorption_column"
+_ACOUSTIC_INDUCED_VIBRATION_SCREENING = "process.acoustic_induced_vibration_screening"
 _ACTIVE_FIRE_PROTECTION_SCREENING = "process.active_fire_protection_screening"
 _STRIPPING_COLUMN = "process.stripping_column"
 _DISTILLATION_COLUMN = "process.distillation_column"
@@ -260,7 +279,15 @@ _BOW_TIE = "process.bow_tie"
 _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
+_FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
+_ALARP_AUDIT = "process.alarp_audit"
+_ESCALATION_GRAPH = "process.escalation_graph"
+_INHERENT_SAFETY = "process.inherent_safety"
+_NORSOK_P002_COMPLIANCE = "process.norsok_p002_compliance"
+_STS0131_GATE = "process.sts0131_gate"
 _MDMT = "process.mdmt"
+_PIPING_FIV_GAS = "process.piping_fiv_gas"
+_PIPING_FIV_LIQUID = "process.piping_fiv_liquid"
 _VACUUM_COLLAPSE = "process.vacuum_collapse"
 _VCE = "process.vce"
 _FILTER = "process.filter"
@@ -1797,6 +1824,210 @@ def mdmt(
         governing_thickness=governing_thickness,
         stress_ratio=stress_ratio,
         min_operating_temperature=min_operating_temperature,
+    )
+
+
+def acoustic_induced_vibration_screening(
+    mass_flow: Q,
+    upstream_pressure: Q,
+    downstream_pressure: Q,
+    temperature: Q,
+    molecular_weight: Q,
+    outside_diameter: Q,
+    wall_thickness: Q,
+) -> AcousticInducedVibrationResult:
+    """The sound power level downstream of a pressure-reducing device and its band.
+
+    The bands are exclusive upward, so -10 dB is medium, 0 high and +10 very high; the
+    downstream pressure must be strictly below the upstream one.
+
+    See :func:`azoth.process.reference.acoustic_induced_vibration_screening`.
+    """
+    return resolve(_ACOUSTIC_INDUCED_VIBRATION_SCREENING)(  # type: ignore[no-any-return]
+        mass_flow=mass_flow,
+        upstream_pressure=upstream_pressure,
+        downstream_pressure=downstream_pressure,
+        temperature=temperature,
+        molecular_weight=molecular_weight,
+        outside_diameter=outside_diameter,
+        wall_thickness=wall_thickness,
+    )
+
+
+def flow_induced_pulsation_screening(
+    acoustic_length: Q,
+    branch_internal_diameter: Q,
+    run_internal_diameter: Q,
+    main_line_velocity: Q,
+    main_line_density: Q,
+    speed_of_sound: Q,
+    edge_radius: Q | None = None,
+    termination: str | None = None,
+    strouhal_number: float | None = None,
+    mode_count: float | None = None,
+) -> FlowInducedPulsationResult:
+    """The side-branch pulsation likelihood and every evaluated acoustic mode.
+
+    A closed branch is a quarter-wave tube and an open one a half-wave tube; a mode locks in
+    inside ``[0.8 f_n, 1.2 f_n]``. Only the strongest locked mode's weight enters the
+    severity, and a branch with no lock-in or a severity below 0.05 is low.
+
+    See :func:`azoth.process.reference.flow_induced_pulsation_screening`.
+    """
+    return resolve(_FLOW_INDUCED_PULSATION_SCREENING)(  # type: ignore[no-any-return]
+        acoustic_length=acoustic_length,
+        branch_internal_diameter=branch_internal_diameter,
+        run_internal_diameter=run_internal_diameter,
+        main_line_velocity=main_line_velocity,
+        main_line_density=main_line_density,
+        speed_of_sound=speed_of_sound,
+        edge_radius=edge_radius,
+        termination=termination,
+        strouhal_number=strouhal_number,
+        mode_count=mode_count,
+    )
+
+
+def norsok_p002_compliance(
+    checks: list[dict[str, object]],
+) -> NorsokP002ComplianceResult:
+    """The NORSOK P-002 point checks and their findings.
+
+    Each numeric check is ``value <= limit``, so equality passes; the defaults are the
+    class's. The two recorded criteria read only the caller's pass flag, and a row states
+    only the field its criterion reads. **A passing report covers the supplied checks
+    alone**, not conformity with the whole standard.
+
+    See :func:`azoth.process.reference.norsok_p002_compliance`.
+    """
+    return resolve(_NORSOK_P002_COMPLIANCE)(  # type: ignore[no-any-return]
+        checks=checks,
+    )
+
+
+def sts0131_gate(
+    checks: list[dict[str, object]],
+) -> Sts0131GateResult:
+    """The STS-0131 gate's findings and its overall acceptability.
+
+    The PSV margin passes at or above its required value; the MDMT check passes at or above
+    the design MDMT; the trapped-liquid check passes when no rupture is predicted. A row
+    states only the field its check reads.
+
+    See :func:`azoth.process.reference.sts0131_gate`.
+    """
+    return resolve(_STS0131_GATE)(  # type: ignore[no-any-return]
+        checks=checks,
+    )
+
+
+def inherent_safety(
+    substitute_score: float | None = None,
+    minimize_score: float | None = None,
+    moderate_score: float | None = None,
+    simplify_score: float | None = None,
+) -> InherentSafetyResult:
+    """The mean of the four Kletz inherent-safety pillars.
+
+    Each score is in ``[0, 10]`` and 10 is the best; an absent pillar is zero, the class's
+    zero-initialised array.
+
+    See :func:`azoth.process.reference.inherent_safety`.
+    """
+    return resolve(_INHERENT_SAFETY)(  # type: ignore[no-any-return]
+        substitute_score=substitute_score,
+        minimize_score=minimize_score,
+        moderate_score=moderate_score,
+        simplify_score=simplify_score,
+    )
+
+
+def alarp_audit(
+    measures: list[dict[str, object]],
+    value_of_statistical_life: float | None = None,
+    disproportion_factor: float | None = None,
+) -> AlarpAuditResult:
+    """Each measure's ICAF and its ALARP verdict.
+
+    A measure is implemented at or below ``VSL x disproportion_factor``; a zero-risk measure
+    has an infinite ICAF, published absent. The amounts are in NOK and declared
+    dimensionless.
+
+    See :func:`azoth.process.reference.alarp_audit`.
+    """
+    return resolve(_ALARP_AUDIT)(  # type: ignore[no-any-return]
+        measures=measures,
+        value_of_statistical_life=value_of_statistical_life,
+        disproportion_factor=disproportion_factor,
+    )
+
+
+def escalation_graph(
+    items: list[dict[str, object]],
+    exposures: list[dict[str, object]],
+    initiator: str,
+) -> EscalationGraphResult:
+    """The items that fail from an initiator, and the worst case over every item.
+
+    A target fails when the cumulative load from every failed source is at or above its
+    threshold. The sets are published in the items order.
+
+    See :func:`azoth.process.reference.escalation_graph`.
+    """
+    return resolve(_ESCALATION_GRAPH)(  # type: ignore[no-any-return]
+        items=items,
+        exposures=exposures,
+        initiator=initiator,
+    )
+
+
+def piping_fiv_gas(
+    density: Q,
+    velocity: Q,
+    outside_diameter: Q,
+    wall_thickness: Q,
+    branch_count: float,
+    pulsation_factor: float,
+    support_quality_factor: float,
+) -> PipingFivGasResult:
+    """The gas-line flow-induced-vibration likelihood of failure.
+
+    The pulsation factor is clamped to ``[1, 4]`` and the support-quality factor to
+    ``[1, 3]``; the bands are exclusive upward, so 0.3 is medium, 0.5 high and 1.0 very high.
+
+    See :func:`azoth.process.reference.piping_fiv_gas`.
+    """
+    return resolve(_PIPING_FIV_GAS)(  # type: ignore[no-any-return]
+        density=density,
+        velocity=velocity,
+        outside_diameter=outside_diameter,
+        wall_thickness=wall_thickness,
+        branch_count=branch_count,
+        pulsation_factor=pulsation_factor,
+        support_quality_factor=support_quality_factor,
+    )
+
+
+def piping_fiv_liquid(
+    velocity: Q,
+    outside_diameter: Q,
+    wall_thickness: Q,
+    branch_count: float,
+    support_quality_factor: float,
+) -> PipingFivLiquidResult:
+    """The liquid-line flow-induced-vibration likelihood of failure.
+
+    The support-quality factor is clamped to ``[1, 3]``; the bands are exclusive upward, so
+    0.3 is medium, 0.5 high and 1.0 very high.
+
+    See :func:`azoth.process.reference.piping_fiv_liquid`.
+    """
+    return resolve(_PIPING_FIV_LIQUID)(  # type: ignore[no-any-return]
+        velocity=velocity,
+        outside_diameter=outside_diameter,
+        wall_thickness=wall_thickness,
+        branch_count=branch_count,
+        support_quality_factor=support_quality_factor,
     )
 
 

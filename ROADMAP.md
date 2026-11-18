@@ -931,7 +931,8 @@ a claim nothing holds.
   subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
   own classes - the risk core, the two release models, the five overpressure calculators,
   the six dispersion ids, the four rupture ids, the four self-heating ids, the four hazid
-  worksheet ids, the four safety-review worksheet ids and the six safety screens; the types
+  worksheet ids, the four safety-review worksheet ids, the six safety screens and the nine
+  safety worksheets and vibration screens; the types
   no bullet names remain unported, each with its class.
 - **The self-heating family** - four ids. **`process.semenov_self_heating` is
   `SemenovSelfHeatingAnalyzer.analyze`**: `psi` against `1/e`, the critical-temperature
@@ -1004,6 +1005,28 @@ a claim nothing holds.
   verdict; its real-gas Z arm needs a fluid and is owed. The unit-string setters, the
   fluid-derived `k`, molar mass, density, specific heat and Z, the cooling curve, the
   restriction-diameter setter and every report are not carried. Held to six captures.
+- **The safety worksheets and vibration screens** - nine ids. **`process.piping_fiv_gas` and
+  `process.piping_fiv_liquid` are `PipingFivScreening.screenGas` and `screenLiquid`**: the AVIFF
+  momentum-flux and velocity scores, the D/t factor floored at 40, the 0.15 and 0.10 branch
+  factors, the pulsation and support clamps the class applies silently, and the 0.3/0.5/1.0
+  bands. **`process.acoustic_induced_vibration_screening` is
+  `AcousticInducedVibrationScreening.screen`**: the Carucci-Mueller PWL in the class's imperial
+  form (the SI inputs converted before it, the molar mass declared kg/mol), the design-line
+  allowable and the -10/0/+10 dB bands. **`process.flow_induced_pulsation_screening` is
+  `FlowInducedPulsationScreening.screen`**: the quarter- and half-wave eigenfrequencies, the
+  inclusive +/-20% lock-in envelope, the strongest locked mode's weight and every mode's row.
+  **`process.norsok_p002_compliance` is `NorsokP002ComplianceChecker`**: five numeric checks at
+  the class's inclusive defaults and two recorded checks, each row stating only the field its
+  criterion reads. **`process.sts0131_gate` is `Sts0131Gate`**: the PSV area margin, the MDMT
+  comparison and the four pass-through checks, with the declared WARNING severity emitted by no
+  builder. **`process.inherent_safety` is `InherentSafetyEvaluator.overallIndex`**: the mean of
+  the four Kletz pillars, an absent pillar being the class's zero. **`process.alarp_audit` is
+  `ALARPAuditReport.evaluate`**: each measure's ICAF against `VSL x disproportion_factor`, a
+  zero-risk measure's infinity published as an absent value while its verdict still compares it.
+  **`process.escalation_graph` is `EscalationGraphAnalyzer.propagate`**: cumulative loads over
+  every failed source, an inclusive threshold, a duplicate item's last threshold and the worst
+  case in the items order. The classes' reports and recommendation strings are presentation.
+  Held to nine captures.
 - **The relief and overpressure arithmetic** — seven ids. **`process.psv_sizing` is
   `ReliefValveSizing`'s three area methods and the API 520 D to T ladder**: gas with the
   conventional/balanced-bellows `Kb` and the rupture-disk `Kc`, liquid with `Kw`, the
@@ -1241,8 +1264,8 @@ study: safety scenarios, one registered model each, and bow-ties whose frequency
 `process.bow_tie`'s. Each has its own command model, envelope and route — `/sheets` and
 `/safety` — and its own bindings (`SheetEditor`/`SafetyEditor` in wasm, `azoth sheets`/`azoth
 safety` in the shell); the read-only drawing rides `/dexpi`. The **Case** menu switches the four
-interfaces from one registry in `ui/src/interfaces.ts`. The safety interface runs the twenty-six
-scalar safety models across seven families, and the bow-tie, natively; the record-shaped models
+interfaces from one registry in `ui/src/interfaces.ts`. The safety interface runs the thirty
+scalar safety models across nine families, and the bow-tie, natively; the record-shaped models
 and the rupture, release and QRA families are listed with their manual pages and no native view
 yet. A HAZOP worksheet, a printable safety report, a flux-versus-distance chart and scenario
 bundles remain unbuilt.

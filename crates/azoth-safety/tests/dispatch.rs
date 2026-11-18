@@ -622,3 +622,83 @@ fn an_unknown_id_is_refused_rather_than_panicking() {
         Outcome::Ok(_) => panic!("an unknown id ran"),
     }
 }
+
+#[test]
+fn the_gas_fiv_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.piping_fiv_gas",
+        &json!({
+            "density": 1.0,
+            "velocity": 10.0,
+            "outside_diameter": 0.2,
+            "wall_thickness": 0.01,
+            "branch_count": 0.0,
+            "pulsation_factor": 1.0,
+            "support_quality_factor": 1.0,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "lof") - 0.002).abs() < 1e-15);
+    assert_eq!(
+        outputs.outputs.get("likelihood").and_then(Value::as_str),
+        Some("low")
+    );
+}
+
+#[test]
+fn the_liquid_fiv_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.piping_fiv_liquid",
+        &json!({
+            "velocity": 1.0,
+            "outside_diameter": 0.2,
+            "wall_thickness": 0.01,
+            "branch_count": 0.0,
+            "support_quality_factor": 1.0,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "lof") - 0.166_666_666_666_666_66).abs() < 1e-15);
+    assert_eq!(
+        outputs.outputs.get("likelihood").and_then(Value::as_str),
+        Some("low")
+    );
+}
+
+#[test]
+fn the_acoustic_vibration_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.acoustic_induced_vibration_screening",
+        &json!({
+            "mass_flow": 1.0,
+            "upstream_pressure": 1_000_000.0,
+            "downstream_pressure": 900_000.0,
+            "temperature": 300.0,
+            "molecular_weight": 0.020,
+            "outside_diameter": 0.2,
+            "wall_thickness": 0.01,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "pwl") - 114.143_050_358_489_87).abs() < 1e-9);
+    assert!((number(outputs, "margin") + 56.956_949_641_510_12).abs() < 1e-9);
+    assert_eq!(
+        outputs.outputs.get("likelihood").and_then(Value::as_str),
+        Some("low")
+    );
+}
+
+#[test]
+fn the_inherent_safety_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.inherent_safety",
+        &json!({
+            "substitute_score": 8.0,
+            "minimize_score": 6.0,
+            "moderate_score": 4.0,
+            "simplify_score": 6.0,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "overall_index") - 6.0).abs() < 1e-15);
+}

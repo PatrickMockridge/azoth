@@ -1730,6 +1730,231 @@ def _mdmt(inputs: Mapping[str, Any]) -> dict[str, float]:
     return {"mdmt_c": solution.mdmt_k - 273.15, "mdmt_k": solution.mdmt_k}
 
 
+def _acoustic_induced_vibration_screening(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.acoustic_induced_vibration_screening`'s layers, from the reference's arithmetic.
+
+    The likelihood is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.acoustic_induced_vibration_screening import _evaluate
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["mass_flow"]), "kg/s"),
+        quantity(float(inputs["upstream_pressure"]), "Pa"),
+        quantity(float(inputs["downstream_pressure"]), "Pa"),
+        quantity(float(inputs["temperature"]), "K"),
+        quantity(float(inputs["molecular_weight"]), "kg/mol"),
+        quantity(float(inputs["outside_diameter"]), "m"),
+        quantity(float(inputs["wall_thickness"]), "m"),
+    )
+    return {
+        "pwl_db": solution.pwl,
+        "allowable_pwl_db": solution.allowable_pwl,
+        "margin_db": solution.margin,
+        "pressure_drop_ratio": solution.pressure_drop_ratio,
+        "d_over_t": solution.d_overt,
+    }
+
+
+def _escalation_graph(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.escalation_graph`'s layers, from the reference's arithmetic."""
+    from azoth.process.reference.escalation_graph import escalation_graph as evaluate
+
+    result = evaluate(
+        list(inputs["items"]),
+        list(inputs["exposures"]),
+        str(inputs["initiator"]),
+    )
+    return {
+        "failure_count": result.failure_count,
+        "worst_case_count": result.worst_case_count,
+    }
+
+
+def _alarp_audit(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.alarp_audit`'s layers, from the reference's arithmetic.
+
+    The per-measure rows and the threshold are held by the cases and the capture; the
+    measure count is the one shared numeric layer.
+    """
+    from azoth.process.reference.alarp_audit import _evaluate
+
+    def optional(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    evaluations, _, _ = _evaluate(
+        list(inputs["measures"]),
+        value_of_statistical_life=optional("value_of_statistical_life"),
+        disproportion_factor=optional("disproportion_factor"),
+    )
+    return {"measure_count": float(len(evaluations))}
+
+
+def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.inherent_safety`'s layers, from the reference's arithmetic."""
+    from azoth.process.reference.inherent_safety import _evaluate
+
+    def optional(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    solution, _ = _evaluate(
+        optional("substitute_score"),
+        optional("minimize_score"),
+        optional("moderate_score"),
+        optional("simplify_score"),
+    )
+    return {"overall_index": solution.overall_index}
+
+
+def _sts0131_gate(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.sts0131_gate`'s layers, from the reference's arithmetic.
+
+    The findings are rows held by the cases; the failure count is the numeric layer.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.sts0131_gate import sts0131_gate as evaluate
+
+    rows: list[dict[str, object]] = []
+    for row in inputs["checks"]:
+        converted = dict(row)
+        for field, unit in (
+            ("required_area", "m**2"),
+            ("selected_area", "m**2"),
+            ("minimum_wall_temperature", "K"),
+            ("design_mdmt", "K"),
+        ):
+            if converted.get(field) is not None:
+                converted[field] = quantity(float(converted[field]), unit)
+        rows.append(converted)
+    result = evaluate(rows)
+    return {"failure_count": result.failure_count}
+
+
+def _norsok_p002_compliance(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.norsok_p002_compliance`'s layers, from the reference's arithmetic.
+
+    The findings are rows held by the cases; the non-compliant count is the numeric layer.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.norsok_p002_compliance import (
+        norsok_p002_compliance as evaluate,
+    )
+
+    rows: list[dict[str, object]] = []
+    for row in inputs["checks"]:
+        converted = dict(row)
+        for field, unit in (
+            ("momentum_flux", "Pa"),
+            ("momentum_flux_limit", "Pa"),
+            ("vent_velocity", "m/s"),
+            ("vent_velocity_limit", "m/s"),
+        ):
+            if converted.get(field) is not None:
+                converted[field] = quantity(float(converted[field]), unit)
+        rows.append(converted)
+    result = evaluate(rows)
+    return {"non_compliant_count": result.non_compliant_count}
+
+
+def _flow_induced_pulsation_screening(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.flow_induced_pulsation_screening`'s layers, from the reference's arithmetic.
+
+    The likelihood and the per-mode rows are the model's own, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.flow_induced_pulsation_screening import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["acoustic_length"]), "m"),
+        quantity(float(inputs["branch_internal_diameter"]), "m"),
+        quantity(float(inputs["run_internal_diameter"]), "m"),
+        quantity(float(inputs["main_line_velocity"]), "m/s"),
+        quantity(float(inputs["main_line_density"]), "kg/m**3"),
+        quantity(float(inputs["speed_of_sound"]), "m/s"),
+        edge_radius=optional("edge_radius", "m"),
+        termination=(None if inputs.get("termination") is None else str(inputs["termination"])),
+        strouhal_number=(
+            None if inputs.get("strouhal_number") is None else float(inputs["strouhal_number"])
+        ),
+        mode_count=(None if inputs.get("mode_count") is None else float(inputs["mode_count"])),
+    )
+    return {
+        "shedding_frequency_hz": solution.shedding_frequency,
+        "lowest_resonance_velocity_mps": solution.lowest_resonance_velocity,
+        "effective_width_m": solution.effective_width,
+        "diameter_ratio": solution.diameter_ratio,
+        "rho_v2_pa": solution.rho_v2,
+        "energy_term": solution.energy_term,
+        "coupling_factor": solution.coupling_factor,
+        "mode_weight": solution.mode_weight,
+        "severity": solution.severity,
+    }
+
+
+def _piping_fiv_gas(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.piping_fiv_gas`'s layers, from the reference's arithmetic.
+
+    The likelihood is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.piping_fiv_gas import _evaluate
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["density"]), "kg/m**3"),
+        quantity(float(inputs["velocity"]), "m/s"),
+        quantity(float(inputs["outside_diameter"]), "m"),
+        quantity(float(inputs["wall_thickness"]), "m"),
+        float(inputs["branch_count"]),
+        float(inputs["pulsation_factor"]),
+        float(inputs["support_quality_factor"]),
+    )
+    return {
+        "lof": solution.lof,
+        "rho_v2_pa": solution.rho_v2,
+        "d_over_t": solution.d_overt,
+        "d_over_t_factor": solution.d_overt_factor,
+        "branch_factor": solution.branch_factor,
+        "pulsation_factor_applied": solution.pulsation,
+        "support_quality_factor_applied": solution.support,
+        "energy_term": solution.energy_term,
+    }
+
+
+def _piping_fiv_liquid(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.piping_fiv_liquid`'s layers, from the reference's arithmetic.
+
+    The likelihood is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.piping_fiv_liquid import _evaluate
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["velocity"]), "m/s"),
+        quantity(float(inputs["outside_diameter"]), "m"),
+        quantity(float(inputs["wall_thickness"]), "m"),
+        float(inputs["branch_count"]),
+        float(inputs["support_quality_factor"]),
+    )
+    return {
+        "lof": solution.lof,
+        "d_over_t": solution.d_overt,
+        "d_over_t_factor": solution.d_overt_factor,
+        "branch_factor": solution.branch_factor,
+        "support_quality_factor_applied": solution.support,
+        "energy_term": solution.energy_term,
+    }
+
+
 def _runaway_reaction(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.runaway_reaction`'s layers, from the reference's arithmetic.
 
@@ -3643,6 +3868,15 @@ DUMPERS: dict[str, Dumper] = {
     "process.pump_deadhead": _pump_deadhead,
     "process.runaway_reaction": _runaway_reaction,
     "process.mdmt": _mdmt,
+    "process.acoustic_induced_vibration_screening": _acoustic_induced_vibration_screening,
+    "process.alarp_audit": _alarp_audit,
+    "process.escalation_graph": _escalation_graph,
+    "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
+    "process.inherent_safety": _inherent_safety,
+    "process.norsok_p002_compliance": _norsok_p002_compliance,
+    "process.sts0131_gate": _sts0131_gate,
+    "process.piping_fiv_gas": _piping_fiv_gas,
+    "process.piping_fiv_liquid": _piping_fiv_liquid,
     "process.vacuum_collapse": _vacuum_collapse,
     "process.settle_out_pressure": _settle_out_pressure,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
@@ -4731,6 +4965,88 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_mdmt.tsv",
         block=1,
         identified_by=("#label", "mdmt_curve_b_25"),
+    ),
+    # Escalation's one: the three-item chain. The six further states and the two refusals are
+    # declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.escalation_graph",
+        case="chain",
+        capture="process_escalation_graph.tsv",
+        block=0,
+        identified_by=("#label", "esc_chain"),
+    ),
+    # ALARP's one: the implemented measure. The five further states, the empty audit and the
+    # two refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.alarp_audit",
+        case="implement",
+        capture="process_alarp_audit.tsv",
+        block=0,
+        identified_by=("#label", "alarp_implement"),
+    ),
+    # Inherent safety's one: the mixed score set. The zero and boundary states and the two
+    # refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.inherent_safety",
+        case="mixed",
+        capture="process_inherent_safety.tsv",
+        block=0,
+        identified_by=("#label", "inherent_mixed"),
+    ),
+    # STS-0131's one: the PSV margin at equality. The five further cases, the seven
+    # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
+    # `UNCASED_ROWS`.
+    LayerCase(
+        model="process.sts0131_gate",
+        case="psv_equal",
+        capture="process_sts0131_gate.tsv",
+        block=1,
+        identified_by=("#label", "sts_psv_equal"),
+    ),
+    # NORSOK P-002's one: all seven checks passing. The four further cases and the empty
+    # checker are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.norsok_p002_compliance",
+        case="all_pass",
+        capture="process_norsok_p002_compliance.tsv",
+        block=0,
+        identified_by=("#label", "p002_all_pass"),
+    ),
+    # Pulsation's one: the closed unlocked branch. The eleven further states and the ten
+    # refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.flow_induced_pulsation_screening",
+        case="closed_low",
+        capture="process_flow_induced_pulsation_screening.tsv",
+        block=0,
+        identified_by=("#label", "puls_closed_low"),
+    ),
+    # AIV's one: the low let-down. The other three states, the six band rows and the
+    # refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.acoustic_induced_vibration_screening",
+        case="aiv_low",
+        capture="process_acoustic_induced_vibration_screening.tsv",
+        block=0,
+        identified_by=("#label", "aiv_low"),
+    ),
+    # Gas-line FIV's one: the low state. The three band boundaries, the D/t and branch
+    # factors, the two clamps and the refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.piping_fiv_gas",
+        case="gas_low",
+        capture="process_piping_fiv_gas.tsv",
+        block=0,
+        identified_by=("#label", "fiv_gas_low"),
+    ),
+    # Liquid-line FIV's one: the low state. The three band boundaries, the branch factor,
+    # the support clamp and the refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.piping_fiv_liquid",
+        case="liquid_low",
+        capture="process_piping_fiv_liquid.tsv",
+        block=0,
+        identified_by=("#label", "fiv_liquid_low"),
     ),
     # Runaway reaction's one: the no-MAT low state. The six further cases are the severity
     # bands, the MAT verdicts, the gassy state and the TMR; the unit aliases are declared in
@@ -7576,6 +7892,27 @@ UNCASED_ROWS: dict[str, int] = {
     "process_vacuum_collapse.tsv": 7,
     # MDMT's nine: the seven further model cases and the unit aliases.
     "process_mdmt.tsv": 9,
+    # AIV's eighteen: the three further model states, the six band rows and the nine
+    # refusals.
+    "process_acoustic_induced_vibration_screening.tsv": 18,
+    # Pulsation's twenty-one: the eleven further model states and the ten refusals.
+    "process_flow_induced_pulsation_screening.tsv": 21,
+    # NORSOK P-002's five: the all-fail, equality, custom-limit and recorded cases, and the
+    # empty checker the row-list schema cannot state.
+    "process_norsok_p002_compliance.tsv": 5,
+    # STS-0131's fourteen: the empty gate, the five further cases, the seven single-arm
+    # states and the area refusal.
+    "process_sts0131_gate.tsv": 14,
+    # Inherent safety's four: the zero and boundary states and the two refusals.
+    "process_inherent_safety.tsv": 4,
+    # ALARP's eight: the five further states, the empty audit and the two refusals.
+    "process_alarp_audit.tsv": 8,
+    # Escalation's eight: the six further states and the two refusals.
+    "process_escalation_graph.tsv": 8,
+    # Gas-line FIV's thirteen: the eight further model states and the five refusals.
+    "process_piping_fiv_gas.tsv": 13,
+    # Liquid-line FIV's nine: the five further model states and the four refusals.
+    "process_piping_fiv_liquid.tsv": 9,
     # Runaway reaction's seven: the six further model cases and the unit aliases.
     "process_runaway_reaction.tsv": 7,
     # Pump deadhead's seven: the six further model cases and the unit aliases.

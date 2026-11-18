@@ -291,9 +291,8 @@ tags = ["flow-assurance"]
 name = "azoth-acoustic-induced-vibration-screening"
 version = "0.1.0"
 description = "Educational acoustic-induced-vibration (AIV) screening using the public Energy Institute likelihood-of-failure form for gas pressure-reducing devices. USE WHEN: a task needs a public, screening-level estimate of sound power level, pipe diameter-to-thickness ratio, allowable sound power level, and an AIV likelihood-of-failure index for a control valve, relief valve, or restriction orifice before detailed vibration assessment."
-calculation_basis = "screening"
+calculation_basis = "azoth"
 path = "skills/process/acoustic-induced-vibration-screening/SKILL.md"
-tranche = "mechanical-design"
 tags = ["process"]
 
 [[skill]]
@@ -410,9 +409,8 @@ tags = ["process"]
 name = "azoth-flow-induced-vibration-screening"
 version = "0.1.0"
 description = "Educational flow-induced vibration (FIV) screening using a public fluid kinetic-energy (rho v^2) likelihood-of-failure index. USE WHEN: a task needs a public, screening-level check of whether a main-line flow velocity and density produce a kinetic-energy level that warrants a detailed Energy Institute style FIV assessment before piping vibration design."
-calculation_basis = "screening"
+calculation_basis = "azoth"
 path = "skills/process/flow-induced-vibration-screening/SKILL.md"
-tranche = "mechanical-design"
 tags = ["process"]
 
 [[skill]]
@@ -649,54 +647,48 @@ tags = ["safety"]
 name = "azoth-firewater-deluge-design"
 version = "0.1.0"
 description = "Educational fire-water and deluge coverage screening: area versus dedicated object demand, deluge nozzle-net sizing from both the flow and the spacing criterion, and fire-monitor screening with wind drift. USE WHEN: a task asks whether a process area has adequate fire-water coverage, how many deluge nozzles are needed, or whether monitors or passive fire protection can substitute for a fixed system."
-calculation_basis = "screening"
+calculation_basis = "azoth"
 path = "skills/safety/firewater-deluge-design/SKILL.md"
-tranche = "safety"
 tags = ["safety"]
 
 [[skill]]
 name = "azoth-flare-radiation-screening"
 version = "0.1.0"
 description = "Educational flare thermal-radiation screening using the public API 521 / API 537 point-source equation. USE WHEN: a task needs a public, screening-level estimate of radiant heat flux at a distance from a flare and a check against allowable radiation limits before detailed flare and radiation design."
-calculation_basis = "screening"
+calculation_basis = "azoth"
 path = "skills/safety/flare-radiation-screening/SKILL.md"
-tranche = "safety"
 tags = ["safety"]
 
 [[skill]]
 name = "azoth-gas-dispersion-distance-screening"
 version = "0.1.0"
 description = "Educational Gaussian point-source gas-dispersion screening that estimates the downwind distance to a target concentration (LFL or toxic ppm) using the public Pasquill-Gifford / Briggs rural model. USE WHEN: a task needs a public, screening-level distance-to-LFL or distance-to-ppm estimate for a continuous gas release before detailed dispersion or consequence analysis."
-calculation_basis = "screening"
+calculation_basis = "azoth"
 path = "skills/safety/gas-dispersion-distance-screening/SKILL.md"
-tranche = "safety"
 tags = ["safety"]
 
 [[skill]]
 name = "azoth-jet-fire-radiation-screening"
 version = "0.1.0"
 description = "Educational jet-fire thermal-radiation screening that estimates the radiative flux at a distance, or the distance to a target flux, using the public single-point-source flame radiation model. USE WHEN: a task needs a public, screening-level jet-fire radiation flux or a distance to a personnel/equipment thermal limit before detailed fire-consequence analysis."
-calculation_basis = "screening"
+calculation_basis = "azoth"
 path = "skills/safety/jet-fire-radiation-screening/SKILL.md"
-tranche = "safety"
 tags = ["safety"]
 
 [[skill]]
 name = "azoth-psv-orifice-screening"
 version = "0.1.0"
 description = "Educational pressure-safety-valve orifice screening using the public API 520 Part I critical gas-flow equation. USE WHEN: a task needs a public, screening-level required PSV orifice area and a mapped API orifice letter before detailed relief-valve sizing and selection."
-calculation_basis = "screening"
+calculation_basis = "azoth"
 path = "skills/safety/psv-orifice-screening/SKILL.md"
-tranche = "safety"
 tags = ["safety"]
 
 [[skill]]
 name = "azoth-relief-load-screening"
 version = "0.1.0"
 description = "Educational fire-case relief load screening indicators for pressure relief devices. USE WHEN: a task needs public, screening-level fire-case relief load estimates and capacity flags without proprietary relief design methods."
-calculation_basis = "screening"
+calculation_basis = "azoth"
 path = "skills/safety/relief-load-screening/SKILL.md"
-tranche = "safety"
 tags = ["safety"]
 
 [[skill]]

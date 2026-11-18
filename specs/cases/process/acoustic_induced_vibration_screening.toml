@@ -1,0 +1,77 @@
+model = "process.acoustic_induced_vibration_screening"
+[[cases]]
+id = "aiv_low"
+tolerance = 1.0e-12
+source = "A 1 kg/s let-down from 10 to 9 bara at 300 K on a 20 D/t line: the PWL is 114.14 dB against an allowable 171.1 dB, a 56.96 dB margin, low. From `validation/neqsim/captures/process_acoustic_induced_vibration_screening.tsv` (`aiv_low`)."
+[cases.inputs]
+mass_flow = 1.0
+upstream_pressure = 1000000.0
+downstream_pressure = 900000.0
+temperature = 300.0
+molecular_weight = 0.020
+outside_diameter = 0.2
+wall_thickness = 0.01
+[cases.expected]
+pwl = 114.14305035848987
+allowable_pwl = 171.1
+margin = -56.95694964151012
+likelihood = "low"
+pressure_drop_ratio = 0.1
+d_overt = 20.0
+[[cases]]
+id = "aiv_medium"
+tolerance = 1.0e-12
+source = "A 10 kg/s let-down from 50 to 5 bara at 350 K: a 1.80 dB exceedance, medium. From (`aiv_medium`)."
+[cases.inputs]
+mass_flow = 10.0
+upstream_pressure = 5000000.0
+downstream_pressure = 500000.0
+temperature = 350.0
+molecular_weight = 0.020
+outside_diameter = 0.2
+wall_thickness = 0.01
+[cases.expected]
+pwl = 169.29914217387292
+allowable_pwl = 171.1
+margin = -1.8008578261270713
+likelihood = "medium"
+pressure_drop_ratio = 0.9
+d_overt = 20.0
+[[cases]]
+id = "aiv_very_high"
+tolerance = 1.0e-12
+source = "A 40 kg/s let-down from 50 to 0.5 bara at 400 K: a 12.43 dB exceedance, very high. From (`aiv_very_high`)."
+[cases.inputs]
+mass_flow = 40.0
+upstream_pressure = 5000000.0
+downstream_pressure = 50000.0
+temperature = 400.0
+molecular_weight = 0.020
+outside_diameter = 0.2
+wall_thickness = 0.01
+[cases.expected]
+pwl = 183.5263820298605
+allowable_pwl = 171.1
+margin = 12.42638202986052
+likelihood = "very_high"
+pressure_drop_ratio = 0.99
+d_overt = 20.0
+[[cases]]
+id = "aiv_p2_zero"
+tolerance = 1.0e-12
+source = "A full let-down to zero downstream pressure is legal: the ratio is 1.0 and the margin is still below the band. From (`aiv_p2_zero`)."
+[cases.inputs]
+mass_flow = 1.0
+upstream_pressure = 1000000.0
+downstream_pressure = 0.0
+temperature = 300.0
+molecular_weight = 0.020
+outside_diameter = 0.2
+wall_thickness = 0.01
+[cases.expected]
+pwl = 150.14305035848986
+allowable_pwl = 171.1
+margin = -20.956949641510136
+likelihood = "low"
+pressure_drop_ratio = 1.0
+d_overt = 20.0

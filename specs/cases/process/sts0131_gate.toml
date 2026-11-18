@@ -1,0 +1,71 @@
+model = "process.sts0131_gate"
+[[cases]]
+id = "psv_equal"
+tolerance = 1.0e-12
+source = "A 1.1 m2 selected area against 1.0 m2 required is a 10% margin, exactly the required one, so the check passes. From `validation/neqsim/captures/process_sts0131_gate.tsv` (`sts_psv_equal`)."
+[cases.inputs]
+checks = [
+  { check_type = "psv_sizing_margin", required_area = 1.0, selected_area = 1.1, required_margin = 0.1 },
+]
+[cases.expected]
+acceptable = true
+failure_count = 0.0
+[[cases]]
+id = "psv_below"
+tolerance = 1.0e-12
+source = "A 5% margin against a required 10% fails. From (`sts_psv_below`)."
+[cases.inputs]
+checks = [
+  { check_type = "psv_sizing_margin", required_area = 1.0, selected_area = 1.05, required_margin = 0.1 },
+]
+[cases.expected]
+acceptable = false
+failure_count = 1.0
+[[cases]]
+id = "mdmt_equal"
+tolerance = 1.0e-12
+source = "A minimum wall temperature exactly at the design MDMT passes, because the comparison is inclusive. From (`sts_mdmt_equal`)."
+[cases.inputs]
+checks = [
+  { check_type = "mdmt", minimum_wall_temperature = 233.15, design_mdmt = 233.15 },
+]
+[cases.expected]
+acceptable = true
+failure_count = 0.0
+[[cases]]
+id = "mdmt_below"
+tolerance = 1.0e-12
+source = "Five kelvin below the design MDMT fails. From (`sts_mdmt_below`)."
+[cases.inputs]
+checks = [
+  { check_type = "mdmt", minimum_wall_temperature = 228.15, design_mdmt = 233.15 },
+]
+[cases.expected]
+acceptable = false
+failure_count = 1.0
+[[cases]]
+id = "pass_throughs"
+tolerance = 1.0e-12
+source = "A depressurisation pass, a no-rupture pass and a compliant SIL pass, each read as its own flag. From the class's three add arms."
+[cases.inputs]
+checks = [
+  { check_type = "depressurisation", acceptable = true },
+  { check_type = "trapped_liquid_rupture", rupture_predicted = false },
+  { check_type = "sil", sil_compliant = true },
+]
+[cases.expected]
+acceptable = true
+failure_count = 0.0
+[[cases]]
+id = "mixed"
+tolerance = 1.0e-12
+source = "A failed depressurisation, a passing PSV margin and a named custom pass: one failure in three findings. From (`sts_mixed`)."
+[cases.inputs]
+checks = [
+  { check_type = "depressurisation", acceptable = false },
+  { check_type = "psv_sizing_margin", required_area = 1.0, selected_area = 1.1, required_margin = 0.1 },
+  { check_type = "custom", name = "custom", custom_ok = true },
+]
+[cases.expected]
+acceptable = false
+failure_count = 1.0

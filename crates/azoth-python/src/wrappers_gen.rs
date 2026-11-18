@@ -5435,6 +5435,30 @@ pub fn reynolds_number(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Acoustic-induced vibration screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (mass_flow, upstream_pressure, downstream_pressure, temperature, molecular_weight, outside_diameter, wall_thickness))]
+#[pyo3(
+    text_signature = "(mass_flow, upstream_pressure, downstream_pressure, temperature, molecular_weight, outside_diameter, wall_thickness)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn acoustic_induced_vibration_screening(
+    py: Python<'_>,
+    mass_flow: f64,
+    upstream_pressure: f64,
+    downstream_pressure: f64,
+    temperature: f64,
+    molecular_weight: f64,
+    outside_diameter: f64,
+    wall_thickness: f64,
+) -> PyResult<crate::transport_gen::PyAcousticInducedVibrationResult> {
+    azoth_process::models::acoustic_induced_vibration_screening::acoustic_induced_vibration_screening(kilograms_per_second(mass_flow), pascals(upstream_pressure), pascals(downstream_pressure), kelvins(temperature), kilograms_per_mole(molecular_weight), meters(outside_diameter), meters(wall_thickness))
+        .map(|r| crate::transport_gen::PyAcousticInducedVibrationResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Active fire protection screening.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -5459,6 +5483,35 @@ pub fn active_fire_protection_screening(
         cubic_meters_per_second(general_area_demand),
     )
     .map(|r| crate::transport_gen::PyActiveFireProtectionScreeningResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// ALARP measure audit.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (measures, value_of_statistical_life, disproportion_factor))]
+#[pyo3(text_signature = "(measures, value_of_statistical_life, disproportion_factor)")]
+pub fn alarp_audit(
+    py: Python<'_>,
+    measures: Vec<crate::records_gen::AlarpMeasure>,
+    value_of_statistical_life: Option<f64>,
+    disproportion_factor: Option<f64>,
+) -> PyResult<crate::transport_gen::PyAlarpAuditResult> {
+    let measures_records: Vec<azoth_process::models::alarp_audit::AlarpMeasure> = measures
+        .into_iter()
+        .map(|row| azoth_process::models::alarp_audit::AlarpMeasure {
+            description: row.description,
+            risk_reduction_per_year: row.risk_reduction_per_year,
+            annualised_cost: row.annualised_cost,
+        })
+        .collect();
+    azoth_process::models::alarp_audit::alarp_audit(
+        &measures_records,
+        value_of_statistical_life,
+        disproportion_factor,
+    )
+    .map(|r| crate::transport_gen::PyAlarpAuditResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -6125,6 +6178,47 @@ pub fn distillation_column(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Escalation graph analysis.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (items, exposures, initiator))]
+#[pyo3(text_signature = "(items, exposures, initiator)")]
+pub fn escalation_graph(
+    py: Python<'_>,
+    items: Vec<crate::records_gen::EscalationItem>,
+    exposures: Vec<crate::records_gen::EscalationExposure>,
+    initiator: &str,
+) -> PyResult<crate::transport_gen::PyEscalationGraphResult> {
+    let items_records: Vec<azoth_process::models::escalation_graph::EscalationItem> = items
+        .into_iter()
+        .map(
+            |row| azoth_process::models::escalation_graph::EscalationItem {
+                item_id: row.item_id,
+                failure_threshold: row.failure_threshold,
+            },
+        )
+        .collect();
+    let exposures_records: Vec<azoth_process::models::escalation_graph::EscalationExposure> =
+        exposures
+            .into_iter()
+            .map(
+                |row| azoth_process::models::escalation_graph::EscalationExposure {
+                    source: row.source,
+                    target: row.target,
+                    load: row.load,
+                },
+            )
+            .collect();
+    azoth_process::models::escalation_graph::escalation_graph(
+        &items_records,
+        &exposures_records,
+        initiator,
+    )
+    .map(|r| crate::transport_gen::PyEscalationGraphResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Event tree.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6366,6 +6460,44 @@ pub fn flare(
         design_molar_flow_capacity,
     )
     .map(|r| crate::transport_gen::PyFlareResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Flow-induced pulsation screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (acoustic_length, branch_internal_diameter, run_internal_diameter, main_line_velocity, main_line_density, speed_of_sound, edge_radius, termination, strouhal_number, mode_count))]
+#[pyo3(
+    text_signature = "(acoustic_length, branch_internal_diameter, run_internal_diameter, main_line_velocity, main_line_density, speed_of_sound, edge_radius, termination, strouhal_number, mode_count)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn flow_induced_pulsation_screening(
+    py: Python<'_>,
+    acoustic_length: f64,
+    branch_internal_diameter: f64,
+    run_internal_diameter: f64,
+    main_line_velocity: f64,
+    main_line_density: f64,
+    speed_of_sound: f64,
+    edge_radius: Option<f64>,
+    termination: Option<&str>,
+    strouhal_number: Option<f64>,
+    mode_count: Option<f64>,
+) -> PyResult<crate::transport_gen::PyFlowInducedPulsationResult> {
+    azoth_process::models::flow_induced_pulsation_screening::flow_induced_pulsation_screening(
+        meters(acoustic_length),
+        meters(branch_internal_diameter),
+        meters(run_internal_diameter),
+        meters_per_second(main_line_velocity),
+        kilograms_per_cubic_meter(main_line_density),
+        meters_per_second(speed_of_sound),
+        edge_radius.map(meters),
+        termination,
+        strouhal_number,
+        mode_count,
+    )
+    .map(|r| crate::transport_gen::PyFlowInducedPulsationResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -6892,6 +7024,29 @@ pub fn hem_release(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Inherent-safety index.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (substitute_score, minimize_score, moderate_score, simplify_score))]
+#[pyo3(text_signature = "(substitute_score, minimize_score, moderate_score, simplify_score)")]
+pub fn inherent_safety(
+    py: Python<'_>,
+    substitute_score: Option<f64>,
+    minimize_score: Option<f64>,
+    moderate_score: Option<f64>,
+    simplify_score: Option<f64>,
+) -> PyResult<crate::transport_gen::PyInherentSafetyResult> {
+    azoth_process::models::inherent_safety::inherent_safety(
+        substitute_score,
+        minimize_score,
+        moderate_score,
+        simplify_score,
+    )
+    .map(|r| crate::transport_gen::PyInherentSafetyResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Jet fire radiation.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -7115,6 +7270,39 @@ pub fn nog070_sil_determination(
     )
     .map(|r| crate::transport_gen::PyNog070SilDeterminationResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
+}
+
+/// NORSOK P-002 point-check compliance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (checks))]
+#[pyo3(text_signature = "(checks)")]
+pub fn norsok_p002_compliance(
+    py: Python<'_>,
+    checks: Vec<crate::records_gen::P002CheckRow>,
+) -> PyResult<crate::transport_gen::PyNorsokP002ComplianceResult> {
+    let checks_records: Vec<azoth_process::models::norsok_p002_compliance::P002CheckRow> = checks
+        .into_iter()
+        .map(
+            |row| azoth_process::models::norsok_p002_compliance::P002CheckRow {
+                name: row.name,
+                criterion: row.criterion,
+                mach_number: row.mach_number,
+                mach_limit: row.mach_limit,
+                momentum_flux: row.momentum_flux.map(pascals),
+                momentum_flux_limit: row.momentum_flux_limit.map(pascals),
+                vent_velocity: row.vent_velocity.map(meters_per_second),
+                vent_velocity_limit: row.vent_velocity_limit.map(meters_per_second),
+                carry_over_fraction: row.carry_over_fraction,
+                carry_over_limit: row.carry_over_limit,
+                recorded_ok: row.recorded_ok,
+            },
+        )
+        .collect();
+    azoth_process::models::norsok_p002_compliance::norsok_p002_compliance(&checks_records)
+        .map(|r| crate::transport_gen::PyNorsokP002ComplianceResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
 }
 
 /// Overpressure acceptance.
@@ -7441,6 +7629,65 @@ pub fn pipeline_pressure_protection(
         pascals(barrier2_setpoint),
     )
     .map(|r| crate::transport_gen::PyPipelinePressureProtectionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Gas-line flow-induced vibration screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (density, velocity, outside_diameter, wall_thickness, branch_count, pulsation_factor, support_quality_factor))]
+#[pyo3(
+    text_signature = "(density, velocity, outside_diameter, wall_thickness, branch_count, pulsation_factor, support_quality_factor)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn piping_fiv_gas(
+    py: Python<'_>,
+    density: f64,
+    velocity: f64,
+    outside_diameter: f64,
+    wall_thickness: f64,
+    branch_count: f64,
+    pulsation_factor: f64,
+    support_quality_factor: f64,
+) -> PyResult<crate::transport_gen::PyPipingFivGasResult> {
+    azoth_process::models::piping_fiv_gas::piping_fiv_gas(
+        kilograms_per_cubic_meter(density),
+        meters_per_second(velocity),
+        meters(outside_diameter),
+        meters(wall_thickness),
+        branch_count,
+        pulsation_factor,
+        support_quality_factor,
+    )
+    .map(|r| crate::transport_gen::PyPipingFivGasResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Liquid-line flow-induced vibration screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (velocity, outside_diameter, wall_thickness, branch_count, support_quality_factor))]
+#[pyo3(
+    text_signature = "(velocity, outside_diameter, wall_thickness, branch_count, support_quality_factor)"
+)]
+pub fn piping_fiv_liquid(
+    py: Python<'_>,
+    velocity: f64,
+    outside_diameter: f64,
+    wall_thickness: f64,
+    branch_count: f64,
+    support_quality_factor: f64,
+) -> PyResult<crate::transport_gen::PyPipingFivLiquidResult> {
+    azoth_process::models::piping_fiv_liquid::piping_fiv_liquid(
+        meters_per_second(velocity),
+        meters(outside_diameter),
+        meters(wall_thickness),
+        branch_count,
+        support_quality_factor,
+    )
+    .map(|r| crate::transport_gen::PyPipingFivLiquidResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -8159,6 +8406,37 @@ pub fn splitter(
     )
     .map(|r| crate::transport_gen::PySplitterResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
+}
+
+/// STS-0131 acceptance gate.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (checks))]
+#[pyo3(text_signature = "(checks)")]
+pub fn sts0131_gate(
+    py: Python<'_>,
+    checks: Vec<crate::records_gen::Sts0131CheckRow>,
+) -> PyResult<crate::transport_gen::PySts0131GateResult> {
+    let checks_records: Vec<azoth_process::models::sts0131_gate::Sts0131CheckRow> = checks
+        .into_iter()
+        .map(|row| azoth_process::models::sts0131_gate::Sts0131CheckRow {
+            check_type: row.check_type,
+            name: row.name,
+            acceptable: row.acceptable,
+            required_area: row.required_area.map(square_meters),
+            selected_area: row.selected_area.map(square_meters),
+            required_margin: row.required_margin,
+            minimum_wall_temperature: row.minimum_wall_temperature.map(kelvins),
+            design_mdmt: row.design_mdmt.map(kelvins),
+            rupture_predicted: row.rupture_predicted,
+            sil_compliant: row.sil_compliant,
+            custom_ok: row.custom_ok,
+        })
+        .collect();
+    azoth_process::models::sts0131_gate::sts0131_gate(&checks_records)
+        .map(|r| crate::transport_gen::PySts0131GateResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
 }
 
 /// Tank.

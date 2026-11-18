@@ -21583,6 +21583,270 @@
   ],
   "safety": [
     {
+      "family": "vibration",
+      "form": {
+        "assumptions": [
+          "**the sound power level is `10 log10[(dP/P1)^3.6 W^2 (T/MW)^1.2] + 126.1`** in the class's imperial form, with W in lb/s, T in degrees Rankine and MW in g/mol.",
+          "**the mass flow and temperature are converted inside the correlation**; the id declares SI, and the molecular weight is declared kg/mol and multiplied by 1000 before the same expression.",
+          "**the allowable design-line PWL is `173.6 - 0.125 D/t`**, the Carucci and Mueller design line.",
+          "**the bands are exclusive upward**: below -10 dB low, below 0 dB medium, below 10 dB high, else very high.",
+          "**the downstream pressure must be in `[0, upstream)`**, as the class refuses equality and above; zero is a full let-down.",
+          "**the bands are AVIFF screening categories**; the class's recommendation text is presentation."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.acoustic_induced_vibration_screening",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the gas mass flow through the pressure-reducing device, above zero.\n",
+            "dimension": "mass_rate",
+            "kind": "quantity",
+            "name": "mass_flow",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive mass flow",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "kg/s",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the upstream absolute pressure, above zero.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "upstream_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive upstream pressure",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the downstream absolute pressure, at least zero and strictly below the upstream pressure.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "downstream_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a negative downstream pressure",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the downstream temperature, above zero.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "temperature",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive temperature",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the gas molar mass, above zero; the correlation's g/mol form is an internal conversion.\n",
+            "dimension": "molar_mass",
+            "kind": "quantity",
+            "name": "molecular_weight",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive molar mass",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "kg/mol",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pipe outside diameter, above zero.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "outside_diameter",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive outside diameter",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pipe wall thickness, above zero.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "wall_thickness",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive wall thickness",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m",
+            "values": []
+          }
+        ],
+        "name": "Acoustic-induced vibration screening",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "the sound power level, in dB.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "pwl",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the design-line allowable sound power level, in dB.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "allowable_pwl",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "`pwl - allowable_pwl`, in dB; positive is an exceedance.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "margin",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the AVIFF likelihood band from the margin.\n",
+            "dimension": null,
+            "kind": "enum",
+            "name": "likelihood",
+            "optional": false,
+            "unit": null,
+            "values": [
+              "low",
+              "medium",
+              "high",
+              "very_high"
+            ]
+          },
+          {
+            "description": "`(P1 - P2)/P1`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "pressure_drop_ratio",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the outside-diameter-to-wall-thickness ratio.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "d_overt",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "7c416882656dac01316b3a21583a6dc607bc961537f7d26fdc60da54817bc3cf",
+          "rust_sha256": "54cd13dbe14b65e521eb0137a2786d4a7522af1f61c4a063a157160df2b90cde",
+          "spec_sha256": "d0cdc71758a3663a2bb81892e7e1e3079db3d1a48016aa9de7f3a92d868799a8",
+          "tests_active": 4,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "Carucci, V.A. and Mueller, R.T. (1982). Acoustically induced piping vibration in high-capacity compressors and control valves.",
+          "Energy Institute. Guidelines for the Avoidance of Vibration Induced Fatigue Failure in Process Pipework (AVIFF), 2nd edition."
+        ],
+        "refusal": null,
+        "summary": "The sound power level downstream of a pressure-reducing device, the design-line allowable and the screening margin.",
+        "worked_example": {}
+      },
+      "id": "process.acoustic_induced_vibration_screening",
+      "name": "Acoustic-induced vibration screening",
+      "native": true,
+      "purpose": "The sound power level downstream of a pressure-reducing device, the design-line allowable and the screening margin.",
+      "refusal": null,
+      "sub_interface": "vibration"
+    },
+    {
       "family": "firewater",
       "form": {
         "assumptions": [
@@ -21770,6 +22034,15 @@
       "purpose": "Whether water can extinguish the fire, the blowdown margin over the steel's failure and the selective-protection saving.",
       "refusal": null,
       "sub_interface": "firewater"
+    },
+    {
+      "family": "safetyassessment",
+      "id": "process.alarp_audit",
+      "name": "ALARP measure audit",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "safetyassessment"
     },
     {
       "family": "api14c",
@@ -22475,6 +22748,15 @@
       "purpose": "The deluge nozzle count from the flow and coverage criteria, the grid spacing and the delivered density.",
       "refusal": null,
       "sub_interface": "firewater"
+    },
+    {
+      "family": "safetyassessment",
+      "id": "process.escalation_graph",
+      "name": "Escalation graph analysis",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "safetyassessment"
     },
     {
       "family": "risk",
@@ -23340,6 +23622,15 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input, which a scenario does not yet provide",
       "sub_interface": "firewater"
+    },
+    {
+      "family": "vibration",
+      "id": "process.flow_induced_pulsation_screening",
+      "name": "Flow-induced pulsation screening",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation returns a table of rows, which this workspace does not yet draw",
+      "sub_interface": "vibration"
     },
     {
       "family": "hazid",
@@ -24397,6 +24688,149 @@
       "sub_interface": null
     },
     {
+      "family": "safetyassessment",
+      "form": {
+        "assumptions": [
+          "**the overall index is the simple mean of the four Kletz pillar scores**, each in `[0, 10]` and 10 the best.",
+          "**an absent pillar is zero**, the class's zero-initialised array; the caller's notes and report are presentation.",
+          "**the class's `score` may be called repeatedly and the last value wins**; one value per pillar is the only state this id can represent.",
+          "**a score outside `[0, 10]` is refused**, as the class throws."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.inherent_safety",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the substitute pillar's score, in `[0, 10]`. **Absent is 0.**\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "substitute_score",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 10.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a score outside [0, 10]",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the minimize pillar's score, in `[0, 10]`. **Absent is 0.**\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "minimize_score",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 10.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a score outside [0, 10]",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the moderate pillar's score, in `[0, 10]`. **Absent is 0.**\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "moderate_score",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 10.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a score outside [0, 10]",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the simplify pillar's score, in `[0, 10]`. **Absent is 0.**\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "simplify_score",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 10.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a score outside [0, 10]",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          }
+        ],
+        "name": "Inherent-safety index",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "the mean of the four pillar scores.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "overall_index",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "92de9c22e0df8073128adba129be02c1b35592fe603377a55c3a04883054b657",
+          "rust_sha256": "4f36f6f32df31e9dbd469e94f1ac74bf970021a0cc6b92ffe19b91533a200919",
+          "spec_sha256": "534ed33564b73067189f2cfb046119331cd7dc202f130f0cd317b623665b3a88",
+          "tests_active": 3,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "Kletz, T.A. (1978). What you don't have, can't leak. Chemistry and Industry, 287-292.",
+          "CCPS. Inherently Safer Chemical Processes: A Life Cycle Approach, 2nd edition."
+        ],
+        "refusal": null,
+        "summary": "The four Kletz pillar scores and their average inherent-safety index.",
+        "worked_example": {}
+      },
+      "id": "process.inherent_safety",
+      "name": "Inherent-safety index",
+      "native": true,
+      "purpose": "The four Kletz pillar scores and their average inherent-safety index.",
+      "refusal": null,
+      "sub_interface": "safetyassessment"
+    },
+    {
       "family": "fire",
       "form": {
         "assumptions": [
@@ -24944,6 +25378,15 @@
       "purpose": "The achieved SIL against the NOG 070 minimum, and the PFD reduction a non-compliant SIF needs.",
       "refusal": null,
       "sub_interface": "risk"
+    },
+    {
+      "family": "compliance",
+      "id": "process.norsok_p002_compliance",
+      "name": "NORSOK P-002 point-check compliance",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
     },
     {
       "family": "overpressure",
@@ -25664,6 +26107,522 @@
       "purpose": "The incidental pressure, the design margin and whether the segment is fully rated or needs two barriers.",
       "refusal": null,
       "sub_interface": "overpressure"
+    },
+    {
+      "family": "vibration",
+      "form": {
+        "assumptions": [
+          "**the likelihood is `rho v^2 / 50000 * D/t factor * branch factor * pulsation * support`**, with the D/t factor floored at one for a ratio at or below 40.",
+          "**the pulsation factor is clamped to `[1, 4]` and the support-quality factor to `[1, 3]`**; the clamps are silent in the class, and the applied values are published.",
+          "**the bands are exclusive upward**: below 0.3 low, below 0.5 medium, below 1.0 high, else very high.",
+          "**the branch factor is `1 + 0.15 n`**, where n is the number of small-bore connections.",
+          "**the bands are the AVIFF screening categories**; the class's recommendation text is presentation.",
+          "**negative density, velocity or branch count are refused**, as the class throws, and a non-positive diameter or wall is refused too."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.piping_fiv_gas",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the gas density at line conditions, non-negative.\n",
+            "dimension": "mass_density",
+            "kind": "quantity",
+            "name": "density",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a negative density",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "kg/m**3",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the gas velocity at line conditions, non-negative.\n",
+            "dimension": "velocity",
+            "kind": "quantity",
+            "name": "velocity",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a negative velocity",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m/s",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pipe outside diameter, above zero.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "outside_diameter",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive outside diameter",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pipe wall thickness, above zero.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "wall_thickness",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive wall thickness",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the number of small-bore connections, a whole number at least zero.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "branch_count",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a negative branch count",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pulsation source factor, 1 for steady service to 4 for a reciprocating compressor's near field; clamped to `[1, 4]`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "pulsation_factor",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 4.0,
+                "max_inclusive": true,
+                "min": 1.0,
+                "min_inclusive": true,
+                "rationale": "the class clamps the pulsation factor to [1, 4] rather than refusing it",
+                "severity": "warning"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the support-quality factor, 1 for good supports to 3 for poor ones; clamped to `[1, 3]`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "support_quality_factor",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 3.0,
+                "max_inclusive": true,
+                "min": 1.0,
+                "min_inclusive": true,
+                "rationale": "the class clamps the support-quality factor to [1, 3] rather than refusing it",
+                "severity": "warning"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          }
+        ],
+        "name": "Gas-line flow-induced vibration screening",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "the normalised likelihood of failure.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "lof",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the AVIFF likelihood band.\n",
+            "dimension": null,
+            "kind": "enum",
+            "name": "likelihood",
+            "optional": false,
+            "unit": null,
+            "values": [
+              "low",
+              "medium",
+              "high",
+              "very_high"
+            ]
+          },
+          {
+            "description": "the gas momentum flux `rho v^2`.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "rho_v2",
+            "optional": false,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "description": "the outside-diameter-to-wall-thickness ratio.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "d_overt",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the D/t factor, floored at one for a ratio at or below 40.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "d_overt_factor",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the branch factor `1 + 0.15 n`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "branch_factor",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the pulsation factor after the clamp.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "pulsation_factor_applied",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the support-quality factor after the clamp.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "support_quality_factor_applied",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the momentum flux normalised by 50000 Pa.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "energy_term",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "4b96853c6bb69dc880582de1191c7032ec3d7e55928a7ef032dee535ed114efe",
+          "rust_sha256": "3b676f5f9fcd6d03330c83bdf638617678d9d23eb40e3756cc7d2e40cfa610f9",
+          "spec_sha256": "4bbd582c0b2bc713bb1c70bcea2852e42803c4a5e4bd0caebdc9066ad0495d70",
+          "tests_active": 8,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "Energy Institute. Guidelines for the Avoidance of Vibration Induced Fatigue Failure in Process Pipework (AVIFF), 2nd edition."
+        ],
+        "refusal": null,
+        "summary": "The flow-induced-vibration likelihood of failure for a gas line from its momentum flux, diameter ratio, branch count, pulsation source and support quality.",
+        "worked_example": {}
+      },
+      "id": "process.piping_fiv_gas",
+      "name": "Gas-line flow-induced vibration screening",
+      "native": true,
+      "purpose": "The flow-induced-vibration likelihood of failure for a gas line from its momentum flux, diameter ratio, branch count, pulsation source and support quality.",
+      "refusal": null,
+      "sub_interface": "vibration"
+    },
+    {
+      "family": "vibration",
+      "form": {
+        "assumptions": [
+          "**the likelihood is `v / 6 * D/t factor * branch factor * support`**, with the D/t factor floored at one for a ratio at or below 40.",
+          "**the support-quality factor is clamped to `[1, 3]`**; the clamp is silent in the class, and the applied value is published.",
+          "**the bands are exclusive upward**: below 0.3 low, below 0.5 medium, below 1.0 high, else very high.",
+          "**the branch factor is `1 + 0.10 n`**, where n is the number of small-bore connections.",
+          "**the bands are the AVIFF screening categories**; the class's recommendation text is presentation.",
+          "**negative velocity or branch count are refused**, as the class throws, and a non-positive diameter or wall is refused too."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.piping_fiv_liquid",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the liquid velocity at line conditions, non-negative.\n",
+            "dimension": "velocity",
+            "kind": "quantity",
+            "name": "velocity",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a negative velocity",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m/s",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pipe outside diameter, above zero.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "outside_diameter",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive outside diameter",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pipe wall thickness, above zero.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "wall_thickness",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive wall thickness",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the number of small-bore connections, a whole number at least zero.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "branch_count",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a negative branch count",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the support-quality factor, 1 for good supports to 3 for poor ones; clamped to `[1, 3]`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "support_quality_factor",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 3.0,
+                "max_inclusive": true,
+                "min": 1.0,
+                "min_inclusive": true,
+                "rationale": "the class clamps the support-quality factor to [1, 3] rather than refusing it",
+                "severity": "warning"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          }
+        ],
+        "name": "Liquid-line flow-induced vibration screening",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "the normalised likelihood of failure.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "lof",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the AVIFF likelihood band.\n",
+            "dimension": null,
+            "kind": "enum",
+            "name": "likelihood",
+            "optional": false,
+            "unit": null,
+            "values": [
+              "low",
+              "medium",
+              "high",
+              "very_high"
+            ]
+          },
+          {
+            "description": "the outside-diameter-to-wall-thickness ratio.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "d_overt",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the D/t factor, floored at one for a ratio at or below 40.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "d_overt_factor",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the branch factor `1 + 0.10 n`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "branch_factor",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the support-quality factor after the clamp.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "support_quality_factor_applied",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the velocity normalised by 6 m/s.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "energy_term",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "e5b14cc1efff9fd36b018d27dfb36211c9ab93c109d55f66118213a6e5535ec8",
+          "rust_sha256": "fff4d53104c876d88a0bddc46ff17bae466365b7bd1a83ffb41d0020c941bfbe",
+          "spec_sha256": "361af6fcc03f6413db702474a964c01bd822ddf39c7e90c531e6168ba8c21b11",
+          "tests_active": 6,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "Energy Institute. Guidelines for the Avoidance of Vibration Induced Fatigue Failure in Process Pipework (AVIFF), 2nd edition."
+        ],
+        "refusal": null,
+        "summary": "The flow-induced-vibration likelihood of failure for a liquid line from its velocity, diameter ratio, branch count and support quality.",
+        "worked_example": {}
+      },
+      "id": "process.piping_fiv_liquid",
+      "name": "Liquid-line flow-induced vibration screening",
+      "native": true,
+      "purpose": "The flow-induced-vibration likelihood of failure for a liquid line from its velocity, diameter ratio, branch count and support quality.",
+      "refusal": null,
+      "sub_interface": "vibration"
     },
     {
       "family": "fire",
@@ -28397,6 +29356,15 @@
       "purpose": "",
       "refusal": "this calculation returns a table of rows, which this workspace does not yet draw",
       "sub_interface": "risk"
+    },
+    {
+      "family": "compliance",
+      "id": "process.sts0131_gate",
+      "name": "STS-0131 acceptance gate",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
     },
     {
       "family": "dispersion",
