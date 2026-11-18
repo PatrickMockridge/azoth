@@ -3667,7 +3667,7 @@ pub static ALL_PROVENANCE: &[ProvenanceStatic] = &[
         python_path: "python/src/azoth/process/reference/escalation_graph.py",
         python_sha256: "acd95bd154bf6c8467acaee0a718d7e9bbddc86553306e388103f50ee9266d20",
         rust_path: "crates/azoth-process/src/models/escalation_graph.rs",
-        rust_sha256: "e73bacbe22b7dcd54d060f1580bbd2711c1aa52d464542090af809d71ecfeeb2",
+        rust_sha256: "10adb40e2d2749785d8665e94bef75134cc1d8572578513eb995227d5a590487",
         source: "NeqSim process/safety/escalation/EscalationGraphAnalyzer.java",
         verification: VerificationStatus::PartiallyVerified,
         validation_cases: 0,
