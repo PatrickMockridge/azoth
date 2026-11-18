@@ -1,0 +1,91 @@
+aiv_low
+pwl_db=114.14305035848987
+allowable_pwl_db=171.1
+margin_db=-56.95694964151012
+likelihood=LOW
+pressure_drop_ratio=0.1
+d_over_t=20.0
+mass_flow_lb_per_s=2.2046226218
+temperature_rankine=540.0
+
+aiv_medium
+pwl_db=169.29914217387292
+allowable_pwl_db=171.1
+margin_db=-1.8008578261270713
+likelihood=MEDIUM
+pressure_drop_ratio=0.9
+d_over_t=20.0
+mass_flow_lb_per_s=22.046226218
+temperature_rankine=630.0
+
+aiv_very_high
+pwl_db=183.5263820298605
+allowable_pwl_db=171.1
+margin_db=12.42638202986052
+likelihood=VERY_HIGH
+pressure_drop_ratio=0.99
+d_over_t=20.0
+mass_flow_lb_per_s=88.184904872
+temperature_rankine=720.0
+
+aiv_p2_zero
+pwl_db=150.14305035848986
+allowable_pwl_db=171.1
+margin_db=-20.956949641510136
+likelihood=LOW
+pressure_drop_ratio=1.0
+d_over_t=20.0
+mass_flow_lb_per_s=2.2046226218
+temperature_rankine=540.0
+
+aiv_band_minus_ten
+margin_db=-10.0
+likelihood=MEDIUM
+
+aiv_band_zero
+margin_db=0.0
+likelihood=HIGH
+
+aiv_band_ten
+margin_db=10.0
+likelihood=VERY_HIGH
+
+aiv_band_below_minus_ten
+margin_db=-10.000001
+likelihood=LOW
+
+aiv_band_below_zero
+margin_db=-1.0E-6
+likelihood=MEDIUM
+
+aiv_band_below_ten
+margin_db=9.999999
+likelihood=HIGH
+
+aiv_flow_refusal
+refusal=IllegalArgumentException: massFlow must be positive
+
+aiv_upstream_refusal
+refusal=IllegalArgumentException: upstreamPressure must be positive
+
+aiv_downstream_equal_refusal
+refusal=IllegalArgumentException: downstreamPressure must be in [0, upstreamPressure)
+
+aiv_downstream_above_refusal
+refusal=IllegalArgumentException: downstreamPressure must be in [0, upstreamPressure)
+
+aiv_downstream_negative_refusal
+refusal=IllegalArgumentException: downstreamPressure must be in [0, upstreamPressure)
+
+aiv_temperature_refusal
+refusal=IllegalArgumentException: temperature must be positive
+
+aiv_molecular_weight_refusal
+refusal=IllegalArgumentException: molecularWeight must be positive
+
+aiv_diameter_refusal
+refusal=IllegalArgumentException: outsideDiameter and wallThickness must be positive
+
+aiv_wall_refusal
+refusal=IllegalArgumentException: outsideDiameter and wallThickness must be positive
+

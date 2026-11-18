@@ -1,0 +1,27 @@
+inherent_mixed
+score_substitute=8.0
+score_minimize=6.0
+score_moderate=4.0
+score_simplify=6.0
+overall_index=6.0
+
+inherent_zero
+score_substitute=0.0
+score_minimize=0.0
+score_moderate=0.0
+score_simplify=0.0
+overall_index=0.0
+
+inherent_bounds
+score_substitute=0.0
+score_minimize=10.0
+score_moderate=0.0
+score_simplify=10.0
+overall_index=5.0
+
+inherent_high_refusal
+refusal=IllegalArgumentException: score must be in [0, 10]
+
+inherent_low_refusal
+refusal=IllegalArgumentException: score must be in [0, 10]
+

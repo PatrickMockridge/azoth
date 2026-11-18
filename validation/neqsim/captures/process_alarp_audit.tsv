@@ -1,0 +1,57 @@
+alarp_implement
+measure_count=1
+evaluation0_description=vent
+evaluation0_risk_reduction_per_year=0.001
+evaluation0_annualised_cost=10000.0
+evaluation0_icaf=1.0E7
+evaluation0_verdict=IMPLEMENT (cost-effective)
+
+alarp_reject
+measure_count=1
+evaluation0_description=vent
+evaluation0_risk_reduction_per_year=0.001
+evaluation0_annualised_cost=1000000.0
+evaluation0_icaf=1.0E9
+evaluation0_verdict=REJECT (exceeds GDF threshold)
+
+alarp_threshold_equal
+measure_count=1
+evaluation0_description=vent
+evaluation0_risk_reduction_per_year=0.001
+evaluation0_annualised_cost=90000.0
+evaluation0_icaf=9.0E7
+evaluation0_verdict=IMPLEMENT (cost-effective)
+
+alarp_zero_risk
+measure_count=1
+evaluation0_description=vent
+evaluation0_risk_reduction_per_year=0.0
+evaluation0_annualised_cost=0.0
+evaluation0_icaf=Infinity
+evaluation0_verdict=REJECT (exceeds GDF threshold)
+
+alarp_zero_cost
+measure_count=1
+evaluation0_description=vent
+evaluation0_risk_reduction_per_year=0.001
+evaluation0_annualised_cost=0.0
+evaluation0_icaf=0.0
+evaluation0_verdict=IMPLEMENT (cost-effective)
+
+alarp_custom
+measure_count=1
+evaluation0_description=vent
+evaluation0_risk_reduction_per_year=0.001
+evaluation0_annualised_cost=20000.0
+evaluation0_icaf=2.0E7
+evaluation0_verdict=IMPLEMENT (cost-effective)
+
+alarp_empty
+measure_count=0
+
+alarp_risk_refusal
+refusal=IllegalArgumentException: riskReduction and cost must be non-negative
+
+alarp_cost_refusal
+refusal=IllegalArgumentException: riskReduction and cost must be non-negative
+

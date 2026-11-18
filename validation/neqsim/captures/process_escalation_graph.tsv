@@ -1,0 +1,55 @@
+esc_chain
+initiator=A
+failed=[A, B, C]
+failure_count=3
+worst_case=[A, B, C]
+worst_case_count=3
+
+esc_no_propagation
+initiator=A
+failed=[A]
+failure_count=1
+worst_case=[A]
+worst_case_count=1
+
+esc_threshold_equal
+initiator=A
+failed=[A, B]
+failure_count=2
+worst_case=[A, B]
+worst_case_count=2
+
+esc_two_paths
+initiator=A
+failed=[A, B, C]
+failure_count=3
+worst_case=[A, B, C]
+worst_case_count=3
+
+esc_star
+initiator=A
+failed=[A, B, C, D]
+failure_count=4
+worst_case=[A, B, C, D]
+worst_case_count=4
+
+esc_cycle
+initiator=A
+failed=[A, B]
+failure_count=2
+worst_case=[A, B]
+worst_case_count=2
+
+esc_duplicate
+initiator=A
+failed=[A, B]
+failure_count=2
+worst_case=[A, B]
+worst_case_count=2
+
+esc_initiator_refusal
+refusal=IllegalArgumentException: Unknown initiator: X
+
+esc_exposure_refusal
+refusal=IllegalArgumentException: Both source and target must be registered first
+

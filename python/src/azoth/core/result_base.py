@@ -473,3 +473,50 @@ class RunawayVerdict(StrEnum):
     ACCEPTABLE_MARGIN = "acceptable_margin"
     MARGINAL = "marginal"
     RUNAWAY_RISK = "runaway_risk"
+
+
+class FivLikelihood(StrEnum):
+    """The flow-induced-vibration likelihood-of-failure band."""
+
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    VERY_HIGH = "very_high"
+
+
+class P002Criterion(StrEnum):
+    """The NORSOK P-002 point check a finding belongs to."""
+
+    FLARE_LINE_MACH_07 = "flare_line_mach_07"
+    BLOWDOWN_RHO_V2 = "blowdown_rho_v2"
+    EROSIONAL_VELOCITY = "erosional_velocity"
+    VENT_GAS_VELOCITY = "vent_gas_velocity"
+    LIQUID_CARRY_OVER = "liquid_carry_over"
+    DEPRESSURISATION_VALVE_SIZE = "depressurisation_valve_size"
+    DRAIN_SLOPE_CAPACITY = "drain_slope_capacity"
+
+
+class Sts0131CheckType(StrEnum):
+    """The STS-0131 check a gate finding belongs to."""
+
+    DEPRESSURISATION = "depressurisation"
+    PSV_SIZING_MARGIN = "psv_sizing_margin"
+    MDMT = "mdmt"
+    TRAPPED_LIQUID_RUPTURE = "trapped_liquid_rupture"
+    SIL = "sil"
+    CUSTOM = "custom"
+
+
+class Sts0131Severity(StrEnum):
+    """The severity of an STS-0131 finding."""
+
+    PASS = "pass"
+    WARNING = "warning"
+    FAIL = "fail"
+
+
+class AlarpVerdict(StrEnum):
+    """Whether an ALARP measure is implemented or rejected."""
+
+    IMPLEMENT = "implement"
+    REJECT = "reject"

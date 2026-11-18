@@ -2904,3 +2904,120 @@ passing and a failing cold-service state.
 The four curves are the class's analytic approximations of ASME Fig. UCS-66, not the figure's
 table. The thickness is silently clamped to `[6, 100]` mm; the stress-ratio reduction is 55 K
 at or below 0.35, zero at or above 1.0, and linear between. The capture prints both °C and K.
+
+`process_piping_fiv_gas.tsv` is `PipingFivScreening.screenGas` over a low state, the exact
+0.3, 0.5 and 1.0 likelihood boundaries, a D/t factor above its 40 floor, a branch factor,
+both ends of the pulsation and support-quality clamps, and each refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe piping_fiv_gas \
+  > captures/process_piping_fiv_gas.tsv
+```
+
+The bands are exclusive upward: 0.3 is medium, 0.5 high and 1.0 very high. The pulsation
+factor is clamped to `[1, 4]` and the support-quality factor to `[1, 3]`; the clamps are
+silent in the class, and the port publishes the applied value. The D/t factor is floored at
+1 for D/t at or below 40.
+
+`process_piping_fiv_liquid.tsv` is `PipingFivScreening.screenLiquid` over the same boundaries
+and clamps, with the liquid energy term `v/6` and the 0.10 branch coefficient.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe piping_fiv_liquid \
+  > captures/process_piping_fiv_liquid.tsv
+```
+
+`process_acoustic_induced_vibration_screening.tsv` is
+`AcousticInducedVibrationScreening.screen` over a low, a medium and a very-high state, a
+zero downstream pressure, `bandFor` at the exact -10, 0 and +10 dB boundaries and just
+below each, and every refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe aiv \
+  > captures/process_acoustic_induced_vibration_screening.tsv
+```
+
+The class takes the molecular weight in g/mol and converts mass flow to lb/s and temperature
+to °R inside the Carucci-Mueller correlation; the port declares kg/mol and converts before
+the same expression. A downstream pressure at or above the upstream one is refused; zero is
+legal. The bounds are exclusive upward: -10 dB is medium, 0 high and +10 very high.
+
+`process_flow_induced_pulsation_screening.tsv` is `FlowInducedPulsationScreening.screen`
+over closed and open terminations, locked and unlocked branches, an edge radius, a custom
+Strouhal number, one-three-and-five-mode evaluations, all four likelihood bands, a locked
+but negligible state, and each refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe pulsation \
+  > captures/process_flow_induced_pulsation_screening.tsv
+```
+
+The lock-in envelope is `[0.8 f, 1.2 f]` inclusive, and only the strongest locked mode's
+`1/(2n+1)` weight enters the severity. A branch with no locked mode, or with a severity below
+0.05, is low; 0.3 and 1.0 are the upper bands. The effective width is `pi d/4 + r`, not an
+area. The capture prints every mode's frequency, envelope and resonance velocity.
+
+`process_norsok_p002_compliance.tsv` is `NorsokP002ComplianceChecker` over all seven
+criteria passing, all seven failing, equality at each default limit, custom limits, the two
+recorded checks and the empty checker.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe norsok_p002 \
+  > captures/process_norsok_p002_compliance.tsv
+```
+
+Every comparison is inclusive (`value <= limit`); the defaults are 0.7 Mach, 200000 and
+100000 kg/(m s²) momentum flux, 60 m/s and 1e-3 carry-over. The two recorded criteria carry
+no value or limit (the class stores NaN). A passing report covers only the supplied point
+checks, not conformity with the whole standard.
+
+`process_sts0131_gate.tsv` is `Sts0131Gate` over the empty gate, each of the six checks
+passing and failing, a mixed gate and the non-positive-area refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe sts0131 \
+  > captures/process_sts0131_gate.tsv
+```
+
+The PSV margin is `(selected - required)/required` and passes at equality; the MDMT test is
+`minimum wall >= design`, and the trapped-liquid test fails on a predicted rupture. The
+declared `WARNING` severity is emitted by no builder. `TrappedLiquidFireRuptureResult.builder`
+is package-private, so the trapped rows are built by reflection.
+
+`process_inherent_safety.tsv` is `InherentSafetyEvaluator` over a mixed score set, the
+zero-initialised evaluator, the 0 and 10 boundaries and both out-of-range refusals.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe inherent \
+  > captures/process_inherent_safety.tsv
+```
+
+An unset pillar is zero, so an empty evaluator answers an index of zero. The index is the
+simple mean of the four pillars. Notes and the report are presentation.
+
+`process_alarp_audit.tsv` is `ALARPAuditReport.evaluate` over an implemented and a rejected
+measure, the exact threshold, zero risk (the class's +Infinity), zero cost, a custom VSL and
+disproportion factor, the empty audit and both negative refusals.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe alarp \
+  > captures/process_alarp_audit.tsv
+```
+
+`ICAF = cost/risk`, or +Infinity at exactly zero risk; a measure is implemented at or below
+`VSL * GDF`. The default VSL is 30 MNOK and the default disproportion factor 3.0. The currency
+is NOKs in every case, and the class validates neither VSL nor the factor.
+
+`process_escalation_graph.tsv` is `EscalationGraphAnalyzer` over a three-node chain, a
+no-propagation state, threshold equality, a two-path cumulative load, a star, a cycle, a
+duplicate item row and the unknown-initiator and unknown-exposure refusals.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe escalation \
+  > captures/process_escalation_graph.tsv
+```
+
+Failures propagate to a fixed point: each pass sums the load from every currently failed
+source and fails every target at or above its threshold. The class's sets are unordered, so
+the capture sorts them; a duplicate `addItem` keeps the last threshold, and no exposure
+exists between the two calls to show the class's edge-clearing quirk.

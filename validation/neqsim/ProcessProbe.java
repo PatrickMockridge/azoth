@@ -152,6 +152,24 @@
 //       > captures/process_s001_secondary_pressure_protection.tsv
 //     java -cp .:neqsim-118d9af.jar ProcessProbe s001_clause10_review \
 //       > captures/process_s001_clause10_review.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe piping_fiv_gas \
+//       > captures/process_piping_fiv_gas.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe piping_fiv_liquid \
+//       > captures/process_piping_fiv_liquid.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe aiv \
+//       > captures/process_acoustic_induced_vibration_screening.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe pulsation \
+//       > captures/process_flow_induced_pulsation_screening.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe norsok_p002 \
+//       > captures/process_norsok_p002_compliance.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe sts0131 \
+//       > captures/process_sts0131_gate.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe inherent \
+//       > captures/process_inherent_safety.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe alarp \
+//       > captures/process_alarp_audit.tsv
+//     java -cp .:neqsim-118d9af.jar ProcessProbe escalation \
+//       > captures/process_escalation_graph.tsv
 
 import neqsim.process.equipment.stream.Stream;
 import neqsim.process.equipment.util.AccelerationMethod;
@@ -279,6 +297,22 @@ import neqsim.process.safety.hazid.HazopConsequenceMapping;
 import neqsim.process.safety.hazid.MahBowTieBuilder;
 import neqsim.process.safety.hazid.MahType;
 import neqsim.process.util.fire.ReliefValveSizing;
+import neqsim.process.safety.alarp.ALARPAuditReport;
+import neqsim.process.safety.compliance.NorsokP002ComplianceChecker;
+import neqsim.process.safety.compliance.P002Finding;
+import neqsim.process.safety.compliance.Sts0131Gate;
+import neqsim.process.safety.depressurization.STS0131AcceptanceResult;
+import neqsim.process.safety.escalation.EscalationGraphAnalyzer;
+import neqsim.process.safety.inherent.InherentSafetyEvaluator;
+import neqsim.process.safety.inherent.InherentSafetyEvaluator.Pillar;
+import neqsim.process.safety.rupture.TrappedLiquidFireRuptureResult;
+import neqsim.process.safety.vibration.AcousticInducedVibrationResult;
+import neqsim.process.safety.vibration.AcousticInducedVibrationScreening;
+import neqsim.process.safety.vibration.FivLikelihoodResult;
+import neqsim.process.safety.vibration.FlowInducedPulsationResult;
+import neqsim.process.safety.vibration.FlowInducedPulsationScreening;
+import neqsim.process.safety.vibration.FlowInducedPulsationScreening.AcousticTermination;
+import neqsim.process.safety.vibration.PipingFivScreening;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -595,6 +629,33 @@ public class ProcessProbe {
         break;
       case "mdmt":
         mdmtRows();
+        break;
+      case "piping_fiv_gas":
+        pipingFivGasRows();
+        break;
+      case "piping_fiv_liquid":
+        pipingFivLiquidRows();
+        break;
+      case "aiv":
+        acousticInducedVibrationRows();
+        break;
+      case "pulsation":
+        flowInducedPulsationRows();
+        break;
+      case "norsok_p002":
+        norsokP002Rows();
+        break;
+      case "sts0131":
+        sts0131Rows();
+        break;
+      case "inherent":
+        inherentSafetyRows();
+        break;
+      case "alarp":
+        alarpRows();
+        break;
+      case "escalation":
+        escalationRows();
         break;
       case "pipe_fire_rupture":
         pipeFireRuptureRows();
@@ -17764,5 +17825,480 @@ public class ProcessProbe {
     printMdmt("mdmt_clamp_above", new MDMTCalculator(MaterialCurve.B, 150.0), 20.0);
     printMdmt("mdmt_pass", new MDMTCalculator(MaterialCurve.D, 25.0), -35.0);
     printMdmt("mdmt_fail", new MDMTCalculator(MaterialCurve.D, 25.0), -45.0);
+  }
+
+  // ---- the safety worksheets and vibration screens ---------------------------
+
+  static void printFivGas(String label, double density, double velocity, double outsideDiameter,
+      double wallThickness, int branchCount, double pulsationFactor,
+      double supportQualityFactor) {
+    FivLikelihoodResult result = PipingFivScreening.screenGas("circuit", density, velocity,
+        outsideDiameter, wallThickness, branchCount, pulsationFactor, supportQualityFactor);
+    Map<String, Double> factors = result.getContributingFactors();
+    System.out.println(label);
+    System.out.println("lof=" + result.getLofScore());
+    System.out.println("likelihood=" + result.getLikelihood());
+    System.out.println("rho_v2_pa=" + factors.get("rhoV2_kgPerMs2"));
+    System.out.println("d_over_t=" + factors.get("DoverT"));
+    System.out.println("d_over_t_factor=" + factors.get("DoverTFactor"));
+    System.out.println("branch_factor=" + factors.get("branchFactor"));
+    System.out.println("pulsation_factor_applied=" + factors.get("pulsationFactor"));
+    System.out.println("support_quality_factor_applied=" + factors.get("supportQualityFactor"));
+    System.out.println("energy_term=" + factors.get("energyTerm"));
+    System.out.println();
+  }
+
+  static void pipingFivGasRows() {
+    printFivGas("fiv_gas_low", 1.0, 10.0, 0.2, 0.01, 0, 1.0, 1.0);
+    printFivGas("fiv_gas_boundary_030", 150.0, 10.0, 0.2, 0.01, 0, 1.0, 1.0);
+    printFivGas("fiv_gas_boundary_050", 250.0, 10.0, 0.2, 0.01, 0, 1.0, 1.0);
+    printFivGas("fiv_gas_boundary_100", 500.0, 10.0, 0.2, 0.01, 0, 1.0, 1.0);
+    printFivGas("fiv_gas_dt_factor", 1.0, 10.0, 0.6, 0.01, 0, 1.0, 1.0);
+    printFivGas("fiv_gas_branch_factor", 1.0, 10.0, 0.2, 0.01, 2, 1.0, 1.0);
+    printFivGas("fiv_gas_pulsation_low", 1.0, 10.0, 0.2, 0.01, 0, 0.5, 1.0);
+    printFivGas("fiv_gas_pulsation_high", 1.0, 10.0, 0.2, 0.01, 0, 5.0, 1.0);
+    printFivGas("fiv_gas_support_high", 1.0, 10.0, 0.2, 0.01, 0, 1.0, 5.0);
+    refusalProbe("fiv_gas_density_refusal",
+        () -> PipingFivScreening.screenGas("c", -1.0, 10.0, 0.2, 0.01, 0, 1.0, 1.0));
+    refusalProbe("fiv_gas_velocity_refusal",
+        () -> PipingFivScreening.screenGas("c", 1.0, -1.0, 0.2, 0.01, 0, 1.0, 1.0));
+    refusalProbe("fiv_gas_diameter_refusal",
+        () -> PipingFivScreening.screenGas("c", 1.0, 10.0, 0.0, 0.01, 0, 1.0, 1.0));
+    refusalProbe("fiv_gas_wall_refusal",
+        () -> PipingFivScreening.screenGas("c", 1.0, 10.0, 0.2, 0.0, 0, 1.0, 1.0));
+    refusalProbe("fiv_gas_branch_refusal",
+        () -> PipingFivScreening.screenGas("c", 1.0, 10.0, 0.2, 0.01, -1, 1.0, 1.0));
+  }
+
+  static void printFivLiquid(String label, double velocity, double outsideDiameter,
+      double wallThickness, int branchCount, double supportQualityFactor) {
+    FivLikelihoodResult result = PipingFivScreening.screenLiquid("circuit", velocity,
+        outsideDiameter, wallThickness, branchCount, supportQualityFactor);
+    Map<String, Double> factors = result.getContributingFactors();
+    System.out.println(label);
+    System.out.println("lof=" + result.getLofScore());
+    System.out.println("likelihood=" + result.getLikelihood());
+    System.out.println("d_over_t=" + factors.get("DoverT"));
+    System.out.println("d_over_t_factor=" + factors.get("DoverTFactor"));
+    System.out.println("branch_factor=" + factors.get("branchFactor"));
+    System.out.println("support_quality_factor_applied=" + factors.get("supportQualityFactor"));
+    System.out.println("energy_term=" + factors.get("energyTerm"));
+    System.out.println();
+  }
+
+  static void pipingFivLiquidRows() {
+    printFivLiquid("fiv_liquid_low", 1.0, 0.2, 0.01, 0, 1.0);
+    printFivLiquid("fiv_liquid_boundary_030", 1.8, 0.2, 0.01, 0, 1.0);
+    printFivLiquid("fiv_liquid_boundary_050", 3.0, 0.2, 0.01, 0, 1.0);
+    printFivLiquid("fiv_liquid_boundary_100", 6.0, 0.2, 0.01, 0, 1.0);
+    printFivLiquid("fiv_liquid_branch_factor", 1.0, 0.2, 0.01, 2, 1.0);
+    printFivLiquid("fiv_liquid_support_high", 1.0, 0.2, 0.01, 0, 5.0);
+    refusalProbe("fiv_liquid_velocity_refusal",
+        () -> PipingFivScreening.screenLiquid("c", -1.0, 0.2, 0.01, 0, 1.0));
+    refusalProbe("fiv_liquid_diameter_refusal",
+        () -> PipingFivScreening.screenLiquid("c", 1.0, 0.0, 0.01, 0, 1.0));
+    refusalProbe("fiv_liquid_wall_refusal",
+        () -> PipingFivScreening.screenLiquid("c", 1.0, 0.2, 0.0, 0, 1.0));
+    refusalProbe("fiv_liquid_branch_refusal",
+        () -> PipingFivScreening.screenLiquid("c", 1.0, 0.2, 0.01, -1, 1.0));
+  }
+
+  static void printAiv(String label, double massFlow, double upstreamPressure,
+      double downstreamPressure, double temperature, double molecularWeight,
+      double outsideDiameter, double wallThickness) {
+    AcousticInducedVibrationResult result = AcousticInducedVibrationScreening.screen("circuit",
+        massFlow, upstreamPressure, downstreamPressure, temperature, molecularWeight,
+        outsideDiameter, wallThickness);
+    Map<String, Double> factors = result.getContributingFactors();
+    System.out.println(label);
+    System.out.println("pwl_db=" + result.getPwlDb());
+    System.out.println("allowable_pwl_db=" + result.getAllowablePwlDb());
+    System.out.println("margin_db=" + result.getMarginDb());
+    System.out.println("likelihood=" + result.getLikelihood());
+    System.out.println("pressure_drop_ratio=" + factors.get("pressureDropRatio"));
+    System.out.println("d_over_t=" + factors.get("DoverT"));
+    System.out.println("mass_flow_lb_per_s=" + factors.get("massFlow_lbPerSec"));
+    System.out.println("temperature_rankine=" + factors.get("temperature_rankine"));
+    System.out.println();
+  }
+
+  static void printAivBand(String label, double marginDb) {
+    System.out.println(label);
+    System.out.println("margin_db=" + marginDb);
+    System.out.println("likelihood=" + AcousticInducedVibrationScreening.bandFor(marginDb));
+    System.out.println();
+  }
+
+  static void acousticInducedVibrationRows() {
+    printAiv("aiv_low", 1.0, 10.0e5, 9.0e5, 300.0, 20.0, 0.2, 0.01);
+    printAiv("aiv_medium", 10.0, 50.0e5, 5.0e5, 350.0, 20.0, 0.2, 0.01);
+    printAiv("aiv_very_high", 40.0, 50.0e5, 0.5e5, 400.0, 20.0, 0.2, 0.01);
+    printAiv("aiv_p2_zero", 1.0, 10.0e5, 0.0, 300.0, 20.0, 0.2, 0.01);
+    printAivBand("aiv_band_minus_ten", -10.0);
+    printAivBand("aiv_band_zero", 0.0);
+    printAivBand("aiv_band_ten", 10.0);
+    printAivBand("aiv_band_below_minus_ten", -10.000001);
+    printAivBand("aiv_band_below_zero", -0.000001);
+    printAivBand("aiv_band_below_ten", 9.999999);
+    refusalProbe("aiv_flow_refusal",
+        () -> AcousticInducedVibrationScreening.screen("c", 0.0, 10.0e5, 9.0e5, 300.0, 20.0, 0.2, 0.01));
+    refusalProbe("aiv_upstream_refusal",
+        () -> AcousticInducedVibrationScreening.screen("c", 1.0, 0.0, 0.0, 300.0, 20.0, 0.2, 0.01));
+    refusalProbe("aiv_downstream_equal_refusal",
+        () -> AcousticInducedVibrationScreening.screen("c", 1.0, 10.0e5, 10.0e5, 300.0, 20.0, 0.2, 0.01));
+    refusalProbe("aiv_downstream_above_refusal",
+        () -> AcousticInducedVibrationScreening.screen("c", 1.0, 10.0e5, 11.0e5, 300.0, 20.0, 0.2, 0.01));
+    refusalProbe("aiv_downstream_negative_refusal",
+        () -> AcousticInducedVibrationScreening.screen("c", 1.0, 10.0e5, -1.0, 300.0, 20.0, 0.2, 0.01));
+    refusalProbe("aiv_temperature_refusal",
+        () -> AcousticInducedVibrationScreening.screen("c", 1.0, 10.0e5, 9.0e5, 0.0, 20.0, 0.2, 0.01));
+    refusalProbe("aiv_molecular_weight_refusal",
+        () -> AcousticInducedVibrationScreening.screen("c", 1.0, 10.0e5, 9.0e5, 300.0, 0.0, 0.2, 0.01));
+    refusalProbe("aiv_diameter_refusal",
+        () -> AcousticInducedVibrationScreening.screen("c", 1.0, 10.0e5, 9.0e5, 300.0, 20.0, 0.0, 0.01));
+    refusalProbe("aiv_wall_refusal",
+        () -> AcousticInducedVibrationScreening.screen("c", 1.0, 10.0e5, 9.0e5, 300.0, 20.0, 0.2, 0.0));
+  }
+
+  static void printPulsationResult(String label, FlowInducedPulsationResult result) {
+    Map<String, Double> factors = result.getContributingFactors();
+    System.out.println(label);
+    System.out.println("likelihood=" + result.getLikelihood());
+    System.out.println("any_mode_locked_in=" + result.isAnyModeLockedIn());
+    System.out.println("shedding_frequency_hz=" + result.getSheddingFrequencyHz());
+    System.out.println("lowest_resonance_velocity_mps=" + result.getLowestResonanceVelocityMPerS());
+    System.out.println("effective_width_m=" + factors.get("effectiveWidth_m"));
+    System.out.println("diameter_ratio=" + factors.get("diameterRatio"));
+    System.out.println("rho_v2_pa=" + factors.get("rhoV2_Pa"));
+    System.out.println("energy_term=" + factors.get("energyTerm"));
+    System.out.println("coupling_factor=" + factors.get("couplingFactor"));
+    System.out.println("mode_weight=" + factors.get("modeWeight"));
+    System.out.println("severity=" + factors.get("severity"));
+    List<FlowInducedPulsationResult.BranchMode> modes = result.getModes();
+    for (int i = 0; i < modes.size(); i++) {
+      FlowInducedPulsationResult.BranchMode mode = modes.get(i);
+      String head = "mode" + i + "_";
+      System.out.println(head + "index=" + mode.getModeIndex());
+      System.out.println(head + "frequency_hz=" + mode.getFrequencyHz());
+      System.out.println(head + "envelope_low_hz=" + mode.getEnvelopeLowHz());
+      System.out.println(head + "envelope_high_hz=" + mode.getEnvelopeHighHz());
+      System.out.println(head + "locked_in=" + mode.isLockedIn());
+      System.out.println(head + "resonance_velocity_mps=" + mode.getResonanceVelocityMPerS());
+      System.out.println(head + "resonance_low_mps=" + mode.getResonanceVelocityLowMPerS());
+      System.out.println(head + "resonance_high_mps=" + mode.getResonanceVelocityHighMPerS());
+    }
+    System.out.println();
+  }
+
+  static void printPulsation(String label, double acousticLength, double branchDiameter,
+      double edgeRadius, double runDiameter, double velocity, double density, double sound,
+      AcousticTermination termination, double strouhal, int modeCount) {
+    printPulsationResult(label, FlowInducedPulsationScreening.screen("branch", acousticLength,
+        branchDiameter, edgeRadius, runDiameter, velocity, density, sound, termination, strouhal,
+        modeCount));
+  }
+
+  static void printPulsationDefault(String label, double acousticLength, double branchDiameter,
+      double runDiameter, double velocity, double density, double sound) {
+    printPulsationResult(label, FlowInducedPulsationScreening.screen("branch", acousticLength,
+        branchDiameter, runDiameter, velocity, density, sound));
+  }
+
+  static void flowInducedPulsationRows() {
+    printPulsationDefault("puls_closed_low", 3.0, 0.15, 0.3, 20.0, 10.0, 400.0);
+    printPulsation("puls_closed_lock", 3.0, 0.15, 0.0, 0.3, 31.84, 10.0, 400.0,
+        AcousticTermination.CLOSED, 0.37, 5);
+    printPulsation("puls_open_lock", 3.0, 0.15, 0.0, 0.3, 20.0, 10.0, 400.0,
+        AcousticTermination.OPEN, 0.37, 5);
+    printPulsation("puls_open_boundary_030", 3.0, 0.15, 0.0, 0.3, 20.0, 15.0, 400.0,
+        AcousticTermination.OPEN, 0.37, 5);
+    printPulsation("puls_open_high", 3.0, 0.15, 0.0, 0.3, 20.0, 40.0, 400.0,
+        AcousticTermination.OPEN, 0.37, 5);
+    printPulsation("puls_open_boundary_100", 3.0, 0.15, 0.0, 0.3, 20.0, 50.0, 400.0,
+        AcousticTermination.OPEN, 0.37, 5);
+    printPulsation("puls_open_very_high", 3.0, 0.15, 0.0, 0.3, 20.0, 60.0, 400.0,
+        AcousticTermination.OPEN, 0.37, 5);
+    printPulsation("puls_edge_radius", 3.0, 0.15, 0.05, 0.3, 20.0, 10.0, 400.0,
+        AcousticTermination.CLOSED, 0.37, 5);
+    printPulsation("puls_strouhal_020", 3.0, 0.15, 0.0, 0.3, 20.0, 10.0, 400.0,
+        AcousticTermination.CLOSED, 0.20, 5);
+    printPulsation("puls_modes_three", 3.0, 0.15, 0.0, 0.3, 31.84, 10.0, 400.0,
+        AcousticTermination.CLOSED, 0.37, 3);
+    printPulsation("puls_mode_one", 3.0, 0.15, 0.0, 0.3, 31.84, 10.0, 400.0,
+        AcousticTermination.CLOSED, 0.37, 1);
+    printPulsation("puls_locked_negligible", 3.0, 0.15, 0.0, 0.3, 9.03, 10.0, 400.0,
+        AcousticTermination.CLOSED, 0.37, 5);
+    refusalProbe("puls_length_refusal",
+        () -> FlowInducedPulsationScreening.screen("b", 0.0, 0.15, 0.0, 0.3, 20.0, 10.0, 400.0,
+            AcousticTermination.CLOSED, 0.37, 5));
+    refusalProbe("puls_diameter_refusal",
+        () -> FlowInducedPulsationScreening.screen("b", 3.0, 0.0, 0.0, 0.3, 20.0, 10.0, 400.0,
+            AcousticTermination.CLOSED, 0.37, 5));
+    refusalProbe("puls_edge_refusal",
+        () -> FlowInducedPulsationScreening.screen("b", 3.0, 0.15, -1.0, 0.3, 20.0, 10.0, 400.0,
+            AcousticTermination.CLOSED, 0.37, 5));
+    refusalProbe("puls_run_refusal",
+        () -> FlowInducedPulsationScreening.screen("b", 3.0, 0.15, 0.0, 0.0, 20.0, 10.0, 400.0,
+            AcousticTermination.CLOSED, 0.37, 5));
+    refusalProbe("puls_sound_refusal",
+        () -> FlowInducedPulsationScreening.screen("b", 3.0, 0.15, 0.0, 0.3, 20.0, 10.0, 0.0,
+            AcousticTermination.CLOSED, 0.37, 5));
+    refusalProbe("puls_strouhal_refusal",
+        () -> FlowInducedPulsationScreening.screen("b", 3.0, 0.15, 0.0, 0.3, 20.0, 10.0, 400.0,
+            AcousticTermination.CLOSED, 0.0, 5));
+    refusalProbe("puls_modes_refusal",
+        () -> FlowInducedPulsationScreening.screen("b", 3.0, 0.15, 0.0, 0.3, 20.0, 10.0, 400.0,
+            AcousticTermination.CLOSED, 0.37, 0));
+    refusalProbe("puls_velocity_refusal",
+        () -> FlowInducedPulsationScreening.screen("b", 3.0, 0.15, 0.0, 0.3, -1.0, 10.0, 400.0,
+            AcousticTermination.CLOSED, 0.37, 5));
+    refusalProbe("puls_density_refusal",
+        () -> FlowInducedPulsationScreening.screen("b", 3.0, 0.15, 0.0, 0.3, 20.0, -1.0, 400.0,
+            AcousticTermination.CLOSED, 0.37, 5));
+    refusalProbe("puls_termination_refusal",
+        () -> FlowInducedPulsationScreening.screen("b", 3.0, 0.15, 0.0, 0.3, 20.0, 10.0, 400.0,
+            null, 0.37, 5));
+  }
+
+  static void printNorsok(String label, NorsokP002ComplianceChecker checker) {
+    List<P002Finding> findings = checker.getFindings();
+    System.out.println(label);
+    System.out.println("compliant=" + checker.isCompliant());
+    System.out.println("non_compliant_count=" + checker.countNonCompliant());
+    for (int i = 0; i < findings.size(); i++) {
+      P002Finding finding = findings.get(i);
+      String head = "finding" + i + "_";
+      System.out.println(head + "name=" + finding.getEquipmentName());
+      System.out.println(head + "criterion=" + finding.getCriterion());
+      System.out.println(head + "compliant=" + finding.isCompliant());
+      System.out.println(head + "value=" + finding.getValue());
+      System.out.println(head + "limit=" + finding.getLimit());
+    }
+    System.out.println();
+  }
+
+  static void norsokP002Rows() {
+    printNorsok("p002_all_pass", new NorsokP002ComplianceChecker()
+        .checkFlareLineMach("flare", 0.5)
+        .checkBlowdownRhoV2("blowdown", 150000.0)
+        .checkErosionalVelocity("line", 90000.0)
+        .checkVentGasVelocity("vent", 50.0)
+        .checkLiquidCarryOver("separator", 5.0e-4)
+        .recordDepressurisationValve("bdv", true, "sized")
+        .recordDrainSlope("drain", true, "adequate"));
+    printNorsok("p002_all_fail", new NorsokP002ComplianceChecker()
+        .checkFlareLineMach("flare", 0.8)
+        .checkBlowdownRhoV2("blowdown", 250000.0)
+        .checkErosionalVelocity("line", 150000.0)
+        .checkVentGasVelocity("vent", 70.0)
+        .checkLiquidCarryOver("separator", 2.0e-3)
+        .recordDepressurisationValve("bdv", false, "undersized")
+        .recordDrainSlope("drain", false, "slope"));
+    printNorsok("p002_equality", new NorsokP002ComplianceChecker()
+        .checkFlareLineMach("flare", 0.7)
+        .checkBlowdownRhoV2("blowdown", 200000.0)
+        .checkErosionalVelocity("line", 100000.0)
+        .checkVentGasVelocity("vent", 60.0)
+        .checkLiquidCarryOver("separator", 1.0e-3));
+    printNorsok("p002_custom_limits", new NorsokP002ComplianceChecker()
+        .checkFlareLineMach("flare", 0.6, 0.5)
+        .checkVentGasVelocity("vent", 25.0, 30.0));
+    printNorsok("p002_recorded", new NorsokP002ComplianceChecker()
+        .recordDepressurisationValve("bdv", true, "sized")
+        .recordDrainSlope("drain", false, "slope"));
+    printNorsok("p002_empty", new NorsokP002ComplianceChecker());
+  }
+
+  static STS0131AcceptanceResult stsAcceptance(boolean acceptable) {
+    return new STS0131AcceptanceResult(10.0, 5.0, 100.0, 1.0, true, acceptable, true, true,
+        true, true, acceptable);
+  }
+
+  /// **`TrappedLiquidFireRuptureResult.builder` is package-private**, so the probe reaches it by
+  /// reflection, the same route the CSTR temperatures take.
+  static TrappedLiquidFireRuptureResult trappedLiquidResult(boolean ruptured) {
+    try {
+      Method factory =
+          TrappedLiquidFireRuptureResult.class.getDeclaredMethod("builder", String.class);
+      factory.setAccessible(true);
+      Object builder = factory.invoke(null, "segment");
+      Method record = builder.getClass().getDeclaredMethod(
+          ruptured ? "recordPipeRupture" : "recordReliefSet", double.class);
+      record.setAccessible(true);
+      record.invoke(builder, 5.0);
+      Method build = builder.getClass().getDeclaredMethod("build");
+      build.setAccessible(true);
+      return (TrappedLiquidFireRuptureResult) build.invoke(builder);
+    } catch (ReflectiveOperationException ex) {
+      throw new IllegalStateException(ex);
+    }
+  }
+
+  static void printSts(String label, Sts0131Gate gate) {
+    List<Sts0131Gate.Finding> findings = gate.getFindings();
+    System.out.println(label);
+    System.out.println("acceptable=" + gate.isAcceptable());
+    System.out.println("failure_count=" + gate.countFailures());
+    for (int i = 0; i < findings.size(); i++) {
+      Sts0131Gate.Finding finding = findings.get(i);
+      String head = "finding" + i + "_";
+      System.out.println(head + "check=" + finding.getCheckName());
+      System.out.println(head + "severity=" + finding.getSeverity());
+    }
+    System.out.println();
+  }
+
+  static void sts0131Rows() {
+    printSts("sts_empty", new Sts0131Gate());
+    printSts("sts_psv_equal", new Sts0131Gate().addPsvSizingMargin(1.0, 1.1, 0.1));
+    printSts("sts_psv_below", new Sts0131Gate().addPsvSizingMargin(1.0, 1.05, 0.1));
+    printSts("sts_mdmt_equal", new Sts0131Gate().addMdmt(-40.0, -40.0));
+    printSts("sts_mdmt_below", new Sts0131Gate().addMdmt(-45.0, -40.0));
+    printSts("sts_depressurisation_pass",
+        new Sts0131Gate().addDepressurisation(stsAcceptance(true)));
+    printSts("sts_depressurisation_fail",
+        new Sts0131Gate().addDepressurisation(stsAcceptance(false)));
+    printSts("sts_trapped_pass",
+        new Sts0131Gate().addTrappedLiquidRupture(trappedLiquidResult(false)));
+    printSts("sts_trapped_fail",
+        new Sts0131Gate().addTrappedLiquidRupture(trappedLiquidResult(true)));
+    printSts("sts_sil_pass", new Sts0131Gate().addSil(new Nog070SilDetermination(
+        Nog070SifType.PSD_PROCESS_SEGMENT, 1.0e-3, 3, 2, true, "compliant")));
+    printSts("sts_sil_fail", new Sts0131Gate().addSil(new Nog070SilDetermination(
+        Nog070SifType.PSD_PROCESS_SEGMENT, 1.0e-2, 2, 3, false, "below minimum")));
+    printSts("sts_custom_pass", new Sts0131Gate().addCustom("custom", true, "ok"));
+    printSts("sts_custom_fail", new Sts0131Gate().addCustom("custom", false, "not ok"));
+    printSts("sts_mixed", new Sts0131Gate()
+        .addDepressurisation(stsAcceptance(false))
+        .addPsvSizingMargin(1.0, 1.1, 0.1)
+        .addCustom("custom", true, "ok"));
+    refusalProbe("sts_area_refusal",
+        () -> new Sts0131Gate().addPsvSizingMargin(0.0, 1.0, 0.1));
+  }
+
+  static void printInherent(String label, InherentSafetyEvaluator evaluator) {
+    System.out.println(label);
+    for (Pillar pillar : Pillar.values()) {
+      System.out.println("score_" + pillar.name().toLowerCase(java.util.Locale.ROOT) + "="
+          + evaluator.getScore(pillar));
+    }
+    System.out.println("overall_index=" + evaluator.overallIndex());
+    System.out.println();
+  }
+
+  static void inherentSafetyRows() {
+    printInherent("inherent_mixed", new InherentSafetyEvaluator("design")
+        .score(Pillar.SUBSTITUTE, 8.0, "s")
+        .score(Pillar.MINIMIZE, 6.0, "m")
+        .score(Pillar.MODERATE, 4.0, "o")
+        .score(Pillar.SIMPLIFY, 6.0, "p"));
+    printInherent("inherent_zero", new InherentSafetyEvaluator("design"));
+    printInherent("inherent_bounds", new InherentSafetyEvaluator("design")
+        .score(Pillar.SUBSTITUTE, 0.0, "s")
+        .score(Pillar.MINIMIZE, 10.0, "m")
+        .score(Pillar.MODERATE, 0.0, "o")
+        .score(Pillar.SIMPLIFY, 10.0, "p"));
+    refusalProbe("inherent_high_refusal",
+        () -> new InherentSafetyEvaluator("design").score(Pillar.SUBSTITUTE, 11.0, "s"));
+    refusalProbe("inherent_low_refusal",
+        () -> new InherentSafetyEvaluator("design").score(Pillar.SUBSTITUTE, -1.0, "s"));
+  }
+
+  static void printAlarp(String label, ALARPAuditReport report) {
+    List<ALARPAuditReport.EvaluationResult> rows = report.evaluate();
+    System.out.println(label);
+    System.out.println("measure_count=" + rows.size());
+    for (int i = 0; i < rows.size(); i++) {
+      ALARPAuditReport.EvaluationResult row = rows.get(i);
+      String head = "evaluation" + i + "_";
+      System.out.println(head + "description=" + row.description);
+      System.out.println(head + "risk_reduction_per_year=" + row.riskReductionPerYear);
+      System.out.println(head + "annualised_cost=" + row.annualisedCostNOK);
+      System.out.println(head + "icaf=" + row.icaf);
+      System.out.println(head + "verdict=" + row.verdict);
+    }
+    System.out.println();
+  }
+
+  static void alarpRows() {
+    printAlarp("alarp_implement", new ALARPAuditReport("study")
+        .addMeasure("vent", 1.0e-3, 1.0e4));
+    printAlarp("alarp_reject", new ALARPAuditReport("study")
+        .addMeasure("vent", 1.0e-3, 1.0e6));
+    printAlarp("alarp_threshold_equal", new ALARPAuditReport("study")
+        .addMeasure("vent", 1.0e-3, 9.0e4));
+    printAlarp("alarp_zero_risk", new ALARPAuditReport("study")
+        .addMeasure("vent", 0.0, 0.0));
+    printAlarp("alarp_zero_cost", new ALARPAuditReport("study")
+        .addMeasure("vent", 1.0e-3, 0.0));
+    printAlarp("alarp_custom", new ALARPAuditReport("study")
+        .setValueOfStatisticalLife(10.0e6)
+        .setDisproportionFactor(2.0)
+        .addMeasure("vent", 1.0e-3, 2.0e4));
+    printAlarp("alarp_empty", new ALARPAuditReport("study"));
+    refusalProbe("alarp_risk_refusal",
+        () -> new ALARPAuditReport("study").addMeasure("vent", -1.0, 1.0));
+    refusalProbe("alarp_cost_refusal",
+        () -> new ALARPAuditReport("study").addMeasure("vent", 1.0, -1.0));
+  }
+
+  static void printEscalation(String label, EscalationGraphAnalyzer analyzer,
+      String initiator) {
+    Set<String> failed = analyzer.propagate(initiator);
+    Set<String> worst = analyzer.worstCaseEscalation();
+    System.out.println(label);
+    System.out.println("initiator=" + initiator);
+    System.out.println("failed=" + new java.util.TreeSet<>(failed));
+    System.out.println("failure_count=" + failed.size());
+    System.out.println("worst_case=" + new java.util.TreeSet<>(worst));
+    System.out.println("worst_case_count=" + worst.size());
+    System.out.println();
+  }
+
+  static void escalationRows() {
+    EscalationGraphAnalyzer chain = new EscalationGraphAnalyzer()
+        .addItem("A", 0.0)
+        .addItem("B", 50.0)
+        .addItem("C", 50.0)
+        .addExposure("A", "B", 100.0)
+        .addExposure("B", "C", 100.0);
+    printEscalation("esc_chain", chain, "A");
+    printEscalation("esc_no_propagation", new EscalationGraphAnalyzer()
+        .addItem("A", 0.0)
+        .addItem("B", 50.0)
+        .addExposure("A", "B", 10.0), "A");
+    printEscalation("esc_threshold_equal", new EscalationGraphAnalyzer()
+        .addItem("A", 0.0)
+        .addItem("B", 50.0)
+        .addExposure("A", "B", 50.0), "A");
+    printEscalation("esc_two_paths", new EscalationGraphAnalyzer()
+        .addItem("A", 0.0)
+        .addItem("B", 50.0)
+        .addItem("C", 50.0)
+        .addExposure("A", "B", 100.0)
+        .addExposure("A", "C", 30.0)
+        .addExposure("B", "C", 30.0), "A");
+    printEscalation("esc_star", new EscalationGraphAnalyzer()
+        .addItem("A", 0.0)
+        .addItem("B", 50.0)
+        .addItem("C", 50.0)
+        .addItem("D", 50.0)
+        .addExposure("A", "B", 100.0)
+        .addExposure("A", "C", 100.0)
+        .addExposure("A", "D", 100.0), "A");
+    printEscalation("esc_cycle", new EscalationGraphAnalyzer()
+        .addItem("A", 50.0)
+        .addItem("B", 50.0)
+        .addExposure("A", "B", 100.0)
+        .addExposure("B", "A", 100.0), "A");
+    printEscalation("esc_duplicate", new EscalationGraphAnalyzer()
+        .addItem("A", 0.0)
+        .addItem("B", 50.0)
+        .addItem("B", 75.0)
+        .addExposure("A", "B", 80.0), "A");
+    EscalationGraphAnalyzer refusedInitiator = new EscalationGraphAnalyzer().addItem("A", 0.0);
+    refusalProbe("esc_initiator_refusal", () -> refusedInitiator.propagate("X"));
+    EscalationGraphAnalyzer refusedExposure = new EscalationGraphAnalyzer().addItem("A", 0.0);
+    refusalProbe("esc_exposure_refusal", () -> refusedExposure.addExposure("A", "X", 1.0));
   }
 }

@@ -480,6 +480,11 @@ ENUMS = {
     "VacuumVerdict",
     "SettleOutVerdict",
     "RunawayVerdict",
+    "FivLikelihood",
+    "P002Criterion",
+    "Sts0131CheckType",
+    "Sts0131Severity",
+    "AlarpVerdict",
 }
 
 
