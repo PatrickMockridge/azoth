@@ -119,9 +119,7 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
         == "processsafetysystem"
     )
     assert module.sub_interface_of(by_id["process.hem_release"], "release") is None
-    assert (
-        module.sub_interface_of(by_id["process.piping_fiv_gas"], "vibration") == "vibration"
-    )
+    assert module.sub_interface_of(by_id["process.piping_fiv_gas"], "vibration") == "vibration"
     assert (
         module.sub_interface_of(by_id["process.flow_induced_pulsation_screening"], "vibration")
         == "vibration"
