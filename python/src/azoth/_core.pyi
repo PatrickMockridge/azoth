@@ -609,6 +609,21 @@ class MapCurvePoint(TypedDict):
     head: float
     efficiency: float
 
+class P002CheckRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    criterion: str
+    mach_number: float | None
+    mach_limit: float | None
+    momentum_flux: float | None
+    momentum_flux_limit: float | None
+    vent_velocity: float | None
+    vent_velocity_limit: float | None
+    carry_over_fraction: float | None
+    carry_over_limit: float | None
+    recorded_ok: bool | None
+
 class OverpressureScenario(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1220,6 +1235,14 @@ class MahBarrier:
     id: str
     description: str
     pfd: float
+
+@final
+class P002FindingResult:
+    """one row per check, in the caller's order."""
+
+    name: str
+    criterion: str
+    compliant: bool
 
 @final
 class PipeFireRupturePoint:
@@ -4243,6 +4266,13 @@ class Nog070SilDeterminationResult:
     achieved_sil: float
     compliant: bool
     required_pfd_reduction_factor: float | None
+    warnings: list[Warning]
+
+@final
+class NorsokP002ComplianceResult:
+    findings: list[P002FindingResult]
+    compliant: bool
+    non_compliant_count: float
     warnings: list[Warning]
 
 @final
@@ -8155,6 +8185,7 @@ def nog070_sil_determination(
     pfd_average: float,
     minimum_sil: float | None = None,
 ) -> Nog070SilDeterminationResult: ...
+def norsok_p002_compliance(checks: list[P002CheckRow]) -> NorsokP002ComplianceResult: ...
 def overpressure_acceptance(
     peak_pressure: float,
     mawp: float,

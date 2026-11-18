@@ -7179,6 +7179,39 @@ pub fn nog070_sil_determination(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// NORSOK P-002 point-check compliance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (checks))]
+#[pyo3(text_signature = "(checks)")]
+pub fn norsok_p002_compliance(
+    py: Python<'_>,
+    checks: Vec<crate::records_gen::P002CheckRow>,
+) -> PyResult<crate::transport_gen::PyNorsokP002ComplianceResult> {
+    let checks_records: Vec<azoth_process::models::norsok_p002_compliance::P002CheckRow> = checks
+        .into_iter()
+        .map(
+            |row| azoth_process::models::norsok_p002_compliance::P002CheckRow {
+                name: row.name,
+                criterion: row.criterion,
+                mach_number: row.mach_number,
+                mach_limit: row.mach_limit,
+                momentum_flux: row.momentum_flux.map(pascals),
+                momentum_flux_limit: row.momentum_flux_limit.map(pascals),
+                vent_velocity: row.vent_velocity.map(meters_per_second),
+                vent_velocity_limit: row.vent_velocity_limit.map(meters_per_second),
+                carry_over_fraction: row.carry_over_fraction,
+                carry_over_limit: row.carry_over_limit,
+                recorded_ok: row.recorded_ok,
+            },
+        )
+        .collect();
+    azoth_process::models::norsok_p002_compliance::norsok_p002_compliance(&checks_records)
+        .map(|r| crate::transport_gen::PyNorsokP002ComplianceResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Overpressure acceptance.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

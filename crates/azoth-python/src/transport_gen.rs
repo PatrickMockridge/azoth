@@ -22,12 +22,12 @@ use crate::record_outputs_gen::{
     PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIncrementalZoneRow,
     PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
     PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyNaceIssueRow, PyPipeFireRupturePoint, PyPulsationModeResult, PyRegisterFinding,
-    PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage,
-    PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice,
-    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
-    PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue, PySterileRadius,
-    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
+    PyNaceIssueRow, PyP002FindingResult, PyPipeFireRupturePoint, PyPulsationModeResult,
+    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
+    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
+    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
     PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
@@ -20509,6 +20509,54 @@ impl From<&azoth_process::models::nog070_sil_determination::Nog070SilDeterminati
             achieved_sil: r.achieved_sil,
             compliant: r.compliant,
             required_pfd_reduction_factor: r.required_pfd_reduction_factor,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.norsok_p002_compliance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "NorsokP002ComplianceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyNorsokP002ComplianceResult {
+    /// one row per check, in the caller's order.
+    #[pyo3(get)]
+    pub findings: Vec<PyP002FindingResult>,
+    /// whether every finding is compliant.
+    #[pyo3(get)]
+    pub compliant: bool,
+    /// the number of non-compliant findings.
+    #[pyo3(get)]
+    pub non_compliant_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyNorsokP002ComplianceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "NorsokP002ComplianceResult(findings={:?}, compliant={:?}, non_compliant_count={:?}, {} warning(s))",
+            self.findings,
+            self.compliant,
+            self.non_compliant_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::norsok_p002_compliance::NorsokP002ComplianceResult>
+    for PyNorsokP002ComplianceResult
+{
+    fn from(r: &azoth_process::models::norsok_p002_compliance::NorsokP002ComplianceResult) -> Self {
+        Self {
+            findings: r.findings.iter().map(PyP002FindingResult::from).collect(),
+            compliant: r.compliant,
+            non_compliant_count: r.non_compliant_count,
             warnings: transport(&r.warnings),
         }
     }

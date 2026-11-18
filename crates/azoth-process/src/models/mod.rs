@@ -84,6 +84,7 @@ pub mod map_turbo_expander_compressor;
 pub mod mdmt;
 pub mod mixer;
 pub mod nog070_sil_determination;
+pub mod norsok_p002_compliance;
 pub mod overpressure;
 pub mod overpressure_acceptance;
 pub mod overpressure_protection_study;
@@ -224,6 +225,10 @@ pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expand
 pub use mdmt::{MdmtResult, mdmt};
 pub use mixer::{MixerResult, mixer};
 pub use nog070_sil_determination::{Nog070SilDeterminationResult, nog070_sil_determination};
+pub use norsok_p002_compliance::{
+    NorsokP002ComplianceResult, P002CheckRow, P002Criterion, P002FindingResult,
+    norsok_p002_compliance,
+};
 pub use overpressure_acceptance::{OverpressureAcceptanceResult, overpressure_acceptance};
 pub use overpressure_protection_study::{
     OverpressureProtectionStudyResult, OverpressureScenario, overpressure_protection_study,

@@ -380,6 +380,7 @@ Five sections, and the difference between them is the point:
 - [`process.mdmt`](./process/mdmt.md) — Minimum design metal temperature
 - [`process.mixer`](./process/mixer.md) — Mixer
 - [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
+- [`process.norsok_p002_compliance`](./process/norsok_p002_compliance.md) — NORSOK P-002 point-check compliance
 - [`process.overpressure_acceptance`](./process/overpressure_acceptance.md) — Overpressure acceptance
 - [`process.overpressure_protection_study`](./process/overpressure_protection_study.md) — Overpressure protection study
 - [`process.packed_column`](./process/packed_column.md) — Packed column

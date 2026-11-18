@@ -64,6 +64,7 @@ use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mdmt::MdmtResult;
 use crate::models::mixer::MixerResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
+use crate::models::norsok_p002_compliance::NorsokP002ComplianceResult;
 use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
 use crate::models::overpressure_protection_study::OverpressureProtectionStudyResult;
 use crate::models::packed_column::PackedColumnResult;
@@ -1410,6 +1411,16 @@ impl CalcResult for Nog070SilDeterminationResult {
         "required_pfd_reduction_factor",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for NorsokP002ComplianceResult {
+    const CALC_ID: &'static str = "process.norsok_p002_compliance";
+    const FIELDS: &'static [&'static str] =
+        &["findings", "compliant", "non_compliant_count", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

@@ -66,6 +66,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.mdmt`](./mdmt.md) | `ucs66_analytic_mdmt` | NeqSim process/safety/mdmt/MDMTCalculator.java |
 | [`process.mixer`](./mixer.md) | `direct composition` | NeqSim process/equipment/mixer/Mixer.java |
 | [`process.nog070_sil_determination`](./nog070_sil_determination.md) | `closed_form_nog070_sil_determination` | NeqSim process/safety/risk/sis/nog070/Nog070SilDetermination.java |
+| [`process.norsok_p002_compliance`](./norsok_p002_compliance.md) | `norsok_p002_point_checks` | NeqSim process/safety/compliance/NorsokP002ComplianceChecker.java |
 | [`process.overpressure_acceptance`](./overpressure_acceptance.md) | `closed_form_overpressure_acceptance` | NeqSim process/safety/overpressure/OverpressureAcceptanceChecker.java |
 | [`process.overpressure_protection_study`](./overpressure_protection_study.md) | `overpressure_protection_study` | NeqSim process/safety/overpressure/OverpressureProtectionStudy.java |
 | [`process.packed_column`](./packed_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/PackedColumn.java |

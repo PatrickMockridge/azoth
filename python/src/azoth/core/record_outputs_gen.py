@@ -742,6 +742,20 @@ class NaceIssueRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class P002FindingResult:
+    """one row per check, in the caller's order."""
+
+    #: the segment, equipment or item the check is about.
+    name: str
+
+    #: the criterion checked.
+    criterion: str
+
+    #: whether the value is at or below the limit, or the caller's flag for a recorded check.
+    compliant: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PipeFireRupturePoint:
     """one row per marching step, in time order, ending at the rupture step when one is found."""
 

@@ -54,6 +54,7 @@
 //!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/nog070_sil_determination.toml
+//!   - specs/models/process/norsok_p002_compliance.toml
 //!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/overpressure_protection_study.toml
 //!   - specs/models/process/packed_column.toml
@@ -54717,6 +54718,477 @@ pub static NOG070_SIL_DETERMINATION_SPEC: ModelSpec = ModelSpec {
     cases: NOG070_SIL_DETERMINATION_CASES,
 };
 
+static NORSOK_P002_COMPLIANCE_CHECKS: &[SpecCheck] = &[];
+
+static NORSOK_P002_COMPLIANCE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "all_pass",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("non_compliant_count", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("flare"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("flare_line_mach_07"),
+                    },
+                    RecordField {
+                        name: "mach_number",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("blowdown"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("blowdown_rho_v2"),
+                    },
+                    RecordField {
+                        name: "momentum_flux",
+                        value: FieldValue::Number(150000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("line"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("erosional_velocity"),
+                    },
+                    RecordField {
+                        name: "momentum_flux",
+                        value: FieldValue::Number(90000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("vent"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("vent_gas_velocity"),
+                    },
+                    RecordField {
+                        name: "vent_velocity",
+                        value: FieldValue::Number(50.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("separator"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("liquid_carry_over"),
+                    },
+                    RecordField {
+                        name: "carry_over_fraction",
+                        value: FieldValue::Number(0.0005),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("bdv"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("depressurisation_valve_size"),
+                    },
+                    RecordField {
+                        name: "recorded_ok",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("drain"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("drain_slope_capacity"),
+                    },
+                    RecordField {
+                        name: "recorded_ok",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "all_fail",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("non_compliant_count", 7.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("flare"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("flare_line_mach_07"),
+                    },
+                    RecordField {
+                        name: "mach_number",
+                        value: FieldValue::Number(0.8),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("blowdown"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("blowdown_rho_v2"),
+                    },
+                    RecordField {
+                        name: "momentum_flux",
+                        value: FieldValue::Number(250000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("line"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("erosional_velocity"),
+                    },
+                    RecordField {
+                        name: "momentum_flux",
+                        value: FieldValue::Number(150000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("vent"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("vent_gas_velocity"),
+                    },
+                    RecordField {
+                        name: "vent_velocity",
+                        value: FieldValue::Number(70.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("separator"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("liquid_carry_over"),
+                    },
+                    RecordField {
+                        name: "carry_over_fraction",
+                        value: FieldValue::Number(0.002),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("bdv"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("depressurisation_valve_size"),
+                    },
+                    RecordField {
+                        name: "recorded_ok",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("drain"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("drain_slope_capacity"),
+                    },
+                    RecordField {
+                        name: "recorded_ok",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "equality",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("non_compliant_count", 0.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("flare"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("flare_line_mach_07"),
+                    },
+                    RecordField {
+                        name: "mach_number",
+                        value: FieldValue::Number(0.7),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("blowdown"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("blowdown_rho_v2"),
+                    },
+                    RecordField {
+                        name: "momentum_flux",
+                        value: FieldValue::Number(200000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("line"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("erosional_velocity"),
+                    },
+                    RecordField {
+                        name: "momentum_flux",
+                        value: FieldValue::Number(100000.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("vent"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("vent_gas_velocity"),
+                    },
+                    RecordField {
+                        name: "vent_velocity",
+                        value: FieldValue::Number(60.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("separator"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("liquid_carry_over"),
+                    },
+                    RecordField {
+                        name: "carry_over_fraction",
+                        value: FieldValue::Number(0.001),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "custom_limits",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("non_compliant_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("flare"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("flare_line_mach_07"),
+                    },
+                    RecordField {
+                        name: "mach_number",
+                        value: FieldValue::Number(0.6),
+                    },
+                    RecordField {
+                        name: "mach_limit",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("vent"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("vent_gas_velocity"),
+                    },
+                    RecordField {
+                        name: "vent_velocity",
+                        value: FieldValue::Number(25.0),
+                    },
+                    RecordField {
+                        name: "vent_velocity_limit",
+                        value: FieldValue::Number(30.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "recorded",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("non_compliant_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "checks",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("bdv"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("depressurisation_valve_size"),
+                    },
+                    RecordField {
+                        name: "recorded_ok",
+                        value: FieldValue::Flag(true),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("drain"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("drain_slope_capacity"),
+                    },
+                    RecordField {
+                        name: "recorded_ok",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static NORSOK_P002_COMPLIANCE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "norsok_p002_point_checks",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.norsok_p002_compliance`.
+pub static NORSOK_P002_COMPLIANCE_SPEC: ModelSpec = ModelSpec {
+    id: "process.norsok_p002_compliance",
+    kind: "procedure",
+    algorithm: Some(&NORSOK_P002_COMPLIANCE_ALGORITHM),
+    checks: NORSOK_P002_COMPLIANCE_CHECKS,
+    cases: NORSOK_P002_COMPLIANCE_CASES,
+};
+
 static OVERPRESSURE_ACCEPTANCE_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -86359,6 +86831,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &MDMT_SPEC,
     &MIXER_SPEC,
     &NOG070_SIL_DETERMINATION_SPEC,
+    &NORSOK_P002_COMPLIANCE_SPEC,
     &OVERPRESSURE_ACCEPTANCE_SPEC,
     &OVERPRESSURE_PROTECTION_STUDY_SPEC,
     &PACKED_COLUMN_SPEC,

@@ -557,6 +557,33 @@ pub struct OverpressureScenario {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct P002CheckRow {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub criterion: String,
+    #[pyo3(item)]
+    pub mach_number: Option<f64>,
+    #[pyo3(item)]
+    pub mach_limit: Option<f64>,
+    #[pyo3(item)]
+    pub momentum_flux: Option<f64>,
+    #[pyo3(item)]
+    pub momentum_flux_limit: Option<f64>,
+    #[pyo3(item)]
+    pub vent_velocity: Option<f64>,
+    #[pyo3(item)]
+    pub vent_velocity_limit: Option<f64>,
+    #[pyo3(item)]
+    pub carry_over_fraction: Option<f64>,
+    #[pyo3(item)]
+    pub carry_over_limit: Option<f64>,
+    #[pyo3(item)]
+    pub recorded_ok: Option<bool>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct PerformanceStandardRow {
     #[pyo3(item)]
     pub id: String,

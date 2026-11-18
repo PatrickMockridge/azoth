@@ -1,0 +1,74 @@
+model = "process.norsok_p002_compliance"
+[[cases]]
+id = "all_pass"
+tolerance = 1.0e-12
+source = "Seven checks under their defaults: a 0.5 Mach flare line, 150000 and 90000 Pa momentum fluxes, 50 m/s vent, 5e-4 carry-over and two recorded passes. From `validation/neqsim/captures/process_norsok_p002_compliance.tsv` (`p002_all_pass`)."
+[cases.inputs]
+checks = [
+  { name = "flare", criterion = "flare_line_mach_07", mach_number = 0.5 },
+  { name = "blowdown", criterion = "blowdown_rho_v2", momentum_flux = 150000.0 },
+  { name = "line", criterion = "erosional_velocity", momentum_flux = 90000.0 },
+  { name = "vent", criterion = "vent_gas_velocity", vent_velocity = 50.0 },
+  { name = "separator", criterion = "liquid_carry_over", carry_over_fraction = 5.0e-4 },
+  { name = "bdv", criterion = "depressurisation_valve_size", recorded_ok = true },
+  { name = "drain", criterion = "drain_slope_capacity", recorded_ok = true },
+]
+[cases.expected]
+compliant = true
+non_compliant_count = 0.0
+[[cases]]
+id = "all_fail"
+tolerance = 1.0e-12
+source = "The same seven checks above their defaults fail together. From (`p002_all_fail`)."
+[cases.inputs]
+checks = [
+  { name = "flare", criterion = "flare_line_mach_07", mach_number = 0.8 },
+  { name = "blowdown", criterion = "blowdown_rho_v2", momentum_flux = 250000.0 },
+  { name = "line", criterion = "erosional_velocity", momentum_flux = 150000.0 },
+  { name = "vent", criterion = "vent_gas_velocity", vent_velocity = 70.0 },
+  { name = "separator", criterion = "liquid_carry_over", carry_over_fraction = 2.0e-3 },
+  { name = "bdv", criterion = "depressurisation_valve_size", recorded_ok = false },
+  { name = "drain", criterion = "drain_slope_capacity", recorded_ok = false },
+]
+[cases.expected]
+compliant = false
+non_compliant_count = 7.0
+[[cases]]
+id = "equality"
+tolerance = 1.0e-12
+source = "Every numeric check exactly at its default limit passes, because the comparison is inclusive. From (`p002_equality`)."
+[cases.inputs]
+checks = [
+  { name = "flare", criterion = "flare_line_mach_07", mach_number = 0.7 },
+  { name = "blowdown", criterion = "blowdown_rho_v2", momentum_flux = 200000.0 },
+  { name = "line", criterion = "erosional_velocity", momentum_flux = 100000.0 },
+  { name = "vent", criterion = "vent_gas_velocity", vent_velocity = 60.0 },
+  { name = "separator", criterion = "liquid_carry_over", carry_over_fraction = 1.0e-3 },
+]
+[cases.expected]
+compliant = true
+non_compliant_count = 0.0
+[[cases]]
+id = "custom_limits"
+tolerance = 1.0e-12
+source = "A 0.6 Mach against a stated 0.5 limit fails, while 25 m/s against 30 passes. From (`p002_custom_limits`)."
+[cases.inputs]
+checks = [
+  { name = "flare", criterion = "flare_line_mach_07", mach_number = 0.6, mach_limit = 0.5 },
+  { name = "vent", criterion = "vent_gas_velocity", vent_velocity = 25.0, vent_velocity_limit = 30.0 },
+]
+[cases.expected]
+compliant = false
+non_compliant_count = 1.0
+[[cases]]
+id = "recorded"
+tolerance = 1.0e-12
+source = "One recorded valve pass and one drain failure. From (`p002_recorded`)."
+[cases.inputs]
+checks = [
+  { name = "bdv", criterion = "depressurisation_valve_size", recorded_ok = true },
+  { name = "drain", criterion = "drain_slope_capacity", recorded_ok = false },
+]
+[cases.expected]
+compliant = false
+non_compliant_count = 1.0

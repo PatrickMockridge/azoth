@@ -219,12 +219,14 @@ from azoth.core.result import (
     NaceIssueRow,
     NitricSulfuricAcidVaporPressureResult,
     Nog070SilDeterminationResult,
+    NorsokP002ComplianceResult,
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
     OrificeFlowResult,
     OverallVerdict,
     OverpressureAcceptanceResult,
     OverpressureProtectionStudyResult,
+    P002FindingResult,
     PackedColumnResult,
     PackingHydraulicsResult,
     PackingSizingResult,
@@ -636,6 +638,7 @@ __all__ = [
     "multiflash_stability_test",
     "nitric_sulfuric_acid_vapor_pressure",
     "nog070_sil_determination",
+    "norsok_p002_compliance",
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
     "orifice_flow",
@@ -7561,6 +7564,20 @@ def nog070_sil_determination(sif_type: str, pfd_average: float, minimum_sil: flo
         achieved_sil=result.achieved_sil,
         compliant=result.compliant,
         required_pfd_reduction_factor=result.required_pfd_reduction_factor,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def norsok_p002_compliance(checks: list[dict[str, object]]) -> NorsokP002ComplianceResult:
+    """``process.norsok_p002_compliance``, computed in Rust."""
+    spec = _models_gen.model("process.norsok_p002_compliance")
+    result = _core.norsok_p002_compliance(
+        input_records_to_si(spec, "checks", checks),
+    )
+    return NorsokP002ComplianceResult(
+        findings=tuple(P002FindingResult(name=c.name, criterion=c.criterion, compliant=c.compliant) for c in result.findings),
+        compliant=result.compliant,
+        non_compliant_count=result.non_compliant_count,
         warnings=_warnings(result.warnings),
     )
 

@@ -72,6 +72,7 @@ from azoth.core.result import (
     MdmtResult,
     MixerResult,
     Nog070SilDeterminationResult,
+    NorsokP002ComplianceResult,
     OverpressureAcceptanceResult,
     OverpressureProtectionStudyResult,
     PackedColumnResult,
@@ -188,6 +189,7 @@ __all__ = [
     "mdmt",
     "mixer",
     "nog070_sil_determination",
+    "norsok_p002_compliance",
     "overpressure_acceptance",
     "packed_column",
     "pfp_demand",
@@ -270,6 +272,7 @@ _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
+_NORSOK_P002_COMPLIANCE = "process.norsok_p002_compliance"
 _MDMT = "process.mdmt"
 _PIPING_FIV_GAS = "process.piping_fiv_gas"
 _PIPING_FIV_LIQUID = "process.piping_fiv_liquid"
@@ -1870,6 +1873,23 @@ def flow_induced_pulsation_screening(
         termination=termination,
         strouhal_number=strouhal_number,
         mode_count=mode_count,
+    )
+
+
+def norsok_p002_compliance(
+    checks: list[dict[str, object]],
+) -> NorsokP002ComplianceResult:
+    """The NORSOK P-002 point checks and their findings.
+
+    Each numeric check is ``value <= limit``, so equality passes; the defaults are the
+    class's. The two recorded criteria read only the caller's pass flag, and a row states
+    only the field its criterion reads. **A passing report covers the supplied checks
+    alone**, not conformity with the whole standard.
+
+    See :func:`azoth.process.reference.norsok_p002_compliance`.
+    """
+    return resolve(_NORSOK_P002_COMPLIANCE)(  # type: ignore[no-any-return]
+        checks=checks,
     )
 
 

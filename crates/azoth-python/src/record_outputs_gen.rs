@@ -2019,6 +2019,48 @@ impl From<&azoth_thermal::results::NaceIssueRow> for PyNaceIssueRow {
     }
 }
 
+/// one row per check, in the caller's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "P002FindingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyP002FindingResult {
+    /// the segment, equipment or item the check is about.
+    #[pyo3(get)]
+    pub name: String,
+    /// the criterion checked.
+    #[pyo3(get)]
+    pub criterion: String,
+    /// whether the value is at or below the limit, or the caller's flag for a recorded check.
+    #[pyo3(get)]
+    pub compliant: bool,
+}
+
+#[pymethods]
+impl PyP002FindingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "P002FindingResult(name={}, criterion={}, compliant={:?})",
+            self.name, self.criterion, self.compliant
+        )
+    }
+}
+
+impl From<&azoth_process::models::norsok_p002_compliance::P002FindingResult>
+    for PyP002FindingResult
+{
+    fn from(row: &azoth_process::models::norsok_p002_compliance::P002FindingResult) -> Self {
+        Self {
+            name: row.name.clone(),
+            criterion: row.criterion.as_str().to_string(),
+            compliant: row.compliant,
+        }
+    }
+}
+
 /// one row per marching step, in time order, ending at the rupture step when one is found.
 #[pyclass(
     frozen,

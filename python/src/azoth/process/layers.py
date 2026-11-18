@@ -1757,6 +1757,32 @@ def _acoustic_induced_vibration_screening(inputs: Mapping[str, Any]) -> dict[str
     }
 
 
+def _norsok_p002_compliance(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.norsok_p002_compliance`'s layers, from the reference's arithmetic.
+
+    The findings are rows held by the cases; the non-compliant count is the numeric layer.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.norsok_p002_compliance import (
+        norsok_p002_compliance as evaluate,
+    )
+
+    rows: list[dict[str, object]] = []
+    for row in inputs["checks"]:
+        converted = dict(row)
+        for field, unit in (
+            ("momentum_flux", "Pa"),
+            ("momentum_flux_limit", "Pa"),
+            ("vent_velocity", "m/s"),
+            ("vent_velocity_limit", "m/s"),
+        ):
+            if converted.get(field) is not None:
+                converted[field] = quantity(float(converted[field]), unit)
+        rows.append(converted)
+    result = evaluate(rows)
+    return {"non_compliant_count": result.non_compliant_count}
+
+
 def _flow_induced_pulsation_screening(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.flow_induced_pulsation_screening`'s layers, from the reference's arithmetic.
 
@@ -3768,6 +3794,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.mdmt": _mdmt,
     "process.acoustic_induced_vibration_screening": _acoustic_induced_vibration_screening,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
+    "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.piping_fiv_gas": _piping_fiv_gas,
     "process.piping_fiv_liquid": _piping_fiv_liquid,
     "process.vacuum_collapse": _vacuum_collapse,
@@ -4858,6 +4885,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_mdmt.tsv",
         block=1,
         identified_by=("#label", "mdmt_curve_b_25"),
+    ),
+    # NORSOK P-002's one: all seven checks passing. The four further cases and the empty
+    # checker are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.norsok_p002_compliance",
+        case="all_pass",
+        capture="process_norsok_p002_compliance.tsv",
+        block=0,
+        identified_by=("#label", "p002_all_pass"),
     ),
     # Pulsation's one: the closed unlocked branch. The eleven further states and the ten
     # refusals are declared in `UNCASED_ROWS`.
@@ -7744,6 +7780,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_acoustic_induced_vibration_screening.tsv": 18,
     # Pulsation's twenty-one: the eleven further model states and the ten refusals.
     "process_flow_induced_pulsation_screening.tsv": 21,
+    # NORSOK P-002's five: the all-fail, equality, custom-limit and recorded cases, and the
+    # empty checker the row-list schema cannot state.
+    "process_norsok_p002_compliance.tsv": 5,
     # Gas-line FIV's thirteen: the eight further model states and the five refusals.
     "process_piping_fiv_gas.tsv": 13,
     # Liquid-line FIV's nine: the five further model states and the four refusals.

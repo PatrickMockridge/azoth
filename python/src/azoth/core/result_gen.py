@@ -52,6 +52,7 @@ from azoth.core.record_outputs_gen import (
     MineralEquilibriumRow,
     MinimalCutSet,
     NaceIssueRow,
+    P002FindingResult,
     PipeFireRupturePoint,
     PulsationModeResult,
     RegisterFinding,
@@ -8287,6 +8288,25 @@ class Nog070SilDeterminationResult(_HasWarnings):
 
     #: `10^(minimum - achieved)`, published only when the SIF is not compliant.
     required_pfd_reduction_factor: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class NorsokP002ComplianceResult(_HasWarnings):
+    """Result of ``process.norsok_p002_compliance``."""
+
+    CALC_ID: ClassVar[str] = "process.norsok_p002_compliance"
+
+    #: one row per check, in the caller's order.
+    findings: tuple[P002FindingResult, ...]
+
+    #: whether every finding is compliant.
+    compliant: bool
+
+    #: the number of non-compliant findings.
+    non_compliant_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]
