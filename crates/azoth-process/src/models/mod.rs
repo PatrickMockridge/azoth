@@ -91,6 +91,8 @@ pub mod pipe;
 pub mod pipe_fire_rupture;
 pub mod pipe_fire_rupture_material;
 pub mod pipeline_pressure_protection;
+pub mod piping_fiv_gas;
+pub mod piping_fiv_liquid;
 pub mod plug_flow_reactor;
 pub mod pool_fire;
 pub mod porous_media_self_heating;
@@ -230,6 +232,8 @@ pub use pipe_fire_rupture_material::{
 pub use pipeline_pressure_protection::{
     PipelinePressureProtectionResult, pipeline_pressure_protection,
 };
+pub use piping_fiv_gas::{FivLikelihood, PipingFivGasResult, piping_fiv_gas};
+pub use piping_fiv_liquid::{PipingFivLiquidResult, piping_fiv_liquid};
 pub use plug_flow_reactor::{PlugFlowReactorResult, plug_flow_reactor};
 pub use pool_fire::{PoolFireResult, pool_fire};
 pub use porous_media_self_heating::{PorousMediaSelfHeatingResult, porous_media_self_heating};

@@ -7444,6 +7444,65 @@ pub fn pipeline_pressure_protection(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Gas-line flow-induced vibration screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (density, velocity, outside_diameter, wall_thickness, branch_count, pulsation_factor, support_quality_factor))]
+#[pyo3(
+    text_signature = "(density, velocity, outside_diameter, wall_thickness, branch_count, pulsation_factor, support_quality_factor)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn piping_fiv_gas(
+    py: Python<'_>,
+    density: f64,
+    velocity: f64,
+    outside_diameter: f64,
+    wall_thickness: f64,
+    branch_count: f64,
+    pulsation_factor: f64,
+    support_quality_factor: f64,
+) -> PyResult<crate::transport_gen::PyPipingFivGasResult> {
+    azoth_process::models::piping_fiv_gas::piping_fiv_gas(
+        kilograms_per_cubic_meter(density),
+        meters_per_second(velocity),
+        meters(outside_diameter),
+        meters(wall_thickness),
+        branch_count,
+        pulsation_factor,
+        support_quality_factor,
+    )
+    .map(|r| crate::transport_gen::PyPipingFivGasResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Liquid-line flow-induced vibration screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (velocity, outside_diameter, wall_thickness, branch_count, support_quality_factor))]
+#[pyo3(
+    text_signature = "(velocity, outside_diameter, wall_thickness, branch_count, support_quality_factor)"
+)]
+pub fn piping_fiv_liquid(
+    py: Python<'_>,
+    velocity: f64,
+    outside_diameter: f64,
+    wall_thickness: f64,
+    branch_count: f64,
+    support_quality_factor: f64,
+) -> PyResult<crate::transport_gen::PyPipingFivLiquidResult> {
+    azoth_process::models::piping_fiv_liquid::piping_fiv_liquid(
+        meters_per_second(velocity),
+        meters(outside_diameter),
+        meters(wall_thickness),
+        branch_count,
+        support_quality_factor,
+    )
+    .map(|r| crate::transport_gen::PyPipingFivLiquidResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Pool fire radiation.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

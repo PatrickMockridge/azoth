@@ -1730,6 +1730,62 @@ def _mdmt(inputs: Mapping[str, Any]) -> dict[str, float]:
     return {"mdmt_c": solution.mdmt_k - 273.15, "mdmt_k": solution.mdmt_k}
 
 
+def _piping_fiv_gas(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.piping_fiv_gas`'s layers, from the reference's arithmetic.
+
+    The likelihood is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.piping_fiv_gas import _evaluate
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["density"]), "kg/m**3"),
+        quantity(float(inputs["velocity"]), "m/s"),
+        quantity(float(inputs["outside_diameter"]), "m"),
+        quantity(float(inputs["wall_thickness"]), "m"),
+        float(inputs["branch_count"]),
+        float(inputs["pulsation_factor"]),
+        float(inputs["support_quality_factor"]),
+    )
+    return {
+        "lof": solution.lof,
+        "rho_v2_pa": solution.rho_v2,
+        "d_over_t": solution.d_overt,
+        "d_over_t_factor": solution.d_overt_factor,
+        "branch_factor": solution.branch_factor,
+        "pulsation_factor_applied": solution.pulsation,
+        "support_quality_factor_applied": solution.support,
+        "energy_term": solution.energy_term,
+    }
+
+
+def _piping_fiv_liquid(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.piping_fiv_liquid`'s layers, from the reference's arithmetic.
+
+    The likelihood is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.piping_fiv_liquid import _evaluate
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["velocity"]), "m/s"),
+        quantity(float(inputs["outside_diameter"]), "m"),
+        quantity(float(inputs["wall_thickness"]), "m"),
+        float(inputs["branch_count"]),
+        float(inputs["support_quality_factor"]),
+    )
+    return {
+        "lof": solution.lof,
+        "d_over_t": solution.d_overt,
+        "d_over_t_factor": solution.d_overt_factor,
+        "branch_factor": solution.branch_factor,
+        "support_quality_factor_applied": solution.support,
+        "energy_term": solution.energy_term,
+    }
+
+
 def _runaway_reaction(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.runaway_reaction`'s layers, from the reference's arithmetic.
 
@@ -3643,6 +3699,8 @@ DUMPERS: dict[str, Dumper] = {
     "process.pump_deadhead": _pump_deadhead,
     "process.runaway_reaction": _runaway_reaction,
     "process.mdmt": _mdmt,
+    "process.piping_fiv_gas": _piping_fiv_gas,
+    "process.piping_fiv_liquid": _piping_fiv_liquid,
     "process.vacuum_collapse": _vacuum_collapse,
     "process.settle_out_pressure": _settle_out_pressure,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
@@ -4731,6 +4789,24 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_mdmt.tsv",
         block=1,
         identified_by=("#label", "mdmt_curve_b_25"),
+    ),
+    # Gas-line FIV's one: the low state. The three band boundaries, the D/t and branch
+    # factors, the two clamps and the refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.piping_fiv_gas",
+        case="gas_low",
+        capture="process_piping_fiv_gas.tsv",
+        block=0,
+        identified_by=("#label", "fiv_gas_low"),
+    ),
+    # Liquid-line FIV's one: the low state. The three band boundaries, the branch factor,
+    # the support clamp and the refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.piping_fiv_liquid",
+        case="liquid_low",
+        capture="process_piping_fiv_liquid.tsv",
+        block=0,
+        identified_by=("#label", "fiv_liquid_low"),
     ),
     # Runaway reaction's one: the no-MAT low state. The six further cases are the severity
     # bands, the MAT verdicts, the gassy state and the TMR; the unit aliases are declared in
@@ -7576,6 +7652,10 @@ UNCASED_ROWS: dict[str, int] = {
     "process_vacuum_collapse.tsv": 7,
     # MDMT's nine: the seven further model cases and the unit aliases.
     "process_mdmt.tsv": 9,
+    # Gas-line FIV's thirteen: the eight further model states and the five refusals.
+    "process_piping_fiv_gas.tsv": 13,
+    # Liquid-line FIV's nine: the five further model states and the four refusals.
+    "process_piping_fiv_liquid.tsv": 9,
     # Runaway reaction's seven: the six further model cases and the unit aliases.
     "process_runaway_reaction.tsv": 7,
     # Pump deadhead's seven: the six further model cases and the unit aliases.

@@ -21370,6 +21370,153 @@ impl From<&azoth_process::models::pipeline_pressure_protection::PipelinePressure
         }
     }
 }
+/// Result of `process.piping_fiv_gas`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipingFivGasResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipingFivGasResult {
+    /// the normalised likelihood of failure.
+    #[pyo3(get)]
+    pub lof: f64,
+    /// the AVIFF likelihood band.
+    #[pyo3(get)]
+    pub likelihood: String,
+    /// the gas momentum flux `rho v^2`.
+    #[pyo3(get)]
+    pub rho_v2: PyQty,
+    /// the outside-diameter-to-wall-thickness ratio.
+    #[pyo3(get)]
+    pub d_overt: f64,
+    /// the D/t factor, floored at one for a ratio at or below 40.
+    #[pyo3(get)]
+    pub d_overt_factor: f64,
+    /// the branch factor `1 + 0.15 n`.
+    #[pyo3(get)]
+    pub branch_factor: f64,
+    /// the pulsation factor after the clamp.
+    #[pyo3(get)]
+    pub pulsation_factor_applied: f64,
+    /// the support-quality factor after the clamp.
+    #[pyo3(get)]
+    pub support_quality_factor_applied: f64,
+    /// the momentum flux normalised by 50000 Pa.
+    #[pyo3(get)]
+    pub energy_term: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPipingFivGasResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipingFivGasResult(lof={:?}, likelihood={:?}, rho_v2={:?}, d_overt={:?}, d_overt_factor={:?}, branch_factor={:?}, pulsation_factor_applied={:?}, support_quality_factor_applied={:?}, energy_term={:?}, {} warning(s))",
+            self.lof,
+            self.likelihood,
+            self.rho_v2,
+            self.d_overt,
+            self.d_overt_factor,
+            self.branch_factor,
+            self.pulsation_factor_applied,
+            self.support_quality_factor_applied,
+            self.energy_term,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::piping_fiv_gas::PipingFivGasResult> for PyPipingFivGasResult {
+    fn from(r: &azoth_process::models::piping_fiv_gas::PipingFivGasResult) -> Self {
+        Self {
+            lof: r.lof,
+            likelihood: r.likelihood.as_str().to_string(),
+            rho_v2: PyQty {
+                magnitude_si: r.rho_v2.value,
+                unit: "Pa".to_string(),
+            },
+            d_overt: r.d_overt,
+            d_overt_factor: r.d_overt_factor,
+            branch_factor: r.branch_factor,
+            pulsation_factor_applied: r.pulsation_factor_applied,
+            support_quality_factor_applied: r.support_quality_factor_applied,
+            energy_term: r.energy_term,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.piping_fiv_liquid`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PipingFivLiquidResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPipingFivLiquidResult {
+    /// the normalised likelihood of failure.
+    #[pyo3(get)]
+    pub lof: f64,
+    /// the AVIFF likelihood band.
+    #[pyo3(get)]
+    pub likelihood: String,
+    /// the outside-diameter-to-wall-thickness ratio.
+    #[pyo3(get)]
+    pub d_overt: f64,
+    /// the D/t factor, floored at one for a ratio at or below 40.
+    #[pyo3(get)]
+    pub d_overt_factor: f64,
+    /// the branch factor `1 + 0.10 n`.
+    #[pyo3(get)]
+    pub branch_factor: f64,
+    /// the support-quality factor after the clamp.
+    #[pyo3(get)]
+    pub support_quality_factor_applied: f64,
+    /// the velocity normalised by 6 m/s.
+    #[pyo3(get)]
+    pub energy_term: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPipingFivLiquidResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PipingFivLiquidResult(lof={:?}, likelihood={:?}, d_overt={:?}, d_overt_factor={:?}, branch_factor={:?}, support_quality_factor_applied={:?}, energy_term={:?}, {} warning(s))",
+            self.lof,
+            self.likelihood,
+            self.d_overt,
+            self.d_overt_factor,
+            self.branch_factor,
+            self.support_quality_factor_applied,
+            self.energy_term,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::piping_fiv_liquid::PipingFivLiquidResult>
+    for PyPipingFivLiquidResult
+{
+    fn from(r: &azoth_process::models::piping_fiv_liquid::PipingFivLiquidResult) -> Self {
+        Self {
+            lof: r.lof,
+            likelihood: r.likelihood.as_str().to_string(),
+            d_overt: r.d_overt,
+            d_overt_factor: r.d_overt_factor,
+            branch_factor: r.branch_factor,
+            support_quality_factor_applied: r.support_quality_factor_applied,
+            energy_term: r.energy_term,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.plug_flow_reactor`, transported.
 #[pyclass(
     frozen,

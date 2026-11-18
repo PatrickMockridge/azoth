@@ -60,6 +60,8 @@
 //!   - specs/models/process/pipe_fire_rupture.toml
 //!   - specs/models/process/pipe_fire_rupture_material.toml
 //!   - specs/models/process/pipeline_pressure_protection.toml
+//!   - specs/models/process/piping_fiv_gas.toml
+//!   - specs/models/process/piping_fiv_liquid.toml
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/porous_media_self_heating.toml

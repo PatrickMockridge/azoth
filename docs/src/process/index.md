@@ -72,6 +72,8 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.pipe_fire_rupture`](./pipe_fire_rupture.md) | `strain_rate_pipe_fire_rupture` | NeqSim process/safety/rupture/PipeFireRuptureStudy.java |
 | [`process.pipe_fire_rupture_material`](./pipe_fire_rupture_material.md) | `sellars_tegart_pipe_material_curves` | NeqSim process/safety/rupture/PipeFireRuptureMaterial.java |
 | [`process.pipeline_pressure_protection`](./pipeline_pressure_protection.md) | `closed_form_pipeline_pressure_protection` | NeqSim process/safety/overpressure/PipelinePressureProtectionCalculator.java |
+| [`process.piping_fiv_gas`](./piping_fiv_gas.md) | `aviff_gas_likelihood_of_failure` | NeqSim process/safety/vibration/PipingFivScreening.java |
+| [`process.piping_fiv_liquid`](./piping_fiv_liquid.md) | `aviff_liquid_likelihood_of_failure` | NeqSim process/safety/vibration/PipingFivScreening.java |
 | [`process.plug_flow_reactor`](./plug_flow_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/PlugFlowReactor.java |
 | [`process.pool_fire`](./pool_fire.md) | `api521_mudan_pool_fire` | NeqSim process/safety/fire/PoolFireModel.java |
 | [`process.porous_media_self_heating`](./porous_media_self_heating.md) | `frank_kamenetskii_criticality` | NeqSim process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.java |

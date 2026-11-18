@@ -4347,6 +4347,30 @@ class PipelinePressureProtectionResult:
     warnings: list[Warning]
 
 @final
+class PipingFivGasResult:
+    lof: float
+    likelihood: str
+    rho_v2: Qty
+    d_overt: float
+    d_overt_factor: float
+    branch_factor: float
+    pulsation_factor_applied: float
+    support_quality_factor_applied: float
+    energy_term: float
+    warnings: list[Warning]
+
+@final
+class PipingFivLiquidResult:
+    lof: float
+    likelihood: str
+    d_overt: float
+    d_overt_factor: float
+    branch_factor: float
+    support_quality_factor_applied: float
+    energy_term: float
+    warnings: list[Warning]
+
+@final
 class PlugFlowReactorResult:
     product_n: Qty
     product_z: list[float]
@@ -8206,6 +8230,22 @@ def pipeline_pressure_protection(
     barrier1_setpoint: float,
     barrier2_setpoint: float,
 ) -> PipelinePressureProtectionResult: ...
+def piping_fiv_gas(
+    density: float,
+    velocity: float,
+    outside_diameter: float,
+    wall_thickness: float,
+    branch_count: float,
+    pulsation_factor: float,
+    support_quality_factor: float,
+) -> PipingFivGasResult: ...
+def piping_fiv_liquid(
+    velocity: float,
+    outside_diameter: float,
+    wall_thickness: float,
+    branch_count: float,
+    support_quality_factor: float,
+) -> PipingFivLiquidResult: ...
 def plug_flow_reactor(
     components: list[str],
     feed_n: float,

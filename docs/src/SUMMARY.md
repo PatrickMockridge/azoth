@@ -294,6 +294,8 @@
   - [Pipe fire rupture](./process/pipe_fire_rupture.md)
   - [Pipe fire-rupture material](./process/pipe_fire_rupture_material.md)
   - [Pipeline pressure protection](./process/pipeline_pressure_protection.md)
+  - [Gas-line flow-induced vibration screening](./process/piping_fiv_gas.md)
+  - [Liquid-line flow-induced vibration screening](./process/piping_fiv_liquid.md)
   - [Plug-flow reactor](./process/plug_flow_reactor.md)
   - [Pool fire radiation](./process/pool_fire.md)
   - [Porous media self-heating](./process/porous_media_self_heating.md)

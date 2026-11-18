@@ -70,6 +70,8 @@ use crate::models::pipe::PipeResult;
 use crate::models::pipe_fire_rupture::PipeFireRuptureResult;
 use crate::models::pipe_fire_rupture_material::PipeFireRuptureMaterialResult;
 use crate::models::pipeline_pressure_protection::PipelinePressureProtectionResult;
+use crate::models::piping_fiv_gas::PipingFivGasResult;
+use crate::models::piping_fiv_liquid::PipingFivLiquidResult;
 use crate::models::plug_flow_reactor::PlugFlowReactorResult;
 use crate::models::pool_fire::PoolFireResult;
 use crate::models::porous_media_self_heating::PorousMediaSelfHeatingResult;
@@ -1560,6 +1562,44 @@ impl CalcResult for PipelinePressureProtectionResult {
         "barrier2_adequate",
         "protection_adequate",
         "verdict",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PipingFivGasResult {
+    const CALC_ID: &'static str = "process.piping_fiv_gas";
+    const FIELDS: &'static [&'static str] = &[
+        "lof",
+        "likelihood",
+        "rho_v2",
+        "d_overt",
+        "d_overt_factor",
+        "branch_factor",
+        "pulsation_factor_applied",
+        "support_quality_factor_applied",
+        "energy_term",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PipingFivLiquidResult {
+    const CALC_ID: &'static str = "process.piping_fiv_liquid";
+    const FIELDS: &'static [&'static str] = &[
+        "lof",
+        "likelihood",
+        "d_overt",
+        "d_overt_factor",
+        "branch_factor",
+        "support_quality_factor_applied",
+        "energy_term",
         "warnings",
     ];
 

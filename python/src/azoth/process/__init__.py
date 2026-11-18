@@ -78,6 +78,8 @@ from azoth.core.result import (
     PipeFireRuptureResult,
     PipelinePressureProtectionResult,
     PipeResult,
+    PipingFivGasResult,
+    PipingFivLiquidResult,
     PlugFlowReactorResult,
     PoolFireResult,
     PorousMediaSelfHeatingResult,
@@ -189,6 +191,8 @@ __all__ = [
     "pipe_fire_rupture",
     "pipe_fire_rupture_material",
     "pipeline_pressure_protection",
+    "piping_fiv_gas",
+    "piping_fiv_liquid",
     "plug_flow_reactor",
     "pool_fire",
     "probit",
@@ -261,6 +265,8 @@ _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _MDMT = "process.mdmt"
+_PIPING_FIV_GAS = "process.piping_fiv_gas"
+_PIPING_FIV_LIQUID = "process.piping_fiv_liquid"
 _VACUUM_COLLAPSE = "process.vacuum_collapse"
 _VCE = "process.vce"
 _FILTER = "process.filter"
@@ -1797,6 +1803,56 @@ def mdmt(
         governing_thickness=governing_thickness,
         stress_ratio=stress_ratio,
         min_operating_temperature=min_operating_temperature,
+    )
+
+
+def piping_fiv_gas(
+    density: Q,
+    velocity: Q,
+    outside_diameter: Q,
+    wall_thickness: Q,
+    branch_count: float,
+    pulsation_factor: float,
+    support_quality_factor: float,
+) -> PipingFivGasResult:
+    """The gas-line flow-induced-vibration likelihood of failure.
+
+    The pulsation factor is clamped to ``[1, 4]`` and the support-quality factor to
+    ``[1, 3]``; the bands are exclusive upward, so 0.3 is medium, 0.5 high and 1.0 very high.
+
+    See :func:`azoth.process.reference.piping_fiv_gas`.
+    """
+    return resolve(_PIPING_FIV_GAS)(  # type: ignore[no-any-return]
+        density=density,
+        velocity=velocity,
+        outside_diameter=outside_diameter,
+        wall_thickness=wall_thickness,
+        branch_count=branch_count,
+        pulsation_factor=pulsation_factor,
+        support_quality_factor=support_quality_factor,
+    )
+
+
+def piping_fiv_liquid(
+    velocity: Q,
+    outside_diameter: Q,
+    wall_thickness: Q,
+    branch_count: float,
+    support_quality_factor: float,
+) -> PipingFivLiquidResult:
+    """The liquid-line flow-induced-vibration likelihood of failure.
+
+    The support-quality factor is clamped to ``[1, 3]``; the bands are exclusive upward, so
+    0.3 is medium, 0.5 high and 1.0 very high.
+
+    See :func:`azoth.process.reference.piping_fiv_liquid`.
+    """
+    return resolve(_PIPING_FIV_LIQUID)(  # type: ignore[no-any-return]
+        velocity=velocity,
+        outside_diameter=outside_diameter,
+        wall_thickness=wall_thickness,
+        branch_count=branch_count,
+        support_quality_factor=support_quality_factor,
     )
 
 

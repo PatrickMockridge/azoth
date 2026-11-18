@@ -41,6 +41,8 @@ pub const NATIVE: &[&str] = &[
     "process.overpressure_acceptance",
     "process.pfp_demand",
     "process.pipeline_pressure_protection",
+    "process.piping_fiv_gas",
+    "process.piping_fiv_liquid",
     "process.pool_fire",
     "process.probit",
     "process.psv_fire_sizing",
@@ -168,6 +170,22 @@ pub fn required(id: &str) -> Option<&'static [&'static str]> {
             "min_operating_temperature",
         ],
         "process.pump_deadhead" => &["suction_pressure", "normal_discharge_pressure"],
+        "process.piping_fiv_gas" => &[
+            "density",
+            "velocity",
+            "outside_diameter",
+            "wall_thickness",
+            "branch_count",
+            "pulsation_factor",
+            "support_quality_factor",
+        ],
+        "process.piping_fiv_liquid" => &[
+            "velocity",
+            "outside_diameter",
+            "wall_thickness",
+            "branch_count",
+            "support_quality_factor",
+        ],
         "process.runaway_reaction" => &[
             "process_temperature",
             "reaction_enthalpy",
@@ -224,6 +242,8 @@ fn arm(id: &str, inputs: &Value) -> Result<Outcome, Outcome> {
         "process.psv_sizing" => psv_sizing(inputs),
         "process.gas_blowby" => gas_blowby(inputs),
         "process.mdmt" => mdmt(inputs),
+        "process.piping_fiv_gas" => piping_fiv_gas(inputs),
+        "process.piping_fiv_liquid" => piping_fiv_liquid(inputs),
         "process.pump_deadhead" => pump_deadhead(inputs),
         "process.runaway_reaction" => runaway_reaction(inputs),
         "process.s001_secondary_pressure_protection" => s001_secondary_pressure_protection(inputs),
@@ -1575,6 +1595,90 @@ fn mdmt(inputs: &Value) -> Result<Outcome, Outcome> {
                 let mut outputs = BTreeMap::new();
                 quantity(&mut outputs, "mdmt", result.mdmt.value, "K");
                 outputs.insert("acceptable".to_string(), json!(result.acceptable));
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn piping_fiv_gas(inputs: &Value) -> Result<Outcome, Outcome> {
+    let density = number(inputs, "density")?;
+    let velocity = number(inputs, "velocity")?;
+    let outside_diameter = number(inputs, "outside_diameter")?;
+    let wall_thickness = number(inputs, "wall_thickness")?;
+    let branch_count = number(inputs, "branch_count")?;
+    let pulsation_factor = number(inputs, "pulsation_factor")?;
+    let support_quality_factor = number(inputs, "support_quality_factor")?;
+    Ok(
+        match azoth_process::piping_fiv_gas(
+            kilograms_per_cubic_meter(density),
+            meters_per_second(velocity),
+            meters(outside_diameter),
+            meters(wall_thickness),
+            branch_count,
+            pulsation_factor,
+            support_quality_factor,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                scalar(&mut outputs, "lof", result.lof);
+                outputs.insert(
+                    "likelihood".to_string(),
+                    json!(result.likelihood.as_str()),
+                );
+                quantity(&mut outputs, "rho_v2", result.rho_v2.value, "Pa");
+                scalar(&mut outputs, "d_overt", result.d_overt);
+                scalar(&mut outputs, "d_overt_factor", result.d_overt_factor);
+                scalar(&mut outputs, "branch_factor", result.branch_factor);
+                scalar(
+                    &mut outputs,
+                    "pulsation_factor_applied",
+                    result.pulsation_factor_applied,
+                );
+                scalar(
+                    &mut outputs,
+                    "support_quality_factor_applied",
+                    result.support_quality_factor_applied,
+                );
+                scalar(&mut outputs, "energy_term", result.energy_term);
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn piping_fiv_liquid(inputs: &Value) -> Result<Outcome, Outcome> {
+    let velocity = number(inputs, "velocity")?;
+    let outside_diameter = number(inputs, "outside_diameter")?;
+    let wall_thickness = number(inputs, "wall_thickness")?;
+    let branch_count = number(inputs, "branch_count")?;
+    let support_quality_factor = number(inputs, "support_quality_factor")?;
+    Ok(
+        match azoth_process::piping_fiv_liquid(
+            meters_per_second(velocity),
+            meters(outside_diameter),
+            meters(wall_thickness),
+            branch_count,
+            support_quality_factor,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                scalar(&mut outputs, "lof", result.lof);
+                outputs.insert(
+                    "likelihood".to_string(),
+                    json!(result.likelihood.as_str()),
+                );
+                scalar(&mut outputs, "d_overt", result.d_overt);
+                scalar(&mut outputs, "d_overt_factor", result.d_overt_factor);
+                scalar(&mut outputs, "branch_factor", result.branch_factor);
+                scalar(
+                    &mut outputs,
+                    "support_quality_factor_applied",
+                    result.support_quality_factor_applied,
+                );
+                scalar(&mut outputs, "energy_term", result.energy_term);
                 done(outputs, &result.warnings)
             }
             Err(error) => refused(error),

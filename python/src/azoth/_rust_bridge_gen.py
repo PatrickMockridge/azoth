@@ -110,6 +110,7 @@ from azoth.core.result import (
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
     FirozabadiRamleyInterfaceTensionResult,
+    FivLikelihood,
     FlareResult,
     FlowlineScaleProfileResult,
     FlowlineScaleSegment,
@@ -240,6 +241,8 @@ from azoth.core.result import (
     PipelineCooldownResult,
     PipelinePressureProtectionResult,
     PipeResult,
+    PipingFivGasResult,
+    PipingFivLiquidResult,
     PitzerHydrateFormationPressureResult,
     PitzerHydrateFormationTemperatureResult,
     PitzerPhaseResult,
@@ -650,6 +653,8 @@ __all__ = [
     "pipe_fire_rupture_material",
     "pipeline_cooldown",
     "pipeline_pressure_protection",
+    "piping_fiv_gas",
+    "piping_fiv_liquid",
     "pitzer_hydrate_formation_pressure",
     "pitzer_hydrate_formation_temperature",
     "pitzer_phase",
@@ -7803,6 +7808,54 @@ def pipeline_pressure_protection(max_source_pressure: Q, design_pressure: Q, inc
         barrier2_adequate=result.barrier2_adequate,
         protection_adequate=result.protection_adequate,
         verdict=result.verdict,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def piping_fiv_gas(density: Q, velocity: Q, outside_diameter: Q, wall_thickness: Q, branch_count: float, pulsation_factor: float, support_quality_factor: float) -> PipingFivGasResult:
+    """``process.piping_fiv_gas``, computed in Rust."""
+    spec = _models_gen.model("process.piping_fiv_gas")
+    result = _core.piping_fiv_gas(
+        input_to_si(spec, "density", density),
+        input_to_si(spec, "velocity", velocity),
+        input_to_si(spec, "outside_diameter", outside_diameter),
+        input_to_si(spec, "wall_thickness", wall_thickness),
+        branch_count,
+        pulsation_factor,
+        support_quality_factor,
+    )
+    return PipingFivGasResult(
+        lof=result.lof,
+        likelihood=FivLikelihood(result.likelihood),
+        rho_v2=from_si(result.rho_v2.magnitude_si, result.rho_v2.unit),
+        d_overt=result.d_overt,
+        d_overt_factor=result.d_overt_factor,
+        branch_factor=result.branch_factor,
+        pulsation_factor_applied=result.pulsation_factor_applied,
+        support_quality_factor_applied=result.support_quality_factor_applied,
+        energy_term=result.energy_term,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def piping_fiv_liquid(velocity: Q, outside_diameter: Q, wall_thickness: Q, branch_count: float, support_quality_factor: float) -> PipingFivLiquidResult:
+    """``process.piping_fiv_liquid``, computed in Rust."""
+    spec = _models_gen.model("process.piping_fiv_liquid")
+    result = _core.piping_fiv_liquid(
+        input_to_si(spec, "velocity", velocity),
+        input_to_si(spec, "outside_diameter", outside_diameter),
+        input_to_si(spec, "wall_thickness", wall_thickness),
+        branch_count,
+        support_quality_factor,
+    )
+    return PipingFivLiquidResult(
+        lof=result.lof,
+        likelihood=FivLikelihood(result.likelihood),
+        d_overt=result.d_overt,
+        d_overt_factor=result.d_overt_factor,
+        branch_factor=result.branch_factor,
+        support_quality_factor_applied=result.support_quality_factor_applied,
+        energy_term=result.energy_term,
         warnings=_warnings(result.warnings),
     )
 

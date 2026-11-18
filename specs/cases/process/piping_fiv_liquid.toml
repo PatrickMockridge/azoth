@@ -1,0 +1,109 @@
+model = "process.piping_fiv_liquid"
+[[cases]]
+id = "liquid_low"
+tolerance = 1.0e-12
+source = "A 1 m/s liquid in a 20 D/t line: the velocity term is 1/6 and the score is low. From `validation/neqsim/captures/process_piping_fiv_liquid.tsv` (`fiv_liquid_low`)."
+[cases.inputs]
+velocity = 1.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 0.16666666666666666
+likelihood = "low"
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+support_quality_factor_applied = 1.0
+energy_term = 0.16666666666666666
+[[cases]]
+id = "liquid_boundary_030"
+tolerance = 1.0e-12
+source = "A 1.8 m/s liquid scores exactly 0.3, the medium band's lower boundary. From (`fiv_liquid_boundary_030`)."
+[cases.inputs]
+velocity = 1.8
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 0.3
+likelihood = "medium"
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+support_quality_factor_applied = 1.0
+energy_term = 0.3
+[[cases]]
+id = "liquid_boundary_050"
+tolerance = 1.0e-12
+source = "A 3 m/s liquid scores exactly 0.5, the high band's lower boundary. From (`fiv_liquid_boundary_050`)."
+[cases.inputs]
+velocity = 3.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 0.5
+likelihood = "high"
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+support_quality_factor_applied = 1.0
+energy_term = 0.5
+[[cases]]
+id = "liquid_boundary_100"
+tolerance = 1.0e-12
+source = "A 6 m/s liquid scores exactly 1.0, the very-high band's lower boundary. From (`fiv_liquid_boundary_100`)."
+[cases.inputs]
+velocity = 6.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 1.0
+likelihood = "very_high"
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+support_quality_factor_applied = 1.0
+energy_term = 1.0
+[[cases]]
+id = "liquid_branch_factor"
+tolerance = 1.0e-12
+source = "Two small-bore connections raise the liquid branch factor to 1.2. From (`fiv_liquid_branch_factor`)."
+[cases.inputs]
+velocity = 1.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 2
+support_quality_factor = 1.0
+[cases.expected]
+lof = 0.19999999999999998
+likelihood = "low"
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.2
+support_quality_factor_applied = 1.0
+energy_term = 0.16666666666666666
+[[cases]]
+id = "liquid_support_clamp"
+tolerance = 1.0e-12
+source = "A support-quality factor of 5 is clamped to 3, so the 1 m/s score reaches 0.5. From (`fiv_liquid_support_high`)."
+[cases.inputs]
+velocity = 1.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+support_quality_factor = 5.0
+[cases.expected]
+lof = 0.5
+likelihood = "high"
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+support_quality_factor_applied = 3.0
+energy_term = 0.16666666666666666

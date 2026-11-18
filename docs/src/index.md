@@ -386,6 +386,8 @@ Five sections, and the difference between them is the point:
 - [`process.pipe_fire_rupture`](./process/pipe_fire_rupture.md) — Pipe fire rupture
 - [`process.pipe_fire_rupture_material`](./process/pipe_fire_rupture_material.md) — Pipe fire-rupture material
 - [`process.pipeline_pressure_protection`](./process/pipeline_pressure_protection.md) — Pipeline pressure protection
+- [`process.piping_fiv_gas`](./process/piping_fiv_gas.md) — Gas-line flow-induced vibration screening
+- [`process.piping_fiv_liquid`](./process/piping_fiv_liquid.md) — Liquid-line flow-induced vibration screening
 - [`process.plug_flow_reactor`](./process/plug_flow_reactor.md) — Plug-flow reactor
 - [`process.pool_fire`](./process/pool_fire.md) — Pool fire radiation
 - [`process.porous_media_self_heating`](./process/porous_media_self_heating.md) — Porous media self-heating

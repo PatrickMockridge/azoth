@@ -1,0 +1,98 @@
+id = "process.piping_fiv_liquid"
+name = "Liquid-line flow-induced vibration screening"
+kind = "procedure"
+assumptions = [
+    "**the likelihood is `v / 6 * D/t factor * branch factor * support`**, with the D/t factor floored at one for a ratio at or below 40.",
+    "**the support-quality factor is clamped to `[1, 3]`**; the clamp is silent in the class, and the applied value is published.",
+    "**the bands are exclusive upward**: below 0.3 low, below 0.5 medium, below 1.0 high, else very high.",
+    "**the branch factor is `1 + 0.10 n`**, where n is the number of small-bore connections.",
+    "**the bands are the AVIFF screening categories**; the class's recommendation text is presentation.",
+    "**negative velocity or branch count are refused**, as the class throws, and a non-positive diameter or wall is refused too.",
+]
+references = [
+    "Energy Institute. Guidelines for the Avoidance of Vibration Induced Fatigue Failure in Process Pipework (AVIFF), 2nd edition.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/vibration/PipingFivScreening.java` (`screenLiquid`) is the port source.",
+    "`validation/neqsim/captures/process_piping_fiv_liquid.tsv` - the band boundaries, the branch factor and the support clamp.",
+]
+[source]
+standard = "NeqSim process/safety/vibration/PipingFivScreening.java"
+edition = "Its `screenLiquid` and `bandFor`."
+[algorithm]
+scheme = "aviff_liquid_likelihood_of_failure"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.velocity]
+unit = "m/s"
+description = "the liquid velocity at line conditions, non-negative.\n"
+[inputs.outside_diameter]
+unit = "m"
+description = "the pipe outside diameter, above zero.\n"
+[inputs.wall_thickness]
+unit = "m"
+description = "the pipe wall thickness, above zero.\n"
+[inputs.branch_count]
+unit = "dimensionless"
+description = "the number of small-bore connections, a whole number at least zero.\n"
+[inputs.support_quality_factor]
+unit = "dimensionless"
+description = "the support-quality factor, 1 for good supports to 3 for poor ones; clamped to `[1, 3]`.\n"
+[outputs]
+[outputs.lof]
+unit = "dimensionless"
+description = "the normalised likelihood of failure.\n"
+[outputs.likelihood]
+type = "enum"
+values = ["low", "medium", "high", "very_high"]
+description = "the AVIFF likelihood band.\n"
+[outputs.d_overt]
+unit = "dimensionless"
+description = "the outside-diameter-to-wall-thickness ratio.\n"
+[outputs.d_overt_factor]
+unit = "dimensionless"
+description = "the D/t factor, floored at one for a ratio at or below 40.\n"
+[outputs.branch_factor]
+unit = "dimensionless"
+description = "the branch factor `1 + 0.10 n`.\n"
+[outputs.support_quality_factor_applied]
+unit = "dimensionless"
+description = "the support-quality factor after the clamp.\n"
+[outputs.energy_term]
+unit = "dimensionless"
+description = "the velocity normalised by 6 m/s.\n"
+[[valid_range]]
+quantity = "velocity"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative velocity"
+[[valid_range]]
+quantity = "outside_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive outside diameter"
+[[valid_range]]
+quantity = "wall_thickness"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive wall thickness"
+[[valid_range]]
+quantity = "branch_count"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative branch count"
+[[valid_range]]
+quantity = "support_quality_factor"
+min = 1
+min_inclusive = true
+max = 3
+max_inclusive = true
+severity = "warning"
+rationale = "the class clamps the support-quality factor to [1, 3] rather than refusing it"
+[implementations]
+python = "azoth.process.piping_fiv_liquid"
+rust = "azoth_process::piping_fiv_liquid"

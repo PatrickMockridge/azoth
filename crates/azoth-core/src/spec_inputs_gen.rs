@@ -281,6 +281,8 @@
 //!   - specs/models/process/pipe_fire_rupture.toml
 //!   - specs/models/process/pipe_fire_rupture_material.toml
 //!   - specs/models/process/pipeline_pressure_protection.toml
+//!   - specs/models/process/piping_fiv_gas.toml
+//!   - specs/models/process/piping_fiv_liquid.toml
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/porous_media_self_heating.toml
@@ -4326,6 +4328,30 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.pipeline_pressure_protection",
         "barrier2_setpoint",
         "pressure",
+    ),
+    ("process.piping_fiv_gas", "density", "mass_density"),
+    ("process.piping_fiv_gas", "velocity", "velocity"),
+    ("process.piping_fiv_gas", "outside_diameter", "length"),
+    ("process.piping_fiv_gas", "wall_thickness", "length"),
+    ("process.piping_fiv_gas", "branch_count", "dimensionless"),
+    (
+        "process.piping_fiv_gas",
+        "pulsation_factor",
+        "dimensionless",
+    ),
+    (
+        "process.piping_fiv_gas",
+        "support_quality_factor",
+        "dimensionless",
+    ),
+    ("process.piping_fiv_liquid", "velocity", "velocity"),
+    ("process.piping_fiv_liquid", "outside_diameter", "length"),
+    ("process.piping_fiv_liquid", "wall_thickness", "length"),
+    ("process.piping_fiv_liquid", "branch_count", "dimensionless"),
+    (
+        "process.piping_fiv_liquid",
+        "support_quality_factor",
+        "dimensionless",
     ),
     ("process.plug_flow_reactor", "feed_n", "molar_flow"),
     ("process.plug_flow_reactor", "feed_z", "dimensionless"),

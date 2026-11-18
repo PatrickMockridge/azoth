@@ -1,0 +1,177 @@
+model = "process.piping_fiv_gas"
+[[cases]]
+id = "gas_low"
+tolerance = 1.0e-12
+source = "A 1 kg/m3 gas at 10 m/s in a 20 D/t line: the momentum flux is 100 Pa and the score is 0.002, low. From `validation/neqsim/captures/process_piping_fiv_gas.tsv` (`fiv_gas_low`)."
+[cases.inputs]
+density = 1.0
+velocity = 10.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+pulsation_factor = 1.0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 0.002
+likelihood = "low"
+rho_v2 = 100.0
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+pulsation_factor_applied = 1.0
+support_quality_factor_applied = 1.0
+energy_term = 0.002
+[[cases]]
+id = "gas_boundary_030"
+tolerance = 1.0e-12
+source = "A score of exactly 0.3 is the medium band's lower boundary. From (`fiv_gas_boundary_030`)."
+[cases.inputs]
+density = 150.0
+velocity = 10.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+pulsation_factor = 1.0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 0.3
+likelihood = "medium"
+rho_v2 = 15000.0
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+pulsation_factor_applied = 1.0
+support_quality_factor_applied = 1.0
+energy_term = 0.3
+[[cases]]
+id = "gas_boundary_050"
+tolerance = 1.0e-12
+source = "A score of exactly 0.5 is the high band's lower boundary. From (`fiv_gas_boundary_050`)."
+[cases.inputs]
+density = 250.0
+velocity = 10.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+pulsation_factor = 1.0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 0.5
+likelihood = "high"
+rho_v2 = 25000.0
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+pulsation_factor_applied = 1.0
+support_quality_factor_applied = 1.0
+energy_term = 0.5
+[[cases]]
+id = "gas_boundary_100"
+tolerance = 1.0e-12
+source = "A score of exactly 1.0 is the very-high band's lower boundary. From (`fiv_gas_boundary_100`)."
+[cases.inputs]
+density = 500.0
+velocity = 10.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+pulsation_factor = 1.0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 1.0
+likelihood = "very_high"
+rho_v2 = 50000.0
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+pulsation_factor_applied = 1.0
+support_quality_factor_applied = 1.0
+energy_term = 1.0
+[[cases]]
+id = "gas_dt_factor"
+tolerance = 1.0e-12
+source = "A 60 D/t line raises the factor to 1.5, so the same momentum flux scores 0.003. From (`fiv_gas_dt_factor`)."
+[cases.inputs]
+density = 1.0
+velocity = 10.0
+outside_diameter = 0.6
+wall_thickness = 0.01
+branch_count = 0
+pulsation_factor = 1.0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 0.003
+likelihood = "low"
+rho_v2 = 100.0
+d_overt = 60.0
+d_overt_factor = 1.5
+branch_factor = 1.0
+pulsation_factor_applied = 1.0
+support_quality_factor_applied = 1.0
+energy_term = 0.002
+[[cases]]
+id = "gas_branch_factor"
+tolerance = 1.0e-12
+source = "Two small-bore connections raise the branch factor to 1.3. From (`fiv_gas_branch_factor`)."
+[cases.inputs]
+density = 1.0
+velocity = 10.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 2
+pulsation_factor = 1.0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 0.0026000000000000003
+likelihood = "low"
+rho_v2 = 100.0
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.3
+pulsation_factor_applied = 1.0
+support_quality_factor_applied = 1.0
+energy_term = 0.002
+[[cases]]
+id = "gas_pulsation_clamp"
+tolerance = 1.0e-12
+source = "A pulsation factor of 5 is clamped to 4. From (`fiv_gas_pulsation_high`)."
+[cases.inputs]
+density = 1.0
+velocity = 10.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+pulsation_factor = 5.0
+support_quality_factor = 1.0
+[cases.expected]
+lof = 0.008
+likelihood = "low"
+rho_v2 = 100.0
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+pulsation_factor_applied = 4.0
+support_quality_factor_applied = 1.0
+energy_term = 0.002
+[[cases]]
+id = "gas_support_clamp"
+tolerance = 1.0e-12
+source = "A support-quality factor of 5 is clamped to 3. From (`fiv_gas_support_high`)."
+[cases.inputs]
+density = 1.0
+velocity = 10.0
+outside_diameter = 0.2
+wall_thickness = 0.01
+branch_count = 0
+pulsation_factor = 1.0
+support_quality_factor = 5.0
+[cases.expected]
+lof = 0.006
+likelihood = "low"
+rho_v2 = 100.0
+d_overt = 20.0
+d_overt_factor = 1.0
+branch_factor = 1.0
+pulsation_factor_applied = 1.0
+support_quality_factor_applied = 3.0
+energy_term = 0.002

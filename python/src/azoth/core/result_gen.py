@@ -86,6 +86,7 @@ from azoth.core.result_base import (
     EmulsionType,
     ErosionRiskLevel,
     FeSMorphology,
+    FivLikelihood,
     FlowRegime,
     FluidBasis,
     GoverningCriterion,
@@ -8615,6 +8616,74 @@ class PipelinePressureProtectionResult(_HasWarnings):
 
     #: `FULLY_RATED`, `TWO_BARRIERS_REQUIRED` or `INSUFFICIENT`, the class's own spellings.
     verdict: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PipingFivGasResult(_HasWarnings):
+    """Result of ``process.piping_fiv_gas``."""
+
+    CALC_ID: ClassVar[str] = "process.piping_fiv_gas"
+
+    #: the normalised likelihood of failure.
+    lof: float
+
+    #: the AVIFF likelihood band.
+    likelihood: FivLikelihood
+
+    #: the gas momentum flux `rho v^2`.
+    rho_v2: Q
+
+    #: the outside-diameter-to-wall-thickness ratio.
+    d_overt: float
+
+    #: the D/t factor, floored at one for a ratio at or below 40.
+    d_overt_factor: float
+
+    #: the branch factor `1 + 0.15 n`.
+    branch_factor: float
+
+    #: the pulsation factor after the clamp.
+    pulsation_factor_applied: float
+
+    #: the support-quality factor after the clamp.
+    support_quality_factor_applied: float
+
+    #: the momentum flux normalised by 50000 Pa.
+    energy_term: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PipingFivLiquidResult(_HasWarnings):
+    """Result of ``process.piping_fiv_liquid``."""
+
+    CALC_ID: ClassVar[str] = "process.piping_fiv_liquid"
+
+    #: the normalised likelihood of failure.
+    lof: float
+
+    #: the AVIFF likelihood band.
+    likelihood: FivLikelihood
+
+    #: the outside-diameter-to-wall-thickness ratio.
+    d_overt: float
+
+    #: the D/t factor, floored at one for a ratio at or below 40.
+    d_overt_factor: float
+
+    #: the branch factor `1 + 0.10 n`.
+    branch_factor: float
+
+    #: the support-quality factor after the clamp.
+    support_quality_factor_applied: float
+
+    #: the velocity normalised by 6 m/s.
+    energy_term: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

@@ -299,6 +299,8 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPipeFireRuptureResult>()?;
     m.add_class::<crate::transport_gen::PyPipeFireRuptureMaterialResult>()?;
     m.add_class::<crate::transport_gen::PyPipelinePressureProtectionResult>()?;
+    m.add_class::<crate::transport_gen::PyPipingFivGasResult>()?;
+    m.add_class::<crate::transport_gen::PyPipingFivLiquidResult>()?;
     m.add_class::<crate::transport_gen::PyPlugFlowReactorResult>()?;
     m.add_class::<crate::transport_gen::PyPoolFireResult>()?;
     m.add_class::<crate::transport_gen::PyPorousMediaSelfHeatingResult>()?;
@@ -1079,6 +1081,8 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::pipeline_pressure_protection,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::piping_fiv_gas, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::piping_fiv_liquid, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::plug_flow_reactor, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::pool_fire, m)?)?;
     m.add_function(wrap_pyfunction!(

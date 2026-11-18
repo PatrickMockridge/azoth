@@ -300,6 +300,8 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.pipe_fire_rupture" => azoth_process::models::pipe_fire_rupture::PipeFireRuptureResult::FIELDS.to_vec(),
         "process.pipe_fire_rupture_material" => azoth_process::models::pipe_fire_rupture_material::PipeFireRuptureMaterialResult::FIELDS.to_vec(),
         "process.pipeline_pressure_protection" => azoth_process::models::pipeline_pressure_protection::PipelinePressureProtectionResult::FIELDS.to_vec(),
+        "process.piping_fiv_gas" => azoth_process::models::piping_fiv_gas::PipingFivGasResult::FIELDS.to_vec(),
+        "process.piping_fiv_liquid" => azoth_process::models::piping_fiv_liquid::PipingFivLiquidResult::FIELDS.to_vec(),
         "process.plug_flow_reactor" => azoth_process::models::plug_flow_reactor::PlugFlowReactorResult::FIELDS.to_vec(),
         "process.pool_fire" => azoth_process::models::pool_fire::PoolFireResult::FIELDS.to_vec(),
         "process.porous_media_self_heating" => azoth_process::models::porous_media_self_heating::PorousMediaSelfHeatingResult::FIELDS.to_vec(),
