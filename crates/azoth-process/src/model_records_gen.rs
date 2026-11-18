@@ -55,6 +55,7 @@ use crate::models::heat_exchanger::HeatExchangerResult;
 use crate::models::heater::HeaterResult;
 use crate::models::heavy_gas_dispersion::HeavyGasDispersionResult;
 use crate::models::hem_release::HemReleaseResult;
+use crate::models::inherent_safety::InherentSafetyResult;
 use crate::models::jet_fire::JetFireResult;
 use crate::models::leak_blowdown::LeakBlowdownResult;
 use crate::models::lopa::LopaResult;
@@ -1253,6 +1254,15 @@ impl CalcResult for HemReleaseResult {
         "diagnostic_codes",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for InherentSafetyResult {
+    const CALC_ID: &'static str = "process.inherent_safety";
+    const FIELDS: &'static [&'static str] = &["overall_index", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

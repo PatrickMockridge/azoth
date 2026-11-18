@@ -45,6 +45,7 @@
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
 //!   - specs/models/process/hem_release.toml
+//!   - specs/models/process/inherent_safety.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
 //!   - specs/models/process/lopa.toml
@@ -49993,6 +49994,160 @@ pub static HEM_RELEASE_SPEC: ModelSpec = ModelSpec {
     cases: HEM_RELEASE_CASES,
 };
 
+static INHERENT_SAFETY_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "substitute_score",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(10.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a score outside [0, 10]",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "minimize_score",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(10.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a score outside [0, 10]",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "moderate_score",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(10.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a score outside [0, 10]",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "simplify_score",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(10.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a score outside [0, 10]",
+        },
+    },
+];
+
+static INHERENT_SAFETY_CASES: &[TestCase] = &[
+    TestCase {
+        id: "mixed",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("substitute_score", 8.0),
+            ("minimize_score", 6.0),
+            ("moderate_score", 4.0),
+            ("simplify_score", 6.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("overall_index", 6.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "bounds",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("substitute_score", 0.0),
+            ("minimize_score", 10.0),
+            ("moderate_score", 0.0),
+            ("simplify_score", 10.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("overall_index", 5.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "one_pillar",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("simplify_score", 10.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("overall_index", 2.5)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static INHERENT_SAFETY_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "kletz_inherent_safety_index",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.inherent_safety`.
+pub static INHERENT_SAFETY_SPEC: ModelSpec = ModelSpec {
+    id: "process.inherent_safety",
+    kind: "procedure",
+    algorithm: Some(&INHERENT_SAFETY_ALGORITHM),
+    checks: INHERENT_SAFETY_CHECKS,
+    cases: INHERENT_SAFETY_CASES,
+};
+
 static JET_FIRE_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -87115,6 +87270,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &HEATER_SPEC,
     &HEAVY_GAS_DISPERSION_SPEC,
     &HEM_RELEASE_SPEC,
+    &INHERENT_SAFETY_SPEC,
     &JET_FIRE_SPEC,
     &LEAK_BLOWDOWN_SPEC,
     &LOPA_SPEC,

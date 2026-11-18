@@ -36,6 +36,7 @@ pub const NATIVE: &[&str] = &[
     "process.gaussian_plume",
     "process.hazardous_area",
     "process.heavy_gas_dispersion",
+    "process.inherent_safety",
     "process.jet_fire",
     "process.mdmt",
     "process.nog070_sil_determination",
@@ -174,6 +175,7 @@ pub fn required(id: &str) -> Option<&'static [&'static str]> {
             "specific_heat_ratio",
             "molar_mass",
         ],
+        "process.inherent_safety" => &[],
         "process.mdmt" => &[
             "material_curve",
             "governing_thickness",
@@ -252,6 +254,7 @@ fn arm(id: &str, inputs: &Value) -> Result<Outcome, Outcome> {
         "process.psv_sizing" => psv_sizing(inputs),
         "process.gas_blowby" => gas_blowby(inputs),
         "process.mdmt" => mdmt(inputs),
+        "process.inherent_safety" => inherent_safety(inputs),
         "process.acoustic_induced_vibration_screening" => acoustic_induced_vibration_screening(inputs),
         "process.piping_fiv_gas" => piping_fiv_gas(inputs),
         "process.piping_fiv_liquid" => piping_fiv_liquid(inputs),
@@ -1606,6 +1609,28 @@ fn mdmt(inputs: &Value) -> Result<Outcome, Outcome> {
                 let mut outputs = BTreeMap::new();
                 quantity(&mut outputs, "mdmt", result.mdmt.value, "K");
                 outputs.insert("acceptable".to_string(), json!(result.acceptable));
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn inherent_safety(inputs: &Value) -> Result<Outcome, Outcome> {
+    let substitute_score = optional_number(inputs, "substitute_score")?;
+    let minimize_score = optional_number(inputs, "minimize_score")?;
+    let moderate_score = optional_number(inputs, "moderate_score")?;
+    let simplify_score = optional_number(inputs, "simplify_score")?;
+    Ok(
+        match azoth_process::inherent_safety(
+            substitute_score,
+            minimize_score,
+            moderate_score,
+            simplify_score,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                scalar(&mut outputs, "overall_index", result.overall_index);
                 done(outputs, &result.warnings)
             }
             Err(error) => refused(error),

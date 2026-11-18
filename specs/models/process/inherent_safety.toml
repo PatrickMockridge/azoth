@@ -1,0 +1,79 @@
+id = "process.inherent_safety"
+name = "Inherent-safety index"
+kind = "procedure"
+assumptions = [
+    "**the overall index is the simple mean of the four Kletz pillar scores**, each in `[0, 10]` and 10 the best.",
+    "**an absent pillar is zero**, the class's zero-initialised array; the caller's notes and report are presentation.",
+    "**the class's `score` may be called repeatedly and the last value wins**; one value per pillar is the only state this id can represent.",
+    "**a score outside `[0, 10]` is refused**, as the class throws.",
+]
+references = [
+    "Kletz, T.A. (1978). What you don't have, can't leak. Chemistry and Industry, 287-292.",
+    "CCPS. Inherently Safer Chemical Processes: A Life Cycle Approach, 2nd edition.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/inherent/InherentSafetyEvaluator.java` is the port source.",
+    "`validation/neqsim/captures/process_inherent_safety.tsv` - a mixed score set, the zero evaluator, the boundaries and both out-of-range refusals.",
+]
+[source]
+standard = "NeqSim process/safety/inherent/InherentSafetyEvaluator.java"
+edition = "Its four-pillar `score` and `overallIndex`."
+[algorithm]
+scheme = "kletz_inherent_safety_index"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.substitute_score]
+unit = "dimensionless"
+optional = true
+description = "the substitute pillar's score, in `[0, 10]`. **Absent is 0.**\n"
+[inputs.minimize_score]
+unit = "dimensionless"
+optional = true
+description = "the minimize pillar's score, in `[0, 10]`. **Absent is 0.**\n"
+[inputs.moderate_score]
+unit = "dimensionless"
+optional = true
+description = "the moderate pillar's score, in `[0, 10]`. **Absent is 0.**\n"
+[inputs.simplify_score]
+unit = "dimensionless"
+optional = true
+description = "the simplify pillar's score, in `[0, 10]`. **Absent is 0.**\n"
+[outputs]
+[outputs.overall_index]
+unit = "dimensionless"
+description = "the mean of the four pillar scores.\n"
+[[valid_range]]
+quantity = "substitute_score"
+min = 0
+min_inclusive = true
+max = 10
+max_inclusive = true
+severity = "error"
+rationale = "the class refuses a score outside [0, 10]"
+[[valid_range]]
+quantity = "minimize_score"
+min = 0
+min_inclusive = true
+max = 10
+max_inclusive = true
+severity = "error"
+rationale = "the class refuses a score outside [0, 10]"
+[[valid_range]]
+quantity = "moderate_score"
+min = 0
+min_inclusive = true
+max = 10
+max_inclusive = true
+severity = "error"
+rationale = "the class refuses a score outside [0, 10]"
+[[valid_range]]
+quantity = "simplify_score"
+min = 0
+min_inclusive = true
+max = 10
+max_inclusive = true
+severity = "error"
+rationale = "the class refuses a score outside [0, 10]"
+[implementations]
+python = "azoth.process.inherent_safety"
+rust = "azoth_process::inherent_safety"

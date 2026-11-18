@@ -6954,6 +6954,29 @@ pub fn hem_release(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Inherent-safety index.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (substitute_score, minimize_score, moderate_score, simplify_score))]
+#[pyo3(text_signature = "(substitute_score, minimize_score, moderate_score, simplify_score)")]
+pub fn inherent_safety(
+    py: Python<'_>,
+    substitute_score: Option<f64>,
+    minimize_score: Option<f64>,
+    moderate_score: Option<f64>,
+    simplify_score: Option<f64>,
+) -> PyResult<crate::transport_gen::PyInherentSafetyResult> {
+    azoth_process::models::inherent_safety::inherent_safety(
+        substitute_score,
+        minimize_score,
+        moderate_score,
+        simplify_score,
+    )
+    .map(|r| crate::transport_gen::PyInherentSafetyResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Jet fire radiation.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

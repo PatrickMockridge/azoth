@@ -266,6 +266,7 @@
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
 //!   - specs/models/process/hem_release.toml
+//!   - specs/models/process/inherent_safety.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
 //!   - specs/models/process/lopa.toml
@@ -3922,6 +3923,14 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "dimensionless",
     ),
     ("process.hem_release", "back_pressure", "pressure"),
+    (
+        "process.inherent_safety",
+        "substitute_score",
+        "dimensionless",
+    ),
+    ("process.inherent_safety", "minimize_score", "dimensionless"),
+    ("process.inherent_safety", "moderate_score", "dimensionless"),
+    ("process.inherent_safety", "simplify_score", "dimensionless"),
     ("process.jet_fire", "mass_flow", "mass_rate"),
     ("process.jet_fire", "heat_of_combustion", "dimensionless"),
     ("process.jet_fire", "radiative_fraction", "dimensionless"),

@@ -285,6 +285,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.heater" => azoth_process::models::heater::HeaterResult::FIELDS.to_vec(),
         "process.heavy_gas_dispersion" => azoth_process::models::heavy_gas_dispersion::HeavyGasDispersionResult::FIELDS.to_vec(),
         "process.hem_release" => azoth_process::models::hem_release::HemReleaseResult::FIELDS.to_vec(),
+        "process.inherent_safety" => azoth_process::models::inherent_safety::InherentSafetyResult::FIELDS.to_vec(),
         "process.jet_fire" => azoth_process::models::jet_fire::JetFireResult::FIELDS.to_vec(),
         "process.leak_blowdown" => azoth_process::models::leak_blowdown::LeakBlowdownResult::FIELDS.to_vec(),
         "process.lopa" => azoth_process::models::lopa::LopaResult::FIELDS.to_vec(),

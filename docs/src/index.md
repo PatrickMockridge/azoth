@@ -371,6 +371,7 @@ Five sections, and the difference between them is the point:
 - [`process.heater`](./process/heater.md) — Heater
 - [`process.heavy_gas_dispersion`](./process/heavy_gas_dispersion.md) — Heavy-gas dispersion
 - [`process.hem_release`](./process/hem_release.md) — Homogeneous-equilibrium orifice release
+- [`process.inherent_safety`](./process/inherent_safety.md) — Inherent-safety index
 - [`process.jet_fire`](./process/jet_fire.md) — Jet fire radiation
 - [`process.leak_blowdown`](./process/leak_blowdown.md) — Vessel leak blowdown
 - [`process.lopa`](./process/lopa.md) — Layer of protection analysis

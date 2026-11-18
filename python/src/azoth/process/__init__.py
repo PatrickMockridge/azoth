@@ -63,6 +63,7 @@ from azoth.core.result import (
     HeatExchangerResult,
     HeavyGasDispersionResult,
     HemReleaseResult,
+    InherentSafetyResult,
     JetFireResult,
     LeakBlowdownResult,
     LopaResult,
@@ -181,6 +182,7 @@ __all__ = [
     "heater",
     "heavy_gas_dispersion",
     "hem_release",
+    "inherent_safety",
     "jet_fire",
     "leak_blowdown",
     "load_flowsheet",
@@ -274,6 +276,7 @@ _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
+_INHERENT_SAFETY = "process.inherent_safety"
 _NORSOK_P002_COMPLIANCE = "process.norsok_p002_compliance"
 _STS0131_GATE = "process.sts0131_gate"
 _MDMT = "process.mdmt"
@@ -1909,6 +1912,27 @@ def sts0131_gate(
     """
     return resolve(_STS0131_GATE)(  # type: ignore[no-any-return]
         checks=checks,
+    )
+
+
+def inherent_safety(
+    substitute_score: float | None = None,
+    minimize_score: float | None = None,
+    moderate_score: float | None = None,
+    simplify_score: float | None = None,
+) -> InherentSafetyResult:
+    """The mean of the four Kletz inherent-safety pillars.
+
+    Each score is in ``[0, 10]`` and 10 is the best; an absent pillar is zero, the class's
+    zero-initialised array.
+
+    See :func:`azoth.process.reference.inherent_safety`.
+    """
+    return resolve(_INHERENT_SAFETY)(  # type: ignore[no-any-return]
+        substitute_score=substitute_score,
+        minimize_score=minimize_score,
+        moderate_score=moderate_score,
+        simplify_score=simplify_score,
     )
 
 

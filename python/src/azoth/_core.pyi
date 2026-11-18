@@ -4193,6 +4193,11 @@ class HemReleaseResult:
     warnings: list[Warning]
 
 @final
+class InherentSafetyResult:
+    overall_index: float
+    warnings: list[Warning]
+
+@final
 class JetFireResult:
     total_radiative_power: Qty
     transmissivity: float | None
@@ -8132,6 +8137,12 @@ def hem_release(
     discharge_coefficient: float,
     back_pressure: float,
 ) -> HemReleaseResult: ...
+def inherent_safety(
+    substitute_score: float | None = None,
+    minimize_score: float | None = None,
+    moderate_score: float | None = None,
+    simplify_score: float | None = None,
+) -> InherentSafetyResult: ...
 def jet_fire(
     mass_flow: float,
     heat_of_combustion: float,

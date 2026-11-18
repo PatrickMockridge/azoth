@@ -279,6 +279,7 @@
   - [Heater](./process/heater.md)
   - [Heavy-gas dispersion](./process/heavy_gas_dispersion.md)
   - [Homogeneous-equilibrium orifice release](./process/hem_release.md)
+  - [Inherent-safety index](./process/inherent_safety.md)
   - [Jet fire radiation](./process/jet_fire.md)
   - [Vessel leak blowdown](./process/leak_blowdown.md)
   - [Layer of protection analysis](./process/lopa.md)

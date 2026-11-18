@@ -445,6 +445,7 @@ NON_UNIT_MODELS = {
     "process.gas_blowby": "the choked/subcritical blowby rate over scalars, not a unit",
     "process.pump_deadhead": "the pump deadhead and minimum-flow screen over scalars, not a unit",
     "process.runaway_reaction": "the adiabatic runaway screen over scalars, not a unit",
+    "process.inherent_safety": "the Kletz four-pillar index over scalars, not a unit",
     "process.mdmt": "the UCS-66 MDMT curve over scalars, not a unit",
     "process.norsok_p002_compliance": "the P-002 point checks over rows, not a unit",
     "process.sts0131_gate": "the STS-0131 gate over rows, not a unit",

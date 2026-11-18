@@ -1,0 +1,31 @@
+model = "process.inherent_safety"
+[[cases]]
+id = "mixed"
+tolerance = 1.0e-12
+source = "Scores 8, 6, 4 and 6 average to 6.0. From `validation/neqsim/captures/process_inherent_safety.tsv` (`inherent_mixed`)."
+[cases.inputs]
+substitute_score = 8.0
+minimize_score = 6.0
+moderate_score = 4.0
+simplify_score = 6.0
+[cases.expected]
+overall_index = 6.0
+[[cases]]
+id = "bounds"
+tolerance = 1.0e-12
+source = "The 0 and 10 boundaries average to 5.0. From (`inherent_bounds`)."
+[cases.inputs]
+substitute_score = 0.0
+minimize_score = 10.0
+moderate_score = 0.0
+simplify_score = 10.0
+[cases.expected]
+overall_index = 5.0
+[[cases]]
+id = "one_pillar"
+tolerance = 1.0e-12
+source = "One scored pillar out of four: 10 averages to 2.5."
+[cases.inputs]
+simplify_score = 10.0
+[cases.expected]
+overall_index = 2.5

@@ -1757,6 +1757,23 @@ def _acoustic_induced_vibration_screening(inputs: Mapping[str, Any]) -> dict[str
     }
 
 
+def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.inherent_safety`'s layers, from the reference's arithmetic."""
+    from azoth.process.reference.inherent_safety import _evaluate
+
+    def optional(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    solution, _ = _evaluate(
+        optional("substitute_score"),
+        optional("minimize_score"),
+        optional("moderate_score"),
+        optional("simplify_score"),
+    )
+    return {"overall_index": solution.overall_index}
+
+
 def _sts0131_gate(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.sts0131_gate`'s layers, from the reference's arithmetic.
 
@@ -3818,6 +3835,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.mdmt": _mdmt,
     "process.acoustic_induced_vibration_screening": _acoustic_induced_vibration_screening,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
+    "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.sts0131_gate": _sts0131_gate,
     "process.piping_fiv_gas": _piping_fiv_gas,
@@ -4910,6 +4928,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_mdmt.tsv",
         block=1,
         identified_by=("#label", "mdmt_curve_b_25"),
+    ),
+    # Inherent safety's one: the mixed score set. The zero and boundary states and the two
+    # refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.inherent_safety",
+        case="mixed",
+        capture="process_inherent_safety.tsv",
+        block=0,
+        identified_by=("#label", "inherent_mixed"),
     ),
     # STS-0131's one: the PSV margin at equality. The five further cases, the seven
     # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
@@ -7821,6 +7848,8 @@ UNCASED_ROWS: dict[str, int] = {
     # STS-0131's fourteen: the empty gate, the five further cases, the seven single-arm
     # states and the area refusal.
     "process_sts0131_gate.tsv": 14,
+    # Inherent safety's four: the zero and boundary states and the two refusals.
+    "process_inherent_safety.tsv": 4,
     # Gas-line FIV's thirteen: the eight further model states and the five refusals.
     "process_piping_fiv_gas.tsv": 13,
     # Liquid-line FIV's nine: the five further model states and the four refusals.

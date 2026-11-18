@@ -19796,6 +19796,44 @@ impl From<&azoth_process::models::hem_release::HemReleaseResult> for PyHemReleas
         }
     }
 }
+/// Result of `process.inherent_safety`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "InherentSafetyResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyInherentSafetyResult {
+    /// the mean of the four pillar scores.
+    #[pyo3(get)]
+    pub overall_index: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyInherentSafetyResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "InherentSafetyResult(overall_index={:?}, {} warning(s))",
+            self.overall_index,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::inherent_safety::InherentSafetyResult>
+    for PyInherentSafetyResult
+{
+    fn from(r: &azoth_process::models::inherent_safety::InherentSafetyResult) -> Self {
+        Self {
+            overall_index: r.overall_index,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.jet_fire`, transported.
 #[pyclass(
     frozen,

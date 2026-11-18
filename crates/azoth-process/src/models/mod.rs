@@ -75,6 +75,7 @@ pub mod heat_exchanger;
 pub mod heater;
 pub mod heavy_gas_dispersion;
 pub mod hem_release;
+pub mod inherent_safety;
 pub mod jet_fire;
 pub mod leak_blowdown;
 pub mod lopa;
@@ -213,6 +214,7 @@ pub use heat_exchanger::{HeatExchangerResult, heat_exchanger};
 pub use heater::{HeaterResult, heater};
 pub use heavy_gas_dispersion::{HeavyGasDispersionResult, heavy_gas_dispersion};
 pub use hem_release::{HemReleaseResult, hem_release};
+pub use inherent_safety::{InherentSafetyResult, inherent_safety};
 pub use jet_fire::{JetFireResult, jet_fire};
 pub use leak_blowdown::{LeakBlowdownResult, leak_blowdown};
 pub use lopa::{

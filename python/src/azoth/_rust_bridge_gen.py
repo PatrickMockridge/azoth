@@ -177,6 +177,7 @@ from azoth.core.result import (
     IdealGasCpResult,
     IncrementalZoneAnalysisResult,
     IncrementalZoneRow,
+    InherentSafetyResult,
     InterfacePropertiesResult,
     Iso6976Result,
     JetFireResult,
@@ -609,6 +610,7 @@ __all__ = [
     "iapws_saturation_pressure",
     "ideal_gas_cp",
     "incremental_zone_analysis",
+    "inherent_safety",
     "interface_properties",
     "iso6976",
     "jet_fire",
@@ -7347,6 +7349,20 @@ def hem_release(components: list[str], upstream_z: list[float], upstream_t: Q, u
         stations=tuple(HemReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction) for c in result.stations),
         diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
         diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def inherent_safety(substitute_score: float | None=None, minimize_score: float | None=None, moderate_score: float | None=None, simplify_score: float | None=None) -> InherentSafetyResult:
+    """``process.inherent_safety``, computed in Rust."""
+    result = _core.inherent_safety(
+        None if substitute_score is None else substitute_score,
+        None if minimize_score is None else minimize_score,
+        None if moderate_score is None else moderate_score,
+        None if simplify_score is None else simplify_score,
+    )
+    return InherentSafetyResult(
+        overall_index=result.overall_index,
         warnings=_warnings(result.warnings),
     )
 

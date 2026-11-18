@@ -8013,6 +8013,19 @@ class HemReleaseResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class InherentSafetyResult(_HasWarnings):
+    """Result of ``process.inherent_safety``."""
+
+    CALC_ID: ClassVar[str] = "process.inherent_safety"
+
+    #: the mean of the four pillar scores.
+    overall_index: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class JetFireResult(_HasWarnings):
     """Result of ``process.jet_fire``."""
 
