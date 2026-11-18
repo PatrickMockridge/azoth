@@ -23351,6 +23351,310 @@
       "sub_interface": null
     },
     {
+      "family": "equipmentsafety",
+      "form": {
+        "assumptions": [
+          "**the critical ratio is `(2/(k+1))^(k/(k-1))` and the flow is choked when `p2/p1` is at or below it**; equality is choked.",
+          "**the choked rate is `Cd A p1 sqrt(k M/(R T1) (2/(k+1))^((k+1)/(k-1)))`** with `R = 8.314462618`.",
+          "**the subcritical rate is `Cd A p1 sqrt(2 M/(R T1) k/(k-1) [r^(2/k) - r^((k+1)/k)])`** with `r = p2/p1`.",
+          "**the standard volume is at 288.15 K and 101325 Pa** - 15 C, not 0 C - and is `(mdot/M) R 288.15/101325`.",
+          "**a relief margin of zero is adequate**, and a missing capacity publishes `no_relief_data` with `relief_adequate` false and an absent margin.",
+          "**the discharge coefficient defaults to 0.85.** `k` and the molar mass are stated explicitly; the class's fallbacks of 1.3 and 0.018 kg/mol are recorded, not reproduced.",
+          "**a downstream pressure at or above the upstream pressure is refused**, as the class throws; the standard state is 15 C."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.gas_blowby",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the high-pressure source pressure, absolute, above zero.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "upstream_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive upstream pressure",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the upstream temperature, above absolute zero.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "upstream_temperature",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive temperature",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the low-pressure protected system's pressure, absolute, at least zero and **below the upstream pressure**.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "downstream_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a negative downstream pressure",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the effective flow area of the fully open restriction, above zero. A diameter is the caller's `pi d^2/4`.\n",
+            "dimension": "area",
+            "kind": "quantity",
+            "name": "restriction_area",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive restriction area",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m**2",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the gas specific-heat ratio `Cp/Cv`, above one.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "specific_heat_ratio",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 1.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a specific-heat ratio at or below one",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the gas molar mass, above zero.\n",
+            "dimension": "molar_mass",
+            "kind": "quantity",
+            "name": "molar_mass",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive molar mass",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "kg/mol",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the restriction's discharge coefficient in `(0, 1]`. **Absent is 0.85**, the class's default.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "discharge_coefficient",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 1.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a discharge coefficient outside (0, 1]",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the downstream relief capacity available to absorb the blowby, at least zero. **Absent publishes no relief data** rather than a zero capacity.\n",
+            "dimension": "mass_rate",
+            "kind": "quantity",
+            "name": "downstream_relief_capacity",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a negative relief capacity",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "kg/s",
+            "values": []
+          }
+        ],
+        "name": "Gas blowby through a restriction",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "whether the flow is choked at the stated pressure ratio.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "choked",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "`(2/(k+1))^(k/(k-1))`, the pressure ratio at and below which the flow is choked.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "critical_pressure_ratio",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "`p2/p1`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "actual_pressure_ratio",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the blowby mass rate through the restriction, choked or subcritical.\n",
+            "dimension": "mass_rate",
+            "kind": "quantity",
+            "name": "blowby_mass_rate",
+            "optional": false,
+            "unit": "kg/s",
+            "values": []
+          },
+          {
+            "description": "the same rate as a standard volume flow at 288.15 K and 101325 Pa.\n",
+            "dimension": "volume_rate",
+            "kind": "quantity",
+            "name": "blowby_std_vol_rate",
+            "optional": false,
+            "unit": "m**3/s",
+            "values": []
+          },
+          {
+            "description": "`capacity - blowby_mass_rate`; **absent when no capacity is stated**.\n",
+            "dimension": "mass_rate",
+            "kind": "quantity",
+            "name": "relief_margin",
+            "optional": true,
+            "unit": "kg/s",
+            "values": []
+          },
+          {
+            "description": "whether the stated capacity is at least the blowby rate; false when no capacity is stated.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "relief_adequate",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "the class's verdict: no capacity, adequate, or inadequate.\n",
+            "dimension": null,
+            "kind": "enum",
+            "name": "verdict",
+            "optional": false,
+            "unit": null,
+            "values": [
+              "no_relief_data",
+              "relief_adequate",
+              "relief_inadequate"
+            ]
+          }
+        ],
+        "provenance": {
+          "python_sha256": "b58d1e311415776ea4977c8ed34dccc038ad0a9e04dbf177fc5ff0b62f4fa43d",
+          "rust_sha256": "c49e0aeb68981afb8c38f75654e9d3253e8df49eccd333405736edcd8a18031e",
+          "spec_sha256": "833233d8f7dbbf297c4f2e4f74e1c7b987739b69a8ff8439e47076d2ed318316",
+          "tests_active": 6,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "API STD 520 Part I (2020). Sizing, Selection, and Installation of Pressure-relieving Devices in Refineries."
+        ],
+        "refusal": null,
+        "summary": "The choked or subcritical blowby rate through an open restriction and whether a stated relief capacity absorbs it.",
+        "worked_example": {}
+      },
+      "id": "process.gas_blowby",
+      "name": "Gas blowby through a restriction",
+      "native": true,
+      "purpose": "The choked or subcritical blowby rate through an open restriction and whether a stated relief capacity absorbs it.",
+      "refusal": null,
+      "sub_interface": "equipmentsafety"
+    },
+    {
       "family": "dispersion",
       "id": "process.gas_dispersion",
       "name": "Gas dispersion screening",
@@ -24339,6 +24643,142 @@
       "purpose": "",
       "refusal": "this calculation returns a table of rows, which this workspace does not yet draw",
       "sub_interface": null
+    },
+    {
+      "family": "equipmentsafety",
+      "form": {
+        "assumptions": [
+          "**the governing thickness is clamped to `[6, 100]` mm before the curve is read**; the class clamps silently.",
+          "**the base in C is**: A `-29 + 18 ln(t/6)`, B `-48 + 22 ln(t/6)`, C `-55 + 20 ln(t/6)`, D `-65 + 18 ln(t/6)`.",
+          "**the stress-ratio reduction is 55 K at or below 0.35, zero at or above 1.0, and `55 (1 - s)/0.65` between.**",
+          "**the MDMT is the base minus the reduction and is published in kelvin**; the class answers C and the capture prints both.",
+          "**the cold-service verdict is `min_operating_temperature >= MDMT`**, equality passing.",
+          "**the four curves are the class's analytic approximations of ASME Fig. UCS-66, not the figure's table.** The class's `report` calls them API 579, which the arithmetic does not implement.",
+          "**the thickness is stated in metres and converted to the class's millimetres.**"
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.mdmt",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the UCS-66 impact-test exemption curve: A is the most restrictive and D the least.\n",
+            "dimension": null,
+            "kind": "enum",
+            "name": "material_curve",
+            "range": [],
+            "required": true,
+            "unit": null,
+            "values": [
+              "a",
+              "b",
+              "c",
+              "d"
+            ]
+          },
+          {
+            "default": null,
+            "description": "the governing thickness, above zero; the class clamps it to 6-100 mm.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "governing_thickness",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class's constructor refuses a non-positive governing thickness",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the coldest metal temperature the blowdown or cold service reaches.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "min_operating_temperature",
+            "range": [],
+            "required": true,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the applied-to-allowable stress ratio in `(0, 1]`. **Absent is 1.0**, no reduction.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "stress_ratio",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 1.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a stress ratio outside (0, 1]",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          }
+        ],
+        "name": "Minimum design metal temperature",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "the minimum design metal temperature without impact testing.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "mdmt",
+            "optional": false,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "description": "whether the minimum operating temperature is at or above the MDMT.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "acceptable",
+            "optional": false,
+            "unit": null,
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "3540ca2bbe4a90b32874c88eae1c6c383b539475bfdcae80ef8d71169bc16f3b",
+          "rust_sha256": "4f605e97b8996b642bff15f22271d4fb198a9622331f3d6b549ac1335ac2804f",
+          "spec_sha256": "d5cbb7cfca572406a828a07e8caaa0af075f8cb28d8f4c670203767bae6fcccc",
+          "tests_active": 8,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "ASME Boiler and Pressure Vessel Code, Section VIII Division 1, UCS-66 (2021).",
+          "API 579-1 / ASME FFS-1, Part 3 (2021). Assessment of existing equipment for brittle fracture."
+        ],
+        "refusal": null,
+        "summary": "The UCS-66 curve's minimum design metal temperature and whether the cold service is acceptable.",
+        "worked_example": {}
+      },
+      "id": "process.mdmt",
+      "name": "Minimum design metal temperature",
+      "native": true,
+      "purpose": "The UCS-66 curve's minimum design metal temperature and whether the cold service is acceptable.",
+      "refusal": null,
+      "sub_interface": "equipmentsafety"
     },
     {
       "family": "risk",
@@ -26657,6 +27097,310 @@
       "sub_interface": "overpressure"
     },
     {
+      "family": "equipmentsafety",
+      "form": {
+        "assumptions": [
+          "**the rated differential is `pn - ps`, the shut-off differential is `ratio` times it, and the deadhead pressure is `ps` plus the shut-off differential.**",
+          "**the margin is `rating - deadhead`; equality is within the rating** and the exceeded test is strict.",
+          "**the shut-off head is `shutoff_dp/(rho g)` with `g = 9.80665` m/s2.**",
+          "**the recirculation rise is `shutoff_dp (1 - eta)/(rho eta cp)`**, the absorbed power heating the minimum-flow liquid.",
+          "**the defaults are a shut-off ratio of 1.20 and a minimum-flow efficiency of 0.30**.",
+          "**without density or specific heat the head and rise are absent and `temp_rise_exceeded` is false**; the class's fluid-derived values are supplied explicitly.",
+          "**the suction temperature is read only by the un-carried fluid path**, so it is not an input."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.pump_deadhead",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the pump suction pressure, absolute, at least zero.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "suction_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a negative suction pressure",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the normal discharge pressure, absolute, **above the suction pressure**.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "normal_discharge_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "a non-positive discharge pressure is not a pump state",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the shut-off head as a multiple of the rated differential, at least one. **Absent is 1.20.**\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "shutoff_head_ratio",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 1.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a shut-off ratio below one",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the protected system's or casing's pressure rating, above zero. **Absent publishes no rating verdict.**\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "protected_pressure_rating",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive rating",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pumped liquid density, above zero. **Absent with the specific heat leaves the head and rise absent.**\n",
+            "dimension": "mass_density",
+            "kind": "quantity",
+            "name": "liquid_density",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive density",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "kg/m**3",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the liquid specific heat, above zero.\n",
+            "dimension": "specific_heat_capacity",
+            "kind": "quantity",
+            "name": "specific_heat",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive specific heat",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "J/(kg*K)",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pump efficiency at minimum continuous flow, in `(0, 1]`. **Absent is 0.30.**\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "minimum_flow_efficiency",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 1.0,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses an efficiency outside (0, 1]",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the allowable recirculation temperature rise, above zero; the exceeded test is strict. **Absent reports no rise verdict.**\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "max_allowable_temperature_rise",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive allowable rise",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "K",
+            "values": []
+          }
+        ],
+        "name": "Pump deadhead and minimum-flow temperature rise",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "`normal_discharge_pressure - suction_pressure`.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "rated_differential_pressure",
+            "optional": false,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "description": "`suction_pressure + ratio (normal_discharge_pressure - suction_pressure)`.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "deadhead_pressure",
+            "optional": false,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "description": "`rating - deadhead_pressure`; **absent when no rating is stated**.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "pressure_margin",
+            "optional": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "description": "whether the deadhead pressure is strictly above the rating; false without a rating.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "pressure_rating_exceeded",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "`shutoff_dp/(rho g)`; **absent without density or specific heat**.\n",
+            "dimension": "length",
+            "kind": "quantity",
+            "name": "shutoff_head",
+            "optional": true,
+            "unit": "m",
+            "values": []
+          },
+          {
+            "description": "the minimum-flow recirculation rise; **absent without density or specific heat**.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "recirculation_temperature_rise",
+            "optional": true,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "description": "whether the rise is strictly above the allowable one; false when either is absent.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "temp_rise_exceeded",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "the class's verdict: no rating, within it, or exceeded.\n",
+            "dimension": null,
+            "kind": "enum",
+            "name": "verdict",
+            "optional": false,
+            "unit": null,
+            "values": [
+              "no_rating",
+              "within_rating",
+              "exceeds_rating"
+            ]
+          }
+        ],
+        "provenance": {
+          "python_sha256": "fd92ca78abaa9be2472ff77dac32774a0c68fb86a1236e930cb1b9886711c4eb",
+          "rust_sha256": "4b38b5ee0aac51ce3cb8950c2f7827b9526f3c128c46274917ffc9a9a1761113",
+          "spec_sha256": "ee164b61e33beb07c195ac3e50a3228b3cc86061028bd690214f936d39b02106",
+          "tests_active": 7,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "API STD 610 (2021). Centrifugal Pumps for Petroleum, Petrochemical and Natural Gas Industries."
+        ],
+        "refusal": null,
+        "summary": "The shut-off deadhead pressure against the protected rating, and the minimum-flow recirculation temperature rise.",
+        "worked_example": {}
+      },
+      "id": "process.pump_deadhead",
+      "name": "Pump deadhead and minimum-flow temperature rise",
+      "native": true,
+      "purpose": "The shut-off deadhead pressure against the protected rating, and the minimum-flow recirculation temperature rise.",
+      "refusal": null,
+      "sub_interface": "equipmentsafety"
+    },
+    {
       "family": "overpressure",
       "id": "process.relief_disposal_network",
       "name": "Relief disposal network",
@@ -26673,6 +27417,285 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": "risk"
+    },
+    {
+      "family": "equipmentsafety",
+      "form": {
+        "assumptions": [
+          "**the total heat is `|dH| n` and the adiabatic rise is `Q/(m cp)`**; the enthalpy sign is ignored.",
+          "**the MTSR is `T0 + dTad` and the margin is `MAT - MTSR`**; the exceeded test is strict.",
+          "**the time to maximum rate is `cp R T0^2/(q0 Ea)` with `R = 8.314462618`**, published only when both the activation energy and the initial rate are positive.",
+          "**without a MAT the verdict is `runaway_risk` at a rise of 200 K and `marginal` at 50 K**, both inclusive; otherwise `no_rating`.",
+          "**with a MAT the verdict is `runaway_risk` when the margin is negative and `marginal` when it is below the acceptable margin**, strictly; otherwise `acceptable_margin`.",
+          "**the two-phase relief flag is the gassy flag or an exceeded margin.** A negative acceptable margin is accepted, as the class accepts it; the defaults are 50 K and not gassy.",
+          "**the initial heat-release rate is stated in W/kg and declared dimensionless**, because the vocabulary has no specific-power unit; the class's fluid-derived mass and specific heat are supplied explicitly."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.runaway_reaction",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the process temperature, above absolute zero.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "process_temperature",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive process temperature",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the reaction enthalpy in J per mole of limiting reactant; **the sign is ignored**.\n",
+            "dimension": "molar_energy",
+            "kind": "quantity",
+            "name": "reaction_enthalpy",
+            "range": [],
+            "required": true,
+            "unit": "J/mol",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the moles of limiting reactant, above zero.\n",
+            "dimension": "amount",
+            "kind": "quantity",
+            "name": "limiting_reactant_moles",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses non-positive limiting-reactant moles",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "mol",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the reacting mass, above zero.\n",
+            "dimension": "mass",
+            "kind": "quantity",
+            "name": "total_mass",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive reacting mass",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "kg",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the reacting mixture's specific heat, above zero.\n",
+            "dimension": "specific_heat_capacity",
+            "kind": "quantity",
+            "name": "specific_heat",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive specific heat",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "J/(kg*K)",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the maximum allowable temperature, **above the process temperature**. Absent publishes no margin and selects the adiabatic-severity bands.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "max_allowable_temperature",
+            "range": [],
+            "required": false,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the apparent activation energy; the TMR needs it positive together with the initial rate.\n",
+            "dimension": "molar_energy",
+            "kind": "quantity",
+            "name": "activation_energy",
+            "range": [],
+            "required": false,
+            "unit": "J/mol",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the specific heat-release rate at the process temperature, **in W/kg**. Dimensionless because the vocabulary has no specific-power unit.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "initial_heat_release_rate",
+            "range": [],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the acceptable margin between the MAT and the MTSR; **absent is 50 K**, and a negative value is accepted as the class accepts it.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "acceptable_margin",
+            "range": [],
+            "required": false,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "whether the reaction generates permanent gas; **absent is false** and the flag forces the two-phase relief screen.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "gassy_system",
+            "range": [],
+            "required": false,
+            "unit": null,
+            "values": []
+          }
+        ],
+        "name": "Runaway reaction screening",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "`|dH| n/(m cp)`.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "adiabatic_temperature_rise",
+            "optional": false,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "description": "`process_temperature + adiabatic_temperature_rise`.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "mtsr",
+            "optional": false,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "description": "`max_allowable_temperature - mtsr`; **absent without a MAT**.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "temperature_margin",
+            "optional": true,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "description": "whether the MTSR is strictly above the MAT; false without a MAT.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "margin_exceeded",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "`|dH| n`.\n",
+            "dimension": "energy",
+            "kind": "quantity",
+            "name": "total_heat_release",
+            "optional": false,
+            "unit": "J",
+            "values": []
+          },
+          {
+            "description": "`cp R T0^2/(q0 Ea)`; **absent unless both the activation energy and the initial rate are positive**.\n",
+            "dimension": "time",
+            "kind": "quantity",
+            "name": "time_to_max_rate",
+            "optional": true,
+            "unit": "s",
+            "values": []
+          },
+          {
+            "description": "whether the gassy flag is set or the margin is exceeded.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "two_phase_relief_screening_required",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "the class's classification.\n",
+            "dimension": null,
+            "kind": "enum",
+            "name": "verdict",
+            "optional": false,
+            "unit": null,
+            "values": [
+              "no_rating",
+              "acceptable_margin",
+              "marginal",
+              "runaway_risk"
+            ]
+          }
+        ],
+        "provenance": {
+          "python_sha256": "201b43ff1e1916dad856a8eb3cba56ca331e142155f835381762be9762e663ca",
+          "rust_sha256": "4cd0bd1265038c75e8e6e0c3b56c23f5657656f23729cffaf932b1d9e037d687",
+          "spec_sha256": "09423d5b131f4af9254f50a46b85c68c6db3fec5714f733dacb1501358df383c",
+          "tests_active": 7,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "Stoessel, F. (2008). Thermal Safety of Chemical Processes: Risk Assessment and Process Design. Wiley-VCH."
+        ],
+        "refusal": null,
+        "summary": "The adiabatic temperature rise, MTSR, margin, time to maximum rate and the two-phase relief flag.",
+        "worked_example": {}
+      },
+      "id": "process.runaway_reaction",
+      "name": "Runaway reaction screening",
+      "native": true,
+      "purpose": "The adiabatic temperature rise, MTSR, margin, time to maximum rate and the two-phase relief flag.",
+      "refusal": null,
+      "sub_interface": "equipmentsafety"
     },
     {
       "family": "processsafetysystem",
@@ -27358,6 +28381,15 @@
       "sub_interface": null
     },
     {
+      "family": "equipmentsafety",
+      "id": "process.settle_out_pressure",
+      "name": "Settle-out pressure of connected gas volumes",
+      "native": false,
+      "purpose": "The settle-out pressure of connected gas volumes against the protected rating, with each compartment's inventory.",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "equipmentsafety"
+    },
+    {
       "family": "risk",
       "id": "process.sil_verification",
       "name": "SIL verification",
@@ -27589,6 +28621,15 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": "overpressure"
+    },
+    {
+      "family": "equipmentsafety",
+      "id": "process.vacuum_collapse",
+      "name": "Vacuum collapse screening",
+      "native": false,
+      "purpose": "The constant-volume cooling sweep's minimum pressure against the external rating, and the make-up gas.",
+      "refusal": "this calculation takes a fluid as input, which a scenario does not yet provide",
+      "sub_interface": "equipmentsafety"
     },
     {
       "family": "fire",

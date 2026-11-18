@@ -1630,6 +1630,229 @@ def _fire_monitor_coverage(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _settle_out_pressure(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.settle_out_pressure`'s layers, from the reference's arithmetic.
+
+    The verdict and the exceeds flag are the model's own words, asserted by its test and
+    the cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.settle_out_pressure import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    rows: list[dict[str, object]] = [
+        {
+            "name": str(row["name"]),
+            "volume": quantity(float(row["volume"]), "m**3"),
+            "pressure": quantity(float(row["pressure"]), "Pa"),
+            "temperature": quantity(float(row["temperature"]), "K"),
+        }
+        for row in inputs["compartments"]
+    ]
+    solution, _ = _evaluate(
+        rows,
+        settle_out_temperature=optional("settle_out_temperature", "K"),
+        protected_pressure_rating=optional("protected_pressure_rating", "Pa"),
+    )
+    dumped = {
+        "settle_out_pressure_bara": solution.pressure / 1.0e5,
+        "settle_out_temperature_k": solution.temperature,
+        "settle_out_z_factor": 1.0,
+        "total_moles": solution.total_moles,
+        "total_volume_m3": solution.total_volume,
+        "max_compartment_pressure_bara": solution.max_pressure / 1.0e5,
+        "min_compartment_pressure_bara": solution.min_pressure / 1.0e5,
+    }
+    if solution.margin is not None:
+        dumped["margin_to_rating_bar"] = solution.margin / 1.0e5
+    return dumped
+
+
+def _vacuum_collapse(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.vacuum_collapse`'s layers, from the reference's arithmetic.
+
+    The verdict and the two flags are the model's own words, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.vacuum_collapse import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["mole_fractions"]],
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["initial_pressure"]), "Pa"),
+        quantity(float(inputs["initial_temperature"]), "K"),
+        quantity(float(inputs["cold_end_temperature"]), "K"),
+        atmospheric_pressure=optional("atmospheric_pressure", "Pa"),
+        external_pressure_rating=optional("external_pressure_rating", "Pa"),
+        makeup_setpoint=optional("makeup_setpoint", "Pa"),
+        makeup_gas_molar_mass=optional("makeup_gas_molar_mass", "kg/mol"),
+        cooling_steps=(
+            None if inputs.get("cooling_steps") is None else float(inputs["cooling_steps"])
+        ),
+    )
+    return {
+        "final_pressure_bara": solution.final_pressure / 1.0e5,
+        "minimum_pressure_bara": solution.minimum_pressure / 1.0e5,
+        "minimum_pressure_temperature_k": solution.minimum_temperature,
+        "vacuum_depth_bar": solution.vacuum_depth / 1.0e5,
+        "margin_to_rating_bar": solution.margin / 1.0e5,
+        "makeup_gas_moles": solution.makeup_moles,
+        "makeup_gas_mass_kg": solution.makeup_mass,
+    }
+
+
+def _mdmt(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.mdmt`'s layers, from the reference's arithmetic.
+
+    The verdict is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.mdmt import _evaluate
+
+    solution, _ = _evaluate(
+        str(inputs["material_curve"]),
+        quantity(float(inputs["governing_thickness"]), "m"),
+        stress_ratio=(
+            None if inputs.get("stress_ratio") is None else float(inputs["stress_ratio"])
+        ),
+        min_operating_temperature=quantity(float(inputs["min_operating_temperature"]), "K"),
+    )
+    return {"mdmt_c": solution.mdmt_k - 273.15, "mdmt_k": solution.mdmt_k}
+
+
+def _runaway_reaction(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.runaway_reaction`'s layers, from the reference's arithmetic.
+
+    The verdict and the two flags are the model's own words, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.runaway_reaction import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["process_temperature"]), "K"),
+        quantity(float(inputs["reaction_enthalpy"]), "J/mol"),
+        quantity(float(inputs["limiting_reactant_moles"]), "mol"),
+        quantity(float(inputs["total_mass"]), "kg"),
+        quantity(float(inputs["specific_heat"]), "J/(kg*K)"),
+        max_allowable_temperature=optional("max_allowable_temperature", "K"),
+        activation_energy=optional("activation_energy", "J/mol"),
+        initial_heat_release_rate=(
+            None
+            if inputs.get("initial_heat_release_rate") is None
+            else float(inputs["initial_heat_release_rate"])
+        ),
+        acceptable_margin=optional("acceptable_margin", "K"),
+        gassy_system=(None if inputs.get("gassy_system") is None else bool(inputs["gassy_system"])),
+    )
+    dumped = {
+        "adiabatic_temperature_rise_k": solution.rise,
+        "mtsr_k": solution.mtsr,
+        "total_heat_release_j": solution.heat,
+    }
+    if solution.margin is not None:
+        dumped["temperature_margin_k"] = solution.margin
+    if solution.tmr is not None:
+        dumped["time_to_max_rate_s"] = solution.tmr
+    return dumped
+
+
+def _pump_deadhead(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.pump_deadhead`'s layers, from the reference's arithmetic.
+
+    The verdict and the two flags are the model's own words, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.pump_deadhead import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["suction_pressure"]), "Pa"),
+        quantity(float(inputs["normal_discharge_pressure"]), "Pa"),
+        shutoff_head_ratio=(
+            None
+            if inputs.get("shutoff_head_ratio") is None
+            else float(inputs["shutoff_head_ratio"])
+        ),
+        protected_pressure_rating=optional("protected_pressure_rating", "Pa"),
+        liquid_density=optional("liquid_density", "kg/m**3"),
+        specific_heat=optional("specific_heat", "J/(kg*K)"),
+        minimum_flow_efficiency=(
+            None
+            if inputs.get("minimum_flow_efficiency") is None
+            else float(inputs["minimum_flow_efficiency"])
+        ),
+        max_allowable_temperature_rise=optional("max_allowable_temperature_rise", "K"),
+    )
+    dumped = {
+        "rated_differential_bara": solution.rated / 1.0e5,
+        "deadhead_pressure_bara": solution.deadhead / 1.0e5,
+    }
+    if solution.margin is not None:
+        dumped["pressure_margin_bara"] = solution.margin / 1.0e5
+    if solution.head is not None:
+        dumped["shutoff_head_m"] = solution.head
+    if solution.rise is not None:
+        dumped["recirculation_temp_rise_k"] = solution.rise
+    return dumped
+
+
+def _gas_blowby(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.gas_blowby`'s layers, from the reference's arithmetic.
+
+    The verdict and the adequacy flag are the model's own words, asserted by its test and
+    the cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.gas_blowby import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["upstream_pressure"]), "Pa"),
+        quantity(float(inputs["upstream_temperature"]), "K"),
+        quantity(float(inputs["downstream_pressure"]), "Pa"),
+        quantity(float(inputs["restriction_area"]), "m**2"),
+        float(inputs["specific_heat_ratio"]),
+        quantity(float(inputs["molar_mass"]), "kg/mol"),
+        discharge_coefficient=(
+            None
+            if inputs.get("discharge_coefficient") is None
+            else float(inputs["discharge_coefficient"])
+        ),
+        downstream_relief_capacity=optional("downstream_relief_capacity", "kg/s"),
+    )
+    dumped = {
+        "critical_pressure_ratio": solution.critical_pressure_ratio,
+        "actual_pressure_ratio": solution.actual_pressure_ratio,
+        "blowby_mass_rate_kg_per_hr": solution.mass_rate * 3600.0,
+        "blowby_std_vol_rate_sm3_per_hr": solution.std_vol_rate * 3600.0,
+    }
+    if solution.relief_margin is not None:
+        dumped["relief_margin_kg_per_hr"] = solution.relief_margin * 3600.0
+    return dumped
+
+
 def _fire_water_coverage_assessment(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.fire_water_coverage_assessment`'s layers, from the reference's arithmetic.
 
@@ -3416,6 +3639,12 @@ DUMPERS: dict[str, Dumper] = {
     "process.deluge_nozzle_layout": _deluge_nozzle_layout,
     "process.fire_monitor_coverage": _fire_monitor_coverage,
     "process.fire_water_coverage_assessment": _fire_water_coverage_assessment,
+    "process.gas_blowby": _gas_blowby,
+    "process.pump_deadhead": _pump_deadhead,
+    "process.runaway_reaction": _runaway_reaction,
+    "process.mdmt": _mdmt,
+    "process.vacuum_collapse": _vacuum_collapse,
+    "process.settle_out_pressure": _settle_out_pressure,
     "process.active_fire_protection_screening": _active_fire_protection_screening,
     "process.api537_flare_flame_model": _api537_flare_flame_model,
     "process.fault_tree": _fault_tree,
@@ -4472,6 +4701,66 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_fire_monitor_coverage.tsv",
         block=8,
         identified_by=("#label", "fmc_characteristic_dimension"),
+    ),
+    # Settle-out pressure's one: the two-compartment balance. The five further cases are the
+    # exceeded, equality, three-compartment, stated-temperature and no-rating states; the
+    # unit aliases and the one-compartment refusal are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.settle_out_pressure",
+        case="two_compartments_within",
+        capture="process_settle_out_pressure.tsv",
+        block=0,
+        identified_by=("#label", "settle_two_within"),
+    ),
+    # Vacuum collapse's one: the condensing sweep at a 0.2 bara rating. The five further
+    # cases are the non-condensing, exceeded, no-rating, make-up and five-step states; the
+    # unit aliases and the cold-end refusal are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.vacuum_collapse",
+        case="vacuum_within_rating",
+        capture="process_vacuum_collapse.tsv",
+        block=1,
+        identified_by=("#label", "vacuum_mixed_condense"),
+    ),
+    # MDMT's one: curve B at 25 mm. The seven further cases are the other curves, the
+    # stress-ratio reduction, the clamps and the passing and failing verdicts; the curves C
+    # and D at 25 mm are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.mdmt",
+        case="curve_b_25",
+        capture="process_mdmt.tsv",
+        block=1,
+        identified_by=("#label", "mdmt_curve_b_25"),
+    ),
+    # Runaway reaction's one: the no-MAT low state. The six further cases are the severity
+    # bands, the MAT verdicts, the gassy state and the TMR; the unit aliases are declared in
+    # `UNCASED_ROWS`.
+    LayerCase(
+        model="process.runaway_reaction",
+        case="no_mat_low",
+        capture="process_runaway_reaction.tsv",
+        block=0,
+        identified_by=("#label", "runaway_no_mat_low"),
+    ),
+    # Pump deadhead's one: the within-rating state. The six further cases are the exceeded,
+    # equality, no-rating, rise and absent-density states; the unit aliases are declared in
+    # `UNCASED_ROWS`.
+    LayerCase(
+        model="process.pump_deadhead",
+        case="within_rating",
+        capture="process_pump_deadhead.tsv",
+        block=0,
+        identified_by=("#label", "pump_within_rating"),
+    ),
+    # Gas blowby's one: the choked state the class's first test states. The five further
+    # cases are the subcritical, boundary, zero-margin and no-capacity states; the unit
+    # aliases and the diameter setter are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.gas_blowby",
+        case="choked_adequate",
+        capture="process_gas_blowby.tsv",
+        block=0,
+        identified_by=("#label", "blowby_choked_adequate"),
     ),
     # The coverage assessment's five: the class's four tests and the coverage gap with the
     # supply in hand. The unset-supply state and the five refusals are uncased.
@@ -7279,6 +7568,21 @@ UNCASED_ROWS: dict[str, int] = {
     "process_deluge_nozzle_layout.tsv": 8,
     # The monitor coverage's eleven: the constructor and each setter's refusal.
     "process_fire_monitor_coverage.tsv": 11,
+    # Settle-out pressure's seven: the five further model cases, the unit aliases and the
+    # one-compartment refusal.
+    "process_settle_out_pressure.tsv": 7,
+    # Vacuum collapse's seven: the five further model cases, the unit aliases and the
+    # cold-end refusal.
+    "process_vacuum_collapse.tsv": 7,
+    # MDMT's nine: the seven further model cases and the unit aliases.
+    "process_mdmt.tsv": 9,
+    # Runaway reaction's seven: the six further model cases and the unit aliases.
+    "process_runaway_reaction.tsv": 7,
+    # Pump deadhead's seven: the six further model cases and the unit aliases.
+    "process_pump_deadhead.tsv": 7,
+    # Gas blowby's seven: the five further model cases, the unit aliases and the
+    # restriction-diameter setter.
+    "process_gas_blowby.tsv": 7,
     # The coverage assessment's six: the unset-supply state, where the class's NaN defaults
     # read as feasible, and the constructor and setter refusals.
     "process_fire_water_coverage_assessment.tsv": 6,

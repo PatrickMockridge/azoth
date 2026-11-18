@@ -1,0 +1,141 @@
+model = "process.vacuum_collapse"
+[[cases]]
+id = "no_vacuum"
+tolerance = 1.0e-7
+source = "Methane cooled from 300 K to 250 K in a rigid vessel at 5 bara: the pressure falls to 4.145 bara, above atmosphere, so no vacuum develops. From `validation/neqsim/captures/process_vacuum_collapse.tsv` (`vacuum_gas_cool`)."
+[cases.inputs]
+components = ["methane"]
+mole_fractions = [1.0]
+vessel_volume = 10.0
+initial_pressure = 5.0e5
+initial_temperature = 300.0
+cold_end_temperature = 250.0
+external_pressure_rating = 1.0e5
+[cases.expected]
+final_pressure = 414496.2552504512
+minimum_pressure = 414496.2552504512
+minimum_pressure_temperature = 250.0
+vacuum_depth = 0.0
+margin_to_rating = 314496.2552504512
+vacuum_present = false
+within_rating = true
+makeup_gas_moles = 0.0
+makeup_gas_mass = 0.0
+verdict = "no_vacuum"
+[[cases]]
+id = "vacuum_within_rating"
+tolerance = 1.0e-7
+source = "A 20/80 methane/propane inventory cooled to 180 K falls to 0.652 bara, a vacuum that stays above a 0.2 bara rating. From (`vacuum_mixed_condense`)."
+[cases.inputs]
+components = ["methane", "propane"]
+mole_fractions = [0.2, 0.8]
+vessel_volume = 10.0
+initial_pressure = 5.0e5
+initial_temperature = 300.0
+cold_end_temperature = 180.0
+external_pressure_rating = 2.0e4
+[cases.expected]
+final_pressure = 65232.37382223759
+minimum_pressure = 65232.37382223759
+minimum_pressure_temperature = 180.0
+vacuum_depth = 36092.62617776241
+margin_to_rating = 45232.37382223759
+vacuum_present = true
+within_rating = true
+makeup_gas_moles = 241.1636194531241
+makeup_gas_mass = 6.755812937188147
+verdict = "vacuum_within_rating"
+[[cases]]
+id = "vacuum_exceeds_rating"
+tolerance = 1.0e-7
+source = "The same inventory against a 0.8 bara rating: the 0.652 bara minimum is below it. From (`vacuum_exceeds_rating`)."
+[cases.inputs]
+components = ["methane", "propane"]
+mole_fractions = [0.2, 0.8]
+vessel_volume = 10.0
+initial_pressure = 5.0e5
+initial_temperature = 300.0
+cold_end_temperature = 180.0
+external_pressure_rating = 8.0e4
+[cases.expected]
+final_pressure = 65232.37382223759
+minimum_pressure = 65232.37382223759
+minimum_pressure_temperature = 180.0
+vacuum_depth = 36092.62617776241
+margin_to_rating = -14767.626177762416
+vacuum_present = true
+within_rating = false
+makeup_gas_moles = 241.1636194531241
+makeup_gas_mass = 6.755812937188147
+verdict = "vacuum_exceeds_rating"
+[[cases]]
+id = "no_rating"
+tolerance = 1.0e-7
+source = "No rating: the class assumes a full-vacuum-rated vessel at 0 bara, so the same minimum is within it. From (`vacuum_no_rating`)."
+[cases.inputs]
+components = ["methane", "propane"]
+mole_fractions = [0.2, 0.8]
+vessel_volume = 10.0
+initial_pressure = 5.0e5
+initial_temperature = 300.0
+cold_end_temperature = 180.0
+[cases.expected]
+final_pressure = 65232.37382223759
+minimum_pressure = 65232.37382223759
+minimum_pressure_temperature = 180.0
+vacuum_depth = 36092.62617776241
+margin_to_rating = 65232.37382223759
+vacuum_present = true
+within_rating = true
+makeup_gas_moles = 241.1636194531241
+makeup_gas_mass = 6.755812937188147
+verdict = "vacuum_within_rating"
+[[cases]]
+id = "makeup_setpoint"
+tolerance = 1.0e-7
+source = "A 1 bara make-up setpoint makes the gas 232.31 mol of a 0.028 kg/mol make-up gas. From (`vacuum_makeup`)."
+[cases.inputs]
+components = ["methane", "propane"]
+mole_fractions = [0.2, 0.8]
+vessel_volume = 10.0
+initial_pressure = 5.0e5
+initial_temperature = 300.0
+cold_end_temperature = 180.0
+external_pressure_rating = 2.0e4
+makeup_setpoint = 1.0e5
+makeup_gas_molar_mass = 0.028
+[cases.expected]
+final_pressure = 65232.37382223759
+minimum_pressure = 65232.37382223759
+minimum_pressure_temperature = 180.0
+vacuum_depth = 36092.62617776241
+margin_to_rating = 45232.37382223759
+vacuum_present = true
+within_rating = true
+makeup_gas_moles = 232.31023776231584
+makeup_gas_mass = 6.504686657344844
+verdict = "vacuum_within_rating"
+[[cases]]
+id = "five_steps"
+tolerance = 1.0e-7
+source = "Five steps instead of twenty: the cold end is unchanged, so the minimum and the make-up are the same to the capture's digits. From (`vacuum_steps_five`)."
+[cases.inputs]
+components = ["methane", "propane"]
+mole_fractions = [0.2, 0.8]
+vessel_volume = 10.0
+initial_pressure = 5.0e5
+initial_temperature = 300.0
+cold_end_temperature = 180.0
+external_pressure_rating = 2.0e4
+cooling_steps = 5.0
+[cases.expected]
+final_pressure = 65232.37382223752
+minimum_pressure = 65232.37382223752
+minimum_pressure_temperature = 180.0
+vacuum_depth = 36092.62617776248
+margin_to_rating = 45232.37382223752
+vacuum_present = true
+within_rating = true
+makeup_gas_moles = 241.16361945312454
+makeup_gas_mass = 6.755812937188159
+verdict = "vacuum_within_rating"

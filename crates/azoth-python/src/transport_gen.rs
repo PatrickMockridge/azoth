@@ -25,9 +25,9 @@ use crate::record_outputs_gen::{
     PyNaceIssueRow, PyPipeFireRupturePoint, PyRegisterFinding, PyReliefDisposalRow,
     PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
     PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
-    PyWaterMixingResult, PyZoneRatingRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint,
+    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
+    PySubFraction, PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -17579,6 +17579,86 @@ impl From<&azoth_process::models::fmea_worksheet::FmeaWorksheetResult> for PyFme
         }
     }
 }
+/// Result of `process.gas_blowby`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GasBlowbyResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGasBlowbyResult {
+    /// whether the flow is choked at the stated pressure ratio.
+    #[pyo3(get)]
+    pub choked: bool,
+    /// `(2/(k+1))^(k/(k-1))`, the pressure ratio at and below which the flow is choked.
+    #[pyo3(get)]
+    pub critical_pressure_ratio: f64,
+    /// `p2/p1`.
+    #[pyo3(get)]
+    pub actual_pressure_ratio: f64,
+    /// the blowby mass rate through the restriction, choked or subcritical.
+    #[pyo3(get)]
+    pub blowby_mass_rate: PyQty,
+    /// the same rate as a standard volume flow at 288.15 K and 101325 Pa.
+    #[pyo3(get)]
+    pub blowby_std_vol_rate: PyQty,
+    /// `capacity - blowby_mass_rate`; **absent when no capacity is stated**.
+    #[pyo3(get)]
+    pub relief_margin: Option<PyQty>,
+    /// whether the stated capacity is at least the blowby rate; false when no capacity is stated.
+    #[pyo3(get)]
+    pub relief_adequate: bool,
+    /// the class's verdict: no capacity, adequate, or inadequate.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyGasBlowbyResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "GasBlowbyResult(choked={:?}, critical_pressure_ratio={:?}, actual_pressure_ratio={:?}, blowby_mass_rate={:?}, blowby_std_vol_rate={:?}, relief_margin={:?}, relief_adequate={:?}, verdict={:?}, {} warning(s))",
+            self.choked,
+            self.critical_pressure_ratio,
+            self.actual_pressure_ratio,
+            self.blowby_mass_rate,
+            self.blowby_std_vol_rate,
+            self.relief_margin,
+            self.relief_adequate,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::gas_blowby::GasBlowbyResult> for PyGasBlowbyResult {
+    fn from(r: &azoth_process::models::gas_blowby::GasBlowbyResult) -> Self {
+        Self {
+            choked: r.choked,
+            critical_pressure_ratio: r.critical_pressure_ratio,
+            actual_pressure_ratio: r.actual_pressure_ratio,
+            blowby_mass_rate: PyQty {
+                magnitude_si: r.blowby_mass_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            blowby_std_vol_rate: PyQty {
+                magnitude_si: r.blowby_std_vol_rate.value,
+                unit: "m**3/s".to_string(),
+            },
+            relief_margin: r.relief_margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            relief_adequate: r.relief_adequate,
+            verdict: r.verdict.as_str().to_string(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.gas_dispersion`, transported.
 #[pyclass(
     frozen,
@@ -20079,6 +20159,50 @@ impl From<&azoth_process::models::map_turbo_expander_compressor::MapTurboExpande
         }
     }
 }
+/// Result of `process.mdmt`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MdmtResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMdmtResult {
+    /// the minimum design metal temperature without impact testing.
+    #[pyo3(get)]
+    pub mdmt: PyQty,
+    /// whether the minimum operating temperature is at or above the MDMT.
+    #[pyo3(get)]
+    pub acceptable: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyMdmtResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "MdmtResult(mdmt={:?}, acceptable={:?}, {} warning(s))",
+            self.mdmt,
+            self.acceptable,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::mdmt::MdmtResult> for PyMdmtResult {
+    fn from(r: &azoth_process::models::mdmt::MdmtResult) -> Self {
+        Self {
+            mdmt: PyQty {
+                magnitude_si: r.mdmt.value,
+                unit: "K".to_string(),
+            },
+            acceptable: r.acceptable,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.mixer`, transported.
 #[pyclass(
     frozen,
@@ -22376,6 +22500,92 @@ impl From<&azoth_process::models::pump::PumpResult> for PyPumpResult {
         }
     }
 }
+/// Result of `process.pump_deadhead`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PumpDeadheadResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPumpDeadheadResult {
+    /// `normal_discharge_pressure - suction_pressure`.
+    #[pyo3(get)]
+    pub rated_differential_pressure: PyQty,
+    /// `suction_pressure + ratio (normal_discharge_pressure - suction_pressure)`.
+    #[pyo3(get)]
+    pub deadhead_pressure: PyQty,
+    /// `rating - deadhead_pressure`; **absent when no rating is stated**.
+    #[pyo3(get)]
+    pub pressure_margin: Option<PyQty>,
+    /// whether the deadhead pressure is strictly above the rating; false without a rating.
+    #[pyo3(get)]
+    pub pressure_rating_exceeded: bool,
+    /// `shutoff_dp/(rho g)`; **absent without density or specific heat**.
+    #[pyo3(get)]
+    pub shutoff_head: Option<PyQty>,
+    /// the minimum-flow recirculation rise; **absent without density or specific heat**.
+    #[pyo3(get)]
+    pub recirculation_temperature_rise: Option<PyQty>,
+    /// whether the rise is strictly above the allowable one; false when either is absent.
+    #[pyo3(get)]
+    pub temp_rise_exceeded: bool,
+    /// the class's verdict: no rating, within it, or exceeded.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPumpDeadheadResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PumpDeadheadResult(rated_differential_pressure={:?}, deadhead_pressure={:?}, pressure_margin={:?}, pressure_rating_exceeded={:?}, shutoff_head={:?}, recirculation_temperature_rise={:?}, temp_rise_exceeded={:?}, verdict={:?}, {} warning(s))",
+            self.rated_differential_pressure,
+            self.deadhead_pressure,
+            self.pressure_margin,
+            self.pressure_rating_exceeded,
+            self.shutoff_head,
+            self.recirculation_temperature_rise,
+            self.temp_rise_exceeded,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::pump_deadhead::PumpDeadheadResult> for PyPumpDeadheadResult {
+    fn from(r: &azoth_process::models::pump_deadhead::PumpDeadheadResult) -> Self {
+        Self {
+            rated_differential_pressure: PyQty {
+                magnitude_si: r.rated_differential_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            deadhead_pressure: PyQty {
+                magnitude_si: r.deadhead_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            pressure_margin: r.pressure_margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            pressure_rating_exceeded: r.pressure_rating_exceeded,
+            shutoff_head: r.shutoff_head.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m".to_string(),
+            }),
+            recirculation_temperature_rise: r.recirculation_temperature_rise.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            temp_rise_exceeded: r.temp_rise_exceeded,
+            verdict: r.verdict.as_str().to_string(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.rate_based_packed_column`, transported.
 #[pyclass(
     frozen,
@@ -22897,6 +23107,94 @@ impl From<&azoth_process::models::risk_matrix::RiskMatrixResult> for PyRiskMatri
                 .map(PyRiskAssessmentRow::from)
                 .collect(),
             total_annual_risk_cost: r.total_annual_risk_cost,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.runaway_reaction`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RunawayReactionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRunawayReactionResult {
+    /// `|dH| n/(m cp)`.
+    #[pyo3(get)]
+    pub adiabatic_temperature_rise: PyQty,
+    /// `process_temperature + adiabatic_temperature_rise`.
+    #[pyo3(get)]
+    pub mtsr: PyQty,
+    /// `max_allowable_temperature - mtsr`; **absent without a MAT**.
+    #[pyo3(get)]
+    pub temperature_margin: Option<PyQty>,
+    /// whether the MTSR is strictly above the MAT; false without a MAT.
+    #[pyo3(get)]
+    pub margin_exceeded: bool,
+    /// `|dH| n`.
+    #[pyo3(get)]
+    pub total_heat_release: PyQty,
+    /// `cp R T0^2/(q0 Ea)`; **absent unless both the activation energy and the initial rate are positive**.
+    #[pyo3(get)]
+    pub time_to_max_rate: Option<PyQty>,
+    /// whether the gassy flag is set or the margin is exceeded.
+    #[pyo3(get)]
+    pub two_phase_relief_screening_required: bool,
+    /// the class's classification.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyRunawayReactionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "RunawayReactionResult(adiabatic_temperature_rise={:?}, mtsr={:?}, temperature_margin={:?}, margin_exceeded={:?}, total_heat_release={:?}, time_to_max_rate={:?}, two_phase_relief_screening_required={:?}, verdict={:?}, {} warning(s))",
+            self.adiabatic_temperature_rise,
+            self.mtsr,
+            self.temperature_margin,
+            self.margin_exceeded,
+            self.total_heat_release,
+            self.time_to_max_rate,
+            self.two_phase_relief_screening_required,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::runaway_reaction::RunawayReactionResult>
+    for PyRunawayReactionResult
+{
+    fn from(r: &azoth_process::models::runaway_reaction::RunawayReactionResult) -> Self {
+        Self {
+            adiabatic_temperature_rise: PyQty {
+                magnitude_si: r.adiabatic_temperature_rise.value,
+                unit: "K".to_string(),
+            },
+            mtsr: PyQty {
+                magnitude_si: r.mtsr.value,
+                unit: "K".to_string(),
+            },
+            temperature_margin: r.temperature_margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            margin_exceeded: r.margin_exceeded,
+            total_heat_release: PyQty {
+                magnitude_si: r.total_heat_release.value,
+                unit: "J".to_string(),
+            },
+            time_to_max_rate: r.time_to_max_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            two_phase_relief_screening_required: r.two_phase_relief_screening_required,
+            verdict: r.verdict.as_str().to_string(),
             warnings: transport(&r.warnings),
         }
     }
@@ -24217,6 +24515,119 @@ impl From<&azoth_process::models::separator_performance::SeparatorPerformanceRes
                 magnitude_si: v.value,
                 unit: "m".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.settle_out_pressure`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SettleOutPressureResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySettleOutPressureResult {
+    /// the pressure the connected volumes settle at, `N R T_s / sum V_i`.
+    #[pyo3(get)]
+    pub settle_out_pressure: PyQty,
+    /// the settled temperature, stated or mole-weighted.
+    #[pyo3(get)]
+    pub settle_out_temperature: PyQty,
+    /// the settle-out compressibility, **1.0**: the class's no-gas state.
+    #[pyo3(get)]
+    pub settle_out_z_factor: f64,
+    /// the summed inventory.
+    #[pyo3(get)]
+    pub total_moles: PyQty,
+    /// the summed volume.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the largest stated compartment pressure.
+    #[pyo3(get)]
+    pub max_compartment_pressure: PyQty,
+    /// the smallest stated compartment pressure.
+    #[pyo3(get)]
+    pub min_compartment_pressure: PyQty,
+    /// `rating - settle_out_pressure`; **absent when no rating is stated**.
+    #[pyo3(get)]
+    pub margin_to_rating: Option<PyQty>,
+    /// whether the settle-out pressure is strictly above the rating.
+    #[pyo3(get)]
+    pub exceeds_rating: bool,
+    /// the class's verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// one row per compartment, in the caller's order, with its Z and moles.
+    #[pyo3(get)]
+    pub compartments: Vec<PySettleOutCompartmentResult>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySettleOutPressureResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SettleOutPressureResult(settle_out_pressure={:?}, settle_out_temperature={:?}, settle_out_z_factor={:?}, total_moles={:?}, total_volume={:?}, max_compartment_pressure={:?}, min_compartment_pressure={:?}, margin_to_rating={:?}, exceeds_rating={:?}, verdict={:?}, compartments={:?}, {} warning(s))",
+            self.settle_out_pressure,
+            self.settle_out_temperature,
+            self.settle_out_z_factor,
+            self.total_moles,
+            self.total_volume,
+            self.max_compartment_pressure,
+            self.min_compartment_pressure,
+            self.margin_to_rating,
+            self.exceeds_rating,
+            self.verdict,
+            self.compartments,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::settle_out_pressure::SettleOutPressureResult>
+    for PySettleOutPressureResult
+{
+    fn from(r: &azoth_process::models::settle_out_pressure::SettleOutPressureResult) -> Self {
+        Self {
+            settle_out_pressure: PyQty {
+                magnitude_si: r.settle_out_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            settle_out_temperature: PyQty {
+                magnitude_si: r.settle_out_temperature.value,
+                unit: "K".to_string(),
+            },
+            settle_out_z_factor: r.settle_out_z_factor,
+            total_moles: PyQty {
+                magnitude_si: r.total_moles.value,
+                unit: "mol".to_string(),
+            },
+            total_volume: PyQty {
+                magnitude_si: r.total_volume.value,
+                unit: "m**3".to_string(),
+            },
+            max_compartment_pressure: PyQty {
+                magnitude_si: r.max_compartment_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            min_compartment_pressure: PyQty {
+                magnitude_si: r.min_compartment_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            margin_to_rating: r.margin_to_rating.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "Pa".to_string(),
+            }),
+            exceeds_rating: r.exceeds_rating,
+            verdict: r.verdict.as_str().to_string(),
+            compartments: r
+                .compartments
+                .iter()
+                .map(PySettleOutCompartmentResult::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }
@@ -26217,6 +26628,110 @@ impl From<&azoth_process::models::turbo_expander_compressor::TurboExpanderResult
                 magnitude_si: v.value,
                 unit: "m".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.vacuum_collapse`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "VacuumCollapseResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyVacuumCollapseResult {
+    /// the pressure at the cold end, the last step's.
+    #[pyo3(get)]
+    pub final_pressure: PyQty,
+    /// the smallest pressure on the cooling curve.
+    #[pyo3(get)]
+    pub minimum_pressure: PyQty,
+    /// the temperature at which the smallest pressure is reached.
+    #[pyo3(get)]
+    pub minimum_pressure_temperature: PyQty,
+    /// `max(0, atmospheric_pressure - minimum_pressure)`.
+    #[pyo3(get)]
+    pub vacuum_depth: PyQty,
+    /// `minimum_pressure - external_pressure_rating`.
+    #[pyo3(get)]
+    pub margin_to_rating: PyQty,
+    /// whether the minimum pressure is below the atmospheric pressure.
+    #[pyo3(get)]
+    pub vacuum_present: bool,
+    /// whether the minimum pressure is at or above the external rating.
+    #[pyo3(get)]
+    pub within_rating: bool,
+    /// the make-up moles needed to hold the setpoint; zero when the minimum stays above it.
+    #[pyo3(get)]
+    pub makeup_gas_moles: PyQty,
+    /// the make-up mass, `moles` times the molar mass.
+    #[pyo3(get)]
+    pub makeup_gas_mass: PyQty,
+    /// the class's verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyVacuumCollapseResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "VacuumCollapseResult(final_pressure={:?}, minimum_pressure={:?}, minimum_pressure_temperature={:?}, vacuum_depth={:?}, margin_to_rating={:?}, vacuum_present={:?}, within_rating={:?}, makeup_gas_moles={:?}, makeup_gas_mass={:?}, verdict={:?}, {} warning(s))",
+            self.final_pressure,
+            self.minimum_pressure,
+            self.minimum_pressure_temperature,
+            self.vacuum_depth,
+            self.margin_to_rating,
+            self.vacuum_present,
+            self.within_rating,
+            self.makeup_gas_moles,
+            self.makeup_gas_mass,
+            self.verdict,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::vacuum_collapse::VacuumCollapseResult>
+    for PyVacuumCollapseResult
+{
+    fn from(r: &azoth_process::models::vacuum_collapse::VacuumCollapseResult) -> Self {
+        Self {
+            final_pressure: PyQty {
+                magnitude_si: r.final_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            minimum_pressure: PyQty {
+                magnitude_si: r.minimum_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            minimum_pressure_temperature: PyQty {
+                magnitude_si: r.minimum_pressure_temperature.value,
+                unit: "K".to_string(),
+            },
+            vacuum_depth: PyQty {
+                magnitude_si: r.vacuum_depth.value,
+                unit: "Pa".to_string(),
+            },
+            margin_to_rating: PyQty {
+                magnitude_si: r.margin_to_rating.value,
+                unit: "Pa".to_string(),
+            },
+            vacuum_present: r.vacuum_present,
+            within_rating: r.within_rating,
+            makeup_gas_moles: PyQty {
+                magnitude_si: r.makeup_gas_moles.value,
+                unit: "mol".to_string(),
+            },
+            makeup_gas_mass: PyQty {
+                magnitude_si: r.makeup_gas_mass.value,
+                unit: "kg".to_string(),
+            },
+            verdict: r.verdict.as_str().to_string(),
             warnings: transport(&r.warnings),
         }
     }

@@ -442,6 +442,75 @@ fn the_s001_secondary_pressure_case_runs_through_the_dispatch() {
 }
 
 #[test]
+fn the_gas_blowby_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.gas_blowby",
+        &json!({
+            "upstream_pressure": 1.0e6,
+            "upstream_temperature": 300.0,
+            "downstream_pressure": 5.0e5,
+            "restriction_area": 1.0e-4,
+            "specific_heat_ratio": 1.3,
+            "molar_mass": 0.020,
+            "downstream_relief_capacity": 0.2777777777777778,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert_eq!(outputs.outputs["choked"], json!(true));
+    assert!((number(outputs, "blowby_mass_rate") - 0.1606026936773972).abs() < 1e-12);
+    assert_eq!(outputs.outputs["verdict"], json!("relief_adequate"));
+}
+
+#[test]
+fn the_pump_deadhead_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.pump_deadhead",
+        &json!({
+            "suction_pressure": 2.0e5,
+            "normal_discharge_pressure": 1.0e6,
+            "protected_pressure_rating": 1.5e6,
+            "liquid_density": 998.0,
+            "specific_heat": 4180.0,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "deadhead_pressure") - 1.16e6).abs() < 1e-6);
+    assert_eq!(outputs.outputs["verdict"], json!("within_rating"));
+}
+
+#[test]
+fn the_runaway_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.runaway_reaction",
+        &json!({
+            "process_temperature": 350.0,
+            "reaction_enthalpy": -100000.0,
+            "limiting_reactant_moles": 10.0,
+            "total_mass": 100.0,
+            "specific_heat": 2000.0,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "adiabatic_temperature_rise") - 5.0).abs() < 1e-12);
+    assert_eq!(outputs.outputs["verdict"], json!("no_rating"));
+}
+
+#[test]
+fn the_mdmt_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.mdmt",
+        &json!({
+            "material_curve": "b",
+            "governing_thickness": 0.025,
+            "min_operating_temperature": 233.15,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert!((number(outputs, "mdmt") - 256.5465598240832).abs() < 1e-9);
+    assert_eq!(outputs.outputs["acceptable"], json!(false));
+}
+
+#[test]
 fn the_sif_case_runs_through_the_dispatch() {
     let outcome = dispatch::run(
         "process.safety_instrumented_function",

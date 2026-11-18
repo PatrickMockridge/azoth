@@ -31,6 +31,7 @@
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
 //!   - specs/models/process/fmea_worksheet.toml
+//!   - specs/models/process/gas_blowby.toml
 //!   - specs/models/process/gas_dispersion.toml
 //!   - specs/models/process/gas_scrubber.toml
 //!   - specs/models/process/gaussian_plume.toml
@@ -48,6 +49,7 @@
 //!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
+//!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/overpressure_acceptance.toml
@@ -65,9 +67,11 @@
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/pump.toml
+//!   - specs/models/process/pump_deadhead.toml
 //!   - specs/models/process/rate_based_packed_column.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
+//!   - specs/models/process/runaway_reaction.toml
 //!   - specs/models/process/s001_clause10_review.toml
 //!   - specs/models/process/s001_secondary_pressure_protection.toml
 //!   - specs/models/process/safety_instrumented_function.toml
@@ -76,6 +80,7 @@
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml
+//!   - specs/models/process/settle_out_pressure.toml
 //!   - specs/models/process/shortcut_distillation_column.toml
 //!   - specs/models/process/sil_verification.toml
 //!   - specs/models/process/splitter.toml
@@ -88,6 +93,7 @@
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
+//!   - specs/models/process/vacuum_collapse.toml
 //!   - specs/models/process/vce.toml
 //!   - specs/models/process/vessel_rupture.toml
 //!

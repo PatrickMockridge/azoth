@@ -12,7 +12,7 @@ use azoth_core::units::{
     cubic_meters, cubic_meters_per_mole, cubic_meters_per_second, joules_per_kilogram_kelvin,
     joules_per_mole, joules_per_mole_kelvin, kelvin_intervals, kelvins, kilograms,
     kilograms_per_cubic_meter, kilograms_per_mole, kilograms_per_second,
-    kilograms_per_square_meter_second, meters, meters_per_second, moles_per_cubic_meter,
+    kilograms_per_square_meter_second, meters, meters_per_second, moles, moles_per_cubic_meter,
     newtons_per_meter, pascal_seconds, pascals, seconds, square_meters, watts,
     watts_per_meter_kelvin, watts_per_square_meter, watts_per_square_meter_kelvin,
 };
@@ -6398,6 +6398,40 @@ pub fn fmea_worksheet(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Gas blowby through a restriction.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (upstream_pressure, upstream_temperature, downstream_pressure, restriction_area, specific_heat_ratio, molar_mass, discharge_coefficient, downstream_relief_capacity))]
+#[pyo3(
+    text_signature = "(upstream_pressure, upstream_temperature, downstream_pressure, restriction_area, specific_heat_ratio, molar_mass, discharge_coefficient, downstream_relief_capacity)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn gas_blowby(
+    py: Python<'_>,
+    upstream_pressure: f64,
+    upstream_temperature: f64,
+    downstream_pressure: f64,
+    restriction_area: f64,
+    specific_heat_ratio: f64,
+    molar_mass: f64,
+    discharge_coefficient: Option<f64>,
+    downstream_relief_capacity: Option<f64>,
+) -> PyResult<crate::transport_gen::PyGasBlowbyResult> {
+    azoth_process::models::gas_blowby::gas_blowby(
+        pascals(upstream_pressure),
+        kelvins(upstream_temperature),
+        pascals(downstream_pressure),
+        square_meters(restriction_area),
+        specific_heat_ratio,
+        kilograms_per_mole(molar_mass),
+        discharge_coefficient,
+        downstream_relief_capacity.map(kilograms_per_second),
+    )
+    .map(|r| crate::transport_gen::PyGasBlowbyResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Gas dispersion screening.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -7010,6 +7044,31 @@ pub fn manifold(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Minimum design metal temperature.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (material_curve, governing_thickness, min_operating_temperature, stress_ratio))]
+#[pyo3(
+    text_signature = "(material_curve, governing_thickness, min_operating_temperature, stress_ratio)"
+)]
+pub fn mdmt(
+    py: Python<'_>,
+    material_curve: &str,
+    governing_thickness: f64,
+    min_operating_temperature: f64,
+    stress_ratio: Option<f64>,
+) -> PyResult<crate::transport_gen::PyMdmtResult> {
+    azoth_process::models::mdmt::mdmt(
+        material_curve,
+        meters(governing_thickness),
+        kelvins(min_operating_temperature),
+        stress_ratio,
+    )
+    .map(|r| crate::transport_gen::PyMdmtResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Mixer.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -7567,6 +7626,40 @@ pub fn psv_sizing(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Pump deadhead and minimum-flow temperature rise.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (suction_pressure, normal_discharge_pressure, shutoff_head_ratio, protected_pressure_rating, liquid_density, specific_heat, minimum_flow_efficiency, max_allowable_temperature_rise))]
+#[pyo3(
+    text_signature = "(suction_pressure, normal_discharge_pressure, shutoff_head_ratio, protected_pressure_rating, liquid_density, specific_heat, minimum_flow_efficiency, max_allowable_temperature_rise)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn pump_deadhead(
+    py: Python<'_>,
+    suction_pressure: f64,
+    normal_discharge_pressure: f64,
+    shutoff_head_ratio: Option<f64>,
+    protected_pressure_rating: Option<f64>,
+    liquid_density: Option<f64>,
+    specific_heat: Option<f64>,
+    minimum_flow_efficiency: Option<f64>,
+    max_allowable_temperature_rise: Option<f64>,
+) -> PyResult<crate::transport_gen::PyPumpDeadheadResult> {
+    azoth_process::models::pump_deadhead::pump_deadhead(
+        pascals(suction_pressure),
+        pascals(normal_discharge_pressure),
+        shutoff_head_ratio,
+        protected_pressure_rating.map(pascals),
+        liquid_density.map(kilograms_per_cubic_meter),
+        specific_heat.map(joules_per_kilogram_kelvin),
+        minimum_flow_efficiency,
+        max_allowable_temperature_rise.map(kelvin_intervals),
+    )
+    .map(|r| crate::transport_gen::PyPumpDeadheadResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Relief disposal network.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -7624,6 +7717,44 @@ pub fn risk_matrix(
         downtime_cost_per_hour,
     )
     .map(|r| crate::transport_gen::PyRiskMatrixResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Runaway reaction screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (process_temperature, reaction_enthalpy, limiting_reactant_moles, total_mass, specific_heat, max_allowable_temperature, activation_energy, initial_heat_release_rate, acceptable_margin, gassy_system))]
+#[pyo3(
+    text_signature = "(process_temperature, reaction_enthalpy, limiting_reactant_moles, total_mass, specific_heat, max_allowable_temperature, activation_energy, initial_heat_release_rate, acceptable_margin, gassy_system)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn runaway_reaction(
+    py: Python<'_>,
+    process_temperature: f64,
+    reaction_enthalpy: f64,
+    limiting_reactant_moles: f64,
+    total_mass: f64,
+    specific_heat: f64,
+    max_allowable_temperature: Option<f64>,
+    activation_energy: Option<f64>,
+    initial_heat_release_rate: Option<f64>,
+    acceptable_margin: Option<f64>,
+    gassy_system: Option<bool>,
+) -> PyResult<crate::transport_gen::PyRunawayReactionResult> {
+    azoth_process::models::runaway_reaction::runaway_reaction(
+        kelvins(process_temperature),
+        joules_per_mole(reaction_enthalpy),
+        moles(limiting_reactant_moles),
+        kilograms(total_mass),
+        joules_per_kilogram_kelvin(specific_heat),
+        max_allowable_temperature.map(kelvins),
+        activation_energy.map(joules_per_mole),
+        initial_heat_release_rate,
+        acceptable_margin.map(kelvin_intervals),
+        gassy_system,
+    )
+    .map(|r| crate::transport_gen::PyRunawayReactionResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -7878,6 +8009,40 @@ pub fn separator_capacity_assessment(
         mechanical_design_max_gas_flow.map(cubic_meters_per_second),
     )
     .map(|r| crate::transport_gen::PySeparatorCapacityAssessmentResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Settle-out pressure of connected gas volumes.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (compartments, settle_out_temperature, protected_pressure_rating))]
+#[pyo3(text_signature = "(compartments, settle_out_temperature, protected_pressure_rating)")]
+pub fn settle_out_pressure(
+    py: Python<'_>,
+    compartments: Vec<crate::records_gen::SettleOutCompartment>,
+    settle_out_temperature: Option<f64>,
+    protected_pressure_rating: Option<f64>,
+) -> PyResult<crate::transport_gen::PySettleOutPressureResult> {
+    let compartments_records: Vec<
+        azoth_process::models::settle_out_pressure::SettleOutCompartment,
+    > = compartments
+        .into_iter()
+        .map(
+            |row| azoth_process::models::settle_out_pressure::SettleOutCompartment {
+                name: row.name,
+                volume: cubic_meters(row.volume),
+                pressure: pascals(row.pressure),
+                temperature: kelvins(row.temperature),
+            },
+        )
+        .collect();
+    azoth_process::models::settle_out_pressure::settle_out_pressure(
+        &compartments_records,
+        settle_out_temperature.map(kelvins),
+        protected_pressure_rating.map(pascals),
+    )
+    .map(|r| crate::transport_gen::PySettleOutPressureResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -8228,6 +8393,46 @@ pub fn tube_rupture_relief(
         scenario_name,
     )
     .map(|r| crate::transport_gen::PyTubeRuptureReliefResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Vacuum collapse screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mole_fractions, vessel_volume, initial_pressure, initial_temperature, cold_end_temperature, atmospheric_pressure, external_pressure_rating, makeup_setpoint, makeup_gas_molar_mass, cooling_steps))]
+#[pyo3(
+    text_signature = "(components, mole_fractions, vessel_volume, initial_pressure, initial_temperature, cold_end_temperature, atmospheric_pressure, external_pressure_rating, makeup_setpoint, makeup_gas_molar_mass, cooling_steps)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn vacuum_collapse(
+    py: Python<'_>,
+    components: Vec<String>,
+    mole_fractions: Vec<f64>,
+    vessel_volume: f64,
+    initial_pressure: f64,
+    initial_temperature: f64,
+    cold_end_temperature: f64,
+    atmospheric_pressure: Option<f64>,
+    external_pressure_rating: Option<f64>,
+    makeup_setpoint: Option<f64>,
+    makeup_gas_molar_mass: Option<f64>,
+    cooling_steps: Option<f64>,
+) -> PyResult<crate::transport_gen::PyVacuumCollapseResult> {
+    azoth_process::models::vacuum_collapse::vacuum_collapse(
+        &components,
+        &mole_fractions,
+        cubic_meters(vessel_volume),
+        pascals(initial_pressure),
+        kelvins(initial_temperature),
+        kelvins(cold_end_temperature),
+        atmospheric_pressure.map(pascals),
+        external_pressure_rating.map(pascals),
+        makeup_setpoint.map(pascals),
+        makeup_gas_molar_mass.map(kilograms_per_mole),
+        cooling_steps,
+    )
+    .map(|r| crate::transport_gen::PyVacuumCollapseResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

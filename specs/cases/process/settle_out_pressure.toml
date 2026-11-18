@@ -1,0 +1,126 @@
+model = "process.settle_out_pressure"
+[[cases]]
+id = "two_compartments_within"
+tolerance = 1.0e-12
+source = "A 5 m3 suction volume at 10 bara and 300 K and a 2 m3 discharge volume at 20 bara and 320 K settle at 12.857 bara and 308.57 K, inside a 15 bara rating. From `validation/neqsim/captures/process_settle_out_pressure.tsv` (`settle_two_within`)."
+[cases.inputs]
+compartments = [
+  { name = "suction", volume = 5.0, pressure = 1.0e6, temperature = 300.0 },
+  { name = "discharge", volume = 2.0, pressure = 2.0e6, temperature = 320.0 },
+]
+protected_pressure_rating = 1.5e6
+[cases.expected]
+settle_out_pressure = 1.2857142857142858e6
+settle_out_temperature = 308.57142857142856
+settle_out_z_factor = 1.0
+total_moles = 3507.9436888108294
+total_volume = 7.0
+max_compartment_pressure = 2.0e6
+min_compartment_pressure = 1.0e6
+margin_to_rating = 2.1428571428571423e5
+exceeds_rating = false
+verdict = "within_rating"
+[[cases]]
+id = "two_compartments_exceed"
+tolerance = 1.0e-12
+source = "The same volumes against a 10 bara rating: the settle-out pressure is above it. From (`settle_two_exceeds`)."
+[cases.inputs]
+compartments = [
+  { name = "suction", volume = 5.0, pressure = 1.0e6, temperature = 300.0 },
+  { name = "discharge", volume = 2.0, pressure = 2.0e6, temperature = 320.0 },
+]
+protected_pressure_rating = 1.0e6
+[cases.expected]
+settle_out_pressure = 1.2857142857142858e6
+settle_out_temperature = 308.57142857142856
+settle_out_z_factor = 1.0
+total_moles = 3507.9436888108294
+total_volume = 7.0
+max_compartment_pressure = 2.0e6
+min_compartment_pressure = 1.0e6
+margin_to_rating = -2.8571428571428577e5
+exceeds_rating = true
+verdict = "exceeds_rating"
+[[cases]]
+id = "rating_equal"
+tolerance = 1.0e-12
+source = "The rating set to the settle-out pressure: equality is within it. From (`settle_rating_equal`)."
+[cases.inputs]
+compartments = [
+  { name = "suction", volume = 5.0, pressure = 1.0e6, temperature = 300.0 },
+  { name = "discharge", volume = 2.0, pressure = 2.0e6, temperature = 320.0 },
+]
+protected_pressure_rating = 1.2857142857142858e6
+[cases.expected]
+settle_out_pressure = 1.2857142857142858e6
+settle_out_temperature = 308.57142857142856
+settle_out_z_factor = 1.0
+total_moles = 3507.9436888108294
+total_volume = 7.0
+max_compartment_pressure = 2.0e6
+min_compartment_pressure = 1.0e6
+exceeds_rating = false
+verdict = "within_rating"
+[[cases]]
+id = "three_compartments"
+tolerance = 1.0e-12
+source = "A third 3 m3 header at 5 bara and 290 K settles the three volumes at 10.5 bara and 305.77 K. From (`settle_three`)."
+[cases.inputs]
+compartments = [
+  { name = "suction", volume = 5.0, pressure = 1.0e6, temperature = 300.0 },
+  { name = "discharge", volume = 2.0, pressure = 2.0e6, temperature = 320.0 },
+  { name = "header", volume = 3.0, pressure = 5.0e5, temperature = 290.0 },
+]
+protected_pressure_rating = 1.5e6
+[cases.expected]
+settle_out_pressure = 1.0499999999999998e6
+settle_out_temperature = 305.7740585774058
+settle_out_z_factor = 1.0
+total_moles = 4130.042076974326
+total_volume = 10.0
+max_compartment_pressure = 2.0e6
+min_compartment_pressure = 5.0e5
+margin_to_rating = 4.500000000000002e5
+exceeds_rating = false
+verdict = "within_rating"
+[[cases]]
+id = "stated_temperature"
+tolerance = 1.0e-12
+source = "A stated 310 K settle temperature in place of the mole-weighted 308.57 K. From (`settle_stated_temperature`)."
+[cases.inputs]
+compartments = [
+  { name = "suction", volume = 5.0, pressure = 1.0e6, temperature = 300.0 },
+  { name = "discharge", volume = 2.0, pressure = 2.0e6, temperature = 320.0 },
+]
+settle_out_temperature = 310.0
+protected_pressure_rating = 1.5e6
+[cases.expected]
+settle_out_pressure = 1.2916666666666668e6
+settle_out_temperature = 310.0
+settle_out_z_factor = 1.0
+total_moles = 3507.9436888108294
+total_volume = 7.0
+max_compartment_pressure = 2.0e6
+min_compartment_pressure = 1.0e6
+margin_to_rating = 2.083333333333332e5
+exceeds_rating = false
+verdict = "within_rating"
+[[cases]]
+id = "no_rating"
+tolerance = 1.0e-12
+source = "No rating: the settle-out pressure is published, the margin is absent and the verdict is `no_rating`. From (`settle_no_rating`)."
+[cases.inputs]
+compartments = [
+  { name = "suction", volume = 5.0, pressure = 1.0e6, temperature = 300.0 },
+  { name = "discharge", volume = 2.0, pressure = 2.0e6, temperature = 320.0 },
+]
+[cases.expected]
+settle_out_pressure = 1.2857142857142858e6
+settle_out_temperature = 308.57142857142856
+settle_out_z_factor = 1.0
+total_moles = 3507.9436888108294
+total_volume = 7.0
+max_compartment_pressure = 2.0e6
+min_compartment_pressure = 1.0e6
+exceeds_rating = false
+verdict = "no_rating"

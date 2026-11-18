@@ -252,6 +252,7 @@
 //!   - specs/models/process/fire_water_demand.toml
 //!   - specs/models/process/flare.toml
 //!   - specs/models/process/fmea_worksheet.toml
+//!   - specs/models/process/gas_blowby.toml
 //!   - specs/models/process/gas_dispersion.toml
 //!   - specs/models/process/gas_scrubber.toml
 //!   - specs/models/process/gaussian_plume.toml
@@ -269,6 +270,7 @@
 //!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
+//!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/overpressure_acceptance.toml
@@ -286,9 +288,11 @@
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/pump.toml
+//!   - specs/models/process/pump_deadhead.toml
 //!   - specs/models/process/rate_based_packed_column.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
+//!   - specs/models/process/runaway_reaction.toml
 //!   - specs/models/process/s001_clause10_review.toml
 //!   - specs/models/process/s001_secondary_pressure_protection.toml
 //!   - specs/models/process/safety_instrumented_function.toml
@@ -297,6 +301,7 @@
 //!   - specs/models/process/separator.toml
 //!   - specs/models/process/separator_capacity_assessment.toml
 //!   - specs/models/process/separator_performance.toml
+//!   - specs/models/process/settle_out_pressure.toml
 //!   - specs/models/process/shortcut_distillation_column.toml
 //!   - specs/models/process/sil_verification.toml
 //!   - specs/models/process/splitter.toml
@@ -309,6 +314,7 @@
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
+//!   - specs/models/process/vacuum_collapse.toml
 //!   - specs/models/process/vce.toml
 //!   - specs/models/process/vessel_rupture.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
@@ -3433,6 +3439,26 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.flare", "design_mass_flow_capacity", "mass_rate"),
     ("process.flare", "design_molar_flow_capacity", "molar_flow"),
     ("process.fmea_worksheet", "rpn_threshold", "dimensionless"),
+    ("process.gas_blowby", "upstream_pressure", "pressure"),
+    (
+        "process.gas_blowby",
+        "upstream_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.gas_blowby", "downstream_pressure", "pressure"),
+    ("process.gas_blowby", "restriction_area", "area"),
+    ("process.gas_blowby", "specific_heat_ratio", "dimensionless"),
+    ("process.gas_blowby", "molar_mass", "molar_mass"),
+    (
+        "process.gas_blowby",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.gas_blowby",
+        "downstream_relief_capacity",
+        "mass_rate",
+    ),
     ("process.gas_dispersion", "composition", "dimensionless"),
     ("process.gas_dispersion", "mass_release_rate", "mass_rate"),
     (
@@ -3947,6 +3973,13 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "impeller_diameter",
         "length",
     ),
+    ("process.mdmt", "governing_thickness", "length"),
+    (
+        "process.mdmt",
+        "min_operating_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.mdmt", "stress_ratio", "dimensionless"),
     ("process.mixer", "feed_n", "molar_flow"),
     ("process.mixer", "feed_z", "dimensionless"),
     ("process.mixer", "feed_p", "pressure"),
@@ -4509,6 +4542,38 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.pump", "por_high_fraction", "dimensionless"),
     ("process.pump", "aor_low_fraction", "dimensionless"),
     ("process.pump", "aor_high_fraction", "dimensionless"),
+    ("process.pump_deadhead", "suction_pressure", "pressure"),
+    (
+        "process.pump_deadhead",
+        "normal_discharge_pressure",
+        "pressure",
+    ),
+    (
+        "process.pump_deadhead",
+        "shutoff_head_ratio",
+        "dimensionless",
+    ),
+    (
+        "process.pump_deadhead",
+        "protected_pressure_rating",
+        "pressure",
+    ),
+    ("process.pump_deadhead", "liquid_density", "mass_density"),
+    (
+        "process.pump_deadhead",
+        "specific_heat",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.pump_deadhead",
+        "minimum_flow_efficiency",
+        "dimensionless",
+    ),
+    (
+        "process.pump_deadhead",
+        "max_allowable_temperature_rise",
+        "thermodynamic_temperature",
+    ),
     ("process.rate_based_packed_column", "gas_n", "molar_flow"),
     ("process.rate_based_packed_column", "gas_z", "dimensionless"),
     ("process.rate_based_packed_column", "gas_p", "pressure"),
@@ -4568,6 +4633,47 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.risk_matrix",
         "downtime_cost_per_hour",
         "dimensionless",
+    ),
+    (
+        "process.runaway_reaction",
+        "process_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.runaway_reaction",
+        "reaction_enthalpy",
+        "molar_energy",
+    ),
+    (
+        "process.runaway_reaction",
+        "limiting_reactant_moles",
+        "amount",
+    ),
+    ("process.runaway_reaction", "total_mass", "mass"),
+    (
+        "process.runaway_reaction",
+        "specific_heat",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.runaway_reaction",
+        "max_allowable_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.runaway_reaction",
+        "activation_energy",
+        "molar_energy",
+    ),
+    (
+        "process.runaway_reaction",
+        "initial_heat_release_rate",
+        "dimensionless",
+    ),
+    (
+        "process.runaway_reaction",
+        "acceptable_margin",
+        "thermodynamic_temperature",
     ),
     (
         "process.s001_secondary_pressure_protection",
@@ -4967,6 +5073,16 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.separator_performance",
         "liquid_liquid_residence_time",
         "time",
+    ),
+    (
+        "process.settle_out_pressure",
+        "settle_out_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.settle_out_pressure",
+        "protected_pressure_rating",
+        "pressure",
     ),
     (
         "process.shortcut_distillation_column",
@@ -5466,6 +5582,36 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "expander_out_temperature",
         "thermodynamic_temperature",
     ),
+    ("process.vacuum_collapse", "mole_fractions", "dimensionless"),
+    ("process.vacuum_collapse", "vessel_volume", "volume"),
+    ("process.vacuum_collapse", "initial_pressure", "pressure"),
+    (
+        "process.vacuum_collapse",
+        "initial_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.vacuum_collapse",
+        "cold_end_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.vacuum_collapse",
+        "atmospheric_pressure",
+        "pressure",
+    ),
+    (
+        "process.vacuum_collapse",
+        "external_pressure_rating",
+        "pressure",
+    ),
+    ("process.vacuum_collapse", "makeup_setpoint", "pressure"),
+    (
+        "process.vacuum_collapse",
+        "makeup_gas_molar_mass",
+        "molar_mass",
+    ),
+    ("process.vacuum_collapse", "cooling_steps", "dimensionless"),
     ("process.vce", "cloud_fuel_mass", "mass"),
     ("process.vce", "heat_of_combustion", "dimensionless"),
     ("process.vce", "strength_class", "dimensionless"),

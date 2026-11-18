@@ -1,0 +1,117 @@
+id = "process.runaway_reaction"
+name = "Runaway reaction screening"
+kind = "procedure"
+assumptions = [
+    "**the total heat is `|dH| n` and the adiabatic rise is `Q/(m cp)`**; the enthalpy sign is ignored.",
+    "**the MTSR is `T0 + dTad` and the margin is `MAT - MTSR`**; the exceeded test is strict.",
+    "**the time to maximum rate is `cp R T0^2/(q0 Ea)` with `R = 8.314462618`**, published only when both the activation energy and the initial rate are positive.",
+    "**without a MAT the verdict is `runaway_risk` at a rise of 200 K and `marginal` at 50 K**, both inclusive; otherwise `no_rating`.",
+    "**with a MAT the verdict is `runaway_risk` when the margin is negative and `marginal` when it is below the acceptable margin**, strictly; otherwise `acceptable_margin`.",
+    "**the two-phase relief flag is the gassy flag or an exceeded margin.** A negative acceptable margin is accepted, as the class accepts it; the defaults are 50 K and not gassy.",
+    "**the initial heat-release rate is stated in W/kg and declared dimensionless**, because the vocabulary has no specific-power unit; the class's fluid-derived mass and specific heat are supplied explicitly.",
+]
+references = [
+    "Stoessel, F. (2008). Thermal Safety of Chemical Processes: Risk Assessment and Process Design. Wiley-VCH.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/reaction/RunawayReactionAnalyzer.java` is the port source.",
+    "`validation/neqsim/captures/process_runaway_reaction.tsv` - the no-MAT bands, the MAT verdicts, the gassy state, the TMR and the unit aliases.",
+]
+[source]
+standard = "NeqSim process/safety/reaction/RunawayReactionAnalyzer.java"
+edition = "Its `analyze`: the adiabatic rise, MTSR, margin, TMR, two-phase flag and verdict."
+[algorithm]
+scheme = "adiabatic_runaway_screen"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.process_temperature]
+unit = "K"
+description = "the process temperature, above absolute zero.\n"
+[inputs.reaction_enthalpy]
+unit = "J/mol"
+description = "the reaction enthalpy in J per mole of limiting reactant; **the sign is ignored**.\n"
+[inputs.limiting_reactant_moles]
+unit = "mol"
+description = "the moles of limiting reactant, above zero.\n"
+[inputs.total_mass]
+unit = "kg"
+description = "the reacting mass, above zero.\n"
+[inputs.specific_heat]
+unit = "J/(kg*K)"
+description = "the reacting mixture's specific heat, above zero.\n"
+[inputs.max_allowable_temperature]
+unit = "K"
+optional = true
+description = "the maximum allowable temperature, **above the process temperature**. Absent publishes no margin and selects the adiabatic-severity bands.\n"
+[inputs.activation_energy]
+unit = "J/mol"
+optional = true
+description = "the apparent activation energy; the TMR needs it positive together with the initial rate.\n"
+[inputs.initial_heat_release_rate]
+unit = "dimensionless"
+optional = true
+description = "the specific heat-release rate at the process temperature, **in W/kg**. Dimensionless because the vocabulary has no specific-power unit.\n"
+[inputs.acceptable_margin]
+unit = "K"
+interval = true
+optional = true
+description = "the acceptable margin between the MAT and the MTSR; **absent is 50 K**, and a negative value is accepted as the class accepts it.\n"
+[inputs.gassy_system]
+type = "boolean"
+optional = true
+description = "whether the reaction generates permanent gas; **absent is false** and the flag forces the two-phase relief screen.\n"
+[outputs]
+[outputs.adiabatic_temperature_rise]
+unit = "K"
+description = "`|dH| n/(m cp)`.\n"
+[outputs.mtsr]
+unit = "K"
+description = "`process_temperature + adiabatic_temperature_rise`.\n"
+[outputs.temperature_margin]
+unit = "K"
+optional = true
+description = "`max_allowable_temperature - mtsr`; **absent without a MAT**.\n"
+[outputs.margin_exceeded]
+type = "boolean"
+description = "whether the MTSR is strictly above the MAT; false without a MAT.\n"
+[outputs.total_heat_release]
+unit = "J"
+description = "`|dH| n`.\n"
+[outputs.time_to_max_rate]
+unit = "s"
+optional = true
+description = "`cp R T0^2/(q0 Ea)`; **absent unless both the activation energy and the initial rate are positive**.\n"
+[outputs.two_phase_relief_screening_required]
+type = "boolean"
+description = "whether the gassy flag is set or the margin is exceeded.\n"
+[outputs.verdict]
+type = "enum"
+values = ["no_rating", "acceptable_margin", "marginal", "runaway_risk"]
+description = "the class's classification.\n"
+[[valid_range]]
+quantity = "process_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive process temperature"
+[[valid_range]]
+quantity = "limiting_reactant_moles"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses non-positive limiting-reactant moles"
+[[valid_range]]
+quantity = "total_mass"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive reacting mass"
+[[valid_range]]
+quantity = "specific_heat"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive specific heat"
+[implementations]
+python = "azoth.process.runaway_reaction"
+rust = "azoth_process::runaway_reaction"

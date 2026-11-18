@@ -44,9 +44,10 @@ def test_the_catalogue_is_every_safety_model_and_nothing_else() -> None:
     specs = [spec for _, spec in module.documents()]
     ids = [spec["id"] for spec in specs]
     assert len(ids) == len(set(ids))
-    assert len(ids) == 56
+    assert len(ids) == 62
     families = [module.family_of(spec) for spec in specs]
     assert families.count("dispersion") == 6
+    assert families.count("equipmentsafety") == 6
     assert families.count("fire") == 6
     assert families.count("firewater") == 5
     assert families.count("overpressure") == 12
@@ -72,10 +73,12 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
         "process.fire_case_relief",
         "process.fire_monitor_coverage",
         "process.fire_water_coverage_assessment",
+        "process.gas_blowby",
         "process.gaussian_plume",
         "process.hazardous_area",
         "process.heavy_gas_dispersion",
         "process.jet_fire",
+        "process.mdmt",
         "process.nog070_sil_determination",
         "process.overpressure_acceptance",
         "process.pfp_demand",
@@ -84,6 +87,8 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
         "process.probit",
         "process.psv_fire_sizing",
         "process.psv_sizing",
+        "process.pump_deadhead",
+        "process.runaway_reaction",
         "process.s001_secondary_pressure_protection",
         "process.safety_instrumented_function",
         "process.toxic_library",
@@ -94,6 +99,9 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
     assert module.sub_interface_of(by_id[module.BOWTIE], "risk") == "bowtie"
     assert module.sub_interface_of(by_id["process.jet_fire"], "fire") == "fire"
     assert module.sub_interface_of(by_id["process.gas_dispersion"], "dispersion") == "dispersion"
+    assert (
+        module.sub_interface_of(by_id["process.gas_blowby"], "equipmentsafety") == "equipmentsafety"
+    )
     assert module.sub_interface_of(by_id["process.fire_water_demand"], "firewater") == "firewater"
     assert module.sub_interface_of(by_id["process.psv_sizing"], "overpressure") == "overpressure"
     assert module.sub_interface_of(by_id["process.safety_instrumented_function"], "risk") == "risk"
@@ -109,8 +117,8 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
 def test_every_non_native_entry_has_a_refusal_and_no_form() -> None:
     module: Any = tool()
     entries = module.render()
-    assert entries.count("native: false") == 33
-    assert entries.count("refusal: Some(") == 33
+    assert entries.count("native: false") == 35
+    assert entries.count("refusal: Some(") == 35
     for _, spec in module.documents():
         if module.native_of(spec):
             assert module.refusal_of(spec) is None, spec["id"]

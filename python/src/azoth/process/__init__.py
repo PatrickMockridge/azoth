@@ -49,6 +49,7 @@ from azoth.core.result import (
     FireWaterDemandResult,
     FlareResult,
     FmeaWorksheetResult,
+    GasBlowbyResult,
     GasDispersionResult,
     GasScrubberResult,
     GaussianPlumeResult,
@@ -66,6 +67,7 @@ from azoth.core.result import (
     MahBowTieSkeletonResult,
     ManifoldResult,
     MapTurboExpanderResult,
+    MdmtResult,
     MixerResult,
     Nog070SilDeterminationResult,
     OverpressureAcceptanceResult,
@@ -82,10 +84,12 @@ from azoth.core.result import (
     ProbitResult,
     PsvFireSizingResult,
     PsvSizingResult,
+    PumpDeadheadResult,
     PumpResult,
     RateBasedPackedColumnResult,
     ReliefDisposalNetworkResult,
     RiskMatrixResult,
+    RunawayReactionResult,
     S001Clause10ReviewResult,
     S001SecondaryPressureProtectionResult,
     SafetyInstrumentedFunctionResult,
@@ -94,6 +98,7 @@ from azoth.core.result import (
     SeparatorCapacityAssessmentResult,
     SeparatorPerformanceResult,
     SeparatorResult,
+    SettleOutPressureResult,
     ShortcutDistillationColumnResult,
     SilVerificationResult,
     SplitterResult,
@@ -106,6 +111,7 @@ from azoth.core.result import (
     Tr3001ComplianceResult,
     TubeRuptureReliefResult,
     TurboExpanderResult,
+    VacuumCollapseResult,
     VceResult,
     VesselRuptureResult,
 )
@@ -157,6 +163,7 @@ __all__ = [
     "fire_water_demand",
     "flare",
     "forms",
+    "gas_blowby",
     "gas_dispersion",
     "gas_scrubber",
     "gaussian_plume",
@@ -172,6 +179,7 @@ __all__ = [
     "lopa",
     "manifold",
     "map_turbo_expander_compressor",
+    "mdmt",
     "mixer",
     "nog070_sil_determination",
     "overpressure_acceptance",
@@ -187,15 +195,18 @@ __all__ = [
     "psv_fire_sizing",
     "psv_sizing",
     "pump",
+    "pump_deadhead",
     "rate_based_packed_column",
     "relief_disposal_network",
     "risk_matrix",
     "run_flowsheet",
+    "runaway_reaction",
     "s001_clause10_review",
     "s001_secondary_pressure_protection",
     "safety_instrumented_function",
     "separator",
     "separator_capacity_assessment",
+    "settle_out_pressure",
     "shortcut_distillation_column",
     "sil_verification",
     "splitter",
@@ -207,6 +218,7 @@ __all__ = [
     "tools",
     "toxic_library",
     "tr3001_compliance",
+    "vacuum_collapse",
     "validate",
     "vce",
     "vessel_rupture",
@@ -226,6 +238,7 @@ _PIPELINE_PRESSURE_PROTECTION = "process.pipeline_pressure_protection"
 _RATE_BASED_PACKED_COLUMN = "process.rate_based_packed_column"
 _RELIEF_DISPOSAL_NETWORK = "process.relief_disposal_network"
 _RISK_MATRIX = "process.risk_matrix"
+_RUNAWAY_REACTION = "process.runaway_reaction"
 _SAFETY_INSTRUMENTED_FUNCTION = "process.safety_instrumented_function"
 _PIPE = "process.pipe"
 _GAS_SCRUBBER = "process.gas_scrubber"
@@ -247,6 +260,8 @@ _BOW_TIE = "process.bow_tie"
 _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
+_MDMT = "process.mdmt"
+_VACUUM_COLLAPSE = "process.vacuum_collapse"
 _VCE = "process.vce"
 _FILTER = "process.filter"
 _FIRE_CASE_RELIEF = "process.fire_case_relief"
@@ -256,6 +271,7 @@ _HEM_RELEASE = "process.hem_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
+_GAS_BLOWBY = "process.gas_blowby"
 _GAS_DISPERSION = "process.gas_dispersion"
 _GAUSSIAN_PLUME = "process.gaussian_plume"
 _HAZARDOUS_AREA = "process.hazardous_area"
@@ -266,6 +282,7 @@ _PSV_SIZING = "process.psv_sizing"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
+_SETTLE_OUT_PRESSURE = "process.settle_out_pressure"
 _SHORTCUT_DISTILLATION_COLUMN = "process.shortcut_distillation_column"
 _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
@@ -276,6 +293,7 @@ _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
 _POOL_FIRE = "process.pool_fire"
 _POROUS_MEDIA_SELF_HEATING = "process.porous_media_self_heating"
+_PUMP_DEADHEAD = "process.pump_deadhead"
 _PUMP = "process.pump"
 _SPLITTER = "process.splitter"
 _STIRRED_TANK_REACTOR = "process.stirred_tank_reactor"
@@ -314,6 +332,36 @@ def validate(flowsheet: str, palette_dir: str = "specs/unit_ops") -> list[str]:
 def load_flowsheet(path: str, palette_dir: str = "specs/unit_ops") -> list[str]:
     """Read a flowsheet file and validate it; returns the diagnostic lines."""
     return validate(pathlib.Path(path).read_text(), palette_dir)
+
+
+def pump_deadhead(
+    suction_pressure: Q,
+    normal_discharge_pressure: Q,
+    shutoff_head_ratio: float | None = None,
+    protected_pressure_rating: Q | None = None,
+    liquid_density: Q | None = None,
+    specific_heat: Q | None = None,
+    minimum_flow_efficiency: float | None = None,
+    max_allowable_temperature_rise: Q | None = None,
+) -> PumpDeadheadResult:
+    """The deadhead pressure, the rating verdict and the minimum-flow rise.
+
+    **Equality with the protected rating is within it** and the temperature-rise test is
+    strict. Without density or specific heat the shut-off head and rise are absent. The
+    defaults are a 1.20 shut-off ratio and a 0.30 minimum-flow efficiency.
+
+    See :func:`azoth.process.reference.pump_deadhead`.
+    """
+    return resolve(_PUMP_DEADHEAD)(  # type: ignore[no-any-return]
+        suction_pressure=suction_pressure,
+        normal_discharge_pressure=normal_discharge_pressure,
+        shutoff_head_ratio=shutoff_head_ratio,
+        protected_pressure_rating=protected_pressure_rating,
+        liquid_density=liquid_density,
+        specific_heat=specific_heat,
+        minimum_flow_efficiency=minimum_flow_efficiency,
+        max_allowable_temperature_rise=max_allowable_temperature_rise,
+    )
 
 
 def pump(
@@ -1730,6 +1778,28 @@ def expander(
     )
 
 
+def mdmt(
+    material_curve: str,
+    governing_thickness: Q,
+    min_operating_temperature: Q,
+    stress_ratio: float | None = None,
+) -> MdmtResult:
+    """The UCS-66 curve's MDMT and the cold-service verdict.
+
+    The thickness is clamped to 6-100 mm. The four curves are analytic approximations of
+    ASME Fig. UCS-66, **not the figure's table**, and the verdict is
+    ``min_operating_temperature >= MDMT``.
+
+    See :func:`azoth.process.reference.mdmt`.
+    """
+    return resolve(_MDMT)(  # type: ignore[no-any-return]
+        material_curve=material_curve,
+        governing_thickness=governing_thickness,
+        stress_ratio=stress_ratio,
+        min_operating_temperature=min_operating_temperature,
+    )
+
+
 def map_turbo_expander_compressor(
     expander_components: list[str],
     compressor_components: list[str],
@@ -2799,6 +2869,40 @@ def tr3001_compliance(
     )
 
 
+def runaway_reaction(
+    process_temperature: Q,
+    reaction_enthalpy: Q,
+    limiting_reactant_moles: Q,
+    total_mass: Q,
+    specific_heat: Q,
+    max_allowable_temperature: Q | None = None,
+    activation_energy: Q | None = None,
+    initial_heat_release_rate: float | None = None,
+    acceptable_margin: Q | None = None,
+    gassy_system: bool | None = None,
+) -> RunawayReactionResult:
+    """The adiabatic rise, MTSR, margin, time to maximum rate and runaway verdict.
+
+    The enthalpy sign is ignored. Without a MAT the verdict reads the adiabatic rise alone;
+    with one the exceeded test is strict. The TMR needs a positive activation energy and a
+    positive initial rate, the latter **in W/kg**.
+
+    See :func:`azoth.process.reference.runaway_reaction`.
+    """
+    return resolve(_RUNAWAY_REACTION)(  # type: ignore[no-any-return]
+        process_temperature=process_temperature,
+        reaction_enthalpy=reaction_enthalpy,
+        limiting_reactant_moles=limiting_reactant_moles,
+        total_mass=total_mass,
+        specific_heat=specific_heat,
+        max_allowable_temperature=max_allowable_temperature,
+        activation_energy=activation_energy,
+        initial_heat_release_rate=initial_heat_release_rate,
+        acceptable_margin=acceptable_margin,
+        gassy_system=gassy_system,
+    )
+
+
 def risk_matrix(
     equipment: list[dict[str, object]],
     product_price_per_kg: float | None = None,
@@ -3418,6 +3522,37 @@ def toxic_library(
     )
 
 
+def gas_blowby(
+    upstream_pressure: Q,
+    upstream_temperature: Q,
+    downstream_pressure: Q,
+    restriction_area: Q,
+    specific_heat_ratio: float,
+    molar_mass: Q,
+    discharge_coefficient: float | None = None,
+    downstream_relief_capacity: Q | None = None,
+) -> GasBlowbyResult:
+    """The blowby rate through an open restriction and the relief verdict.
+
+    The isentropic nozzle forms: the flow is choked at or below the critical ratio and the
+    slower subcritical form applies above it. The standard volume is at **288.15 K and
+    101325 Pa - 15 C, not 0 C**. A stated capacity at least the blowby rate is adequate; a
+    missing capacity publishes no relief data rather than a zero capacity.
+
+    See :func:`azoth.process.reference.gas_blowby`.
+    """
+    return resolve(_GAS_BLOWBY)(  # type: ignore[no-any-return]
+        upstream_pressure=upstream_pressure,
+        upstream_temperature=upstream_temperature,
+        downstream_pressure=downstream_pressure,
+        restriction_area=restriction_area,
+        specific_heat_ratio=specific_heat_ratio,
+        molar_mass=molar_mass,
+        discharge_coefficient=discharge_coefficient,
+        downstream_relief_capacity=downstream_relief_capacity,
+    )
+
+
 def gas_dispersion(
     components: list[str],
     composition: list[float],
@@ -3824,6 +3959,26 @@ def separator_capacity_assessment(
         design_basis_provenance=design_basis_provenance,
         heat_input=heat_input,
         mechanical_design_max_gas_flow=mechanical_design_max_gas_flow,
+    )
+
+
+def settle_out_pressure(
+    compartments: list[dict[str, object]],
+    settle_out_temperature: Q | None = None,
+    protected_pressure_rating: Q | None = None,
+) -> SettleOutPressureResult:
+    """The settle-out pressure of connected gas volumes and the rating verdict.
+
+    Each compartment's inventory is ``p V/(R T)`` with ``Z = 1``, the class's no-gas basis;
+    the settle temperature is the mole-weighted mean unless stated. **At least two
+    compartments are required.**
+
+    See :func:`azoth.process.reference.settle_out_pressure`.
+    """
+    return resolve(_SETTLE_OUT_PRESSURE)(  # type: ignore[no-any-return]
+        compartments=compartments,
+        settle_out_temperature=settle_out_temperature,
+        protected_pressure_rating=protected_pressure_rating,
     )
 
 
@@ -4322,6 +4477,42 @@ def gibbs_reactor(
         regularization=regularization,
         regularization_threshold=regularization_threshold,
         regularization_tau=regularization_tau,
+    )
+
+
+def vacuum_collapse(
+    components: list[str],
+    mole_fractions: list[float],
+    vessel_volume: Q,
+    initial_pressure: Q,
+    initial_temperature: Q,
+    cold_end_temperature: Q,
+    atmospheric_pressure: Q | None = None,
+    external_pressure_rating: Q | None = None,
+    makeup_setpoint: Q | None = None,
+    makeup_gas_molar_mass: Q | None = None,
+    cooling_steps: float | None = None,
+) -> VacuumCollapseResult:
+    """The constant-volume cooling sweep's minimum pressure and the make-up gas.
+
+    The inventory is the amount that fills the rigid vessel at the stated state, and the
+    sweep holds its molar volume while a constant-volume flash runs at every cooling step.
+    **An absent external rating is 0 bara**, the class's full-vacuum assumption.
+
+    See :func:`azoth.process.reference.vacuum_collapse`.
+    """
+    return resolve(_VACUUM_COLLAPSE)(  # type: ignore[no-any-return]
+        components=components,
+        mole_fractions=mole_fractions,
+        vessel_volume=vessel_volume,
+        initial_pressure=initial_pressure,
+        initial_temperature=initial_temperature,
+        cold_end_temperature=cold_end_temperature,
+        atmospheric_pressure=atmospheric_pressure,
+        external_pressure_rating=external_pressure_rating,
+        makeup_setpoint=makeup_setpoint,
+        makeup_gas_molar_mass=makeup_gas_molar_mass,
+        cooling_steps=cooling_steps,
     )
 
 

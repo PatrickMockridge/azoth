@@ -1,0 +1,65 @@
+id = "process.mdmt"
+name = "Minimum design metal temperature"
+kind = "procedure"
+assumptions = [
+    "**the governing thickness is clamped to `[6, 100]` mm before the curve is read**; the class clamps silently.",
+    "**the base in C is**: A `-29 + 18 ln(t/6)`, B `-48 + 22 ln(t/6)`, C `-55 + 20 ln(t/6)`, D `-65 + 18 ln(t/6)`.",
+    "**the stress-ratio reduction is 55 K at or below 0.35, zero at or above 1.0, and `55 (1 - s)/0.65` between.**",
+    "**the MDMT is the base minus the reduction and is published in kelvin**; the class answers C and the capture prints both.",
+    "**the cold-service verdict is `min_operating_temperature >= MDMT`**, equality passing.",
+    "**the four curves are the class's analytic approximations of ASME Fig. UCS-66, not the figure's table.** The class's `report` calls them API 579, which the arithmetic does not implement.",
+    "**the thickness is stated in metres and converted to the class's millimetres.**",
+]
+references = [
+    "ASME Boiler and Pressure Vessel Code, Section VIII Division 1, UCS-66 (2021).",
+    "API 579-1 / ASME FFS-1, Part 3 (2021). Assessment of existing equipment for brittle fracture.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/mdmt/MDMTCalculator.java` is the port source.",
+    "`validation/neqsim/captures/process_mdmt.tsv` - the four curves, the stress-ratio reduction, the thickness clamps and a passing and a failing cold service.",
+]
+[source]
+standard = "NeqSim process/safety/mdmt/MDMTCalculator.java"
+edition = "Its `getMDMT_C` and `isAcceptable`: the analytic curve, the stress-ratio reduction and the verdict."
+[algorithm]
+scheme = "ucs66_analytic_mdmt"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.material_curve]
+type = "enum"
+values = ["a", "b", "c", "d"]
+description = "the UCS-66 impact-test exemption curve: A is the most restrictive and D the least.\n"
+[inputs.governing_thickness]
+unit = "m"
+description = "the governing thickness, above zero; the class clamps it to 6-100 mm.\n"
+[inputs.min_operating_temperature]
+unit = "K"
+description = "the coldest metal temperature the blowdown or cold service reaches.\n"
+[inputs.stress_ratio]
+unit = "dimensionless"
+optional = true
+description = "the applied-to-allowable stress ratio in `(0, 1]`. **Absent is 1.0**, no reduction.\n"
+[outputs]
+[outputs.mdmt]
+unit = "K"
+description = "the minimum design metal temperature without impact testing.\n"
+[outputs.acceptable]
+type = "boolean"
+description = "whether the minimum operating temperature is at or above the MDMT.\n"
+[[valid_range]]
+quantity = "governing_thickness"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive governing thickness"
+[[valid_range]]
+quantity = "stress_ratio"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class refuses a stress ratio outside (0, 1]"
+[implementations]
+python = "azoth.process.mdmt"
+rust = "azoth_process::mdmt"

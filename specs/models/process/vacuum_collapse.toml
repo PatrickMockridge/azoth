@@ -1,0 +1,127 @@
+id = "process.vacuum_collapse"
+name = "Vacuum collapse screening"
+kind = "procedure"
+assumptions = [
+    "**the blocked-in inventory is the amount that fills the rigid vessel at the stated initial pressure and temperature**, from a TP flash at that state.",
+    "**the sweep holds the molar volume and runs a constant-volume flash at `T_i = T0 + (Tc - T0) i/steps`**, `i = 1..steps`.",
+    "**the final pressure is the last step's and the minimum is the smallest on the curve**, which may be interior when condensation is not monotonic.",
+    "**the vacuum depth is `max(0, patm - pmin)`, the margin `pmin - rating`, vacuum is `pmin < patm` and within-rating is `pmin >= rating`.**",
+    "**an absent external rating is 0 bara**, the class's full-vacuum assumption; there is no `no_rating` verdict.",
+    "**make-up is `V (setpoint - pmin)/(R Tmin)` moles when the minimum is below the setpoint.** The defaults are 101325 Pa atmosphere, 0 Pa rating, the atmospheric setpoint, a 0.0280134 kg/mol make-up gas and 20 steps.",
+    "**the cubic is the databank PR** and the class's cooling curve is presentation; a failed step truncates the sweep at the last converged point.",
+]
+references = [
+    "API STD 521 (2020). Pressure-relieving and Depressuring Systems.",
+    "API STD 2000 (2014). Venting Atmospheric and Low-pressure Storage Tanks.",
+    "ASME Boiler and Pressure Vessel Code, Section VIII Division 1, UG-28 (2021).",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/vacuum/VacuumCollapseAnalyzer.java` is the port source.",
+    "`validation/neqsim/captures/process_vacuum_collapse.tsv` - the non-condensing and condensing sweeps, the rating bands, the make-up setpoint and the cold-end refusal.",
+]
+[source]
+standard = "NeqSim process/safety/vacuum/VacuumCollapseAnalyzer.java"
+edition = "Its `analyze`: the constant-volume cooling sweep, the minimum pressure, the rating verdict and the make-up gas."
+[algorithm]
+scheme = "constant_volume_cooling_sweep"
+convergence = "absolute"
+tolerance = 1.0e-4
+max_iterations = 20
+[inputs]
+[inputs.components]
+type = "components"
+description = "the blocked-in inventory's substances, by name, resolved against the component databank. The fluid is required: the sweep is a flash of it.\n"
+[inputs.mole_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the inventory's overall composition, summing to one.\n"
+[inputs.vessel_volume]
+unit = "m**3"
+description = "the rigid internal vessel volume, above zero.\n"
+[inputs.initial_pressure]
+unit = "Pa"
+description = "the blocked-in pressure, above zero.\n"
+[inputs.initial_temperature]
+unit = "K"
+description = "the blocked-in temperature, above zero.\n"
+[inputs.cold_end_temperature]
+unit = "K"
+description = "the coldest temperature the inventory reaches, **below the initial temperature**.\n"
+[inputs.atmospheric_pressure]
+unit = "Pa"
+optional = true
+description = "the ambient pressure the vacuum is measured against. **Absent is 101325 Pa.**\n"
+[inputs.external_pressure_rating]
+unit = "Pa"
+optional = true
+description = "the vessel's external-pressure rating. **Absent is 0 Pa**, a full-vacuum-rated vessel.\n"
+[inputs.makeup_setpoint]
+unit = "Pa"
+optional = true
+description = "the pressure the make-up gas holds. **Absent is the atmospheric pressure.**\n"
+[inputs.makeup_gas_molar_mass]
+unit = "kg/mol"
+optional = true
+description = "the make-up gas molar mass, above zero. **Absent is 0.0280134 kg/mol** (nitrogen).\n"
+[inputs.cooling_steps]
+unit = "dimensionless"
+optional = true
+description = "the number of cooling steps, a positive integer. **Absent is 20.**\n"
+[outputs]
+[outputs.final_pressure]
+unit = "Pa"
+description = "the pressure at the cold end, the last step's.\n"
+[outputs.minimum_pressure]
+unit = "Pa"
+description = "the smallest pressure on the cooling curve.\n"
+[outputs.minimum_pressure_temperature]
+unit = "K"
+description = "the temperature at which the smallest pressure is reached.\n"
+[outputs.vacuum_depth]
+unit = "Pa"
+description = "`max(0, atmospheric_pressure - minimum_pressure)`.\n"
+[outputs.margin_to_rating]
+unit = "Pa"
+description = "`minimum_pressure - external_pressure_rating`.\n"
+[outputs.vacuum_present]
+type = "boolean"
+description = "whether the minimum pressure is below the atmospheric pressure.\n"
+[outputs.within_rating]
+type = "boolean"
+description = "whether the minimum pressure is at or above the external rating.\n"
+[outputs.makeup_gas_moles]
+unit = "mol"
+description = "the make-up moles needed to hold the setpoint; zero when the minimum stays above it.\n"
+[outputs.makeup_gas_mass]
+unit = "kg"
+description = "the make-up mass, `moles` times the molar mass.\n"
+[outputs.verdict]
+type = "enum"
+values = ["no_vacuum", "vacuum_within_rating", "vacuum_exceeds_rating"]
+description = "the class's verdict.\n"
+[[valid_range]]
+quantity = "vessel_volume"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class's constructor refuses a non-positive vessel volume"
+[[valid_range]]
+quantity = "initial_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive initial pressure"
+[[valid_range]]
+quantity = "initial_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive initial temperature"
+[[valid_range]]
+quantity = "cooling_steps"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "at least one step is needed for a sweep"
+[implementations]
+python = "azoth.process.vacuum_collapse"
+rust = "azoth_process::vacuum_collapse"

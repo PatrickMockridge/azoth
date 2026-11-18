@@ -1,0 +1,90 @@
+model = "process.mdmt"
+[[cases]]
+id = "curve_b_25"
+tolerance = 1.0e-12
+source = "Curve B at 25 mm and a unit stress ratio: the base is -16.60 C, and -40 C is colder than it, so the service fails. From `validation/neqsim/captures/process_mdmt.tsv` (`mdmt_curve_b_25`)."
+[cases.inputs]
+material_curve = "b"
+governing_thickness = 0.025
+min_operating_temperature = 233.15
+[cases.expected]
+mdmt = 256.5465598240832
+acceptable = false
+[[cases]]
+id = "curve_a_25"
+tolerance = 1.0e-12
+source = "Curve A at 25 mm: the most restrictive curve answers -3.31 C. From (`mdmt_curve_a_25`)."
+[cases.inputs]
+material_curve = "a"
+governing_thickness = 0.025
+min_operating_temperature = 233.15
+[cases.expected]
+mdmt = 269.8380944015226
+acceptable = false
+[[cases]]
+id = "stress_ratio_035"
+tolerance = 1.0e-12
+source = "Curve B at 25 mm and a 0.35 stress ratio: the full 55 K reduction applies, but -80 C is still colder than -71.60 C. From (`mdmt_stress_035`)."
+[cases.inputs]
+material_curve = "b"
+governing_thickness = 0.025
+stress_ratio = 0.35
+min_operating_temperature = 193.15
+[cases.expected]
+mdmt = 201.5465598240832
+acceptable = false
+[[cases]]
+id = "thickness_clamp_six"
+tolerance = 1.0e-12
+source = "A 6 mm thickness, the lower clamp: the base is -48 C for curve B. From (`mdmt_clamp_six`)."
+[cases.inputs]
+material_curve = "b"
+governing_thickness = 0.006
+min_operating_temperature = 223.15
+[cases.expected]
+mdmt = 225.14999999999998
+acceptable = false
+[[cases]]
+id = "thickness_clamp_hundred"
+tolerance = 1.0e-12
+source = "A 100 mm thickness, the upper clamp: the base is 13.90 C and a 20 C service passes. From (`mdmt_clamp_hundred`)."
+[cases.inputs]
+material_curve = "b"
+governing_thickness = 0.1
+min_operating_temperature = 293.15
+[cases.expected]
+mdmt = 287.04503576872077
+acceptable = true
+[[cases]]
+id = "thickness_clamp_above"
+tolerance = 1.0e-12
+source = "A 150 mm thickness clamps to the same 100 mm answer. From (`mdmt_clamp_above`)."
+[cases.inputs]
+material_curve = "b"
+governing_thickness = 0.15
+min_operating_temperature = 293.15
+[cases.expected]
+mdmt = 287.04503576872077
+acceptable = true
+[[cases]]
+id = "curve_d_pass"
+tolerance = 1.0e-12
+source = "Curve D at 25 mm answers -39.31 C, and -35 C is warmer, so the service passes. From (`mdmt_pass`)."
+[cases.inputs]
+material_curve = "d"
+governing_thickness = 0.025
+min_operating_temperature = 238.15
+[cases.expected]
+mdmt = 233.8380944015226
+acceptable = true
+[[cases]]
+id = "curve_d_fail"
+tolerance = 1.0e-12
+source = "The same curve at -45 C fails. From (`mdmt_fail`)."
+[cases.inputs]
+material_curve = "d"
+governing_thickness = 0.025
+min_operating_temperature = 228.15
+[cases.expected]
+mdmt = 233.8380944015226
+acceptable = false

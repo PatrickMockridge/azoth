@@ -205,6 +205,29 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `test_cross_impl` compares them on both results.
         "choked",
         "gas_valve",
+        # `gas_blowby`'s relief verdict, a boolean with no slot in `TestCase`.
+        # `crates/azoth-process/tests/gas_blowby.rs` asserts it against the capture, and
+        # `test_cross_impl` compares it on both results.
+        "relief_adequate",
+        # `pump_deadhead`'s two flags, booleans with no slot in `TestCase`.
+        # `crates/azoth-process/tests/pump_deadhead.rs` asserts them against the capture,
+        # and `test_cross_impl` compares them on both results.
+        "pressure_rating_exceeded",
+        "temp_rise_exceeded",
+        # `runaway_reaction`'s two flags, booleans with no slot in `TestCase`.
+        # `crates/azoth-process/tests/runaway_reaction.rs` asserts them against the capture,
+        # and `test_cross_impl` compares them on both results.
+        "margin_exceeded",
+        "two_phase_relief_screening_required",
+        # `vacuum_collapse`'s two flags, booleans with no slot in `TestCase`.
+        # `crates/azoth-process/tests/vacuum_collapse.rs` asserts them against the capture,
+        # and `test_cross_impl` compares them on both results.
+        "vacuum_present",
+        "within_rating",
+        # `settle_out_pressure`'s exceeds flag, a boolean with no slot in `TestCase`.
+        # `crates/azoth-process/tests/settle_out_pressure.rs` asserts it against the capture,
+        # and `test_cross_impl` compares it on both results.
+        "exceeds_rating",
         # `gas_dispersion`'s two endpoint predicates, booleans with no slot in `TestCase`.
         # `crates/azoth-process/tests/gas_dispersion.rs` asserts them against the capture,
         # and `test_cross_impl` compares them on both results.

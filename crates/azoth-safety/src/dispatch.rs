@@ -8,11 +8,11 @@ use std::collections::BTreeMap;
 
 use azoth_core::Warning;
 use azoth_core::units::{
-    bars, cubic_meters, cubic_meters_per_second, joules_per_kilogram_kelvin, kelvins, kilograms,
-    kilograms_per_cubic_meter, kilograms_per_mole, kilograms_per_second,
-    kilograms_per_square_meter_second, liters_per_minute, meters, meters_per_second,
-    pascal_seconds, pascals, seconds, square_meters, watts, watts_per_meter_kelvin,
-    watts_per_square_meter,
+    bars, cubic_meters, cubic_meters_per_second, joules_per_kilogram_kelvin, joules_per_mole,
+    kelvin_intervals, kelvins, kilograms, kilograms_per_cubic_meter, kilograms_per_mole,
+    kilograms_per_second, kilograms_per_square_meter_second, liters_per_minute, meters,
+    meters_per_second, moles, pascal_seconds, pascals, seconds, square_meters, watts,
+    watts_per_meter_kelvin, watts_per_square_meter,
 };
 use azoth_process::models::bow_tie::{BowTieBarrier, BowTieConsequence, BowTieThreat};
 pub use azoth_sheets::dispatch::Outcome;
@@ -31,10 +31,12 @@ pub const NATIVE: &[&str] = &[
     "process.fire_case_relief",
     "process.fire_monitor_coverage",
     "process.fire_water_coverage_assessment",
+    "process.gas_blowby",
     "process.gaussian_plume",
     "process.hazardous_area",
     "process.heavy_gas_dispersion",
     "process.jet_fire",
+    "process.mdmt",
     "process.nog070_sil_determination",
     "process.overpressure_acceptance",
     "process.pfp_demand",
@@ -43,6 +45,8 @@ pub const NATIVE: &[&str] = &[
     "process.probit",
     "process.psv_fire_sizing",
     "process.psv_sizing",
+    "process.pump_deadhead",
+    "process.runaway_reaction",
     "process.s001_secondary_pressure_protection",
     "process.safety_instrumented_function",
     "process.toxic_library",
@@ -150,6 +154,27 @@ pub fn required(id: &str) -> Option<&'static [&'static str]> {
             "overpressure_fraction",
             "back_pressure",
         ],
+        "process.gas_blowby" => &[
+            "upstream_pressure",
+            "upstream_temperature",
+            "downstream_pressure",
+            "restriction_area",
+            "specific_heat_ratio",
+            "molar_mass",
+        ],
+        "process.mdmt" => &[
+            "material_curve",
+            "governing_thickness",
+            "min_operating_temperature",
+        ],
+        "process.pump_deadhead" => &["suction_pressure", "normal_discharge_pressure"],
+        "process.runaway_reaction" => &[
+            "process_temperature",
+            "reaction_enthalpy",
+            "limiting_reactant_moles",
+            "total_mass",
+            "specific_heat",
+        ],
         "process.s001_secondary_pressure_protection" => &[],
         "process.safety_instrumented_function" => &[
             "pfd_average",
@@ -197,6 +222,10 @@ fn arm(id: &str, inputs: &Value) -> Result<Outcome, Outcome> {
         "process.probit" => probit(inputs),
         "process.psv_fire_sizing" => psv_fire_sizing(inputs),
         "process.psv_sizing" => psv_sizing(inputs),
+        "process.gas_blowby" => gas_blowby(inputs),
+        "process.mdmt" => mdmt(inputs),
+        "process.pump_deadhead" => pump_deadhead(inputs),
+        "process.runaway_reaction" => runaway_reaction(inputs),
         "process.s001_secondary_pressure_protection" => s001_secondary_pressure_protection(inputs),
         "process.safety_instrumented_function" => safety_instrumented_function(inputs),
         "process.toxic_library" => toxic_library(inputs),
@@ -1329,6 +1358,223 @@ fn s001_secondary_pressure_protection(inputs: &Value) -> Result<Outcome, Outcome
                 ] {
                     outputs.insert(name.to_string(), json!(value));
                 }
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn gas_blowby(inputs: &Value) -> Result<Outcome, Outcome> {
+    let upstream_pressure = number(inputs, "upstream_pressure")?;
+    let upstream_temperature = number(inputs, "upstream_temperature")?;
+    let downstream_pressure = number(inputs, "downstream_pressure")?;
+    let restriction_area = number(inputs, "restriction_area")?;
+    let specific_heat_ratio = number(inputs, "specific_heat_ratio")?;
+    let molar_mass = number(inputs, "molar_mass")?;
+    let discharge_coefficient = optional_number(inputs, "discharge_coefficient")?;
+    let downstream_relief_capacity = optional_number(inputs, "downstream_relief_capacity")?;
+    Ok(
+        match azoth_process::gas_blowby(
+            pascals(upstream_pressure),
+            kelvins(upstream_temperature),
+            pascals(downstream_pressure),
+            square_meters(restriction_area),
+            specific_heat_ratio,
+            kilograms_per_mole(molar_mass),
+            discharge_coefficient,
+            downstream_relief_capacity.map(kilograms_per_second),
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                outputs.insert("choked".to_string(), json!(result.choked));
+                scalar(
+                    &mut outputs,
+                    "critical_pressure_ratio",
+                    result.critical_pressure_ratio,
+                );
+                scalar(
+                    &mut outputs,
+                    "actual_pressure_ratio",
+                    result.actual_pressure_ratio,
+                );
+                quantity(
+                    &mut outputs,
+                    "blowby_mass_rate",
+                    result.blowby_mass_rate.value,
+                    "kg/s",
+                );
+                quantity(
+                    &mut outputs,
+                    "blowby_std_vol_rate",
+                    result.blowby_std_vol_rate.value,
+                    "m**3/s",
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "relief_margin",
+                    result.relief_margin.map(|value| value.value),
+                    "kg/s",
+                );
+                outputs.insert("relief_adequate".to_string(), json!(result.relief_adequate));
+                outputs.insert("verdict".to_string(), json!(result.verdict.as_str()));
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn pump_deadhead(inputs: &Value) -> Result<Outcome, Outcome> {
+    let suction_pressure = number(inputs, "suction_pressure")?;
+    let normal_discharge_pressure = number(inputs, "normal_discharge_pressure")?;
+    let shutoff_head_ratio = optional_number(inputs, "shutoff_head_ratio")?;
+    let protected_pressure_rating = optional_number(inputs, "protected_pressure_rating")?;
+    let liquid_density = optional_number(inputs, "liquid_density")?;
+    let specific_heat = optional_number(inputs, "specific_heat")?;
+    let minimum_flow_efficiency = optional_number(inputs, "minimum_flow_efficiency")?;
+    let max_allowable_temperature_rise = optional_number(inputs, "max_allowable_temperature_rise")?;
+    Ok(
+        match azoth_process::pump_deadhead(
+            pascals(suction_pressure),
+            pascals(normal_discharge_pressure),
+            shutoff_head_ratio,
+            protected_pressure_rating.map(pascals),
+            liquid_density.map(kilograms_per_cubic_meter),
+            specific_heat.map(joules_per_kilogram_kelvin),
+            minimum_flow_efficiency,
+            max_allowable_temperature_rise.map(kelvin_intervals),
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                quantity(
+                    &mut outputs,
+                    "rated_differential_pressure",
+                    result.rated_differential_pressure.value,
+                    "Pa",
+                );
+                quantity(
+                    &mut outputs,
+                    "deadhead_pressure",
+                    result.deadhead_pressure.value,
+                    "Pa",
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "pressure_margin",
+                    result.pressure_margin.map(|value| value.value),
+                    "Pa",
+                );
+                outputs.insert(
+                    "pressure_rating_exceeded".to_string(),
+                    json!(result.pressure_rating_exceeded),
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "shutoff_head",
+                    result.shutoff_head.map(|value| value.value),
+                    "m",
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "recirculation_temperature_rise",
+                    result
+                        .recirculation_temperature_rise
+                        .map(|value| value.value),
+                    "K",
+                );
+                outputs.insert(
+                    "temp_rise_exceeded".to_string(),
+                    json!(result.temp_rise_exceeded),
+                );
+                outputs.insert("verdict".to_string(), json!(result.verdict.as_str()));
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn runaway_reaction(inputs: &Value) -> Result<Outcome, Outcome> {
+    let process_temperature = number(inputs, "process_temperature")?;
+    let reaction_enthalpy = number(inputs, "reaction_enthalpy")?;
+    let limiting_reactant_moles = number(inputs, "limiting_reactant_moles")?;
+    let total_mass = number(inputs, "total_mass")?;
+    let specific_heat = number(inputs, "specific_heat")?;
+    let max_allowable_temperature = optional_number(inputs, "max_allowable_temperature")?;
+    let activation_energy = optional_number(inputs, "activation_energy")?;
+    let initial_heat_release_rate = optional_number(inputs, "initial_heat_release_rate")?;
+    let acceptable_margin = optional_number(inputs, "acceptable_margin")?;
+    let gassy_system = optional_flag(inputs, "gassy_system")?;
+    Ok(
+        match azoth_process::runaway_reaction(
+            kelvins(process_temperature),
+            joules_per_mole(reaction_enthalpy),
+            moles(limiting_reactant_moles),
+            kilograms(total_mass),
+            joules_per_kilogram_kelvin(specific_heat),
+            max_allowable_temperature.map(kelvins),
+            activation_energy.map(joules_per_mole),
+            initial_heat_release_rate,
+            acceptable_margin.map(kelvin_intervals),
+            gassy_system,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                quantity(
+                    &mut outputs,
+                    "adiabatic_temperature_rise",
+                    result.adiabatic_temperature_rise.value,
+                    "K",
+                );
+                quantity(&mut outputs, "mtsr", result.mtsr.value, "K");
+                quantity_optional(
+                    &mut outputs,
+                    "temperature_margin",
+                    result.temperature_margin.map(|value| value.value),
+                    "K",
+                );
+                outputs.insert("margin_exceeded".to_string(), json!(result.margin_exceeded));
+                quantity(
+                    &mut outputs,
+                    "total_heat_release",
+                    result.total_heat_release.value,
+                    "J",
+                );
+                quantity_optional(
+                    &mut outputs,
+                    "time_to_max_rate",
+                    result.time_to_max_rate.map(|value| value.value),
+                    "s",
+                );
+                outputs.insert(
+                    "two_phase_relief_screening_required".to_string(),
+                    json!(result.two_phase_relief_screening_required),
+                );
+                outputs.insert("verdict".to_string(), json!(result.verdict.as_str()));
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn mdmt(inputs: &Value) -> Result<Outcome, Outcome> {
+    let material_curve = text(inputs, "material_curve")?;
+    let governing_thickness = number(inputs, "governing_thickness")?;
+    let min_operating_temperature = number(inputs, "min_operating_temperature")?;
+    let stress_ratio = optional_number(inputs, "stress_ratio")?;
+    Ok(
+        match azoth_process::mdmt(
+            material_curve,
+            meters(governing_thickness),
+            kelvins(min_operating_temperature),
+            stress_ratio,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                quantity(&mut outputs, "mdmt", result.mdmt.value, "K");
+                outputs.insert("acceptable".to_string(), json!(result.acceptable));
                 done(outputs, &result.warnings)
             }
             Err(error) => refused(error),

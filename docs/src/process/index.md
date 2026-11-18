@@ -43,6 +43,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.fire_water_demand`](./fire_water_demand.md) | `closed_form_fire_water_demand` | NeqSim process/safety/firewater/FireWaterDemandCalculator.java |
 | [`process.flare`](./flare.md) | `direct composition` | NeqSim process/equipment/flare/Flare.java |
 | [`process.fmea_worksheet`](./fmea_worksheet.md) | `fmea_rpn` | NeqSim process/safety/hazid/FMEAWorksheet.java |
+| [`process.gas_blowby`](./gas_blowby.md) | `isentropic_nozzle_blowby` | NeqSim process/safety/blowby/GasBlowbyAnalyzer.java |
 | [`process.gas_dispersion`](./gas_dispersion.md) | `pasquill_gifford_or_britter_mcquaid_screening` | NeqSim process/safety/dispersion/GasDispersionAnalyzer.java |
 | [`process.gas_scrubber`](./gas_scrubber.md) | `direct composition` | NeqSim process/equipment/separator/GasScrubber.java |
 | [`process.gaussian_plume`](./gaussian_plume.md) | `briggs_pasquill_gifford_two_image_gaussian` | NeqSim process/safety/dispersion/GaussianPlume.java |
@@ -60,6 +61,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.mah_bow_tie_skeleton`](./mah_bow_tie_skeleton.md) | `mah_bow_tie_catalogue` | NeqSim process/safety/hazid/MahBowTieBuilder.java |
 | [`process.manifold`](./manifold.md) | `direct composition` | NeqSim process/equipment/manifold/Manifold.java |
 | [`process.map_turbo_expander_compressor`](./map_turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/MapTurboExpanderCompressor.java |
+| [`process.mdmt`](./mdmt.md) | `ucs66_analytic_mdmt` | NeqSim process/safety/mdmt/MDMTCalculator.java |
 | [`process.mixer`](./mixer.md) | `direct composition` | NeqSim process/equipment/mixer/Mixer.java |
 | [`process.nog070_sil_determination`](./nog070_sil_determination.md) | `closed_form_nog070_sil_determination` | NeqSim process/safety/risk/sis/nog070/Nog070SilDetermination.java |
 | [`process.overpressure_acceptance`](./overpressure_acceptance.md) | `closed_form_overpressure_acceptance` | NeqSim process/safety/overpressure/OverpressureAcceptanceChecker.java |
@@ -77,9 +79,11 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.psv_fire_sizing`](./psv_fire_sizing.md) | `closed_form_psv_fire_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
 | [`process.psv_sizing`](./psv_sizing.md) | `closed_form_psv_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
 | [`process.pump`](./pump.md) | `direct composition` | NeqSim process/equipment/pump/Pump.java and process/equipment/pump/PumpChart.java |
+| [`process.pump_deadhead`](./pump_deadhead.md) | `centrifugal_pump_deadhead_screen` | NeqSim process/safety/pump/PumpDeadheadAnalyzer.java |
 | [`process.rate_based_packed_column`](./rate_based_packed_column.md) | `counter_current_fixed_point_profile` | NeqSim process/equipment/distillation/RateBasedPackedColumn.java |
 | [`process.relief_disposal_network`](./relief_disposal_network.md) | `closed_form_relief_disposal_network` | NeqSim process/safety/overpressure/ReliefDisposalNetwork.java |
 | [`process.risk_matrix`](./risk_matrix.md) | `closed_form_risk_matrix` | NeqSim process/safety/risk/RiskMatrix.java |
+| [`process.runaway_reaction`](./runaway_reaction.md) | `adiabatic_runaway_screen` | NeqSim process/safety/reaction/RunawayReactionAnalyzer.java |
 | [`process.s001_clause10_review`](./s001_clause10_review.md) | `norsok_s001_clause10_review` | NeqSim process/safety/processsafetysystem/ProcessSafetySystemReviewEngine.java |
 | [`process.s001_secondary_pressure_protection`](./s001_secondary_pressure_protection.md) | `norsok_s001_secondary_pressure_protection` | NeqSim process/safety/processsafetysystem/S001SecondaryPressureProtectionCriteria.java |
 | [`process.safety_instrumented_function`](./safety_instrumented_function.md) | `closed_form_safety_instrumented_function` | NeqSim process/safety/risk/sis/SafetyInstrumentedFunction.java |
@@ -88,6 +92,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.separator`](./separator.md) | `direct composition` | NeqSim process/equipment/separator/Separator.java |
 | [`process.separator_capacity_assessment`](./separator_capacity_assessment.md) | `direct composition` | NeqSim process/equipment/separator/SeparatorCapacityAssessment.java |
 | [`process.separator_performance`](./separator_performance.md) | `direct composition` | NeqSim process/equipment/separator/entrainment/SeparatorPerformanceCalculator.java |
+| [`process.settle_out_pressure`](./settle_out_pressure.md) | `ideal_gas_settle_out_balance` | NeqSim process/safety/settleout/SettleOutPressureAnalyzer.java |
 | [`process.shortcut_distillation_column`](./shortcut_distillation_column.md) | `underwood_bisection` | NeqSim process/equipment/distillation/ShortcutDistillationColumn.java |
 | [`process.sil_verification`](./sil_verification.md) | `closed_form_sil_verification` | NeqSim process/safety/risk/sis/SILVerificationResult.java |
 | [`process.splitter`](./splitter.md) | `direct composition` | NeqSim process/equipment/splitter/Splitter.java |
@@ -100,5 +105,6 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.tr3001_compliance`](./tr3001_compliance.md) | `closed_form_tr3001_compliance` | NeqSim process/safety/overpressure/TR3001ComplianceChecker.java |
 | [`process.tube_rupture_relief`](./tube_rupture_relief.md) | `tube_rupture_nozzle` | NeqSim process/safety/overpressure/TubeRuptureRelief.java |
 | [`process.turbo_expander_compressor`](./turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/TurboExpanderCompressor.java |
+| [`process.vacuum_collapse`](./vacuum_collapse.md) | `constant_volume_cooling_sweep` | NeqSim process/safety/vacuum/VacuumCollapseAnalyzer.java |
 | [`process.vce`](./vce.md) | `tno_multi_energy_scaled_overpressure` | NeqSim process/safety/fire/VCEModel.java |
 | [`process.vessel_rupture`](./vessel_rupture.md) | `thin_wall_vessel_rupture_crossover` | NeqSim process/safety/rupture/VesselRuptureAnalyzer.java |

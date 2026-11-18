@@ -1,0 +1,107 @@
+id = "process.settle_out_pressure"
+name = "Settle-out pressure of connected gas volumes"
+kind = "procedure"
+assumptions = [
+    "**each compartment's inventory is `n_i = p_i V_i/(Z_i R T_i)` with `Z_i = 1`**, the class's no-gas basis.",
+    "**the settle-out temperature is the mole-weighted mean of the compartment temperatures unless one is stated.**",
+    "**the settle-out pressure is `N Z_s R T_s / sum V_i` with `Z_s = 1`**; the class's fixed-point Z iteration is a no-op at that value.",
+    "**the margin is `rating - settle_out_pressure`**, equality is within it, and the exceeded test is strict.",
+    "**at least two compartments are required**, as the class's `analyze` refuses fewer.",
+    "**the real-gas arm is owed**: it needs a fluid to evaluate each compartment's Z, and this id carries the class's own no-gas state.",
+    "**the per-compartment breakdown publishes each row's Z and moles**, which the class's result also carries.",
+]
+references = [
+    "API STD 521 (2020). Pressure-relieving and Depressuring Systems, settle-out and blocked-in cases.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/settleout/SettleOutPressureAnalyzer.java` is the port source.",
+    "`validation/neqsim/captures/process_settle_out_pressure.tsv` - the two- and three-compartment balances, the rating bands, the stated temperature and the one-compartment refusal.",
+]
+[source]
+standard = "NeqSim process/safety/settleout/SettleOutPressureAnalyzer.java"
+edition = "Its `analyze`: the ideal-gas inventory, the settle temperature and pressure, the rating verdict and the breakdown."
+[algorithm]
+scheme = "ideal_gas_settle_out_balance"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.compartments]
+type = "record_list"
+row_type = "SettleOutCompartment"
+description = "the connected gas volumes, **at least two**, each with a name, a volume, a pressure and a temperature.\n"
+[inputs.compartments.fields.name]
+type = "string"
+description = "the compartment's label.\n"
+[inputs.compartments.fields.volume]
+unit = "m**3"
+description = "the compartment's internal gas volume, above zero.\n"
+[inputs.compartments.fields.pressure]
+unit = "Pa"
+description = "the compartment's pressure, above zero.\n"
+[inputs.compartments.fields.temperature]
+unit = "K"
+description = "the compartment's temperature, above zero.\n"
+[inputs.settle_out_temperature]
+unit = "K"
+optional = true
+description = "the settled temperature. **Absent is the mole-weighted mean.**\n"
+[inputs.protected_pressure_rating]
+unit = "Pa"
+optional = true
+description = "the protected system's pressure rating, above zero. **Absent publishes no rating verdict.**\n"
+[outputs]
+[outputs.settle_out_pressure]
+unit = "Pa"
+description = "the pressure the connected volumes settle at, `N R T_s / sum V_i`.\n"
+[outputs.settle_out_temperature]
+unit = "K"
+description = "the settled temperature, stated or mole-weighted.\n"
+[outputs.settle_out_z_factor]
+unit = "dimensionless"
+description = "the settle-out compressibility, **1.0**: the class's no-gas state.\n"
+[outputs.total_moles]
+unit = "mol"
+description = "the summed inventory.\n"
+[outputs.total_volume]
+unit = "m**3"
+description = "the summed volume.\n"
+[outputs.max_compartment_pressure]
+unit = "Pa"
+description = "the largest stated compartment pressure.\n"
+[outputs.min_compartment_pressure]
+unit = "Pa"
+description = "the smallest stated compartment pressure.\n"
+[outputs.margin_to_rating]
+unit = "Pa"
+optional = true
+description = "`rating - settle_out_pressure`; **absent when no rating is stated**.\n"
+[outputs.exceeds_rating]
+type = "boolean"
+description = "whether the settle-out pressure is strictly above the rating.\n"
+[outputs.verdict]
+type = "enum"
+values = ["no_rating", "within_rating", "exceeds_rating"]
+description = "the class's verdict.\n"
+[outputs.compartments]
+type = "record_list"
+description = "one row per compartment, in the caller's order, with its Z and moles.\n"
+[outputs.compartments.fields.name]
+type = "string"
+description = "the compartment's label.\n"
+[outputs.compartments.fields.volume]
+unit = "m**3"
+description = "the compartment's volume.\n"
+[outputs.compartments.fields.pressure]
+unit = "Pa"
+description = "the compartment's pressure.\n"
+[outputs.compartments.fields.temperature]
+unit = "K"
+description = "the compartment's temperature.\n"
+[outputs.compartments.fields.z_factor]
+unit = "dimensionless"
+description = "the compartment's compressibility, 1.0.\n"
+[outputs.compartments.fields.moles]
+unit = "mol"
+description = "the compartment's inventory.\n"
+[implementations]
+python = "azoth.process.settle_out_pressure"
+rust = "azoth_process::settle_out_pressure"

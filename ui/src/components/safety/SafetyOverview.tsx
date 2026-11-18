@@ -14,6 +14,7 @@ const FAMILIES: { id: string; label: string }[] = [
   { id: "api14c", label: "API 14C" },
   { id: "barrier", label: "Barriers" },
   { id: "dispersion", label: "Dispersion" },
+  { id: "equipmentsafety", label: "Equipment and system safety" },
   { id: "fire", label: "Fire and explosion" },
   { id: "firewater", label: "Firewater" },
   { id: "hazid", label: "Hazard identification" },
@@ -36,6 +37,11 @@ const SCENARIO_CARDS: { id: ScenarioView; label: string; blurb: string }[] = [
     id: "dispersion",
     label: "Dispersion scenarios",
     blurb: "Gaussian plume, hazardous area, dense gas, probit and toxic thresholds.",
+  },
+  {
+    id: "equipmentsafety",
+    label: "Equipment safety scenarios",
+    blurb: "Gas blowby, pump deadhead, runaway reaction and minimum design metal temperature.",
   },
   {
     id: "firewater",

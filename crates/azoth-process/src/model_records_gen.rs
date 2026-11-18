@@ -41,6 +41,7 @@ use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentRe
 use crate::models::fire_water_demand::FireWaterDemandResult;
 use crate::models::flare::FlareResult;
 use crate::models::fmea_worksheet::FmeaWorksheetResult;
+use crate::models::gas_blowby::GasBlowbyResult;
 use crate::models::gas_dispersion::GasDispersionResult;
 use crate::models::gas_scrubber::GasScrubberResult;
 use crate::models::gaussian_plume::GaussianPlumeResult;
@@ -58,6 +59,7 @@ use crate::models::lopa::LopaResult;
 use crate::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult;
 use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
+use crate::models::mdmt::MdmtResult;
 use crate::models::mixer::MixerResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
 use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
@@ -75,9 +77,11 @@ use crate::models::probit::ProbitResult;
 use crate::models::psv_fire_sizing::PsvFireSizingResult;
 use crate::models::psv_sizing::PsvSizingResult;
 use crate::models::pump::PumpResult;
+use crate::models::pump_deadhead::PumpDeadheadResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
+use crate::models::runaway_reaction::RunawayReactionResult;
 use crate::models::s001_clause10_review::S001Clause10ReviewResult;
 use crate::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
@@ -86,6 +90,7 @@ use crate::models::semenov_self_heating::SemenovSelfHeatingResult;
 use crate::models::separator::SeparatorResult;
 use crate::models::separator_capacity_assessment::SeparatorCapacityAssessmentResult;
 use crate::models::separator_performance::SeparatorPerformanceResult;
+use crate::models::settle_out_pressure::SettleOutPressureResult;
 use crate::models::shortcut_distillation_column::ShortcutDistillationColumnResult;
 use crate::models::sil_verification::SilVerificationResult;
 use crate::models::splitter::SplitterResult;
@@ -98,6 +103,7 @@ use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
 use crate::models::tube_rupture_relief::TubeRuptureReliefResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
+use crate::models::vacuum_collapse::VacuumCollapseResult;
 use crate::models::vce::VceResult;
 use crate::models::vessel_rupture::VesselRuptureResult;
 
@@ -836,6 +842,25 @@ impl CalcResult for FmeaWorksheetResult {
     }
 }
 
+impl CalcResult for GasBlowbyResult {
+    const CALC_ID: &'static str = "process.gas_blowby";
+    const FIELDS: &'static [&'static str] = &[
+        "choked",
+        "critical_pressure_ratio",
+        "actual_pressure_ratio",
+        "blowby_mass_rate",
+        "blowby_std_vol_rate",
+        "relief_margin",
+        "relief_adequate",
+        "verdict",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for GasDispersionResult {
     const CALC_ID: &'static str = "process.gas_dispersion";
     const FIELDS: &'static [&'static str] = &[
@@ -1304,6 +1329,15 @@ impl CalcResult for MapTurboExpanderResult {
     }
 }
 
+impl CalcResult for MdmtResult {
+    const CALC_ID: &'static str = "process.mdmt";
+    const FIELDS: &'static [&'static str] = &["mdmt", "acceptable", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for MixerResult {
     const CALC_ID: &'static str = "process.mixer";
     const FIELDS: &'static [&'static str] = &[
@@ -1736,6 +1770,25 @@ impl CalcResult for PumpResult {
     }
 }
 
+impl CalcResult for PumpDeadheadResult {
+    const CALC_ID: &'static str = "process.pump_deadhead";
+    const FIELDS: &'static [&'static str] = &[
+        "rated_differential_pressure",
+        "deadhead_pressure",
+        "pressure_margin",
+        "pressure_rating_exceeded",
+        "shutoff_head",
+        "recirculation_temperature_rise",
+        "temp_rise_exceeded",
+        "verdict",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for RateBasedPackedColumnResult {
     const CALC_ID: &'static str = "process.rate_based_packed_column";
     const FIELDS: &'static [&'static str] = &[
@@ -1807,6 +1860,25 @@ impl CalcResult for ReliefDisposalNetworkResult {
 impl CalcResult for RiskMatrixResult {
     const CALC_ID: &'static str = "process.risk_matrix";
     const FIELDS: &'static [&'static str] = &["assessments", "total_annual_risk_cost", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for RunawayReactionResult {
+    const CALC_ID: &'static str = "process.runaway_reaction";
+    const FIELDS: &'static [&'static str] = &[
+        "adiabatic_temperature_rise",
+        "mtsr",
+        "temperature_margin",
+        "margin_exceeded",
+        "total_heat_release",
+        "time_to_max_rate",
+        "two_phase_relief_screening_required",
+        "verdict",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -2051,6 +2123,28 @@ impl CalcResult for SeparatorPerformanceResult {
         "post_inlet_device_spread",
         "post_inlet_d50",
         "post_inlet_d32",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SettleOutPressureResult {
+    const CALC_ID: &'static str = "process.settle_out_pressure";
+    const FIELDS: &'static [&'static str] = &[
+        "settle_out_pressure",
+        "settle_out_temperature",
+        "settle_out_z_factor",
+        "total_moles",
+        "total_volume",
+        "max_compartment_pressure",
+        "min_compartment_pressure",
+        "margin_to_rating",
+        "exceeds_rating",
+        "verdict",
+        "compartments",
         "warnings",
     ];
 
@@ -2405,6 +2499,27 @@ impl CalcResult for TurboExpanderResult {
         "design_module_length",
         "design_module_width",
         "design_module_height",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for VacuumCollapseResult {
+    const CALC_ID: &'static str = "process.vacuum_collapse";
+    const FIELDS: &'static [&'static str] = &[
+        "final_pressure",
+        "minimum_pressure",
+        "minimum_pressure_temperature",
+        "vacuum_depth",
+        "margin_to_rating",
+        "vacuum_present",
+        "within_rating",
+        "makeup_gas_moles",
+        "makeup_gas_mass",
+        "verdict",
         "warnings",
     ];
 

@@ -171,6 +171,8 @@ import neqsim.process.safety.barrier.DocumentEvidence;
 import neqsim.process.safety.barrier.PerformanceStandard;
 import neqsim.process.safety.barrier.SafetyBarrier;
 import neqsim.process.safety.barrier.SafetyCriticalElement;
+import neqsim.process.safety.blowby.GasBlowbyAnalyzer;
+import neqsim.process.safety.blowby.GasBlowbyResult;
 import neqsim.process.safety.dispersion.GasDispersionAnalyzer;
 import neqsim.process.safety.dispersion.GasDispersionResult;
 import neqsim.process.safety.dispersion.GaussianPlume;
@@ -195,6 +197,16 @@ import neqsim.process.safety.firewater.FireMonitorCoverage;
 import neqsim.process.safety.firewater.FireWaterCoverageAssessment;
 import neqsim.process.safety.firewater.FireWaterCoverageAssessment.Verdict;
 import neqsim.process.safety.firewater.FireWaterDemandCalculator;
+import neqsim.process.safety.mdmt.MDMTCalculator;
+import neqsim.process.safety.mdmt.MDMTCalculator.MaterialCurve;
+import neqsim.process.safety.pump.PumpDeadheadAnalyzer;
+import neqsim.process.safety.pump.PumpDeadheadResult;
+import neqsim.process.safety.reaction.RunawayReactionAnalyzer;
+import neqsim.process.safety.reaction.RunawayReactionResult;
+import neqsim.process.safety.settleout.SettleOutPressureAnalyzer;
+import neqsim.process.safety.settleout.SettleOutPressureResult;
+import neqsim.process.safety.vacuum.VacuumCollapseAnalyzer;
+import neqsim.process.safety.vacuum.VacuumCollapseResult;
 import neqsim.process.safety.processsafetysystem.ProcessSafetySystemAssessment;
 import neqsim.process.safety.processsafetysystem.ProcessSafetySystemReviewEngine;
 import neqsim.process.safety.processsafetysystem.ProcessSafetySystemReviewInput;
@@ -565,6 +577,24 @@ public class ProcessProbe {
         break;
       case "s001_clause10_review":
         s001Clause10ReviewRows();
+        break;
+      case "gas_blowby":
+        gasBlowbyRows();
+        break;
+      case "pump_deadhead":
+        pumpDeadheadRows();
+        break;
+      case "vacuum_collapse":
+        vacuumCollapseRows();
+        break;
+      case "settle_out_pressure":
+        settleOutPressureRows();
+        break;
+      case "runaway_reaction":
+        runawayReactionRows();
+        break;
+      case "mdmt":
+        mdmtRows();
         break;
       case "pipe_fire_rupture":
         pipeFireRuptureRows();
@@ -17386,5 +17416,353 @@ public class ProcessProbe {
             .put("reliefLoadKgPerS", 10.0).put("psvCapacityKgPerS", 14.0)));
 
     printReviewCoercion();
+  }
+
+  // ---- The safety screens ---------------------------------------------------
+
+  static void printGasBlowby(String label, GasBlowbyAnalyzer analyzer) {
+    GasBlowbyResult result = analyzer.analyze();
+    System.out.println(label);
+    System.out.println("choked=" + result.isChoked());
+    System.out.println("critical_pressure_ratio=" + result.getCriticalPressureRatio());
+    System.out.println("actual_pressure_ratio=" + result.getActualPressureRatio());
+    System.out.println("blowby_mass_rate_kg_per_hr=" + result.getBlowbyMassRateKgPerHr());
+    System.out.println("blowby_std_vol_rate_sm3_per_hr=" + result.getBlowbyStdVolRateSm3PerHr());
+    System.out.println("restriction_area_m2=" + result.getRestrictionAreaM2());
+    System.out.println("discharge_coefficient=" + result.getDischargeCoefficient());
+    System.out.println("specific_heat_ratio=" + result.getSpecificHeatRatio());
+    System.out.println("molar_mass_kg_per_mol=" + result.getMolarMassKgPerMol());
+    System.out.println("relief_capacity_kg_per_hr=" + result.getReliefCapacityKgPerHr());
+    System.out.println("relief_data_provided=" + result.isReliefDataProvided());
+    System.out.println("relief_margin_kg_per_hr=" + result.getReliefMarginKgPerHr());
+    System.out.println("relief_adequate=" + result.isReliefAdequate());
+    System.out.println("verdict=" + result.getVerdict());
+    System.out.println();
+  }
+
+  static GasBlowbyAnalyzer blowbyBase() {
+    return new GasBlowbyAnalyzer().setUpstreamPressure(10.0, "bara")
+        .setUpstreamTemperature(300.0, "K").setDownstreamPressure(5.0, "bara")
+        .setRestrictionArea(1.0e-4, "m2").setSpecificHeatRatio(1.3)
+        .setMolarMass(0.020, "kg/mol");
+  }
+
+  static void gasBlowbyRows() {
+    printGasBlowby("blowby_choked_adequate",
+        blowbyBase().setDownstreamReliefCapacity(1000.0, "kg/hr"));
+    printGasBlowby("blowby_subcritical_inadequate",
+        blowbyBase().setDownstreamPressure(7.0, "bara")
+            .setDownstreamReliefCapacity(100.0, "kg/hr"));
+    double criticalRatio = Math.pow(2.0 / 2.3, 1.3 / 0.3);
+    printGasBlowby("blowby_at_critical_ratio",
+        blowbyBase().setDownstreamPressure(10.0 * criticalRatio, "bara")
+            .setDownstreamReliefCapacity(1000.0, "kg/hr"));
+    printGasBlowby("blowby_above_critical_ratio",
+        blowbyBase().setDownstreamPressure(10.0 * criticalRatio + 1.0e-6, "bara")
+            .setDownstreamReliefCapacity(1000.0, "kg/hr"));
+    GasBlowbyAnalyzer margin = blowbyBase().setDownstreamReliefCapacity(1000.0, "kg/hr");
+    double rate = margin.analyze().getBlowbyMassRateKgPerHr();
+    printGasBlowby("blowby_margin_zero",
+        margin.setDownstreamReliefCapacity(rate, "kg/hr"));
+    printGasBlowby("blowby_no_relief_data", blowbyBase());
+    printGasBlowby("blowby_units",
+        new GasBlowbyAnalyzer().setUpstreamPressure(8.98675, "barg")
+            .setUpstreamTemperature(26.85, "C").setDownstreamPressure(5.0, "bara")
+            .setRestrictionArea(1.0, "cm2").setSpecificHeatRatio(1.3)
+            .setMolarMass(20.0, "g/mol")
+            .setDownstreamReliefCapacity(0.2777777777777778, "kg/s"));
+    printGasBlowby("blowby_diameter",
+        new GasBlowbyAnalyzer().setUpstreamPressure(10.0, "bara")
+            .setUpstreamTemperature(300.0, "K").setDownstreamPressure(5.0, "bara")
+            .setRestrictionDiameter(0.011283791670955125, "m")
+            .setSpecificHeatRatio(1.3).setMolarMass(0.020, "kg/mol"));
+  }
+
+  static void printPumpDeadhead(String label, PumpDeadheadAnalyzer analyzer) {
+    PumpDeadheadResult result = analyzer.analyze();
+    System.out.println(label);
+    System.out.println("suction_pressure_bara=" + result.getSuctionPressureBara());
+    System.out.println("normal_discharge_pressure_bara=" + result.getNormalDischargePressureBara());
+    System.out.println("shutoff_head_ratio=" + result.getShutoffHeadRatio());
+    System.out.println("rated_differential_bara=" + result.getRatedDifferentialBara());
+    System.out.println("deadhead_pressure_bara=" + result.getDeadheadPressureBara());
+    System.out.println("protected_pressure_rating_bara=" + result.getProtectedPressureRatingBara());
+    System.out.println("rating_data_provided=" + result.isRatingDataProvided());
+    System.out.println("pressure_margin_bara=" + result.getPressureMarginBara());
+    System.out.println("pressure_rating_exceeded=" + result.isPressureRatingExceeded());
+    System.out.println("shutoff_head_m=" + result.getShutoffHeadM());
+    System.out.println("liquid_density_kg_per_m3=" + result.getLiquidDensityKgPerM3());
+    System.out.println("specific_heat_j_per_kg_k=" + result.getSpecificHeatJPerKgK());
+    System.out.println("minimum_flow_efficiency=" + result.getMinimumFlowEfficiency());
+    System.out.println("recirculation_temp_rise_k=" + result.getRecirculationTempRiseK());
+    System.out.println("temp_rise_data_available=" + result.isTempRiseDataAvailable());
+    System.out.println("max_allowable_temp_rise_k=" + result.getMaxAllowableTempRiseK());
+    System.out.println("temp_rise_exceeded=" + result.isTempRiseExceeded());
+    System.out.println("verdict=" + result.getVerdict());
+    System.out.println();
+  }
+
+  static PumpDeadheadAnalyzer pumpBase() {
+    return new PumpDeadheadAnalyzer().setSuctionPressure(2.0, "bara")
+        .setNormalDischargePressure(10.0, "bara").setLiquidDensity(998.0, "kg/m3")
+        .setSpecificHeat(4180.0, "J/kgK");
+  }
+
+  static void pumpDeadheadRows() {
+    printPumpDeadhead("pump_within_rating",
+        pumpBase().setProtectedPressureRating(15.0, "bara"));
+    printPumpDeadhead("pump_exceeds_rating",
+        pumpBase().setProtectedPressureRating(11.0, "bara"));
+    printPumpDeadhead("pump_rating_equal",
+        pumpBase().setProtectedPressureRating(11.6, "bara"));
+    printPumpDeadhead("pump_no_rating", pumpBase());
+    printPumpDeadhead("pump_temp_rise_exceeded",
+        pumpBase().setProtectedPressureRating(15.0, "bara")
+            .setMaxAllowableTemperatureRise(0.5, "K"));
+    printPumpDeadhead("pump_no_density",
+        new PumpDeadheadAnalyzer().setSuctionPressure(2.0, "bara")
+            .setNormalDischargePressure(10.0, "bara")
+            .setProtectedPressureRating(15.0, "bara"));
+    printPumpDeadhead("pump_units",
+        new PumpDeadheadAnalyzer().setSuctionPressure(2.0, "bara")
+            .setNormalDischargePressure(10.0, "bara").setLiquidDensity(998.0, "kg/m3")
+            .setSpecificHeat(4.18, "kJ/kgK")
+            .setProtectedPressureRating(15.0, "bara")
+            .setMaxAllowableTemperatureRise(2.0, "C"));
+    printPumpDeadhead("pump_efficiency",
+        pumpBase().setMinimumFlowEfficiency(0.5)
+            .setProtectedPressureRating(15.0, "bara"));
+  }
+
+  static SystemInterface vacuumFluid(String[] names, double[] fractions, double tK,
+      double pBara) {
+    SystemInterface fluid = new SystemPrEos(tK, pBara);
+    for (int i = 0; i < names.length; i++) {
+      fluid.addComponent(names[i], fractions[i]);
+    }
+    fluid.setMixingRule(2);
+    return fluid;
+  }
+
+  static VacuumCollapseAnalyzer vacuumCase(String[] names, double[] fractions,
+      double initialBara, double initialK, double coldK, double volumeM3) {
+    return new VacuumCollapseAnalyzer(vacuumFluid(names, fractions, initialK, initialBara),
+        volumeM3).setInitialConditions(initialBara, "bara", initialK, "K")
+        .setColdEndTemperature(coldK, "K");
+  }
+
+  static void printVacuum(String label, VacuumCollapseAnalyzer analyzer) {
+    VacuumCollapseResult result = analyzer.analyze();
+    System.out.println(label);
+    System.out.println("initial_pressure_bara=" + result.getInitialPressureBara());
+    System.out.println("initial_temperature_k=" + result.getInitialTemperatureK());
+    System.out.println("cold_end_temperature_k=" + result.getColdEndTemperatureK());
+    System.out.println("final_pressure_bara=" + result.getFinalPressureBara());
+    System.out.println("minimum_pressure_bara=" + result.getMinimumPressureBara());
+    System.out.println("minimum_pressure_temperature_k="
+        + result.getMinimumPressureTemperatureK());
+    System.out.println("atmospheric_pressure_bara=" + result.getAtmosphericPressureBara());
+    System.out.println("external_rating_bara=" + result.getExternalRatingBara());
+    System.out.println("rating_provided=" + result.isRatingProvided());
+    System.out.println("vacuum_depth_bar=" + result.getVacuumDepthBar());
+    System.out.println("margin_to_rating_bar=" + result.getMarginToRatingBar());
+    System.out.println("vacuum_present=" + result.isVacuumPresent());
+    System.out.println("within_rating=" + result.isWithinRating());
+    System.out.println("verdict=" + result.getVerdict());
+    System.out.println("makeup_setpoint_bara=" + result.getMakeupSetpointBara());
+    System.out.println("makeup_gas_moles=" + result.getMakeupGasMoles());
+    System.out.println("makeup_gas_mass_kg=" + result.getMakeupGasMassKg());
+    System.out.println("makeup_gas_molar_mass=" + result.getMakeupGasMolarMass());
+    System.out.println();
+  }
+
+  static void printVacuumRefusal(String label, VacuumCollapseAnalyzer analyzer) {
+    System.out.println(label);
+    try {
+      analyzer.analyze();
+      System.out.println("error=none");
+    } catch (RuntimeException ex) {
+      System.out.println("error=" + ex.getClass().getSimpleName());
+      System.out.println("message=" + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static void vacuumCollapseRows() {
+    String[] methane = {"methane"};
+    double[] pure = {1.0};
+    String[] mix = {"methane", "propane"};
+    double[] mixed = {0.2, 0.8};
+    printVacuum("vacuum_gas_cool",
+        vacuumCase(methane, pure, 5.0, 300.0, 250.0, 10.0)
+            .setExternalPressureRating(1.0, "bara"));
+    printVacuum("vacuum_mixed_condense",
+        vacuumCase(mix, mixed, 5.0, 300.0, 180.0, 10.0)
+            .setExternalPressureRating(0.2, "bara"));
+    printVacuum("vacuum_exceeds_rating",
+        vacuumCase(mix, mixed, 5.0, 300.0, 180.0, 10.0)
+            .setExternalPressureRating(0.8, "bara"));
+    printVacuum("vacuum_no_rating",
+        vacuumCase(mix, mixed, 5.0, 300.0, 180.0, 10.0));
+    printVacuum("vacuum_makeup",
+        vacuumCase(mix, mixed, 5.0, 300.0, 180.0, 10.0)
+            .setExternalPressureRating(0.2, "bara").setMakeupSetpoint(1.0, "bara")
+            .setMakeupGasMolarMass(0.028));
+    printVacuum("vacuum_steps_five",
+        vacuumCase(mix, mixed, 5.0, 300.0, 180.0, 10.0).setCoolingSteps(5)
+            .setExternalPressureRating(0.2, "bara"));
+    printVacuum("vacuum_units",
+        new VacuumCollapseAnalyzer(vacuumFluid(methane, pure, 300.0, 5.0), 10.0)
+            .setInitialConditions(3.98675, "barg", 26.85, "C")
+            .setColdEndTemperature(-23.15, "C")
+            .setExternalPressureRating(1.0, "bara"));
+    printVacuumRefusal("vacuum_cold_end_refusal",
+        vacuumCase(mix, mixed, 5.0, 300.0, 310.0, 10.0));
+  }
+
+  static void printSettleOut(String label, SettleOutPressureAnalyzer analyzer) {
+    SettleOutPressureResult result = analyzer.analyze();
+    System.out.println(label);
+    System.out.println("settle_out_pressure_bara=" + result.getSettleOutPressureBara());
+    System.out.println("settle_out_temperature_k=" + result.getSettleOutTemperatureK());
+    System.out.println("settle_out_z_factor=" + result.getSettleOutZFactor());
+    System.out.println("total_moles=" + result.getTotalMoles());
+    System.out.println("total_volume_m3=" + result.getTotalVolumeM3());
+    System.out.println("max_compartment_pressure_bara="
+        + result.getMaxCompartmentPressureBara());
+    System.out.println("min_compartment_pressure_bara="
+        + result.getMinCompartmentPressureBara());
+    System.out.println("protected_rating_bara=" + result.getProtectedRatingBara());
+    System.out.println("rating_provided=" + result.isRatingProvided());
+    System.out.println("margin_to_rating_bar=" + result.getMarginToRatingBar());
+    System.out.println("exceeds_rating=" + result.isExceedsRating());
+    System.out.println("verdict=" + result.getVerdict());
+    for (int i = 0; i < result.getCompartments().size(); i++) {
+      SettleOutPressureResult.CompartmentResult row = result.getCompartments().get(i);
+      String head = "compartment" + i + "_";
+      System.out.println(head + "name=" + row.name);
+      System.out.println(head + "volume_m3=" + row.volumeM3);
+      System.out.println(head + "pressure_bara=" + row.pressureBara);
+      System.out.println(head + "temperature_k=" + row.temperatureK);
+      System.out.println(head + "z_factor=" + row.zFactor);
+      System.out.println(head + "moles=" + row.moles);
+    }
+    System.out.println();
+  }
+
+  static void printSettleOutRefusal(String label, SettleOutPressureAnalyzer analyzer) {
+    System.out.println(label);
+    try {
+      analyzer.analyze();
+      System.out.println("error=none");
+    } catch (RuntimeException ex) {
+      System.out.println("error=" + ex.getClass().getSimpleName());
+      System.out.println("message=" + ex.getMessage());
+    }
+    System.out.println();
+  }
+
+  static SettleOutPressureAnalyzer settleBase() {
+    return new SettleOutPressureAnalyzer()
+        .addVolume("suction", 5.0, "m3", 10.0, "bara", 300.0, "K")
+        .addVolume("discharge", 2.0, "m3", 20.0, "bara", 320.0, "K");
+  }
+
+  static void settleOutPressureRows() {
+    printSettleOut("settle_two_within", settleBase().setProtectedPressureRating(15.0, "bara"));
+    printSettleOut("settle_two_exceeds", settleBase().setProtectedPressureRating(10.0, "bara"));
+    SettleOutPressureAnalyzer equal = settleBase();
+    double pressure = equal.analyze().getSettleOutPressureBara();
+    printSettleOut("settle_rating_equal",
+        equal.setProtectedPressureRating(pressure, "bara"));
+    printSettleOut("settle_three", settleBase()
+        .addVolume("header", 3.0, "m3", 5.0, "bara", 290.0, "K")
+        .setProtectedPressureRating(15.0, "bara"));
+    printSettleOut("settle_stated_temperature",
+        settleBase().setSettleOutTemperature(310.0, "K")
+            .setProtectedPressureRating(15.0, "bara"));
+    printSettleOut("settle_no_rating", settleBase());
+    printSettleOut("settle_units", new SettleOutPressureAnalyzer()
+        .addVolume("suction", 5000.0, "litre", 8.98675, "barg", 26.85, "C")
+        .addVolume("discharge", 2000.0, "litre", 18.98675, "barg", 46.85, "C")
+        .setProtectedPressureRating(15.0, "bara"));
+    printSettleOutRefusal("settle_one_refusal",
+        new SettleOutPressureAnalyzer().addVolume("suction", 5.0, "m3", 10.0, "bara",
+            300.0, "K"));
+  }
+
+  static void printRunaway(String label, RunawayReactionAnalyzer analyzer) {
+    RunawayReactionResult result = analyzer.analyze();
+    System.out.println(label);
+    System.out.println("process_temperature_k=" + result.getProcessTemperatureK());
+    System.out.println("adiabatic_temperature_rise_k="
+        + result.getAdiabaticTemperatureRiseK());
+    System.out.println("mtsr_k=" + result.getMtsrK());
+    System.out.println("max_allowable_temperature_k=" + result.getMaxAllowableTemperatureK());
+    System.out.println("temperature_margin_k=" + result.getTemperatureMarginK());
+    System.out.println("max_allowable_provided=" + result.isMaxAllowableProvided());
+    System.out.println("margin_exceeded=" + result.isMarginExceeded());
+    System.out.println("total_heat_release_j=" + result.getTotalHeatReleaseJ());
+    System.out.println("total_mass_kg=" + result.getTotalMassKg());
+    System.out.println("specific_heat_j_per_kg_k=" + result.getSpecificHeatJPerKgK());
+    System.out.println("time_to_max_rate_provided=" + result.isTimeToMaxRateProvided());
+    System.out.println("time_to_max_rate_s=" + result.getTimeToMaxRateS());
+    System.out.println("two_phase_relief_screening_required="
+        + result.isTwoPhaseReliefScreeningRequired());
+    System.out.println("verdict=" + result.getVerdict());
+    System.out.println();
+  }
+
+  static RunawayReactionAnalyzer runawayBase() {
+    return new RunawayReactionAnalyzer().setProcessTemperature(350.0, "K")
+        .setReactionEnthalpy(-100000.0, "J/mol").setLimitingReactantMoles(10.0)
+        .setTotalMass(100.0, "kg").setSpecificHeat(2000.0, "J/kgK");
+  }
+
+  static void runawayReactionRows() {
+    printRunaway("runaway_no_mat_low", runawayBase());
+    printRunaway("runaway_no_mat_marginal",
+        runawayBase().setReactionEnthalpy(-1000000.0, "J/mol"));
+    printRunaway("runaway_no_mat_risk",
+        runawayBase().setReactionEnthalpy(-4000000.0, "J/mol"));
+    printRunaway("runaway_acceptable",
+        runawayBase().setReactionEnthalpy(-500000.0, "J/mol")
+            .setMaxAllowableTemperature(500.0, "K"));
+    printRunaway("runaway_marginal",
+        runawayBase().setReactionEnthalpy(-800000.0, "J/mol")
+            .setMaxAllowableTemperature(400.0, "K"));
+    printRunaway("runaway_exceeded_gassy",
+        runawayBase().setReactionEnthalpy(-800000.0, "J/mol")
+            .setMaxAllowableTemperature(370.0, "K").setGassySystem(true));
+    printRunaway("runaway_tmr",
+        runawayBase().setActivationEnergy(80000.0, "J/mol")
+            .setInitialHeatReleaseRate(1.0, "W/kg"));
+    printRunaway("runaway_units",
+        new RunawayReactionAnalyzer().setProcessTemperature(76.85, "C")
+            .setReactionEnthalpy(-100.0, "kJ/mol").setLimitingReactantMoles(10.0)
+            .setTotalMass(100.0, "kg").setSpecificHeat(2.0, "kJ/kgK"));
+  }
+
+  static void printMdmt(String label, MDMTCalculator calculator, double minOperatingC) {
+    System.out.println(label);
+    System.out.println("mdmt_c=" + calculator.getMDMT_C());
+    System.out.println("mdmt_k=" + (calculator.getMDMT_C() + 273.15));
+    System.out.println("min_operating_temp_c=" + minOperatingC);
+    System.out.println("acceptable=" + calculator.isAcceptable(minOperatingC));
+    System.out.println();
+  }
+
+  static void mdmtRows() {
+    printMdmt("mdmt_curve_a_25", new MDMTCalculator(MaterialCurve.A, 25.0), -40.0);
+    printMdmt("mdmt_curve_b_25", new MDMTCalculator(MaterialCurve.B, 25.0), -40.0);
+    printMdmt("mdmt_curve_c_25", new MDMTCalculator(MaterialCurve.C, 25.0), -40.0);
+    printMdmt("mdmt_curve_d_25", new MDMTCalculator(MaterialCurve.D, 25.0), -40.0);
+    printMdmt("mdmt_stress_035",
+        new MDMTCalculator(MaterialCurve.B, 25.0).setStressRatio(0.35), -80.0);
+    printMdmt("mdmt_clamp_six", new MDMTCalculator(MaterialCurve.B, 6.0), -50.0);
+    printMdmt("mdmt_clamp_hundred", new MDMTCalculator(MaterialCurve.B, 100.0), 20.0);
+    printMdmt("mdmt_clamp_above", new MDMTCalculator(MaterialCurve.B, 150.0), 20.0);
+    printMdmt("mdmt_pass", new MDMTCalculator(MaterialCurve.D, 25.0), -35.0);
+    printMdmt("mdmt_fail", new MDMTCalculator(MaterialCurve.D, 25.0), -45.0);
   }
 }

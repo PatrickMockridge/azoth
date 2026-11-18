@@ -1,0 +1,126 @@
+model = "process.gas_blowby"
+[[cases]]
+id = "choked_adequate"
+tolerance = 1.0e-12
+source = "10 bara upstream, 300 K, 5 bara downstream and a 1 cm2 opening: the ratio is below the critical ratio, so the flow is choked, and 1000 kg/hr of relief capacity absorbs the 578.17 kg/hr blowby. From `validation/neqsim/captures/process_gas_blowby.tsv` (`blowby_choked_adequate`)."
+[cases.inputs]
+upstream_pressure = 1.0e6
+upstream_temperature = 300.0
+downstream_pressure = 5.0e5
+restriction_area = 1.0e-4
+specific_heat_ratio = 1.3
+molar_mass = 0.020
+discharge_coefficient = 0.85
+downstream_relief_capacity = 0.2777777777777778
+[cases.expected]
+choked = true
+critical_pressure_ratio = 0.545727733814065
+actual_pressure_ratio = 0.5
+blowby_mass_rate = 0.1606026936773972
+blowby_std_vol_rate = 0.18987116976462715
+relief_margin = 0.11717508410038058
+relief_adequate = true
+verdict = "relief_adequate"
+[[cases]]
+id = "subcritical_inadequate"
+tolerance = 1.0e-12
+source = "The same opening at 7 bara downstream: the ratio is above the critical ratio, so the subcritical form applies, and 100 kg/hr is short of the 544.98 kg/hr blowby. From (`blowby_subcritical_inadequate`)."
+[cases.inputs]
+upstream_pressure = 1.0e6
+upstream_temperature = 300.0
+downstream_pressure = 7.0e5
+restriction_area = 1.0e-4
+specific_heat_ratio = 1.3
+molar_mass = 0.020
+downstream_relief_capacity = 0.027777777777777776
+[cases.expected]
+choked = false
+critical_pressure_ratio = 0.545727733814065
+actual_pressure_ratio = 0.7
+blowby_mass_rate = 0.15138288972800862
+blowby_std_vol_rate = 0.17897113489729594
+relief_margin = -0.12360511195023084
+relief_adequate = false
+verdict = "relief_inadequate"
+[[cases]]
+id = "at_critical_ratio"
+tolerance = 1.0e-12
+source = "Downstream set at exactly the critical ratio: equality is choked, so the choked form answers. From (`blowby_at_critical_ratio`)."
+[cases.inputs]
+upstream_pressure = 1.0e6
+upstream_temperature = 300.0
+downstream_pressure = 545727.733814065
+restriction_area = 1.0e-4
+specific_heat_ratio = 1.3
+molar_mass = 0.020
+downstream_relief_capacity = 0.2777777777777778
+[cases.expected]
+choked = true
+critical_pressure_ratio = 0.545727733814065
+actual_pressure_ratio = 0.545727733814065
+blowby_mass_rate = 0.1606026936773972
+blowby_std_vol_rate = 0.18987116976462715
+relief_margin = 0.11717508410038058
+relief_adequate = true
+verdict = "relief_adequate"
+[[cases]]
+id = "just_above_critical_ratio"
+tolerance = 1.0e-12
+source = "A micrometre-bar above the critical ratio: the flow is subcritical and the rate is the choked rate to six digits, but the branch is the subcritical one. From (`blowby_above_critical_ratio`)."
+[cases.inputs]
+upstream_pressure = 1.0e6
+upstream_temperature = 300.0
+downstream_pressure = 545727.833814065
+restriction_area = 1.0e-4
+specific_heat_ratio = 1.3
+molar_mass = 0.020
+downstream_relief_capacity = 0.2777777777777778
+[cases.expected]
+choked = false
+critical_pressure_ratio = 0.545727733814065
+actual_pressure_ratio = 0.5457278338140651
+blowby_mass_rate = 0.1606026936773935
+blowby_std_vol_rate = 0.18987116976462273
+relief_margin = 0.1171750841003843
+relief_adequate = true
+verdict = "relief_adequate"
+[[cases]]
+id = "margin_zero"
+tolerance = 1.0e-12
+source = "The capacity set to the blowby rate itself: a zero margin is adequate. From (`blowby_margin_zero`)."
+[cases.inputs]
+upstream_pressure = 1.0e6
+upstream_temperature = 300.0
+downstream_pressure = 5.0e5
+restriction_area = 1.0e-4
+specific_heat_ratio = 1.3
+molar_mass = 0.020
+downstream_relief_capacity = 0.1606026936773972
+[cases.expected]
+choked = true
+critical_pressure_ratio = 0.545727733814065
+actual_pressure_ratio = 0.5
+blowby_mass_rate = 0.1606026936773972
+blowby_std_vol_rate = 0.18987116976462715
+relief_margin = 0.0
+relief_adequate = true
+verdict = "relief_adequate"
+[[cases]]
+id = "no_relief_capacity"
+tolerance = 1.0e-12
+source = "No capacity stated: the rate is still published, the margin is absent and the verdict is `no_relief_data`. From (`blowby_no_relief_data`)."
+[cases.inputs]
+upstream_pressure = 1.0e6
+upstream_temperature = 300.0
+downstream_pressure = 5.0e5
+restriction_area = 1.0e-4
+specific_heat_ratio = 1.3
+molar_mass = 0.020
+[cases.expected]
+choked = true
+critical_pressure_ratio = 0.545727733814065
+actual_pressure_ratio = 0.5
+blowby_mass_rate = 0.1606026936773972
+blowby_std_vol_rate = 0.18987116976462715
+relief_adequate = false
+verdict = "no_relief_data"

@@ -60,6 +60,7 @@ pub mod fire_water_coverage_assessment;
 pub mod fire_water_demand;
 pub mod flare;
 pub mod fmea_worksheet;
+pub mod gas_blowby;
 pub mod gas_dispersion;
 pub mod gas_scrubber;
 pub mod gaussian_plume;
@@ -78,6 +79,7 @@ pub mod lopa;
 pub mod mah_bow_tie_skeleton;
 pub mod manifold;
 pub mod map_turbo_expander_compressor;
+pub mod mdmt;
 pub mod mixer;
 pub mod nog070_sil_determination;
 pub mod overpressure;
@@ -96,9 +98,11 @@ pub mod probit;
 pub mod psv_fire_sizing;
 pub mod psv_sizing;
 pub mod pump;
+pub mod pump_deadhead;
 pub mod rate_based_packed_column;
 pub mod relief_disposal_network;
 pub mod risk_matrix;
+pub mod runaway_reaction;
 pub mod s001_clause10_review;
 pub mod s001_secondary_pressure_protection;
 pub mod safety_instrumented_function;
@@ -109,6 +113,7 @@ pub mod semenov_self_heating;
 pub mod separator;
 pub mod separator_capacity_assessment;
 pub mod separator_performance;
+pub mod settle_out_pressure;
 pub mod shortcut_distillation_column;
 pub mod sil_verification;
 pub mod splitter;
@@ -121,6 +126,7 @@ pub mod toxic_library;
 pub mod tr3001_compliance;
 pub mod tube_rupture_relief;
 pub mod turbo_expander_compressor;
+pub mod vacuum_collapse;
 pub mod vce;
 pub mod vessel_rupture;
 
@@ -177,6 +183,7 @@ pub use fire_water_coverage_assessment::{
 pub use fire_water_demand::{FireWaterDemandResult, ProtectedObject, fire_water_demand};
 pub use flare::{FlareResult, flare};
 pub use fmea_worksheet::{FmeaEntry, FmeaRankedEntry, FmeaWorksheetResult, fmea_worksheet};
+pub use gas_blowby::{BlowbyVerdict, GasBlowbyResult, gas_blowby};
 pub use gas_dispersion::{GasDispersionResult, gas_dispersion};
 pub use gas_scrubber::{GasScrubberResult, gas_scrubber};
 pub use gaussian_plume::{GaussianPlumeResult, gaussian_plume};
@@ -204,6 +211,7 @@ pub use mah_bow_tie_skeleton::{
 };
 pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};
+pub use mdmt::{MdmtResult, mdmt};
 pub use mixer::{MixerResult, mixer};
 pub use nog070_sil_determination::{Nog070SilDeterminationResult, nog070_sil_determination};
 pub use overpressure_acceptance::{OverpressureAcceptanceResult, overpressure_acceptance};
@@ -229,6 +237,7 @@ pub use probit::{ProbitResult, probit};
 pub use psv_fire_sizing::{PsvFireSizingResult, psv_fire_sizing};
 pub use psv_sizing::{PsvSizingResult, psv_sizing};
 pub use pump::{PumpResult, pump};
+pub use pump_deadhead::{DeadheadVerdict, PumpDeadheadResult, pump_deadhead};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};
 pub use relief_disposal_network::{
     ReliefCause, ReliefContribution, ReliefDisposalNetworkResult, ReliefDisposalRow, ReliefPhase,
@@ -238,6 +247,7 @@ pub use risk_matrix::{
     RiskAssessmentRow, RiskConsequenceCategory, RiskEquipment, RiskLevel, RiskMatrixResult,
     RiskProbabilityCategory, risk_matrix,
 };
+pub use runaway_reaction::{RunawayReactionResult, RunawayVerdict, runaway_reaction};
 pub use s001_clause10_review::{
     OverallVerdict, ReviewAssessment, ReviewCoverage, ReviewEvidence, ReviewItem, ReviewReference,
     ReviewVerdict, S001Clause10ReviewResult, s001_clause10_review,
@@ -259,6 +269,10 @@ pub use separator_capacity_assessment::{
     SeparatorCapacityAssessmentResult, separator_capacity_assessment,
 };
 pub use separator_performance::{SeparatorPerformanceResult, separator_performance};
+pub use settle_out_pressure::{
+    SettleOutCompartment, SettleOutCompartmentResult, SettleOutPressureResult, SettleOutVerdict,
+    settle_out_pressure,
+};
 pub use shortcut_distillation_column::{
     ShortcutDistillationColumnResult, shortcut_distillation_column,
 };
@@ -278,6 +292,7 @@ pub use tr3001_compliance::{
 };
 pub use tube_rupture_relief::{TubeRuptureReliefResult, tube_rupture_relief};
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};
+pub use vacuum_collapse::{VacuumCollapseResult, VacuumVerdict, vacuum_collapse};
 pub use vce::{VceResult, vce};
 pub use vessel_rupture::{
     VesselRuptureResult, VesselRuptureState, VesselRuptureStep, vessel_rupture,

@@ -1,8 +1,8 @@
 /**
  * The Safety workspace's sub-interfaces.
  *
- * **One document, six readings.** Overview lists what the study holds; Bow-tie draws the causes
- * and outcomes; the six scenario decks run their family's models. A tab is a view and never a
+ * **One document, seven readings.** Overview lists what the study holds; Bow-tie draws the causes
+ * and outcomes; the seven scenario decks run their family's models. A tab is a view and never a
  * second document, so switching one cannot lose an edit.
  */
 
@@ -24,6 +24,7 @@ const VIEWS: { id: SafetyView; label: string }[] = [
   { id: "bowtie", label: "Bow-tie" },
   { id: "fire", label: "Fire" },
   { id: "dispersion", label: "Dispersion" },
+  { id: "equipmentsafety", label: "Equipment safety" },
   { id: "firewater", label: "Firewater" },
   { id: "overpressure", label: "Relief" },
   { id: "processsafetysystem", label: "Process safety" },

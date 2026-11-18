@@ -432,3 +432,44 @@ class HenryStatus(StrEnum):
 
     #: The equation is defined, but the temperature is outside the row's fitted range.
     GUIDELINE_EXTRAPOLATION = "guideline_extrapolation"
+
+
+class BlowbyVerdict(StrEnum):
+    """Whether a stated relief capacity absorbs the gas blowby."""
+
+    NO_RELIEF_DATA = "no_relief_data"
+    RELIEF_ADEQUATE = "relief_adequate"
+    RELIEF_INADEQUATE = "relief_inadequate"
+
+
+class DeadheadVerdict(StrEnum):
+    """Whether the pump's deadhead pressure stays within its protected rating."""
+
+    NO_RATING = "no_rating"
+    WITHIN_RATING = "within_rating"
+    EXCEEDS_RATING = "exceeds_rating"
+
+
+class VacuumVerdict(StrEnum):
+    """Whether a blocked-in vessel's cooling sweep pulls a vacuum beyond its rating."""
+
+    NO_VACUUM = "no_vacuum"
+    VACUUM_WITHIN_RATING = "vacuum_within_rating"
+    VACUUM_EXCEEDS_RATING = "vacuum_exceeds_rating"
+
+
+class SettleOutVerdict(StrEnum):
+    """Whether the connected-volume settle-out pressure exceeds the protected rating."""
+
+    NO_RATING = "no_rating"
+    WITHIN_RATING = "within_rating"
+    EXCEEDS_RATING = "exceeds_rating"
+
+
+class RunawayVerdict(StrEnum):
+    """The runaway-reaction screening band."""
+
+    NO_RATING = "no_rating"
+    ACCEPTABLE_MARGIN = "acceptable_margin"
+    MARGINAL = "marginal"
+    RUNAWAY_RISK = "runaway_risk"

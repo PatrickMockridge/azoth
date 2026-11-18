@@ -67,6 +67,7 @@ from azoth.core.record_outputs_gen import (
     ScenarioChangeRow,
     ScenarioIndexRow,
     SelfHeatingTimePoint,
+    SettleOutCompartmentResult,
     SilIssue,
     SterileRadius,
     StreamScaleMineralRow,
@@ -78,8 +79,10 @@ from azoth.core.record_outputs_gen import (
 )
 from azoth.core.result_base import (
     BeggsBrillRegime,
+    BlowbyVerdict,
     CooldownVerdict,
     CorrosionSeverity,
+    DeadheadVerdict,
     EmulsionType,
     ErosionRiskLevel,
     FeSMorphology,
@@ -95,13 +98,16 @@ from azoth.core.result_base import (
     PlusModel,
     ReliefPhase,
     RootStructure,
+    RunawayVerdict,
     RuptureStatus,
     SelfHeatingGeometry,
     SelfHeatingVerdict,
+    SettleOutVerdict,
     StabilityVerdict,
     Sts0131PressureCategory,
     SupplyVerdict,
     TpMultiflashSeed,
+    VacuumVerdict,
     _HasWarnings,
 )
 from azoth.core.units import Q
@@ -7068,6 +7074,40 @@ class FmeaWorksheetResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class GasBlowbyResult(_HasWarnings):
+    """Result of ``process.gas_blowby``."""
+
+    CALC_ID: ClassVar[str] = "process.gas_blowby"
+
+    #: whether the flow is choked at the stated pressure ratio.
+    choked: bool
+
+    #: `(2/(k+1))^(k/(k-1))`, the pressure ratio at and below which the flow is choked.
+    critical_pressure_ratio: float
+
+    #: `p2/p1`.
+    actual_pressure_ratio: float
+
+    #: the blowby mass rate through the restriction, choked or subcritical.
+    blowby_mass_rate: Q
+
+    #: the same rate as a standard volume flow at 288.15 K and 101325 Pa.
+    blowby_std_vol_rate: Q
+
+    #: `capacity - blowby_mass_rate`; **absent when no capacity is stated**.
+    relief_margin: Q | None
+
+    #: whether the stated capacity is at least the blowby rate; false when no capacity is stated.
+    relief_adequate: bool
+
+    #: the class's verdict: no capacity, adequate, or inadequate.
+    verdict: BlowbyVerdict
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class GasDispersionResult(_HasWarnings):
     """Result of ``process.gas_dispersion``."""
 
@@ -8105,6 +8145,22 @@ class MapTurboExpanderResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MdmtResult(_HasWarnings):
+    """Result of ``process.mdmt``."""
+
+    CALC_ID: ClassVar[str] = "process.mdmt"
+
+    #: the minimum design metal temperature without impact testing.
+    mdmt: Q
+
+    #: whether the minimum operating temperature is at or above the MDMT.
+    acceptable: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class MixerResult(_HasWarnings):
     """Result of ``process.mixer``."""
 
@@ -9022,6 +9078,40 @@ class PumpResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PumpDeadheadResult(_HasWarnings):
+    """Result of ``process.pump_deadhead``."""
+
+    CALC_ID: ClassVar[str] = "process.pump_deadhead"
+
+    #: `normal_discharge_pressure - suction_pressure`.
+    rated_differential_pressure: Q
+
+    #: `suction_pressure + ratio (normal_discharge_pressure - suction_pressure)`.
+    deadhead_pressure: Q
+
+    #: `rating - deadhead_pressure`; **absent when no rating is stated**.
+    pressure_margin: Q | None
+
+    #: whether the deadhead pressure is strictly above the rating; false without a rating.
+    pressure_rating_exceeded: bool
+
+    #: `shutoff_dp/(rho g)`; **absent without density or specific heat**.
+    shutoff_head: Q | None
+
+    #: the minimum-flow recirculation rise; **absent without density or specific heat**.
+    recirculation_temperature_rise: Q | None
+
+    #: whether the rise is strictly above the allowable one; false when either is absent.
+    temp_rise_exceeded: bool
+
+    #: the class's verdict: no rating, within it, or exceeded.
+    verdict: DeadheadVerdict
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class RateBasedPackedColumnResult(_HasWarnings):
     """Result of ``process.rate_based_packed_column``."""
 
@@ -9190,6 +9280,40 @@ class RiskMatrixResult(_HasWarnings):
 
     #: the sum of the annual costs.
     total_annual_risk_cost: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class RunawayReactionResult(_HasWarnings):
+    """Result of ``process.runaway_reaction``."""
+
+    CALC_ID: ClassVar[str] = "process.runaway_reaction"
+
+    #: `|dH| n/(m cp)`.
+    adiabatic_temperature_rise: Q
+
+    #: `process_temperature + adiabatic_temperature_rise`.
+    mtsr: Q
+
+    #: `max_allowable_temperature - mtsr`; **absent without a MAT**.
+    temperature_margin: Q | None
+
+    #: whether the MTSR is strictly above the MAT; false without a MAT.
+    margin_exceeded: bool
+
+    #: `|dH| n`.
+    total_heat_release: Q
+
+    #: `cp R T0^2/(q0 Ea)`; **absent unless both the activation energy and the initial rate are positive**.
+    time_to_max_rate: Q | None
+
+    #: whether the gassy flag is set or the margin is exceeded.
+    two_phase_relief_screening_required: bool
+
+    #: the class's classification.
+    verdict: RunawayVerdict
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -9744,6 +9868,49 @@ class SeparatorPerformanceResult(_HasWarnings):
 
     #: the downstream distribution's Sauter mean diameter, the 50-class `sum(d^3)/sum(d^2)`.
     post_inlet_d32: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SettleOutPressureResult(_HasWarnings):
+    """Result of ``process.settle_out_pressure``."""
+
+    CALC_ID: ClassVar[str] = "process.settle_out_pressure"
+
+    #: the pressure the connected volumes settle at, `N R T_s / sum V_i`.
+    settle_out_pressure: Q
+
+    #: the settled temperature, stated or mole-weighted.
+    settle_out_temperature: Q
+
+    #: the settle-out compressibility, **1.0**: the class's no-gas state.
+    settle_out_z_factor: float
+
+    #: the summed inventory.
+    total_moles: Q
+
+    #: the summed volume.
+    total_volume: Q
+
+    #: the largest stated compartment pressure.
+    max_compartment_pressure: Q
+
+    #: the smallest stated compartment pressure.
+    min_compartment_pressure: Q
+
+    #: `rating - settle_out_pressure`; **absent when no rating is stated**.
+    margin_to_rating: Q | None
+
+    #: whether the settle-out pressure is strictly above the rating.
+    exceeds_rating: bool
+
+    #: the class's verdict.
+    verdict: SettleOutVerdict
+
+    #: one row per compartment, in the caller's order, with its Z and moles.
+    compartments: tuple[SettleOutCompartmentResult, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -10557,6 +10724,46 @@ class TurboExpanderResult(_HasWarnings):
 
     #: `getModuleHeight`, floored at `2.0`.
     design_module_height: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class VacuumCollapseResult(_HasWarnings):
+    """Result of ``process.vacuum_collapse``."""
+
+    CALC_ID: ClassVar[str] = "process.vacuum_collapse"
+
+    #: the pressure at the cold end, the last step's.
+    final_pressure: Q
+
+    #: the smallest pressure on the cooling curve.
+    minimum_pressure: Q
+
+    #: the temperature at which the smallest pressure is reached.
+    minimum_pressure_temperature: Q
+
+    #: `max(0, atmospheric_pressure - minimum_pressure)`.
+    vacuum_depth: Q
+
+    #: `minimum_pressure - external_pressure_rating`.
+    margin_to_rating: Q
+
+    #: whether the minimum pressure is below the atmospheric pressure.
+    vacuum_present: bool
+
+    #: whether the minimum pressure is at or above the external rating.
+    within_rating: bool
+
+    #: the make-up moles needed to hold the setpoint; zero when the minimum stays above it.
+    makeup_gas_moles: Q
+
+    #: the make-up mass, `moles` times the molar mass.
+    makeup_gas_mass: Q
+
+    #: the class's verdict.
+    verdict: VacuumVerdict
 
     #: Caveats.
     warnings: tuple[Warning, ...]

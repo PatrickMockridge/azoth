@@ -169,7 +169,7 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # load; 322: the overpressure protection study; 323-326: the self-heating family;
     # 327: the HAZOP template; 328: the FMEA worksheet; 329: the consequence population;
     # 330: the MAH bow-tie skeleton.
-    assert len(registered) == 334
+    assert len(registered) == 340
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

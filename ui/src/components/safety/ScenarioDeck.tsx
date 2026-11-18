@@ -43,6 +43,14 @@ const COPY: Record<
       "Each scenario holds one dispersion model's inputs and its last answer: a concentration, a distance, a probit or a threshold lookup.",
     step: "Add a plume, a hazardous-area screen, a dense-gas distance, a probit or a toxic-threshold lookup.",
   },
+  equipmentsafety: {
+    title: "Equipment safety models",
+    heading: "Equipment safety scenarios",
+    search: "Search equipment safety models",
+    blurb:
+      "Each scenario holds one equipment safety screen's inputs and its last answer: a blowby rate, a deadhead pressure, an adiabatic rise or a metal temperature.",
+    step: "Add a gas blowby, a pump deadhead, a runaway reaction or a minimum design metal temperature.",
+  },
   firewater: {
     title: "Firewater models",
     heading: "Firewater scenarios",

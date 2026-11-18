@@ -1,0 +1,139 @@
+id = "process.pump_deadhead"
+name = "Pump deadhead and minimum-flow temperature rise"
+kind = "procedure"
+assumptions = [
+    "**the rated differential is `pn - ps`, the shut-off differential is `ratio` times it, and the deadhead pressure is `ps` plus the shut-off differential.**",
+    "**the margin is `rating - deadhead`; equality is within the rating** and the exceeded test is strict.",
+    "**the shut-off head is `shutoff_dp/(rho g)` with `g = 9.80665` m/s2.**",
+    "**the recirculation rise is `shutoff_dp (1 - eta)/(rho eta cp)`**, the absorbed power heating the minimum-flow liquid.",
+    "**the defaults are a shut-off ratio of 1.20 and a minimum-flow efficiency of 0.30**.",
+    "**without density or specific heat the head and rise are absent and `temp_rise_exceeded` is false**; the class's fluid-derived values are supplied explicitly.",
+    "**the suction temperature is read only by the un-carried fluid path**, so it is not an input.",
+]
+references = [
+    "API STD 610 (2021). Centrifugal Pumps for Petroleum, Petrochemical and Natural Gas Industries.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/pump/PumpDeadheadAnalyzer.java` is the port source.",
+    "`validation/neqsim/captures/process_pump_deadhead.tsv` - the rating bands, the temperature-rise states, the absent-density path and the unit aliases.",
+]
+[source]
+standard = "NeqSim process/safety/pump/PumpDeadheadAnalyzer.java"
+edition = "Its `analyze`: the deadhead pressure, the rating verdict, the shut-off head and the minimum-flow rise."
+[algorithm]
+scheme = "centrifugal_pump_deadhead_screen"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.suction_pressure]
+unit = "Pa"
+description = "the pump suction pressure, absolute, at least zero.\n"
+[inputs.normal_discharge_pressure]
+unit = "Pa"
+description = "the normal discharge pressure, absolute, **above the suction pressure**.\n"
+[inputs.shutoff_head_ratio]
+unit = "dimensionless"
+optional = true
+description = "the shut-off head as a multiple of the rated differential, at least one. **Absent is 1.20.**\n"
+[inputs.protected_pressure_rating]
+unit = "Pa"
+optional = true
+description = "the protected system's or casing's pressure rating, above zero. **Absent publishes no rating verdict.**\n"
+[inputs.liquid_density]
+unit = "kg/m**3"
+optional = true
+description = "the pumped liquid density, above zero. **Absent with the specific heat leaves the head and rise absent.**\n"
+[inputs.specific_heat]
+unit = "J/(kg*K)"
+optional = true
+description = "the liquid specific heat, above zero.\n"
+[inputs.minimum_flow_efficiency]
+unit = "dimensionless"
+optional = true
+description = "the pump efficiency at minimum continuous flow, in `(0, 1]`. **Absent is 0.30.**\n"
+[inputs.max_allowable_temperature_rise]
+unit = "K"
+interval = true
+optional = true
+description = "the allowable recirculation temperature rise, above zero; the exceeded test is strict. **Absent reports no rise verdict.**\n"
+[outputs]
+[outputs.rated_differential_pressure]
+unit = "Pa"
+description = "`normal_discharge_pressure - suction_pressure`.\n"
+[outputs.deadhead_pressure]
+unit = "Pa"
+description = "`suction_pressure + ratio (normal_discharge_pressure - suction_pressure)`.\n"
+[outputs.pressure_margin]
+unit = "Pa"
+optional = true
+description = "`rating - deadhead_pressure`; **absent when no rating is stated**.\n"
+[outputs.pressure_rating_exceeded]
+type = "boolean"
+description = "whether the deadhead pressure is strictly above the rating; false without a rating.\n"
+[outputs.shutoff_head]
+unit = "m"
+optional = true
+description = "`shutoff_dp/(rho g)`; **absent without density or specific heat**.\n"
+[outputs.recirculation_temperature_rise]
+unit = "K"
+optional = true
+description = "the minimum-flow recirculation rise; **absent without density or specific heat**.\n"
+[outputs.temp_rise_exceeded]
+type = "boolean"
+description = "whether the rise is strictly above the allowable one; false when either is absent.\n"
+[outputs.verdict]
+type = "enum"
+values = ["no_rating", "within_rating", "exceeds_rating"]
+description = "the class's verdict: no rating, within it, or exceeded.\n"
+[[valid_range]]
+quantity = "suction_pressure"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative suction pressure"
+[[valid_range]]
+quantity = "normal_discharge_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a non-positive discharge pressure is not a pump state"
+[[valid_range]]
+quantity = "shutoff_head_ratio"
+min = 1
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a shut-off ratio below one"
+[[valid_range]]
+quantity = "protected_pressure_rating"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive rating"
+[[valid_range]]
+quantity = "liquid_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive density"
+[[valid_range]]
+quantity = "specific_heat"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive specific heat"
+[[valid_range]]
+quantity = "minimum_flow_efficiency"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class refuses an efficiency outside (0, 1]"
+[[valid_range]]
+quantity = "max_allowable_temperature_rise"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive allowable rise"
+[implementations]
+python = "azoth.process.pump_deadhead"
+rust = "azoth_process::pump_deadhead"

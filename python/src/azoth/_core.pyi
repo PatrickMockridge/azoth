@@ -698,6 +698,14 @@ class EfficiencyPoint(TypedDict):
     diameter: float
     efficiency: float
 
+class SettleOutCompartment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    volume: float
+    pressure: float
+    temperature: float
+
 class Tr3001Scenario(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1277,6 +1285,17 @@ class SelfHeatingTimePoint:
     time: Qty
     centre_temperature: Qty
     max_temperature: Qty
+
+@final
+class SettleOutCompartmentResult:
+    """one row per compartment, in the caller's order, with its Z and moles."""
+
+    name: str
+    volume: Qty
+    pressure: Qty
+    temperature: Qty
+    z_factor: float
+    moles: Qty
 
 @final
 class SilIssue:
@@ -3793,6 +3812,18 @@ class FmeaWorksheetResult:
     warnings: list[Warning]
 
 @final
+class GasBlowbyResult:
+    choked: bool
+    critical_pressure_ratio: float
+    actual_pressure_ratio: float
+    blowby_mass_rate: Qty
+    blowby_std_vol_rate: Qty
+    relief_margin: Qty | None
+    relief_adequate: bool
+    verdict: str
+    warnings: list[Warning]
+
+@final
 class GasDispersionResult:
     selected_model: str
     mass_release_rate: Qty
@@ -4150,6 +4181,12 @@ class MapTurboExpanderResult:
     warnings: list[Warning]
 
 @final
+class MdmtResult:
+    mdmt: Qty
+    acceptable: bool
+    warnings: list[Warning]
+
+@final
 class MixerResult:
     product_n: Qty
     product_z: list[float]
@@ -4467,6 +4504,18 @@ class PumpResult:
     warnings: list[Warning]
 
 @final
+class PumpDeadheadResult:
+    rated_differential_pressure: Qty
+    deadhead_pressure: Qty
+    pressure_margin: Qty | None
+    pressure_rating_exceeded: bool
+    shutoff_head: Qty | None
+    recirculation_temperature_rise: Qty | None
+    temp_rise_exceeded: bool
+    verdict: str
+    warnings: list[Warning]
+
+@final
 class RateBasedPackedColumnResult:
     gas_out_n: Qty
     gas_out_z: list[float]
@@ -4524,6 +4573,18 @@ class ReliefDisposalNetworkResult:
 class RiskMatrixResult:
     assessments: list[RiskAssessmentRow]
     total_annual_risk_cost: float
+    warnings: list[Warning]
+
+@final
+class RunawayReactionResult:
+    adiabatic_temperature_rise: Qty
+    mtsr: Qty
+    temperature_margin: Qty | None
+    margin_exceeded: bool
+    total_heat_release: Qty
+    time_to_max_rate: Qty | None
+    two_phase_relief_screening_required: bool
+    verdict: str
     warnings: list[Warning]
 
 @final
@@ -4714,6 +4775,21 @@ class SeparatorPerformanceResult:
     post_inlet_device_spread: float | None
     post_inlet_d50: Qty | None
     post_inlet_d32: Qty | None
+    warnings: list[Warning]
+
+@final
+class SettleOutPressureResult:
+    settle_out_pressure: Qty
+    settle_out_temperature: Qty
+    settle_out_z_factor: float
+    total_moles: Qty
+    total_volume: Qty
+    max_compartment_pressure: Qty
+    min_compartment_pressure: Qty
+    margin_to_rating: Qty | None
+    exceeds_rating: bool
+    verdict: str
+    compartments: list[SettleOutCompartmentResult]
     warnings: list[Warning]
 
 @final
@@ -4993,6 +5069,20 @@ class TurboExpanderResult:
     design_module_length: Qty | None
     design_module_width: Qty | None
     design_module_height: Qty | None
+    warnings: list[Warning]
+
+@final
+class VacuumCollapseResult:
+    final_pressure: Qty
+    minimum_pressure: Qty
+    minimum_pressure_temperature: Qty
+    vacuum_depth: Qty
+    margin_to_rating: Qty
+    vacuum_present: bool
+    within_rating: bool
+    makeup_gas_moles: Qty
+    makeup_gas_mass: Qty
+    verdict: str
     warnings: list[Warning]
 
 @final
@@ -7673,6 +7763,16 @@ def flare(
     design_molar_flow_capacity: float | None = None,
 ) -> FlareResult: ...
 def fmea_worksheet(entries: list[FmeaEntry], rpn_threshold: float) -> FmeaWorksheetResult: ...
+def gas_blowby(
+    upstream_pressure: float,
+    upstream_temperature: float,
+    downstream_pressure: float,
+    restriction_area: float,
+    specific_heat_ratio: float,
+    molar_mass: float,
+    discharge_coefficient: float | None = None,
+    downstream_relief_capacity: float | None = None,
+) -> GasBlowbyResult: ...
 def gas_dispersion(
     components: list[str],
     composition: list[float],
@@ -7952,6 +8052,12 @@ def map_turbo_expander_compressor(
     chart_conditions: list[float] | None = None,
     impeller_diameter: float | None = None,
 ) -> MapTurboExpanderResult: ...
+def mdmt(
+    material_curve: str,
+    governing_thickness: float,
+    min_operating_temperature: float,
+    stress_ratio: float | None = None,
+) -> MdmtResult: ...
 def mixer(
     components: list[str],
     feed_n: list[float],
@@ -8221,6 +8327,16 @@ def pump(
     aor_low_fraction: float | None = None,
     aor_high_fraction: float | None = None,
 ) -> PumpResult: ...
+def pump_deadhead(
+    suction_pressure: float,
+    normal_discharge_pressure: float,
+    shutoff_head_ratio: float | None = None,
+    protected_pressure_rating: float | None = None,
+    liquid_density: float | None = None,
+    specific_heat: float | None = None,
+    minimum_flow_efficiency: float | None = None,
+    max_allowable_temperature_rise: float | None = None,
+) -> PumpDeadheadResult: ...
 def rate_based_packed_column(
     gas_components: list[str],
     liquid_components: list[str],
@@ -8254,6 +8370,18 @@ def risk_matrix(
     product_price_per_kg: float | None = None,
     downtime_cost_per_hour: float | None = None,
 ) -> RiskMatrixResult: ...
+def runaway_reaction(
+    process_temperature: float,
+    reaction_enthalpy: float,
+    limiting_reactant_moles: float,
+    total_mass: float,
+    specific_heat: float,
+    max_allowable_temperature: float | None = None,
+    activation_energy: float | None = None,
+    initial_heat_release_rate: float | None = None,
+    acceptable_margin: float | None = None,
+    gassy_system: bool | None = None,
+) -> RunawayReactionResult: ...
 def s001_clause10_review(
     items: list[ReviewItem] | None = None,
     evidence: list[ReviewEvidence] | None = None,
@@ -8395,6 +8523,11 @@ def separator_performance(
     design_k_factor: float | None = None,
     liquid_liquid_residence_time: float | None = None,
 ) -> SeparatorPerformanceResult: ...
+def settle_out_pressure(
+    compartments: list[SettleOutCompartment],
+    settle_out_temperature: float | None = None,
+    protected_pressure_rating: float | None = None,
+) -> SettleOutPressureResult: ...
 def shortcut_distillation_column(
     components: list[str],
     feed_n: float,
@@ -8603,6 +8736,19 @@ def turbo_expander_compressor(
     igv_penalty_curve: list[TurboIgvPenaltyPoint] | None = None,
     mechanical_design: bool | None = None,
 ) -> TurboExpanderResult: ...
+def vacuum_collapse(
+    components: list[str],
+    mole_fractions: list[float],
+    vessel_volume: float,
+    initial_pressure: float,
+    initial_temperature: float,
+    cold_end_temperature: float,
+    atmospheric_pressure: float | None = None,
+    external_pressure_rating: float | None = None,
+    makeup_setpoint: float | None = None,
+    makeup_gas_molar_mass: float | None = None,
+    cooling_steps: float | None = None,
+) -> VacuumCollapseResult: ...
 def vce(
     cloud_fuel_mass: float,
     heat_of_combustion: float,

@@ -931,8 +931,8 @@ a claim nothing holds.
   subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
   own classes - the risk core, the two release models, the five overpressure calculators,
   the six dispersion ids, the four rupture ids, the four self-heating ids, the four hazid
-  worksheet ids and the four safety-review worksheet ids; the types no bullet names remain
-  unported, each with its class.
+  worksheet ids, the four safety-review worksheet ids and the six safety screens; the types
+  no bullet names remain unported, each with its class.
 - **The self-heating family** - four ids. **`process.semenov_self_heating` is
   `SemenovSelfHeatingAnalyzer.analyze`**: `psi` against `1/e`, the critical-temperature
   bisection on [150, 2000] K, the margin and the three-value verdict.
@@ -985,6 +985,25 @@ a claim nothing holds.
   `ProcessSafetySystemReviewInput.fromJsonObject`, the function-id merging), the messages and
   detail maps, the performance analyzer's live-detector and SIF arms, `TR2237Templates` and
   the report exporters are not carried.
+- **The safety screens** - six ids. **`process.gas_blowby` is `GasBlowbyAnalyzer.analyze`**:
+  the isentropic nozzle forms at the critical ratio, the 15 C standard volume and the
+  relief-capacity verdict; equality at the critical ratio is choked and a zero margin is
+  adequate. **`process.pump_deadhead` is `PumpDeadheadAnalyzer.analyze`**: the shut-off
+  deadhead pressure against the protected rating and the minimum-flow recirculation rise,
+  with the class's 1.20 and 0.30 defaults. **`process.runaway_reaction` is
+  `RunawayReactionAnalyzer.analyze`**: the adiabatic rise, MTSR, margin, the time to maximum
+  rate and the two-phase flag, with the no-MAT bands at 50 and 200 K inclusive.
+  **`process.mdmt` is `MDMTCalculator`**: the four analytic UCS-66 curves, the silent
+  6-100 mm clamp and the stress-ratio reduction; the curves are the class's approximations,
+  not the figure's table. **`process.vacuum_collapse` is
+  `VacuumCollapseAnalyzer.analyze`**: the blocked-in inventory's TP flash, the constant-volume
+  flash at every cooling step, the minimum pressure against the external rating and the
+  make-up gas; the cubic is the databank PR and the port's TV flash matches the capture.
+  **`process.settle_out_pressure` is `SettleOutPressureAnalyzer.analyze`**: the no-gas
+  compartment inventory, the mole-weighted settle temperature and pressure and the rating
+  verdict; its real-gas Z arm needs a fluid and is owed. The unit-string setters, the
+  fluid-derived `k`, molar mass, density, specific heat and Z, the cooling curve, the
+  restriction-diameter setter and every report are not carried. Held to six captures.
 - **The relief and overpressure arithmetic** — seven ids. **`process.psv_sizing` is
   `ReliefValveSizing`'s three area methods and the API 520 D to T ladder**: gas with the
   conventional/balanced-bellows `Kb` and the rupture-disk `Kc`, liquid with `Kw`, the
@@ -1222,8 +1241,8 @@ study: safety scenarios, one registered model each, and bow-ties whose frequency
 `process.bow_tie`'s. Each has its own command model, envelope and route — `/sheets` and
 `/safety` — and its own bindings (`SheetEditor`/`SafetyEditor` in wasm, `azoth sheets`/`azoth
 safety` in the shell); the read-only drawing rides `/dexpi`. The **Case** menu switches the four
-interfaces from one registry in `ui/src/interfaces.ts`. The safety interface runs the twenty-one
-scalar safety models across five families, and the bow-tie, natively; the record-shaped models
+interfaces from one registry in `ui/src/interfaces.ts`. The safety interface runs the twenty-six
+scalar safety models across seven families, and the bow-tie, natively; the record-shaped models
 and the rupture, release and QRA families are listed with their manual pages and no native view
 yet. A HAZOP worksheet, a printable safety report, a flux-versus-distance chart and scenario
 bundles remain unbuilt.

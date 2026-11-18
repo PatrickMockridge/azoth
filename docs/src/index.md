@@ -357,6 +357,7 @@ Five sections, and the difference between them is the point:
 - [`process.fire_water_demand`](./process/fire_water_demand.md) — Fire-water demand
 - [`process.flare`](./process/flare.md) — Flare
 - [`process.fmea_worksheet`](./process/fmea_worksheet.md) — FMEA worksheet
+- [`process.gas_blowby`](./process/gas_blowby.md) — Gas blowby through a restriction
 - [`process.gas_dispersion`](./process/gas_dispersion.md) — Gas dispersion screening
 - [`process.gas_scrubber`](./process/gas_scrubber.md) — Gas scrubber
 - [`process.gaussian_plume`](./process/gaussian_plume.md) — Gaussian plume dispersion
@@ -374,6 +375,7 @@ Five sections, and the difference between them is the point:
 - [`process.mah_bow_tie_skeleton`](./process/mah_bow_tie_skeleton.md) — MAH bow-tie skeleton
 - [`process.manifold`](./process/manifold.md) — Manifold
 - [`process.map_turbo_expander_compressor`](./process/map_turbo_expander_compressor.md) — Map turbo-expander compressor
+- [`process.mdmt`](./process/mdmt.md) — Minimum design metal temperature
 - [`process.mixer`](./process/mixer.md) — Mixer
 - [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
 - [`process.overpressure_acceptance`](./process/overpressure_acceptance.md) — Overpressure acceptance
@@ -391,9 +393,11 @@ Five sections, and the difference between them is the point:
 - [`process.psv_fire_sizing`](./process/psv_fire_sizing.md) — PSV fire sizing
 - [`process.psv_sizing`](./process/psv_sizing.md) — PSV sizing
 - [`process.pump`](./process/pump.md) — Pump
+- [`process.pump_deadhead`](./process/pump_deadhead.md) — Pump deadhead and minimum-flow temperature rise
 - [`process.rate_based_packed_column`](./process/rate_based_packed_column.md) — Rate-based packed column
 - [`process.relief_disposal_network`](./process/relief_disposal_network.md) — Relief disposal network
 - [`process.risk_matrix`](./process/risk_matrix.md) — Risk matrix
+- [`process.runaway_reaction`](./process/runaway_reaction.md) — Runaway reaction screening
 - [`process.s001_clause10_review`](./process/s001_clause10_review.md) — NORSOK S-001 Clause 10 review
 - [`process.s001_secondary_pressure_protection`](./process/s001_secondary_pressure_protection.md) — NORSOK S-001 secondary pressure protection
 - [`process.safety_instrumented_function`](./process/safety_instrumented_function.md) — Safety instrumented function
@@ -402,6 +406,7 @@ Five sections, and the difference between them is the point:
 - [`process.separator`](./process/separator.md) — Separator
 - [`process.separator_capacity_assessment`](./process/separator_capacity_assessment.md) — Separator capacity assessment
 - [`process.separator_performance`](./process/separator_performance.md) — Separator performance calculator
+- [`process.settle_out_pressure`](./process/settle_out_pressure.md) — Settle-out pressure of connected gas volumes
 - [`process.shortcut_distillation_column`](./process/shortcut_distillation_column.md) — Shortcut distillation column
 - [`process.sil_verification`](./process/sil_verification.md) — SIL verification
 - [`process.splitter`](./process/splitter.md) — Splitter
@@ -414,6 +419,7 @@ Five sections, and the difference between them is the point:
 - [`process.tr3001_compliance`](./process/tr3001_compliance.md) — TR3001 compliance
 - [`process.tube_rupture_relief`](./process/tube_rupture_relief.md) — Tube rupture relief
 - [`process.turbo_expander_compressor`](./process/turbo_expander_compressor.md) — Turbo-expander compressor
+- [`process.vacuum_collapse`](./process/vacuum_collapse.md) — Vacuum collapse screening
 - [`process.vce`](./process/vce.md) — Vapour-cloud explosion overpressure
 - [`process.vessel_rupture`](./process/vessel_rupture.md) — Vessel rupture
 

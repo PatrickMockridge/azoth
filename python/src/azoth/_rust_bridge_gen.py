@@ -35,6 +35,7 @@ from azoth.core.result import (
     BeggsBrillSegmentResult,
     BleveResult,
     BlockedOutletReliefResult,
+    BlowbyVerdict,
     BlowdownPressureProfileResult,
     BoilingHeatTransferResult,
     BowTieResult,
@@ -76,6 +77,7 @@ from azoth.core.result import (
     CostaldMolarVolumeResult,
     CriticalPointResult,
     DarcyWeisbachResult,
+    DeadheadVerdict,
     DelugeNozzleLayoutResult,
     DelumpingResult,
     DepositionSegmentRow,
@@ -122,6 +124,7 @@ from azoth.core.result import (
     FullerSchettlerGiddingsDiffusivityResult,
     FurstElectrolyteMod2004PhaseResult,
     FurstElectrolytePhaseResult,
+    GasBlowbyResult,
     GasDispersionResult,
     GasScrubberResult,
     GaussianPlumeResult,
@@ -202,6 +205,7 @@ from azoth.core.result import (
     MatcopPrAlphaResult,
     MatcopPrumrAlphaResult,
     MatcopPrumrNewAlphaResult,
+    MdmtResult,
     MineralEquilibriumRow,
     MinimalCutSet,
     MixerResult,
@@ -265,6 +269,7 @@ from azoth.core.result import (
     PtFlashResult,
     PtPhaseEnvelopeResult,
     PuFlashResult,
+    PumpDeadheadResult,
     PumpPowerResult,
     PumpResult,
     PvfFlashResult,
@@ -294,6 +299,8 @@ from azoth.core.result import (
     RkAlphaAbResult,
     RkDepartureResult,
     RootStructure,
+    RunawayReactionResult,
+    RunawayVerdict,
     RuptureStatus,
     S001Clause10ReviewResult,
     S001SecondaryPressureProtectionResult,
@@ -325,6 +332,9 @@ from azoth.core.result import (
     SeparatorPerformanceResult,
     SeparatorResult,
     SetHeavyTbpToPlusResult,
+    SettleOutCompartmentResult,
+    SettleOutPressureResult,
+    SettleOutVerdict,
     ShahCondensationResult,
     ShellAndTubeDesignResult,
     ShellAndTubeRatingResult,
@@ -396,6 +406,8 @@ from azoth.core.result import (
     UnifacPsrkActivityCoefficientsResult,
     UnifacUmrpruActivityCoefficientsResult,
     UniquacActivityCoefficientsResult,
+    VacuumCollapseResult,
+    VacuumVerdict,
     ValveScaleDriftResult,
     VanLaarAcidActivityCoefficientsResult,
     VceResult,
@@ -548,6 +560,7 @@ __all__ = [
     "fuller_schettler_giddings_diffusivity",
     "furst_electrolyte_mod2004_phase",
     "furst_electrolyte_phase",
+    "gas_blowby",
     "gas_dispersion",
     "gas_scrubber",
     "gaussian_plume",
@@ -607,6 +620,7 @@ __all__ = [
     "matcop_pr_alpha",
     "matcop_prumr_alpha",
     "matcop_prumr_new_alpha",
+    "mdmt",
     "mixer",
     "molar_enthalpy_entropy",
     "mollerup_alpha",
@@ -666,6 +680,7 @@ __all__ = [
     "pt_phase_envelope",
     "pu_flash",
     "pump",
+    "pump_deadhead",
     "pump_power",
     "pv_flash",
     "pv_reflux_flash",
@@ -685,6 +700,7 @@ __all__ = [
     "risk_matrix",
     "rk_alpha_ab",
     "rk_departure",
+    "runaway_reaction",
     "s001_clause10_review",
     "s001_secondary_pressure_protection",
     "safety_instrumented_function",
@@ -706,6 +722,7 @@ __all__ = [
     "separator_capacity_assessment",
     "separator_performance",
     "set_heavy_tbp_to_plus",
+    "settle_out_pressure",
     "shah_condensation",
     "shell_and_tube_design",
     "shell_and_tube_rating",
@@ -769,6 +786,7 @@ __all__ = [
     "unifac_psrk_activity_coefficients",
     "unifac_umrpru_activity_coefficients",
     "uniquac_activity_coefficients",
+    "vacuum_collapse",
     "valve_scale_drift",
     "van_laar_acid_activity_coefficients",
     "vce",
@@ -6695,6 +6713,32 @@ def fmea_worksheet(entries: list[dict[str, object]], rpn_threshold: float) -> Fm
     )
 
 
+def gas_blowby(upstream_pressure: Q, upstream_temperature: Q, downstream_pressure: Q, restriction_area: Q, specific_heat_ratio: float, molar_mass: Q, discharge_coefficient: float | None=None, downstream_relief_capacity: Q | None=None) -> GasBlowbyResult:
+    """``process.gas_blowby``, computed in Rust."""
+    spec = _models_gen.model("process.gas_blowby")
+    result = _core.gas_blowby(
+        input_to_si(spec, "upstream_pressure", upstream_pressure),
+        input_to_si(spec, "upstream_temperature", upstream_temperature),
+        input_to_si(spec, "downstream_pressure", downstream_pressure),
+        input_to_si(spec, "restriction_area", restriction_area),
+        specific_heat_ratio,
+        input_to_si(spec, "molar_mass", molar_mass),
+        None if discharge_coefficient is None else discharge_coefficient,
+        None if downstream_relief_capacity is None else input_to_si(spec, "downstream_relief_capacity", downstream_relief_capacity),
+    )
+    return GasBlowbyResult(
+        choked=result.choked,
+        critical_pressure_ratio=result.critical_pressure_ratio,
+        actual_pressure_ratio=result.actual_pressure_ratio,
+        blowby_mass_rate=from_si(result.blowby_mass_rate.magnitude_si, result.blowby_mass_rate.unit),
+        blowby_std_vol_rate=from_si(result.blowby_std_vol_rate.magnitude_si, result.blowby_std_vol_rate.unit),
+        relief_margin=None if result.relief_margin is None else from_si(result.relief_margin.magnitude_si, result.relief_margin.unit),
+        relief_adequate=result.relief_adequate,
+        verdict=BlowbyVerdict(result.verdict),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def gas_dispersion(components: list[str], composition: list[float], mass_release_rate: Q, ambient_temperature: Q | None=None, atmospheric_pressure: Q | None=None, wind_speed: Q | None=None, pasquill_stability_class: str | None=None, surface_roughness: Q | None=None, offshore: bool | None=None, release_height: Q | None=None, model_selection: str | None=None, lower_flammable_limit: float | None=None, flammable_endpoint_fraction_of_lfl: float | None=None, toxic_component: str | None=None, toxic_threshold: float | None=None) -> GasDispersionResult:
     """``process.gas_dispersion``, computed in Rust."""
     spec = _models_gen.model("process.gas_dispersion")
@@ -7400,6 +7444,22 @@ def map_turbo_expander_compressor(expander_components: list[str], compressor_com
     )
 
 
+def mdmt(material_curve: str, governing_thickness: Q, min_operating_temperature: Q, stress_ratio: float | None=None) -> MdmtResult:
+    """``process.mdmt``, computed in Rust."""
+    spec = _models_gen.model("process.mdmt")
+    result = _core.mdmt(
+        material_curve,
+        input_to_si(spec, "governing_thickness", governing_thickness),
+        input_to_si(spec, "min_operating_temperature", min_operating_temperature),
+        None if stress_ratio is None else stress_ratio,
+    )
+    return MdmtResult(
+        mdmt=from_si(result.mdmt.magnitude_si, result.mdmt.unit),
+        acceptable=result.acceptable,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def mixer(components: list[str], feed_n: list[Q], feed_z: list[list[float]], feed_p: list[Q], feed_t: list[Q], outlet_pressure: Q | None=None) -> MixerResult:
     """``process.mixer``, computed in Rust."""
     spec = _models_gen.model("process.mixer")
@@ -8053,6 +8113,32 @@ def pump(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, in
     )
 
 
+def pump_deadhead(suction_pressure: Q, normal_discharge_pressure: Q, shutoff_head_ratio: float | None=None, protected_pressure_rating: Q | None=None, liquid_density: Q | None=None, specific_heat: Q | None=None, minimum_flow_efficiency: float | None=None, max_allowable_temperature_rise: Q | None=None) -> PumpDeadheadResult:
+    """``process.pump_deadhead``, computed in Rust."""
+    spec = _models_gen.model("process.pump_deadhead")
+    result = _core.pump_deadhead(
+        input_to_si(spec, "suction_pressure", suction_pressure),
+        input_to_si(spec, "normal_discharge_pressure", normal_discharge_pressure),
+        None if shutoff_head_ratio is None else shutoff_head_ratio,
+        None if protected_pressure_rating is None else input_to_si(spec, "protected_pressure_rating", protected_pressure_rating),
+        None if liquid_density is None else input_to_si(spec, "liquid_density", liquid_density),
+        None if specific_heat is None else input_to_si(spec, "specific_heat", specific_heat),
+        None if minimum_flow_efficiency is None else minimum_flow_efficiency,
+        None if max_allowable_temperature_rise is None else input_to_si(spec, "max_allowable_temperature_rise", max_allowable_temperature_rise),
+    )
+    return PumpDeadheadResult(
+        rated_differential_pressure=from_si(result.rated_differential_pressure.magnitude_si, result.rated_differential_pressure.unit),
+        deadhead_pressure=from_si(result.deadhead_pressure.magnitude_si, result.deadhead_pressure.unit),
+        pressure_margin=None if result.pressure_margin is None else from_si(result.pressure_margin.magnitude_si, result.pressure_margin.unit),
+        pressure_rating_exceeded=result.pressure_rating_exceeded,
+        shutoff_head=None if result.shutoff_head is None else from_si(result.shutoff_head.magnitude_si, result.shutoff_head.unit),
+        recirculation_temperature_rise=None if result.recirculation_temperature_rise is None else from_si(result.recirculation_temperature_rise.magnitude_si, result.recirculation_temperature_rise.unit),
+        temp_rise_exceeded=result.temp_rise_exceeded,
+        verdict=DeadheadVerdict(result.verdict),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def rate_based_packed_column(gas_components: list[str], gas_n: Q, gas_z: list[float], gas_p: Q, gas_t: Q, liquid_components: list[str], liquid_n: Q, liquid_z: list[float], liquid_p: Q, liquid_t: Q, transfer_components: list[str] | None=None, column_diameter: Q | None=None, packed_height: Q | None=None, number_of_segments: int | None=None, packing_type: str | None=None, max_iterations: int | None=None, convergence_tolerance: Q | None=None, mass_transfer_correction: float | None=None, mass_transfer_correlation: str | None=None, film_model: str | None=None, heat_transfer_model: str | None=None, segment_solver: str | None=None, column_solver: str | None=None) -> RateBasedPackedColumnResult:
     """``process.rate_based_packed_column``, computed in Rust."""
     spec = _models_gen.model("process.rate_based_packed_column")
@@ -8154,6 +8240,34 @@ def risk_matrix(equipment: list[dict[str, object]], product_price_per_kg: float 
     return RiskMatrixResult(
         assessments=tuple(RiskAssessmentRow(name=c.name, failures_per_year=c.failures_per_year, mtbf_hours=c.mtbf_hours, mttr_hours=c.mttr_hours, expected_downtime_hours_per_year=c.expected_downtime_hours_per_year, probability_category=c.probability_category, probability_level=c.probability_level, production_loss_percent=c.production_loss_percent, production_loss_kg_hr=from_si(c.production_loss_kg_hr.magnitude_si, c.production_loss_kg_hr.unit), consequence_category=c.consequence_category, consequence_level=c.consequence_level, risk_score=c.risk_score, risk_level=c.risk_level, cost_per_failure=c.cost_per_failure, annual_risk_cost=c.annual_risk_cost) for c in result.assessments),
         total_annual_risk_cost=result.total_annual_risk_cost,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def runaway_reaction(process_temperature: Q, reaction_enthalpy: Q, limiting_reactant_moles: Q, total_mass: Q, specific_heat: Q, max_allowable_temperature: Q | None=None, activation_energy: Q | None=None, initial_heat_release_rate: float | None=None, acceptable_margin: Q | None=None, gassy_system: bool | None=None) -> RunawayReactionResult:
+    """``process.runaway_reaction``, computed in Rust."""
+    spec = _models_gen.model("process.runaway_reaction")
+    result = _core.runaway_reaction(
+        input_to_si(spec, "process_temperature", process_temperature),
+        input_to_si(spec, "reaction_enthalpy", reaction_enthalpy),
+        input_to_si(spec, "limiting_reactant_moles", limiting_reactant_moles),
+        input_to_si(spec, "total_mass", total_mass),
+        input_to_si(spec, "specific_heat", specific_heat),
+        None if max_allowable_temperature is None else input_to_si(spec, "max_allowable_temperature", max_allowable_temperature),
+        None if activation_energy is None else input_to_si(spec, "activation_energy", activation_energy),
+        None if initial_heat_release_rate is None else initial_heat_release_rate,
+        None if acceptable_margin is None else input_to_si(spec, "acceptable_margin", acceptable_margin),
+        gassy_system,
+    )
+    return RunawayReactionResult(
+        adiabatic_temperature_rise=from_si(result.adiabatic_temperature_rise.magnitude_si, result.adiabatic_temperature_rise.unit),
+        mtsr=from_si(result.mtsr.magnitude_si, result.mtsr.unit),
+        temperature_margin=None if result.temperature_margin is None else from_si(result.temperature_margin.magnitude_si, result.temperature_margin.unit),
+        margin_exceeded=result.margin_exceeded,
+        total_heat_release=from_si(result.total_heat_release.magnitude_si, result.total_heat_release.unit),
+        time_to_max_rate=None if result.time_to_max_rate is None else from_si(result.time_to_max_rate.magnitude_si, result.time_to_max_rate.unit),
+        two_phase_relief_screening_required=result.two_phase_relief_screening_required,
+        verdict=RunawayVerdict(result.verdict),
         warnings=_warnings(result.warnings),
     )
 
@@ -8516,6 +8630,30 @@ def separator_performance(gas_density: Q, oil_density: Q, water_density: Q, gas_
         post_inlet_device_spread=result.post_inlet_device_spread,
         post_inlet_d50=None if result.post_inlet_d50 is None else from_si(result.post_inlet_d50.magnitude_si, result.post_inlet_d50.unit),
         post_inlet_d32=None if result.post_inlet_d32 is None else from_si(result.post_inlet_d32.magnitude_si, result.post_inlet_d32.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def settle_out_pressure(compartments: list[dict[str, object]], settle_out_temperature: Q | None=None, protected_pressure_rating: Q | None=None) -> SettleOutPressureResult:
+    """``process.settle_out_pressure``, computed in Rust."""
+    spec = _models_gen.model("process.settle_out_pressure")
+    result = _core.settle_out_pressure(
+        input_records_to_si(spec, "compartments", compartments),
+        None if settle_out_temperature is None else input_to_si(spec, "settle_out_temperature", settle_out_temperature),
+        None if protected_pressure_rating is None else input_to_si(spec, "protected_pressure_rating", protected_pressure_rating),
+    )
+    return SettleOutPressureResult(
+        settle_out_pressure=from_si(result.settle_out_pressure.magnitude_si, result.settle_out_pressure.unit),
+        settle_out_temperature=from_si(result.settle_out_temperature.magnitude_si, result.settle_out_temperature.unit),
+        settle_out_z_factor=result.settle_out_z_factor,
+        total_moles=from_si(result.total_moles.magnitude_si, result.total_moles.unit),
+        total_volume=from_si(result.total_volume.magnitude_si, result.total_volume.unit),
+        max_compartment_pressure=from_si(result.max_compartment_pressure.magnitude_si, result.max_compartment_pressure.unit),
+        min_compartment_pressure=from_si(result.min_compartment_pressure.magnitude_si, result.min_compartment_pressure.unit),
+        margin_to_rating=None if result.margin_to_rating is None else from_si(result.margin_to_rating.magnitude_si, result.margin_to_rating.unit),
+        exceeds_rating=result.exceeds_rating,
+        verdict=SettleOutVerdict(result.verdict),
+        compartments=tuple(SettleOutCompartmentResult(name=c.name, volume=from_si(c.volume.magnitude_si, c.volume.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), z_factor=c.z_factor, moles=from_si(c.moles.magnitude_si, c.moles.unit)) for c in result.compartments),
         warnings=_warnings(result.warnings),
     )
 
@@ -9050,6 +9188,37 @@ def turbo_expander_compressor(expander_components: list[str], compressor_compone
         design_module_length=None if result.design_module_length is None else from_si(result.design_module_length.magnitude_si, result.design_module_length.unit),
         design_module_width=None if result.design_module_width is None else from_si(result.design_module_width.magnitude_si, result.design_module_width.unit),
         design_module_height=None if result.design_module_height is None else from_si(result.design_module_height.magnitude_si, result.design_module_height.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def vacuum_collapse(components: list[str], mole_fractions: list[float], vessel_volume: Q, initial_pressure: Q, initial_temperature: Q, cold_end_temperature: Q, atmospheric_pressure: Q | None=None, external_pressure_rating: Q | None=None, makeup_setpoint: Q | None=None, makeup_gas_molar_mass: Q | None=None, cooling_steps: float | None=None) -> VacuumCollapseResult:
+    """``process.vacuum_collapse``, computed in Rust."""
+    spec = _models_gen.model("process.vacuum_collapse")
+    result = _core.vacuum_collapse(
+        list(components),
+        list(mole_fractions),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "initial_pressure", initial_pressure),
+        input_to_si(spec, "initial_temperature", initial_temperature),
+        input_to_si(spec, "cold_end_temperature", cold_end_temperature),
+        None if atmospheric_pressure is None else input_to_si(spec, "atmospheric_pressure", atmospheric_pressure),
+        None if external_pressure_rating is None else input_to_si(spec, "external_pressure_rating", external_pressure_rating),
+        None if makeup_setpoint is None else input_to_si(spec, "makeup_setpoint", makeup_setpoint),
+        None if makeup_gas_molar_mass is None else input_to_si(spec, "makeup_gas_molar_mass", makeup_gas_molar_mass),
+        None if cooling_steps is None else cooling_steps,
+    )
+    return VacuumCollapseResult(
+        final_pressure=from_si(result.final_pressure.magnitude_si, result.final_pressure.unit),
+        minimum_pressure=from_si(result.minimum_pressure.magnitude_si, result.minimum_pressure.unit),
+        minimum_pressure_temperature=from_si(result.minimum_pressure_temperature.magnitude_si, result.minimum_pressure_temperature.unit),
+        vacuum_depth=from_si(result.vacuum_depth.magnitude_si, result.vacuum_depth.unit),
+        margin_to_rating=from_si(result.margin_to_rating.magnitude_si, result.margin_to_rating.unit),
+        vacuum_present=result.vacuum_present,
+        within_rating=result.within_rating,
+        makeup_gas_moles=from_si(result.makeup_gas_moles.magnitude_si, result.makeup_gas_moles.unit),
+        makeup_gas_mass=from_si(result.makeup_gas_mass.magnitude_si, result.makeup_gas_mass.unit),
+        verdict=VacuumVerdict(result.verdict),
         warnings=_warnings(result.warnings),
     )
 

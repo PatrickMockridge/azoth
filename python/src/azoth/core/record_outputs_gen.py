@@ -1033,6 +1033,29 @@ class SelfHeatingTimePoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SettleOutCompartmentResult:
+    """one row per compartment, in the caller's order, with its Z and moles."""
+
+    #: the compartment's label.
+    name: str
+
+    #: the compartment's volume.
+    volume: Q
+
+    #: the compartment's pressure.
+    pressure: Q
+
+    #: the compartment's temperature.
+    temperature: Q
+
+    #: the compartment's compressibility, 1.0.
+    z_factor: float
+
+    #: the compartment's inventory.
+    moles: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SilIssue:
     """one row per issue, in the class's check order."""
 

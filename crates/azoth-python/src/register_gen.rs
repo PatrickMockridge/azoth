@@ -270,6 +270,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyFireWaterDemandResult>()?;
     m.add_class::<crate::transport_gen::PyFlareResult>()?;
     m.add_class::<crate::transport_gen::PyFmeaWorksheetResult>()?;
+    m.add_class::<crate::transport_gen::PyGasBlowbyResult>()?;
     m.add_class::<crate::transport_gen::PyGasDispersionResult>()?;
     m.add_class::<crate::transport_gen::PyGasScrubberResult>()?;
     m.add_class::<crate::transport_gen::PyGaussianPlumeResult>()?;
@@ -287,6 +288,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyMahBowTieSkeletonResult>()?;
     m.add_class::<crate::transport_gen::PyManifoldResult>()?;
     m.add_class::<crate::transport_gen::PyMapTurboExpanderResult>()?;
+    m.add_class::<crate::transport_gen::PyMdmtResult>()?;
     m.add_class::<crate::transport_gen::PyMixerResult>()?;
     m.add_class::<crate::transport_gen::PyNog070SilDeterminationResult>()?;
     m.add_class::<crate::transport_gen::PyOverpressureAcceptanceResult>()?;
@@ -304,9 +306,11 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPsvFireSizingResult>()?;
     m.add_class::<crate::transport_gen::PyPsvSizingResult>()?;
     m.add_class::<crate::transport_gen::PyPumpResult>()?;
+    m.add_class::<crate::transport_gen::PyPumpDeadheadResult>()?;
     m.add_class::<crate::transport_gen::PyRateBasedPackedColumnResult>()?;
     m.add_class::<crate::transport_gen::PyReliefDisposalNetworkResult>()?;
     m.add_class::<crate::transport_gen::PyRiskMatrixResult>()?;
+    m.add_class::<crate::transport_gen::PyRunawayReactionResult>()?;
     m.add_class::<crate::transport_gen::PyS001Clause10ReviewResult>()?;
     m.add_class::<crate::transport_gen::PyS001SecondaryPressureProtectionResult>()?;
     m.add_class::<crate::transport_gen::PySafetyInstrumentedFunctionResult>()?;
@@ -315,6 +319,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PySeparatorResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorCapacityAssessmentResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorPerformanceResult>()?;
+    m.add_class::<crate::transport_gen::PySettleOutPressureResult>()?;
     m.add_class::<crate::transport_gen::PyShortcutDistillationColumnResult>()?;
     m.add_class::<crate::transport_gen::PySilVerificationResult>()?;
     m.add_class::<crate::transport_gen::PySplitterResult>()?;
@@ -327,6 +332,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyTr3001ComplianceResult>()?;
     m.add_class::<crate::transport_gen::PyTubeRuptureReliefResult>()?;
     m.add_class::<crate::transport_gen::PyTurboExpanderResult>()?;
+    m.add_class::<crate::transport_gen::PyVacuumCollapseResult>()?;
     m.add_class::<crate::transport_gen::PyVceResult>()?;
     m.add_class::<crate::transport_gen::PyVesselRuptureResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
@@ -398,6 +404,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyScenarioChangeRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioIndexRow>()?;
     m.add_class::<crate::record_outputs_gen::PySelfHeatingTimePoint>()?;
+    m.add_class::<crate::record_outputs_gen::PySettleOutCompartmentResult>()?;
     m.add_class::<crate::record_outputs_gen::PySilIssue>()?;
     m.add_class::<crate::record_outputs_gen::PySterileRadius>()?;
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
@@ -1016,6 +1023,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::process::fire_water_demand, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::flare, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::fmea_worksheet, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_blowby, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_dispersion, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_scrubber, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gaussian_plume, m)?)?;
@@ -1045,6 +1053,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::process::map_turbo_expander_compressor,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::mdmt, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::mixer, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::nog070_sil_determination,
@@ -1080,6 +1089,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::psv_fire_sizing, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::psv_sizing, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::pump, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::pump_deadhead, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::process::rate_based_packed_column,
         m
@@ -1089,6 +1099,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::risk_matrix, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::runaway_reaction, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::s001_clause10_review, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::s001_secondary_pressure_protection,
@@ -1113,6 +1124,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::process::separator_performance, m)?)?;
     m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::settle_out_pressure,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::shortcut_distillation_column,
         m
     )?)?;
@@ -1136,6 +1151,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::process::turbo_expander_compressor,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::vacuum_collapse, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vce, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vessel_rupture, m)?)?;
     m.add_function(wrap_pyfunction!(
