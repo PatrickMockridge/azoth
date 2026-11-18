@@ -53,8 +53,8 @@ fn require_finite(name: &'static str, value: f64) -> Result<()> {
 pub fn mdmt(
     material_curve: &str,
     governing_thickness: Length,
-    stress_ratio: Option<f64>,
     min_operating_temperature: ThermodynamicTemperature,
+    stress_ratio: Option<f64>,
 ) -> Result<MdmtResult> {
     let spec = &model_gen::MDMT_SPEC;
     let mut warnings = Vec::new();

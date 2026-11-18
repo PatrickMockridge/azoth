@@ -7048,22 +7048,22 @@ pub fn manifold(
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
 #[pyfunction]
-#[pyo3(signature = (material_curve, governing_thickness, stress_ratio, min_operating_temperature))]
+#[pyo3(signature = (material_curve, governing_thickness, min_operating_temperature, stress_ratio))]
 #[pyo3(
-    text_signature = "(material_curve, governing_thickness, stress_ratio, min_operating_temperature)"
+    text_signature = "(material_curve, governing_thickness, min_operating_temperature, stress_ratio)"
 )]
 pub fn mdmt(
     py: Python<'_>,
     material_curve: &str,
     governing_thickness: f64,
-    stress_ratio: Option<f64>,
     min_operating_temperature: f64,
+    stress_ratio: Option<f64>,
 ) -> PyResult<crate::transport_gen::PyMdmtResult> {
     azoth_process::models::mdmt::mdmt(
         material_curve,
         meters(governing_thickness),
-        stress_ratio,
         kelvins(min_operating_temperature),
+        stress_ratio,
     )
     .map(|r| crate::transport_gen::PyMdmtResult::from(&r))
     .map_err(|e| to_pyerr(py, e))

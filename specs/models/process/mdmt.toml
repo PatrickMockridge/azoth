@@ -32,13 +32,13 @@ description = "the UCS-66 impact-test exemption curve: A is the most restrictive
 [inputs.governing_thickness]
 unit = "m"
 description = "the governing thickness, above zero; the class clamps it to 6-100 mm.\n"
+[inputs.min_operating_temperature]
+unit = "K"
+description = "the coldest metal temperature the blowdown or cold service reaches.\n"
 [inputs.stress_ratio]
 unit = "dimensionless"
 optional = true
 description = "the applied-to-allowable stress ratio in `(0, 1]`. **Absent is 1.0**, no reduction.\n"
-[inputs.min_operating_temperature]
-unit = "K"
-description = "the coldest metal temperature the blowdown or cold service reaches.\n"
 [outputs]
 [outputs.mdmt]
 unit = "K"

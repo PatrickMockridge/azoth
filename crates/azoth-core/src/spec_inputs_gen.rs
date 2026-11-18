@@ -3974,12 +3974,12 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "length",
     ),
     ("process.mdmt", "governing_thickness", "length"),
-    ("process.mdmt", "stress_ratio", "dimensionless"),
     (
         "process.mdmt",
         "min_operating_temperature",
         "thermodynamic_temperature",
     ),
+    ("process.mdmt", "stress_ratio", "dimensionless"),
     ("process.mixer", "feed_n", "molar_flow"),
     ("process.mixer", "feed_z", "dimensionless"),
     ("process.mixer", "feed_p", "pressure"),

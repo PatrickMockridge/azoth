@@ -2977,8 +2977,8 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.mdmt': {
         "calc_id": 'process.mdmt',
         "name": 'Minimum design metal temperature',
-        "spec": {'path': 'specs/models/process/mdmt.toml', 'sha256': 'effb9ffd06d1aa5a6c28a1a1e6b6ca637f6c7d08a8fce25cd2fd0af12d880ce6'},
-        "code": [{'path': 'python/src/azoth/process/reference/mdmt.py', 'sha256': '3540ca2bbe4a90b32874c88eae1c6c383b539475bfdcae80ef8d71169bc16f3b'}, {'path': 'crates/azoth-process/src/models/mdmt.rs', 'sha256': '2a23ba75298808284f75f56aed4f0119e0658640743628c57a3c03c784e37075'}],
+        "spec": {'path': 'specs/models/process/mdmt.toml', 'sha256': 'd5cbb7cfca572406a828a07e8caaa0af075f8cb28d8f4c670203767bae6fcccc'},
+        "code": [{'path': 'python/src/azoth/process/reference/mdmt.py', 'sha256': '3540ca2bbe4a90b32874c88eae1c6c383b539475bfdcae80ef8d71169bc16f3b'}, {'path': 'crates/azoth-process/src/models/mdmt.rs', 'sha256': '4f605e97b8996b642bff15f22271d4fb198a9622331f3d6b549ac1335ac2804f'}],
         "source": 'NeqSim process/safety/mdmt/MDMTCalculator.java',
         "verification": 'partially_verified',
         "validation_cases": 0,

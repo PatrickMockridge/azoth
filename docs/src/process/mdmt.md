@@ -29,8 +29,8 @@ not an equation, and both implementations read it from here.
 |---|---|---|
 | `material_curve` | a / b / c / d | the UCS-66 impact-test exemption curve: A is the most restrictive and D the least. |
 | `governing_thickness` | m | the governing thickness, above zero; the class clamps it to 6-100 mm. |
-| `stress_ratio` | dimensionless | *Optional.* the applied-to-allowable stress ratio in `(0, 1]`. **Absent is 1.0**, no reduction. |
 | `min_operating_temperature` | K | the coldest metal temperature the blowdown or cold service reaches. |
+| `stress_ratio` | dimensionless | *Optional.* the applied-to-allowable stress ratio in `(0, 1]`. **Absent is 1.0**, no reduction. |
 
 
 ## Outputs

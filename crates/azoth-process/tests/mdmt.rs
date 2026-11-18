@@ -15,7 +15,7 @@ fn close(actual: f64, expected: f64, what: &str) {
 }
 
 fn curve(material_curve: &str, thickness: f64, ratio: Option<f64>, minimum: f64) -> MdmtResult {
-    mdmt(material_curve, meters(thickness), ratio, kelvins(minimum))
+    mdmt(material_curve, meters(thickness), kelvins(minimum), ratio)
         .expect("the captured state is valid")
 }
 
@@ -78,12 +78,12 @@ fn the_cold_service_verdict_is_the_comparison() {
 #[test]
 fn the_refusals_are_the_class_validations() {
     // An unknown curve.
-    assert!(mdmt("e", meters(0.025), None, kelvins(233.15)).is_err());
+    assert!(mdmt("e", meters(0.025), kelvins(233.15), None).is_err());
     // A non-positive thickness.
-    assert!(mdmt("b", meters(0.0), None, kelvins(233.15)).is_err());
+    assert!(mdmt("b", meters(0.0), kelvins(233.15), None).is_err());
     // A stress ratio outside (0, 1].
-    assert!(mdmt("b", meters(0.025), Some(0.0), kelvins(233.15)).is_err());
-    assert!(mdmt("b", meters(0.025), Some(1.1), kelvins(233.15)).is_err());
+    assert!(mdmt("b", meters(0.025), kelvins(233.15), Some(0.0)).is_err());
+    assert!(mdmt("b", meters(0.025), kelvins(233.15), Some(1.1)).is_err());
     // A non-finite operating temperature.
-    assert!(mdmt("b", meters(0.025), None, kelvins(f64::NAN)).is_err());
+    assert!(mdmt("b", meters(0.025), kelvins(f64::NAN), None).is_err());
 }

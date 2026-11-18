@@ -1568,8 +1568,8 @@ fn mdmt(inputs: &Value) -> Result<Outcome, Outcome> {
         match azoth_process::mdmt(
             material_curve,
             meters(governing_thickness),
-            stress_ratio,
             kelvins(min_operating_temperature),
+            stress_ratio,
         ) {
             Ok(result) => {
                 let mut outputs = BTreeMap::new();

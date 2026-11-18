@@ -7450,8 +7450,8 @@ def mdmt(material_curve: str, governing_thickness: Q, min_operating_temperature:
     result = _core.mdmt(
         material_curve,
         input_to_si(spec, "governing_thickness", governing_thickness),
-        None if stress_ratio is None else stress_ratio,
         input_to_si(spec, "min_operating_temperature", min_operating_temperature),
+        None if stress_ratio is None else stress_ratio,
     )
     return MdmtResult(
         mdmt=from_si(result.mdmt.magnitude_si, result.mdmt.unit),
