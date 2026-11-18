@@ -89,11 +89,7 @@ def _evaluate(
         if activation_energy is None
         else input_to_si(spec, "activation_energy", activation_energy)
     )
-    rate = (
-        None
-        if initial_heat_release_rate is None
-        else float(initial_heat_release_rate)
-    )
+    rate = None if initial_heat_release_rate is None else float(initial_heat_release_rate)
     margin_input = (
         None
         if acceptable_margin is None
@@ -236,14 +232,10 @@ def runaway_reaction(
     return RunawayReactionResult(
         adiabatic_temperature_rise=from_si(solution.rise, "K"),
         mtsr=from_si(solution.mtsr, "K"),
-        temperature_margin=(
-            None if solution.margin is None else from_si(solution.margin, "K")
-        ),
+        temperature_margin=(None if solution.margin is None else from_si(solution.margin, "K")),
         margin_exceeded=solution.exceeded,
         total_heat_release=from_si(solution.heat, "J"),
-        time_to_max_rate=(
-            None if solution.tmr is None else from_si(solution.tmr, "s")
-        ),
+        time_to_max_rate=(None if solution.tmr is None else from_si(solution.tmr, "s")),
         two_phase_relief_screening_required=solution.two_phase,
         verdict=solution.verdict,
         warnings=tuple(warnings),

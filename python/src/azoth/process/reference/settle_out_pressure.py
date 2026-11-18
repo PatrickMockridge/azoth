@@ -10,7 +10,8 @@ inventory, the settle temperature and pressure, and the rating verdict.
 from __future__ import annotations
 
 import math
-from typing import Any, NamedTuple, Sequence
+from collections.abc import Sequence
+from typing import Any, NamedTuple
 
 from azoth.core.errors import InvalidInputError
 from azoth.core.range import apply_checks, checks_for
@@ -68,7 +69,7 @@ def _evaluate(
     warnings: list[Warning] = []
     apply_checks(checks_for(spec).on_input, lambda _: None, warnings)
 
-    rows = input_records_to_si(spec, "compartments", compartments)
+    rows: list[dict[str, Any]] = input_records_to_si(spec, "compartments", compartments)
     if len(rows) < 2:
         raise InvalidInputError(
             "compartments",
@@ -124,9 +125,7 @@ def _evaluate(
         minimum_pressure = min(minimum_pressure, pressure)
 
     settled_temperature = (
-        weighted_temperature / total_moles
-        if stated_temperature is None
-        else stated_temperature
+        weighted_temperature / total_moles if stated_temperature is None else stated_temperature
     )
     settled_pressure = total_moles * R_GAS * settled_temperature / total_volume
 
@@ -137,11 +136,7 @@ def _evaluate(
     else:
         margin = rating - settled_pressure
         exceeded = settled_pressure > rating
-        verdict = (
-            SettleOutVerdict.EXCEEDS_RATING
-            if exceeded
-            else SettleOutVerdict.WITHIN_RATING
-        )
+        verdict = SettleOutVerdict.EXCEEDS_RATING if exceeded else SettleOutVerdict.WITHIN_RATING
 
     return (
         _Solution(
@@ -187,9 +182,7 @@ def settle_out_pressure(
             volume, pressure or temperature, a non-positive stated temperature or rating, or
             a non-finite input.
     """
-    solution, warnings = _evaluate(
-        compartments, settle_out_temperature, protected_pressure_rating
-    )
+    solution, warnings = _evaluate(compartments, settle_out_temperature, protected_pressure_rating)
     return SettleOutPressureResult(
         settle_out_pressure=from_si(solution.pressure, "Pa"),
         settle_out_temperature=from_si(solution.temperature, "K"),
@@ -198,9 +191,7 @@ def settle_out_pressure(
         total_volume=from_si(solution.total_volume, "m**3"),
         max_compartment_pressure=from_si(solution.max_pressure, "Pa"),
         min_compartment_pressure=from_si(solution.min_pressure, "Pa"),
-        margin_to_rating=(
-            None if solution.margin is None else from_si(solution.margin, "Pa")
-        ),
+        margin_to_rating=(None if solution.margin is None else from_si(solution.margin, "Pa")),
         exceeds_rating=solution.exceeded,
         verdict=solution.verdict,
         compartments=tuple(

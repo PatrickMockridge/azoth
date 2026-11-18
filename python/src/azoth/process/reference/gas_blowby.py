@@ -124,20 +124,12 @@ def _evaluate(
             coefficient
             * area
             * p1
-            * math.sqrt(
-                k
-                * m
-                / (R_GAS * t1)
-                * (2.0 / (k + 1.0)) ** ((k + 1.0) / (k - 1.0))
-            )
+            * math.sqrt(k * m / (R_GAS * t1) * (2.0 / (k + 1.0)) ** ((k + 1.0) / (k - 1.0)))
         )
     else:
         term = max(0.0, actual ** (2.0 / k) - actual ** ((k + 1.0) / k))
         mass_rate = (
-            coefficient
-            * area
-            * p1
-            * math.sqrt(2.0 * m / (R_GAS * t1) * (k / (k - 1.0)) * term)
+            coefficient * area * p1 * math.sqrt(2.0 * m / (R_GAS * t1) * (k / (k - 1.0)) * term)
         )
     std_vol_rate = (mass_rate / m) * R_GAS * STANDARD_TEMPERATURE_K / STANDARD_PRESSURE_PA
 
@@ -149,9 +141,7 @@ def _evaluate(
         relief_margin = capacity - mass_rate
         relief_adequate = relief_margin >= 0.0
         verdict = (
-            BlowbyVerdict.RELIEF_ADEQUATE
-            if relief_adequate
-            else BlowbyVerdict.RELIEF_INADEQUATE
+            BlowbyVerdict.RELIEF_ADEQUATE if relief_adequate else BlowbyVerdict.RELIEF_INADEQUATE
         )
 
     return (
@@ -223,9 +213,7 @@ def gas_blowby(
         blowby_mass_rate=from_si(solution.mass_rate, "kg/s"),
         blowby_std_vol_rate=from_si(solution.std_vol_rate, "m**3/s"),
         relief_margin=(
-            None
-            if solution.relief_margin is None
-            else from_si(solution.relief_margin, "kg/s")
+            None if solution.relief_margin is None else from_si(solution.relief_margin, "kg/s")
         ),
         relief_adequate=solution.relief_adequate,
         verdict=solution.verdict,

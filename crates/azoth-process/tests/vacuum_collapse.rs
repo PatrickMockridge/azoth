@@ -1,6 +1,9 @@
 //! `process.vacuum_collapse` against
 //! `validation/neqsim/captures/process_vacuum_collapse.tsv`.
 
+#![allow(clippy::excessive_precision)]
+#![allow(clippy::inconsistent_digit_grouping)]
+
 use azoth_core::units::{cubic_meters, kelvins, kilograms_per_mole, pascals};
 use azoth_process::models::vacuum_collapse::{
     VacuumCollapseResult, VacuumVerdict, vacuum_collapse,

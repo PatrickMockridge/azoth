@@ -1,6 +1,9 @@
 //! `process.runaway_reaction` against
 //! `validation/neqsim/captures/process_runaway_reaction.tsv`.
 
+#![allow(clippy::excessive_precision)]
+#![allow(clippy::inconsistent_digit_grouping)]
+
 use azoth_core::units::{
     joules_per_kilogram_kelvin, joules_per_mole, kelvin_intervals, kelvins, kilograms, moles,
 };

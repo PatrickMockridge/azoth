@@ -1,6 +1,9 @@
 //! `process.settle_out_pressure` against
 //! `validation/neqsim/captures/process_settle_out_pressure.tsv`.
 
+#![allow(clippy::excessive_precision)]
+#![allow(clippy::inconsistent_digit_grouping)]
+
 use azoth_core::units::{cubic_meters, kelvins, pascals};
 use azoth_process::models::settle_out_pressure::{
     SettleOutCompartment, SettleOutPressureResult, SettleOutVerdict, settle_out_pressure,

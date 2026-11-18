@@ -10,7 +10,8 @@ fixes the molar volume, the constant-volume cooling sweep and the make-up gas.
 from __future__ import annotations
 
 import math
-from typing import Any, NamedTuple, Sequence
+from collections.abc import Sequence
+from typing import Any, NamedTuple
 
 from azoth.core.errors import InvalidInputError, SolverNotConvergedError
 from azoth.core.range import apply_checks, checks_for
@@ -136,22 +137,16 @@ def _evaluate(
         )
     steps = DEFAULT_COOLING_STEPS if steps_input is None else steps_input
     if steps < 1.0 or abs(steps - round(steps)) > 1.0e-9:
-        raise InvalidInputError(
-            "cooling_steps", "the step count must be a positive integer"
-        )
+        raise InvalidInputError("cooling_steps", "the step count must be a positive integer")
     if atmospheric <= 0.0:
-        raise InvalidInputError(
-            "atmospheric_pressure", "the atmospheric pressure must be positive"
-        )
+        raise InvalidInputError("atmospheric_pressure", "the atmospheric pressure must be positive")
     if rating < 0.0:
         raise InvalidInputError(
             "external_pressure_rating",
             "the external-pressure rating must be at least zero",
         )
     if setpoint <= 0.0:
-        raise InvalidInputError(
-            "makeup_setpoint", "the make-up setpoint must be positive"
-        )
+        raise InvalidInputError("makeup_setpoint", "the make-up setpoint must be positive")
     if makeup_molar_mass <= 0.0:
         raise InvalidInputError(
             "makeup_gas_molar_mass", "the make-up gas molar mass must be positive"
@@ -165,9 +160,7 @@ def _evaluate(
     if flash.phase == Phase.TWO_PHASE:
         beta = flash.vapour_fraction
         if beta is None:
-            raise InvalidInputError(
-                "mole_fractions", "a two-phase split has no vapour fraction"
-            )
+            raise InvalidInputError("mole_fractions", "a two-phase split has no vapour fraction")
         compressibility = (1.0 - beta) * flash.z_liquid + beta * flash.z_vapour
     elif flash.phase == Phase.ALL_LIQUID:
         compressibility = flash.z_liquid
@@ -175,7 +168,7 @@ def _evaluate(
         compressibility = flash.z_vapour
     molar_volume = compressibility * R_GAS * t0 / p0
 
-    count = int(round(steps))
+    count = round(steps)
     final_pressure = p0
     minimum_pressure = p0
     minimum_temperature = t0

@@ -8,7 +8,7 @@ assumptions = [
     "**without a MAT the verdict is `runaway_risk` at a rise of 200 K and `marginal` at 50 K**, both inclusive; otherwise `no_rating`.",
     "**with a MAT the verdict is `runaway_risk` when the margin is negative and `marginal` when it is below the acceptable margin**, strictly; otherwise `acceptable_margin`.",
     "**the two-phase relief flag is the gassy flag or an exceeded margin.** A negative acceptable margin is accepted, as the class accepts it; the defaults are 50 K and not gassy.",
-    "**the initial heat-release rate is stated in W/kg and declared dimensionless**, because the vocabulary has no specific-power unit; the class's fluid-derived mass and specific heat are not carried.",
+    "**the initial heat-release rate is stated in W/kg and declared dimensionless**, because the vocabulary has no specific-power unit; the class's fluid-derived mass and specific heat are supplied explicitly.",
 ]
 references = [
     "Stoessel, F. (2008). Thermal Safety of Chemical Processes: Risk Assessment and Process Design. Wiley-VCH.",

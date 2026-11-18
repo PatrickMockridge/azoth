@@ -68,7 +68,7 @@ not an equation, and both implementations read it from here.
 - **the shut-off head is `shutoff_dp/(rho g)` with `g = 9.80665` m/s2.**
 - **the recirculation rise is `shutoff_dp (1 - eta)/(rho eta cp)`**, the absorbed power heating the minimum-flow liquid.
 - **the defaults are a shut-off ratio of 1.20 and a minimum-flow efficiency of 0.30**.
-- **without density or specific heat the head and rise are absent and `temp_rise_exceeded` is false**; the class's fluid-derived values are not carried.
+- **without density or specific heat the head and rise are absent and `temp_rise_exceeded` is false**; the class's fluid-derived values are supplied explicitly.
 - **the suction temperature is read only by the un-carried fluid path**, so it is not an input.
 
 ## Cases

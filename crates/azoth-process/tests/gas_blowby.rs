@@ -1,5 +1,8 @@
 //! `process.gas_blowby` against `validation/neqsim/captures/process_gas_blowby.tsv`.
 
+#![allow(clippy::excessive_precision)]
+#![allow(clippy::inconsistent_digit_grouping)]
+
 use azoth_core::units::{
     kelvins, kilograms_per_mole, kilograms_per_second, pascals, square_meters,
 };

@@ -1643,7 +1643,7 @@ def _settle_out_pressure(inputs: Mapping[str, Any]) -> dict[str, float]:
         value = inputs.get(name)
         return None if value is None else quantity(float(value), unit)
 
-    rows = [
+    rows: list[dict[str, object]] = [
         {
             "name": str(row["name"]),
             "volume": quantity(float(row["volume"]), "m**3"),
@@ -1696,9 +1696,7 @@ def _vacuum_collapse(inputs: Mapping[str, Any]) -> dict[str, float]:
         makeup_setpoint=optional("makeup_setpoint", "Pa"),
         makeup_gas_molar_mass=optional("makeup_gas_molar_mass", "kg/mol"),
         cooling_steps=(
-            None
-            if inputs.get("cooling_steps") is None
-            else float(inputs["cooling_steps"])
+            None if inputs.get("cooling_steps") is None else float(inputs["cooling_steps"])
         ),
     )
     return {
@@ -1725,13 +1723,9 @@ def _mdmt(inputs: Mapping[str, Any]) -> dict[str, float]:
         str(inputs["material_curve"]),
         quantity(float(inputs["governing_thickness"]), "m"),
         stress_ratio=(
-            None
-            if inputs.get("stress_ratio") is None
-            else float(inputs["stress_ratio"])
+            None if inputs.get("stress_ratio") is None else float(inputs["stress_ratio"])
         ),
-        min_operating_temperature=quantity(
-            float(inputs["min_operating_temperature"]), "K"
-        ),
+        min_operating_temperature=quantity(float(inputs["min_operating_temperature"]), "K"),
     )
     return {"mdmt_c": solution.mdmt_k - 273.15, "mdmt_k": solution.mdmt_k}
 
@@ -1763,11 +1757,7 @@ def _runaway_reaction(inputs: Mapping[str, Any]) -> dict[str, float]:
             else float(inputs["initial_heat_release_rate"])
         ),
         acceptable_margin=optional("acceptable_margin", "K"),
-        gassy_system=(
-            None
-            if inputs.get("gassy_system") is None
-            else bool(inputs["gassy_system"])
-        ),
+        gassy_system=(None if inputs.get("gassy_system") is None else bool(inputs["gassy_system"])),
     )
     dumped = {
         "adiabatic_temperature_rise_k": solution.rise,

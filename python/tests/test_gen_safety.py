@@ -100,8 +100,7 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
     assert module.sub_interface_of(by_id["process.jet_fire"], "fire") == "fire"
     assert module.sub_interface_of(by_id["process.gas_dispersion"], "dispersion") == "dispersion"
     assert (
-        module.sub_interface_of(by_id["process.gas_blowby"], "equipmentsafety")
-        == "equipmentsafety"
+        module.sub_interface_of(by_id["process.gas_blowby"], "equipmentsafety") == "equipmentsafety"
     )
     assert module.sub_interface_of(by_id["process.fire_water_demand"], "firewater") == "firewater"
     assert module.sub_interface_of(by_id["process.psv_sizing"], "overpressure") == "overpressure"

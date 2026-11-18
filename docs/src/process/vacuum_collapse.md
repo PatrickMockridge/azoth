@@ -70,7 +70,7 @@ not an equation, and both implementations read it from here.
 - **the vacuum depth is `max(0, patm - pmin)`, the margin `pmin - rating`, vacuum is `pmin < patm` and within-rating is `pmin >= rating`.**
 - **an absent external rating is 0 bara**, the class's full-vacuum assumption; there is no `no_rating` verdict.
 - **make-up is `V (setpoint - pmin)/(R Tmin)` moles when the minimum is below the setpoint.** The defaults are 101325 Pa atmosphere, 0 Pa rating, the atmospheric setpoint, a 0.0280134 kg/mol make-up gas and 20 steps.
-- **the cubic is the databank PR** and the class's cooling curve is presentation, not carried; a failed step truncates the sweep at the last converged point.
+- **the cubic is the databank PR** and the class's cooling curve is presentation; a failed step truncates the sweep at the last converged point.
 
 ## Cases
 

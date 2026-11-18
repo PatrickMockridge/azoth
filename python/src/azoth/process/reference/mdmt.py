@@ -96,9 +96,7 @@ def _evaluate(
     elif material_curve == "d":
         base = -65.0 + 18.0 * logarithm
     else:
-        raise InvalidInputError(
-            "material_curve", "the curve must be one of a, b, c or d"
-        )
+        raise InvalidInputError("material_curve", "the curve must be one of a, b, c or d")
     ratio = 1.0 if ratio_input is None else ratio_input
     if ratio <= 0.35:
         reduction = FULL_REDUCTION_K

@@ -1723,7 +1723,7 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
                 "**the subcritical rate is `Cd A p1 sqrt(2 M/(R T1) k/(k-1) [r^(2/k) - r^((k+1)/k)])`** with `r = p2/p1`.",
                 "**the standard volume is at 288.15 K and 101325 Pa** - 15 C, not 0 C - and is `(mdot/M) R 288.15/101325`.",
                 "**a relief margin of zero is adequate**, and a missing capacity publishes `no_relief_data` with `relief_adequate` false and an absent margin.",
-                "**the discharge coefficient defaults to 0.85.** `k` and the molar mass are stated because the class's gas-derived values are not carried; its fallbacks of 1.3 and 0.018 kg/mol are recorded, not reproduced.",
+                "**the discharge coefficient defaults to 0.85.** `k` and the molar mass are stated explicitly; the class's fallbacks of 1.3 and 0.018 kg/mol are recorded, not reproduced.",
                 "**a downstream pressure at or above the upstream pressure is refused**, as the class throws; the standard state is 15 C.",
             ],
             references: &[
@@ -5206,7 +5206,7 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
                 "**the shut-off head is `shutoff_dp/(rho g)` with `g = 9.80665` m/s2.**",
                 "**the recirculation rise is `shutoff_dp (1 - eta)/(rho eta cp)`**, the absorbed power heating the minimum-flow liquid.",
                 "**the defaults are a shut-off ratio of 1.20 and a minimum-flow efficiency of 0.30**.",
-                "**without density or specific heat the head and rise are absent and `temp_rise_exceeded` is false**; the class's fluid-derived values are not carried.",
+                "**without density or specific heat the head and rise are absent and `temp_rise_exceeded` is false**; the class's fluid-derived values are supplied explicitly.",
                 "**the suction temperature is read only by the un-carried fluid path**, so it is not an input.",
             ],
             references: &[
@@ -5508,7 +5508,7 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
                 "**without a MAT the verdict is `runaway_risk` at a rise of 200 K and `marginal` at 50 K**, both inclusive; otherwise `no_rating`.",
                 "**with a MAT the verdict is `runaway_risk` when the margin is negative and `marginal` when it is below the acceptable margin**, strictly; otherwise `acceptable_margin`.",
                 "**the two-phase relief flag is the gassy flag or an exceeded margin.** A negative acceptable margin is accepted, as the class accepts it; the defaults are 50 K and not gassy.",
-                "**the initial heat-release rate is stated in W/kg and declared dimensionless**, because the vocabulary has no specific-power unit; the class's fluid-derived mass and specific heat are not carried.",
+                "**the initial heat-release rate is stated in W/kg and declared dimensionless**, because the vocabulary has no specific-power unit; the class's fluid-derived mass and specific heat are supplied explicitly.",
             ],
             references: &[
                 "Stoessel, F. (2008). Thermal Safety of Chemical Processes: Risk Assessment and Process Design. Wiley-VCH.",

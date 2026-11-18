@@ -79,24 +79,14 @@ def _evaluate(
         else input_to_si(spec, "protected_pressure_rating", protected_pressure_rating)
     )
     density = (
-        None
-        if liquid_density is None
-        else input_to_si(spec, "liquid_density", liquid_density)
+        None if liquid_density is None else input_to_si(spec, "liquid_density", liquid_density)
     )
-    heat = (
-        None
-        if specific_heat is None
-        else input_to_si(spec, "specific_heat", specific_heat)
-    )
-    efficiency_input = (
-        None if minimum_flow_efficiency is None else float(minimum_flow_efficiency)
-    )
+    heat = None if specific_heat is None else input_to_si(spec, "specific_heat", specific_heat)
+    efficiency_input = None if minimum_flow_efficiency is None else float(minimum_flow_efficiency)
     allowable = (
         None
         if max_allowable_temperature_rise is None
-        else input_to_si(
-            spec, "max_allowable_temperature_rise", max_allowable_temperature_rise
-        )
+        else input_to_si(spec, "max_allowable_temperature_rise", max_allowable_temperature_rise)
     )
     apply_checks(
         checks_for(spec).on_input,
@@ -144,27 +134,17 @@ def _evaluate(
     else:
         margin = rating - deadhead
         exceeded = deadhead > rating
-        verdict = (
-            DeadheadVerdict.EXCEEDS_RATING
-            if exceeded
-            else DeadheadVerdict.WITHIN_RATING
-        )
+        verdict = DeadheadVerdict.EXCEEDS_RATING if exceeded else DeadheadVerdict.WITHIN_RATING
 
     if density is None or heat is None:
         head = None
         rise = None
     else:
-        efficiency = (
-            DEFAULT_MIN_FLOW_EFFICIENCY
-            if efficiency_input is None
-            else efficiency_input
-        )
+        efficiency = DEFAULT_MIN_FLOW_EFFICIENCY if efficiency_input is None else efficiency_input
         head = shutoff / (density * GRAVITY)
         rise = shutoff * (1.0 - efficiency) / (density * efficiency * heat)
 
-    temp_exceeded = (
-        rise is not None and allowable is not None and rise > allowable
-    )
+    temp_exceeded = rise is not None and allowable is not None and rise > allowable
 
     return (
         _Solution(
@@ -231,9 +211,7 @@ def pump_deadhead(
     return PumpDeadheadResult(
         rated_differential_pressure=from_si(solution.rated, "Pa"),
         deadhead_pressure=from_si(solution.deadhead, "Pa"),
-        pressure_margin=(
-            None if solution.margin is None else from_si(solution.margin, "Pa")
-        ),
+        pressure_margin=(None if solution.margin is None else from_si(solution.margin, "Pa")),
         pressure_rating_exceeded=solution.exceeded,
         shutoff_head=None if solution.head is None else from_si(solution.head, "m"),
         recirculation_temperature_rise=(

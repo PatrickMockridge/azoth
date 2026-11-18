@@ -83,7 +83,6 @@ values = ["no_rating", "within_rating", "exceeds_rating"]
 description = "the class's verdict.\n"
 [outputs.compartments]
 type = "record_list"
-row_type = "SettleOutCompartmentResult"
 description = "one row per compartment, in the caller's order, with its Z and moles.\n"
 [outputs.compartments.fields.name]
 type = "string"

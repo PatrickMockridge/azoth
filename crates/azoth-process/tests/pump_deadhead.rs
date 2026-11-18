@@ -1,5 +1,8 @@
 //! `process.pump_deadhead` against `validation/neqsim/captures/process_pump_deadhead.tsv`.
 
+#![allow(clippy::excessive_precision)]
+#![allow(clippy::inconsistent_digit_grouping)]
+
 use azoth_core::units::{
     joules_per_kilogram_kelvin, kelvin_intervals, kilograms_per_cubic_meter, pascals,
 };

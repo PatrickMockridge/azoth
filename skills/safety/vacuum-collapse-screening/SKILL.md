@@ -64,7 +64,7 @@ result = azoth.process.vacuum_collapse(
     external_pressure_rating=2.0e4,
 )
 print(result.minimum_pressure.to("bara"))  # 0.652 bara
-print(result.verdict)                      # vacuum_within_rating
+print(result.verdict)  # vacuum_within_rating
 ```
 
 ## The keycard
