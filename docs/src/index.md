@@ -348,6 +348,7 @@ Five sections, and the difference between them is the point:
 - [`process.cooler`](./process/cooler.md) — Cooler
 - [`process.deluge_nozzle_layout`](./process/deluge_nozzle_layout.md) — Deluge nozzle layout
 - [`process.depressurization`](./process/depressurization.md) — Vessel depressurization
+- [`process.depressurization_acceptance`](./process/depressurization_acceptance.md) — Depressurization acceptance
 - [`process.distillation_column`](./process/distillation_column.md) — Distillation column
 - [`process.dynamic_psv_sizing`](./process/dynamic_psv_sizing.md) — Dynamic PSV sizing
 - [`process.ejector`](./process/ejector.md) — Ejector

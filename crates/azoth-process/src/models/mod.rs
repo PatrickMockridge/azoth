@@ -51,6 +51,7 @@ pub mod control_valve_failure_relief;
 pub mod cooler;
 pub mod deluge_nozzle_layout;
 pub mod depressurization;
+pub mod depressurization_acceptance;
 pub mod distillation_column;
 pub mod dynamic_psv_sizing;
 pub mod ejector;
@@ -190,6 +191,9 @@ pub use deluge_nozzle_layout::{
     DelugeNozzleLayoutResult, GoverningCriterion, deluge_nozzle_layout,
 };
 pub use depressurization::{DepressurizationPoint, DepressurizationResult, depressurization};
+pub use depressurization_acceptance::{
+    DepressurizationAcceptancePoint, DepressurizationAcceptanceResult, depressurization_acceptance,
+};
 pub use distillation_column::{DistillationColumnResult, distillation_column};
 pub use dynamic_psv_sizing::{DynamicPsvSizingResult, dynamic_psv_sizing};
 pub use ejector::{EjectorResult, ejector};

@@ -22,6 +22,7 @@
 //!   - specs/models/process/cooler.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/depressurization.toml
+//!   - specs/models/process/depressurization_acceptance.toml
 //!   - specs/models/process/distillation_column.toml
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
@@ -27889,6 +27890,727 @@ pub static DEPRESSURIZATION_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&DEPRESSURIZATION_ALGORITHM),
     checks: DEPRESSURIZATION_CHECKS,
     cases: DEPRESSURIZATION_CASES,
+};
+
+static DEPRESSURIZATION_ACCEPTANCE_CHECKS: &[SpecCheck] = &[];
+
+static DEPRESSURIZATION_ACCEPTANCE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "pass_with_rupture_limit",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("time_to_escape", 120.0),
+            ("estimated_time_to_rupture", 100.0),
+            ("maximum_pressure_at_rupture", 1500000.0),
+            ("maximum_remaining_mass", 50.0),
+            ("maximum_escalated_fire_rate", 6.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("limiting_time", 100.0),
+            ("pressure_at_limiting_time", 1000000.0),
+            ("remaining_mass_at_limiting_time", 40.0),
+            ("peak_discharge_rate", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(200.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "fail_pressure",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("time_to_escape", 120.0),
+            ("estimated_time_to_rupture", 100.0),
+            ("maximum_pressure_at_rupture", 900000.0),
+            ("maximum_remaining_mass", 50.0),
+            ("maximum_escalated_fire_rate", 6.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("limiting_time", 100.0),
+            ("pressure_at_limiting_time", 1000000.0),
+            ("remaining_mass_at_limiting_time", 40.0),
+            ("peak_discharge_rate", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(200.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "fail_mass",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("time_to_escape", 120.0),
+            ("estimated_time_to_rupture", 100.0),
+            ("maximum_pressure_at_rupture", 1500000.0),
+            ("maximum_remaining_mass", 30.0),
+            ("maximum_escalated_fire_rate", 6.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("limiting_time", 100.0),
+            ("pressure_at_limiting_time", 1000000.0),
+            ("remaining_mass_at_limiting_time", 40.0),
+            ("peak_discharge_rate", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(200.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "fail_fire_rate",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("time_to_escape", 120.0),
+            ("estimated_time_to_rupture", 100.0),
+            ("maximum_pressure_at_rupture", 1500000.0),
+            ("maximum_remaining_mass", 50.0),
+            ("maximum_escalated_fire_rate", 4.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("limiting_time", 100.0),
+            ("pressure_at_limiting_time", 1000000.0),
+            ("remaining_mass_at_limiting_time", 40.0),
+            ("peak_discharge_rate", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(200.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "no_criteria",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("limiting_time", 200.0),
+            ("pressure_at_limiting_time", 500000.0),
+            ("remaining_mass_at_limiting_time", 20.0),
+            ("peak_discharge_rate", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(200.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "escape_limited",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("time_to_escape", 50.0),
+            ("estimated_time_to_rupture", 150.0),
+            ("maximum_pressure_at_rupture", 1500000.0),
+            ("maximum_remaining_mass", 80.0),
+            ("maximum_escalated_fire_rate", 6.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("limiting_time", 50.0),
+            ("pressure_at_limiting_time", 3000000.0),
+            ("remaining_mass_at_limiting_time", 70.0),
+            ("peak_discharge_rate", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(200.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "equality",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("maximum_pressure_at_rupture", 1000000.0),
+            ("maximum_remaining_mass", 40.0),
+            ("maximum_escalated_fire_rate", 5.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("limiting_time", 200.0),
+            ("pressure_at_limiting_time", 500000.0),
+            ("remaining_mass_at_limiting_time", 20.0),
+            ("peak_discharge_rate", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(200.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "beyond_the_last_sample",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("time_to_escape", 500.0),
+            ("maximum_pressure_at_rupture", 1500000.0),
+            ("maximum_remaining_mass", 50.0),
+            ("maximum_escalated_fire_rate", 6.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("limiting_time", 200.0),
+            ("pressure_at_limiting_time", 500000.0),
+            ("remaining_mass_at_limiting_time", 20.0),
+            ("peak_discharge_rate", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(40.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(200.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "mass",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static DEPRESSURIZATION_ACCEPTANCE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "trajectory_acceptance",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.depressurization_acceptance`.
+pub static DEPRESSURIZATION_ACCEPTANCE_SPEC: ModelSpec = ModelSpec {
+    id: "process.depressurization_acceptance",
+    kind: "procedure",
+    algorithm: Some(&DEPRESSURIZATION_ACCEPTANCE_ALGORITHM),
+    checks: DEPRESSURIZATION_ACCEPTANCE_CHECKS,
+    cases: DEPRESSURIZATION_ACCEPTANCE_CASES,
 };
 
 static DISTILLATION_COLUMN_CHECKS: &[SpecCheck] = &[
@@ -89705,6 +90427,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &COOLER_SPEC,
     &DELUGE_NOZZLE_LAYOUT_SPEC,
     &DEPRESSURIZATION_SPEC,
+    &DEPRESSURIZATION_ACCEPTANCE_SPEC,
     &DISTILLATION_COLUMN_SPEC,
     &DYNAMIC_PSV_SIZING_SPEC,
     &EJECTOR_SPEC,

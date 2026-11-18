@@ -1964,6 +1964,44 @@ def _depressurization(inputs: Mapping[str, Any]) -> dict[str, float]:
     return rows
 
 
+def _depressurization_acceptance(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.depressurization_acceptance`'s layers, from the reference's arithmetic.
+
+    The criteria are the model's own words, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.depressurization_acceptance import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    rows: list[dict[str, object]] = [
+        {
+            "time": quantity(float(row["time"]), "s"),
+            "pressure": quantity(float(row["pressure"]), "Pa"),
+            "mass": quantity(float(row["mass"]), "kg"),
+            "mass_flow": quantity(float(row["mass_flow"]), "kg/s"),
+        }
+        for row in inputs["points"]
+    ]
+    solution, _ = _evaluate(
+        rows,
+        optional("time_to_escape", "s"),
+        optional("estimated_time_to_rupture", "s"),
+        optional("maximum_pressure_at_rupture", "Pa"),
+        optional("maximum_remaining_mass", "kg"),
+        optional("maximum_escalated_fire_rate", "kg/s"),
+    )
+    return {
+        "limiting_time_s": solution.limiting_time,
+        "pressure_at_limiting_time_pa": solution.pressure_at_limiting_time,
+        "remaining_mass_at_limiting_time_kg": solution.remaining_mass_at_limiting_time,
+        "peak_discharge_rate_kg_s": solution.peak_discharge_rate,
+    }
+
+
 def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.inherent_safety`'s layers, from the reference's arithmetic."""
     from azoth.process.reference.inherent_safety import _evaluate
@@ -4048,6 +4086,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.dynamic_psv_sizing": _dynamic_psv_sizing,
     "process.vessel_filling": _vessel_filling,
     "process.depressurization": _depressurization,
+    "process.depressurization_acceptance": _depressurization_acceptance,
     "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.sts0131_gate": _sts0131_gate,
@@ -5204,6 +5243,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_depressurization.tsv",
         block=0,
         identified_by=("#label", "dep_cold_gas_60s"),
+    ),
+    # The acceptance's one: the passing state. The seven further states and the empty-trace
+    # refusal are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.depressurization_acceptance",
+        case="pass_with_rupture_limit",
+        capture="process_depressurization_acceptance.tsv",
+        block=0,
+        identified_by=("#label", "acc_pass_rupture_limits"),
     ),
     # STS-0131's one: the PSV margin at equality. The five further cases, the seven
     # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
@@ -8121,6 +8169,7 @@ UNCASED_ROWS: dict[str, int] = {
     "process_dynamic_psv_sizing.tsv": 3,
     "process_vessel_filling.tsv": 12,
     "process_depressurization.tsv": 14,
+    "process_depressurization_acceptance.tsv": 8,
     # ALARP's eight: the five further states, the empty audit and the two refusals.
     "process_alarp_audit.tsv": 8,
     # Escalation's eight: the six further states and the two refusals.

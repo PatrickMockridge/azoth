@@ -15976,6 +15976,108 @@ impl From<&azoth_process::models::depressurization::DepressurizationResult>
         }
     }
 }
+/// Result of `process.depressurization_acceptance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DepressurizationAcceptanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDepressurizationAcceptanceResult {
+    /// the earliest configured limiting time bounded by the trajectory.
+    #[pyo3(get)]
+    pub limiting_time: PyQty,
+    /// the interpolated pressure at the limiting time.
+    #[pyo3(get)]
+    pub pressure_at_limiting_time: PyQty,
+    /// the interpolated inventory at the limiting time.
+    #[pyo3(get)]
+    pub remaining_mass_at_limiting_time: PyQty,
+    /// the maximum discharge rate at or before the limiting time.
+    #[pyo3(get)]
+    pub peak_discharge_rate: PyQty,
+    /// whether a pressure limit was given.
+    #[pyo3(get)]
+    pub pressure_configured: bool,
+    /// whether the pressure is at or below its limit, or the limit is absent.
+    #[pyo3(get)]
+    pub pressure_criterion_met: bool,
+    /// whether a mass limit was given.
+    #[pyo3(get)]
+    pub mass_configured: bool,
+    /// whether the mass is at or below its limit, or the limit is absent.
+    #[pyo3(get)]
+    pub mass_criterion_met: bool,
+    /// whether a fire-rate limit was given.
+    #[pyo3(get)]
+    pub fire_rate_configured: bool,
+    /// whether the peak rate is at or below its limit, or the limit is absent.
+    #[pyo3(get)]
+    pub fire_rate_criterion_met: bool,
+    /// whether all three criteria pass.
+    #[pyo3(get)]
+    pub acceptable: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDepressurizationAcceptanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DepressurizationAcceptanceResult(limiting_time={:?}, pressure_at_limiting_time={:?}, remaining_mass_at_limiting_time={:?}, peak_discharge_rate={:?}, pressure_configured={:?}, pressure_criterion_met={:?}, mass_configured={:?}, mass_criterion_met={:?}, fire_rate_configured={:?}, fire_rate_criterion_met={:?}, acceptable={:?}, {} warning(s))",
+            self.limiting_time,
+            self.pressure_at_limiting_time,
+            self.remaining_mass_at_limiting_time,
+            self.peak_discharge_rate,
+            self.pressure_configured,
+            self.pressure_criterion_met,
+            self.mass_configured,
+            self.mass_criterion_met,
+            self.fire_rate_configured,
+            self.fire_rate_criterion_met,
+            self.acceptable,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::depressurization_acceptance::DepressurizationAcceptanceResult>
+    for PyDepressurizationAcceptanceResult
+{
+    fn from(
+        r: &azoth_process::models::depressurization_acceptance::DepressurizationAcceptanceResult,
+    ) -> Self {
+        Self {
+            limiting_time: PyQty {
+                magnitude_si: r.limiting_time.value,
+                unit: "s".to_string(),
+            },
+            pressure_at_limiting_time: PyQty {
+                magnitude_si: r.pressure_at_limiting_time.value,
+                unit: "Pa".to_string(),
+            },
+            remaining_mass_at_limiting_time: PyQty {
+                magnitude_si: r.remaining_mass_at_limiting_time.value,
+                unit: "kg".to_string(),
+            },
+            peak_discharge_rate: PyQty {
+                magnitude_si: r.peak_discharge_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            pressure_configured: r.pressure_configured,
+            pressure_criterion_met: r.pressure_criterion_met,
+            mass_configured: r.mass_configured,
+            mass_criterion_met: r.mass_criterion_met,
+            fire_rate_configured: r.fire_rate_configured,
+            fire_rate_criterion_met: r.fire_rate_criterion_met,
+            acceptable: r.acceptable,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.distillation_column`, transported.
 #[pyclass(
     frozen,

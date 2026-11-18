@@ -22,6 +22,7 @@
 //!   - specs/models/process/cooler.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/depressurization.toml
+//!   - specs/models/process/depressurization_acceptance.toml
 //!   - specs/models/process/distillation_column.toml
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml

@@ -480,6 +480,14 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         "liner_limits_met",
         "relief_demand",
         "header_mach_acceptable",
+        # The acceptance's six configured/met predicates, booleans with no slot in `TestCase`.
+        # Its model test asserts them against the capture and `test_cross_impl` compares them.
+        "pressure_configured",
+        "pressure_criterion_met",
+        "mass_configured",
+        "mass_criterion_met",
+        "fire_rate_configured",
+        "fire_rate_criterion_met",
     }
 )
 

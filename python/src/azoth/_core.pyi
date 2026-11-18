@@ -539,6 +539,14 @@ class ConsequenceOutcomeSpec(TypedDict):
     temperature: float | None
     pressure: float | None
 
+class DepressurizationAcceptancePoint(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    time: float
+    pressure: float
+    mass: float
+    mass_flow: float
+
 class EscalationItem(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -3706,6 +3714,21 @@ class DepressurizationResult:
     pressure_monotonic_non_increasing: bool
     mass_monotonic_non_increasing: bool
     recorded_points: float
+    warnings: list[Warning]
+
+@final
+class DepressurizationAcceptanceResult:
+    limiting_time: Qty
+    pressure_at_limiting_time: Qty
+    remaining_mass_at_limiting_time: Qty
+    peak_discharge_rate: Qty
+    pressure_configured: bool
+    pressure_criterion_met: bool
+    mass_configured: bool
+    mass_criterion_met: bool
+    fire_rate_configured: bool
+    fire_rate_criterion_met: bool
+    acceptable: bool
     warnings: list[Warning]
 
 @final
@@ -7854,6 +7877,14 @@ def depressurization(
     stop_pressure: float | None = None,
     withdrawal_mode: str | None = None,
 ) -> DepressurizationResult: ...
+def depressurization_acceptance(
+    points: list[DepressurizationAcceptancePoint],
+    time_to_escape: float | None = None,
+    estimated_time_to_rupture: float | None = None,
+    maximum_pressure_at_rupture: float | None = None,
+    maximum_remaining_mass: float | None = None,
+    maximum_escalated_fire_rate: float | None = None,
+) -> DepressurizationAcceptanceResult: ...
 def distillation_column(
     components: list[str],
     feed_n: float,

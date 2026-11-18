@@ -6106,6 +6106,48 @@ pub fn depressurization(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Depressurization acceptance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (points, time_to_escape, estimated_time_to_rupture, maximum_pressure_at_rupture, maximum_remaining_mass, maximum_escalated_fire_rate))]
+#[pyo3(
+    text_signature = "(points, time_to_escape, estimated_time_to_rupture, maximum_pressure_at_rupture, maximum_remaining_mass, maximum_escalated_fire_rate)"
+)]
+pub fn depressurization_acceptance(
+    py: Python<'_>,
+    points: Vec<crate::records_gen::DepressurizationAcceptancePoint>,
+    time_to_escape: Option<f64>,
+    estimated_time_to_rupture: Option<f64>,
+    maximum_pressure_at_rupture: Option<f64>,
+    maximum_remaining_mass: Option<f64>,
+    maximum_escalated_fire_rate: Option<f64>,
+) -> PyResult<crate::transport_gen::PyDepressurizationAcceptanceResult> {
+    let points_records: Vec<
+        azoth_process::models::depressurization_acceptance::DepressurizationAcceptancePoint,
+    > = points
+        .into_iter()
+        .map(|row| {
+            azoth_process::models::depressurization_acceptance::DepressurizationAcceptancePoint {
+                time: seconds(row.time),
+                pressure: pascals(row.pressure),
+                mass: kilograms(row.mass),
+                mass_flow: kilograms_per_second(row.mass_flow),
+            }
+        })
+        .collect();
+    azoth_process::models::depressurization_acceptance::depressurization_acceptance(
+        &points_records,
+        time_to_escape.map(seconds),
+        estimated_time_to_rupture.map(seconds),
+        maximum_pressure_at_rupture.map(pascals),
+        maximum_remaining_mass.map(kilograms),
+        maximum_escalated_fire_rate.map(kilograms_per_second),
+    )
+    .map(|r| crate::transport_gen::PyDepressurizationAcceptanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Distillation column.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

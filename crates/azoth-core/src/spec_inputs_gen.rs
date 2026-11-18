@@ -243,6 +243,7 @@
 //!   - specs/models/process/cooler.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/depressurization.toml
+//!   - specs/models/process/depressurization_acceptance.toml
 //!   - specs/models/process/distillation_column.toml
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
@@ -3152,6 +3153,31 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.depressurization", "time_step", "time"),
     ("process.depressurization", "max_time", "time"),
     ("process.depressurization", "stop_pressure", "pressure"),
+    (
+        "process.depressurization_acceptance",
+        "time_to_escape",
+        "time",
+    ),
+    (
+        "process.depressurization_acceptance",
+        "estimated_time_to_rupture",
+        "time",
+    ),
+    (
+        "process.depressurization_acceptance",
+        "maximum_pressure_at_rupture",
+        "pressure",
+    ),
+    (
+        "process.depressurization_acceptance",
+        "maximum_remaining_mass",
+        "mass",
+    ),
+    (
+        "process.depressurization_acceptance",
+        "maximum_escalated_fire_rate",
+        "mass_rate",
+    ),
     ("process.distillation_column", "feed_n", "molar_flow"),
     ("process.distillation_column", "feed_z", "dimensionless"),
     ("process.distillation_column", "feed_p", "pressure"),

@@ -39,6 +39,7 @@ from azoth.core.result import (
     ControlValveFailureReliefResult,
     CoolerResult,
     DelugeNozzleLayoutResult,
+    DepressurizationAcceptanceResult,
     DepressurizationPoint,
     DepressurizationResult,
     DistillationColumnResult,
@@ -316,6 +317,7 @@ _PSV_VALVE = "process.psv_valve"
 _DYNAMIC_PSV_SIZING = "process.dynamic_psv_sizing"
 _VESSEL_FILLING = "process.vessel_filling"
 _DEPRESSURIZATION = "process.depressurization"
+_DEPRESSURIZATION_ACCEPTANCE = "process.depressurization_acceptance"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
@@ -4154,6 +4156,32 @@ def depressurization(
         max_time=max_time,
         stop_pressure=stop_pressure,
         withdrawal_mode=withdrawal_mode,
+    )
+
+
+def depressurization_acceptance(
+    points: list[dict[str, object]],
+    time_to_escape: Q | None = None,
+    estimated_time_to_rupture: Q | None = None,
+    maximum_pressure_at_rupture: Q | None = None,
+    maximum_remaining_mass: Q | None = None,
+    maximum_escalated_fire_rate: Q | None = None,
+) -> DepressurizationAcceptanceResult:
+    """The STS-0131 acceptance of a stored blowdown trajectory.
+
+    The limiting time is the last sample's time reduced by the positive escape and rupture
+    times; pressure and mass are linearly interpolated and the peak rate is the maximum at
+    or before that time.
+
+    See :func:`azoth.process.reference.depressurization_acceptance`.
+    """
+    return resolve(_DEPRESSURIZATION_ACCEPTANCE)(  # type: ignore[no-any-return]
+        points=points,
+        time_to_escape=time_to_escape,
+        estimated_time_to_rupture=estimated_time_to_rupture,
+        maximum_pressure_at_rupture=maximum_pressure_at_rupture,
+        maximum_remaining_mass=maximum_remaining_mass,
+        maximum_escalated_fire_rate=maximum_escalated_fire_rate,
     )
 
 

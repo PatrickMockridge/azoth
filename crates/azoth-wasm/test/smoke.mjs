@@ -42,7 +42,7 @@ check("20 tools", withTools.tools.length === 20, `${withTools.tools.length}`);
 check("98 calculations", catalogue.calcs.length === 98, `${catalogue.calcs.length}`);
 const available = catalogue.calcs.filter((entry) => entry.available).length;
 check("94 a sheet can draw", available === 94, `${available}`);
-check("75 safety calculations", catalogue.safety.length === 75, `${catalogue.safety.length}`);
+check("76 safety calculations", catalogue.safety.length === 76, `${catalogue.safety.length}`);
 const nativeSafety = catalogue.safety.filter((entry) => entry.native).length;
 check("32 native safety ids", nativeSafety === 32, `${nativeSafety}`);
 
@@ -159,5 +159,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.log(
-  "wasm smoke: OK (31 palette entries, 16 tools, 98 calculations, 75 safety ids, 32 native, 6 nodes, 43 values)",
+  "wasm smoke: OK (31 palette entries, 16 tools, 98 calculations, 76 safety ids, 32 native, 6 nodes, 43 values)",
 );

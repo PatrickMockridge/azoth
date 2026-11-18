@@ -256,6 +256,7 @@
   - [Cooler](./process/cooler.md)
   - [Deluge nozzle layout](./process/deluge_nozzle_layout.md)
   - [Vessel depressurization](./process/depressurization.md)
+  - [Depressurization acceptance](./process/depressurization_acceptance.md)
   - [Distillation column](./process/distillation_column.md)
   - [Dynamic PSV sizing](./process/dynamic_psv_sizing.md)
   - [Ejector](./process/ejector.md)

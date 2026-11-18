@@ -1,0 +1,97 @@
+id = "process.depressurization_acceptance"
+name = "Depressurization acceptance"
+kind = "procedure"
+assumptions = [
+    "**the class's `STS0131AcceptanceCriteria.evaluate`** over a stored blowdown trajectory: the limiting time, the interpolated pressure and mass, the peak discharge rate at or before it, and the three optional criteria.",
+    "**the limiting time is the last sample's time**, reduced by the positive escape and rupture times and floored at zero; a non-positive or non-finite escape or rupture time is absent, the class's NaN.",
+    "**pressure and mass are linearly interpolated** between the two samples that bracket the limiting time; outside the range the nearest endpoint's value is used.",
+    "**the peak rate starts at 0** and takes the maximum over samples at or before the limiting time, so a negative flow alone never sets it.",
+    "**each criterion passes when it is unconfigured or at or below its limit**; acceptable is all three, and an empty trajectory is refused as the class throws.",
+]
+references = [
+    "NORSOK S-001; STS 0131. Fire escalation and depressurization acceptance.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/depressurization/STS0131AcceptanceCriteria.java` and `STS0131AcceptanceResult.java` are the port source.",
+    "`validation/neqsim/captures/process_depressurization_acceptance.tsv` - a passing state, one failing per criterion, no criteria, an escape-limited state, equality, a limit beyond the last sample and the empty-trajectory refusal.",
+]
+[source]
+standard = "NeqSim process/safety/depressurization/STS0131AcceptanceCriteria.java"
+edition = "Its `evaluate`: the limiting time, the interpolations, the peak rate, the three configured criteria and the acceptance verdict."
+[algorithm]
+scheme = "trajectory_acceptance"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.points]
+type = "record_list"
+row_type = "DepressurizationAcceptancePoint"
+description = "the blowdown trajectory, at least one row, in time order.\n"
+[inputs.points.fields.time]
+unit = "s"
+description = "the sample's time.\n"
+[inputs.points.fields.pressure]
+unit = "Pa"
+description = "the sample's pressure.\n"
+[inputs.points.fields.mass]
+unit = "kg"
+description = "the sample's inventory.\n"
+[inputs.points.fields.mass_flow]
+unit = "kg/s"
+description = "the sample's discharge rate.\n"
+[inputs.time_to_escape]
+unit = "s"
+optional = true
+description = "the personnel escape time, one possible limiting time. **Absent is no limit.**\n"
+[inputs.estimated_time_to_rupture]
+unit = "s"
+optional = true
+description = "the fire-exposed item's estimated time to rupture. **Absent is no limit.**\n"
+[inputs.maximum_pressure_at_rupture]
+unit = "Pa"
+optional = true
+description = "the maximum acceptable pressure at the limiting time. **Absent is unconfigured.**\n"
+[inputs.maximum_remaining_mass]
+unit = "kg"
+optional = true
+description = "the maximum acceptable remaining inventory. **Absent is unconfigured.**\n"
+[inputs.maximum_escalated_fire_rate]
+unit = "kg/s"
+optional = true
+description = "the maximum acceptable escalated fire rate. **Absent is unconfigured.**\n"
+[outputs]
+[outputs.limiting_time]
+unit = "s"
+description = "the earliest configured limiting time bounded by the trajectory.\n"
+[outputs.pressure_at_limiting_time]
+unit = "Pa"
+description = "the interpolated pressure at the limiting time.\n"
+[outputs.remaining_mass_at_limiting_time]
+unit = "kg"
+description = "the interpolated inventory at the limiting time.\n"
+[outputs.peak_discharge_rate]
+unit = "kg/s"
+description = "the maximum discharge rate at or before the limiting time.\n"
+[outputs.pressure_configured]
+type = "boolean"
+description = "whether a pressure limit was given.\n"
+[outputs.pressure_criterion_met]
+type = "boolean"
+description = "whether the pressure is at or below its limit, or the limit is absent.\n"
+[outputs.mass_configured]
+type = "boolean"
+description = "whether a mass limit was given.\n"
+[outputs.mass_criterion_met]
+type = "boolean"
+description = "whether the mass is at or below its limit, or the limit is absent.\n"
+[outputs.fire_rate_configured]
+type = "boolean"
+description = "whether a fire-rate limit was given.\n"
+[outputs.fire_rate_criterion_met]
+type = "boolean"
+description = "whether the peak rate is at or below its limit, or the limit is absent.\n"
+[outputs.acceptable]
+type = "boolean"
+description = "whether all three criteria pass.\n"
+[implementations]
+python = "azoth.process.depressurization_acceptance"
+rust = "azoth_process::depressurization_acceptance"

@@ -261,6 +261,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyCoolerResult>()?;
     m.add_class::<crate::transport_gen::PyDelugeNozzleLayoutResult>()?;
     m.add_class::<crate::transport_gen::PyDepressurizationResult>()?;
+    m.add_class::<crate::transport_gen::PyDepressurizationAcceptanceResult>()?;
     m.add_class::<crate::transport_gen::PyDistillationColumnResult>()?;
     m.add_class::<crate::transport_gen::PyDynamicPsvSizingResult>()?;
     m.add_class::<crate::transport_gen::PyEjectorResult>()?;
@@ -1028,6 +1029,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::depressurization, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::depressurization_acceptance,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::distillation_column,
         m

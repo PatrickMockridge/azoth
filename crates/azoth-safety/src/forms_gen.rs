@@ -1139,6 +1139,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.depressurization_acceptance",
+        name: "Depressurization acceptance",
+        family: "depressurization",
+        sub_interface: Some("depressurization"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input, which a scenario does not yet provide",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.dynamic_psv_sizing",
         name: "Dynamic PSV sizing",
         family: "depressurization",

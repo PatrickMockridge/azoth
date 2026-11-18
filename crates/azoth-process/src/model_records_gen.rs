@@ -32,6 +32,7 @@ use crate::models::control_valve_failure_relief::ControlValveFailureReliefResult
 use crate::models::cooler::CoolerResult;
 use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::depressurization::DepressurizationResult;
+use crate::models::depressurization_acceptance::DepressurizationAcceptanceResult;
 use crate::models::distillation_column::DistillationColumnResult;
 use crate::models::dynamic_psv_sizing::DynamicPsvSizingResult;
 use crate::models::ejector::EjectorResult;
@@ -565,6 +566,28 @@ impl CalcResult for DepressurizationResult {
         "pressure_monotonic_non_increasing",
         "mass_monotonic_non_increasing",
         "recorded_points",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for DepressurizationAcceptanceResult {
+    const CALC_ID: &'static str = "process.depressurization_acceptance";
+    const FIELDS: &'static [&'static str] = &[
+        "limiting_time",
+        "pressure_at_limiting_time",
+        "remaining_mass_at_limiting_time",
+        "peak_discharge_rate",
+        "pressure_configured",
+        "pressure_criterion_met",
+        "mass_configured",
+        "mass_criterion_met",
+        "fire_rate_configured",
+        "fire_rate_criterion_met",
+        "acceptable",
         "warnings",
     ];
 

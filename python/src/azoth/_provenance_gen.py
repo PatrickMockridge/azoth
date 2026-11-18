@@ -2677,6 +2677,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 9,
         "tests_skipped": 0,
     },
+    'process.depressurization_acceptance': {
+        "calc_id": 'process.depressurization_acceptance',
+        "name": 'Depressurization acceptance',
+        "spec": {'path': 'specs/models/process/depressurization_acceptance.toml', 'sha256': 'c65e75577888c5d43754e6dbddea1772e50e3d1b103fb2b542f4b8bc73f59315'},
+        "code": [{'path': 'python/src/azoth/process/reference/depressurization_acceptance.py', 'sha256': '69965ab475855313a59e14b55f391028c024250bfe1d992bd293d62d9da3e434'}, {'path': 'crates/azoth-process/src/models/depressurization_acceptance.rs', 'sha256': '774111dc5954962abda902003bee9b07d63a4ec605d954d280681cf32b63d649'}],
+        "source": 'NeqSim process/safety/depressurization/STS0131AcceptanceCriteria.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 8,
+        "tests_skipped": 0,
+    },
     'process.distillation_column': {
         "calc_id": 'process.distillation_column',
         "name": 'Distillation column',

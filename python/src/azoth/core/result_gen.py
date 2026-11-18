@@ -6446,6 +6446,49 @@ class DepressurizationResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class DepressurizationAcceptanceResult(_HasWarnings):
+    """Result of ``process.depressurization_acceptance``."""
+
+    CALC_ID: ClassVar[str] = "process.depressurization_acceptance"
+
+    #: the earliest configured limiting time bounded by the trajectory.
+    limiting_time: Q
+
+    #: the interpolated pressure at the limiting time.
+    pressure_at_limiting_time: Q
+
+    #: the interpolated inventory at the limiting time.
+    remaining_mass_at_limiting_time: Q
+
+    #: the maximum discharge rate at or before the limiting time.
+    peak_discharge_rate: Q
+
+    #: whether a pressure limit was given.
+    pressure_configured: bool
+
+    #: whether the pressure is at or below its limit, or the limit is absent.
+    pressure_criterion_met: bool
+
+    #: whether a mass limit was given.
+    mass_configured: bool
+
+    #: whether the mass is at or below its limit, or the limit is absent.
+    mass_criterion_met: bool
+
+    #: whether a fire-rate limit was given.
+    fire_rate_configured: bool
+
+    #: whether the peak rate is at or below its limit, or the limit is absent.
+    fire_rate_criterion_met: bool
+
+    #: whether all three criteria pass.
+    acceptable: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DistillationColumnResult(_HasWarnings):
     """Result of ``process.distillation_column``."""
 

@@ -84,6 +84,7 @@ from azoth.core.result import (
     DelugeNozzleLayoutResult,
     DelumpingResult,
     DepositionSegmentRow,
+    DepressurizationAcceptanceResult,
     DepressurizationPoint,
     DepressurizationResult,
     DesmukhMatherPhaseResult,
@@ -548,6 +549,7 @@ __all__ = [
     "deluge_nozzle_layout",
     "delumping",
     "depressurization",
+    "depressurization_acceptance",
     "desmukh_mather_phase",
     "dew_pressure",
     "dew_temperature",
@@ -6318,6 +6320,33 @@ def depressurization(components: list[str], initial_z: list[float], initial_t: Q
         pressure_monotonic_non_increasing=result.pressure_monotonic_non_increasing,
         mass_monotonic_non_increasing=result.mass_monotonic_non_increasing,
         recorded_points=result.recorded_points,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def depressurization_acceptance(points: list[dict[str, object]], time_to_escape: Q | None=None, estimated_time_to_rupture: Q | None=None, maximum_pressure_at_rupture: Q | None=None, maximum_remaining_mass: Q | None=None, maximum_escalated_fire_rate: Q | None=None) -> DepressurizationAcceptanceResult:
+    """``process.depressurization_acceptance``, computed in Rust."""
+    spec = _models_gen.model("process.depressurization_acceptance")
+    result = _core.depressurization_acceptance(
+        input_records_to_si(spec, "points", points),
+        None if time_to_escape is None else input_to_si(spec, "time_to_escape", time_to_escape),
+        None if estimated_time_to_rupture is None else input_to_si(spec, "estimated_time_to_rupture", estimated_time_to_rupture),
+        None if maximum_pressure_at_rupture is None else input_to_si(spec, "maximum_pressure_at_rupture", maximum_pressure_at_rupture),
+        None if maximum_remaining_mass is None else input_to_si(spec, "maximum_remaining_mass", maximum_remaining_mass),
+        None if maximum_escalated_fire_rate is None else input_to_si(spec, "maximum_escalated_fire_rate", maximum_escalated_fire_rate),
+    )
+    return DepressurizationAcceptanceResult(
+        limiting_time=from_si(result.limiting_time.magnitude_si, result.limiting_time.unit),
+        pressure_at_limiting_time=from_si(result.pressure_at_limiting_time.magnitude_si, result.pressure_at_limiting_time.unit),
+        remaining_mass_at_limiting_time=from_si(result.remaining_mass_at_limiting_time.magnitude_si, result.remaining_mass_at_limiting_time.unit),
+        peak_discharge_rate=from_si(result.peak_discharge_rate.magnitude_si, result.peak_discharge_rate.unit),
+        pressure_configured=result.pressure_configured,
+        pressure_criterion_met=result.pressure_criterion_met,
+        mass_configured=result.mass_configured,
+        mass_criterion_met=result.mass_criterion_met,
+        fire_rate_configured=result.fire_rate_configured,
+        fire_rate_criterion_met=result.fire_rate_criterion_met,
+        acceptable=result.acceptable,
         warnings=_warnings(result.warnings),
     )
 
