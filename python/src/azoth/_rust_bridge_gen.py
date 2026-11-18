@@ -429,6 +429,8 @@ from azoth.core.result import (
     VanLaarAcidActivityCoefficientsResult,
     VceResult,
     Vdw1fMixBinaryResult,
+    VesselFillingPoint,
+    VesselFillingResult,
     VesselRuptureResult,
     VesselRuptureStep,
     VhFlashResult,
@@ -819,6 +821,7 @@ __all__ = [
     "van_laar_acid_activity_coefficients",
     "vce",
     "vdw1f_mix_binary",
+    "vessel_filling",
     "vessel_rupture",
     "vh_flash",
     "viscosity",
@@ -9503,6 +9506,48 @@ def vce(cloud_fuel_mass: Q, heat_of_combustion: float, strength_class: float, am
         dimensionless_overpressure=result.dimensionless_overpressure,
         overpressure=None if result.overpressure is None else from_si(result.overpressure.magnitude_si, result.overpressure.unit),
         distance_to_overpressure=None if result.distance_to_overpressure is None else from_si(result.distance_to_overpressure.magnitude_si, result.distance_to_overpressure.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def vessel_filling(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, inlet_temperature: Q, supply_pressure: Q, inlet_mass_flow: Q, target_pressure: Q | None=None, wall_mass: Q | None=None, wall_area: Q | None=None, wall_specific_heat: Q | None=None, wall_heat_transfer_coefficient: Q | None=None, woodfield_nozzle_diameter: Q | None=None, vessel_height: Q | None=None, liner_min_temperature: Q | None=None, liner_max_temperature: Q | None=None, time_step: Q | None=None, max_time: Q | None=None) -> VesselFillingResult:
+    """``process.vessel_filling``, computed in Rust."""
+    spec = _models_gen.model("process.vessel_filling")
+    result = _core.vessel_filling(
+        list(components),
+        list(initial_z),
+        input_to_si(spec, "initial_t", initial_t),
+        input_to_si(spec, "initial_p", initial_p),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "inlet_temperature", inlet_temperature),
+        input_to_si(spec, "supply_pressure", supply_pressure),
+        input_to_si(spec, "inlet_mass_flow", inlet_mass_flow),
+        None if target_pressure is None else input_to_si(spec, "target_pressure", target_pressure),
+        None if wall_mass is None else input_to_si(spec, "wall_mass", wall_mass),
+        None if wall_area is None else input_to_si(spec, "wall_area", wall_area),
+        None if wall_specific_heat is None else input_to_si(spec, "wall_specific_heat", wall_specific_heat),
+        None if wall_heat_transfer_coefficient is None else input_to_si(spec, "wall_heat_transfer_coefficient", wall_heat_transfer_coefficient),
+        None if woodfield_nozzle_diameter is None else input_to_si(spec, "woodfield_nozzle_diameter", woodfield_nozzle_diameter),
+        None if vessel_height is None else input_to_si(spec, "vessel_height", vessel_height),
+        None if liner_min_temperature is None else input_to_si(spec, "liner_min_temperature", liner_min_temperature),
+        None if liner_max_temperature is None else input_to_si(spec, "liner_max_temperature", liner_max_temperature),
+        None if time_step is None else input_to_si(spec, "time_step", time_step),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+    )
+    return VesselFillingResult(
+        points=tuple(VesselFillingPoint(time=from_si(c.time.magnitude_si, c.time.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), mass=from_si(c.mass.magnitude_si, c.mass.unit), wall_temperature=from_si(c.wall_temperature.magnitude_si, c.wall_temperature.unit)) for c in result.points),
+        inlet_temperature=from_si(result.inlet_temperature.magnitude_si, result.inlet_temperature.unit),
+        inlet_mass_flow=from_si(result.inlet_mass_flow.magnitude_si, result.inlet_mass_flow.unit),
+        vu_flash_fallback_count=result.vu_flash_fallback_count,
+        max_fluid_temperature=from_si(result.max_fluid_temperature.magnitude_si, result.max_fluid_temperature.unit),
+        min_fluid_temperature=from_si(result.min_fluid_temperature.magnitude_si, result.min_fluid_temperature.unit),
+        max_pressure=from_si(result.max_pressure.magnitude_si, result.max_pressure.unit),
+        final_pressure=from_si(result.final_pressure.magnitude_si, result.final_pressure.unit),
+        final_mass=from_si(result.final_mass.magnitude_si, result.final_mass.unit),
+        liner_over_temperature=result.liner_over_temperature,
+        liner_under_temperature=result.liner_under_temperature,
+        liner_limits_met=result.liner_limits_met,
+        recorded_points=result.recorded_points,
         warnings=_warnings(result.warnings),
     )
 

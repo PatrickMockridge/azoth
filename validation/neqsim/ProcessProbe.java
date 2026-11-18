@@ -18682,6 +18682,17 @@ public class ProcessProbe {
         Double.POSITIVE_INFINITY, 0.5, 600.0);
     fillRow("fill_pure_liner_over_600s", pure, pureZ, 288.15, 20.0, 0.05, 288.15, 350.0, 0.02,
         50.0, 1.0, 0.0, 470.0, 50.0, false, 0.0, 0.0, 233.15, 300.0, 0.5, 600.0);
+    fillRow("fill_pure_no_wall_5s", pure, pureZ, 288.15, 20.0, 0.05, 288.15, 350.0, 0.02, 0.0,
+        0.0, 0.0, 470.0, 50.0, false, 0.0, 0.0, Double.NEGATIVE_INFINITY,
+        Double.POSITIVE_INFINITY, 0.5, 5.0);
+    fillRow("fill_pure_wall_5s", pure, pureZ, 288.15, 20.0, 0.05, 288.15, 350.0, 0.02, 50.0,
+        1.0, 0.0, 470.0, 50.0, false, 0.0, 0.0, Double.NEGATIVE_INFINITY,
+        Double.POSITIVE_INFINITY, 0.5, 5.0);
+    fillRow("fill_pure_woodfield_5s", pure, pureZ, 288.15, 20.0, 0.05, 288.15, 350.0, 0.02,
+        50.0, 1.0, 0.0, 470.0, 50.0, true, 0.01, 0.8, Double.NEGATIVE_INFINITY,
+        Double.POSITIVE_INFINITY, 0.5, 5.0);
+    fillRow("fill_pure_liner_over_5s", pure, pureZ, 288.15, 20.0, 0.05, 288.15, 350.0, 0.02,
+        50.0, 1.0, 0.0, 470.0, 50.0, false, 0.0, 0.0, 233.15, 287.0, 0.5, 5.0);
     refusalProbe("fill_zero_volume_refusal", () -> new VesselFillingSimulator(
         leakFluid(false, gas, gasZ, 288.15, 20.0), 0.0));
     VesselFillingSimulator runRefusal =

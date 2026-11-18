@@ -44,9 +44,9 @@ def test_the_catalogue_is_every_safety_model_and_nothing_else() -> None:
     specs = [spec for _, spec in module.documents()]
     ids = [spec["id"] for spec in specs]
     assert len(ids) == len(set(ids))
-    assert len(ids) == 73
+    assert len(ids) == 74
     families = [module.family_of(spec) for spec in specs]
-    assert families.count("depressurization") == 2
+    assert families.count("depressurization") == 3
     assert families.count("dispersion") == 6
     assert families.count("equipmentsafety") == 6
     assert families.count("fire") == 6
@@ -140,8 +140,8 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
 def test_every_non_native_entry_has_a_refusal_and_no_form() -> None:
     module: Any = tool()
     entries = module.render()
-    assert entries.count("native: false") == 41
-    assert entries.count("refusal: Some(") == 41
+    assert entries.count("native: false") == 42
+    assert entries.count("refusal: Some(") == 42
     for _, spec in module.documents():
         if module.native_of(spec):
             assert module.refusal_of(spec) is None, spec["id"]

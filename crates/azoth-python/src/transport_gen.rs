@@ -28,7 +28,8 @@ use crate::record_outputs_gen::{
     PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
     PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
     PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyTr3001Finding, PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult,
+    PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -27492,6 +27493,123 @@ impl From<&azoth_process::models::vce::VceResult> for PyVceResult {
                 magnitude_si: v.value,
                 unit: "m".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.vessel_filling`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "VesselFillingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyVesselFillingResult {
+    /// one row per step, in time order.
+    #[pyo3(get)]
+    pub points: Vec<PyVesselFillingPoint>,
+    /// the supply stagnation temperature the run used.
+    #[pyo3(get)]
+    pub inlet_temperature: PyQty,
+    /// the charging mass flow the run used.
+    #[pyo3(get)]
+    pub inlet_mass_flow: PyQty,
+    /// the steps that used the ideal-gas fallback.
+    #[pyo3(get)]
+    pub vu_flash_fallback_count: f64,
+    /// the hottest recorded gas temperature.
+    #[pyo3(get)]
+    pub max_fluid_temperature: PyQty,
+    /// the coldest recorded gas temperature.
+    #[pyo3(get)]
+    pub min_fluid_temperature: PyQty,
+    /// the highest recorded pressure.
+    #[pyo3(get)]
+    pub max_pressure: PyQty,
+    /// the last recorded pressure.
+    #[pyo3(get)]
+    pub final_pressure: PyQty,
+    /// the last recorded inventory mass.
+    #[pyo3(get)]
+    pub final_mass: PyQty,
+    /// whether any recorded gas temperature exceeded the upper liner limit.
+    #[pyo3(get)]
+    pub liner_over_temperature: bool,
+    /// whether any recorded gas temperature fell below the lower liner limit.
+    #[pyo3(get)]
+    pub liner_under_temperature: bool,
+    /// whether every recorded gas temperature stayed within the limits.
+    #[pyo3(get)]
+    pub liner_limits_met: bool,
+    /// the recorded rows.
+    #[pyo3(get)]
+    pub recorded_points: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyVesselFillingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "VesselFillingResult(points={:?}, inlet_temperature={:?}, inlet_mass_flow={:?}, vu_flash_fallback_count={:?}, max_fluid_temperature={:?}, min_fluid_temperature={:?}, max_pressure={:?}, final_pressure={:?}, final_mass={:?}, liner_over_temperature={:?}, liner_under_temperature={:?}, liner_limits_met={:?}, recorded_points={:?}, {} warning(s))",
+            self.points,
+            self.inlet_temperature,
+            self.inlet_mass_flow,
+            self.vu_flash_fallback_count,
+            self.max_fluid_temperature,
+            self.min_fluid_temperature,
+            self.max_pressure,
+            self.final_pressure,
+            self.final_mass,
+            self.liner_over_temperature,
+            self.liner_under_temperature,
+            self.liner_limits_met,
+            self.recorded_points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::vessel_filling::VesselFillingResult> for PyVesselFillingResult {
+    fn from(r: &azoth_process::models::vessel_filling::VesselFillingResult) -> Self {
+        Self {
+            points: r.points.iter().map(PyVesselFillingPoint::from).collect(),
+            inlet_temperature: PyQty {
+                magnitude_si: r.inlet_temperature.value,
+                unit: "K".to_string(),
+            },
+            inlet_mass_flow: PyQty {
+                magnitude_si: r.inlet_mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            vu_flash_fallback_count: r.vu_flash_fallback_count,
+            max_fluid_temperature: PyQty {
+                magnitude_si: r.max_fluid_temperature.value,
+                unit: "K".to_string(),
+            },
+            min_fluid_temperature: PyQty {
+                magnitude_si: r.min_fluid_temperature.value,
+                unit: "K".to_string(),
+            },
+            max_pressure: PyQty {
+                magnitude_si: r.max_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            final_pressure: PyQty {
+                magnitude_si: r.final_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            final_mass: PyQty {
+                magnitude_si: r.final_mass.value,
+                unit: "kg".to_string(),
+            },
+            liner_over_temperature: r.liner_over_temperature,
+            liner_under_temperature: r.liner_under_temperature,
+            liner_limits_met: r.liner_limits_met,
+            recorded_points: r.recorded_points,
             warnings: transport(&r.warnings),
         }
     }

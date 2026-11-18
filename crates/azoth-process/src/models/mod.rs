@@ -139,7 +139,9 @@ pub mod tube_rupture_relief;
 pub mod turbo_expander_compressor;
 pub mod vacuum_collapse;
 pub mod vce;
+pub mod vessel_filling;
 pub mod vessel_rupture;
+pub(crate) mod vu_flash_route;
 
 pub use absorption_column::{AbsorptionColumnResult, absorption_column};
 pub use acoustic_induced_vibration_screening::{
@@ -331,6 +333,7 @@ pub use tube_rupture_relief::{TubeRuptureReliefResult, tube_rupture_relief};
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};
 pub use vacuum_collapse::{VacuumCollapseResult, VacuumVerdict, vacuum_collapse};
 pub use vce::{VceResult, vce};
+pub use vessel_filling::{VesselFillingPoint, VesselFillingResult, vessel_filling};
 pub use vessel_rupture::{
     VesselRuptureResult, VesselRuptureState, VesselRuptureStep, vessel_rupture,
 };

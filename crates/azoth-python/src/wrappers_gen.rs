@@ -8833,6 +8833,62 @@ pub fn vce(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Vessel filling.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, initial_z, initial_t, initial_p, vessel_volume, inlet_temperature, supply_pressure, inlet_mass_flow, target_pressure, wall_mass, wall_area, wall_specific_heat, wall_heat_transfer_coefficient, woodfield_nozzle_diameter, vessel_height, liner_min_temperature, liner_max_temperature, time_step, max_time))]
+#[pyo3(
+    text_signature = "(components, initial_z, initial_t, initial_p, vessel_volume, inlet_temperature, supply_pressure, inlet_mass_flow, target_pressure, wall_mass, wall_area, wall_specific_heat, wall_heat_transfer_coefficient, woodfield_nozzle_diameter, vessel_height, liner_min_temperature, liner_max_temperature, time_step, max_time)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn vessel_filling(
+    py: Python<'_>,
+    components: Vec<String>,
+    initial_z: Vec<f64>,
+    initial_t: f64,
+    initial_p: f64,
+    vessel_volume: f64,
+    inlet_temperature: f64,
+    supply_pressure: f64,
+    inlet_mass_flow: f64,
+    target_pressure: Option<f64>,
+    wall_mass: Option<f64>,
+    wall_area: Option<f64>,
+    wall_specific_heat: Option<f64>,
+    wall_heat_transfer_coefficient: Option<f64>,
+    woodfield_nozzle_diameter: Option<f64>,
+    vessel_height: Option<f64>,
+    liner_min_temperature: Option<f64>,
+    liner_max_temperature: Option<f64>,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+) -> PyResult<crate::transport_gen::PyVesselFillingResult> {
+    azoth_process::models::vessel_filling::vessel_filling(
+        &components,
+        &initial_z,
+        kelvins(initial_t),
+        pascals(initial_p),
+        cubic_meters(vessel_volume),
+        kelvins(inlet_temperature),
+        pascals(supply_pressure),
+        kilograms_per_second(inlet_mass_flow),
+        target_pressure.map(pascals),
+        wall_mass.map(kilograms),
+        wall_area.map(square_meters),
+        wall_specific_heat.map(joules_per_kilogram_kelvin),
+        wall_heat_transfer_coefficient.map(watts_per_square_meter_kelvin),
+        woodfield_nozzle_diameter.map(meters),
+        vessel_height.map(meters),
+        liner_min_temperature.map(kelvins),
+        liner_max_temperature.map(kelvins),
+        time_step.map(seconds),
+        max_time.map(seconds),
+    )
+    .map(|r| crate::transport_gen::PyVesselFillingResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Vessel rupture.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

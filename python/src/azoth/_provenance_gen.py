@@ -3601,6 +3601,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 13,
         "tests_skipped": 0,
     },
+    'process.vessel_filling': {
+        "calc_id": 'process.vessel_filling',
+        "name": 'Vessel filling',
+        "spec": {'path': 'specs/models/process/vessel_filling.toml', 'sha256': 'e2a2c2ffbdb3203085621fe32df1afa2a7450fb1153f5fd91f2a691bb1a093d3'},
+        "code": [{'path': 'python/src/azoth/process/reference/vessel_filling.py', 'sha256': '8578270c13aa2c3f385e608ec50d18cdc170cf5e8ae9b33b8202cc0b691f9aaa'}, {'path': 'crates/azoth-process/src/models/vessel_filling.rs', 'sha256': 'c0ed7a0b1fe9c9db91aed4cf604136673147f14b2f6efff74e30d05ed62a0348'}],
+        "source": 'NeqSim process/safety/depressurization/VesselFillingSimulator.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 5,
+        "tests_skipped": 0,
+    },
     'process.vessel_rupture': {
         "calc_id": 'process.vessel_rupture',
         "name": 'Vessel rupture',

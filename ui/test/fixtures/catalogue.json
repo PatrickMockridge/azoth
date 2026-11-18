@@ -30174,6 +30174,15 @@
       "sub_interface": "fire"
     },
     {
+      "family": "depressurization",
+      "id": "process.vessel_filling",
+      "name": "Vessel filling",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "depressurization"
+    },
+    {
       "family": "rupture",
       "id": "process.vessel_rupture",
       "name": "Vessel rupture",

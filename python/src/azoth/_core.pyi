@@ -1406,6 +1406,16 @@ class Tr3001Finding:
     status: str
 
 @final
+class VesselFillingPoint:
+    """one row per step, in time order."""
+
+    time: Qty
+    pressure: Qty
+    temperature: Qty
+    mass: Qty
+    wall_temperature: Qty
+
+@final
 class VesselRuptureStep:
     """one row per input state, in the caller's order."""
 
@@ -5291,6 +5301,23 @@ class VceResult:
     warnings: list[Warning]
 
 @final
+class VesselFillingResult:
+    points: list[VesselFillingPoint]
+    inlet_temperature: Qty
+    inlet_mass_flow: Qty
+    vu_flash_fallback_count: float
+    max_fluid_temperature: Qty
+    min_fluid_temperature: Qty
+    max_pressure: Qty
+    final_pressure: Qty
+    final_mass: Qty
+    liner_over_temperature: bool
+    liner_under_temperature: bool
+    liner_limits_met: bool
+    recorded_points: float
+    warnings: list[Warning]
+
+@final
 class VesselRuptureResult:
     ruptured: bool
     rupture_time: Qty | None
@@ -9039,6 +9066,27 @@ def vce(
     distance: float | None = None,
     target_overpressure: float | None = None,
 ) -> VceResult: ...
+def vessel_filling(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: float,
+    initial_p: float,
+    vessel_volume: float,
+    inlet_temperature: float,
+    supply_pressure: float,
+    inlet_mass_flow: float,
+    target_pressure: float | None = None,
+    wall_mass: float | None = None,
+    wall_area: float | None = None,
+    wall_specific_heat: float | None = None,
+    wall_heat_transfer_coefficient: float | None = None,
+    woodfield_nozzle_diameter: float | None = None,
+    vessel_height: float | None = None,
+    liner_min_temperature: float | None = None,
+    liner_max_temperature: float | None = None,
+    time_step: float | None = None,
+    max_time: float | None = None,
+) -> VesselFillingResult: ...
 def vessel_rupture(
     inner_radius: float,
     wall_thickness: float,

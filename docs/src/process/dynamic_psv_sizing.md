@@ -88,6 +88,16 @@ not an equation, and both implementations read it from here.
 | `fifty_bara_gas` | components = ['methane', 'ethane', 'propane'], initial_z = [0.85, 0.1, 0.05], initial_t = 350.0, initial_p = 5000000.0, vessel_volume = 5.0, fire_heat_input = 500000.0, set_pressure = 5000000.0, overpressure_fraction = 0.21, back_pressure = 100000.0 | steady_required_area = 0.00013484834741989848, dynamic_required_area = 5.401978650632388e-05, oversizing_ratio = 2.496276941118831, allowable_pressure = 6050000.0, peak_dynamic_pressure = 6049999.996251063, steady_relief_rate = 1.4285714285714286 |
 | `low_pressure_small_vessel` | components = ['methane', 'ethane', 'propane'], initial_z = [0.85, 0.1, 0.05], initial_t = 350.0, initial_p = 1100000.0, vessel_volume = 1.0, fire_heat_input = 150000.0, set_pressure = 1100000.0, overpressure_fraction = 0.21, back_pressure = 100000.0 | steady_required_area = 0.00019424246655211374, dynamic_required_area = 6.094593000614838e-05, oversizing_ratio = 3.1871277792055692, allowable_pressure = 1331000.0, peak_dynamic_pressure = 1330999.9986886573, steady_relief_rate = 0.42857142857142855 |
 
+## How far this is checked
+**`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.
+
+- Tests: 2 declared, every one run
+- External check: no external validation case names it
+
+The same account travels with every result this returns: `result.provenance`
+carries the status, the spec and both kernels with a SHA-256 of each, and which
+declared checks *that call* could not evaluate.
+
 ## References
 
 - API STD 521. Pressure-relieving and Depressuring Systems, 7th edition, sections 4.4 and 5.15.

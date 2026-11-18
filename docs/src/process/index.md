@@ -118,4 +118,5 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.turbo_expander_compressor`](./turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/TurboExpanderCompressor.java |
 | [`process.vacuum_collapse`](./vacuum_collapse.md) | `constant_volume_cooling_sweep` | NeqSim process/safety/vacuum/VacuumCollapseAnalyzer.java |
 | [`process.vce`](./vce.md) | `tno_multi_energy_scaled_overpressure` | NeqSim process/safety/fire/VCEModel.java |
+| [`process.vessel_filling`](./vessel_filling.md) | `explicit_euler_vessel_filling` | NeqSim process/safety/depressurization/VesselFillingSimulator.java |
 | [`process.vessel_rupture`](./vessel_rupture.md) | `thin_wall_vessel_rupture_crossover` | NeqSim process/safety/rupture/VesselRuptureAnalyzer.java |

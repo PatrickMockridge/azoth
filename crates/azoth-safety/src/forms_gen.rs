@@ -8065,6 +8065,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.vessel_filling",
+        name: "Vessel filling",
+        family: "depressurization",
+        sub_interface: Some("depressurization"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.vessel_rupture",
         name: "Vessel rupture",
         family: "rupture",

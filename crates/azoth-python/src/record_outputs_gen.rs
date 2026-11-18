@@ -3358,6 +3358,69 @@ impl From<&azoth_process::models::tr3001_compliance::Tr3001Finding> for PyTr3001
     }
 }
 
+/// one row per step, in time order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "VesselFillingPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyVesselFillingPoint {
+    /// the step's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the vessel pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the gas temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// the vessel inventory.
+    #[pyo3(get)]
+    pub mass: PyQty,
+    /// the wall metal temperature, equal to the fluid's when no wall is modelled.
+    #[pyo3(get)]
+    pub wall_temperature: PyQty,
+}
+
+#[pymethods]
+impl PyVesselFillingPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "VesselFillingPoint(time={:?}, pressure={:?}, temperature={:?}, mass={:?}, wall_temperature={:?})",
+            self.time, self.pressure, self.temperature, self.mass, self.wall_temperature
+        )
+    }
+}
+
+impl From<&azoth_process::models::vessel_filling::VesselFillingPoint> for PyVesselFillingPoint {
+    fn from(row: &azoth_process::models::vessel_filling::VesselFillingPoint) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            temperature: PyQty {
+                magnitude_si: row.temperature.value,
+                unit: "K".to_string(),
+            },
+            mass: PyQty {
+                magnitude_si: row.mass.value,
+                unit: "kg".to_string(),
+            },
+            wall_temperature: PyQty {
+                magnitude_si: row.wall_temperature.value,
+                unit: "K".to_string(),
+            },
+        }
+    }
+}
+
 /// one row per input state, in the caller's order.
 #[pyclass(
     frozen,

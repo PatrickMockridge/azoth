@@ -106,6 +106,7 @@
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vacuum_collapse.toml
 //!   - specs/models/process/vce.toml
+//!   - specs/models/process/vessel_filling.toml
 //!   - specs/models/process/vessel_rupture.toml
 //!
 //! Regenerate with `python tools/gen_models.py`; CI runs `--check` and fails

@@ -1211,6 +1211,26 @@ class Tr3001Finding:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class VesselFillingPoint:
+    """one row per step, in time order."""
+
+    #: the step's time.
+    time: Q
+
+    #: the vessel pressure.
+    pressure: Q
+
+    #: the gas temperature.
+    temperature: Q
+
+    #: the vessel inventory.
+    mass: Q
+
+    #: the wall metal temperature, equal to the fluid's when no wall is modelled.
+    wall_temperature: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class VesselRuptureStep:
     """one row per input state, in the caller's order."""
 

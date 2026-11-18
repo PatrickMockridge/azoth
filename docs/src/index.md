@@ -432,6 +432,7 @@ Five sections, and the difference between them is the point:
 - [`process.turbo_expander_compressor`](./process/turbo_expander_compressor.md) — Turbo-expander compressor
 - [`process.vacuum_collapse`](./process/vacuum_collapse.md) — Vacuum collapse screening
 - [`process.vce`](./process/vce.md) — Vapour-cloud explosion overpressure
+- [`process.vessel_filling`](./process/vessel_filling.md) — Vessel filling
 - [`process.vessel_rupture`](./process/vessel_rupture.md) — Vessel rupture
 
 **Reactions** - [`reactions/index.md`](./reactions/index.md):

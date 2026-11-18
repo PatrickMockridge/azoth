@@ -116,6 +116,7 @@ use crate::models::tube_rupture_relief::TubeRuptureReliefResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vacuum_collapse::VacuumCollapseResult;
 use crate::models::vce::VceResult;
+use crate::models::vessel_filling::VesselFillingResult;
 use crate::models::vessel_rupture::VesselRuptureResult;
 
 impl CalcResult for AbsorptionColumnResult {
@@ -2706,6 +2707,30 @@ impl CalcResult for VceResult {
         "dimensionless_overpressure",
         "overpressure",
         "distance_to_overpressure",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for VesselFillingResult {
+    const CALC_ID: &'static str = "process.vessel_filling";
+    const FIELDS: &'static [&'static str] = &[
+        "points",
+        "inlet_temperature",
+        "inlet_mass_flow",
+        "vu_flash_fallback_count",
+        "max_fluid_temperature",
+        "min_fluid_temperature",
+        "max_pressure",
+        "final_pressure",
+        "final_mass",
+        "liner_over_temperature",
+        "liner_under_temperature",
+        "liner_limits_met",
+        "recorded_points",
         "warnings",
     ];
 

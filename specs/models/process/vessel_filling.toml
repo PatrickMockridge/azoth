@@ -1,0 +1,220 @@
+id = "process.vessel_filling"
+name = "Vessel filling"
+kind = "procedure"
+assumptions = [
+    "**the class's `run`**: the inlet specific enthalpy is flashed once at the supply state on a separate fluid, the vessel's moles are aligned to `density x volume`, and each step adds `mdot dt`, exchanges heat with the lumped wall, scales the moles and VU-flashes at the vessel volume and the new internal energy.",
+    "**the VU flash is the class's dispatch**: a pure feed whose pressure and temperature are subcritical and whose internal energy lies between the saturated values takes `VUflashSingleComp` at the system's pressure (which it reads and never uses the volume for); every other feed takes `OptimizedVUflash`.",
+    "**a VU-flash failure takes the class's fallback**: the pressure is set to `P = m R T/(MW V)` — no Z and no back-pressure floor — and a TP flash follows. The fallback count is published.",
+    "**the inside film coefficient is the fixed configured value**, or the Woodfield mixed-convection correlation `Nu = 0.56 Re_d^0.67 + 0.104 Ra_H^0.352` when both the inlet-nozzle diameter and the vessel height are given.",
+    "**the wall is a lump**: the fluid loses `h A (T_wall - T)` and the wall gains it; a zero wall mass disables the wall and leaves the wall temperature equal to the initial fluid temperature.",
+    "**liner limits are evaluated over every recorded gas temperature**, so an over-temperature is a flag on the trajectory rather than the final state.",
+    "**the class's unit setters, the inlet stagnation enthalpy's clone and the summary line are presentation.**",
+]
+references = [
+    "Woodfield, P. L.; Monde, M.; Mitsutake, Y. (2007). Measurement of averaged heat transfer coefficients in high-pressure vessel during charging with hydrogen, nitrogen or argon. Journal of Thermal Science and Technology, 2(2), 180-191.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/depressurization/VesselFillingSimulator.java` is the port source, through `run`.",
+    "`validation/neqsim/captures/process_vessel_filling.tsv` - a mixture with no wall, pure methane with no wall, a lumped wall, the Woodfield coefficient and a liner-limited state, with the refusals.",
+]
+[source]
+standard = "NeqSim process/safety/depressurization/VesselFillingSimulator.java"
+edition = "Its `run`: the inlet enthalpy, the mole alignment, the VU-flash march, the lumped wall, the Woodfield coefficient and the liner limits."
+[algorithm]
+scheme = "explicit_euler_vessel_filling"
+convergence = "relative"
+tolerance = 1.0e-12
+max_iterations = 1000000
+[inputs]
+[inputs.components]
+type = "components"
+description = "the residual gas's substances, by name, resolved against the component databank.\n"
+[inputs.initial_z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the residual gas's composition, checked rather than renormalised.\n"
+[inputs.initial_t]
+unit = "K"
+description = "the residual gas temperature before charging.\n"
+[inputs.initial_p]
+unit = "Pa"
+description = "the residual gas pressure before charging.\n"
+[inputs.vessel_volume]
+unit = "m**3"
+description = "the vessel's internal volume. Must be positive.\n"
+[inputs.inlet_temperature]
+unit = "K"
+description = "the supply gas's stagnation temperature. Must be positive.\n"
+[inputs.supply_pressure]
+unit = "Pa"
+description = "the supply pressure used for the inlet enthalpy. Must be positive.\n"
+[inputs.inlet_mass_flow]
+unit = "kg/s"
+description = "the charging mass flow. Must be positive.\n"
+[inputs.target_pressure]
+unit = "Pa"
+optional = true
+description = "the pressure at which charging stops. **Absent charges for the whole horizon.**\n"
+[inputs.wall_mass]
+unit = "kg"
+optional = true
+description = "the lumped wall's metal mass. **Absent is 0, which disables the wall.**\n"
+[inputs.wall_area]
+unit = "m**2"
+optional = true
+description = "the wall's internal heat-transfer area. **Absent is 0.**\n"
+[inputs.wall_specific_heat]
+unit = "J/(kg*K)"
+optional = true
+description = "the wall metal's specific heat. **Absent takes the class's 470.**\n"
+[inputs.wall_heat_transfer_coefficient]
+unit = "W/(m**2*K)"
+optional = true
+description = "the fixed inside film coefficient. **Absent takes the class's 50.**\n"
+[inputs.woodfield_nozzle_diameter]
+unit = "m"
+optional = true
+description = "the inlet nozzle diameter for the Woodfield correlation. **Absent uses the fixed coefficient.**\n"
+[inputs.vessel_height]
+unit = "m"
+optional = true
+description = "the vessel height for the Woodfield Rayleigh number. **Absent uses the fixed coefficient.**\n"
+[inputs.liner_min_temperature]
+unit = "K"
+optional = true
+description = "the lower liner temperature limit. **Absent is no limit.**\n"
+[inputs.liner_max_temperature]
+unit = "K"
+optional = true
+description = "the upper liner temperature limit. **Absent is no limit.**\n"
+[inputs.time_step]
+unit = "s"
+optional = true
+description = "the explicit step. **Absent takes the class's 1.0 s.**\n"
+[inputs.max_time]
+unit = "s"
+optional = true
+description = "the charging horizon. **Absent takes the class's 600 s.**\n"
+[outputs]
+[outputs.points]
+type = "record_list"
+description = "one row per step, in time order.\n"
+[outputs.points.fields.time]
+unit = "s"
+description = "the step's time.\n"
+[outputs.points.fields.pressure]
+unit = "Pa"
+description = "the vessel pressure.\n"
+[outputs.points.fields.temperature]
+unit = "K"
+description = "the gas temperature.\n"
+[outputs.points.fields.mass]
+unit = "kg"
+description = "the vessel inventory.\n"
+[outputs.points.fields.wall_temperature]
+unit = "K"
+description = "the wall metal temperature, equal to the fluid's when no wall is modelled.\n"
+[outputs.inlet_temperature]
+unit = "K"
+description = "the supply stagnation temperature the run used.\n"
+[outputs.inlet_mass_flow]
+unit = "kg/s"
+description = "the charging mass flow the run used.\n"
+[outputs.vu_flash_fallback_count]
+unit = "dimensionless"
+description = "the steps that used the ideal-gas fallback.\n"
+[outputs.max_fluid_temperature]
+unit = "K"
+description = "the hottest recorded gas temperature.\n"
+[outputs.min_fluid_temperature]
+unit = "K"
+description = "the coldest recorded gas temperature.\n"
+[outputs.max_pressure]
+unit = "Pa"
+description = "the highest recorded pressure.\n"
+[outputs.final_pressure]
+unit = "Pa"
+description = "the last recorded pressure.\n"
+[outputs.final_mass]
+unit = "kg"
+description = "the last recorded inventory mass.\n"
+[outputs.liner_over_temperature]
+type = "boolean"
+description = "whether any recorded gas temperature exceeded the upper liner limit.\n"
+[outputs.liner_under_temperature]
+type = "boolean"
+description = "whether any recorded gas temperature fell below the lower liner limit.\n"
+[outputs.liner_limits_met]
+type = "boolean"
+description = "whether every recorded gas temperature stayed within the limits.\n"
+[outputs.recorded_points]
+unit = "dimensionless"
+description = "the recorded rows.\n"
+[[valid_range]]
+quantity = "initial_t"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "initial_p"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "vessel_volume"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive volume"
+[[valid_range]]
+quantity = "inlet_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive inlet temperature"
+[[valid_range]]
+quantity = "supply_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive supply pressure"
+[[valid_range]]
+quantity = "inlet_mass_flow"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive charging flow"
+[[valid_range]]
+quantity = "target_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive target pressure"
+[[valid_range]]
+quantity = "woodfield_nozzle_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive nozzle diameter"
+[[valid_range]]
+quantity = "vessel_height"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive vessel height"
+[[valid_range]]
+quantity = "time_step"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive step"
+[[valid_range]]
+quantity = "max_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive horizon"
+[implementations]
+python = "azoth.process.vessel_filling"
+rust = "azoth_process::vessel_filling"

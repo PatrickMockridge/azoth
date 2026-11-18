@@ -124,6 +124,8 @@ from azoth.core.result import (
     TurboExpanderResult,
     VacuumCollapseResult,
     VceResult,
+    VesselFillingPoint,
+    VesselFillingResult,
     VesselRuptureResult,
 )
 from azoth.core.units import Q
@@ -310,6 +312,7 @@ _PSV_FIRE_SIZING = "process.psv_fire_sizing"
 _PSV_SIZING = "process.psv_sizing"
 _PSV_VALVE = "process.psv_valve"
 _DYNAMIC_PSV_SIZING = "process.dynamic_psv_sizing"
+_VESSEL_FILLING = "process.vessel_filling"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
@@ -4036,6 +4039,58 @@ def dynamic_psv_sizing(
         time_step=time_step,
         max_time=max_time,
         initial_pressure_fraction=initial_pressure_fraction,
+    )
+
+
+def vessel_filling(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: Q,
+    initial_p: Q,
+    vessel_volume: Q,
+    inlet_temperature: Q,
+    supply_pressure: Q,
+    inlet_mass_flow: Q,
+    target_pressure: Q | None = None,
+    wall_mass: Q | None = None,
+    wall_area: Q | None = None,
+    wall_specific_heat: Q | None = None,
+    wall_heat_transfer_coefficient: Q | None = None,
+    woodfield_nozzle_diameter: Q | None = None,
+    vessel_height: Q | None = None,
+    liner_min_temperature: Q | None = None,
+    liner_max_temperature: Q | None = None,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+) -> VesselFillingResult:
+    """The gas-charging transient of a vessel.
+
+    The inlet specific enthalpy is flashed once; each step adds the charge, exchanges heat
+    with the lumped wall and VU-flashes at the vessel volume and the new internal energy.
+    The Woodfield coefficient is used when both the nozzle diameter and the height are given.
+
+    See :func:`azoth.process.reference.vessel_filling`.
+    """
+    return resolve(_VESSEL_FILLING)(  # type: ignore[no-any-return]
+        components=components,
+        initial_z=initial_z,
+        initial_t=initial_t,
+        initial_p=initial_p,
+        vessel_volume=vessel_volume,
+        inlet_temperature=inlet_temperature,
+        supply_pressure=supply_pressure,
+        inlet_mass_flow=inlet_mass_flow,
+        target_pressure=target_pressure,
+        wall_mass=wall_mass,
+        wall_area=wall_area,
+        wall_specific_heat=wall_specific_heat,
+        wall_heat_transfer_coefficient=wall_heat_transfer_coefficient,
+        woodfield_nozzle_diameter=woodfield_nozzle_diameter,
+        vessel_height=vessel_height,
+        liner_min_temperature=liner_min_temperature,
+        liner_max_temperature=liner_max_temperature,
+        time_step=time_step,
+        max_time=max_time,
     )
 
 

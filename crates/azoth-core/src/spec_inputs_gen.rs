@@ -327,6 +327,7 @@
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vacuum_collapse.toml
 //!   - specs/models/process/vce.toml
+//!   - specs/models/process/vessel_filling.toml
 //!   - specs/models/process/vessel_rupture.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
@@ -5804,6 +5805,52 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.vce", "ambient_pressure", "pressure"),
     ("process.vce", "distance", "length"),
     ("process.vce", "target_overpressure", "pressure"),
+    ("process.vessel_filling", "initial_z", "dimensionless"),
+    (
+        "process.vessel_filling",
+        "initial_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.vessel_filling", "initial_p", "pressure"),
+    ("process.vessel_filling", "vessel_volume", "volume"),
+    (
+        "process.vessel_filling",
+        "inlet_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.vessel_filling", "supply_pressure", "pressure"),
+    ("process.vessel_filling", "inlet_mass_flow", "mass_rate"),
+    ("process.vessel_filling", "target_pressure", "pressure"),
+    ("process.vessel_filling", "wall_mass", "mass"),
+    ("process.vessel_filling", "wall_area", "area"),
+    (
+        "process.vessel_filling",
+        "wall_specific_heat",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.vessel_filling",
+        "wall_heat_transfer_coefficient",
+        "heat_transfer",
+    ),
+    (
+        "process.vessel_filling",
+        "woodfield_nozzle_diameter",
+        "length",
+    ),
+    ("process.vessel_filling", "vessel_height", "length"),
+    (
+        "process.vessel_filling",
+        "liner_min_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.vessel_filling",
+        "liner_max_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.vessel_filling", "time_step", "time"),
+    ("process.vessel_filling", "max_time", "time"),
     ("process.vessel_rupture", "inner_radius", "length"),
     ("process.vessel_rupture", "wall_thickness", "length"),
     ("process.vessel_rupture", "yield_strength", "pressure"),

@@ -345,6 +345,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyTurboExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyVacuumCollapseResult>()?;
     m.add_class::<crate::transport_gen::PyVceResult>()?;
+    m.add_class::<crate::transport_gen::PyVesselFillingResult>()?;
     m.add_class::<crate::transport_gen::PyVesselRuptureResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
     m.add_class::<crate::transport_gen::PyEquilibriumConstantResult>()?;
@@ -426,6 +427,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PySts0131FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
     m.add_class::<crate::record_outputs_gen::PyTr3001Finding>()?;
+    m.add_class::<crate::record_outputs_gen::PyVesselFillingPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyVesselRuptureStep>()?;
     m.add_class::<crate::record_outputs_gen::PyWaterMixingResult>()?;
     m.add_class::<crate::record_outputs_gen::PyZoneRatingRow>()?;
@@ -1192,6 +1194,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vacuum_collapse, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vce, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::vessel_filling, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vessel_rupture, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::chemical_equilibrium,

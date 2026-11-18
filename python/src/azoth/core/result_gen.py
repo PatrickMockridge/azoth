@@ -78,6 +78,7 @@ from azoth.core.record_outputs_gen import (
     Sts0131FindingResult,
     SubFraction,
     Tr3001Finding,
+    VesselFillingPoint,
     VesselRuptureStep,
     WaterMixingResult,
     ZoneRatingRow,
@@ -11079,6 +11080,55 @@ class VceResult(_HasWarnings):
 
     #: the distance at which the overpressure falls to the target. **Absent when the overpressure at 0.1 m is already below the target**, where the class answers that near bound.
     distance_to_overpressure: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class VesselFillingResult(_HasWarnings):
+    """Result of ``process.vessel_filling``."""
+
+    CALC_ID: ClassVar[str] = "process.vessel_filling"
+
+    #: one row per step, in time order.
+    points: tuple[VesselFillingPoint, ...]
+
+    #: the supply stagnation temperature the run used.
+    inlet_temperature: Q
+
+    #: the charging mass flow the run used.
+    inlet_mass_flow: Q
+
+    #: the steps that used the ideal-gas fallback.
+    vu_flash_fallback_count: float
+
+    #: the hottest recorded gas temperature.
+    max_fluid_temperature: Q
+
+    #: the coldest recorded gas temperature.
+    min_fluid_temperature: Q
+
+    #: the highest recorded pressure.
+    max_pressure: Q
+
+    #: the last recorded pressure.
+    final_pressure: Q
+
+    #: the last recorded inventory mass.
+    final_mass: Q
+
+    #: whether any recorded gas temperature exceeded the upper liner limit.
+    liner_over_temperature: bool
+
+    #: whether any recorded gas temperature fell below the lower liner limit.
+    liner_under_temperature: bool
+
+    #: whether every recorded gas temperature stayed within the limits.
+    liner_limits_met: bool
+
+    #: the recorded rows.
+    recorded_points: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

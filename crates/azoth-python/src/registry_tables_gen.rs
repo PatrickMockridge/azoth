@@ -346,6 +346,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.turbo_expander_compressor" => azoth_process::models::turbo_expander_compressor::TurboExpanderResult::FIELDS.to_vec(),
         "process.vacuum_collapse" => azoth_process::models::vacuum_collapse::VacuumCollapseResult::FIELDS.to_vec(),
         "process.vce" => azoth_process::models::vce::VceResult::FIELDS.to_vec(),
+        "process.vessel_filling" => azoth_process::models::vessel_filling::VesselFillingResult::FIELDS.to_vec(),
         "process.vessel_rupture" => azoth_process::models::vessel_rupture::VesselRuptureResult::FIELDS.to_vec(),
         "reactions.chemical_equilibrium" => azoth_reactions::chemical_equilibrium::ChemicalEquilibriumResult::FIELDS.to_vec(),
         "reactions.equilibrium_constant" => azoth_reactions::equilibrium_constant::EquilibriumConstantResult::FIELDS.to_vec(),

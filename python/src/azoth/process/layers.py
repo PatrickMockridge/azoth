@@ -1861,6 +1861,53 @@ def _dynamic_psv_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _vessel_filling(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.vessel_filling`'s layers, from the reference's arithmetic.
+
+    The trajectory rows are held by the cases and the capture; the summary numbers are the
+    shared layers.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.vessel_filling import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["initial_z"]],
+        quantity(float(inputs["initial_t"]), "K"),
+        quantity(float(inputs["initial_p"]), "Pa"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["inlet_temperature"]), "K"),
+        quantity(float(inputs["supply_pressure"]), "Pa"),
+        quantity(float(inputs["inlet_mass_flow"]), "kg/s"),
+        optional("target_pressure", "Pa"),
+        optional("wall_mass", "kg"),
+        optional("wall_area", "m**2"),
+        optional("wall_specific_heat", "J/(kg*K)"),
+        optional("wall_heat_transfer_coefficient", "W/(m**2*K)"),
+        optional("woodfield_nozzle_diameter", "m"),
+        optional("vessel_height", "m"),
+        optional("liner_min_temperature", "K"),
+        optional("liner_max_temperature", "K"),
+        optional("time_step", "s"),
+        optional("max_time", "s"),
+    )
+    return {
+        "inlet_temperature_k": solution.inlet_temperature,
+        "inlet_mass_flow_kg_s": solution.inlet_mass_flow,
+        "vu_flash_fallback_count": solution.vu_flash_fallback_count,
+        "max_fluid_temperature_k": solution.max_fluid_temperature,
+        "min_fluid_temperature_k": solution.min_fluid_temperature,
+        "max_pressure_pa": solution.max_pressure,
+        "final_pressure_pa": solution.final_pressure,
+        "final_mass_kg": solution.final_mass,
+        "recorded_points": solution.recorded_points,
+    }
+
+
 def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.inherent_safety`'s layers, from the reference's arithmetic."""
     from azoth.process.reference.inherent_safety import _evaluate
@@ -3943,6 +3990,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.psv_valve": _psv_valve,
     "process.dynamic_psv_sizing": _dynamic_psv_sizing,
+    "process.vessel_filling": _vessel_filling,
     "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.sts0131_gate": _sts0131_gate,
@@ -5081,6 +5129,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_dynamic_psv_sizing.tsv",
         block=0,
         identified_by=("#label", "dpsv_50bara"),
+    ),
+    # Filling's one: the mixture with no wall. The four short pure states, the four long
+    # evidence runs and the four refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.vessel_filling",
+        case="mixture_no_wall",
+        capture="process_vessel_filling.tsv",
+        block=0,
+        identified_by=("#label", "fill_mixture_no_wall_20s"),
     ),
     # STS-0131's one: the PSV margin at equality. The five further cases, the seven
     # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
@@ -7996,6 +8053,7 @@ UNCASED_ROWS: dict[str, int] = {
     "process_inherent_safety.tsv": 4,
     "process_psv_valve.tsv": 16,
     "process_dynamic_psv_sizing.tsv": 3,
+    "process_vessel_filling.tsv": 12,
     # ALARP's eight: the five further states, the empty audit and the two refusals.
     "process_alarp_audit.tsv": 8,
     # Escalation's eight: the six further states and the two refusals.
