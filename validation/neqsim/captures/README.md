@@ -3021,3 +3021,145 @@ Failures propagate to a fixed point: each pass sums the load from every currentl
 source and fails every target at or above its threshold. The class's sets are unordered, so
 the capture sorts them; a duplicate `addItem` keeps the last threshold, and no exposure
 exists between the two calls to show the class's edge-clearing quirk.
+
+## The PSV latch
+
+`process_psv_valve.tsv` is `PsvValveModel` one step at a time: below the set pressure, at the
+set pressure, latched above the reseat pressure, reseating below it, a second pop from a
+closed two-cycle state, a subcritical discharge and the constructor and mass-flow refusals.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe psv_valve \
+  > captures/process_psv_valve.tsv
+```
+
+The valve opens when closed and `P >= Pset`, and closes only at `P <= Pset (1 - blowdown)`;
+the cycle counter increments on the closed-to-open transition alone. The flow is the API 520
+orifice form with `Kd = 0.975`, choked at the critical ratio and subcritical above it. The
+capture prints the state **before** the update as `was_open`/`prior_cycle_count`, because
+those are the model's one-step inputs; an open valve necessarily carries at least one pop.
+
+## The blowdown simulator
+
+`process_depressurization.tsv` is `DepressurizationSimulator` over a cold four-component gas,
+the same gas for 900 s (the API 521 criteria), a wall-routed fire, the jet-fire preset, the
+explicit flux overload, a two-phase inventory under vapour, bulk and auto withdrawal, a pure
+supercritical gas and a pure two-phase liquid.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe depressurization \
+  > captures/process_depressurization.tsv
+```
+
+The mole basis is aligned to the vessel volume before the first row, so `initialPressureBara`
+(the pre-alignment flash) and `point_0` (the aligned state) can differ. AUTO and VAPOUR
+discharge the **lightest** phase when the flash is multiphase and its density is at most
+300 kg/m3; a step removes at most 25 % of that phase. The pressure is then set by a VU flash
+at the vessel volume and the new internal energy: a pure feed whose energy lies between the
+saturated values takes `VUflashSingleComp` (which reads the system pressure and never reads
+the volume), everything else takes `OptimizedVUflash`. The catch is the fallback counter:
+a flash failure replaces the state with `P = m R T/(MW V) Z` floored at the back pressure. The
+900 s run is evidence, not a case: 901 points are decimated to 57 rows with `stride=16`. The
+two-phase states show why withdrawal mode matters: vapour withdrawal leaves 10014 kg and
+5.20 MPa, bulk drains to 9716 kg and 5.66 MPa.
+
+## The depressurization acceptance
+
+`process_depressurization_acceptance.tsv` is `STS0131AcceptanceCriteria.evaluate` over a
+three-row synthetic trajectory: a passing state, one failing each of pressure, mass and fire
+rate, no criteria at all, an escape-limited state, equality at every limit, a limit beyond
+the last sample and the empty-trajectory refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe depressurization_acceptance \
+  > captures/process_depressurization_acceptance.tsv
+```
+
+The limiting time is the last sample time, reduced by the positive escape and rupture times
+and floored at zero; pressure and mass are linearly interpolated, and the peak discharge rate
+is the maximum at or before that time, starting at 0. Each criterion passes when unconfigured
+or at `value <= limit`. The class stores NaN for an unconfigured criterion, so the model
+publishes the criterion absent and its `*_configured` flag false.
+
+## The vessel filling
+
+`process_vessel_filling.tsv` is `VesselFillingSimulator` over a mixture with no wall, pure
+methane with no wall, a lumped wall, the Woodfield mixed-convection film coefficient, and a
+liner-limited state that the charging heat violates.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe vessel_filling \
+  > captures/process_vessel_filling.tsv
+```
+
+The inlet specific enthalpy is flashed once at the supply state on a separate fluid; the
+vessel moles are then scaled to `density x volume`. Each step adds `mdot dt`, exchanges heat
+with the lumped wall, scales the moles and VU-flashes; the fallback here is
+`P = m R T/(MW V)` with neither Z nor a back-pressure floor. The 600 s runs keep 1201 points
+and are decimated to 59 rows (`stride=21`). The default wall is 1 kg when none is set, and
+the temperature clamps live in the class, not the caller.
+
+## The blocked-outlet overpressure
+
+`process_blocked_outlet_overpressure.tsv` is `BlockedOutletOverpressureAnalyzer` reaching the
+relief set pressure in 71 s from a 2 kg/s feed, and not reaching it in a 20 s low-flow state.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe blocked_outlet \
+  > captures/process_blocked_outlet_overpressure.tsv
+```
+
+The analyzer is a `VesselFillingSimulator` run with the relief set pressure as its target;
+the time to demand is the first recorded sample at or above the set, with no interpolation.
+`simulated_horizon` is the configured horizon, not the elapsed time.
+
+## The non-equilibrium blowdown
+
+`process_non_equilibrium_blowdown.tsv` is `NonEquilibriumBlowdownModel` on a rich methane/
+propane/butane inventory, fire-exposed with the class's test parameters, with the default
+parameters, and the single-phase-feed refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe non_equilibrium \
+  > captures/process_non_equilibrium_blowdown.tsv
+```
+
+There is no fire-off switch: the default flame parameters act on `4 V^(2/3)` when no exposure
+is set, and the default wall mass is 1 kg, which the default fire heats to the flame
+temperature in one step; that second state is evidence of the default instability, not a
+design case. The pressure is set by a TV flash of the gas zone at the gas volume, the wetted
+wall drives Rohsenow boiling capped at `critical_heat_flux`, and a zone-flash failure breaks
+the march and increments the counter.
+
+## The multi-vessel blowdown study
+
+`process_multi_vessel_blowdown_study.tsv` superimposes two hand-built linear-decay sources on
+a common grid with no header, a 0.2 m header that exceeds Mach 0.7 and a 0.8 m header that
+passes, plus the empty-study refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe multi_vessel \
+  > captures/process_multi_vessel_blowdown_study.tsv
+```
+
+The source rows are printed as the `sample_<n>_*` lines, in first-appearance order, so a case
+can replay them as the long-form input. A source returns its first flow at or before its
+first sample and zero at or after its last; the peak is the first strictly positive total, so
+ties select the earliest grid index. The model takes precomputed trajectories only: a
+simulator instance is not a record row.
+
+## The dynamic PSV sizing
+
+`process_dynamic_psv_sizing.tsv` is `DynamicPsvSizingStudy` on a 50 bara gas and the
+low-pressure small-vessel corner, plus the constructor and blowdown refusals.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe dynamic_psv_sizing \
+  > captures/process_dynamic_psv_sizing.tsv
+```
+
+The steady area is the API 521 gas equation with `Kd = 0.975` and the conventional back-
+pressure correction; the dynamic area is the bisection result that keeps the peak pressure at
+the allowable accumulation. The dynamic march is an ideal-gas lumped vessel seeded from one
+flash: `p_start = Pset x initial_pressure_fraction`, so the fluid's own stated pressure enters
+only through the flash and Z. The two states give oversizing ratios of 2.50 and 3.19.

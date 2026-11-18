@@ -296,12 +296,25 @@ import neqsim.process.safety.hazid.HazopConsequenceAutoPopulator;
 import neqsim.process.safety.hazid.HazopConsequenceMapping;
 import neqsim.process.safety.hazid.MahBowTieBuilder;
 import neqsim.process.safety.hazid.MahType;
+import neqsim.process.util.fire.FirePreset;
 import neqsim.process.util.fire.ReliefValveSizing;
 import neqsim.process.safety.alarp.ALARPAuditReport;
 import neqsim.process.safety.compliance.NorsokP002ComplianceChecker;
 import neqsim.process.safety.compliance.P002Finding;
 import neqsim.process.safety.compliance.Sts0131Gate;
+import neqsim.process.safety.depressurization.BlockedOutletOverpressureAnalyzer;
+import neqsim.process.safety.depressurization.DepressurizationSimulator;
+import neqsim.process.safety.depressurization.DepressurizationSimulator.DepressurizationResult;
+import neqsim.process.safety.depressurization.DepressurizationSimulator.WithdrawalMode;
+import neqsim.process.safety.depressurization.DynamicPsvSizingStudy;
+import neqsim.process.safety.depressurization.MultiVesselBlowdownStudy;
+import neqsim.process.safety.depressurization.MultiVesselBlowdownStudy.MultiVesselBlowdownResult;
+import neqsim.process.safety.depressurization.NonEquilibriumBlowdownModel;
+import neqsim.process.safety.depressurization.PsvValveModel;
+import neqsim.process.safety.depressurization.STS0131AcceptanceCriteria;
 import neqsim.process.safety.depressurization.STS0131AcceptanceResult;
+import neqsim.process.safety.depressurization.VesselFillingSimulator;
+import neqsim.process.safety.depressurization.VesselFillingSimulator.VesselFillingResult;
 import neqsim.process.safety.escalation.EscalationGraphAnalyzer;
 import neqsim.process.safety.inherent.InherentSafetyEvaluator;
 import neqsim.process.safety.inherent.InherentSafetyEvaluator.Pillar;
@@ -656,6 +669,30 @@ public class ProcessProbe {
         break;
       case "escalation":
         escalationRows();
+        break;
+      case "psv_valve":
+        psvValveRows();
+        break;
+      case "depressurization":
+        depressurizationRows();
+        break;
+      case "depressurization_acceptance":
+        depressurizationAcceptanceRows();
+        break;
+      case "vessel_filling":
+        vesselFillingRows();
+        break;
+      case "blocked_outlet":
+        blockedOutletRows();
+        break;
+      case "non_equilibrium":
+        nonEquilibriumRows();
+        break;
+      case "multi_vessel":
+        multiVesselRows();
+        break;
+      case "dynamic_psv_sizing":
+        dynamicPsvSizingRows();
         break;
       case "pipe_fire_rupture":
         pipeFireRuptureRows();
@@ -18300,5 +18337,647 @@ public class ProcessProbe {
     refusalProbe("esc_initiator_refusal", () -> refusedInitiator.propagate("X"));
     EscalationGraphAnalyzer refusedExposure = new EscalationGraphAnalyzer().addItem("A", 0.0);
     refusalProbe("esc_exposure_refusal", () -> refusedExposure.addExposure("A", "X", 1.0));
+  }
+
+  // === process.psv_valve =========================================================
+
+  static void psvValveRows() {
+    psvValve("valve_closed_below_set", false, 0, 48.0e5, 350.0, 0.018, 1.3, 0.95);
+    psvValve("valve_pops_at_set", false, 0, 50.0e5, 350.0, 0.018, 1.3, 0.95);
+    psvValve("valve_latched_above_reseat", true, 1, 46.0e5, 350.0, 0.018, 1.3, 0.95);
+    psvValve("valve_reseats_below_reseat", true, 1, 44.0e5, 350.0, 0.018, 1.3, 0.95);
+    psvValve("valve_second_pop", false, 2, 51.0e5, 350.0, 0.018, 1.3, 0.95);
+    psvValve("valve_closed_passes_no_flow", false, 0, 40.0e5, 350.0, 0.018, 1.3, 0.95);
+    psvValveSubcritical("valve_subcritical", true, 1, 5.2e5, 350.0, 0.018, 1.3, 0.95);
+    refusalProbe("valve_negative_back_refusal",
+        () -> new PsvValveModel(50.0e5, 0.1, 0.975, 1.0e-3, -1.0));
+    refusalProbe("valve_set_below_back_refusal",
+        () -> new PsvValveModel(50.0e5, 0.1, 0.975, 1.0e-3, 60.0e5));
+    refusalProbe("valve_zero_blowdown_refusal",
+        () -> new PsvValveModel(50.0e5, 0.0, 0.975, 1.0e-3, 1.0e5));
+    refusalProbe("valve_full_blowdown_refusal",
+        () -> new PsvValveModel(50.0e5, 1.0, 0.975, 1.0e-3, 1.0e5));
+    refusalProbe("valve_zero_coefficient_refusal",
+        () -> new PsvValveModel(50.0e5, 0.1, 0.0, 1.0e-3, 1.0e5));
+    refusalProbe("valve_zero_area_refusal",
+        () -> new PsvValveModel(50.0e5, 0.1, 0.975, 0.0, 1.0e5));
+    PsvValveModel gammaProbe = new PsvValveModel(50.0e5, 0.1, 0.975, 1.0e-3, 1.0e5);
+    gammaProbe.update(55.0e5);
+    refusalProbe("valve_gamma_refusal",
+        () -> gammaProbe.massFlowKgPerS(55.0e5, 350.0, 0.018, 1.0, 0.95));
+    refusalProbe("valve_temperature_refusal",
+        () -> gammaProbe.massFlowKgPerS(55.0e5, 0.0, 0.018, 1.3, 0.95));
+    refusalProbe("valve_molar_mass_refusal",
+        () -> gammaProbe.massFlowKgPerS(55.0e5, 350.0, 0.0, 1.3, 0.95));
+    refusalProbe("valve_compressibility_refusal",
+        () -> gammaProbe.massFlowKgPerS(55.0e5, 350.0, 0.018, 1.3, 0.0));
+  }
+
+  static void psvValve(String label, boolean wasOpen, int priorCycles, double upstream,
+      double temperatureK, double molarMass, double gamma, double z) {
+    psvValveSubcritical(label, wasOpen, priorCycles, upstream, temperatureK, molarMass, gamma, z);
+  }
+
+  static void psvValveSubcritical(String label, boolean wasOpen, int priorCycles, double upstream,
+      double temperatureK, double molarMass, double gamma, double z) {
+    boolean subcritical = label.equals("valve_subcritical");
+    double set = subcritical ? 5.0e5 : 50.0e5;
+    double back = subcritical ? 4.0e5 : 1.0e5;
+    PsvValveModel psv = new PsvValveModel(set, 0.1, 0.975, 1.0e-3, back);
+    // Put the valve in the state the model's `was_open`/`prior_cycle_count` inputs state.
+    // An open valve has popped, so its cycle count is at least one.
+    int targetCycles = wasOpen ? Math.max(priorCycles, 1) : priorCycles;
+    for (int i = 0; i < targetCycles; i++) {
+      psv.update(set);
+      if (i < targetCycles - 1 || !wasOpen) {
+        psv.update(set * 0.9 - 1.0);
+      }
+    }
+    System.out.println(label);
+    System.out.println("set_pressure_pa=" + set);
+    System.out.println("blowdown_fraction=" + 0.1);
+    System.out.println("discharge_coefficient=" + 0.975);
+    System.out.println("orifice_area_m2=" + 1.0e-3);
+    System.out.println("back_pressure_pa=" + back);
+    System.out.println("upstream_pressure_pa=" + upstream);
+    System.out.println("upstream_temperature_k=" + temperatureK);
+    System.out.println("molar_mass_kg_mol=" + molarMass);
+    System.out.println("heat_capacity_ratio=" + gamma);
+    System.out.println("compressibility=" + z);
+    System.out.println("was_open=" + psv.isOpen());
+    System.out.println("prior_cycle_count=" + psv.getCycleCount());
+    boolean open = psv.update(upstream);
+    System.out.println("open=" + open);
+    System.out.println("cycle_count=" + psv.getCycleCount());
+    System.out.println("mass_flow_kg_s="
+        + psv.massFlowKgPerS(upstream, temperatureK, molarMass, gamma, z));
+    System.out.println();
+  }
+
+  // === process.depressurization ==================================================
+
+  static void depressurizationRows() {
+    String[] gas = {"methane", "ethane", "propane", "n-butane"};
+    double[] gasZ = {85.0, 8.0, 4.0, 3.0};
+    depRow("dep_cold_gas_60s", gas, gasZ, 313.15, 90.0, 30.0, 0.03, 0.85, 2.0e5, 0.0, false,
+        null, 0.0, 0.0, 0.0, 470.0, 50.0, 1.0, 60.0, 1.5e5, WithdrawalMode.AUTO);
+    depRow("dep_cold_gas_900s_evidence", gas, gasZ, 313.15, 90.0, 30.0, 0.03, 0.85, 2.0e5, 0.0,
+        false, null, 0.0, 0.0, 0.0, 470.0, 50.0, 1.0, 900.0, 1.5e5, WithdrawalMode.AUTO);
+    depRow("dep_wall_fire_60s", gas, gasZ, 313.15, 90.0, 30.0, 0.03, 0.85, 2.0e5, 5.0e5, true,
+        null, 0.0, 20000.0, 50.0, 470.0, 60.0, 1.0, 60.0, 1.5e5, WithdrawalMode.AUTO);
+    depRow("dep_preset_jet_fire_60s", gas, gasZ, 313.15, 90.0, 30.0, 0.03, 0.85, 2.0e5, 0.0,
+        false, FirePreset.JET_FIRE_PEAK, 25.0, 0.0, 0.0, 470.0, 50.0, 1.0, 60.0, 1.5e5,
+        WithdrawalMode.AUTO);
+    depExplicitFire("dep_explicit_flux_60s", gas, gasZ, 313.15, 90.0, 30.0, 0.03, 0.85, 2.0e5,
+        0.9, 1100.0, 30.0, 25.0, 1.0, 60.0, 1.5e5, WithdrawalMode.AUTO);
+    String[] twoPhase = {"nitrogen", "CO2", "methane", "ethane", "propane", "n-butane",
+        "n-pentane", "n-heptane", "n-decane"};
+    double[] twoPhaseZ = {0.5, 1.5, 45.0, 6.0, 4.0, 3.0, 3.0, 12.0, 25.0};
+    depRow("dep_two_phase_vapour_20s", twoPhase, twoPhaseZ, 333.15, 60.0, 40.0, 0.04, 0.85,
+        6.0e5, 0.0, false, null, 0.0, 0.0, 0.0, 470.0, 50.0, 2.0, 20.0, 30.0e5,
+        WithdrawalMode.VAPOUR);
+    depRow("dep_two_phase_bulk_20s", twoPhase, twoPhaseZ, 333.15, 60.0, 40.0, 0.04, 0.85, 6.0e5,
+        0.0, false, null, 0.0, 0.0, 0.0, 470.0, 50.0, 2.0, 20.0, 30.0e5,
+        WithdrawalMode.BULK);
+    depRow("dep_two_phase_auto_20s", twoPhase, twoPhaseZ, 333.15, 60.0, 40.0, 0.04, 0.85, 6.0e5,
+        0.0, false, null, 0.0, 0.0, 0.0, 470.0, 50.0, 2.0, 20.0, 30.0e5,
+        WithdrawalMode.AUTO);
+    depRow("dep_pure_methane_supercritical_20s", new String[] {"methane"}, new double[] {1.0},
+        313.15, 90.0, 1.0, 0.01, 0.62, 101325.0, 0.0, false, null, 0.0, 0.0, 0.0, 470.0, 50.0,
+        1.0, 20.0, 1.5e5, WithdrawalMode.AUTO);
+    depRow("dep_pure_propane_two_phase_20s", new String[] {"propane"}, new double[] {1.0},
+        300.0, 9.9, 1.0, 0.01, 0.62, 101325.0, 0.0, false, null, 0.0, 0.0, 0.0, 470.0, 50.0,
+        1.0, 20.0, 1.5e5, WithdrawalMode.AUTO);
+    refusalProbe("dep_zero_volume_refusal", () -> new DepressurizationSimulator(
+        leakFluid(false, gas, gasZ, 313.15, 90.0), 0.0, 0.03, 0.85, 2.0e5));
+    refusalProbe("dep_zero_orifice_refusal", () -> new DepressurizationSimulator(
+        leakFluid(false, gas, gasZ, 313.15, 90.0), 30.0, 0.0, 0.85, 2.0e5));
+    DepressurizationSimulator fireRefusal = new DepressurizationSimulator(
+        leakFluid(false, gas, gasZ, 313.15, 90.0), 30.0, 0.03, 0.85, 2.0e5);
+    refusalProbe("dep_fire_area_refusal", () -> fireRefusal.setFireExposure(FirePreset.JET_FIRE_PEAK,
+        0.0));
+    refusalProbe("dep_fire_flame_refusal",
+        () -> fireRefusal.setFireExposure(0.9, 0.0, 30.0, 25.0));
+  }
+
+  @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:ParameterNumber"})
+  static void depRow(String label, String[] names, double[] amounts, double temperatureK,
+      double pressureBara, double volume, double diameter, double coefficient, double back,
+      double fireHeat, boolean fireToWall, FirePreset preset, double exposedArea, double wallMass,
+      double wallArea, double wallCp, double wallHtc, double step, double maxTime,
+      double stopPressure, WithdrawalMode mode) {
+    SystemInterface fluid = leakFluid(false, names, amounts, temperatureK, pressureBara);
+    DepressurizationSimulator sim =
+        new DepressurizationSimulator(fluid, volume, diameter, coefficient, back);
+    sim.setFireHeatInput(fireHeat);
+    sim.setFireHeatInputToWall(fireToWall);
+    if (preset != null) {
+      sim.setFireExposure(preset, exposedArea);
+    }
+    if (wallMass > 0.0) {
+      sim.setWall(wallMass, wallArea, wallCp, wallHtc);
+    }
+    sim.setTimeStep(step);
+    sim.setMaxTime(maxTime);
+    sim.setStopPressure(stopPressure);
+    sim.setWithdrawalMode(mode);
+    DepressurizationResult result = sim.run();
+    System.out.println(label);
+    System.out.println("eos=pr");
+    System.out.println("input_t_k=" + temperatureK);
+    System.out.println("input_p_pa=" + pressureBara * 1.0e5);
+    StringBuilder z = new StringBuilder();
+    for (int i = 0; i < names.length; i++) {
+      z.append(i == 0 ? "" : ",").append(names[i]).append(":").append(amounts[i]);
+    }
+    System.out.println("input_z=" + z);
+    System.out.println("vessel_volume_m3=" + volume);
+    System.out.println("orifice_diameter_m=" + diameter);
+    System.out.println("discharge_coefficient=" + coefficient);
+    System.out.println("back_pressure_pa=" + back);
+    System.out.println("fire_heat_input_w=" + fireHeat);
+    System.out.println("fire_heat_input_to_wall=" + fireToWall);
+    System.out.println("fire_preset=" + (preset == null ? "" : preset.name().toLowerCase()));
+    System.out.println("fire_exposed_area_m2=" + exposedArea);
+    System.out.println("wall_mass_kg=" + wallMass);
+    System.out.println("wall_area_m2=" + wallArea);
+    System.out.println("wall_specific_heat=" + wallCp);
+    System.out.println("wall_heat_transfer_coefficient=" + wallHtc);
+    System.out.println("time_step_s=" + step);
+    System.out.println("max_time_s=" + maxTime);
+    System.out.println("stop_pressure_pa=" + stopPressure);
+    System.out.println("withdrawal_mode=" + mode.name().toLowerCase());
+    printDepResult(result);
+  }
+
+  @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:ParameterNumber"})
+  static void depExplicitFire(String label, String[] names, double[] amounts, double temperatureK,
+      double pressureBara, double volume, double diameter, double coefficient, double back,
+      double emissivity, double flameK, double convection, double exposedArea, double step,
+      double maxTime, double stopPressure, WithdrawalMode mode) {
+    SystemInterface fluid = leakFluid(false, names, amounts, temperatureK, pressureBara);
+    DepressurizationSimulator sim =
+        new DepressurizationSimulator(fluid, volume, diameter, coefficient, back);
+    sim.setFireExposure(emissivity, flameK, convection, exposedArea);
+    sim.setTimeStep(step);
+    sim.setMaxTime(maxTime);
+    sim.setStopPressure(stopPressure);
+    sim.setWithdrawalMode(mode);
+    DepressurizationResult result = sim.run();
+    System.out.println(label);
+    System.out.println("eos=pr");
+    System.out.println("input_t_k=" + temperatureK);
+    System.out.println("input_p_pa=" + pressureBara * 1.0e5);
+    System.out.println("vessel_volume_m3=" + volume);
+    System.out.println("orifice_diameter_m=" + diameter);
+    System.out.println("discharge_coefficient=" + coefficient);
+    System.out.println("back_pressure_pa=" + back);
+    System.out.println("fire_heat_input_w=" + 0.0);
+    System.out.println("fire_heat_input_to_wall=" + false);
+    System.out.println("fire_preset=");
+    System.out.println("fire_emissivity=" + emissivity);
+    System.out.println("fire_flame_temperature_k=" + flameK);
+    System.out.println("fire_convective_coefficient=" + convection);
+    System.out.println("fire_exposed_area_m2=" + exposedArea);
+    System.out.println("wall_mass_kg=" + 0.0);
+    System.out.println("wall_area_m2=" + 0.0);
+    System.out.println("wall_specific_heat=" + 470.0);
+    System.out.println("wall_heat_transfer_coefficient=" + 50.0);
+    System.out.println("time_step_s=" + step);
+    System.out.println("max_time_s=" + maxTime);
+    System.out.println("stop_pressure_pa=" + stopPressure);
+    System.out.println("withdrawal_mode=" + mode.name().toLowerCase());
+    printDepResult(result);
+  }
+
+  static void printDepResult(DepressurizationResult result) {
+    System.out.println("initial_pressure_pa=" + result.initialPressureBara * 1.0e5);
+    System.out.println("fire_heat_input_w_used=" + result.fireHeatInputW);
+    System.out.println("fire_heat_routed_to_wall=" + result.fireHeatInputRoutedToWall);
+    System.out.println("vu_flash_fallback_count=" + result.vuFlashFallbackCount);
+    System.out.println("vapour_withdrawal_used=" + result.vapourWithdrawalUsed);
+    System.out.println("time_to_half_pressure_s=" + result.timeToHalfPressure);
+    System.out.println("time_to_7_barg_s=" + result.timeTo7BargS);
+    System.out.println("min_fluid_temperature_k=" + result.minFluidTemperatureK);
+    System.out.println("min_wall_temperature_k=" + result.minWallTemperatureK);
+    System.out.println("max_pressure_pa=" + result.maxPressureBara * 1.0e5);
+    System.out.println("max_fluid_temperature_k=" + result.maxFluidTemperatureK);
+    System.out.println("max_wall_temperature_k=" + result.maxWallTemperatureK);
+    System.out.println("half_pressure_criterion_met=" + result.halfPressureCriterionMet);
+    System.out.println("seven_barg_criterion_met=" + result.sevenBargCriterionMet);
+    System.out.println("pressure_monotonic_non_increasing=" + result.pressureMonotonicNonIncreasing);
+    System.out.println("mass_monotonic_non_increasing=" + result.massMonotonicNonIncreasing);
+    System.out.println("recorded_points=" + result.time.size());
+    int stride = result.time.size() <= 120 ? 1 : (int) Math.ceil(result.time.size() / 60.0);
+    System.out.println("stride=" + stride);
+    for (int i = 0; i < result.time.size(); i += stride) {
+      printDepPoint(i, result);
+    }
+    if ((result.time.size() - 1) % stride != 0) {
+      printDepPoint(result.time.size() - 1, result);
+    }
+    System.out.println();
+  }
+
+  static void printDepPoint(int i, DepressurizationResult r) {
+    String head = "point_" + i + "_";
+    System.out.println(head + "time_s=" + r.time.get(i));
+    System.out.println(head + "pressure_pa=" + r.pressureBara.get(i) * 1.0e5);
+    System.out.println(head + "temperature_k=" + r.temperatureK.get(i));
+    System.out.println(head + "mass_kg=" + r.massKg.get(i));
+    System.out.println(head + "wall_temperature_k=" + r.wallTempK.get(i));
+    System.out.println(head + "mass_flow_kg_s=" + r.massFlowKgPerS.get(i));
+  }
+
+  // === process.depressurization_acceptance =======================================
+
+  static void depressurizationAcceptanceRows() {
+    DepressurizationResult result = syntheticDepResult();
+    accRow("acc_pass_rupture_limits", result, 120.0, 100.0, 15.0, 50.0, 6.0);
+    accRow("acc_fail_pressure", result, 120.0, 100.0, 9.0, 50.0, 6.0);
+    accRow("acc_fail_mass", result, 120.0, 100.0, 15.0, 30.0, 6.0);
+    accRow("acc_fail_fire_rate", result, 120.0, 100.0, 15.0, 50.0, 4.0);
+    accRow("acc_no_criteria", result, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+    accRow("acc_escape_limits", result, 50.0, 150.0, 15.0, 80.0, 6.0);
+    accRow("acc_equality", result, Double.NaN, Double.NaN, 10.0, 40.0, 5.0);
+    accRow("acc_beyond_last", result, 500.0, Double.NaN, 15.0, 50.0, 6.0);
+    DepressurizationResult empty = new DepressurizationResult();
+    refusalProbe("acc_empty_points_refusal",
+        () -> new STS0131AcceptanceCriteria().evaluate(empty));
+  }
+
+  static DepressurizationResult syntheticDepResult() {
+    DepressurizationResult result = new DepressurizationResult();
+    result.initialPressureBara = 50.0;
+    result.time.add(0.0);
+    result.pressureBara.add(50.0);
+    result.temperatureK.add(293.15);
+    result.massKg.add(100.0);
+    result.wallTempK.add(293.15);
+    result.massFlowKgPerS.add(0.0);
+    result.time.add(100.0);
+    result.pressureBara.add(10.0);
+    result.temperatureK.add(280.0);
+    result.massKg.add(40.0);
+    result.wallTempK.add(285.0);
+    result.massFlowKgPerS.add(5.0);
+    result.time.add(200.0);
+    result.pressureBara.add(5.0);
+    result.temperatureK.add(275.0);
+    result.massKg.add(20.0);
+    result.wallTempK.add(280.0);
+    result.massFlowKgPerS.add(2.0);
+    return result;
+  }
+
+  static void accRow(String label, DepressurizationResult result, double escape, double rupture,
+      double maxPressureBara, double maxMass, double maxRate) {
+    STS0131AcceptanceCriteria criteria = new STS0131AcceptanceCriteria()
+        .setTimeToEscapeS(escape)
+        .setEstimatedTimeToRuptureS(rupture)
+        .setMaximumPressureAtRuptureBara(maxPressureBara)
+        .setMaximumRemainingMassKg(maxMass)
+        .setMaximumEscalatedFireRateKgPerS(maxRate);
+    STS0131AcceptanceResult acceptance = criteria.evaluate(result);
+    System.out.println(label);
+    System.out.println("time_to_escape_s=" + escape);
+    System.out.println("estimated_time_to_rupture_s=" + rupture);
+    System.out.println("maximum_pressure_at_rupture_pa=" + maxPressureBara * 1.0e5);
+    System.out.println("maximum_remaining_mass_kg=" + maxMass);
+    System.out.println("maximum_escalated_fire_rate_kg_s=" + maxRate);
+    System.out.println("limiting_time_s=" + acceptance.getLimitingTimeS());
+    System.out.println(
+        "pressure_at_limiting_time_pa=" + acceptance.getPressureAtLimitingTimeBara() * 1.0e5);
+    System.out.println(
+        "remaining_mass_at_limiting_time_kg=" + acceptance.getRemainingMassAtLimitingTimeKg());
+    System.out.println("peak_discharge_rate_kg_s=" + acceptance.getPeakDischargeRateKgPerS());
+    System.out.println("pressure_configured=" + acceptance.isPressureCriterionConfigured());
+    System.out.println("pressure_criterion_met=" + acceptance.isPressureCriterionMet());
+    System.out.println("mass_configured=" + acceptance.isMassCriterionConfigured());
+    System.out.println("mass_criterion_met=" + acceptance.isMassCriterionMet());
+    System.out.println("fire_rate_configured=" + acceptance.isFireRateCriterionConfigured());
+    System.out.println("fire_rate_criterion_met=" + acceptance.isFireRateCriterionMet());
+    System.out.println("acceptable=" + acceptance.isAcceptable());
+    System.out.println();
+  }
+
+  // === process.vessel_filling ====================================================
+
+  static void vesselFillingRows() {
+    String[] gas = {"methane", "ethane", "propane"};
+    double[] gasZ = {90.0, 7.0, 3.0};
+    fillRow("fill_mixture_no_wall_20s", gas, gasZ, 288.15, 20.0, 0.05, 288.15, 300.0, 0.01,
+        0.0, 0.0, 0.0, 470.0, 50.0, false, 0.0, 0.0, Double.NEGATIVE_INFINITY,
+        Double.POSITIVE_INFINITY, 1.0, 20.0);
+    String[] pure = {"methane"};
+    double[] pureZ = {1.0};
+    fillRow("fill_pure_no_wall_600s", pure, pureZ, 288.15, 20.0, 0.05, 288.15, 350.0, 0.02, 0.0,
+        0.0, 0.0, 470.0, 50.0, false, 0.0, 0.0, Double.NEGATIVE_INFINITY,
+        Double.POSITIVE_INFINITY, 0.5, 600.0);
+    fillRow("fill_pure_wall_600s", pure, pureZ, 288.15, 20.0, 0.05, 288.15, 350.0, 0.02, 50.0,
+        1.0, 0.0, 470.0, 50.0, false, 0.0, 0.0, Double.NEGATIVE_INFINITY,
+        Double.POSITIVE_INFINITY, 0.5, 600.0);
+    fillRow("fill_pure_woodfield_600s", pure, pureZ, 288.15, 20.0, 0.05, 288.15, 350.0, 0.02,
+        50.0, 1.0, 0.0, 470.0, 50.0, true, 0.01, 0.8, Double.NEGATIVE_INFINITY,
+        Double.POSITIVE_INFINITY, 0.5, 600.0);
+    fillRow("fill_pure_liner_over_600s", pure, pureZ, 288.15, 20.0, 0.05, 288.15, 350.0, 0.02,
+        50.0, 1.0, 0.0, 470.0, 50.0, false, 0.0, 0.0, 233.15, 300.0, 0.5, 600.0);
+    refusalProbe("fill_zero_volume_refusal", () -> new VesselFillingSimulator(
+        leakFluid(false, gas, gasZ, 288.15, 20.0), 0.0));
+    VesselFillingSimulator runRefusal =
+        new VesselFillingSimulator(leakFluid(false, gas, gasZ, 288.15, 20.0), 0.05);
+    refusalProbe("fill_no_inlet_refusal", runRefusal::run);
+    VesselFillingSimulator linerRefusal =
+        new VesselFillingSimulator(leakFluid(false, gas, gasZ, 288.15, 20.0), 0.05);
+    refusalProbe("fill_liner_order_refusal",
+        () -> linerRefusal.setLinerTemperatureLimits(300.0, 250.0));
+    refusalProbe("fill_woodfield_zero_refusal",
+        () -> linerRefusal.setWoodfieldHeatTransfer(0.0, 1.0));
+  }
+
+  @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:ParameterNumber"})
+  static void fillRow(String label, String[] names, double[] amounts, double temperatureK,
+      double pressureBara, double volume, double inletK, double supplyBara, double massFlow,
+      double wallMass, double wallArea, double unusedWallCp, double wallCp, double wallHtc,
+      boolean woodfield, double nozzle, double height, double linerMin, double linerMax,
+      double step, double maxTime) {
+    SystemInterface fluid = leakFluid(false, names, amounts, temperatureK, pressureBara);
+    VesselFillingSimulator sim = new VesselFillingSimulator(fluid, volume);
+    sim.setInletConditions(inletK, supplyBara, massFlow);
+    sim.setWall(wallMass, wallArea, wallCp, wallHtc);
+    if (woodfield) {
+      sim.setWoodfieldHeatTransfer(nozzle, height);
+    }
+    if (Double.isFinite(linerMin) || Double.isFinite(linerMax)) {
+      sim.setLinerTemperatureLimits(linerMin, linerMax);
+    }
+    sim.setTimeStep(step);
+    sim.setMaxTime(maxTime);
+    VesselFillingResult result = sim.run();
+    System.out.println(label);
+    System.out.println("eos=pr");
+    System.out.println("input_t_k=" + temperatureK);
+    System.out.println("input_p_pa=" + pressureBara * 1.0e5);
+    System.out.println("vessel_volume_m3=" + volume);
+    System.out.println("inlet_temperature_k=" + inletK);
+    System.out.println("supply_pressure_pa=" + supplyBara * 1.0e5);
+    System.out.println("inlet_mass_flow_kg_s=" + massFlow);
+    System.out.println("wall_mass_kg=" + wallMass);
+    System.out.println("wall_area_m2=" + wallArea);
+    System.out.println("wall_specific_heat=" + wallCp);
+    System.out.println("wall_heat_transfer_coefficient=" + wallHtc);
+    System.out.println("woodfield=" + woodfield);
+    System.out.println("woodfield_nozzle_diameter_m=" + nozzle);
+    System.out.println("vessel_height_m=" + height);
+    System.out.println("liner_min_temperature_k=" + linerMin);
+    System.out.println("liner_max_temperature_k=" + linerMax);
+    System.out.println("time_step_s=" + step);
+    System.out.println("max_time_s=" + maxTime);
+    System.out.println("vu_flash_fallback_count=" + result.vuFlashFallbackCount);
+    System.out.println("max_fluid_temperature_k=" + result.maxFluidTemperatureK);
+    System.out.println("min_fluid_temperature_k=" + result.minFluidTemperatureK);
+    System.out.println("max_pressure_pa=" + result.maxPressureBara * 1.0e5);
+    System.out.println("final_pressure_pa=" + result.finalPressureBara * 1.0e5);
+    System.out.println("final_mass_kg=" + result.finalMassKg);
+    System.out.println("liner_over_temperature=" + result.linerOverTemperature);
+    System.out.println("liner_under_temperature=" + result.linerUnderTemperature);
+    System.out.println("liner_limits_met=" + result.linerLimitsMet);
+    System.out.println("recorded_points=" + result.time.size());
+    int stride = result.time.size() <= 120 ? 1 : (int) Math.ceil(result.time.size() / 60.0);
+    System.out.println("stride=" + stride);
+    for (int i = 0; i < result.time.size(); i += stride) {
+      printFillPoint(i, result);
+    }
+    if ((result.time.size() - 1) % stride != 0) {
+      printFillPoint(result.time.size() - 1, result);
+    }
+    System.out.println();
+  }
+
+  static void printFillPoint(int i, VesselFillingResult result) {
+    String head = "point_" + i + "_";
+    System.out.println(head + "time_s=" + result.time.get(i));
+    System.out.println(head + "pressure_pa=" + result.pressureBara.get(i) * 1.0e5);
+    System.out.println(head + "temperature_k=" + result.temperatureK.get(i));
+    System.out.println(head + "mass_kg=" + result.massKg.get(i));
+    System.out.println(head + "wall_temperature_k=" + result.wallTempK.get(i));
+  }
+
+  // === process.blocked_outlet_overpressure =======================================
+
+  static void blockedOutletRows() {
+    String[] gas = {"methane", "ethane", "propane"};
+    double[] gasZ = {90.0, 7.0, 3.0};
+    blockedRow("blocked_reaches_relief_1800s", gas, gasZ, 298.15, 5.0, 298.15, 90.0, 2.0, 50.0,
+        1.0, 1800.0);
+    blockedRow("blocked_not_reached_20s", gas, gasZ, 298.15, 5.0, 298.15, 90.0, 0.2, 50.0, 1.0,
+        20.0);
+  }
+
+  static void blockedRow(String label, String[] names, double[] amounts, double temperatureK,
+      double volume, double inletK, double supplyBara, double massFlow, double reliefSetBara,
+      double step, double maxTime) {
+    SystemInterface fluid = leakFluid(false, names, amounts, temperatureK, 10.0);
+    BlockedOutletOverpressureAnalyzer analyzer =
+        new BlockedOutletOverpressureAnalyzer(fluid, volume);
+    analyzer.setInletConditions(inletK, supplyBara, massFlow);
+    analyzer.setReliefSetPressure(reliefSetBara);
+    analyzer.setTimeStep(step);
+    analyzer.setMaxTime(maxTime);
+    BlockedOutletOverpressureAnalyzer.BlockedOutletResult result = analyzer.run();
+    System.out.println(label);
+    System.out.println("eos=pr");
+    System.out.println("input_t_k=" + temperatureK);
+    System.out.println("input_p_pa=" + 10.0e5);
+    System.out.println("vessel_volume_m3=" + volume);
+    System.out.println("inlet_temperature_k=" + inletK);
+    System.out.println("supply_pressure_pa=" + supplyBara * 1.0e5);
+    System.out.println("inlet_mass_flow_kg_s=" + massFlow);
+    System.out.println("relief_set_pressure_pa=" + reliefSetBara * 1.0e5);
+    System.out.println("time_step_s=" + step);
+    System.out.println("max_time_s=" + maxTime);
+    System.out.println("relief_set_pressure_pa_used=" + result.reliefSetPressureBara * 1.0e5);
+    System.out.println("max_pressure_pa=" + result.maxPressureBara * 1.0e5);
+    System.out.println("final_pressure_pa=" + result.finalPressureBara * 1.0e5);
+    System.out.println("final_mass_kg=" + result.finalMassKg);
+    System.out.println("inlet_mass_flow_kg_s_used=" + result.inletMassFlowKgPerS);
+    System.out.println("simulated_horizon_s=" + result.simulatedHorizonSeconds);
+    System.out.println("time_to_relief_set_s=" + result.timeToReliefSetSeconds);
+    System.out.println("relief_demand=" + result.reliefDemand);
+    System.out.println();
+  }
+
+  // === process.non_equilibrium_blowdown ==========================================
+
+  static void nonEquilibriumRows() {
+    String[] twoPhase = {"methane", "propane", "n-butane"};
+    double[] twoPhaseZ = {0.6, 0.2, 0.2};
+    nemRow("nem_fire_20s", twoPhase, twoPhaseZ, 280.0, 50.0, 10.0, 0.012, 0.85, 1.0e5, true,
+        20.0);
+    nemRow("nem_default_parameters_20s", twoPhase, twoPhaseZ, 280.0, 50.0, 10.0, 0.002, 0.85, 1.0e5,
+        false, 20.0);
+    refusalProbe("nem_single_phase_refusal", () -> {
+      NonEquilibriumBlowdownModel model = new NonEquilibriumBlowdownModel(
+          leakFluid(false, new String[] {"methane"}, new double[] {1.0}, 300.0, 50.0), 10.0, 0.012,
+          0.85, 1.0e5);
+      model.setMaxTime(20.0).setStopPressure(3.0e5).run();
+    });
+  }
+
+  @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:ParameterNumber"})
+  static void nemRow(String label, String[] names, double[] amounts, double temperatureK,
+      double pressureBara, double volume, double diameter, double coefficient, double back,
+      boolean fire, double maxTime) {
+    SystemInterface fluid = leakFluid(false, names, amounts, temperatureK, pressureBara);
+    NonEquilibriumBlowdownModel model =
+        new NonEquilibriumBlowdownModel(fluid, volume, diameter, coefficient, back);
+    if (fire) {
+      model.setFireExposure(0.9, 1200.0, 30.0, 20.0).setWall(4000.0, 470.0)
+          .setInsideGasCoefficient(50.0).setInterfacial(80.0, 4.0);
+    }
+    model.setLatentHeat(350000.0).setTimeStep(1.0).setMaxTime(maxTime).setStopPressure(3.0e5);
+    NonEquilibriumBlowdownModel.NemResult result = model.run();
+    System.out.println(label);
+    System.out.println("eos=pr");
+    System.out.println("input_t_k=" + temperatureK);
+    System.out.println("input_p_pa=" + pressureBara * 1.0e5);
+    System.out.println("vessel_volume_m3=" + volume);
+    System.out.println("orifice_diameter_m=" + diameter);
+    System.out.println("discharge_coefficient=" + coefficient);
+    System.out.println("back_pressure_pa=" + back);
+    System.out.println("fire=" + fire);
+    System.out.println("time_step_s=" + 1.0);
+    System.out.println("max_time_s=" + maxTime);
+    System.out.println("stop_pressure_pa=" + 3.0e5);
+    System.out.println("initial_pressure_pa=" + result.initialPressureBara * 1.0e5);
+    System.out.println("flash_fallback_count=" + result.flashFallbackCount);
+    System.out.println("final_gas_temperature_k=" + result.finalGasTemperatureK);
+    System.out.println("final_liquid_temperature_k=" + result.finalLiquidTemperatureK);
+    System.out.println("max_temperature_bifurcation_k=" + result.maxTemperatureBifurcationK);
+    System.out.println("recorded_points=" + result.timeS.size());
+    for (int i = 0; i < result.timeS.size(); i++) {
+      String head = "point_" + i + "_";
+      System.out.println(head + "time_s=" + result.timeS.get(i));
+      System.out.println(head + "pressure_pa=" + result.pressureBara.get(i) * 1.0e5);
+      System.out.println(head + "gas_temperature_k=" + result.gasTemperatureK.get(i));
+      System.out.println(head + "liquid_temperature_k=" + result.liquidTemperatureK.get(i));
+      System.out.println(head + "wall_temperature_k=" + result.wallTemperatureK.get(i));
+      System.out.println(head + "gas_mass_kg=" + result.gasMassKg.get(i));
+      System.out.println(head + "liquid_mass_kg=" + result.liquidMassKg.get(i));
+    }
+    System.out.println();
+  }
+
+  // === process.multi_vessel_blowdown_study =======================================
+
+  static void multiVesselRows() {
+    multiRow("mv_two_sources_no_header", false, 0.0);
+    multiRow("mv_small_header_exceeded", true, 0.20);
+    multiRow("mv_large_header_acceptable", true, 0.80);
+    refusalProbe("mv_no_sources_refusal", () -> new MultiVesselBlowdownStudy().run());
+  }
+
+  static DepressurizationResult linearDecay(double peak, double durationS, double stepS) {
+    DepressurizationResult result = new DepressurizationResult();
+    for (double t = 0.0; t <= durationS + 1.0e-9; t += stepS) {
+      result.time.add(t);
+      result.massFlowKgPerS.add(peak * Math.max(0.0, 1.0 - t / durationS));
+    }
+    return result;
+  }
+
+  static void multiRow(String label, boolean withHeader, double headerDiameter) {
+    DepressurizationResult hp = linearDecay(40.0, 5.0, 1.0);
+    DepressurizationResult inletSep = linearDecay(25.0, 3.0, 1.0);
+    MultiVesselBlowdownStudy study = new MultiVesselBlowdownStudy().setGridStep(1.0)
+        .addSourceResult("HP-sep", hp)
+        .addSourceResult("Inlet-sep", inletSep);
+    if (withHeader) {
+      study.setHeader(headerDiameter, 1.5, 288.15, 0.020, 1.30);
+    }
+    MultiVesselBlowdownResult result = study.run();
+    System.out.println(label);
+    System.out.println("grid_step_s=" + 1.0);
+    System.out.println("with_header=" + withHeader);
+    System.out.println("header_diameter_m=" + (withHeader ? headerDiameter : 0.0));
+    System.out.println("header_pressure_pa=" + 1.5e5);
+    System.out.println("header_temperature_k=" + 288.15);
+    System.out.println("header_molar_mass_kg_mol=" + 0.020);
+    System.out.println("header_heat_capacity_ratio=" + 1.30);
+    System.out.println("max_allowable_mach=" + result.getMaxAllowableMach());
+    int sample = 0;
+    sample = printSourceSamples(sample, "HP-sep", hp);
+    sample = printSourceSamples(sample, "Inlet-sep", inletSep);
+    for (int i = 0; i < result.getTimeS().size(); i++) {
+      System.out.println("profile_" + i + "_time_s=" + result.getTimeS().get(i));
+      System.out.println(
+          "profile_" + i + "_total_mass_flow_kg_s=" + result.getTotalMassFlowKgPerS().get(i));
+    }
+    for (Map.Entry<String, Double> entry : result.getPeakContributionKgPerS().entrySet()) {
+      System.out.println("contribution_" + entry.getKey() + "_kg_s=" + entry.getValue());
+    }
+    System.out.println("peak_total_mass_flow_kg_s=" + result.getPeakTotalMassFlowKgPerS());
+    System.out.println("peak_time_s=" + result.getPeakTimeS());
+    System.out.println("header_velocity_m_s=" + result.getHeaderVelocityMPerS());
+    System.out.println("header_mach=" + result.getHeaderMach());
+    System.out.println("header_mach_acceptable=" + result.isHeaderMachAcceptable());
+    System.out.println();
+  }
+
+  static int printSourceSamples(int start, String source, DepressurizationResult result) {
+    int at = start;
+    for (int i = 0; i < result.time.size(); i++) {
+      System.out.println("sample_" + at + "_source=" + source);
+      System.out.println("sample_" + at + "_time_s=" + result.time.get(i));
+      System.out.println("sample_" + at + "_mass_flow_kg_s=" + result.massFlowKgPerS.get(i));
+      at++;
+    }
+    return at;
+  }
+
+  // === process.dynamic_psv_sizing ================================================
+
+  static void dynamicPsvSizingRows() {
+    dpsiRow("dpsv_50bara", 50.0, 5.0, 5.0e5, 50.0e5, 0.21, 1.0e5);
+    dpsiRow("dpsv_11bara_small_vessel", 11.0, 1.0, 1.5e5, 11.0e5, 0.21, 1.0e5);
+    refusalProbe("dpsv_negative_volume_refusal", () -> new DynamicPsvSizingStudy(
+        leakFluid(false, new String[] {"methane"}, new double[] {1.0}, 350.0, 50.0), -1.0,
+        5.0e5, 50.0e5, 0.21, 1.0e5));
+    DynamicPsvSizingStudy blowdownRefusal = new DynamicPsvSizingStudy(
+        leakFluid(false, new String[] {"methane"}, new double[] {1.0}, 350.0, 50.0), 5.0, 5.0e5,
+        50.0e5, 0.21, 1.0e5);
+    refusalProbe("dpsv_blowdown_refusal", () -> blowdownRefusal.setBlowdownFraction(1.5));
+  }
+
+  static void dpsiRow(String label, double pressureBara, double volume, double fireHeat,
+      double setPressurePa, double overpressure, double backPa) {
+    String[] names = {"methane", "ethane", "propane"};
+    double[] amounts = {0.85, 0.10, 0.05};
+    SystemInterface fluid = leakFluid(false, names, amounts, 350.0, pressureBara);
+    DynamicPsvSizingStudy study =
+        new DynamicPsvSizingStudy(fluid, volume, fireHeat, setPressurePa, overpressure, backPa);
+    DynamicPsvSizingStudy.SizingComparison result = study.run();
+    System.out.println(label);
+    System.out.println("eos=pr");
+    System.out.println("input_t_k=" + 350.0);
+    System.out.println("input_p_pa=" + pressureBara * 1.0e5);
+    System.out.println("vessel_volume_m3=" + volume);
+    System.out.println("fire_heat_input_w=" + fireHeat);
+    System.out.println("set_pressure_pa=" + setPressurePa);
+    System.out.println("overpressure_fraction=" + overpressure);
+    System.out.println("back_pressure_pa=" + backPa);
+    System.out.println("blowdown_fraction=" + 0.1);
+    System.out.println("discharge_coefficient=" + 0.975);
+    System.out.println("latent_heat_j_kg=" + 350000.0);
+    System.out.println("time_step_s=" + 0.5);
+    System.out.println("max_time_s=" + 1200.0);
+    System.out.println("initial_pressure_fraction=" + 0.9);
+    System.out.println("steady_required_area_m2=" + result.steadyRequiredAreaM2);
+    System.out.println("dynamic_required_area_m2=" + result.dynamicRequiredAreaM2);
+    System.out.println("oversizing_ratio=" + result.oversizingRatio);
+    System.out.println("allowable_pressure_pa=" + result.allowablePressurePa);
+    System.out.println("peak_dynamic_pressure_pa=" + result.peakDynamicPressurePa);
+    System.out.println("steady_relief_rate_kg_s=" + result.steadyReliefRateKgPerS);
+    System.out.println();
   }
 }
