@@ -2,68 +2,103 @@
 
 Educational Gaussian point-source gas-dispersion screening that estimates the downwind distance to a target concentration (LFL or toxic ppm) using the public Pasquill-Gifford / Briggs rural model. USE WHEN: a task needs a public, screening-level distance-to-LFL or distance-to-ppm estimate for a continuous gas release before detailed dispersion or consequence analysis.
 
-This is a `screening` skill: it produces no azoth number. The library carries the
-calculation as `process.gas_dispersion` and `process.gaussian_plume` - azoth-id-ok: named to
-disclaim, because this page runs neither - and the skill is not promoted to back them until a
-measurement says so.
+**Ported.** `process.gaussian_plume` evaluates the sigma curves, the two-image concentration
+and the log-scan distance to a threshold. `process.gas_dispersion` is the full analyzer: a
+released mixture's ambient flash, its Le Chatelier LFL, the model selection and the flammable
+and toxic endpoints over the passive plume or the dense Britter-McQuaid fit.
 
 ## When to Use
 
-Educational Gaussian point-source gas-dispersion screening that estimates the downwind distance to a target concentration (LFL or toxic ppm) using the public Pasquill-Gifford / Briggs rural model. USE WHEN: a task needs a public, screening-level distance-to-LFL or distance-to-ppm estimate for a continuous gas release before detailed dispersion or consequence analysis.
+A continuous release whose downwind distance to a flammable or toxic threshold is being
+screened; a dispersion contour for a consequence study; or the choice between a passive plume
+and a dense-gas fit.
 
 ## Inputs
 
-The source strength, the effective release height, the wind speed, the Pasquill class, the
-terrain category, the receptor's position and the target concentration. The library's
-declaration of these is `specs/models/process/gaussian_plume.toml`; the screening page does
-not restate it.
+`process.gaussian_plume`: `emission_rate` in kg/s, `effective_stack_height` in m, `wind_speed`
+in m/s, the `stability` class (`A` to `F`), the `terrain` (`rural` or `urban`), the receptor
+`distance`, `crosswind` and `height` in m, and the `threshold` concentration in kg/m³.
+
+`process.gas_dispersion`: the release `components` and `composition`, the `mass_release_rate`,
+and optional ambient conditions, stability, roughness, release height, model selection and the
+flammable or toxic target.
 
 ## Outputs
 
-The two dispersion coefficients, the concentration at the receptor, the ground centreline
-concentration and the downwind distance to the target. The library declares the same five.
+- `gaussian_plume`: `sigma_y`, `sigma_z`, the concentration at the receptor, the centreline
+  ground concentration and the distance to the threshold when it exists on the scan.
+- `gas_dispersion`: the selected model, the source and air densities, the LFL and its
+  endpoint fraction, the distances to the flammable endpoint and to half the LFL, the cloud
+  volume, the toxic distance and the two endpoint flags.
 
 ## How a calculation runs
 
-No azoth calculation runs from this skill. The library's screening is the process id named
-above, and it is not promoted as this skill's backing until a measurement compares them.
+The plume's sigma curves are the Pasquill-Gifford rural correlations, with the urban forms
+where the terrain says so; the concentration is the two-image sum, and the distance to a
+threshold is a log scan from the source. The analyzer flashes the released composition at the
+ambient state, forms the gas phase's Le Chatelier LFL, selects the passive or dense model by
+its own density-ratio test, and reports the endpoint distances.
 
 ## Python usage pattern
 
-None from this skill. The library's own entry points are named below; azoth-id-ok: named to
-disclaim, since this page does not call them.
+```python
+import azoth
+from azoth.core.units import quantity
+
+result = azoth.process.gaussian_plume(
+    emission_rate=quantity(1.0, "kg/s"),
+    effective_stack_height=quantity(0.0, "m"),
+    wind_speed=quantity(5.0, "m/s"),
+    stability="D",
+    terrain="rural",
+    distance=quantity(100.0, "m"),
+    crosswind=quantity(0.0, "m"),
+    height=quantity(0.0, "m"),
+    threshold=quantity(0.05, "kg/m**3"),
+)
+print(result.concentration.to("kg/m**3"))
+print(result.distance_to_threshold)  # absent when the scan never reaches it
+```
 
 ## The keycard
 
-Not applicable: the screening takes its own scalar inputs, and the library's id takes the
-released composition through the databank.
+`process.gaussian_plume` is arithmetic over the caller's release state; no fluid is flashed.
+`process.gas_dispersion` resolves its `components` against the databank and flashes the
+mixture, so a name the databank does not carry is refused.
 
 ## Validation checklist
 
-- [ ] Confirm the task actually needs this calculation.
-- [ ] Use the library's process id for a number, and NeqSim's validated engine where the
-  dense-gas or toxic endpoint is the question.
+- [ ] State the stability class and the terrain the site actually has.
+- [ ] Use the release's real stack or release height, not zero by default.
+- [ ] For a mixture, state the composition rather than a pseudo-gas.
+- [ ] Read the endpoint with its basis: LFL fraction, half-LFL and toxic threshold are three
+      different distances.
+- [ ] Check whether the release is dense enough for the dense-gas fit.
 
 ## Common mistakes
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| A placeholder used as a design result | The calculation is not run from this page | Use the library's process id or NeqSim |
+| The distance to threshold is absent | The scan never reaches the threshold from the source | Check the emission rate and the threshold |
+| A passive plume on a dense release | The stability or the model selection ignored the density | Let the analyzer select the model, or state it |
+| A toxic distance from the wrong component | The toxic component and threshold were not both stated | State both |
+| An LFL distance shorter than the half-LFL distance | The two endpoints were confused | Read each with its fraction |
 
 ## Limitations
 
-This page produces no number. Its public model is the passive Gaussian plume; the library's
-screening id also carries the dense-gas and toxic endpoints. azoth-id-ok: named to disclaim.
+Both ids are screening models. The plume is a steady Gaussian form; the analyzer's dense fit is
+Britter-McQuaid. Neither resolves buildings, terrain or a time-varying release. The DTO's
+scenario name and JSON are session surface.
 
 ## Related Azoth functionality
 
-`process.gas_dispersion` carries the ambient-flash screening with both arms - azoth-id-ok:
-named to disclaim, because this skill runs none of them. The plume arithmetic alone is
-`process.gaussian_plume` - azoth-id-ok: disclaimed - and `process.probit` is the dose-response
-- azoth-id-ok: disclaimed - which this page also runs not. The validated engine today is
-NeqSim's, credited in `NOTICE`.
+- `process.probit` — the consequence of the concentration at the receptor.
+- `process.consequence_analysis` — the QRA engine that composes the models.
+- `process.toxic_library` — the IDLH and ERPG thresholds a toxic target may come from.
 
 ## References
 
+- Pasquill, F. and Smith, F.B. Atmospheric Diffusion.
+- Briggs, G.A. Diffusion Estimation for Small Emissions.
+- Britter, R.E. and McQuaid, J. Workbook on the Dispersion of Dense Gases.
 - NeqSim: https://github.com/equinor/neqsim
-- NeqSim community skills: https://github.com/equinor/neqsim-community-skills
