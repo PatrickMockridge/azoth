@@ -257,6 +257,7 @@
   - [Deluge nozzle layout](./process/deluge_nozzle_layout.md)
   - [Distillation column](./process/distillation_column.md)
   - [Ejector](./process/ejector.md)
+  - [Escalation graph analysis](./process/escalation_graph.md)
   - [Event tree](./process/event_tree.md)
   - [Expander](./process/expander.md)
   - [Fault tree](./process/fault_tree.md)

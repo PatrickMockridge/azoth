@@ -41,6 +41,7 @@ from azoth.core.result import (
     DelugeNozzleLayoutResult,
     DistillationColumnResult,
     EjectorResult,
+    EscalationGraphResult,
     EventTreeResult,
     ExpanderResult,
     FaultTreeResult,
@@ -163,6 +164,7 @@ __all__ = [
     "deluge_nozzle_layout",
     "distillation_column",
     "ejector",
+    "escalation_graph",
     "event_tree",
     "expander",
     "fault_tree",
@@ -279,6 +281,7 @@ _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
 _ALARP_AUDIT = "process.alarp_audit"
+_ESCALATION_GRAPH = "process.escalation_graph"
 _INHERENT_SAFETY = "process.inherent_safety"
 _NORSOK_P002_COMPLIANCE = "process.norsok_p002_compliance"
 _STS0131_GATE = "process.sts0131_gate"
@@ -1956,6 +1959,25 @@ def alarp_audit(
         measures=measures,
         value_of_statistical_life=value_of_statistical_life,
         disproportion_factor=disproportion_factor,
+    )
+
+
+def escalation_graph(
+    items: list[dict[str, object]],
+    exposures: list[dict[str, object]],
+    initiator: str,
+) -> EscalationGraphResult:
+    """The items that fail from an initiator, and the worst case over every item.
+
+    A target fails when the cumulative load from every failed source is at or above its
+    threshold. The sets are published in the items order.
+
+    See :func:`azoth.process.reference.escalation_graph`.
+    """
+    return resolve(_ESCALATION_GRAPH)(  # type: ignore[no-any-return]
+        items=items,
+        exposures=exposures,
+        initiator=initiator,
     )
 
 

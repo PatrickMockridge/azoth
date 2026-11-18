@@ -31,6 +31,7 @@ from azoth.core.record_outputs_gen import (
     ConsequenceOutcomeResult,
     DepositionSegmentRow,
     EquilibriumSoundSpeedSample,
+    EscalationItemResult,
     EventTreeOutcome,
     FlowlineScaleSegment,
     FmeaRankedEntry,
@@ -6627,6 +6628,31 @@ class EjectorResult(_HasWarnings):
 
     #: `getDischargeConnectionLength`: `5 + 2*clamp(discharge/mixing - 1, 0, 3)` times the diffuser outlet's diameter, in bara.
     discharge_connection_length: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EscalationGraphResult(_HasWarnings):
+    """Result of ``process.escalation_graph``."""
+
+    CALC_ID: ClassVar[str] = "process.escalation_graph"
+
+    #: the items that ultimately fail, including the initiator, in the items order.
+    failed_items: tuple[EscalationItemResult, ...]
+
+    #: the number of failed items.
+    failure_count: float
+
+    #: whether more than the initiator failed.
+    any_escalation: bool
+
+    #: the largest propagation over every registered item, in the items order.
+    worst_case_items: tuple[EscalationItemResult, ...]
+
+    #: the number of items in the worst case.
+    worst_case_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

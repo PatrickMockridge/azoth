@@ -232,6 +232,10 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         # `TestCase`. `crates/azoth-process/tests/flow_induced_pulsation_screening.rs`
         # asserts it against the capture, and `test_cross_impl` compares it on both results.
         "any_mode_locked_in",
+        # `escalation_graph`'s escalation flag, a boolean with no slot in `TestCase`.
+        # `crates/azoth-process/tests/escalation_graph.rs` asserts it against the capture, and
+        # `test_cross_impl` compares it on both results.
+        "any_escalation",
         # `gas_dispersion`'s two endpoint predicates, booleans with no slot in `TestCase`.
         # `crates/azoth-process/tests/gas_dispersion.rs` asserts them against the capture,
         # and `test_cross_impl` compares them on both results.

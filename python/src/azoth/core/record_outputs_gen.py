@@ -205,6 +205,14 @@ class EquilibriumSoundSpeedSample:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class EscalationItemResult:
+    """the largest propagation over every registered item, in the items order."""
+
+    #: the failed item's identifier.
+    item_id: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class EventTreeOutcome:
     """one row per leaf, in the class's bit order: `2^n` rows, or one when there are no branches."""
 

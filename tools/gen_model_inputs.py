@@ -446,6 +446,7 @@ NON_UNIT_MODELS = {
     "process.pump_deadhead": "the pump deadhead and minimum-flow screen over scalars, not a unit",
     "process.runaway_reaction": "the adiabatic runaway screen over scalars, not a unit",
     "process.alarp_audit": "the ALARP measure audit over rows, not a unit",
+    "process.escalation_graph": "the domino propagation over item and exposure rows, not a unit",
     "process.inherent_safety": "the Kletz four-pillar index over scalars, not a unit",
     "process.mdmt": "the UCS-66 MDMT curve over scalars, not a unit",
     "process.norsok_p002_compliance": "the P-002 point checks over rows, not a unit",

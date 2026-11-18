@@ -101,6 +101,8 @@ from azoth.core.result import (
     EquilibriumSoundSpeedSample,
     ErosionPredictionResult,
     ErosionRiskLevel,
+    EscalationGraphResult,
+    EscalationItemResult,
     EventTreeOutcome,
     EventTreeResult,
     ExpanderResult,
@@ -552,6 +554,7 @@ __all__ = [
     "equilibrium_constant",
     "equilibrium_sound_speed",
     "erosion_prediction",
+    "escalation_graph",
     "event_tree",
     "expander",
     "fault_tree",
@@ -6426,6 +6429,24 @@ def ejector(motive_components: list[str], motive_n: Q, motive_z: list[float], mo
         total_volume=from_si(result.total_volume.magnitude_si, result.total_volume.unit),
         suction_connection_length=from_si(result.suction_connection_length.magnitude_si, result.suction_connection_length.unit),
         discharge_connection_length=from_si(result.discharge_connection_length.magnitude_si, result.discharge_connection_length.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def escalation_graph(items: list[dict[str, object]], exposures: list[dict[str, object]], initiator: str) -> EscalationGraphResult:
+    """``process.escalation_graph``, computed in Rust."""
+    spec = _models_gen.model("process.escalation_graph")
+    result = _core.escalation_graph(
+        input_records_to_si(spec, "items", items),
+        input_records_to_si(spec, "exposures", exposures),
+        initiator,
+    )
+    return EscalationGraphResult(
+        failed_items=tuple(EscalationItemResult(item_id=c.item_id) for c in result.failed_items),
+        failure_count=result.failure_count,
+        any_escalation=result.any_escalation,
+        worst_case_items=tuple(EscalationItemResult(item_id=c.item_id) for c in result.worst_case_items),
+        worst_case_count=result.worst_case_count,
         warnings=_warnings(result.warnings),
     )
 

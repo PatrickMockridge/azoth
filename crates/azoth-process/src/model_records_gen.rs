@@ -33,6 +33,7 @@ use crate::models::cooler::CoolerResult;
 use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::distillation_column::DistillationColumnResult;
 use crate::models::ejector::EjectorResult;
+use crate::models::escalation_graph::EscalationGraphResult;
 use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
 use crate::models::fault_tree::FaultTreeResult;
@@ -631,6 +632,22 @@ impl CalcResult for EjectorResult {
         "total_volume",
         "suction_connection_length",
         "discharge_connection_length",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for EscalationGraphResult {
+    const CALC_ID: &'static str = "process.escalation_graph";
+    const FIELDS: &'static [&'static str] = &[
+        "failed_items",
+        "failure_count",
+        "any_escalation",
+        "worst_case_items",
+        "worst_case_count",
         "warnings",
     ];
 

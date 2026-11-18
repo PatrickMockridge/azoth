@@ -35,6 +35,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.deluge_nozzle_layout`](./deluge_nozzle_layout.md) | `closed_form_deluge_nozzle_layout` | NeqSim process/safety/firewater/DelugeNozzleLayout.java |
 | [`process.distillation_column`](./distillation_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/DistillationColumn.java |
 | [`process.ejector`](./ejector.md) | `direct composition` | NeqSim process/equipment/ejector/Ejector.java |
+| [`process.escalation_graph`](./escalation_graph.md) | `domino_failure_propagation` | NeqSim process/safety/escalation/EscalationGraphAnalyzer.java |
 | [`process.event_tree`](./event_tree.md) | `full_binary_enumeration` | NeqSim process/safety/risk/eta/EventTreeAnalyzer.java |
 | [`process.expander`](./expander.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
 | [`process.fault_tree`](./fault_tree.md) | `recursive_gate_evaluation` | NeqSim process/safety/risk/fta/FaultTreeAnalyzer.java |

@@ -23,6 +23,7 @@
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/distillation_column.toml
 //!   - specs/models/process/ejector.toml
+//!   - specs/models/process/escalation_graph.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
@@ -29020,6 +29021,608 @@ pub static EJECTOR_SPEC: ModelSpec = ModelSpec {
     algorithm: None,
     checks: EJECTOR_CHECKS,
     cases: EJECTOR_CASES,
+};
+
+static ESCALATION_GRAPH_CHECKS: &[SpecCheck] = &[];
+
+static ESCALATION_GRAPH_CASES: &[TestCase] = &[
+    TestCase {
+        id: "chain",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("initiator", "A")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 3.0), ("worst_case_count", 3.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "items",
+                &[
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("C"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "exposures",
+                &[
+                    &[
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "target",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "load",
+                            value: FieldValue::Number(100.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "target",
+                            value: FieldValue::Name("C"),
+                        },
+                        RecordField {
+                            name: "load",
+                            value: FieldValue::Number(100.0),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "no_propagation",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("initiator", "A")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 1.0), ("worst_case_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "items",
+                &[
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "exposures",
+                &[&[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "target",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "load",
+                        value: FieldValue::Number(10.0),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "threshold_equal",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("initiator", "A")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 2.0), ("worst_case_count", 2.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "items",
+                &[
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "exposures",
+                &[&[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "target",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "load",
+                        value: FieldValue::Number(50.0),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "two_paths",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("initiator", "A")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 3.0), ("worst_case_count", 3.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "items",
+                &[
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("C"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "exposures",
+                &[
+                    &[
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "target",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "load",
+                            value: FieldValue::Number(100.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "target",
+                            value: FieldValue::Name("C"),
+                        },
+                        RecordField {
+                            name: "load",
+                            value: FieldValue::Number(30.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "target",
+                            value: FieldValue::Name("C"),
+                        },
+                        RecordField {
+                            name: "load",
+                            value: FieldValue::Number(30.0),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "star",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("initiator", "A")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 4.0), ("worst_case_count", 4.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "items",
+                &[
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("C"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("D"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "exposures",
+                &[
+                    &[
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "target",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "load",
+                            value: FieldValue::Number(100.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "target",
+                            value: FieldValue::Name("C"),
+                        },
+                        RecordField {
+                            name: "load",
+                            value: FieldValue::Number(100.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "target",
+                            value: FieldValue::Name("D"),
+                        },
+                        RecordField {
+                            name: "load",
+                            value: FieldValue::Number(100.0),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "cycle",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("initiator", "A")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 2.0), ("worst_case_count", 2.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "items",
+                &[
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "exposures",
+                &[
+                    &[
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "target",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "load",
+                            value: FieldValue::Number(100.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "target",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "load",
+                            value: FieldValue::Number(100.0),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "duplicate_item",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("initiator", "A")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("failure_count", 2.0), ("worst_case_count", 2.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "items",
+                &[
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("A"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(50.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item_id",
+                            value: FieldValue::Name("B"),
+                        },
+                        RecordField {
+                            name: "failure_threshold",
+                            value: FieldValue::Number(75.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "exposures",
+                &[&[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("A"),
+                    },
+                    RecordField {
+                        name: "target",
+                        value: FieldValue::Name("B"),
+                    },
+                    RecordField {
+                        name: "load",
+                        value: FieldValue::Number(80.0),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+];
+
+static ESCALATION_GRAPH_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "domino_failure_propagation",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.escalation_graph`.
+pub static ESCALATION_GRAPH_SPEC: ModelSpec = ModelSpec {
+    id: "process.escalation_graph",
+    kind: "procedure",
+    algorithm: Some(&ESCALATION_GRAPH_ALGORITHM),
+    checks: ESCALATION_GRAPH_CHECKS,
+    cases: ESCALATION_GRAPH_CASES,
 };
 
 static EVENT_TREE_CHECKS: &[SpecCheck] = &[SpecCheck {
@@ -87488,6 +88091,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &DELUGE_NOZZLE_LAYOUT_SPEC,
     &DISTILLATION_COLUMN_SPEC,
     &EJECTOR_SPEC,
+    &ESCALATION_GRAPH_SPEC,
     &EVENT_TREE_SPEC,
     &EXPANDER_SPEC,
     &FAULT_TREE_SPEC,

@@ -1,0 +1,131 @@
+model = "process.escalation_graph"
+[[cases]]
+id = "chain"
+tolerance = 1.0e-12
+source = "A 100-unit load from A and from B, with thresholds 0 and 50: all three fail. From `validation/neqsim/captures/process_escalation_graph.tsv` (`esc_chain`)."
+[cases.inputs]
+items = [
+  { item_id = "A", failure_threshold = 0.0 },
+  { item_id = "B", failure_threshold = 50.0 },
+  { item_id = "C", failure_threshold = 50.0 },
+]
+exposures = [
+  { source = "A", target = "B", load = 100.0 },
+  { source = "B", target = "C", load = 100.0 },
+]
+initiator = "A"
+[cases.expected]
+failure_count = 3.0
+any_escalation = true
+worst_case_count = 3.0
+[[cases]]
+id = "no_propagation"
+tolerance = 1.0e-12
+source = "A 10-unit load below the target's 50-unit threshold: only the initiator fails. From (`esc_no_propagation`)."
+[cases.inputs]
+items = [
+  { item_id = "A", failure_threshold = 0.0 },
+  { item_id = "B", failure_threshold = 50.0 },
+]
+exposures = [
+  { source = "A", target = "B", load = 10.0 },
+]
+initiator = "A"
+[cases.expected]
+failure_count = 1.0
+any_escalation = false
+worst_case_count = 1.0
+[[cases]]
+id = "threshold_equal"
+tolerance = 1.0e-12
+source = "A load exactly at the 50-unit threshold fails, because the comparison is inclusive. From (`esc_threshold_equal`)."
+[cases.inputs]
+items = [
+  { item_id = "A", failure_threshold = 0.0 },
+  { item_id = "B", failure_threshold = 50.0 },
+]
+exposures = [
+  { source = "A", target = "B", load = 50.0 },
+]
+initiator = "A"
+[cases.expected]
+failure_count = 2.0
+any_escalation = true
+worst_case_count = 2.0
+[[cases]]
+id = "two_paths"
+tolerance = 1.0e-12
+source = "C receives 30 from A and 30 from the failed B, and 60 passes its 50-unit threshold. From (`esc_two_paths`)."
+[cases.inputs]
+items = [
+  { item_id = "A", failure_threshold = 0.0 },
+  { item_id = "B", failure_threshold = 50.0 },
+  { item_id = "C", failure_threshold = 50.0 },
+]
+exposures = [
+  { source = "A", target = "B", load = 100.0 },
+  { source = "A", target = "C", load = 30.0 },
+  { source = "B", target = "C", load = 30.0 },
+]
+initiator = "A"
+[cases.expected]
+failure_count = 3.0
+any_escalation = true
+worst_case_count = 3.0
+[[cases]]
+id = "star"
+tolerance = 1.0e-12
+source = "A fails three targets at once: the worst case is all four items. From (`esc_star`)."
+[cases.inputs]
+items = [
+  { item_id = "A", failure_threshold = 0.0 },
+  { item_id = "B", failure_threshold = 50.0 },
+  { item_id = "C", failure_threshold = 50.0 },
+  { item_id = "D", failure_threshold = 50.0 },
+]
+exposures = [
+  { source = "A", target = "B", load = 100.0 },
+  { source = "A", target = "C", load = 100.0 },
+  { source = "A", target = "D", load = 100.0 },
+]
+initiator = "A"
+[cases.expected]
+failure_count = 4.0
+any_escalation = true
+worst_case_count = 4.0
+[[cases]]
+id = "cycle"
+tolerance = 1.0e-12
+source = "A and B each deliver 100 to the other: the fixed point is both. From (`esc_cycle`)."
+[cases.inputs]
+items = [
+  { item_id = "A", failure_threshold = 50.0 },
+  { item_id = "B", failure_threshold = 50.0 },
+]
+exposures = [
+  { source = "A", target = "B", load = 100.0 },
+  { source = "B", target = "A", load = 100.0 },
+]
+initiator = "A"
+[cases.expected]
+failure_count = 2.0
+any_escalation = true
+worst_case_count = 2.0
+[[cases]]
+id = "duplicate_item"
+tolerance = 1.0e-12
+source = "B is registered twice, at 50 then 75; the later threshold wins and an 80-unit load still fails it. From (`esc_duplicate`)."
+[cases.inputs]
+items = [
+  { item_id = "A", failure_threshold = 0.0 },
+  { item_id = "B", failure_threshold = 50.0 },
+  { item_id = "B", failure_threshold = 75.0 },
+]
+exposures = [
+  { source = "A", target = "B", load = 80.0 },
+]
+initiator = "A"
+[cases.expected]
+failure_count = 2.0
+any_escalation = true
+worst_case_count = 2.0

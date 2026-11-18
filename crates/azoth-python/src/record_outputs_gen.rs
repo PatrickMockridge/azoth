@@ -552,6 +552,37 @@ impl From<&azoth_eos::results::EquilibriumSoundSpeedSample> for PyEquilibriumSou
     }
 }
 
+/// the largest propagation over every registered item, in the items order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EscalationItemResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEscalationItemResult {
+    /// the failed item's identifier.
+    #[pyo3(get)]
+    pub item_id: String,
+}
+
+#[pymethods]
+impl PyEscalationItemResult {
+    fn __repr__(&self) -> String {
+        format!("EscalationItemResult(item_id={})", self.item_id)
+    }
+}
+
+impl From<&azoth_process::models::escalation_graph::EscalationItemResult>
+    for PyEscalationItemResult
+{
+    fn from(row: &azoth_process::models::escalation_graph::EscalationItemResult) -> Self {
+        Self {
+            item_id: row.item_id.clone(),
+        }
+    }
+}
+
 /// one row per leaf, in the class's bit order: `2^n` rows, or one when there are no branches.
 #[pyclass(
     frozen,

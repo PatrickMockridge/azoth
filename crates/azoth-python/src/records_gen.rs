@@ -260,6 +260,26 @@ pub struct ElementBarrierLink {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct EscalationExposure {
+    #[pyo3(item)]
+    pub source: String,
+    #[pyo3(item)]
+    pub target: String,
+    #[pyo3(item)]
+    pub load: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct EscalationItem {
+    #[pyo3(item)]
+    pub item_id: String,
+    #[pyo3(item)]
+    pub failure_threshold: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct EventTreeBranch {
     #[pyo3(item)]
     pub name: String,

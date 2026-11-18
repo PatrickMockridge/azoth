@@ -16,15 +16,15 @@
 use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
-    PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEventTreeOutcome,
-    PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
-    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
-    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIncrementalZoneRow,
-    PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
-    PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyNaceIssueRow, PyP002FindingResult, PyPipeFireRupturePoint, PyPulsationModeResult,
-    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
-    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
+    PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEscalationItemResult,
+    PyEventTreeOutcome, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
+    PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
+    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
+    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
+    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
+    PyMinimalCutSet, PyNaceIssueRow, PyP002FindingResult, PyPipeFireRupturePoint,
+    PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
     PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
     PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
     PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
@@ -16466,6 +16466,72 @@ impl From<&azoth_process::models::ejector::EjectorResult> for PyEjectorResult {
                 magnitude_si: r.discharge_connection_length.value,
                 unit: "m".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.escalation_graph`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EscalationGraphResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEscalationGraphResult {
+    /// the items that ultimately fail, including the initiator, in the items order.
+    #[pyo3(get)]
+    pub failed_items: Vec<PyEscalationItemResult>,
+    /// the number of failed items.
+    #[pyo3(get)]
+    pub failure_count: f64,
+    /// whether more than the initiator failed.
+    #[pyo3(get)]
+    pub any_escalation: bool,
+    /// the largest propagation over every registered item, in the items order.
+    #[pyo3(get)]
+    pub worst_case_items: Vec<PyEscalationItemResult>,
+    /// the number of items in the worst case.
+    #[pyo3(get)]
+    pub worst_case_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyEscalationGraphResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "EscalationGraphResult(failed_items={:?}, failure_count={:?}, any_escalation={:?}, worst_case_items={:?}, worst_case_count={:?}, {} warning(s))",
+            self.failed_items,
+            self.failure_count,
+            self.any_escalation,
+            self.worst_case_items,
+            self.worst_case_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::escalation_graph::EscalationGraphResult>
+    for PyEscalationGraphResult
+{
+    fn from(r: &azoth_process::models::escalation_graph::EscalationGraphResult) -> Self {
+        Self {
+            failed_items: r
+                .failed_items
+                .iter()
+                .map(PyEscalationItemResult::from)
+                .collect(),
+            failure_count: r.failure_count,
+            any_escalation: r.any_escalation,
+            worst_case_items: r
+                .worst_case_items
+                .iter()
+                .map(PyEscalationItemResult::from)
+                .collect(),
+            worst_case_count: r.worst_case_count,
             warnings: transport(&r.warnings),
         }
     }

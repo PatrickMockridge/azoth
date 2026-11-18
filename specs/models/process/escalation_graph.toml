@@ -1,0 +1,80 @@
+id = "process.escalation_graph"
+name = "Escalation graph analysis"
+kind = "procedure"
+assumptions = [
+    "**a failure propagates to a fixed point**: each pass sums the load on every not-yet-failed target from every currently failed source, and fails it when the cumulative load is at or above its threshold.",
+    "**the cumulative load is over all failed sources, not one path**; a target reached by two failed items receives both loads.",
+    "**the worst case is the largest propagation over every registered item**, and a tie keeps the earliest initiator in the items order.",
+    "**the sets are published in the items list's order**, where the class's `HashSet` fixes no order.",
+    "**a duplicate item row keeps its first position and the later threshold**, as the class's map does; the class's `addItem` edge-clearing is unreachable because every item is registered before the exposures.",
+    "**the thresholds and loads are dimensionless in the caller's own consistent unit** (for example W/m² or Pa); the class compares them and names no unit.",
+    "**negative thresholds and loads are accepted**, as the class accepts them, and non-finite values are refused.",
+    "**an initiator or exposure endpoint that names no item is refused**, as the class throws.",
+]
+references = [
+    "API STD 521 (2020). Pressure-relieving and Depressuring Systems, section 4.6, escalation limits.",
+    "CCPS. Guidelines for Chemical Process Quantitative Risk Analysis, 2nd edition.",
+    "Cozzani, V. and Salzano, E. (2004). The quantitative assessment of domino effects caused by overpressure.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/escalation/EscalationGraphAnalyzer.java` is the port source.",
+    "`validation/neqsim/captures/process_escalation_graph.tsv` - a chain, a no-propagation state, threshold equality, two paths, a star, a cycle, a duplicate item and the two refusals.",
+]
+[source]
+standard = "NeqSim process/safety/escalation/EscalationGraphAnalyzer.java"
+edition = "Its `addItem`, `addExposure`, `propagate` and `worstCaseEscalation`."
+[algorithm]
+scheme = "domino_failure_propagation"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.items]
+type = "record_list"
+row_type = "EscalationItem"
+description = "the process items and their failure thresholds, in caller order.\n"
+[inputs.items.fields.item_id]
+type = "string"
+description = "the item's identifier.\n"
+[inputs.items.fields.failure_threshold]
+unit = "dimensionless"
+description = "the load at which the item fails, in the caller's consistent unit.\n"
+[inputs.exposures]
+type = "record_list"
+row_type = "EscalationExposure"
+description = "the directed hazard exposures, in caller order; both ends must name an item.\n"
+[inputs.exposures.fields.source]
+type = "string"
+description = "the failed item delivering the load.\n"
+[inputs.exposures.fields.target]
+type = "string"
+description = "the item exposed to the load.\n"
+[inputs.exposures.fields.load]
+unit = "dimensionless"
+description = "the load delivered to the target, in the caller's consistent unit.\n"
+[inputs.initiator]
+type = "string"
+description = "the item that fails first; it must name an item.\n"
+[outputs]
+[outputs.failed_items]
+type = "record_list"
+description = "the items that ultimately fail, including the initiator, in the items order.\n"
+[outputs.failed_items.fields.item_id]
+type = "string"
+description = "the failed item's identifier.\n"
+[outputs.failure_count]
+unit = "dimensionless"
+description = "the number of failed items.\n"
+[outputs.any_escalation]
+type = "boolean"
+description = "whether more than the initiator failed.\n"
+[outputs.worst_case_items]
+type = "record_list"
+description = "the largest propagation over every registered item, in the items order.\n"
+[outputs.worst_case_items.fields.item_id]
+type = "string"
+description = "the failed item's identifier.\n"
+[outputs.worst_case_count]
+unit = "dimensionless"
+description = "the number of items in the worst case.\n"
+[implementations]
+python = "azoth.process.escalation_graph"
+rust = "azoth_process::escalation_graph"

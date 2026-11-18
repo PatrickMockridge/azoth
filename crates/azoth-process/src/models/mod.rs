@@ -52,6 +52,7 @@ pub mod cooler;
 pub mod deluge_nozzle_layout;
 pub mod distillation_column;
 pub mod ejector;
+pub mod escalation_graph;
 pub mod event_tree;
 pub mod expander;
 pub mod fault_tree;
@@ -185,6 +186,10 @@ pub use deluge_nozzle_layout::{
 };
 pub use distillation_column::{DistillationColumnResult, distillation_column};
 pub use ejector::{EjectorResult, ejector};
+pub use escalation_graph::{
+    EscalationExposure, EscalationGraphResult, EscalationItem, EscalationItemResult,
+    escalation_graph,
+};
 pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_tree};
 pub use expander::{ExpanderResult, expander};
 pub use fault_tree::{FaultTreeNodeSpec, FaultTreeResult, MinimalCutSet, fault_tree};

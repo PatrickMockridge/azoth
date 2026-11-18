@@ -1757,6 +1757,21 @@ def _acoustic_induced_vibration_screening(inputs: Mapping[str, Any]) -> dict[str
     }
 
 
+def _escalation_graph(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.escalation_graph`'s layers, from the reference's arithmetic."""
+    from azoth.process.reference.escalation_graph import escalation_graph as evaluate
+
+    result = evaluate(
+        list(inputs["items"]),
+        list(inputs["exposures"]),
+        str(inputs["initiator"]),
+    )
+    return {
+        "failure_count": result.failure_count,
+        "worst_case_count": result.worst_case_count,
+    }
+
+
 def _alarp_audit(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.alarp_audit`'s layers, from the reference's arithmetic.
 
@@ -3855,6 +3870,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.mdmt": _mdmt,
     "process.acoustic_induced_vibration_screening": _acoustic_induced_vibration_screening,
     "process.alarp_audit": _alarp_audit,
+    "process.escalation_graph": _escalation_graph,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
@@ -4949,6 +4965,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_mdmt.tsv",
         block=1,
         identified_by=("#label", "mdmt_curve_b_25"),
+    ),
+    # Escalation's one: the three-item chain. The six further states and the two refusals are
+    # declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.escalation_graph",
+        case="chain",
+        capture="process_escalation_graph.tsv",
+        block=0,
+        identified_by=("#label", "esc_chain"),
     ),
     # ALARP's one: the implemented measure. The five further states, the empty audit and the
     # two refusals are declared in `UNCASED_ROWS`.
@@ -7882,6 +7907,8 @@ UNCASED_ROWS: dict[str, int] = {
     "process_inherent_safety.tsv": 4,
     # ALARP's eight: the five further states, the empty audit and the two refusals.
     "process_alarp_audit.tsv": 8,
+    # Escalation's eight: the six further states and the two refusals.
+    "process_escalation_graph.tsv": 8,
     # Gas-line FIV's thirteen: the eight further model states and the five refusals.
     "process_piping_fiv_gas.tsv": 13,
     # Liquid-line FIV's nine: the five further model states and the four refusals.

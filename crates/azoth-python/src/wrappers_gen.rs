@@ -6178,6 +6178,47 @@ pub fn distillation_column(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Escalation graph analysis.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (items, exposures, initiator))]
+#[pyo3(text_signature = "(items, exposures, initiator)")]
+pub fn escalation_graph(
+    py: Python<'_>,
+    items: Vec<crate::records_gen::EscalationItem>,
+    exposures: Vec<crate::records_gen::EscalationExposure>,
+    initiator: &str,
+) -> PyResult<crate::transport_gen::PyEscalationGraphResult> {
+    let items_records: Vec<azoth_process::models::escalation_graph::EscalationItem> = items
+        .into_iter()
+        .map(
+            |row| azoth_process::models::escalation_graph::EscalationItem {
+                item_id: row.item_id,
+                failure_threshold: row.failure_threshold,
+            },
+        )
+        .collect();
+    let exposures_records: Vec<azoth_process::models::escalation_graph::EscalationExposure> =
+        exposures
+            .into_iter()
+            .map(
+                |row| azoth_process::models::escalation_graph::EscalationExposure {
+                    source: row.source,
+                    target: row.target,
+                    load: row.load,
+                },
+            )
+            .collect();
+    azoth_process::models::escalation_graph::escalation_graph(
+        &items_records,
+        &exposures_records,
+        initiator,
+    )
+    .map(|r| crate::transport_gen::PyEscalationGraphResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Event tree.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

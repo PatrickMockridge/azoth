@@ -262,6 +262,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyDelugeNozzleLayoutResult>()?;
     m.add_class::<crate::transport_gen::PyDistillationColumnResult>()?;
     m.add_class::<crate::transport_gen::PyEjectorResult>()?;
+    m.add_class::<crate::transport_gen::PyEscalationGraphResult>()?;
     m.add_class::<crate::transport_gen::PyEventTreeResult>()?;
     m.add_class::<crate::transport_gen::PyExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyFaultTreeResult>()?;
@@ -376,6 +377,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyConsequenceOutcomeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyEquilibriumSoundSpeedSample>()?;
+    m.add_class::<crate::record_outputs_gen::PyEscalationItemResult>()?;
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
     m.add_class::<crate::record_outputs_gen::PyFlowlineScaleSegment>()?;
     m.add_class::<crate::record_outputs_gen::PyFmeaRankedEntry>()?;
@@ -1024,6 +1026,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::process::ejector, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::escalation_graph, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::event_tree, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::expander, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::fault_tree, m)?)?;

@@ -539,6 +539,19 @@ class ConsequenceOutcomeSpec(TypedDict):
     temperature: float | None
     pressure: float | None
 
+class EscalationItem(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    item_id: str
+    failure_threshold: float
+
+class EscalationExposure(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    source: str
+    target: str
+    load: float
+
 class EventTreeBranch(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1068,6 +1081,12 @@ class ConsequenceOutcomeResult:
     frequency_per_year: float
     fatality_probability: float
     fatality_frequency_per_year: float
+
+@final
+class EscalationItemResult:
+    """the largest propagation over every registered item, in the items order."""
+
+    item_id: str
 
 @final
 class EventTreeOutcome:
@@ -3730,6 +3749,15 @@ class EjectorResult:
     total_volume: Qty
     suction_connection_length: Qty
     discharge_connection_length: Qty
+    warnings: list[Warning]
+
+@final
+class EscalationGraphResult:
+    failed_items: list[EscalationItemResult]
+    failure_count: float
+    any_escalation: bool
+    worst_case_items: list[EscalationItemResult]
+    worst_case_count: float
     warnings: list[Warning]
 
 @final
@@ -7802,6 +7830,11 @@ def ejector(
     mixing_efficiency: float,
     diffuser_efficiency: float,
 ) -> EjectorResult: ...
+def escalation_graph(
+    items: list[EscalationItem],
+    exposures: list[EscalationExposure],
+    initiator: str,
+) -> EscalationGraphResult: ...
 def event_tree(
     initiating_frequency_per_year: float,
     branches: list[EventTreeBranch],
