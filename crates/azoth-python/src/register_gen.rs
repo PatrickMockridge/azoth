@@ -241,6 +241,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyReynoldsNumberResult>()?;
     m.add_class::<crate::transport_gen::PyTrayHydraulicsResult>()?;
     m.add_class::<crate::transport_gen::PyAbsorptionColumnResult>()?;
+    m.add_class::<crate::transport_gen::PyAcousticInducedVibrationResult>()?;
     m.add_class::<crate::transport_gen::PyActiveFireProtectionScreeningResult>()?;
     m.add_class::<crate::transport_gen::PyAntiSurgeRecycleResult>()?;
     m.add_class::<crate::transport_gen::PyApi14cSafeChartResult>()?;
@@ -951,6 +952,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::reynolds_number, m)?)?;
     m.add_function(wrap_pyfunction!(crate::hydraulics::tray_hydraulics, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::absorption_column, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::acoustic_induced_vibration_screening,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::active_fire_protection_screening,
         m

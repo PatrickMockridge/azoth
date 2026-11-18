@@ -14007,6 +14007,67 @@ impl From<&azoth_process::models::absorption_column::AbsorptionColumnResult>
         }
     }
 }
+/// Result of `process.acoustic_induced_vibration_screening`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "AcousticInducedVibrationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyAcousticInducedVibrationResult {
+    /// the sound power level, in dB.
+    #[pyo3(get)]
+    pub pwl: f64,
+    /// the design-line allowable sound power level, in dB.
+    #[pyo3(get)]
+    pub allowable_pwl: f64,
+    /// `pwl - allowable_pwl`, in dB; positive is an exceedance.
+    #[pyo3(get)]
+    pub margin: f64,
+    /// the AVIFF likelihood band from the margin.
+    #[pyo3(get)]
+    pub likelihood: String,
+    /// `(P1 - P2)/P1`.
+    #[pyo3(get)]
+    pub pressure_drop_ratio: f64,
+    /// the outside-diameter-to-wall-thickness ratio.
+    #[pyo3(get)]
+    pub d_overt: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyAcousticInducedVibrationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "AcousticInducedVibrationResult(pwl={:?}, allowable_pwl={:?}, margin={:?}, likelihood={:?}, pressure_drop_ratio={:?}, d_overt={:?}, {} warning(s))",
+            self.pwl,
+            self.allowable_pwl,
+            self.margin,
+            self.likelihood,
+            self.pressure_drop_ratio,
+            self.d_overt,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::acoustic_induced_vibration_screening::AcousticInducedVibrationResult> for PyAcousticInducedVibrationResult {
+    fn from(r: &azoth_process::models::acoustic_induced_vibration_screening::AcousticInducedVibrationResult) -> Self {
+        Self {
+            pwl: r.pwl,
+            allowable_pwl: r.allowable_pwl,
+            margin: r.margin,
+            likelihood: r.likelihood.as_str().to_string(),
+            pressure_drop_ratio: r.pressure_drop_ratio,
+            d_overt: r.d_overt,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.active_fire_protection_screening`, transported.
 #[pyclass(
     frozen,

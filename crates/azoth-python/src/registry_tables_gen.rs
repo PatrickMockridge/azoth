@@ -242,6 +242,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "hydraulics.reynolds_number" => azoth_hydraulics::results::ReynoldsNumberResult::FIELDS.to_vec(),
         "hydraulics.tray_hydraulics" => azoth_hydraulics::results::TrayHydraulicsResult::FIELDS.to_vec(),
         "process.absorption_column" => azoth_process::models::absorption_column::AbsorptionColumnResult::FIELDS.to_vec(),
+        "process.acoustic_induced_vibration_screening" => azoth_process::models::acoustic_induced_vibration_screening::AcousticInducedVibrationResult::FIELDS.to_vec(),
         "process.active_fire_protection_screening" => azoth_process::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult::FIELDS.to_vec(),
         "process.anti_surge_recycle" => azoth_process::models::anti_surge_recycle::AntiSurgeRecycleResult::FIELDS.to_vec(),
         "process.api14c_safe_chart" => azoth_process::models::api14c_safe_chart::Api14cSafeChartResult::FIELDS.to_vec(),

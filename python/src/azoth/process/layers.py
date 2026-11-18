@@ -1730,6 +1730,33 @@ def _mdmt(inputs: Mapping[str, Any]) -> dict[str, float]:
     return {"mdmt_c": solution.mdmt_k - 273.15, "mdmt_k": solution.mdmt_k}
 
 
+def _acoustic_induced_vibration_screening(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.acoustic_induced_vibration_screening`'s layers, from the reference's arithmetic.
+
+    The likelihood is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.acoustic_induced_vibration_screening import _evaluate
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["mass_flow"]), "kg/s"),
+        quantity(float(inputs["upstream_pressure"]), "Pa"),
+        quantity(float(inputs["downstream_pressure"]), "Pa"),
+        quantity(float(inputs["temperature"]), "K"),
+        quantity(float(inputs["molecular_weight"]), "kg/mol"),
+        quantity(float(inputs["outside_diameter"]), "m"),
+        quantity(float(inputs["wall_thickness"]), "m"),
+    )
+    return {
+        "pwl_db": solution.pwl,
+        "allowable_pwl_db": solution.allowable_pwl,
+        "margin_db": solution.margin,
+        "pressure_drop_ratio": solution.pressure_drop_ratio,
+        "d_over_t": solution.d_overt,
+    }
+
+
 def _piping_fiv_gas(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.piping_fiv_gas`'s layers, from the reference's arithmetic.
 
@@ -3699,6 +3726,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.pump_deadhead": _pump_deadhead,
     "process.runaway_reaction": _runaway_reaction,
     "process.mdmt": _mdmt,
+    "process.acoustic_induced_vibration_screening": _acoustic_induced_vibration_screening,
     "process.piping_fiv_gas": _piping_fiv_gas,
     "process.piping_fiv_liquid": _piping_fiv_liquid,
     "process.vacuum_collapse": _vacuum_collapse,
@@ -4789,6 +4817,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_mdmt.tsv",
         block=1,
         identified_by=("#label", "mdmt_curve_b_25"),
+    ),
+    # AIV's one: the low let-down. The other three states, the six band rows and the
+    # refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.acoustic_induced_vibration_screening",
+        case="aiv_low",
+        capture="process_acoustic_induced_vibration_screening.tsv",
+        block=0,
+        identified_by=("#label", "aiv_low"),
     ),
     # Gas-line FIV's one: the low state. The three band boundaries, the D/t and branch
     # factors, the two clamps and the refusals are declared in `UNCASED_ROWS`.
@@ -7652,6 +7689,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_vacuum_collapse.tsv": 7,
     # MDMT's nine: the seven further model cases and the unit aliases.
     "process_mdmt.tsv": 9,
+    # AIV's eighteen: the three further model states, the six band rows and the nine
+    # refusals.
+    "process_acoustic_induced_vibration_screening.tsv": 18,
     # Gas-line FIV's thirteen: the eight further model states and the five refusals.
     "process_piping_fiv_gas.tsv": 13,
     # Liquid-line FIV's nine: the five further model states and the four refusals.

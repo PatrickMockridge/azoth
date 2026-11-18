@@ -12,6 +12,7 @@
 use azoth_core::{CalcResult, Warning};
 
 use crate::models::absorption_column::AbsorptionColumnResult;
+use crate::models::acoustic_induced_vibration_screening::AcousticInducedVibrationResult;
 use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult;
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::api14c_safe_chart::Api14cSafeChartResult;
@@ -149,6 +150,23 @@ impl CalcResult for AbsorptionColumnResult {
         "reboiler_duty_kw",
         "condenser_duty_kw",
         "material_grade",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for AcousticInducedVibrationResult {
+    const CALC_ID: &'static str = "process.acoustic_induced_vibration_screening";
+    const FIELDS: &'static [&'static str] = &[
+        "pwl",
+        "allowable_pwl",
+        "margin",
+        "likelihood",
+        "pressure_drop_ratio",
+        "d_overt",
         "warnings",
     ];
 

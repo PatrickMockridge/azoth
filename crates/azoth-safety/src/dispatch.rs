@@ -24,6 +24,7 @@ use serde_json::{Map, Value, json};
 
 /// Every id this workspace can run natively.
 pub const NATIVE: &[&str] = &[
+    "process.acoustic_induced_vibration_screening",
     "process.active_fire_protection_screening",
     "process.bleve",
     "process.bow_tie",
@@ -68,6 +69,15 @@ pub fn is_native(id: &str) -> bool {
 #[must_use]
 pub fn required(id: &str) -> Option<&'static [&'static str]> {
     Some(match id {
+        "process.acoustic_induced_vibration_screening" => &[
+            "mass_flow",
+            "upstream_pressure",
+            "downstream_pressure",
+            "temperature",
+            "molecular_weight",
+            "outside_diameter",
+            "wall_thickness",
+        ],
         "process.active_fire_protection_screening" => &[
             "scenario",
             "blowdown_time_to_target",
@@ -242,6 +252,7 @@ fn arm(id: &str, inputs: &Value) -> Result<Outcome, Outcome> {
         "process.psv_sizing" => psv_sizing(inputs),
         "process.gas_blowby" => gas_blowby(inputs),
         "process.mdmt" => mdmt(inputs),
+        "process.acoustic_induced_vibration_screening" => acoustic_induced_vibration_screening(inputs),
         "process.piping_fiv_gas" => piping_fiv_gas(inputs),
         "process.piping_fiv_liquid" => piping_fiv_liquid(inputs),
         "process.pump_deadhead" => pump_deadhead(inputs),
@@ -1595,6 +1606,46 @@ fn mdmt(inputs: &Value) -> Result<Outcome, Outcome> {
                 let mut outputs = BTreeMap::new();
                 quantity(&mut outputs, "mdmt", result.mdmt.value, "K");
                 outputs.insert("acceptable".to_string(), json!(result.acceptable));
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn acoustic_induced_vibration_screening(inputs: &Value) -> Result<Outcome, Outcome> {
+    let mass_flow = number(inputs, "mass_flow")?;
+    let upstream_pressure = number(inputs, "upstream_pressure")?;
+    let downstream_pressure = number(inputs, "downstream_pressure")?;
+    let temperature = number(inputs, "temperature")?;
+    let molecular_weight = number(inputs, "molecular_weight")?;
+    let outside_diameter = number(inputs, "outside_diameter")?;
+    let wall_thickness = number(inputs, "wall_thickness")?;
+    Ok(
+        match azoth_process::acoustic_induced_vibration_screening(
+            kilograms_per_second(mass_flow),
+            pascals(upstream_pressure),
+            pascals(downstream_pressure),
+            kelvins(temperature),
+            kilograms_per_mole(molecular_weight),
+            meters(outside_diameter),
+            meters(wall_thickness),
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                scalar(&mut outputs, "pwl", result.pwl);
+                scalar(&mut outputs, "allowable_pwl", result.allowable_pwl);
+                scalar(&mut outputs, "margin", result.margin);
+                outputs.insert(
+                    "likelihood".to_string(),
+                    json!(result.likelihood.as_str()),
+                );
+                scalar(
+                    &mut outputs,
+                    "pressure_drop_ratio",
+                    result.pressure_drop_ratio,
+                );
+                scalar(&mut outputs, "d_overt", result.d_overt);
                 done(outputs, &result.warnings)
             }
             Err(error) => refused(error),

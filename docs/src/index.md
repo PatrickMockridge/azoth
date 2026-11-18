@@ -328,6 +328,7 @@ Five sections, and the difference between them is the point:
 *Models* — whose specs fix a procedure rather than an equation:
 
 - [`process.absorption_column`](./process/absorption_column.md) — Absorption column
+- [`process.acoustic_induced_vibration_screening`](./process/acoustic_induced_vibration_screening.md) — Acoustic-induced vibration screening
 - [`process.active_fire_protection_screening`](./process/active_fire_protection_screening.md) — Active fire protection screening
 - [`process.anti_surge_recycle`](./process/anti_surge_recycle.md) — Anti-surge recycle calculator
 - [`process.api14c_safe_chart`](./process/api14c_safe_chart.md) — API 14C SAFE chart

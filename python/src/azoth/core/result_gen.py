@@ -5636,6 +5636,34 @@ class AbsorptionColumnResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class AcousticInducedVibrationResult(_HasWarnings):
+    """Result of ``process.acoustic_induced_vibration_screening``."""
+
+    CALC_ID: ClassVar[str] = "process.acoustic_induced_vibration_screening"
+
+    #: the sound power level, in dB.
+    pwl: float
+
+    #: the design-line allowable sound power level, in dB.
+    allowable_pwl: float
+
+    #: `pwl - allowable_pwl`, in dB; positive is an exceedance.
+    margin: float
+
+    #: the AVIFF likelihood band from the margin.
+    likelihood: FivLikelihood
+
+    #: `(P1 - P2)/P1`.
+    pressure_drop_ratio: float
+
+    #: the outside-diameter-to-wall-thickness ratio.
+    d_overt: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ActiveFireProtectionScreeningResult(_HasWarnings):
     """Result of ``process.active_fire_protection_screening``."""
 

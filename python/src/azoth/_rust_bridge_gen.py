@@ -17,6 +17,7 @@ from azoth._registry_gen import spec as _spec_for
 from azoth.core.bridge_support import _association_spec, _count, _molar_masses, _si, _warnings
 from azoth.core.result import (
     AbsorptionColumnResult,
+    AcousticInducedVibrationResult,
     ActiveFireProtectionScreeningResult,
     ActivityCoefficientRow,
     AmmoniaPhaseResult,
@@ -474,6 +475,7 @@ from azoth.eos.reference.molar_enthalpy_entropy import IdealGasModel
 
 __all__ = [
     "absorption_column",
+    "acoustic_induced_vibration_screening",
     "active_fire_protection_screening",
     "ammonia_phase",
     "anti_surge_recycle",
@@ -5708,6 +5710,29 @@ def absorption_column(gas_components: list[str], gas_n: Q, gas_z: list[float], g
         reboiler_duty_kw=from_si(result.reboiler_duty_kw.magnitude_si, result.reboiler_duty_kw.unit),
         condenser_duty_kw=from_si(result.condenser_duty_kw.magnitude_si, result.condenser_duty_kw.unit),
         material_grade=result.material_grade,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def acoustic_induced_vibration_screening(mass_flow: Q, upstream_pressure: Q, downstream_pressure: Q, temperature: Q, molecular_weight: Q, outside_diameter: Q, wall_thickness: Q) -> AcousticInducedVibrationResult:
+    """``process.acoustic_induced_vibration_screening``, computed in Rust."""
+    spec = _models_gen.model("process.acoustic_induced_vibration_screening")
+    result = _core.acoustic_induced_vibration_screening(
+        input_to_si(spec, "mass_flow", mass_flow),
+        input_to_si(spec, "upstream_pressure", upstream_pressure),
+        input_to_si(spec, "downstream_pressure", downstream_pressure),
+        input_to_si(spec, "temperature", temperature),
+        input_to_si(spec, "molecular_weight", molecular_weight),
+        input_to_si(spec, "outside_diameter", outside_diameter),
+        input_to_si(spec, "wall_thickness", wall_thickness),
+    )
+    return AcousticInducedVibrationResult(
+        pwl=result.pwl,
+        allowable_pwl=result.allowable_pwl,
+        margin=result.margin,
+        likelihood=FivLikelihood(result.likelihood),
+        pressure_drop_ratio=result.pressure_drop_ratio,
+        d_overt=result.d_overt,
         warnings=_warnings(result.warnings),
     )
 

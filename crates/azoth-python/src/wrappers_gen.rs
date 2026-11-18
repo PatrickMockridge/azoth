@@ -5435,6 +5435,30 @@ pub fn reynolds_number(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Acoustic-induced vibration screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (mass_flow, upstream_pressure, downstream_pressure, temperature, molecular_weight, outside_diameter, wall_thickness))]
+#[pyo3(
+    text_signature = "(mass_flow, upstream_pressure, downstream_pressure, temperature, molecular_weight, outside_diameter, wall_thickness)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn acoustic_induced_vibration_screening(
+    py: Python<'_>,
+    mass_flow: f64,
+    upstream_pressure: f64,
+    downstream_pressure: f64,
+    temperature: f64,
+    molecular_weight: f64,
+    outside_diameter: f64,
+    wall_thickness: f64,
+) -> PyResult<crate::transport_gen::PyAcousticInducedVibrationResult> {
+    azoth_process::models::acoustic_induced_vibration_screening::acoustic_induced_vibration_screening(kilograms_per_second(mass_flow), pascals(upstream_pressure), pascals(downstream_pressure), kelvins(temperature), kilograms_per_mole(molecular_weight), meters(outside_diameter), meters(wall_thickness))
+        .map(|r| crate::transport_gen::PyAcousticInducedVibrationResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Active fire protection screening.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

@@ -20,6 +20,7 @@ from azoth import _core
 from azoth._dispatch import resolve
 from azoth.core.result import (
     AbsorptionColumnResult,
+    AcousticInducedVibrationResult,
     ActiveFireProtectionScreeningResult,
     AntiSurgeRecycleResult,
     Api14cSafeChartResult,
@@ -139,6 +140,7 @@ __all__ = [
     "Stream",
     "TearResult",
     "absorption_column",
+    "acoustic_induced_vibration_screening",
     "active_fire_protection_screening",
     "anti_surge_recycle",
     "api14c_safe_chart",
@@ -252,6 +254,7 @@ _COMPRESSOR = "process.compressor"
 _CONSEQUENCE_ANALYSIS = "process.consequence_analysis"
 _CONTROL_VALVE_FAILURE_RELIEF = "process.control_valve_failure_relief"
 _ABSORPTION_COLUMN = "process.absorption_column"
+_ACOUSTIC_INDUCED_VIBRATION_SCREENING = "process.acoustic_induced_vibration_screening"
 _ACTIVE_FIRE_PROTECTION_SCREENING = "process.active_fire_protection_screening"
 _STRIPPING_COLUMN = "process.stripping_column"
 _DISTILLATION_COLUMN = "process.distillation_column"
@@ -1803,6 +1806,33 @@ def mdmt(
         governing_thickness=governing_thickness,
         stress_ratio=stress_ratio,
         min_operating_temperature=min_operating_temperature,
+    )
+
+
+def acoustic_induced_vibration_screening(
+    mass_flow: Q,
+    upstream_pressure: Q,
+    downstream_pressure: Q,
+    temperature: Q,
+    molecular_weight: Q,
+    outside_diameter: Q,
+    wall_thickness: Q,
+) -> AcousticInducedVibrationResult:
+    """The sound power level downstream of a pressure-reducing device and its band.
+
+    The bands are exclusive upward, so -10 dB is medium, 0 high and +10 very high; the
+    downstream pressure must be strictly below the upstream one.
+
+    See :func:`azoth.process.reference.acoustic_induced_vibration_screening`.
+    """
+    return resolve(_ACOUSTIC_INDUCED_VIBRATION_SCREENING)(  # type: ignore[no-any-return]
+        mass_flow=mass_flow,
+        upstream_pressure=upstream_pressure,
+        downstream_pressure=downstream_pressure,
+        temperature=temperature,
+        molecular_weight=molecular_weight,
+        outside_diameter=outside_diameter,
+        wall_thickness=wall_thickness,
     )
 
 

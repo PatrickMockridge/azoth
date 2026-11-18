@@ -223,6 +223,7 @@
 //!   - specs/calcs/hydraulics/reynolds_number.toml
 //!   - specs/calcs/hydraulics/tray_hydraulics.toml
 //!   - specs/models/process/absorption_column.toml
+//!   - specs/models/process/acoustic_induced_vibration_screening.toml
 //!   - specs/models/process/active_fire_protection_screening.toml
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api14c_safe_chart.toml
@@ -2722,6 +2723,41 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.absorption_column",
         "max_operation_pressure",
         "pressure",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "mass_flow",
+        "mass_rate",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "upstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "downstream_pressure",
+        "pressure",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "molecular_weight",
+        "molar_mass",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "outside_diameter",
+        "length",
+    ),
+    (
+        "process.acoustic_induced_vibration_screening",
+        "wall_thickness",
+        "length",
     ),
     (
         "process.active_fire_protection_screening",

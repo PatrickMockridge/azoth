@@ -1,0 +1,112 @@
+id = "process.acoustic_induced_vibration_screening"
+name = "Acoustic-induced vibration screening"
+kind = "procedure"
+assumptions = [
+    "**the sound power level is `10 log10[(dP/P1)^3.6 W^2 (T/MW)^1.2] + 126.1`** in the class's imperial form, with W in lb/s, T in degrees Rankine and MW in g/mol.",
+    "**the mass flow and temperature are converted inside the correlation**; the id declares SI, and the molecular weight is declared kg/mol and multiplied by 1000 before the same expression.",
+    "**the allowable design-line PWL is `173.6 - 0.125 D/t`**, the Carucci and Mueller design line.",
+    "**the bands are exclusive upward**: below -10 dB low, below 0 dB medium, below 10 dB high, else very high.",
+    "**the downstream pressure must be in `[0, upstream)`**, as the class refuses equality and above; zero is a full let-down.",
+    "**the bands are AVIFF screening categories**; the class's recommendation text is presentation.",
+]
+references = [
+    "Carucci, V.A. and Mueller, R.T. (1982). Acoustically induced piping vibration in high-capacity compressors and control valves.",
+    "Energy Institute. Guidelines for the Avoidance of Vibration Induced Fatigue Failure in Process Pipework (AVIFF), 2nd edition.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/vibration/AcousticInducedVibrationScreening.java` is the port source.",
+    "`validation/neqsim/captures/process_acoustic_induced_vibration_screening.tsv` - three states, a zero downstream pressure and the band boundaries.",
+]
+[source]
+standard = "NeqSim process/safety/vibration/AcousticInducedVibrationScreening.java"
+edition = "Its `screen` and `bandFor`."
+[algorithm]
+scheme = "carucci_mueller_acoustic_vibration"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.mass_flow]
+unit = "kg/s"
+description = "the gas mass flow through the pressure-reducing device, above zero.\n"
+[inputs.upstream_pressure]
+unit = "Pa"
+description = "the upstream absolute pressure, above zero.\n"
+[inputs.downstream_pressure]
+unit = "Pa"
+description = "the downstream absolute pressure, at least zero and strictly below the upstream pressure.\n"
+[inputs.temperature]
+unit = "K"
+description = "the downstream temperature, above zero.\n"
+[inputs.molecular_weight]
+unit = "kg/mol"
+description = "the gas molar mass, above zero; the correlation's g/mol form is an internal conversion.\n"
+[inputs.outside_diameter]
+unit = "m"
+description = "the pipe outside diameter, above zero.\n"
+[inputs.wall_thickness]
+unit = "m"
+description = "the pipe wall thickness, above zero.\n"
+[outputs]
+[outputs.pwl]
+unit = "dimensionless"
+description = "the sound power level, in dB.\n"
+[outputs.allowable_pwl]
+unit = "dimensionless"
+description = "the design-line allowable sound power level, in dB.\n"
+[outputs.margin]
+unit = "dimensionless"
+description = "`pwl - allowable_pwl`, in dB; positive is an exceedance.\n"
+[outputs.likelihood]
+type = "enum"
+values = ["low", "medium", "high", "very_high"]
+description = "the AVIFF likelihood band from the margin.\n"
+[outputs.pressure_drop_ratio]
+unit = "dimensionless"
+description = "`(P1 - P2)/P1`.\n"
+[outputs.d_overt]
+unit = "dimensionless"
+description = "the outside-diameter-to-wall-thickness ratio.\n"
+[[valid_range]]
+quantity = "mass_flow"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive mass flow"
+[[valid_range]]
+quantity = "upstream_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive upstream pressure"
+[[valid_range]]
+quantity = "downstream_pressure"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative downstream pressure"
+[[valid_range]]
+quantity = "temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive temperature"
+[[valid_range]]
+quantity = "molecular_weight"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive molar mass"
+[[valid_range]]
+quantity = "outside_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive outside diameter"
+[[valid_range]]
+quantity = "wall_thickness"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive wall thickness"
+[implementations]
+python = "azoth.process.acoustic_induced_vibration_screening"
+rust = "azoth_process::acoustic_induced_vibration_screening"

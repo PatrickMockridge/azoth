@@ -3313,6 +3313,16 @@ class AbsorptionColumnResult:
     warnings: list[Warning]
 
 @final
+class AcousticInducedVibrationResult:
+    pwl: float
+    allowable_pwl: float
+    margin: float
+    likelihood: str
+    pressure_drop_ratio: float
+    d_overt: float
+    warnings: list[Warning]
+
+@final
 class ActiveFireProtectionScreeningResult:
     water_extinguishing: bool
     blowdown_faster_than_failure: bool
@@ -7402,6 +7412,15 @@ def absorption_column(
     material_grade: str | None = None,
     max_operation_pressure: float | None = None,
 ) -> AbsorptionColumnResult: ...
+def acoustic_induced_vibration_screening(
+    mass_flow: float,
+    upstream_pressure: float,
+    downstream_pressure: float,
+    temperature: float,
+    molecular_weight: float,
+    outside_diameter: float,
+    wall_thickness: float,
+) -> AcousticInducedVibrationResult: ...
 def active_fire_protection_screening(
     scenario: str,
     blowdown_time_to_target: float,

@@ -31,6 +31,7 @@
 //! per outlet and `products_z` a matrix with one row per outlet.
 
 pub mod absorption_column;
+pub mod acoustic_induced_vibration_screening;
 pub mod active_fire_protection_screening;
 pub mod anti_surge_recycle;
 pub mod api14c_safe_chart;
@@ -133,6 +134,9 @@ pub mod vce;
 pub mod vessel_rupture;
 
 pub use absorption_column::{AbsorptionColumnResult, absorption_column};
+pub use acoustic_induced_vibration_screening::{
+    AcousticInducedVibrationResult, acoustic_induced_vibration_screening,
+};
 pub use active_fire_protection_screening::{
     ActiveFireProtectionScreeningResult, active_fire_protection_screening,
 };

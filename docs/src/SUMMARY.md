@@ -236,6 +236,7 @@
   - [A tray's flooding, weeping, entrainment, pressure drop and efficiency](./hydraulics/tray_hydraulics.md)
 - [Unit operations](./process/index.md)
   - [Absorption column](./process/absorption_column.md)
+  - [Acoustic-induced vibration screening](./process/acoustic_induced_vibration_screening.md)
   - [Active fire protection screening](./process/active_fire_protection_screening.md)
   - [Anti-surge recycle calculator](./process/anti_surge_recycle.md)
   - [API 14C SAFE chart](./process/api14c_safe_chart.md)
