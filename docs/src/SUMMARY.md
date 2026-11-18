@@ -238,6 +238,7 @@
   - [Absorption column](./process/absorption_column.md)
   - [Acoustic-induced vibration screening](./process/acoustic_induced_vibration_screening.md)
   - [Active fire protection screening](./process/active_fire_protection_screening.md)
+  - [ALARP measure audit](./process/alarp_audit.md)
   - [Anti-surge recycle calculator](./process/anti_surge_recycle.md)
   - [API 14C SAFE chart](./process/api14c_safe_chart.md)
   - [API 537 flare flame model](./process/api537_flare_flame_model.md)

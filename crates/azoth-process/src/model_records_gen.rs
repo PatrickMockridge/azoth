@@ -14,6 +14,7 @@ use azoth_core::{CalcResult, Warning};
 use crate::models::absorption_column::AbsorptionColumnResult;
 use crate::models::acoustic_induced_vibration_screening::AcousticInducedVibrationResult;
 use crate::models::active_fire_protection_screening::ActiveFireProtectionScreeningResult;
+use crate::models::alarp_audit::AlarpAuditResult;
 use crate::models::anti_surge_recycle::AntiSurgeRecycleResult;
 use crate::models::api14c_safe_chart::Api14cSafeChartResult;
 use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
@@ -188,6 +189,16 @@ impl CalcResult for ActiveFireProtectionScreeningResult {
         "selective_protection_saving_fraction",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for AlarpAuditResult {
+    const CALC_ID: &'static str = "process.alarp_audit";
+    const FIELDS: &'static [&'static str] =
+        &["evaluations", "threshold", "measure_count", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

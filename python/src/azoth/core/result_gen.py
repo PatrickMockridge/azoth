@@ -23,6 +23,7 @@ from typing import ClassVar
 
 from azoth.core.record_outputs_gen import (
     ActivityCoefficientRow,
+    AlarpEvaluationResult,
     AppliedStandardRow,
     BrineMixingPointRow,
     CharacterizationComponent,
@@ -5683,6 +5684,25 @@ class ActiveFireProtectionScreeningResult(_HasWarnings):
 
     #: `1 - dedicated_object_demand / general_area_demand`.
     selective_protection_saving_fraction: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class AlarpAuditResult(_HasWarnings):
+    """Result of ``process.alarp_audit``."""
+
+    CALC_ID: ClassVar[str] = "process.alarp_audit"
+
+    #: one row per measure, in caller order.
+    evaluations: tuple[AlarpEvaluationResult, ...]
+
+    #: `value_of_statistical_life * disproportion_factor`, in NOK.
+    threshold: float
+
+    #: the number of evaluated measures.
+    measure_count: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

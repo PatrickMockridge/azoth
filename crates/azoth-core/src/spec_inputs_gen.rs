@@ -225,6 +225,7 @@
 //!   - specs/models/process/absorption_column.toml
 //!   - specs/models/process/acoustic_induced_vibration_screening.toml
 //!   - specs/models/process/active_fire_protection_screening.toml
+//!   - specs/models/process/alarp_audit.toml
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api14c_safe_chart.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
@@ -2782,6 +2783,16 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.active_fire_protection_screening",
         "general_area_demand",
         "volume_rate",
+    ),
+    (
+        "process.alarp_audit",
+        "value_of_statistical_life",
+        "dimensionless",
+    ),
+    (
+        "process.alarp_audit",
+        "disproportion_factor",
+        "dimensionless",
     ),
     ("process.anti_surge_recycle", "feed_n", "molar_flow"),
     ("process.anti_surge_recycle", "feed_z", "dimensionless"),

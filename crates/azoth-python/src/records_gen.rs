@@ -11,6 +11,17 @@ use pyo3::prelude::*;
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct AlarpMeasure {
+    #[pyo3(item)]
+    pub description: String,
+    #[pyo3(item)]
+    pub risk_reduction_per_year: f64,
+    #[pyo3(item)]
+    pub annualised_cost: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct AssayCut {
     #[pyo3(item)]
     pub declared_fraction: f64,

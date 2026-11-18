@@ -5486,6 +5486,35 @@ pub fn active_fire_protection_screening(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// ALARP measure audit.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (measures, value_of_statistical_life, disproportion_factor))]
+#[pyo3(text_signature = "(measures, value_of_statistical_life, disproportion_factor)")]
+pub fn alarp_audit(
+    py: Python<'_>,
+    measures: Vec<crate::records_gen::AlarpMeasure>,
+    value_of_statistical_life: Option<f64>,
+    disproportion_factor: Option<f64>,
+) -> PyResult<crate::transport_gen::PyAlarpAuditResult> {
+    let measures_records: Vec<azoth_process::models::alarp_audit::AlarpMeasure> = measures
+        .into_iter()
+        .map(|row| azoth_process::models::alarp_audit::AlarpMeasure {
+            description: row.description,
+            risk_reduction_per_year: row.risk_reduction_per_year,
+            annualised_cost: row.annualised_cost,
+        })
+        .collect();
+    azoth_process::models::alarp_audit::alarp_audit(
+        &measures_records,
+        value_of_statistical_life,
+        disproportion_factor,
+    )
+    .map(|r| crate::transport_gen::PyAlarpAuditResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Anti-surge recycle calculator.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

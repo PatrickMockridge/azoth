@@ -4,6 +4,7 @@
 //!   - specs/models/process/absorption_column.toml
 //!   - specs/models/process/acoustic_induced_vibration_screening.toml
 //!   - specs/models/process/active_fire_protection_screening.toml
+//!   - specs/models/process/alarp_audit.toml
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api14c_safe_chart.toml
 //!   - specs/models/process/api537_flare_flame_model.toml
@@ -918,6 +919,245 @@ pub static ACTIVE_FIRE_PROTECTION_SCREENING_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&ACTIVE_FIRE_PROTECTION_SCREENING_ALGORITHM),
     checks: ACTIVE_FIRE_PROTECTION_SCREENING_CHECKS,
     cases: ACTIVE_FIRE_PROTECTION_SCREENING_CASES,
+};
+
+static ALARP_AUDIT_CHECKS: &[SpecCheck] = &[];
+
+static ALARP_AUDIT_CASES: &[TestCase] = &[
+    TestCase {
+        id: "implement",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("threshold", 90000000.0), ("measure_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "measures",
+            &[&[
+                RecordField {
+                    name: "description",
+                    value: FieldValue::Name("vent"),
+                },
+                RecordField {
+                    name: "risk_reduction_per_year",
+                    value: FieldValue::Number(0.001),
+                },
+                RecordField {
+                    name: "annualised_cost",
+                    value: FieldValue::Number(10000.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "reject",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("threshold", 90000000.0), ("measure_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "measures",
+            &[&[
+                RecordField {
+                    name: "description",
+                    value: FieldValue::Name("vent"),
+                },
+                RecordField {
+                    name: "risk_reduction_per_year",
+                    value: FieldValue::Number(0.001),
+                },
+                RecordField {
+                    name: "annualised_cost",
+                    value: FieldValue::Number(1000000.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "threshold_equal",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("threshold", 90000000.0), ("measure_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "measures",
+            &[&[
+                RecordField {
+                    name: "description",
+                    value: FieldValue::Name("vent"),
+                },
+                RecordField {
+                    name: "risk_reduction_per_year",
+                    value: FieldValue::Number(0.001),
+                },
+                RecordField {
+                    name: "annualised_cost",
+                    value: FieldValue::Number(90000.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "zero_risk",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("threshold", 90000000.0), ("measure_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "measures",
+            &[&[
+                RecordField {
+                    name: "description",
+                    value: FieldValue::Name("vent"),
+                },
+                RecordField {
+                    name: "risk_reduction_per_year",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annualised_cost",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "zero_cost",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("threshold", 90000000.0), ("measure_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "measures",
+            &[&[
+                RecordField {
+                    name: "description",
+                    value: FieldValue::Name("vent"),
+                },
+                RecordField {
+                    name: "risk_reduction_per_year",
+                    value: FieldValue::Number(0.001),
+                },
+                RecordField {
+                    name: "annualised_cost",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "custom",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("value_of_statistical_life", 10000000.0),
+            ("disproportion_factor", 2.0),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("threshold", 20000000.0), ("measure_count", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "measures",
+            &[&[
+                RecordField {
+                    name: "description",
+                    value: FieldValue::Name("vent"),
+                },
+                RecordField {
+                    name: "risk_reduction_per_year",
+                    value: FieldValue::Number(0.001),
+                },
+                RecordField {
+                    name: "annualised_cost",
+                    value: FieldValue::Number(20000.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+];
+
+static ALARP_AUDIT_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "alarp_icaf_audit",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.alarp_audit`.
+pub static ALARP_AUDIT_SPEC: ModelSpec = ModelSpec {
+    id: "process.alarp_audit",
+    kind: "procedure",
+    algorithm: Some(&ALARP_AUDIT_ALGORITHM),
+    checks: ALARP_AUDIT_CHECKS,
+    cases: ALARP_AUDIT_CASES,
 };
 
 static ANTI_SURGE_RECYCLE_CHECKS: &[SpecCheck] = &[
@@ -87229,6 +87469,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &ABSORPTION_COLUMN_SPEC,
     &ACOUSTIC_INDUCED_VIBRATION_SCREENING_SPEC,
     &ACTIVE_FIRE_PROTECTION_SCREENING_SPEC,
+    &ALARP_AUDIT_SPEC,
     &ANTI_SURGE_RECYCLE_SPEC,
     &API14C_SAFE_CHART_SPEC,
     &API537_FLARE_FLAME_MODEL_SPEC,

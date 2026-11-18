@@ -1,0 +1,71 @@
+id = "process.alarp_audit"
+name = "ALARP measure audit"
+kind = "procedure"
+assumptions = [
+    "**the threshold is `VSL x disproportion_factor`**, the class's gross-disproportion-adjusted value of a statistical life.",
+    "**each measure's ICAF is `annualised_cost / risk_reduction`**, and a measure is implemented at or below the threshold.",
+    "**a measure with no risk reduction has an infinite ICAF** and is rejected; the infinite value is published as an absent one rather than as a non-finite number.",
+    "**the amounts are in NOK and declared dimensionless**, because the unit vocabulary has no currency; the default VSL is 30 million and the default disproportion factor 3.",
+    "**the class validates neither the VSL nor the disproportion factor**, so a finite value of either sign is mirrored; a negative risk reduction or cost is refused, as the class throws.",
+    "**the class's verdict strings and its report are presentation**; the rows carry the description, the ICAF and the verdict.",
+]
+references = [
+    "UK HSE R2P2. Reducing risks, protecting people (2001).",
+    "NORSOK Z-013. Risk and emergency preparedness assessment.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/alarp/ALARPAuditReport.java` (`evaluate`) is the port source.",
+    "`validation/neqsim/captures/process_alarp_audit.tsv` - an implemented and a rejected measure, the exact threshold, zero risk, zero cost, a custom VSL and the empty audit.",
+]
+[source]
+standard = "NeqSim process/safety/alarp/ALARPAuditReport.java"
+edition = "Its `setValueOfStatisticalLife`, `setDisproportionFactor`, `addMeasure` and `evaluate`."
+[algorithm]
+scheme = "alarp_icaf_audit"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.measures]
+type = "record_list"
+row_type = "AlarpMeasure"
+description = "the candidate risk-reduction measures, in caller order.\n"
+[inputs.measures.fields.description]
+type = "string"
+description = "the measure's description.\n"
+[inputs.measures.fields.risk_reduction_per_year]
+unit = "dimensionless"
+description = "the averted fatality frequency per year, in `1/year`, non-negative.\n"
+[inputs.measures.fields.annualised_cost]
+unit = "dimensionless"
+description = "the annualised implementation cost, in NOK/year, non-negative.\n"
+[inputs.value_of_statistical_life]
+unit = "dimensionless"
+optional = true
+description = "the value of a statistical life, in NOK. **Absent is 30 million.**\n"
+[inputs.disproportion_factor]
+unit = "dimensionless"
+optional = true
+description = "the gross-disproportion multiplier. **Absent is 3.**\n"
+[outputs]
+[outputs.evaluations]
+type = "record_list"
+description = "one row per measure, in caller order.\n"
+[outputs.evaluations.fields.description]
+type = "string"
+description = "the measure's description.\n"
+[outputs.evaluations.fields.icaf]
+unit = "dimensionless"
+optional = true
+description = "the implied cost of averting a fatality, in NOK; absent where the class answers infinity.\n"
+[outputs.evaluations.fields.verdict]
+type = "enum"
+values = ["implement", "reject"]
+description = "the ALARP verdict.\n"
+[outputs.threshold]
+unit = "dimensionless"
+description = "`value_of_statistical_life * disproportion_factor`, in NOK.\n"
+[outputs.measure_count]
+unit = "dimensionless"
+description = "the number of evaluated measures.\n"
+[implementations]
+python = "azoth.process.alarp_audit"
+rust = "azoth_process::alarp_audit"

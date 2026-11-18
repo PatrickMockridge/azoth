@@ -16,6 +16,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.absorption_column`](./absorption_column.md) | `direct composition` | NeqSim process/equipment/absorber/AbsorptionColumn.java |
 | [`process.acoustic_induced_vibration_screening`](./acoustic_induced_vibration_screening.md) | `carucci_mueller_acoustic_vibration` | NeqSim process/safety/vibration/AcousticInducedVibrationScreening.java |
 | [`process.active_fire_protection_screening`](./active_fire_protection_screening.md) | `closed_form_active_fire_protection_screening` | NeqSim process/safety/firewater/ActiveFireProtectionScreening.java |
+| [`process.alarp_audit`](./alarp_audit.md) | `alarp_icaf_audit` | NeqSim process/safety/alarp/ALARPAuditReport.java |
 | [`process.anti_surge_recycle`](./anti_surge_recycle.md) | `damped_fixed_point_recycle` | NeqSim process/equipment/compressor/AntiSurgeRecycleCalculator.java |
 | [`process.api14c_safe_chart`](./api14c_safe_chart.md) | `api14c_safe_chart` | NeqSim process/safety/api14c/Api14cSafeChartBuilder.java |
 | [`process.api537_flare_flame_model`](./api537_flare_flame_model.md) | `closed_form_flare_flame_and_radiation` | NeqSim process/safety/fire/Api537FlareFlameModel.java |

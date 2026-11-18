@@ -390,6 +390,13 @@ class WaterAnalysis(TypedDict):
     pressure: float
     co2_partial_pressure: float
 
+class AlarpMeasure(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    description: str
+    risk_reduction_per_year: float
+    annualised_cost: float
+
 class CompressorCurvePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1010,6 +1017,14 @@ class WaterMixingResult:
     si_srso4: float | None
     si_caso4: float | None
     si_feco3: float | None
+
+@final
+class AlarpEvaluationResult:
+    """one row per measure, in caller order."""
+
+    description: str
+    icaf: float | None
+    verdict: str
 
 @final
 class SafeChartItem:
@@ -3388,6 +3403,13 @@ class ActiveFireProtectionScreeningResult:
     blowdown_faster_than_failure: bool
     blowdown_margin: Qty
     selective_protection_saving_fraction: float
+    warnings: list[Warning]
+
+@final
+class AlarpAuditResult:
+    evaluations: list[AlarpEvaluationResult]
+    threshold: float
+    measure_count: float
     warnings: list[Warning]
 
 @final
@@ -7523,6 +7545,11 @@ def active_fire_protection_screening(
     dedicated_object_demand: float,
     general_area_demand: float,
 ) -> ActiveFireProtectionScreeningResult: ...
+def alarp_audit(
+    measures: list[AlarpMeasure],
+    value_of_statistical_life: float | None = None,
+    disproportion_factor: float | None = None,
+) -> AlarpAuditResult: ...
 def anti_surge_recycle(
     components: list[str],
     feed_n: float,

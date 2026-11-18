@@ -4,6 +4,7 @@
 //!   - specs/models/process/absorption_column.toml
 //!   - specs/models/process/acoustic_induced_vibration_screening.toml
 //!   - specs/models/process/active_fire_protection_screening.toml
+//!   - specs/models/process/alarp_audit.toml
 //!   - specs/models/process/anti_surge_recycle.toml
 //!   - specs/models/process/api14c_safe_chart.toml
 //!   - specs/models/process/api537_flare_flame_model.toml

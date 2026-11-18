@@ -33,6 +33,7 @@
 pub mod absorption_column;
 pub mod acoustic_induced_vibration_screening;
 pub mod active_fire_protection_screening;
+pub mod alarp_audit;
 pub mod anti_surge_recycle;
 pub mod api14c_safe_chart;
 pub mod api537_flare_flame_model;
@@ -143,6 +144,9 @@ pub use acoustic_induced_vibration_screening::{
 };
 pub use active_fire_protection_screening::{
     ActiveFireProtectionScreeningResult, active_fire_protection_screening,
+};
+pub use alarp_audit::{
+    AlarpAuditResult, AlarpEvaluationResult, AlarpMeasure, AlarpVerdict, alarp_audit,
 };
 pub use anti_surge_recycle::{AntiSurgeRecycleResult, anti_surge_recycle};
 pub use api14c_safe_chart::{

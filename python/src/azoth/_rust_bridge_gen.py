@@ -20,6 +20,8 @@ from azoth.core.result import (
     AcousticInducedVibrationResult,
     ActiveFireProtectionScreeningResult,
     ActivityCoefficientRow,
+    AlarpAuditResult,
+    AlarpEvaluationResult,
     AmmoniaPhaseResult,
     AntiSurgeRecycleResult,
     AntoineVaporPressureResult,
@@ -484,6 +486,7 @@ __all__ = [
     "absorption_column",
     "acoustic_induced_vibration_screening",
     "active_fire_protection_screening",
+    "alarp_audit",
     "ammonia_phase",
     "anti_surge_recycle",
     "antoine_vapor_pressure",
@@ -5763,6 +5766,22 @@ def active_fire_protection_screening(scenario: str, blowdown_time_to_target: Q, 
         blowdown_faster_than_failure=result.blowdown_faster_than_failure,
         blowdown_margin=from_si(result.blowdown_margin.magnitude_si, result.blowdown_margin.unit),
         selective_protection_saving_fraction=result.selective_protection_saving_fraction,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def alarp_audit(measures: list[dict[str, object]], value_of_statistical_life: float | None=None, disproportion_factor: float | None=None) -> AlarpAuditResult:
+    """``process.alarp_audit``, computed in Rust."""
+    spec = _models_gen.model("process.alarp_audit")
+    result = _core.alarp_audit(
+        input_records_to_si(spec, "measures", measures),
+        None if value_of_statistical_life is None else value_of_statistical_life,
+        None if disproportion_factor is None else disproportion_factor,
+    )
+    return AlarpAuditResult(
+        evaluations=tuple(AlarpEvaluationResult(description=c.description, icaf=c.icaf, verdict=c.verdict) for c in result.evaluations),
+        threshold=result.threshold,
+        measure_count=result.measure_count,
         warnings=_warnings(result.warnings),
     )
 

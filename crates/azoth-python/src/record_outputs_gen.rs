@@ -46,6 +46,46 @@ impl From<&azoth_eos::results::ActivityCoefficientRow> for PyActivityCoefficient
     }
 }
 
+/// one row per measure, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "AlarpEvaluationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyAlarpEvaluationResult {
+    /// the measure's description.
+    #[pyo3(get)]
+    pub description: String,
+    /// the implied cost of averting a fatality, in NOK; absent where the class answers infinity.
+    #[pyo3(get)]
+    pub icaf: Option<f64>,
+    /// the ALARP verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+}
+
+#[pymethods]
+impl PyAlarpEvaluationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "AlarpEvaluationResult(description={}, icaf={:?}, verdict={})",
+            self.description, self.icaf, self.verdict
+        )
+    }
+}
+
+impl From<&azoth_process::models::alarp_audit::AlarpEvaluationResult> for PyAlarpEvaluationResult {
+    fn from(row: &azoth_process::models::alarp_audit::AlarpEvaluationResult) -> Self {
+        Self {
+            description: row.description.clone(),
+            icaf: row.icaf,
+            verdict: row.verdict.as_str().to_string(),
+        }
+    }
+}
+
 /// The standards the design pipeline applied.
 #[pyclass(
     frozen,

@@ -54,7 +54,7 @@ pub use recycle::{Acceleration, RecycleSettings, Residuals};
 // cross-impl test and a NeqSim capture can address it.
 pub use models::{
     AbsorptionColumnResult, AcousticInducedVibrationResult, ActiveFireProtectionScreeningResult,
-    AntiSurgeRecycleResult, Api14cSafeChartResult, Api537FlareFlameModelResult,
+    AlarpAuditResult, AntiSurgeRecycleResult, Api14cSafeChartResult, Api537FlareFlameModelResult,
     BarrierRegisterValidationResult, BasketTestRegressionResult, BleveResult,
     BlockedOutletReliefResult, BlowdownPressureProfileResult, BowTieResult,
     CheckValveLeakReliefResult, ComponentSplitterResult, CompressorResult,
@@ -82,7 +82,7 @@ pub use models::{
     ThreePhaseSeparatorResult, ThrottlingValveResult, ToxicLibraryResult, Tr3001ComplianceResult,
     TubeRuptureReliefResult, TurboExpanderResult, VacuumCollapseResult, VceResult,
     VesselRuptureResult, absorption_column, acoustic_induced_vibration_screening,
-    active_fire_protection_screening, anti_surge_recycle, api14c_safe_chart,
+    active_fire_protection_screening, alarp_audit, anti_surge_recycle, api14c_safe_chart,
     api537_flare_flame_model, barrier_register_validation, basket_test_regression, bleve,
     blocked_outlet_relief, blowdown_pressure_profile, bow_tie, check_valve_leak_relief,
     component_splitter, compressor, consequence_analysis, control_valve_failure_relief, cooler,

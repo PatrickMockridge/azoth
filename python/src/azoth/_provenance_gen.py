@@ -2479,6 +2479,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'process.alarp_audit': {
+        "calc_id": 'process.alarp_audit',
+        "name": 'ALARP measure audit',
+        "spec": {'path': 'specs/models/process/alarp_audit.toml', 'sha256': 'cda53cf5912d2f72bc102c41fd76405f374f75ba4cd5eb2511d125232491444e'},
+        "code": [{'path': 'python/src/azoth/process/reference/alarp_audit.py', 'sha256': '18cbfca8e685aee9dc880abe7d4986b2ad568d5ad527f95f2f5f5714b189e9f6'}, {'path': 'crates/azoth-process/src/models/alarp_audit.rs', 'sha256': '7fd5dff1905dfbcf491fdba1a95ba8551147263b871ebc595cb3cdc93875b3f1'}],
+        "source": 'NeqSim process/safety/alarp/ALARPAuditReport.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'process.anti_surge_recycle': {
         "calc_id": 'process.anti_surge_recycle',
         "name": 'Anti-surge recycle calculator',

@@ -24,6 +24,20 @@ class ActivityCoefficientRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class AlarpEvaluationResult:
+    """one row per measure, in caller order."""
+
+    #: the measure's description.
+    description: str
+
+    #: the implied cost of averting a fatality, in NOK; absent where the class answers infinity.
+    icaf: float | None
+
+    #: the ALARP verdict.
+    verdict: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class AppliedStandardRow:
     """The standards the design pipeline applied."""
 

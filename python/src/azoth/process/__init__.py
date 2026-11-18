@@ -22,6 +22,7 @@ from azoth.core.result import (
     AbsorptionColumnResult,
     AcousticInducedVibrationResult,
     ActiveFireProtectionScreeningResult,
+    AlarpAuditResult,
     AntiSurgeRecycleResult,
     Api14cSafeChartResult,
     Api537FlareFlameModelResult,
@@ -146,6 +147,7 @@ __all__ = [
     "absorption_column",
     "acoustic_induced_vibration_screening",
     "active_fire_protection_screening",
+    "alarp_audit",
     "anti_surge_recycle",
     "api14c_safe_chart",
     "api537_flare_flame_model",
@@ -276,6 +278,7 @@ _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
+_ALARP_AUDIT = "process.alarp_audit"
 _INHERENT_SAFETY = "process.inherent_safety"
 _NORSOK_P002_COMPLIANCE = "process.norsok_p002_compliance"
 _STS0131_GATE = "process.sts0131_gate"
@@ -1933,6 +1936,26 @@ def inherent_safety(
         minimize_score=minimize_score,
         moderate_score=moderate_score,
         simplify_score=simplify_score,
+    )
+
+
+def alarp_audit(
+    measures: list[dict[str, object]],
+    value_of_statistical_life: float | None = None,
+    disproportion_factor: float | None = None,
+) -> AlarpAuditResult:
+    """Each measure's ICAF and its ALARP verdict.
+
+    A measure is implemented at or below ``VSL x disproportion_factor``; a zero-risk measure
+    has an infinite ICAF, published absent. The amounts are in NOK and declared
+    dimensionless.
+
+    See :func:`azoth.process.reference.alarp_audit`.
+    """
+    return resolve(_ALARP_AUDIT)(  # type: ignore[no-any-return]
+        measures=measures,
+        value_of_statistical_life=value_of_statistical_life,
+        disproportion_factor=disproportion_factor,
     )
 
 

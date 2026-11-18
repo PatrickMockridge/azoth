@@ -14,7 +14,7 @@
 //! on any difference.
 
 use crate::record_outputs_gen::{
-    PyActivityCoefficientRow, PyAppliedStandardRow, PyBrineMixingPointRow,
+    PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
     PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEventTreeOutcome,
     PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
@@ -14116,6 +14116,56 @@ impl From<&azoth_process::models::active_fire_protection_screening::ActiveFirePr
             blowdown_faster_than_failure: r.blowdown_faster_than_failure,
             blowdown_margin: PyQty { magnitude_si: r.blowdown_margin.value, unit: "s".to_string() },
             selective_protection_saving_fraction: r.selective_protection_saving_fraction,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.alarp_audit`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "AlarpAuditResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyAlarpAuditResult {
+    /// one row per measure, in caller order.
+    #[pyo3(get)]
+    pub evaluations: Vec<PyAlarpEvaluationResult>,
+    /// `value_of_statistical_life * disproportion_factor`, in NOK.
+    #[pyo3(get)]
+    pub threshold: f64,
+    /// the number of evaluated measures.
+    #[pyo3(get)]
+    pub measure_count: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyAlarpAuditResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "AlarpAuditResult(evaluations={:?}, threshold={:?}, measure_count={:?}, {} warning(s))",
+            self.evaluations,
+            self.threshold,
+            self.measure_count,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::alarp_audit::AlarpAuditResult> for PyAlarpAuditResult {
+    fn from(r: &azoth_process::models::alarp_audit::AlarpAuditResult) -> Self {
+        Self {
+            evaluations: r
+                .evaluations
+                .iter()
+                .map(PyAlarpEvaluationResult::from)
+                .collect(),
+            threshold: r.threshold,
+            measure_count: r.measure_count,
             warnings: transport(&r.warnings),
         }
     }
