@@ -1792,6 +1792,35 @@ def _alarp_audit(inputs: Mapping[str, Any]) -> dict[str, float]:
     return {"measure_count": float(len(evaluations))}
 
 
+def _psv_valve(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.psv_valve`'s layers, from the reference's arithmetic.
+
+    The open state is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.psv_valve import _evaluate
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["set_pressure"]), "Pa"),
+        float(inputs["blowdown_fraction"]),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["orifice_area"]), "m**2"),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["upstream_pressure"]), "Pa"),
+        quantity(float(inputs["upstream_temperature"]), "K"),
+        quantity(float(inputs["molar_mass"]), "kg/mol"),
+        float(inputs["heat_capacity_ratio"]),
+        float(inputs["compressibility"]),
+        None if inputs.get("was_open") is None else bool(inputs["was_open"]),
+        (None if inputs.get("prior_cycle_count") is None else float(inputs["prior_cycle_count"])),
+    )
+    return {
+        "cycle_count": solution.cycle_count,
+        "mass_flow_kg_s": solution.mass_flow_kg_s,
+    }
+
+
 def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.inherent_safety`'s layers, from the reference's arithmetic."""
     from azoth.process.reference.inherent_safety import _evaluate
@@ -3872,6 +3901,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.alarp_audit": _alarp_audit,
     "process.escalation_graph": _escalation_graph,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
+    "process.psv_valve": _psv_valve,
     "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.sts0131_gate": _sts0131_gate,
@@ -4992,6 +5022,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_inherent_safety.tsv",
         block=0,
         identified_by=("#label", "inherent_mixed"),
+    ),
+    # The valve's one: the pop at the set pressure. The six further states and the ten
+    # refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.psv_valve",
+        case="pops_at_set",
+        capture="process_psv_valve.tsv",
+        block=1,
+        identified_by=("#label", "valve_pops_at_set"),
     ),
     # STS-0131's one: the PSV margin at equality. The five further cases, the seven
     # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
@@ -7905,6 +7944,7 @@ UNCASED_ROWS: dict[str, int] = {
     "process_sts0131_gate.tsv": 14,
     # Inherent safety's four: the zero and boundary states and the two refusals.
     "process_inherent_safety.tsv": 4,
+    "process_psv_valve.tsv": 16,
     # ALARP's eight: the five further states, the empty audit and the two refusals.
     "process_alarp_audit.tsv": 8,
     # Escalation's eight: the six further states and the two refusals.

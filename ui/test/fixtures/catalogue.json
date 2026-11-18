@@ -28056,6 +28056,341 @@
       "sub_interface": "overpressure"
     },
     {
+      "family": "depressurization",
+      "form": {
+        "assumptions": [
+          "**one step of the class's `update` then `massFlowKgPerS`**, in that order. The valve's open state and pop count are the step's inputs, so a session loop is the caller's.",
+          "**the latch**: the valve opens when closed and the upstream pressure reaches the set pressure, increments the pop count only on the closed-to-open transition, and closes only at or below the reseat pressure `set (1 - blowdown)`.",
+          "**the flow** is the API 520 compressible-orifice relation with `R = 8.314`, choked at `(2/(gamma+1))^(gamma/(gamma-1))` and subcritical above it; the subcritical radicand is floored at 0 and a negative or NaN rate is published as 0.",
+          "**a closed valve passes no flow**, whatever the upstream state.",
+          "**the constructor's guards are mirrored**: a negative back pressure, a set pressure at or below the back pressure, a blowdown fraction outside `(0, 1)`, a non-positive discharge coefficient or a non-positive orifice area is refused. The mass-flow guards refuse a non-positive pressure or temperature, molar mass or compressibility, and a heat-capacity ratio at or below one.",
+          "**`reset()` is the state inputs**: `was_open = false` with `prior_cycle_count = 0`.",
+          "**a negative or fractional `prior_cycle_count` is refused**, which the class cannot hold: its counter is a whole number, and a fractional one is not a state this step can continue from."
+        ],
+        "available": true,
+        "equation": null,
+        "id": "process.psv_valve",
+        "inputs": [
+          {
+            "default": null,
+            "description": "the set (pop) pressure, absolute. Must exceed the back pressure.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "set_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive set pressure through the set > back guard",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the blowdown fraction in `(0, 1)` exclusive; the reseat pressure is `set_pressure (1 - blowdown_fraction)`.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "blowdown_fraction",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": 1.0,
+                "max_inclusive": false,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a blowdown fraction outside (0, 1)",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the orifice discharge coefficient, typically 0.85 to 0.975. Must be positive.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "discharge_coefficient",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive discharge coefficient",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the effective orifice flow area. Must be positive.\n",
+            "dimension": "area",
+            "kind": "quantity",
+            "name": "orifice_area",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive orifice area",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "m**2",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the downstream back pressure, absolute. Must be non-negative and below the set pressure.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "back_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "the class refuses a negative back pressure",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the upstream pressure at this step, absolute. Must be positive.\n",
+            "dimension": "pressure",
+            "kind": "quantity",
+            "name": "upstream_pressure",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive upstream pressure",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "Pa",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the upstream temperature at this step. Must be positive.\n",
+            "dimension": "thermodynamic_temperature",
+            "kind": "quantity",
+            "name": "upstream_temperature",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive upstream temperature",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "K",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the relieving fluid's molar mass. Must be positive.\n",
+            "dimension": "molar_mass",
+            "kind": "quantity",
+            "name": "molar_mass",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive molar mass",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "kg/mol",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the isentropic exponent `Cp/Cv`. Must be greater than one.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "heat_capacity_ratio",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 1.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a heat-capacity ratio at or below one",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the compressibility factor `Z`. Must be positive.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "compressibility",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": false,
+                "rationale": "the class refuses a non-positive compressibility",
+                "severity": "error"
+              }
+            ],
+            "required": true,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the valve's open state before this step. **Absent is false.**\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "was_open",
+            "range": [],
+            "required": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "default": null,
+            "description": "the pop count before this step, a whole number at least 0. **Absent is 0.**\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "prior_cycle_count",
+            "range": [
+              {
+                "band": "outside",
+                "code": "OUT_OF_VALID_RANGE",
+                "equals": null,
+                "max": null,
+                "max_inclusive": true,
+                "min": 0.0,
+                "min_inclusive": true,
+                "rationale": "a counter cannot be negative",
+                "severity": "error"
+              }
+            ],
+            "required": false,
+            "unit": "dimensionless",
+            "values": []
+          }
+        ],
+        "name": "PSV latch and relief flow",
+        "namespace": "process",
+        "outputs": [
+          {
+            "description": "the valve's open state after the update.\n",
+            "dimension": null,
+            "kind": "boolean",
+            "name": "open",
+            "optional": false,
+            "unit": null,
+            "values": []
+          },
+          {
+            "description": "the pop count after the update.\n",
+            "dimension": "dimensionless",
+            "kind": "quantity",
+            "name": "cycle_count",
+            "optional": false,
+            "unit": "dimensionless",
+            "values": []
+          },
+          {
+            "description": "the relieving mass flow at the upstream state; zero when the valve is closed.\n",
+            "dimension": "mass_rate",
+            "kind": "quantity",
+            "name": "mass_flow",
+            "optional": false,
+            "unit": "kg/s",
+            "values": []
+          }
+        ],
+        "provenance": {
+          "python_sha256": "bcf27899d5dc1e52b07d3da9490256aef0492ae6e758d667804ca131756accef",
+          "rust_sha256": "439a9d051a1de69d30339f1605a044381bb7411918d75cc040c0b9815541edb2",
+          "spec_sha256": "958334b3515880666b5cd880349436f07b2b4383a2e0392353ad724b73636333",
+          "tests_active": 6,
+          "tests_skipped": 0,
+          "validation_cases": 0,
+          "verification": "partially_verified"
+        },
+        "references": [
+          "API STD 520 Part I. Sizing, Selection, and Installation of Pressure-relieving Devices in Refineries."
+        ],
+        "refusal": null,
+        "summary": "One step of a pressure-safety-valve latch: whether it opens or reseats, its pop count and the API 520 relieving flow.",
+        "worked_example": {}
+      },
+      "id": "process.psv_valve",
+      "name": "PSV latch and relief flow",
+      "native": true,
+      "purpose": "One step of a pressure-safety-valve latch: whether it opens or reseats, its pop count and the API 520 relieving flow.",
+      "refusal": null,
+      "sub_interface": "depressurization"
+    },
+    {
       "family": "equipmentsafety",
       "form": {
         "assumptions": [

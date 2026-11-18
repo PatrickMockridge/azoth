@@ -96,7 +96,7 @@ pub use models::{
     overpressure_acceptance, overpressure_protection_study, packed_column, pfp_demand, pipe,
     pipe_fire_rupture, pipe_fire_rupture_material, pipeline_pressure_protection, piping_fiv_gas,
     piping_fiv_liquid, plug_flow_reactor, pool_fire, porous_media_self_heating, probit,
-    psv_fire_sizing, psv_sizing, pump, pump_deadhead, rate_based_packed_column,
+    psv_fire_sizing, psv_sizing, psv_valve, pump, pump_deadhead, rate_based_packed_column,
     relief_disposal_network, risk_matrix, runaway_reaction, s001_clause10_review,
     s001_secondary_pressure_protection, safety_instrumented_function, self_heating_induction,
     semenov_self_heating, separator, separator_capacity_assessment, separator_performance,

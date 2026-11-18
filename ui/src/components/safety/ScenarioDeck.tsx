@@ -99,6 +99,14 @@ const COPY: Record<
       "Each scenario holds one vibration screen's inputs and its last answer: the likelihood of failure, the sound power level and its margin, and every contributing factor.",
     step: "Add a gas or liquid flow-induced vibration screen or an acoustic-induced vibration screen.",
   },
+  depressurization: {
+    title: "Depressurization models",
+    heading: "Depressurization scenarios",
+    search: "Search depressurization models",
+    blurb:
+      "Each scenario holds one blowdown model's inputs and its last answer: the valve's latch state and flow, the vessel filling history, or the blocked-outlet time to relief demand.",
+    step: "Add a pressure-safety-valve step, a vessel filling or a blocked-outlet overpressure screen.",
+  },
 };
 
 export function ScenarioDeck({

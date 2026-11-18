@@ -86,6 +86,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.probit`](./probit.md) | `closed_form_probit` | NeqSim process/safety/dispersion/ProbitModel.java |
 | [`process.psv_fire_sizing`](./psv_fire_sizing.md) | `closed_form_psv_fire_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
 | [`process.psv_sizing`](./psv_sizing.md) | `closed_form_psv_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
+| [`process.psv_valve`](./psv_valve.md) | `psv_latch_one_step` | NeqSim process/safety/depressurization/PsvValveModel.java |
 | [`process.pump`](./pump.md) | `direct composition` | NeqSim process/equipment/pump/Pump.java and process/equipment/pump/PumpChart.java |
 | [`process.pump_deadhead`](./pump_deadhead.md) | `centrifugal_pump_deadhead_screen` | NeqSim process/safety/pump/PumpDeadheadAnalyzer.java |
 | [`process.rate_based_packed_column`](./rate_based_packed_column.md) | `counter_current_fixed_point_profile` | NeqSim process/equipment/distillation/RateBasedPackedColumn.java |

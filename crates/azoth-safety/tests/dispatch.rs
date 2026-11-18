@@ -368,6 +368,29 @@ fn the_psv_sizing_case_runs_through_the_dispatch() {
 }
 
 #[test]
+fn the_psv_valve_case_runs_through_the_dispatch() {
+    let outcome = dispatch::run(
+        "process.psv_valve",
+        &json!({
+            "set_pressure": 5_000_000.0,
+            "blowdown_fraction": 0.1,
+            "discharge_coefficient": 0.975,
+            "orifice_area": 1.0e-3,
+            "back_pressure": 100_000.0,
+            "upstream_pressure": 5_000_000.0,
+            "upstream_temperature": 350.0,
+            "molar_mass": 0.018,
+            "heat_capacity_ratio": 1.3,
+            "compressibility": 0.95,
+        }),
+    );
+    let outputs = ok(&outcome);
+    assert_eq!(outputs.outputs["open"], json!(true));
+    assert!((number(outputs, "cycle_count") - 1.0).abs() < 1e-12);
+    assert!((number(outputs, "mass_flow") - 8.300_545_970_532_687).abs() < 1e-12);
+}
+
+#[test]
 fn the_psv_sizing_liquid_branch_names_the_missing_flow() {
     match dispatch::run(
         "process.psv_sizing",

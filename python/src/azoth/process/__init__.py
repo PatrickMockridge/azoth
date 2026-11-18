@@ -92,6 +92,7 @@ from azoth.core.result import (
     ProbitResult,
     PsvFireSizingResult,
     PsvSizingResult,
+    PsvValveResult,
     PumpDeadheadResult,
     PumpResult,
     RateBasedPackedColumnResult,
@@ -306,6 +307,7 @@ _HEAVY_GAS_DISPERSION = "process.heavy_gas_dispersion"
 _PROBIT = "process.probit"
 _PSV_FIRE_SIZING = "process.psv_fire_sizing"
 _PSV_SIZING = "process.psv_sizing"
+_PSV_VALVE = "process.psv_valve"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
@@ -3950,6 +3952,44 @@ def psv_sizing(
         liquid_heat_capacity=liquid_heat_capacity,
         orifice_area=orifice_area,
         capacity_discharge_coefficient=capacity_discharge_coefficient,
+    )
+
+
+def psv_valve(
+    set_pressure: Q,
+    blowdown_fraction: float,
+    discharge_coefficient: float,
+    orifice_area: Q,
+    back_pressure: Q,
+    upstream_pressure: Q,
+    upstream_temperature: Q,
+    molar_mass: Q,
+    heat_capacity_ratio: float,
+    compressibility: float,
+    was_open: bool | None = None,
+    prior_cycle_count: float | None = None,
+) -> PsvValveResult:
+    """One step of the PSV latch and its relieving flow.
+
+    The valve opens at the set pressure, counts the pop once, and closes only at the
+    reseat pressure ``set (1 - blowdown)``; the flow is the API 520 compressible-orifice
+    relation and is zero when closed.
+
+    See :func:`azoth.process.reference.psv_valve`.
+    """
+    return resolve(_PSV_VALVE)(  # type: ignore[no-any-return]
+        set_pressure=set_pressure,
+        blowdown_fraction=blowdown_fraction,
+        discharge_coefficient=discharge_coefficient,
+        orifice_area=orifice_area,
+        back_pressure=back_pressure,
+        upstream_pressure=upstream_pressure,
+        upstream_temperature=upstream_temperature,
+        molar_mass=molar_mass,
+        heat_capacity_ratio=heat_capacity_ratio,
+        compressibility=compressibility,
+        was_open=was_open,
+        prior_cycle_count=prior_cycle_count,
     )
 
 

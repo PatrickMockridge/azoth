@@ -49,6 +49,7 @@ pub const NATIVE: &[&str] = &[
     "process.probit",
     "process.psv_fire_sizing",
     "process.psv_sizing",
+    "process.psv_valve",
     "process.pump_deadhead",
     "process.runaway_reaction",
     "process.s001_secondary_pressure_protection",
@@ -167,6 +168,18 @@ pub fn required(id: &str) -> Option<&'static [&'static str]> {
             "overpressure_fraction",
             "back_pressure",
         ],
+        "process.psv_valve" => &[
+            "set_pressure",
+            "blowdown_fraction",
+            "discharge_coefficient",
+            "orifice_area",
+            "back_pressure",
+            "upstream_pressure",
+            "upstream_temperature",
+            "molar_mass",
+            "heat_capacity_ratio",
+            "compressibility",
+        ],
         "process.gas_blowby" => &[
             "upstream_pressure",
             "upstream_temperature",
@@ -252,6 +265,7 @@ fn arm(id: &str, inputs: &Value) -> Result<Outcome, Outcome> {
         "process.probit" => probit(inputs),
         "process.psv_fire_sizing" => psv_fire_sizing(inputs),
         "process.psv_sizing" => psv_sizing(inputs),
+        "process.psv_valve" => psv_valve(inputs),
         "process.gas_blowby" => gas_blowby(inputs),
         "process.mdmt" => mdmt(inputs),
         "process.inherent_safety" => inherent_safety(inputs),
@@ -1235,6 +1249,46 @@ fn psv_sizing(inputs: &Value) -> Result<Outcome, Outcome> {
                     result.mass_flow_capacity.map(|value| value.value),
                     "kg/s",
                 );
+                done(outputs, &result.warnings)
+            }
+            Err(error) => refused(error),
+        },
+    )
+}
+
+fn psv_valve(inputs: &Value) -> Result<Outcome, Outcome> {
+    let set_pressure = number(inputs, "set_pressure")?;
+    let blowdown_fraction = number(inputs, "blowdown_fraction")?;
+    let discharge_coefficient = number(inputs, "discharge_coefficient")?;
+    let orifice_area = number(inputs, "orifice_area")?;
+    let back_pressure = number(inputs, "back_pressure")?;
+    let upstream_pressure = number(inputs, "upstream_pressure")?;
+    let upstream_temperature = number(inputs, "upstream_temperature")?;
+    let molar_mass = number(inputs, "molar_mass")?;
+    let heat_capacity_ratio = number(inputs, "heat_capacity_ratio")?;
+    let compressibility = number(inputs, "compressibility")?;
+    let was_open = optional_flag(inputs, "was_open")?;
+    let prior_cycle_count = optional_number(inputs, "prior_cycle_count")?;
+    Ok(
+        match azoth_process::psv_valve(
+            pascals(set_pressure),
+            blowdown_fraction,
+            discharge_coefficient,
+            square_meters(orifice_area),
+            pascals(back_pressure),
+            pascals(upstream_pressure),
+            kelvins(upstream_temperature),
+            kilograms_per_mole(molar_mass),
+            heat_capacity_ratio,
+            compressibility,
+            was_open,
+            prior_cycle_count,
+        ) {
+            Ok(result) => {
+                let mut outputs = BTreeMap::new();
+                outputs.insert("open".to_string(), json!(result.open));
+                scalar(&mut outputs, "cycle_count", result.cycle_count);
+                quantity(&mut outputs, "mass_flow", result.mass_flow.value, "kg/s");
                 done(outputs, &result.warnings)
             }
             Err(error) => refused(error),

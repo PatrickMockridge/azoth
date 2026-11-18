@@ -278,6 +278,7 @@ from azoth.core.result import (
     PsFlashResult,
     PsvFireSizingResult,
     PsvSizingResult,
+    PsvValveResult,
     PtFlashResult,
     PtPhaseEnvelopeResult,
     PuFlashResult,
@@ -699,6 +700,7 @@ __all__ = [
     "ps_flash",
     "psv_fire_sizing",
     "psv_sizing",
+    "psv_valve",
     "pt_flash",
     "pt_phase_envelope",
     "pu_flash",
@@ -8196,6 +8198,31 @@ def psv_sizing(service: str, set_pressure: Q, overpressure_fraction: float, back
         viscosity_correction=result.viscosity_correction,
         mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
         mass_flow_capacity=None if result.mass_flow_capacity is None else from_si(result.mass_flow_capacity.magnitude_si, result.mass_flow_capacity.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def psv_valve(set_pressure: Q, blowdown_fraction: float, discharge_coefficient: float, orifice_area: Q, back_pressure: Q, upstream_pressure: Q, upstream_temperature: Q, molar_mass: Q, heat_capacity_ratio: float, compressibility: float, was_open: bool | None=None, prior_cycle_count: float | None=None) -> PsvValveResult:
+    """``process.psv_valve``, computed in Rust."""
+    spec = _models_gen.model("process.psv_valve")
+    result = _core.psv_valve(
+        input_to_si(spec, "set_pressure", set_pressure),
+        blowdown_fraction,
+        discharge_coefficient,
+        input_to_si(spec, "orifice_area", orifice_area),
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "upstream_pressure", upstream_pressure),
+        input_to_si(spec, "upstream_temperature", upstream_temperature),
+        input_to_si(spec, "molar_mass", molar_mass),
+        heat_capacity_ratio,
+        compressibility,
+        was_open,
+        None if prior_cycle_count is None else prior_cycle_count,
+    )
+    return PsvValveResult(
+        open=result.open,
+        cycle_count=result.cycle_count,
+        mass_flow=from_si(result.mass_flow.magnitude_si, result.mass_flow.unit),
         warnings=_warnings(result.warnings),
     )
 

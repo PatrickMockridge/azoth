@@ -3249,6 +3249,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 14,
         "tests_skipped": 0,
     },
+    'process.psv_valve': {
+        "calc_id": 'process.psv_valve',
+        "name": 'PSV latch and relief flow',
+        "spec": {'path': 'specs/models/process/psv_valve.toml', 'sha256': '958334b3515880666b5cd880349436f07b2b4383a2e0392353ad724b73636333'},
+        "code": [{'path': 'python/src/azoth/process/reference/psv_valve.py', 'sha256': 'bcf27899d5dc1e52b07d3da9490256aef0492ae6e758d667804ca131756accef'}, {'path': 'crates/azoth-process/src/models/psv_valve.rs', 'sha256': '439a9d051a1de69d30339f1605a044381bb7411918d75cc040c0b9815541edb2'}],
+        "source": 'NeqSim process/safety/depressurization/PsvValveModel.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'process.pump': {
         "calc_id": 'process.pump',
         "name": 'Pump',

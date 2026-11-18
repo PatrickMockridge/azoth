@@ -462,6 +462,10 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         "proof_test_configured",
         "proof_test_criterion_met",
         "acceptable",
+        # `psv_valve`'s latch state, a boolean with no slot in `TestCase`.
+        # `crates/azoth-process/tests/psv_valve.rs` asserts it against the capture, and
+        # `test_cross_impl` compares it on both results.
+        "open",
     }
 )
 

@@ -7873,6 +7873,48 @@ pub fn psv_sizing(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// PSV latch and relief flow.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (set_pressure, blowdown_fraction, discharge_coefficient, orifice_area, back_pressure, upstream_pressure, upstream_temperature, molar_mass, heat_capacity_ratio, compressibility, was_open, prior_cycle_count))]
+#[pyo3(
+    text_signature = "(set_pressure, blowdown_fraction, discharge_coefficient, orifice_area, back_pressure, upstream_pressure, upstream_temperature, molar_mass, heat_capacity_ratio, compressibility, was_open, prior_cycle_count)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn psv_valve(
+    py: Python<'_>,
+    set_pressure: f64,
+    blowdown_fraction: f64,
+    discharge_coefficient: f64,
+    orifice_area: f64,
+    back_pressure: f64,
+    upstream_pressure: f64,
+    upstream_temperature: f64,
+    molar_mass: f64,
+    heat_capacity_ratio: f64,
+    compressibility: f64,
+    was_open: Option<bool>,
+    prior_cycle_count: Option<f64>,
+) -> PyResult<crate::transport_gen::PyPsvValveResult> {
+    azoth_process::models::psv_valve::psv_valve(
+        pascals(set_pressure),
+        blowdown_fraction,
+        discharge_coefficient,
+        square_meters(orifice_area),
+        pascals(back_pressure),
+        pascals(upstream_pressure),
+        kelvins(upstream_temperature),
+        kilograms_per_mole(molar_mass),
+        heat_capacity_ratio,
+        compressibility,
+        was_open,
+        prior_cycle_count,
+    )
+    .map(|r| crate::transport_gen::PyPsvValveResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Pump deadhead and minimum-flow temperature rise.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

@@ -295,6 +295,7 @@
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
+//!   - specs/models/process/psv_valve.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/pump_deadhead.toml
 //!   - specs/models/process/rate_based_packed_column.toml
@@ -4654,6 +4655,25 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "capacity_discharge_coefficient",
         "dimensionless",
     ),
+    ("process.psv_valve", "set_pressure", "pressure"),
+    ("process.psv_valve", "blowdown_fraction", "dimensionless"),
+    (
+        "process.psv_valve",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.psv_valve", "orifice_area", "area"),
+    ("process.psv_valve", "back_pressure", "pressure"),
+    ("process.psv_valve", "upstream_pressure", "pressure"),
+    (
+        "process.psv_valve",
+        "upstream_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.psv_valve", "molar_mass", "molar_mass"),
+    ("process.psv_valve", "heat_capacity_ratio", "dimensionless"),
+    ("process.psv_valve", "compressibility", "dimensionless"),
+    ("process.psv_valve", "prior_cycle_count", "dimensionless"),
     ("process.pump", "inlet_n", "molar_flow"),
     ("process.pump", "inlet_z", "dimensionless"),
     ("process.pump", "inlet_p", "pressure"),

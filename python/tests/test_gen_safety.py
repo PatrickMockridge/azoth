@@ -44,8 +44,9 @@ def test_the_catalogue_is_every_safety_model_and_nothing_else() -> None:
     specs = [spec for _, spec in module.documents()]
     ids = [spec["id"] for spec in specs]
     assert len(ids) == len(set(ids))
-    assert len(ids) == 71
+    assert len(ids) == 72
     families = [module.family_of(spec) for spec in specs]
+    assert families.count("depressurization") == 1
     assert families.count("dispersion") == 6
     assert families.count("equipmentsafety") == 6
     assert families.count("fire") == 6
@@ -94,6 +95,7 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
         "process.probit",
         "process.psv_fire_sizing",
         "process.psv_sizing",
+        "process.psv_valve",
         "process.pump_deadhead",
         "process.runaway_reaction",
         "process.s001_secondary_pressure_protection",
@@ -119,6 +121,10 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
         == "processsafetysystem"
     )
     assert module.sub_interface_of(by_id["process.hem_release"], "release") is None
+    assert (
+        module.sub_interface_of(by_id["process.psv_valve"], "depressurization")
+        == "depressurization"
+    )
     assert module.sub_interface_of(by_id["process.piping_fiv_gas"], "vibration") == "vibration"
     assert (
         module.sub_interface_of(by_id["process.flow_induced_pulsation_screening"], "vibration")

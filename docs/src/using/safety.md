@@ -11,7 +11,7 @@ derived and never saved: a scenario's answer is the last calculate's, and a scen
 inputs changed says its answer is out of date.
 
 The **Overview** lists the study's bow-ties and scenarios, every diagnostic the study carries,
-and the whole safety surface grouped by family. Thirty scenario models across nine
+and the whole safety surface grouped by family. Thirty-one scenario models across ten
 families — fire, dispersion, equipment safety, firewater, overpressure, process safety systems,
 risk, safety assessment and vibration — and the bow-tie run inside this interface. The rest — the models that take a fluid or a table of rows, and the rupture,
 release and QRA families — are listed with links to their manual pages; they are not runnable
@@ -140,7 +140,7 @@ route has no call that replaces it.
 
 ## What is not here yet
 
-The record-shaped models in the nine decks stay listed and refused; rupture, release and QRA
+The record-shaped models in the ten decks stay listed and refused; rupture, release and QRA
 have no native view, and their manual pages state the inputs, the range and the worked
 example. The HAZOP worksheet, a printable safety report and a flux-versus-distance chart are
 not built. A scenario runs one model, not a bundle of models for one release.

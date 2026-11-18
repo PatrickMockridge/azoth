@@ -400,6 +400,7 @@ Five sections, and the difference between them is the point:
 - [`process.probit`](./process/probit.md) — Probit dose-response
 - [`process.psv_fire_sizing`](./process/psv_fire_sizing.md) — PSV fire sizing
 - [`process.psv_sizing`](./process/psv_sizing.md) — PSV sizing
+- [`process.psv_valve`](./process/psv_valve.md) — PSV latch and relief flow
 - [`process.pump`](./process/pump.md) — Pump
 - [`process.pump_deadhead`](./process/pump_deadhead.md) — Pump deadhead and minimum-flow temperature rise
 - [`process.rate_based_packed_column`](./process/rate_based_packed_column.md) — Rate-based packed column

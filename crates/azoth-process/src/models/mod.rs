@@ -105,6 +105,7 @@ pub mod porous_media_self_heating;
 pub mod probit;
 pub mod psv_fire_sizing;
 pub mod psv_sizing;
+pub mod psv_valve;
 pub mod pump;
 pub mod pump_deadhead;
 pub mod rate_based_packed_column;
@@ -265,6 +266,7 @@ pub use porous_media_self_heating::{PorousMediaSelfHeatingResult, porous_media_s
 pub use probit::{ProbitResult, probit};
 pub use psv_fire_sizing::{PsvFireSizingResult, psv_fire_sizing};
 pub use psv_sizing::{PsvSizingResult, psv_sizing};
+pub use psv_valve::{PsvValveResult, psv_valve};
 pub use pump::{PumpResult, pump};
 pub use pump_deadhead::{DeadheadVerdict, PumpDeadheadResult, pump_deadhead};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};

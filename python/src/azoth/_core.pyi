@@ -4606,6 +4606,13 @@ class PsvSizingResult:
     warnings: list[Warning]
 
 @final
+class PsvValveResult:
+    open: bool
+    cycle_count: float
+    mass_flow: Qty
+    warnings: list[Warning]
+
+@final
 class PumpResult:
     outlet_n: Qty
     outlet_z: list[float]
@@ -8532,6 +8539,20 @@ def psv_sizing(
     orifice_area: float | None = None,
     capacity_discharge_coefficient: float | None = None,
 ) -> PsvSizingResult: ...
+def psv_valve(
+    set_pressure: float,
+    blowdown_fraction: float,
+    discharge_coefficient: float,
+    orifice_area: float,
+    back_pressure: float,
+    upstream_pressure: float,
+    upstream_temperature: float,
+    molar_mass: float,
+    heat_capacity_ratio: float,
+    compressibility: float,
+    was_open: bool | None = None,
+    prior_cycle_count: float | None = None,
+) -> PsvValveResult: ...
 def pump(
     components: list[str],
     inlet_n: float,

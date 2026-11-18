@@ -22518,6 +22518,55 @@ impl From<&azoth_process::models::psv_sizing::PsvSizingResult> for PyPsvSizingRe
         }
     }
 }
+/// Result of `process.psv_valve`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PsvValveResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPsvValveResult {
+    /// the valve's open state after the update.
+    #[pyo3(get)]
+    pub open: bool,
+    /// the pop count after the update.
+    #[pyo3(get)]
+    pub cycle_count: f64,
+    /// the relieving mass flow at the upstream state; zero when the valve is closed.
+    #[pyo3(get)]
+    pub mass_flow: PyQty,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPsvValveResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PsvValveResult(open={:?}, cycle_count={:?}, mass_flow={:?}, {} warning(s))",
+            self.open,
+            self.cycle_count,
+            self.mass_flow,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::psv_valve::PsvValveResult> for PyPsvValveResult {
+    fn from(r: &azoth_process::models::psv_valve::PsvValveResult) -> Self {
+        Self {
+            open: r.open,
+            cycle_count: r.cycle_count,
+            mass_flow: PyQty {
+                magnitude_si: r.mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.pump`, transported.
 #[pyclass(
     frozen,

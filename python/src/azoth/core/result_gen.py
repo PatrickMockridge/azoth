@@ -9094,6 +9094,25 @@ class PsvSizingResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PsvValveResult(_HasWarnings):
+    """Result of ``process.psv_valve``."""
+
+    CALC_ID: ClassVar[str] = "process.psv_valve"
+
+    #: the valve's open state after the update.
+    open: bool
+
+    #: the pop count after the update.
+    cycle_count: float
+
+    #: the relieving mass flow at the upstream state; zero when the valve is closed.
+    mass_flow: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PumpResult(_HasWarnings):
     """Result of ``process.pump``."""
 

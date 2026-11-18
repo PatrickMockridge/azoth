@@ -84,6 +84,7 @@ use crate::models::porous_media_self_heating::PorousMediaSelfHeatingResult;
 use crate::models::probit::ProbitResult;
 use crate::models::psv_fire_sizing::PsvFireSizingResult;
 use crate::models::psv_sizing::PsvSizingResult;
+use crate::models::psv_valve::PsvValveResult;
 use crate::models::pump::PumpResult;
 use crate::models::pump_deadhead::PumpDeadheadResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
@@ -1819,6 +1820,15 @@ impl CalcResult for PsvSizingResult {
         "mass_flow_capacity",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PsvValveResult {
+    const CALC_ID: &'static str = "process.psv_valve";
+    const FIELDS: &'static [&'static str] = &["open", "cycle_count", "mass_flow", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
