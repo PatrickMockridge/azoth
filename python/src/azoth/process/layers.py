@@ -7578,22 +7578,21 @@ UNCASED_ROWS: dict[str, int] = {
     "process_deluge_nozzle_layout.tsv": 8,
     # The monitor coverage's eleven: the constructor and each setter's refusal.
     "process_fire_monitor_coverage.tsv": 11,
-    # Settle-out pressure's two: the unit-string aliases and the one-compartment refusal.
-    "process_settle_out_pressure.tsv": 2,
-    # Vacuum collapse's two: the unit-string aliases and the cold-end refusal.
-    "process_vacuum_collapse.tsv": 2,
-    # MDMT's two: curves C and D at 25 mm, restatements of the curve family the other cases
-    # already cover. The curve refusal is a hand test.
-    "process_mdmt.tsv": 2,
-    # Runaway reaction's one: the unit-string aliases, the no-MAT low state restated. The
-    # refusal states are hand tests.
-    "process_runaway_reaction.tsv": 1,
-    # Pump deadhead's one: the unit-string aliases, the within-rating state restated. The
-    # refusal states are hand tests.
-    "process_pump_deadhead.tsv": 1,
-    # Gas blowby's two: the unit-string aliases and the restriction-diameter setter, both
-    # the choked state restated. The six refusal states are hand tests.
-    "process_gas_blowby.tsv": 2,
+    # Settle-out pressure's seven: the five further model cases, the unit aliases and the
+    # one-compartment refusal.
+    "process_settle_out_pressure.tsv": 7,
+    # Vacuum collapse's seven: the five further model cases, the unit aliases and the
+    # cold-end refusal.
+    "process_vacuum_collapse.tsv": 7,
+    # MDMT's nine: the seven further model cases and the unit aliases.
+    "process_mdmt.tsv": 9,
+    # Runaway reaction's seven: the six further model cases and the unit aliases.
+    "process_runaway_reaction.tsv": 7,
+    # Pump deadhead's seven: the six further model cases and the unit aliases.
+    "process_pump_deadhead.tsv": 7,
+    # Gas blowby's seven: the five further model cases, the unit aliases and the
+    # restriction-diameter setter.
+    "process_gas_blowby.tsv": 7,
     # The coverage assessment's six: the unset-supply state, where the class's NaN defaults
     # read as feasible, and the constructor and setter refusals.
     "process_fire_water_coverage_assessment.tsv": 6,

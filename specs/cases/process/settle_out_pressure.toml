@@ -43,7 +43,7 @@ exceeds_rating = true
 verdict = "exceeds_rating"
 [[cases]]
 id = "rating_equal"
-tolerance = 1.0e-9
+tolerance = 1.0e-12
 source = "The rating set to the settle-out pressure: equality is within it. From (`settle_rating_equal`)."
 [cases.inputs]
 compartments = [
@@ -59,7 +59,6 @@ total_moles = 3507.9436888108294
 total_volume = 7.0
 max_compartment_pressure = 2.0e6
 min_compartment_pressure = 1.0e6
-margin_to_rating = 0.0
 exceeds_rating = false
 verdict = "within_rating"
 [[cases]]

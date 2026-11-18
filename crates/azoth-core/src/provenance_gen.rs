@@ -4055,7 +4055,7 @@ pub static ALL_PROVENANCE: &[ProvenanceStatic] = &[
         spec_path: "specs/models/process/mdmt.toml",
         spec_sha256: "effb9ffd06d1aa5a6c28a1a1e6b6ca637f6c7d08a8fce25cd2fd0af12d880ce6",
         python_path: "python/src/azoth/process/reference/mdmt.py",
-        python_sha256: "bb56e42dbf6f542f768aa0e419612eb36da99c6b87b870f4319c079e513f0284",
+        python_sha256: "e2db0b7bd7ad05d9d8444dfc986e0f316577738340a4db9730b56a6d580539df",
         rust_path: "crates/azoth-process/src/models/mdmt.rs",
         rust_sha256: "2a23ba75298808284f75f56aed4f0119e0658640743628c57a3c03c784e37075",
         source: "NeqSim process/safety/mdmt/MDMTCalculator.java",

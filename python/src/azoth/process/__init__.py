@@ -1781,8 +1781,8 @@ def expander(
 def mdmt(
     material_curve: str,
     governing_thickness: Q,
+    min_operating_temperature: Q,
     stress_ratio: float | None = None,
-    min_operating_temperature: Q | None = None,
 ) -> MdmtResult:
     """The UCS-66 curve's MDMT and the cold-service verdict.
 

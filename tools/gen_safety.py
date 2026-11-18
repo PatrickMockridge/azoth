@@ -91,6 +91,7 @@ BOWTIE = "process.bow_tie"
 #: families without one are listed on the overview and linked to their manual pages.
 SCENARIO_FAMILIES = (
     "dispersion",
+    "equipmentsafety",
     "fire",
     "firewater",
     "overpressure",

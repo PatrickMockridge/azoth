@@ -119,12 +119,13 @@ describe("the catalogue", () => {
     // listed, plus the two relief ids upstream files elsewhere; every scalar-shaped one can run
     // as a scenario, and the bow-tie has its own view.
     const safetyCalcs = catalogue.safety ?? [];
-    expect(safetyCalcs).toHaveLength(56);
+    expect(safetyCalcs).toHaveLength(62);
     expect(new Set(safetyCalcs.map((entry) => entry.family))).toEqual(
       new Set([
         "api14c",
         "barrier",
         "dispersion",
+        "equipmentsafety",
         "fire",
         "firewater",
         "hazid",
@@ -146,10 +147,12 @@ describe("the catalogue", () => {
       "process.fire_case_relief",
       "process.fire_monitor_coverage",
       "process.fire_water_coverage_assessment",
+      "process.gas_blowby",
       "process.gaussian_plume",
       "process.hazardous_area",
       "process.heavy_gas_dispersion",
       "process.jet_fire",
+      "process.mdmt",
       "process.nog070_sil_determination",
       "process.overpressure_acceptance",
       "process.pfp_demand",
@@ -158,19 +161,21 @@ describe("the catalogue", () => {
       "process.probit",
       "process.psv_fire_sizing",
       "process.psv_sizing",
+      "process.pump_deadhead",
+      "process.runaway_reaction",
       "process.s001_secondary_pressure_protection",
       "process.safety_instrumented_function",
       "process.toxic_library",
       "process.vce",
     ]);
-    expect(native.filter((entry) => entry.form !== undefined)).toHaveLength(22);
+    expect(native.filter((entry) => entry.form !== undefined)).toHaveLength(26);
     expect(safetyCalcs.find((entry) => entry.id === "process.bow_tie")?.form).toBeUndefined();
     for (const entry of native) {
       expect(entry.purpose.trim(), `${entry.id} has no purpose`).not.toBe("");
       expect(entry.purpose.length).toBeLessThanOrEqual(300);
     }
     const listed = safetyCalcs.filter((entry) => !entry.native);
-    expect(listed).toHaveLength(33);
+    expect(listed).toHaveLength(35);
     for (const entry of listed) {
       expect(entry.refusal, `${entry.id} has no refusal`).toBeTruthy();
       expect(entry.form, `${entry.id} has a form but no arm`).toBeUndefined();

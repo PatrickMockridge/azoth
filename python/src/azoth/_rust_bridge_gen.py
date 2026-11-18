@@ -205,6 +205,7 @@ from azoth.core.result import (
     MatcopPrAlphaResult,
     MatcopPrumrAlphaResult,
     MatcopPrumrNewAlphaResult,
+    MdmtResult,
     MineralEquilibriumRow,
     MinimalCutSet,
     MixerResult,
@@ -619,6 +620,7 @@ __all__ = [
     "matcop_pr_alpha",
     "matcop_prumr_alpha",
     "matcop_prumr_new_alpha",
+    "mdmt",
     "mixer",
     "molar_enthalpy_entropy",
     "mollerup_alpha",
@@ -7438,6 +7440,22 @@ def map_turbo_expander_compressor(expander_components: list[str], compressor_com
         power_balance_residual=from_si(result.power_balance_residual.magnitude_si, result.power_balance_residual.unit),
         speed_limited=result.speed_limited,
         operating_status=result.operating_status,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def mdmt(material_curve: str, governing_thickness: Q, min_operating_temperature: Q, stress_ratio: float | None=None) -> MdmtResult:
+    """``process.mdmt``, computed in Rust."""
+    spec = _models_gen.model("process.mdmt")
+    result = _core.mdmt(
+        material_curve,
+        input_to_si(spec, "governing_thickness", governing_thickness),
+        None if stress_ratio is None else stress_ratio,
+        input_to_si(spec, "min_operating_temperature", min_operating_temperature),
+    )
+    return MdmtResult(
+        mdmt=from_si(result.mdmt.magnitude_si, result.mdmt.unit),
+        acceptable=result.acceptable,
         warnings=_warnings(result.warnings),
     )
 

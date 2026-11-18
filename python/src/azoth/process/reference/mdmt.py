@@ -114,8 +114,8 @@ def _evaluate(
 def mdmt(
     material_curve: str,
     governing_thickness: Q,
+    min_operating_temperature: Q,
     stress_ratio: float | None = None,
-    min_operating_temperature: Q | None = None,
 ) -> MdmtResult:
     """The UCS-66 curve's MDMT and the cold-service verdict.
 
@@ -140,8 +140,8 @@ def mdmt(
     solution, warnings = _evaluate(
         material_curve,
         governing_thickness,
-        stress_ratio,
-        min_operating_temperature,
+        stress_ratio=stress_ratio,
+        min_operating_temperature=min_operating_temperature,
     )
     return MdmtResult(
         mdmt=from_si(solution.mdmt_k, "K"),
