@@ -175,7 +175,7 @@ pub fn escalation_graph(
     for at in 0..registry.ids.len() {
         let candidate = registry.propagate(at);
         let count = candidate.iter().filter(|failed| **failed).count();
-        if worst.as_ref().map_or(true, |(best, _)| count > *best) {
+        if worst.as_ref().is_none_or(|(best, _)| count > *best) {
             worst = Some((count, candidate));
         }
     }
