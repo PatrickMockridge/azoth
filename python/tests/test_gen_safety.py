@@ -44,7 +44,7 @@ def test_the_catalogue_is_every_safety_model_and_nothing_else() -> None:
     specs = [spec for _, spec in module.documents()]
     ids = [spec["id"] for spec in specs]
     assert len(ids) == len(set(ids))
-    assert len(ids) == 62
+    assert len(ids) == 71
     families = [module.family_of(spec) for spec in specs]
     assert families.count("dispersion") == 6
     assert families.count("equipmentsafety") == 6
@@ -60,6 +60,9 @@ def test_the_catalogue_is_every_safety_model_and_nothing_else() -> None:
     assert families.count("api14c") == 1
     assert families.count("barrier") == 1
     assert families.count("processsafetysystem") == 2
+    assert families.count("compliance") == 2
+    assert families.count("safetyassessment") == 3
+    assert families.count("vibration") == 4
 
 
 def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
@@ -67,6 +70,7 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
     by_id = {spec["id"]: spec for _, spec in module.documents()}
     native = sorted(module.NATIVE_SCENARIOS)
     assert native == [
+        "process.acoustic_induced_vibration_screening",
         "process.active_fire_protection_screening",
         "process.bleve",
         "process.deluge_nozzle_layout",
@@ -77,12 +81,15 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
         "process.gaussian_plume",
         "process.hazardous_area",
         "process.heavy_gas_dispersion",
+        "process.inherent_safety",
         "process.jet_fire",
         "process.mdmt",
         "process.nog070_sil_determination",
         "process.overpressure_acceptance",
         "process.pfp_demand",
         "process.pipeline_pressure_protection",
+        "process.piping_fiv_gas",
+        "process.piping_fiv_liquid",
         "process.pool_fire",
         "process.probit",
         "process.psv_fire_sizing",
@@ -112,13 +119,25 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
         == "processsafetysystem"
     )
     assert module.sub_interface_of(by_id["process.hem_release"], "release") is None
+    assert (
+        module.sub_interface_of(by_id["process.piping_fiv_gas"], "vibration") == "vibration"
+    )
+    assert (
+        module.sub_interface_of(by_id["process.flow_induced_pulsation_screening"], "vibration")
+        == "vibration"
+    )
+    assert (
+        module.sub_interface_of(by_id["process.inherent_safety"], "safetyassessment")
+        == "safetyassessment"
+    )
+    assert module.sub_interface_of(by_id["process.norsok_p002_compliance"], "compliance") is None
 
 
 def test_every_non_native_entry_has_a_refusal_and_no_form() -> None:
     module: Any = tool()
     entries = module.render()
-    assert entries.count("native: false") == 35
-    assert entries.count("refusal: Some(") == 35
+    assert entries.count("native: false") == 40
+    assert entries.count("refusal: Some(") == 40
     for _, spec in module.documents():
         if module.native_of(spec):
             assert module.refusal_of(spec) is None, spec["id"]

@@ -255,7 +255,9 @@ fn arm(id: &str, inputs: &Value) -> Result<Outcome, Outcome> {
         "process.gas_blowby" => gas_blowby(inputs),
         "process.mdmt" => mdmt(inputs),
         "process.inherent_safety" => inherent_safety(inputs),
-        "process.acoustic_induced_vibration_screening" => acoustic_induced_vibration_screening(inputs),
+        "process.acoustic_induced_vibration_screening" => {
+            acoustic_induced_vibration_screening(inputs)
+        }
         "process.piping_fiv_gas" => piping_fiv_gas(inputs),
         "process.piping_fiv_liquid" => piping_fiv_liquid(inputs),
         "process.pump_deadhead" => pump_deadhead(inputs),
@@ -1661,10 +1663,7 @@ fn acoustic_induced_vibration_screening(inputs: &Value) -> Result<Outcome, Outco
                 scalar(&mut outputs, "pwl", result.pwl);
                 scalar(&mut outputs, "allowable_pwl", result.allowable_pwl);
                 scalar(&mut outputs, "margin", result.margin);
-                outputs.insert(
-                    "likelihood".to_string(),
-                    json!(result.likelihood.as_str()),
-                );
+                outputs.insert("likelihood".to_string(), json!(result.likelihood.as_str()));
                 scalar(
                     &mut outputs,
                     "pressure_drop_ratio",
@@ -1699,10 +1698,7 @@ fn piping_fiv_gas(inputs: &Value) -> Result<Outcome, Outcome> {
             Ok(result) => {
                 let mut outputs = BTreeMap::new();
                 scalar(&mut outputs, "lof", result.lof);
-                outputs.insert(
-                    "likelihood".to_string(),
-                    json!(result.likelihood.as_str()),
-                );
+                outputs.insert("likelihood".to_string(), json!(result.likelihood.as_str()));
                 quantity(&mut outputs, "rho_v2", result.rho_v2.value, "Pa");
                 scalar(&mut outputs, "d_overt", result.d_overt);
                 scalar(&mut outputs, "d_overt_factor", result.d_overt_factor);
@@ -1742,10 +1738,7 @@ fn piping_fiv_liquid(inputs: &Value) -> Result<Outcome, Outcome> {
             Ok(result) => {
                 let mut outputs = BTreeMap::new();
                 scalar(&mut outputs, "lof", result.lof);
-                outputs.insert(
-                    "likelihood".to_string(),
-                    json!(result.likelihood.as_str()),
-                );
+                outputs.insert("likelihood".to_string(), json!(result.likelihood.as_str()));
                 scalar(&mut outputs, "d_overt", result.d_overt);
                 scalar(&mut outputs, "d_overt_factor", result.d_overt_factor);
                 scalar(&mut outputs, "branch_factor", result.branch_factor);

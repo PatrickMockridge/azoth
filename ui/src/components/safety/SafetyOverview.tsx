@@ -13,6 +13,7 @@ import type { SafetyView, ScenarioView } from "./views";
 const FAMILIES: { id: string; label: string }[] = [
   { id: "api14c", label: "API 14C" },
   { id: "barrier", label: "Barriers" },
+  { id: "compliance", label: "Compliance" },
   { id: "dispersion", label: "Dispersion" },
   { id: "equipmentsafety", label: "Equipment and system safety" },
   { id: "fire", label: "Fire and explosion" },
@@ -24,7 +25,9 @@ const FAMILIES: { id: string; label: string }[] = [
   { id: "release", label: "Release" },
   { id: "risk", label: "Risk and SIL" },
   { id: "rupture", label: "Rupture" },
+  { id: "safetyassessment", label: "Safety assessment" },
   { id: "selfheating", label: "Self-heating" },
+  { id: "vibration", label: "Vibration" },
 ];
 
 const SCENARIO_CARDS: { id: ScenarioView; label: string; blurb: string }[] = [
@@ -62,6 +65,16 @@ const SCENARIO_CARDS: { id: ScenarioView; label: string; blurb: string }[] = [
     id: "risk",
     label: "Risk scenarios",
     blurb: "NOG 070 minimum SIL and the instrumented function's PFD arithmetic.",
+  },
+  {
+    id: "safetyassessment",
+    label: "Safety assessment",
+    blurb: "The Kletz inherent-safety index.",
+  },
+  {
+    id: "vibration",
+    label: "Vibration scenarios",
+    blurb: "Gas and liquid flow-induced vibration and acoustic-induced vibration.",
   },
 ];
 

@@ -22,7 +22,7 @@ own command model, its own envelope and its own route — `/sheets` and `/safety
 end draws one document at a time, and a save is no call because the document rides every
 answer. **Their dispatch is the library's own kernels**, not a second executor: the sheet
 dispatcher is generated from `specs/calcs` and the safety study's native ids are the
-twenty-six scalar safety models plus `process.bow_tie`, called as the typed model kernels they
+thirty scalar safety models plus `process.bow_tie`, called as the typed model kernels they
 are. The safety catalogue is attached to the one catalogue call by the
 bindings that own it, because `azoth-process` cannot depend on a crate that depends on it.
 

@@ -50,12 +50,20 @@ EXTRA_FAMILIES = {
     "process.mdmt": "equipmentsafety",
     "process.vacuum_collapse": "equipmentsafety",
     "process.settle_out_pressure": "equipmentsafety",
+    # **Three small source packages are one assessment family.** `inherent/`, `alarp/` and
+    # `escalation/` each hold one worksheet on the safety case rather than a family of its
+    # own; the spec's `[source]` still names each package, and the grouping is id-keyed so a
+    # future class under those paths is not silently pulled in.
+    "process.inherent_safety": "safetyassessment",
+    "process.alarp_audit": "safetyassessment",
+    "process.escalation_graph": "safetyassessment",
 }
 
 #: The ids a scenario can run: every safety model whose inputs and outputs are all scalar,
 #: plus the five fire models. A model with a table-shaped input or output is listed with the
 #: refusal `refusal_of` derives from that shape.
 NATIVE_SCENARIOS = (
+    "process.acoustic_induced_vibration_screening",
     "process.active_fire_protection_screening",
     "process.bleve",
     "process.deluge_nozzle_layout",
@@ -66,12 +74,15 @@ NATIVE_SCENARIOS = (
     "process.gaussian_plume",
     "process.hazardous_area",
     "process.heavy_gas_dispersion",
+    "process.inherent_safety",
     "process.jet_fire",
     "process.mdmt",
     "process.nog070_sil_determination",
     "process.overpressure_acceptance",
     "process.pfp_demand",
     "process.pipeline_pressure_protection",
+    "process.piping_fiv_gas",
+    "process.piping_fiv_liquid",
     "process.pool_fire",
     "process.probit",
     "process.psv_fire_sizing",
@@ -97,12 +108,18 @@ SCENARIO_FAMILIES = (
     "overpressure",
     "processsafetysystem",
     "risk",
+    "safetyassessment",
+    "vibration",
 )
 
 #: The purpose line a native entry's card and form show. Model specs have no summary, so this
 #: is the only copy and a native id without one is a generator error.
 PURPOSES = {
     BOWTIE: "Threat frequencies, prevention-barrier PFDs and the resulting mitigated frequency and RRF.",
+    "process.acoustic_induced_vibration_screening": "The sound power level downstream of a pressure-reducing device, the design-line allowable and the screening margin.",
+    "process.inherent_safety": "The four Kletz pillar scores and their average inherent-safety index.",
+    "process.piping_fiv_gas": "The flow-induced-vibration likelihood of failure for a gas line from its momentum flux, diameter ratio, branch count, pulsation source and support quality.",
+    "process.piping_fiv_liquid": "The flow-induced-vibration likelihood of failure for a liquid line from its velocity, diameter ratio, branch count and support quality.",
     "process.active_fire_protection_screening": "Whether water can extinguish the fire, the blowdown margin over the steel's failure and the selective-protection saving.",
     "process.bleve": "The BLEVE fireball's size, duration and the distance to a target flux.",
     "process.deluge_nozzle_layout": "The deluge nozzle count from the flow and coverage criteria, the grid spacing and the delivered density.",

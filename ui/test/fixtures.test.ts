@@ -119,11 +119,12 @@ describe("the catalogue", () => {
     // listed, plus the two relief ids upstream files elsewhere; every scalar-shaped one can run
     // as a scenario, and the bow-tie has its own view.
     const safetyCalcs = catalogue.safety ?? [];
-    expect(safetyCalcs).toHaveLength(62);
+    expect(safetyCalcs).toHaveLength(71);
     expect(new Set(safetyCalcs.map((entry) => entry.family))).toEqual(
       new Set([
         "api14c",
         "barrier",
+        "compliance",
         "dispersion",
         "equipmentsafety",
         "fire",
@@ -135,11 +136,14 @@ describe("the catalogue", () => {
         "release",
         "risk",
         "rupture",
+        "safetyassessment",
         "selfheating",
+        "vibration",
       ]),
     );
     const native = safetyCalcs.filter((entry) => entry.native);
     expect(native.map((entry) => entry.id)).toEqual([
+      "process.acoustic_induced_vibration_screening",
       "process.active_fire_protection_screening",
       "process.bleve",
       "process.bow_tie",
@@ -151,12 +155,15 @@ describe("the catalogue", () => {
       "process.gaussian_plume",
       "process.hazardous_area",
       "process.heavy_gas_dispersion",
+      "process.inherent_safety",
       "process.jet_fire",
       "process.mdmt",
       "process.nog070_sil_determination",
       "process.overpressure_acceptance",
       "process.pfp_demand",
       "process.pipeline_pressure_protection",
+      "process.piping_fiv_gas",
+      "process.piping_fiv_liquid",
       "process.pool_fire",
       "process.probit",
       "process.psv_fire_sizing",
@@ -168,14 +175,14 @@ describe("the catalogue", () => {
       "process.toxic_library",
       "process.vce",
     ]);
-    expect(native.filter((entry) => entry.form !== undefined)).toHaveLength(26);
+    expect(native.filter((entry) => entry.form !== undefined)).toHaveLength(30);
     expect(safetyCalcs.find((entry) => entry.id === "process.bow_tie")?.form).toBeUndefined();
     for (const entry of native) {
       expect(entry.purpose.trim(), `${entry.id} has no purpose`).not.toBe("");
       expect(entry.purpose.length).toBeLessThanOrEqual(300);
     }
     const listed = safetyCalcs.filter((entry) => !entry.native);
-    expect(listed).toHaveLength(35);
+    expect(listed).toHaveLength(40);
     for (const entry of listed) {
       expect(entry.refusal, `${entry.id} has no refusal`).toBeTruthy();
       expect(entry.form, `${entry.id} has a form but no arm`).toBeUndefined();

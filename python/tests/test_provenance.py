@@ -168,8 +168,14 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # control-valve failure load; 320: the check-valve leak load; 321: the tube-rupture
     # load; 322: the overpressure protection study; 323-326: the self-heating family;
     # 327: the HAZOP template; 328: the FMEA worksheet; 329: the consequence population;
-    # 330: the MAH bow-tie skeleton.
-    assert len(registered) == 340
+    # 330: the MAH bow-tie skeleton; 331: the API 14C SAFE chart; 332: the barrier register
+    # validation; 333: the S-001 Clause 10 review; 334: the S-001 secondary-pressure screen;
+    # 335: the gas blowby; 336: the pump deadhead; 337: the runaway reaction; 338: the
+    # MDMT; 339: the vacuum collapse; 340: the settle-out pressure; 341-342: the gas- and
+    # liquid-line FIV screens; 343: the acoustic-induced vibration screen; 344: the
+    # side-branch pulsation screen; 345: the NORSOK P-002 point checks; 346: the STS-0131
+    # gate; 347: the inherent-safety index; 348: the ALARP audit; 349: the escalation graph.
+    assert len(registered) == 349
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:
