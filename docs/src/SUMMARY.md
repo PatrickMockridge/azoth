@@ -265,6 +265,7 @@
   - [Fire-water coverage assessment](./process/fire_water_coverage_assessment.md)
   - [Fire-water demand](./process/fire_water_demand.md)
   - [Flare](./process/flare.md)
+  - [Flow-induced pulsation screening](./process/flow_induced_pulsation_screening.md)
   - [FMEA worksheet](./process/fmea_worksheet.md)
   - [Gas blowby through a restriction](./process/gas_blowby.md)
   - [Gas dispersion screening](./process/gas_dispersion.md)

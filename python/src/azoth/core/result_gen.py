@@ -53,6 +53,7 @@ from azoth.core.record_outputs_gen import (
     MinimalCutSet,
     NaceIssueRow,
     PipeFireRupturePoint,
+    PulsationModeResult,
     RegisterFinding,
     ReliefDisposalRow,
     RemediationOptionRow,
@@ -7075,6 +7076,52 @@ class FlareResult(_HasWarnings):
 
     #: `isOverloaded`: any present utilisation above `1 + 1e-6`. Absent until at least one utilisation exists.
     overloaded: bool | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FlowInducedPulsationResult(_HasWarnings):
+    """Result of ``process.flow_induced_pulsation_screening``."""
+
+    CALC_ID: ClassVar[str] = "process.flow_induced_pulsation_screening"
+
+    #: the AVIFF likelihood band.
+    likelihood: FivLikelihood
+
+    #: whether the shedding frequency is inside any mode's envelope.
+    any_mode_locked_in: bool
+
+    #: the vortex-shedding frequency.
+    shedding_frequency: Q
+
+    #: the lowest main-line velocity that places the shedding frequency on a mode.
+    lowest_resonance_velocity: Q
+
+    #: the branch-mouth effective width `pi d/4 + r`.
+    effective_width: Q
+
+    #: the branch-to-run diameter ratio.
+    diameter_ratio: float
+
+    #: the main-line momentum flux `rho v^2`.
+    rho_v2: Q
+
+    #: the momentum flux normalised by 20000 Pa.
+    energy_term: float
+
+    #: `min(1, (d/D_run)/0.5)`.
+    coupling_factor: float
+
+    #: the strongest locked mode's `1/(2n+1)` weight, zero when none locks.
+    mode_weight: float
+
+    #: the normalised severity of the excited mode.
+    severity: float
+
+    #: one row per evaluated acoustic mode, in mode order.
+    modes: tuple[PulsationModeResult, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

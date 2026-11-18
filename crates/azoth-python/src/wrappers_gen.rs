@@ -6393,6 +6393,44 @@ pub fn flare(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Flow-induced pulsation screening.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (acoustic_length, branch_internal_diameter, run_internal_diameter, main_line_velocity, main_line_density, speed_of_sound, edge_radius, termination, strouhal_number, mode_count))]
+#[pyo3(
+    text_signature = "(acoustic_length, branch_internal_diameter, run_internal_diameter, main_line_velocity, main_line_density, speed_of_sound, edge_radius, termination, strouhal_number, mode_count)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn flow_induced_pulsation_screening(
+    py: Python<'_>,
+    acoustic_length: f64,
+    branch_internal_diameter: f64,
+    run_internal_diameter: f64,
+    main_line_velocity: f64,
+    main_line_density: f64,
+    speed_of_sound: f64,
+    edge_radius: Option<f64>,
+    termination: Option<&str>,
+    strouhal_number: Option<f64>,
+    mode_count: Option<f64>,
+) -> PyResult<crate::transport_gen::PyFlowInducedPulsationResult> {
+    azoth_process::models::flow_induced_pulsation_screening::flow_induced_pulsation_screening(
+        meters(acoustic_length),
+        meters(branch_internal_diameter),
+        meters(run_internal_diameter),
+        meters_per_second(main_line_velocity),
+        kilograms_per_cubic_meter(main_line_density),
+        meters_per_second(speed_of_sound),
+        edge_radius.map(meters),
+        termination,
+        strouhal_number,
+        mode_count,
+    )
+    .map(|r| crate::transport_gen::PyFlowInducedPulsationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// FMEA worksheet.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

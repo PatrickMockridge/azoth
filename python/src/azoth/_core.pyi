@@ -1040,6 +1040,19 @@ class MinimalCutSet:
     cardinality: float
 
 @final
+class PulsationModeResult:
+    """one row per evaluated acoustic mode, in mode order."""
+
+    mode_index: float
+    frequency: Qty
+    envelope_low: Qty
+    envelope_high: Qty
+    locked_in: bool
+    resonance_velocity: Qty
+    resonance_velocity_low: Qty
+    resonance_velocity_high: Qty
+
+@final
 class FmeaRankedEntry:
     """the entries with `RPN >= rpn_threshold`, in caller order."""
 
@@ -3811,6 +3824,22 @@ class FlareResult:
     mass_utilization: float | None
     molar_utilization: float | None
     overloaded: bool | None
+    warnings: list[Warning]
+
+@final
+class FlowInducedPulsationResult:
+    likelihood: str
+    any_mode_locked_in: bool
+    shedding_frequency: Qty
+    lowest_resonance_velocity: Qty
+    effective_width: Qty
+    diameter_ratio: float
+    rho_v2: Qty
+    energy_term: float
+    coupling_factor: float
+    mode_weight: float
+    severity: float
+    modes: list[PulsationModeResult]
     warnings: list[Warning]
 
 @final
@@ -7805,6 +7834,18 @@ def flare(
     design_mass_flow_capacity: float | None = None,
     design_molar_flow_capacity: float | None = None,
 ) -> FlareResult: ...
+def flow_induced_pulsation_screening(
+    acoustic_length: float,
+    branch_internal_diameter: float,
+    run_internal_diameter: float,
+    main_line_velocity: float,
+    main_line_density: float,
+    speed_of_sound: float,
+    edge_radius: float | None = None,
+    termination: str | None = None,
+    strouhal_number: float | None = None,
+    mode_count: float | None = None,
+) -> FlowInducedPulsationResult: ...
 def fmea_worksheet(entries: list[FmeaEntry], rpn_threshold: float) -> FmeaWorksheetResult: ...
 def gas_blowby(
     upstream_pressure: float,

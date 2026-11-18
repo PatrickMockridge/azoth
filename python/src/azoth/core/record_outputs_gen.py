@@ -774,6 +774,35 @@ class PipeFireRupturePoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PulsationModeResult:
+    """one row per evaluated acoustic mode, in mode order."""
+
+    #: the mode index n, zero for the fundamental.
+    mode_index: float
+
+    #: the acoustic eigenfrequency.
+    frequency: Q
+
+    #: the lower lock-in envelope, `0.8 f_n`.
+    envelope_low: Q
+
+    #: the upper lock-in envelope, `1.2 f_n`.
+    envelope_high: Q
+
+    #: whether the shedding frequency is inside this mode's envelope.
+    locked_in: bool
+
+    #: the main-line velocity that places the shedding frequency on this mode.
+    resonance_velocity: Q
+
+    #: the lower velocity of this mode's lock-in band.
+    resonance_velocity_low: Q
+
+    #: the upper velocity of this mode's lock-in band.
+    resonance_velocity_high: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class RegisterFinding:
     """one row per finding, in the class's order and with its duplicates."""
 

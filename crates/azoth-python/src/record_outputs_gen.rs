@@ -2114,6 +2114,95 @@ impl From<&azoth_process::models::pipe_fire_rupture::PipeFireRupturePoint>
     }
 }
 
+/// one row per evaluated acoustic mode, in mode order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PulsationModeResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPulsationModeResult {
+    /// the mode index n, zero for the fundamental.
+    #[pyo3(get)]
+    pub mode_index: f64,
+    /// the acoustic eigenfrequency.
+    #[pyo3(get)]
+    pub frequency: PyQty,
+    /// the lower lock-in envelope, `0.8 f_n`.
+    #[pyo3(get)]
+    pub envelope_low: PyQty,
+    /// the upper lock-in envelope, `1.2 f_n`.
+    #[pyo3(get)]
+    pub envelope_high: PyQty,
+    /// whether the shedding frequency is inside this mode's envelope.
+    #[pyo3(get)]
+    pub locked_in: bool,
+    /// the main-line velocity that places the shedding frequency on this mode.
+    #[pyo3(get)]
+    pub resonance_velocity: PyQty,
+    /// the lower velocity of this mode's lock-in band.
+    #[pyo3(get)]
+    pub resonance_velocity_low: PyQty,
+    /// the upper velocity of this mode's lock-in band.
+    #[pyo3(get)]
+    pub resonance_velocity_high: PyQty,
+}
+
+#[pymethods]
+impl PyPulsationModeResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PulsationModeResult(mode_index={}, frequency={:?}, envelope_low={:?}, envelope_high={:?}, locked_in={:?}, resonance_velocity={:?}, resonance_velocity_low={:?}, resonance_velocity_high={:?})",
+            self.mode_index,
+            self.frequency,
+            self.envelope_low,
+            self.envelope_high,
+            self.locked_in,
+            self.resonance_velocity,
+            self.resonance_velocity_low,
+            self.resonance_velocity_high
+        )
+    }
+}
+
+impl From<&azoth_process::models::flow_induced_pulsation_screening::PulsationModeResult>
+    for PyPulsationModeResult
+{
+    fn from(
+        row: &azoth_process::models::flow_induced_pulsation_screening::PulsationModeResult,
+    ) -> Self {
+        Self {
+            mode_index: row.mode_index,
+            frequency: PyQty {
+                magnitude_si: row.frequency.value,
+                unit: "1/s".to_string(),
+            },
+            envelope_low: PyQty {
+                magnitude_si: row.envelope_low.value,
+                unit: "1/s".to_string(),
+            },
+            envelope_high: PyQty {
+                magnitude_si: row.envelope_high.value,
+                unit: "1/s".to_string(),
+            },
+            locked_in: row.locked_in,
+            resonance_velocity: PyQty {
+                magnitude_si: row.resonance_velocity.value,
+                unit: "m/s".to_string(),
+            },
+            resonance_velocity_low: PyQty {
+                magnitude_si: row.resonance_velocity_low.value,
+                unit: "m/s".to_string(),
+            },
+            resonance_velocity_high: PyQty {
+                magnitude_si: row.resonance_velocity_high.value,
+                unit: "m/s".to_string(),
+            },
+        }
+    }
+}
+
 /// one row per finding, in the class's order and with its duplicates.
 #[pyclass(
     frozen,

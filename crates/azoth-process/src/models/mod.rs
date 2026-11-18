@@ -60,6 +60,7 @@ pub mod fire_monitor_coverage;
 pub mod fire_water_coverage_assessment;
 pub mod fire_water_demand;
 pub mod flare;
+pub mod flow_induced_pulsation_screening;
 pub mod fmea_worksheet;
 pub mod gas_blowby;
 pub mod gas_dispersion;
@@ -188,6 +189,9 @@ pub use fire_water_coverage_assessment::{
 };
 pub use fire_water_demand::{FireWaterDemandResult, ProtectedObject, fire_water_demand};
 pub use flare::{FlareResult, flare};
+pub use flow_induced_pulsation_screening::{
+    FlowInducedPulsationResult, PulsationModeResult, flow_induced_pulsation_screening,
+};
 pub use fmea_worksheet::{FmeaEntry, FmeaRankedEntry, FmeaWorksheetResult, fmea_worksheet};
 pub use gas_blowby::{BlowbyVerdict, GasBlowbyResult, gas_blowby};
 pub use gas_dispersion::{GasDispersionResult, gas_dispersion};

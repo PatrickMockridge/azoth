@@ -2776,6 +2776,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 9,
         "tests_skipped": 0,
     },
+    'process.flow_induced_pulsation_screening': {
+        "calc_id": 'process.flow_induced_pulsation_screening',
+        "name": 'Flow-induced pulsation screening',
+        "spec": {'path': 'specs/models/process/flow_induced_pulsation_screening.toml', 'sha256': '164a7caf4e68134f0063f3f1de2e9db762bb6accaecb5794492ada955fc43510'},
+        "code": [{'path': 'python/src/azoth/process/reference/flow_induced_pulsation_screening.py', 'sha256': 'cd5eec85763a97fd83f3ceb8bb087bad308e8ec930d70e523703f7e6e8dc999c'}, {'path': 'crates/azoth-process/src/models/flow_induced_pulsation_screening.rs', 'sha256': '8ae0e2aaae8944cca50daa3560312c069971f722fb19adcf67a59eb0e2ccee87'}],
+        "source": 'NeqSim process/safety/vibration/FlowInducedPulsationScreening.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'process.fmea_worksheet': {
         "calc_id": 'process.fmea_worksheet',
         "name": 'FMEA worksheet',

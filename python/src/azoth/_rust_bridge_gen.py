@@ -113,6 +113,7 @@ from azoth.core.result import (
     FirozabadiRamleyInterfaceTensionResult,
     FivLikelihood,
     FlareResult,
+    FlowInducedPulsationResult,
     FlowlineScaleProfileResult,
     FlowlineScaleSegment,
     FlowRegime,
@@ -273,6 +274,7 @@ from azoth.core.result import (
     PtFlashResult,
     PtPhaseEnvelopeResult,
     PuFlashResult,
+    PulsationModeResult,
     PumpDeadheadResult,
     PumpPowerResult,
     PumpResult,
@@ -553,6 +555,7 @@ __all__ = [
     "fire_water_demand",
     "firozabadi_ramley_interface_tension",
     "flare",
+    "flow_induced_pulsation_screening",
     "flowline_scale_profile",
     "fmea_worksheet",
     "fouling_model",
@@ -6723,6 +6726,38 @@ def flare(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, i
         mass_utilization=result.mass_utilization,
         molar_utilization=result.molar_utilization,
         overloaded=result.overloaded,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def flow_induced_pulsation_screening(acoustic_length: Q, branch_internal_diameter: Q, run_internal_diameter: Q, main_line_velocity: Q, main_line_density: Q, speed_of_sound: Q, edge_radius: Q | None=None, termination: str | None=None, strouhal_number: float | None=None, mode_count: float | None=None) -> FlowInducedPulsationResult:
+    """``process.flow_induced_pulsation_screening``, computed in Rust."""
+    spec = _models_gen.model("process.flow_induced_pulsation_screening")
+    result = _core.flow_induced_pulsation_screening(
+        input_to_si(spec, "acoustic_length", acoustic_length),
+        input_to_si(spec, "branch_internal_diameter", branch_internal_diameter),
+        input_to_si(spec, "run_internal_diameter", run_internal_diameter),
+        input_to_si(spec, "main_line_velocity", main_line_velocity),
+        input_to_si(spec, "main_line_density", main_line_density),
+        input_to_si(spec, "speed_of_sound", speed_of_sound),
+        None if edge_radius is None else input_to_si(spec, "edge_radius", edge_radius),
+        termination,
+        None if strouhal_number is None else strouhal_number,
+        None if mode_count is None else mode_count,
+    )
+    return FlowInducedPulsationResult(
+        likelihood=FivLikelihood(result.likelihood),
+        any_mode_locked_in=result.any_mode_locked_in,
+        shedding_frequency=from_si(result.shedding_frequency.magnitude_si, result.shedding_frequency.unit),
+        lowest_resonance_velocity=from_si(result.lowest_resonance_velocity.magnitude_si, result.lowest_resonance_velocity.unit),
+        effective_width=from_si(result.effective_width.magnitude_si, result.effective_width.unit),
+        diameter_ratio=result.diameter_ratio,
+        rho_v2=from_si(result.rho_v2.magnitude_si, result.rho_v2.unit),
+        energy_term=result.energy_term,
+        coupling_factor=result.coupling_factor,
+        mode_weight=result.mode_weight,
+        severity=result.severity,
+        modes=tuple(PulsationModeResult(mode_index=c.mode_index, frequency=from_si(c.frequency.magnitude_si, c.frequency.unit), envelope_low=from_si(c.envelope_low.magnitude_si, c.envelope_low.unit), envelope_high=from_si(c.envelope_high.magnitude_si, c.envelope_high.unit), locked_in=c.locked_in, resonance_velocity=from_si(c.resonance_velocity.magnitude_si, c.resonance_velocity.unit), resonance_velocity_low=from_si(c.resonance_velocity_low.magnitude_si, c.resonance_velocity_low.unit), resonance_velocity_high=from_si(c.resonance_velocity_high.magnitude_si, c.resonance_velocity_high.unit)) for c in result.modes),
         warnings=_warnings(result.warnings),
     )
 

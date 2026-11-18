@@ -49,6 +49,7 @@ from azoth.core.result import (
     FireWaterCoverageAssessmentResult,
     FireWaterDemandResult,
     FlareResult,
+    FlowInducedPulsationResult,
     FmeaWorksheetResult,
     GasBlowbyResult,
     GasDispersionResult,
@@ -166,6 +167,7 @@ __all__ = [
     "fire_water_coverage_assessment",
     "fire_water_demand",
     "flare",
+    "flow_induced_pulsation_screening",
     "forms",
     "gas_blowby",
     "gas_dispersion",
@@ -267,6 +269,7 @@ _BOW_TIE = "process.bow_tie"
 _EXPANDER = "process.expander"
 _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
+_FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
 _MDMT = "process.mdmt"
 _PIPING_FIV_GAS = "process.piping_fiv_gas"
 _PIPING_FIV_LIQUID = "process.piping_fiv_liquid"
@@ -1833,6 +1836,40 @@ def acoustic_induced_vibration_screening(
         molecular_weight=molecular_weight,
         outside_diameter=outside_diameter,
         wall_thickness=wall_thickness,
+    )
+
+
+def flow_induced_pulsation_screening(
+    acoustic_length: Q,
+    branch_internal_diameter: Q,
+    run_internal_diameter: Q,
+    main_line_velocity: Q,
+    main_line_density: Q,
+    speed_of_sound: Q,
+    edge_radius: Q | None = None,
+    termination: str | None = None,
+    strouhal_number: float | None = None,
+    mode_count: float | None = None,
+) -> FlowInducedPulsationResult:
+    """The side-branch pulsation likelihood and every evaluated acoustic mode.
+
+    A closed branch is a quarter-wave tube and an open one a half-wave tube; a mode locks in
+    inside ``[0.8 f_n, 1.2 f_n]``. Only the strongest locked mode's weight enters the
+    severity, and a branch with no lock-in or a severity below 0.05 is low.
+
+    See :func:`azoth.process.reference.flow_induced_pulsation_screening`.
+    """
+    return resolve(_FLOW_INDUCED_PULSATION_SCREENING)(  # type: ignore[no-any-return]
+        acoustic_length=acoustic_length,
+        branch_internal_diameter=branch_internal_diameter,
+        run_internal_diameter=run_internal_diameter,
+        main_line_velocity=main_line_velocity,
+        main_line_density=main_line_density,
+        speed_of_sound=speed_of_sound,
+        edge_radius=edge_radius,
+        termination=termination,
+        strouhal_number=strouhal_number,
+        mode_count=mode_count,
     )
 
 

@@ -22,12 +22,13 @@ use crate::record_outputs_gen::{
     PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIncrementalZoneRow,
     PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLopaLayerContribution,
     PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyNaceIssueRow, PyPipeFireRupturePoint, PyRegisterFinding, PyReliefDisposalRow,
-    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
-    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint,
-    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
-    PySubFraction, PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyNaceIssueRow, PyPipeFireRupturePoint, PyPulsationModeResult, PyRegisterFinding,
+    PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage,
+    PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice,
+    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
+    PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue, PySterileRadius,
+    PyStreamScaleMineralRow, PySubFraction, PyTr3001Finding, PyVesselRuptureStep,
+    PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -17577,6 +17578,113 @@ impl From<&azoth_process::models::flare::FlareResult> for PyFlareResult {
             mass_utilization: r.mass_utilization,
             molar_utilization: r.molar_utilization,
             overloaded: r.overloaded,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.flow_induced_pulsation_screening`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FlowInducedPulsationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFlowInducedPulsationResult {
+    /// the AVIFF likelihood band.
+    #[pyo3(get)]
+    pub likelihood: String,
+    /// whether the shedding frequency is inside any mode's envelope.
+    #[pyo3(get)]
+    pub any_mode_locked_in: bool,
+    /// the vortex-shedding frequency.
+    #[pyo3(get)]
+    pub shedding_frequency: PyQty,
+    /// the lowest main-line velocity that places the shedding frequency on a mode.
+    #[pyo3(get)]
+    pub lowest_resonance_velocity: PyQty,
+    /// the branch-mouth effective width `pi d/4 + r`.
+    #[pyo3(get)]
+    pub effective_width: PyQty,
+    /// the branch-to-run diameter ratio.
+    #[pyo3(get)]
+    pub diameter_ratio: f64,
+    /// the main-line momentum flux `rho v^2`.
+    #[pyo3(get)]
+    pub rho_v2: PyQty,
+    /// the momentum flux normalised by 20000 Pa.
+    #[pyo3(get)]
+    pub energy_term: f64,
+    /// `min(1, (d/D_run)/0.5)`.
+    #[pyo3(get)]
+    pub coupling_factor: f64,
+    /// the strongest locked mode's `1/(2n+1)` weight, zero when none locks.
+    #[pyo3(get)]
+    pub mode_weight: f64,
+    /// the normalised severity of the excited mode.
+    #[pyo3(get)]
+    pub severity: f64,
+    /// one row per evaluated acoustic mode, in mode order.
+    #[pyo3(get)]
+    pub modes: Vec<PyPulsationModeResult>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFlowInducedPulsationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FlowInducedPulsationResult(likelihood={:?}, any_mode_locked_in={:?}, shedding_frequency={:?}, lowest_resonance_velocity={:?}, effective_width={:?}, diameter_ratio={:?}, rho_v2={:?}, energy_term={:?}, coupling_factor={:?}, mode_weight={:?}, severity={:?}, modes={:?}, {} warning(s))",
+            self.likelihood,
+            self.any_mode_locked_in,
+            self.shedding_frequency,
+            self.lowest_resonance_velocity,
+            self.effective_width,
+            self.diameter_ratio,
+            self.rho_v2,
+            self.energy_term,
+            self.coupling_factor,
+            self.mode_weight,
+            self.severity,
+            self.modes,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::flow_induced_pulsation_screening::FlowInducedPulsationResult>
+    for PyFlowInducedPulsationResult
+{
+    fn from(
+        r: &azoth_process::models::flow_induced_pulsation_screening::FlowInducedPulsationResult,
+    ) -> Self {
+        Self {
+            likelihood: r.likelihood.as_str().to_string(),
+            any_mode_locked_in: r.any_mode_locked_in,
+            shedding_frequency: PyQty {
+                magnitude_si: r.shedding_frequency.value,
+                unit: "1/s".to_string(),
+            },
+            lowest_resonance_velocity: PyQty {
+                magnitude_si: r.lowest_resonance_velocity.value,
+                unit: "m/s".to_string(),
+            },
+            effective_width: PyQty {
+                magnitude_si: r.effective_width.value,
+                unit: "m".to_string(),
+            },
+            diameter_ratio: r.diameter_ratio,
+            rho_v2: PyQty {
+                magnitude_si: r.rho_v2.value,
+                unit: "Pa".to_string(),
+            },
+            energy_term: r.energy_term,
+            coupling_factor: r.coupling_factor,
+            mode_weight: r.mode_weight,
+            severity: r.severity,
+            modes: r.modes.iter().map(PyPulsationModeResult::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

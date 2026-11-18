@@ -1757,6 +1757,46 @@ def _acoustic_induced_vibration_screening(inputs: Mapping[str, Any]) -> dict[str
     }
 
 
+def _flow_induced_pulsation_screening(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.flow_induced_pulsation_screening`'s layers, from the reference's arithmetic.
+
+    The likelihood and the per-mode rows are the model's own, asserted by its test and the
+    cross-impl comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.flow_induced_pulsation_screening import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["acoustic_length"]), "m"),
+        quantity(float(inputs["branch_internal_diameter"]), "m"),
+        quantity(float(inputs["run_internal_diameter"]), "m"),
+        quantity(float(inputs["main_line_velocity"]), "m/s"),
+        quantity(float(inputs["main_line_density"]), "kg/m**3"),
+        quantity(float(inputs["speed_of_sound"]), "m/s"),
+        edge_radius=optional("edge_radius", "m"),
+        termination=(None if inputs.get("termination") is None else str(inputs["termination"])),
+        strouhal_number=(
+            None if inputs.get("strouhal_number") is None else float(inputs["strouhal_number"])
+        ),
+        mode_count=(None if inputs.get("mode_count") is None else float(inputs["mode_count"])),
+    )
+    return {
+        "shedding_frequency_hz": solution.shedding_frequency,
+        "lowest_resonance_velocity_mps": solution.lowest_resonance_velocity,
+        "effective_width_m": solution.effective_width,
+        "diameter_ratio": solution.diameter_ratio,
+        "rho_v2_pa": solution.rho_v2,
+        "energy_term": solution.energy_term,
+        "coupling_factor": solution.coupling_factor,
+        "mode_weight": solution.mode_weight,
+        "severity": solution.severity,
+    }
+
+
 def _piping_fiv_gas(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.piping_fiv_gas`'s layers, from the reference's arithmetic.
 
@@ -3727,6 +3767,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.runaway_reaction": _runaway_reaction,
     "process.mdmt": _mdmt,
     "process.acoustic_induced_vibration_screening": _acoustic_induced_vibration_screening,
+    "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.piping_fiv_gas": _piping_fiv_gas,
     "process.piping_fiv_liquid": _piping_fiv_liquid,
     "process.vacuum_collapse": _vacuum_collapse,
@@ -4817,6 +4858,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_mdmt.tsv",
         block=1,
         identified_by=("#label", "mdmt_curve_b_25"),
+    ),
+    # Pulsation's one: the closed unlocked branch. The eleven further states and the ten
+    # refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.flow_induced_pulsation_screening",
+        case="closed_low",
+        capture="process_flow_induced_pulsation_screening.tsv",
+        block=0,
+        identified_by=("#label", "puls_closed_low"),
     ),
     # AIV's one: the low let-down. The other three states, the six band rows and the
     # refusals are declared in `UNCASED_ROWS`.
@@ -7692,6 +7742,8 @@ UNCASED_ROWS: dict[str, int] = {
     # AIV's eighteen: the three further model states, the six band rows and the nine
     # refusals.
     "process_acoustic_induced_vibration_screening.tsv": 18,
+    # Pulsation's twenty-one: the eleven further model states and the ten refusals.
+    "process_flow_induced_pulsation_screening.tsv": 21,
     # Gas-line FIV's thirteen: the eight further model states and the five refusals.
     "process_piping_fiv_gas.tsv": 13,
     # Liquid-line FIV's nine: the five further model states and the four refusals.

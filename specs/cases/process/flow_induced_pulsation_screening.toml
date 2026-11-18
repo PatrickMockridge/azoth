@@ -1,0 +1,142 @@
+model = "process.flow_induced_pulsation_screening"
+[[cases]]
+id = "closed_low"
+tolerance = 1.0e-12
+source = "A 3 m closed branch of 0.15 m on a 0.3 m run at 20 m/s in 10 kg/m3 gas at 400 m/s: the shedding frequency sits between the first two modes, so nothing locks in. From `validation/neqsim/captures/process_flow_induced_pulsation_screening.tsv` (`puls_closed_low`)."
+[cases.inputs]
+acoustic_length = 3.0
+branch_internal_diameter = 0.15
+run_internal_diameter = 0.3
+main_line_velocity = 20.0
+main_line_density = 10.0
+speed_of_sound = 400.0
+[cases.expected]
+likelihood = "low"
+any_mode_locked_in = false
+shedding_frequency = 62.813150873601366
+lowest_resonance_velocity = 10.613488694560113
+effective_width = 0.11780972450961724
+diameter_ratio = 0.5
+rho_v2 = 4000.0
+energy_term = 0.2
+coupling_factor = 1.0
+mode_weight = 0.0
+severity = 0.0
+[[cases]]
+id = "closed_lock"
+tolerance = 1.0e-12
+source = "At 31.84 m/s the shedding frequency lands on the second mode: the weight is 1/3 and the severity is 0.169, medium. From (`puls_closed_lock`)."
+[cases.inputs]
+acoustic_length = 3.0
+branch_internal_diameter = 0.15
+run_internal_diameter = 0.3
+main_line_velocity = 31.84
+main_line_density = 10.0
+speed_of_sound = 400.0
+[cases.expected]
+likelihood = "medium"
+any_mode_locked_in = true
+shedding_frequency = 99.99853619077336
+lowest_resonance_velocity = 10.613488694560113
+effective_width = 0.11780972450961724
+diameter_ratio = 0.5
+rho_v2 = 10137.856
+energy_term = 0.5068928
+coupling_factor = 1.0
+mode_weight = 0.3333333333333333
+severity = 0.16896426666666667
+[[cases]]
+id = "open_lock"
+tolerance = 1.0e-12
+source = "An open termination makes the first half-wave mode the one the shedding frequency hits: the weight is one and the severity 0.2, medium. From (`puls_open_lock`)."
+[cases.inputs]
+acoustic_length = 3.0
+branch_internal_diameter = 0.15
+run_internal_diameter = 0.3
+main_line_velocity = 20.0
+main_line_density = 10.0
+speed_of_sound = 400.0
+termination = "open"
+[cases.expected]
+likelihood = "medium"
+any_mode_locked_in = true
+shedding_frequency = 62.813150873601366
+lowest_resonance_velocity = 21.226977389120226
+effective_width = 0.11780972450961724
+diameter_ratio = 0.5
+rho_v2 = 4000.0
+energy_term = 0.2
+coupling_factor = 1.0
+mode_weight = 1.0
+severity = 0.2
+[[cases]]
+id = "open_boundary_030"
+tolerance = 1.0e-12
+source = "At 15 kg/m3 the severity is exactly 0.3, the high band's lower boundary. From (`puls_open_boundary_030`)."
+[cases.inputs]
+acoustic_length = 3.0
+branch_internal_diameter = 0.15
+run_internal_diameter = 0.3
+main_line_velocity = 20.0
+main_line_density = 15.0
+speed_of_sound = 400.0
+termination = "open"
+[cases.expected]
+likelihood = "high"
+any_mode_locked_in = true
+shedding_frequency = 62.813150873601366
+lowest_resonance_velocity = 21.226977389120226
+effective_width = 0.11780972450961724
+diameter_ratio = 0.5
+rho_v2 = 6000.0
+energy_term = 0.3
+coupling_factor = 1.0
+mode_weight = 1.0
+severity = 0.3
+[[cases]]
+id = "open_boundary_100"
+tolerance = 1.0e-12
+source = "At 50 kg/m3 the severity is exactly 1.0, the very-high band's lower boundary. From (`puls_open_boundary_100`)."
+[cases.inputs]
+acoustic_length = 3.0
+branch_internal_diameter = 0.15
+run_internal_diameter = 0.3
+main_line_velocity = 20.0
+main_line_density = 50.0
+speed_of_sound = 400.0
+termination = "open"
+[cases.expected]
+likelihood = "very_high"
+any_mode_locked_in = true
+shedding_frequency = 62.813150873601366
+lowest_resonance_velocity = 21.226977389120226
+effective_width = 0.11780972450961724
+diameter_ratio = 0.5
+rho_v2 = 20000.0
+energy_term = 1.0
+coupling_factor = 1.0
+mode_weight = 1.0
+severity = 1.0
+[[cases]]
+id = "locked_negligible"
+tolerance = 1.0e-12
+source = "At 9.03 m/s the fundamental locks in but the severity is 0.041, below the 0.05 floor, so the branch is still low. From (`puls_locked_negligible`)."
+[cases.inputs]
+acoustic_length = 3.0
+branch_internal_diameter = 0.15
+run_internal_diameter = 0.3
+main_line_velocity = 9.03
+main_line_density = 10.0
+speed_of_sound = 400.0
+[cases.expected]
+likelihood = "low"
+any_mode_locked_in = true
+shedding_frequency = 28.36013761943101
+lowest_resonance_velocity = 10.613488694560113
+effective_width = 0.11780972450961724
+diameter_ratio = 0.5
+rho_v2 = 815.4089999999999
+energy_term = 0.04077044999999999
+coupling_factor = 1.0
+mode_weight = 1.0
+severity = 0.04077044999999999

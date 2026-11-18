@@ -41,6 +41,7 @@ use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
 use crate::models::fire_water_demand::FireWaterDemandResult;
 use crate::models::flare::FlareResult;
+use crate::models::flow_induced_pulsation_screening::FlowInducedPulsationResult;
 use crate::models::fmea_worksheet::FmeaWorksheetResult;
 use crate::models::gas_blowby::GasBlowbyResult;
 use crate::models::gas_dispersion::GasDispersionResult;
@@ -839,6 +840,29 @@ impl CalcResult for FlareResult {
         "mass_utilization",
         "molar_utilization",
         "overloaded",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FlowInducedPulsationResult {
+    const CALC_ID: &'static str = "process.flow_induced_pulsation_screening";
+    const FIELDS: &'static [&'static str] = &[
+        "likelihood",
+        "any_mode_locked_in",
+        "shedding_frequency",
+        "lowest_resonance_velocity",
+        "effective_width",
+        "diameter_ratio",
+        "rho_v2",
+        "energy_term",
+        "coupling_factor",
+        "mode_weight",
+        "severity",
+        "modes",
         "warnings",
     ];
 

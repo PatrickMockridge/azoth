@@ -270,6 +270,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyFireWaterCoverageAssessmentResult>()?;
     m.add_class::<crate::transport_gen::PyFireWaterDemandResult>()?;
     m.add_class::<crate::transport_gen::PyFlareResult>()?;
+    m.add_class::<crate::transport_gen::PyFlowInducedPulsationResult>()?;
     m.add_class::<crate::transport_gen::PyFmeaWorksheetResult>()?;
     m.add_class::<crate::transport_gen::PyGasBlowbyResult>()?;
     m.add_class::<crate::transport_gen::PyGasDispersionResult>()?;
@@ -393,6 +394,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyMinimalCutSet>()?;
     m.add_class::<crate::record_outputs_gen::PyNaceIssueRow>()?;
     m.add_class::<crate::record_outputs_gen::PyPipeFireRupturePoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyPulsationModeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyRegisterFinding>()?;
     m.add_class::<crate::record_outputs_gen::PyReliefDisposalRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
@@ -1029,6 +1031,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::process::fire_water_demand, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::flare, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::flow_induced_pulsation_screening,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::fmea_worksheet, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_blowby, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_dispersion, m)?)?;

@@ -43,6 +43,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.fire_water_coverage_assessment`](./fire_water_coverage_assessment.md) | `closed_form_fire_water_coverage_assessment` | NeqSim process/safety/firewater/FireWaterCoverageAssessment.java |
 | [`process.fire_water_demand`](./fire_water_demand.md) | `closed_form_fire_water_demand` | NeqSim process/safety/firewater/FireWaterDemandCalculator.java |
 | [`process.flare`](./flare.md) | `direct composition` | NeqSim process/equipment/flare/Flare.java |
+| [`process.flow_induced_pulsation_screening`](./flow_induced_pulsation_screening.md) | `side_branch_acoustic_resonance` | NeqSim process/safety/vibration/FlowInducedPulsationScreening.java |
 | [`process.fmea_worksheet`](./fmea_worksheet.md) | `fmea_rpn` | NeqSim process/safety/hazid/FMEAWorksheet.java |
 | [`process.gas_blowby`](./gas_blowby.md) | `isentropic_nozzle_blowby` | NeqSim process/safety/blowby/GasBlowbyAnalyzer.java |
 | [`process.gas_dispersion`](./gas_dispersion.md) | `pasquill_gifford_or_britter_mcquaid_screening` | NeqSim process/safety/dispersion/GasDispersionAnalyzer.java |

@@ -447,6 +447,7 @@ NON_UNIT_MODELS = {
     "process.runaway_reaction": "the adiabatic runaway screen over scalars, not a unit",
     "process.mdmt": "the UCS-66 MDMT curve over scalars, not a unit",
     "process.acoustic_induced_vibration_screening": "the Carucci-Mueller acoustic screen over scalars, not a unit",
+    "process.flow_induced_pulsation_screening": "the side-branch resonance screen over scalars and mode rows, not a unit",
     "process.piping_fiv_gas": "the AVIFF gas-line likelihood over scalars, not a unit",
     "process.piping_fiv_liquid": "the AVIFF liquid-line likelihood over scalars, not a unit",
     "process.vacuum_collapse": "the constant-volume cooling sweep over a fluid, not a unit",
