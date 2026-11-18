@@ -16,20 +16,20 @@
 use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
-    PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEscalationItemResult,
-    PyEventTreeOutcome, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
-    PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
-    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
-    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
-    PyMinimalCutSet, PyNaceIssueRow, PyP002FindingResult, PyPipeFireRupturePoint,
-    PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PyTr3001Finding, PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult,
-    PyZoneRatingRow,
+    PyDepositionSegmentRow, PyDepressurizationPoint, PyEquilibriumSoundSpeedSample,
+    PyEscalationItemResult, PyEventTreeOutcome, PyFlowlineScaleSegment, PyFmeaRankedEntry,
+    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
+    PyHydrateRiskPoint, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
+    PyLeakBlowdownPoint, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat,
+    PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow, PyP002FindingResult,
+    PyPipeFireRupturePoint, PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow,
+    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
+    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint,
+    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
+    PySts0131FindingResult, PySubFraction, PyTr3001Finding, PyVesselFillingPoint,
+    PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -15822,6 +15822,156 @@ impl From<&azoth_process::models::deluge_nozzle_layout::DelugeNozzleLayoutResult
             pressure_adequate: r.pressure_adequate,
             density_met: r.density_met,
             clearance_adequate: r.clearance_adequate,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.depressurization`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DepressurizationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDepressurizationResult {
+    /// one row per step, in time order.
+    #[pyo3(get)]
+    pub points: Vec<PyDepressurizationPoint>,
+    /// the pre-alignment flash's pressure, one of the class's two initial pressures.
+    #[pyo3(get)]
+    pub initial_pressure: PyQty,
+    /// the constant fire duty the run was given.
+    #[pyo3(get)]
+    pub fire_heat_input: PyQty,
+    /// whether the fire duty is routed through the wall model.
+    #[pyo3(get)]
+    pub fire_heat_routed_to_wall: bool,
+    /// the steps that used the ideal-gas fallback.
+    #[pyo3(get)]
+    pub vu_flash_fallback_count: f64,
+    /// whether any step discharged the vapour phase rather than the bulk.
+    #[pyo3(get)]
+    pub vapour_withdrawal_used: bool,
+    /// the interpolated time to half the initial pressure; absent when not reached.
+    #[pyo3(get)]
+    pub time_to_half_pressure: Option<PyQty>,
+    /// the interpolated time to 8 bara absolute; absent when not reached.
+    #[pyo3(get)]
+    pub time_to_7_barg: Option<PyQty>,
+    /// the coldest recorded fluid temperature.
+    #[pyo3(get)]
+    pub min_fluid_temperature: PyQty,
+    /// the coldest recorded wall temperature.
+    #[pyo3(get)]
+    pub min_wall_temperature: PyQty,
+    /// the highest recorded pressure.
+    #[pyo3(get)]
+    pub max_pressure: PyQty,
+    /// the hottest recorded fluid temperature.
+    #[pyo3(get)]
+    pub max_fluid_temperature: PyQty,
+    /// the hottest recorded wall temperature.
+    #[pyo3(get)]
+    pub max_wall_temperature: PyQty,
+    /// whether the half-pressure crossing is at or within 900 s.
+    #[pyo3(get)]
+    pub half_pressure_criterion_met: bool,
+    /// whether the 8 bara crossing is at or within 900 s.
+    #[pyo3(get)]
+    pub seven_barg_criterion_met: bool,
+    /// whether the pressure never rose beyond numerical tolerance.
+    #[pyo3(get)]
+    pub pressure_monotonic_non_increasing: bool,
+    /// whether the inventory never grew beyond numerical tolerance.
+    #[pyo3(get)]
+    pub mass_monotonic_non_increasing: bool,
+    /// the recorded rows.
+    #[pyo3(get)]
+    pub recorded_points: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDepressurizationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DepressurizationResult(points={:?}, initial_pressure={:?}, fire_heat_input={:?}, fire_heat_routed_to_wall={:?}, vu_flash_fallback_count={:?}, vapour_withdrawal_used={:?}, time_to_half_pressure={:?}, time_to_7_barg={:?}, min_fluid_temperature={:?}, min_wall_temperature={:?}, max_pressure={:?}, max_fluid_temperature={:?}, max_wall_temperature={:?}, half_pressure_criterion_met={:?}, seven_barg_criterion_met={:?}, pressure_monotonic_non_increasing={:?}, mass_monotonic_non_increasing={:?}, recorded_points={:?}, {} warning(s))",
+            self.points,
+            self.initial_pressure,
+            self.fire_heat_input,
+            self.fire_heat_routed_to_wall,
+            self.vu_flash_fallback_count,
+            self.vapour_withdrawal_used,
+            self.time_to_half_pressure,
+            self.time_to_7_barg,
+            self.min_fluid_temperature,
+            self.min_wall_temperature,
+            self.max_pressure,
+            self.max_fluid_temperature,
+            self.max_wall_temperature,
+            self.half_pressure_criterion_met,
+            self.seven_barg_criterion_met,
+            self.pressure_monotonic_non_increasing,
+            self.mass_monotonic_non_increasing,
+            self.recorded_points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::depressurization::DepressurizationResult>
+    for PyDepressurizationResult
+{
+    fn from(r: &azoth_process::models::depressurization::DepressurizationResult) -> Self {
+        Self {
+            points: r.points.iter().map(PyDepressurizationPoint::from).collect(),
+            initial_pressure: PyQty {
+                magnitude_si: r.initial_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            fire_heat_input: PyQty {
+                magnitude_si: r.fire_heat_input.value,
+                unit: "W".to_string(),
+            },
+            fire_heat_routed_to_wall: r.fire_heat_routed_to_wall,
+            vu_flash_fallback_count: r.vu_flash_fallback_count,
+            vapour_withdrawal_used: r.vapour_withdrawal_used,
+            time_to_half_pressure: r.time_to_half_pressure.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            time_to_7_barg: r.time_to_7_barg.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            min_fluid_temperature: PyQty {
+                magnitude_si: r.min_fluid_temperature.value,
+                unit: "K".to_string(),
+            },
+            min_wall_temperature: PyQty {
+                magnitude_si: r.min_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            max_pressure: PyQty {
+                magnitude_si: r.max_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            max_fluid_temperature: PyQty {
+                magnitude_si: r.max_fluid_temperature.value,
+                unit: "K".to_string(),
+            },
+            max_wall_temperature: PyQty {
+                magnitude_si: r.max_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            half_pressure_criterion_met: r.half_pressure_criterion_met,
+            seven_barg_criterion_met: r.seven_barg_criterion_met,
+            pressure_monotonic_non_increasing: r.pressure_monotonic_non_increasing,
+            mass_monotonic_non_increasing: r.mass_monotonic_non_increasing,
+            recorded_points: r.recorded_points,
             warnings: transport(&r.warnings),
         }
     }

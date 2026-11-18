@@ -1083,6 +1083,17 @@ class ConsequenceOutcomeResult:
     fatality_frequency_per_year: float
 
 @final
+class DepressurizationPoint:
+    """one row per step, in time order."""
+
+    time: Qty
+    pressure: Qty
+    temperature: Qty
+    mass: Qty
+    wall_temperature: Qty
+    mass_flow: Qty
+
+@final
 class EscalationItemResult:
     """the largest propagation over every registered item, in the items order."""
 
@@ -3673,6 +3684,28 @@ class DelugeNozzleLayoutResult:
     pressure_adequate: bool
     density_met: bool
     clearance_adequate: bool
+    warnings: list[Warning]
+
+@final
+class DepressurizationResult:
+    points: list[DepressurizationPoint]
+    initial_pressure: Qty
+    fire_heat_input: Qty
+    fire_heat_routed_to_wall: bool
+    vu_flash_fallback_count: float
+    vapour_withdrawal_used: bool
+    time_to_half_pressure: Qty | None
+    time_to_7_barg: Qty | None
+    min_fluid_temperature: Qty
+    min_wall_temperature: Qty
+    max_pressure: Qty
+    max_fluid_temperature: Qty
+    max_wall_temperature: Qty
+    half_pressure_criterion_met: bool
+    seven_barg_criterion_met: bool
+    pressure_monotonic_non_increasing: bool
+    mass_monotonic_non_increasing: bool
+    recorded_points: float
     warnings: list[Warning]
 
 @final
@@ -7796,6 +7829,31 @@ def deluge_nozzle_layout(
     operating_pressure: float | None = None,
     coverage_efficiency: float | None = None,
 ) -> DelugeNozzleLayoutResult: ...
+def depressurization(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: float,
+    initial_p: float,
+    vessel_volume: float,
+    orifice_diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    fire_heat_input: float | None = None,
+    fire_heat_input_to_wall: bool | None = None,
+    fire_exposed_area: float | None = None,
+    fire_preset: str | None = None,
+    fire_emissivity: float | None = None,
+    fire_flame_temperature: float | None = None,
+    fire_convective_coefficient: float | None = None,
+    wall_mass: float | None = None,
+    wall_area: float | None = None,
+    wall_specific_heat: float | None = None,
+    wall_heat_transfer_coefficient: float | None = None,
+    time_step: float | None = None,
+    max_time: float | None = None,
+    stop_pressure: float | None = None,
+    withdrawal_mode: str | None = None,
+) -> DepressurizationResult: ...
 def distillation_column(
     components: list[str],
     feed_n: float,

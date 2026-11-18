@@ -255,6 +255,7 @@
   - [Control valve failure relief](./process/control_valve_failure_relief.md)
   - [Cooler](./process/cooler.md)
   - [Deluge nozzle layout](./process/deluge_nozzle_layout.md)
+  - [Vessel depressurization](./process/depressurization.md)
   - [Distillation column](./process/distillation_column.md)
   - [Dynamic PSV sizing](./process/dynamic_psv_sizing.md)
   - [Ejector](./process/ejector.md)

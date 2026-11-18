@@ -483,6 +483,83 @@ impl From<&azoth_eos::results::DepositionSegmentRow> for PyDepositionSegmentRow 
     }
 }
 
+/// one row per step, in time order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DepressurizationPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDepressurizationPoint {
+    /// the step's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the vessel pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the fluid temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// the vessel inventory.
+    #[pyo3(get)]
+    pub mass: PyQty,
+    /// the wall metal temperature, equal to the fluid's when no wall is modelled.
+    #[pyo3(get)]
+    pub wall_temperature: PyQty,
+    /// the instantaneous discharge rate.
+    #[pyo3(get)]
+    pub mass_flow: PyQty,
+}
+
+#[pymethods]
+impl PyDepressurizationPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "DepressurizationPoint(time={:?}, pressure={:?}, temperature={:?}, mass={:?}, wall_temperature={:?}, mass_flow={:?})",
+            self.time,
+            self.pressure,
+            self.temperature,
+            self.mass,
+            self.wall_temperature,
+            self.mass_flow
+        )
+    }
+}
+
+impl From<&azoth_process::models::depressurization::DepressurizationPoint>
+    for PyDepressurizationPoint
+{
+    fn from(row: &azoth_process::models::depressurization::DepressurizationPoint) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            temperature: PyQty {
+                magnitude_si: row.temperature.value,
+                unit: "K".to_string(),
+            },
+            mass: PyQty {
+                magnitude_si: row.mass.value,
+                unit: "kg".to_string(),
+            },
+            wall_temperature: PyQty {
+                magnitude_si: row.wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            mass_flow: PyQty {
+                magnitude_si: row.mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+        }
+    }
+}
+
 /// the accepted stencil's states, centre first.
 #[pyclass(
     frozen,

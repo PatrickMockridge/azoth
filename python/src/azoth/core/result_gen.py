@@ -30,6 +30,7 @@ from azoth.core.record_outputs_gen import (
     ChemicalWarningRow,
     ConsequenceOutcomeResult,
     DepositionSegmentRow,
+    DepressurizationPoint,
     EquilibriumSoundSpeedSample,
     EscalationItemResult,
     EventTreeOutcome,
@@ -6375,6 +6376,70 @@ class DelugeNozzleLayoutResult(_HasWarnings):
 
     #: whether the available clear depth meets the nozzle's requirement.
     clearance_adequate: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class DepressurizationResult(_HasWarnings):
+    """Result of ``process.depressurization``."""
+
+    CALC_ID: ClassVar[str] = "process.depressurization"
+
+    #: one row per step, in time order.
+    points: tuple[DepressurizationPoint, ...]
+
+    #: the pre-alignment flash's pressure, one of the class's two initial pressures.
+    initial_pressure: Q
+
+    #: the constant fire duty the run was given.
+    fire_heat_input: Q
+
+    #: whether the fire duty is routed through the wall model.
+    fire_heat_routed_to_wall: bool
+
+    #: the steps that used the ideal-gas fallback.
+    vu_flash_fallback_count: float
+
+    #: whether any step discharged the vapour phase rather than the bulk.
+    vapour_withdrawal_used: bool
+
+    #: the interpolated time to half the initial pressure; absent when not reached.
+    time_to_half_pressure: Q | None
+
+    #: the interpolated time to 8 bara absolute; absent when not reached.
+    time_to_7_barg: Q | None
+
+    #: the coldest recorded fluid temperature.
+    min_fluid_temperature: Q
+
+    #: the coldest recorded wall temperature.
+    min_wall_temperature: Q
+
+    #: the highest recorded pressure.
+    max_pressure: Q
+
+    #: the hottest recorded fluid temperature.
+    max_fluid_temperature: Q
+
+    #: the hottest recorded wall temperature.
+    max_wall_temperature: Q
+
+    #: whether the half-pressure crossing is at or within 900 s.
+    half_pressure_criterion_met: bool
+
+    #: whether the 8 bara crossing is at or within 900 s.
+    seven_barg_criterion_met: bool
+
+    #: whether the pressure never rose beyond numerical tolerance.
+    pressure_monotonic_non_increasing: bool
+
+    #: whether the inventory never grew beyond numerical tolerance.
+    mass_monotonic_non_increasing: bool
+
+    #: the recorded rows.
+    recorded_points: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

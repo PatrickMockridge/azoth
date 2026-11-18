@@ -261,6 +261,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.control_valve_failure_relief" => azoth_process::models::control_valve_failure_relief::ControlValveFailureReliefResult::FIELDS.to_vec(),
         "process.cooler" => azoth_process::models::cooler::CoolerResult::FIELDS.to_vec(),
         "process.deluge_nozzle_layout" => azoth_process::models::deluge_nozzle_layout::DelugeNozzleLayoutResult::FIELDS.to_vec(),
+        "process.depressurization" => azoth_process::models::depressurization::DepressurizationResult::FIELDS.to_vec(),
         "process.distillation_column" => azoth_process::models::distillation_column::DistillationColumnResult::FIELDS.to_vec(),
         "process.dynamic_psv_sizing" => azoth_process::models::dynamic_psv_sizing::DynamicPsvSizingResult::FIELDS.to_vec(),
         "process.ejector" => azoth_process::models::ejector::EjectorResult::FIELDS.to_vec(),

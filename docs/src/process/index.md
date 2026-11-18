@@ -33,6 +33,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.control_valve_failure_relief`](./control_valve_failure_relief.md) | `control_valve_fail_open_nozzle` | NeqSim process/safety/overpressure/ControlValveFailureRelief.java |
 | [`process.cooler`](./cooler.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Cooler.java |
 | [`process.deluge_nozzle_layout`](./deluge_nozzle_layout.md) | `closed_form_deluge_nozzle_layout` | NeqSim process/safety/firewater/DelugeNozzleLayout.java |
+| [`process.depressurization`](./depressurization.md) | `explicit_euler_equilibrium_blowdown` | NeqSim process/safety/depressurization/DepressurizationSimulator.java |
 | [`process.distillation_column`](./distillation_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/DistillationColumn.java |
 | [`process.dynamic_psv_sizing`](./dynamic_psv_sizing.md) | `bisection_over_psv_area` | NeqSim process/safety/depressurization/DynamicPsvSizingStudy.java |
 | [`process.ejector`](./ejector.md) | `direct composition` | NeqSim process/equipment/ejector/Ejector.java |

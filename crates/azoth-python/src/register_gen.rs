@@ -260,6 +260,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyControlValveFailureReliefResult>()?;
     m.add_class::<crate::transport_gen::PyCoolerResult>()?;
     m.add_class::<crate::transport_gen::PyDelugeNozzleLayoutResult>()?;
+    m.add_class::<crate::transport_gen::PyDepressurizationResult>()?;
     m.add_class::<crate::transport_gen::PyDistillationColumnResult>()?;
     m.add_class::<crate::transport_gen::PyDynamicPsvSizingResult>()?;
     m.add_class::<crate::transport_gen::PyEjectorResult>()?;
@@ -379,6 +380,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyChemicalWarningRow>()?;
     m.add_class::<crate::record_outputs_gen::PyConsequenceOutcomeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyDepressurizationPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyEquilibriumSoundSpeedSample>()?;
     m.add_class::<crate::record_outputs_gen::PyEscalationItemResult>()?;
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
@@ -1025,6 +1027,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::deluge_nozzle_layout,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::depressurization, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::distillation_column,
         m

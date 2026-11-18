@@ -1,0 +1,250 @@
+id = "process.depressurization"
+name = "Vessel depressurization"
+kind = "procedure"
+assumptions = [
+    "**the class's `run`**: the vessel inventory is aligned to the vessel volume, the initial row is recorded, and each step computes the discharge rate, a mass and energy balance, an optional lumped wall and fire boundary, a VU flash at the vessel volume and the new internal energy, and the API 521 summary.",
+    "**the discharge stream** is the low-pressure inventory through a top-mounted valve: AUTO and VAPOUR take the **lightest** phase of a multiphase flash when its density is at most 300 kg/m3, and the bulk otherwise; a step removes at most 25 % of that phase's moles.",
+    "**the VU flash is the class's dispatch**: a pure feed that is subcritical and whose internal energy lies between the saturated values takes `VUflashSingleComp` at the system's pressure; every other feed takes `OptimizedVUflash`.",
+    "**the energy balance** is `dU = -h dm + Q_fire dt + q_wall dt`, with the fire routed through the wall only when `fire_heat_input_to_wall`, a positive wall mass and a positive wall area are all set; otherwise it heats the fluid directly. The wall exchange and the wall update use the pre-step wall and fluid temperatures.",
+    "**the fire boundary** is the constant `fire_heat_input`, or a temperature-dependent flux `epsilon sigma (T_flame^4 - T_surface^4) + h (T_flame - T_surface)` over the exposed area when `fire_exposed_area` is set; the flux is floored at zero and the temperature-dependent branch **ignores** the constant duty.",
+    "**the class's silent per-step fallbacks are mirrored**, not refused: a capacity ratio at or below one becomes 1.3, an invalid compressibility becomes 1, a NaN or negative rate becomes 0, and a VU-flash failure sets `P = m R T/(MW V) Z` floored at the back pressure and flashes TP. Only the VU-flash fallback is counted.",
+    "**the initial pressure is read twice**: the pre-alignment flash's pressure and the first recorded row's; they are the same flash pressure here because the alignment holds the feed's temperature and pressure.",
+    "**the API 521 criteria** are the half-pressure and 8 bara crossings, linearly interpolated between rows, met at or within 900 s; the monotonic flags use the class's tolerances (`1e-3` bara absolute or `1e-4` relative for pressure, `1e-9` relative for mass).",
+    "**the class's unit setters, `reset`, the message strings and the summary line are presentation.**",
+]
+references = [
+    "API STD 521. Pressure-relieving and Depressurizing Systems, 7th edition, section 5.20; BS EN ISO 23251.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/depressurization/DepressurizationSimulator.java` is the port source, through `run` and its result's `evaluate`.",
+    "`validation/neqsim/captures/process_depressurization.tsv` - a cold gas, the 900 s API run, the wall fire, the preset and explicit fire boundaries, the three withdrawal modes and both pure-feed routes.",
+]
+[source]
+standard = "NeqSim process/safety/depressurization/DepressurizationSimulator.java"
+edition = "Its `run`: the mole alignment, the discharge selection, the mass and energy balance, the lumped wall, the fire boundary, the VU flash and the API 521 evaluation."
+[algorithm]
+scheme = "explicit_euler_equilibrium_blowdown"
+convergence = "relative"
+tolerance = 1.0e-12
+max_iterations = 1000000
+[inputs]
+[inputs.components]
+type = "components"
+description = "the vessel inventory's substances, by name, resolved against the component databank.\n"
+[inputs.initial_z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the inventory's composition, checked rather than renormalised.\n"
+[inputs.initial_t]
+unit = "K"
+description = "the inventory temperature before blowdown.\n"
+[inputs.initial_p]
+unit = "Pa"
+description = "the inventory pressure before blowdown.\n"
+[inputs.vessel_volume]
+unit = "m**3"
+description = "the vessel's internal volume. Must be positive.\n"
+[inputs.orifice_diameter]
+unit = "m"
+description = "the blowdown opening's diameter. Must be positive.\n"
+[inputs.discharge_coefficient]
+unit = "dimensionless"
+description = "the orifice coefficient in `(0, 1]`.\n"
+[inputs.back_pressure]
+unit = "Pa"
+description = "the receiving absolute pressure; the fallback update is floored at it.\n"
+[inputs.fire_heat_input]
+unit = "W"
+optional = true
+description = "the constant fire heat input. **Absent is 0.**\n"
+[inputs.fire_heat_input_to_wall]
+type = "boolean"
+optional = true
+description = "whether the fire heats the lumped wall before the fluid. **Absent is false.**\n"
+[inputs.fire_exposed_area]
+unit = "m**2"
+optional = true
+description = "the fire-exposed area; its presence switches on the temperature-dependent flux. **Absent is 0, the constant duty.**\n"
+[inputs.fire_preset]
+type = "enum"
+values = ["pool_fire_peak", "pool_fire_background", "jet_fire_peak", "jet_fire_background"]
+optional = true
+description = "a screening fire preset supplying the emissivity, flame temperature and convection coefficient. **Absent uses the explicit trio.**\n"
+[inputs.fire_emissivity]
+unit = "dimensionless"
+optional = true
+description = "the effective flame emissivity. **Absent takes 0.9.**\n"
+[inputs.fire_flame_temperature]
+unit = "K"
+optional = true
+description = "the effective radiating flame temperature. **Absent takes 1100 K.**\n"
+[inputs.fire_convective_coefficient]
+unit = "W/(m**2*K)"
+optional = true
+description = "the flame-to-surface convection coefficient. **Absent takes 30.**\n"
+[inputs.wall_mass]
+unit = "kg"
+optional = true
+description = "the lumped wall metal mass. **Absent is 0, which disables the wall.**\n"
+[inputs.wall_area]
+unit = "m**2"
+optional = true
+description = "the wall's internal area. **Absent is 0.**\n"
+[inputs.wall_specific_heat]
+unit = "J/(kg*K)"
+optional = true
+description = "the wall metal's specific heat. **Absent takes 470.**\n"
+[inputs.wall_heat_transfer_coefficient]
+unit = "W/(m**2*K)"
+optional = true
+description = "the inside film coefficient. **Absent takes 50.**\n"
+[inputs.time_step]
+unit = "s"
+optional = true
+description = "the explicit step. **Absent takes 1 s.**\n"
+[inputs.max_time]
+unit = "s"
+optional = true
+description = "the blowdown horizon. **Absent takes 900 s.**\n"
+[inputs.stop_pressure]
+unit = "Pa"
+optional = true
+description = "the pressure at which the march stops. **Absent takes 1.5e5 Pa.**\n"
+[inputs.withdrawal_mode]
+type = "enum"
+values = ["auto", "bulk", "vapour"]
+optional = true
+description = "which inventory leaves through the valve. **Absent is auto.**\n"
+[outputs]
+[outputs.points]
+type = "record_list"
+description = "one row per step, in time order.\n"
+[outputs.points.fields.time]
+unit = "s"
+description = "the step's time.\n"
+[outputs.points.fields.pressure]
+unit = "Pa"
+description = "the vessel pressure.\n"
+[outputs.points.fields.temperature]
+unit = "K"
+description = "the fluid temperature.\n"
+[outputs.points.fields.mass]
+unit = "kg"
+description = "the vessel inventory.\n"
+[outputs.points.fields.wall_temperature]
+unit = "K"
+description = "the wall metal temperature, equal to the fluid's when no wall is modelled.\n"
+[outputs.points.fields.mass_flow]
+unit = "kg/s"
+description = "the instantaneous discharge rate.\n"
+[outputs.initial_pressure]
+unit = "Pa"
+description = "the pre-alignment flash's pressure, one of the class's two initial pressures.\n"
+[outputs.fire_heat_input]
+unit = "W"
+description = "the constant fire duty the run was given.\n"
+[outputs.fire_heat_routed_to_wall]
+type = "boolean"
+description = "whether the fire duty is routed through the wall model.\n"
+[outputs.vu_flash_fallback_count]
+unit = "dimensionless"
+description = "the steps that used the ideal-gas fallback.\n"
+[outputs.vapour_withdrawal_used]
+type = "boolean"
+description = "whether any step discharged the vapour phase rather than the bulk.\n"
+[outputs.time_to_half_pressure]
+unit = "s"
+optional = true
+description = "the interpolated time to half the initial pressure; absent when not reached.\n"
+[outputs.time_to_7_barg]
+unit = "s"
+optional = true
+description = "the interpolated time to 8 bara absolute; absent when not reached.\n"
+[outputs.min_fluid_temperature]
+unit = "K"
+description = "the coldest recorded fluid temperature.\n"
+[outputs.min_wall_temperature]
+unit = "K"
+description = "the coldest recorded wall temperature.\n"
+[outputs.max_pressure]
+unit = "Pa"
+description = "the highest recorded pressure.\n"
+[outputs.max_fluid_temperature]
+unit = "K"
+description = "the hottest recorded fluid temperature.\n"
+[outputs.max_wall_temperature]
+unit = "K"
+description = "the hottest recorded wall temperature.\n"
+[outputs.half_pressure_criterion_met]
+type = "boolean"
+description = "whether the half-pressure crossing is at or within 900 s.\n"
+[outputs.seven_barg_criterion_met]
+type = "boolean"
+description = "whether the 8 bara crossing is at or within 900 s.\n"
+[outputs.pressure_monotonic_non_increasing]
+type = "boolean"
+description = "whether the pressure never rose beyond numerical tolerance.\n"
+[outputs.mass_monotonic_non_increasing]
+type = "boolean"
+description = "whether the inventory never grew beyond numerical tolerance.\n"
+[outputs.recorded_points]
+unit = "dimensionless"
+description = "the recorded rows.\n"
+[[valid_range]]
+quantity = "initial_t"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "initial_p"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "vessel_volume"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive volume"
+[[valid_range]]
+quantity = "orifice_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive orifice"
+[[valid_range]]
+quantity = "discharge_coefficient"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the port refuses a coefficient outside (0, 1]"
+[[valid_range]]
+quantity = "back_pressure"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative receiving pressure is not a pressure"
+[[valid_range]]
+quantity = "time_step"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive step"
+[[valid_range]]
+quantity = "max_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive horizon"
+[[valid_range]]
+quantity = "stop_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive stop pressure"
+[implementations]
+python = "azoth.process.depressurization"
+rust = "azoth_process::depressurization"

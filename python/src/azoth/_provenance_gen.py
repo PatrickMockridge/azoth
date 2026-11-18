@@ -2666,6 +2666,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 6,
         "tests_skipped": 0,
     },
+    'process.depressurization': {
+        "calc_id": 'process.depressurization',
+        "name": 'Vessel depressurization',
+        "spec": {'path': 'specs/models/process/depressurization.toml', 'sha256': '3666d998c5f304a18e65f4e20482ff5e08c83bf1fcb66286f2aa938e607415e2'},
+        "code": [{'path': 'python/src/azoth/process/reference/depressurization.py', 'sha256': '6668f7cde564669427229747546564d82351ba54a291ef47017b92303153a973'}, {'path': 'crates/azoth-process/src/models/depressurization.rs', 'sha256': '0d999a98ce3e7c28ae22863b891a7c1ffd9b37c64006f7faa83360266b9cdb8b'}],
+        "source": 'NeqSim process/safety/depressurization/DepressurizationSimulator.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 9,
+        "tests_skipped": 0,
+    },
     'process.distillation_column': {
         "calc_id": 'process.distillation_column',
         "name": 'Distillation column',

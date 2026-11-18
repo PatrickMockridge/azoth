@@ -100,6 +100,16 @@ not an equation, and both implementations read it from here.
 | `pure_wall_5s` | components = ['methane'], initial_z = [1.0], initial_t = 288.15, initial_p = 2000000.0, vessel_volume = 0.05, inlet_temperature = 288.15, supply_pressure = 35000000.0, inlet_mass_flow = 0.02, wall_mass = 50.0, wall_area = 1.0, wall_specific_heat = 470.0, wall_heat_transfer_coefficient = 50.0, time_step = 0.5, max_time = 5.0 | inlet_temperature = 288.15, inlet_mass_flow = 0.02, vu_flash_fallback_count = 0.0, max_fluid_temperature = 288.15, min_fluid_temperature = 284.0088072426975, max_pressure = 2224022.2853062903, final_pressure = 2224022.2853062903, final_mass = 0.8003827224111474, liner_over_temperature = False, liner_under_temperature = False, liner_limits_met = True, recorded_points = 11.0 |
 | `pure_woodfield_5s` | components = ['methane'], initial_z = [1.0], initial_t = 288.15, initial_p = 2000000.0, vessel_volume = 0.05, inlet_temperature = 288.15, supply_pressure = 35000000.0, inlet_mass_flow = 0.02, wall_mass = 50.0, wall_area = 1.0, wall_specific_heat = 470.0, wall_heat_transfer_coefficient = 50.0, woodfield_nozzle_diameter = 0.01, vessel_height = 0.8, time_step = 0.5, max_time = 5.0 | inlet_temperature = 288.15, inlet_mass_flow = 0.02, vu_flash_fallback_count = 0.0, max_fluid_temperature = 288.15, min_fluid_temperature = 284.51455330898983, max_pressure = 2228517.0330139473, final_pressure = 2228517.0330139473, final_mass = 0.8003827224111474, liner_over_temperature = False, liner_under_temperature = False, liner_limits_met = True, recorded_points = 11.0 |
 
+## How far this is checked
+**`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.
+
+- Tests: 5 declared, every one run
+- External check: no external validation case names it
+
+The same account travels with every result this returns: `result.provenance`
+carries the status, the spec and both kernels with a SHA-256 of each, and which
+declared checks *that call* could not evaluate.
+
 ## References
 
 - Woodfield, P. L.; Monde, M.; Mitsutake, Y. (2007). Measurement of averaged heat transfer coefficients in high-pressure vessel during charging with hydrogen, nitrogen or argon. Journal of Thermal Science and Technology, 2(2), 180-191.

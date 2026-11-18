@@ -347,6 +347,7 @@ Five sections, and the difference between them is the point:
 - [`process.control_valve_failure_relief`](./process/control_valve_failure_relief.md) — Control valve failure relief
 - [`process.cooler`](./process/cooler.md) — Cooler
 - [`process.deluge_nozzle_layout`](./process/deluge_nozzle_layout.md) — Deluge nozzle layout
+- [`process.depressurization`](./process/depressurization.md) — Vessel depressurization
 - [`process.distillation_column`](./process/distillation_column.md) — Distillation column
 - [`process.dynamic_psv_sizing`](./process/dynamic_psv_sizing.md) — Dynamic PSV sizing
 - [`process.ejector`](./process/ejector.md) — Ejector

@@ -18428,10 +18428,13 @@ public class ProcessProbe {
     depRow("dep_preset_jet_fire_60s", gas, gasZ, 313.15, 90.0, 30.0, 0.03, 0.85, 2.0e5, 0.0,
         false, FirePreset.JET_FIRE_PEAK, 25.0, 0.0, 0.0, 470.0, 50.0, 1.0, 60.0, 1.5e5,
         WithdrawalMode.AUTO);
+    depRow("dep_preset_jet_fire_10s", gas, gasZ, 313.15, 90.0, 30.0, 0.03, 0.85, 2.0e5, 0.0,
+        false, FirePreset.JET_FIRE_PEAK, 25.0, 0.0, 0.0, 470.0, 50.0, 1.0, 10.0, 1.5e5,
+        WithdrawalMode.AUTO);
     depExplicitFire("dep_explicit_flux_60s", gas, gasZ, 313.15, 90.0, 30.0, 0.03, 0.85, 2.0e5,
         0.9, 1100.0, 30.0, 25.0, 1.0, 60.0, 1.5e5, WithdrawalMode.AUTO);
     String[] twoPhase = {"nitrogen", "CO2", "methane", "ethane", "propane", "n-butane",
-        "n-pentane", "n-heptane", "n-decane"};
+        "n-pentane", "n-heptane", "n-octane"};
     double[] twoPhaseZ = {0.5, 1.5, 45.0, 6.0, 4.0, 3.0, 3.0, 12.0, 25.0};
     depRow("dep_two_phase_vapour_20s", twoPhase, twoPhaseZ, 333.15, 60.0, 40.0, 0.04, 0.85,
         6.0e5, 0.0, false, null, 0.0, 0.0, 0.0, 470.0, 50.0, 2.0, 20.0, 30.0e5,

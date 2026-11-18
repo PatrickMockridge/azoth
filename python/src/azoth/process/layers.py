@@ -1908,6 +1908,62 @@ def _vessel_filling(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _depressurization(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.depressurization`'s layers, from the reference's arithmetic.
+
+    The trajectory rows and the flags are held by the cases and the capture; the summary
+    numbers are the shared layers.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.depressurization import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["initial_z"]],
+        quantity(float(inputs["initial_t"]), "K"),
+        quantity(float(inputs["initial_p"]), "Pa"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["orifice_diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        optional("fire_heat_input", "W"),
+        inputs.get("fire_heat_input_to_wall"),
+        optional("fire_exposed_area", "m**2"),
+        inputs.get("fire_preset"),
+        inputs.get("fire_emissivity"),
+        optional("fire_flame_temperature", "K"),
+        optional("fire_convective_coefficient", "W/(m**2*K)"),
+        optional("wall_mass", "kg"),
+        optional("wall_area", "m**2"),
+        optional("wall_specific_heat", "J/(kg*K)"),
+        optional("wall_heat_transfer_coefficient", "W/(m**2*K)"),
+        optional("time_step", "s"),
+        optional("max_time", "s"),
+        optional("stop_pressure", "Pa"),
+        inputs.get("withdrawal_mode"),
+    )
+    rows = {
+        "initial_pressure_pa": solution.initial_pressure,
+        "fire_heat_input_w_used": solution.fire_heat_input,
+        "vu_flash_fallback_count": solution.vu_flash_fallback_count,
+        "min_fluid_temperature_k": solution.min_fluid_temperature,
+        "min_wall_temperature_k": solution.min_wall_temperature,
+        "max_pressure_pa": solution.max_pressure,
+        "max_fluid_temperature_k": solution.max_fluid_temperature,
+        "max_wall_temperature_k": solution.max_wall_temperature,
+        "recorded_points": solution.recorded_points,
+    }
+    if solution.time_to_half_pressure is not None:
+        rows["time_to_half_pressure_s"] = solution.time_to_half_pressure
+    if solution.time_to_7_barg is not None:
+        rows["time_to_7_barg_s"] = solution.time_to_7_barg
+    return rows
+
+
 def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.inherent_safety`'s layers, from the reference's arithmetic."""
     from azoth.process.reference.inherent_safety import _evaluate
@@ -3991,6 +4047,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.psv_valve": _psv_valve,
     "process.dynamic_psv_sizing": _dynamic_psv_sizing,
     "process.vessel_filling": _vessel_filling,
+    "process.depressurization": _depressurization,
     "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.sts0131_gate": _sts0131_gate,
@@ -5138,6 +5195,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_vessel_filling.tsv",
         block=0,
         identified_by=("#label", "fill_mixture_no_wall_20s"),
+    ),
+    # The blowdown's one: the cold gas. The nine further states, the 900 s evidence and the
+    # four refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.depressurization",
+        case="cold_gas_60s",
+        capture="process_depressurization.tsv",
+        block=0,
+        identified_by=("#label", "dep_cold_gas_60s"),
     ),
     # STS-0131's one: the PSV margin at equality. The five further cases, the seven
     # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
@@ -8054,6 +8120,7 @@ UNCASED_ROWS: dict[str, int] = {
     "process_psv_valve.tsv": 16,
     "process_dynamic_psv_sizing.tsv": 3,
     "process_vessel_filling.tsv": 12,
+    "process_depressurization.tsv": 14,
     # ALARP's eight: the five further states, the empty audit and the two refusals.
     "process_alarp_audit.tsv": 8,
     # Escalation's eight: the six further states and the two refusals.

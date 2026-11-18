@@ -6042,6 +6042,70 @@ pub fn deluge_nozzle_layout(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Vessel depressurization.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, initial_z, initial_t, initial_p, vessel_volume, orifice_diameter, discharge_coefficient, back_pressure, fire_heat_input, fire_heat_input_to_wall, fire_exposed_area, fire_preset, fire_emissivity, fire_flame_temperature, fire_convective_coefficient, wall_mass, wall_area, wall_specific_heat, wall_heat_transfer_coefficient, time_step, max_time, stop_pressure, withdrawal_mode))]
+#[pyo3(
+    text_signature = "(components, initial_z, initial_t, initial_p, vessel_volume, orifice_diameter, discharge_coefficient, back_pressure, fire_heat_input, fire_heat_input_to_wall, fire_exposed_area, fire_preset, fire_emissivity, fire_flame_temperature, fire_convective_coefficient, wall_mass, wall_area, wall_specific_heat, wall_heat_transfer_coefficient, time_step, max_time, stop_pressure, withdrawal_mode)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn depressurization(
+    py: Python<'_>,
+    components: Vec<String>,
+    initial_z: Vec<f64>,
+    initial_t: f64,
+    initial_p: f64,
+    vessel_volume: f64,
+    orifice_diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    fire_heat_input: Option<f64>,
+    fire_heat_input_to_wall: Option<bool>,
+    fire_exposed_area: Option<f64>,
+    fire_preset: Option<&str>,
+    fire_emissivity: Option<f64>,
+    fire_flame_temperature: Option<f64>,
+    fire_convective_coefficient: Option<f64>,
+    wall_mass: Option<f64>,
+    wall_area: Option<f64>,
+    wall_specific_heat: Option<f64>,
+    wall_heat_transfer_coefficient: Option<f64>,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+    stop_pressure: Option<f64>,
+    withdrawal_mode: Option<&str>,
+) -> PyResult<crate::transport_gen::PyDepressurizationResult> {
+    azoth_process::models::depressurization::depressurization(
+        &components,
+        &initial_z,
+        kelvins(initial_t),
+        pascals(initial_p),
+        cubic_meters(vessel_volume),
+        meters(orifice_diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        fire_heat_input,
+        fire_heat_input_to_wall,
+        fire_exposed_area.map(square_meters),
+        fire_preset,
+        fire_emissivity,
+        fire_flame_temperature.map(kelvins),
+        fire_convective_coefficient.map(watts_per_square_meter_kelvin),
+        wall_mass.map(kilograms),
+        wall_area.map(square_meters),
+        wall_specific_heat.map(joules_per_kilogram_kelvin),
+        wall_heat_transfer_coefficient.map(watts_per_square_meter_kelvin),
+        time_step.map(seconds),
+        max_time.map(seconds),
+        stop_pressure.map(pascals),
+        withdrawal_mode,
+    )
+    .map(|r| crate::transport_gen::PyDepressurizationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Distillation column.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

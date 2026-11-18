@@ -242,6 +242,7 @@
 //!   - specs/models/process/control_valve_failure_relief.toml
 //!   - specs/models/process/cooler.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
+//!   - specs/models/process/depressurization.toml
 //!   - specs/models/process/distillation_column.toml
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
@@ -3104,6 +3105,53 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "coverage_efficiency",
         "dimensionless",
     ),
+    ("process.depressurization", "initial_z", "dimensionless"),
+    (
+        "process.depressurization",
+        "initial_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.depressurization", "initial_p", "pressure"),
+    ("process.depressurization", "vessel_volume", "volume"),
+    ("process.depressurization", "orifice_diameter", "length"),
+    (
+        "process.depressurization",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.depressurization", "back_pressure", "pressure"),
+    ("process.depressurization", "fire_heat_input", "power"),
+    ("process.depressurization", "fire_exposed_area", "area"),
+    (
+        "process.depressurization",
+        "fire_emissivity",
+        "dimensionless",
+    ),
+    (
+        "process.depressurization",
+        "fire_flame_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.depressurization",
+        "fire_convective_coefficient",
+        "heat_transfer",
+    ),
+    ("process.depressurization", "wall_mass", "mass"),
+    ("process.depressurization", "wall_area", "area"),
+    (
+        "process.depressurization",
+        "wall_specific_heat",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.depressurization",
+        "wall_heat_transfer_coefficient",
+        "heat_transfer",
+    ),
+    ("process.depressurization", "time_step", "time"),
+    ("process.depressurization", "max_time", "time"),
+    ("process.depressurization", "stop_pressure", "pressure"),
     ("process.distillation_column", "feed_n", "molar_flow"),
     ("process.distillation_column", "feed_z", "dimensionless"),
     ("process.distillation_column", "feed_p", "pressure"),

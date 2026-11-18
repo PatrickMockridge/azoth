@@ -182,6 +182,29 @@ class DepositionSegmentRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class DepressurizationPoint:
+    """one row per step, in time order."""
+
+    #: the step's time.
+    time: Q
+
+    #: the vessel pressure.
+    pressure: Q
+
+    #: the fluid temperature.
+    temperature: Q
+
+    #: the vessel inventory.
+    mass: Q
+
+    #: the wall metal temperature, equal to the fluid's when no wall is modelled.
+    wall_temperature: Q
+
+    #: the instantaneous discharge rate.
+    mass_flow: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class EquilibriumSoundSpeedSample:
     """the accepted stencil's states, centre first."""
 

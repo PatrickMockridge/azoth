@@ -31,6 +31,7 @@ use crate::models::consequence_analysis::ConsequenceAnalysisResult;
 use crate::models::control_valve_failure_relief::ControlValveFailureReliefResult;
 use crate::models::cooler::CoolerResult;
 use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
+use crate::models::depressurization::DepressurizationResult;
 use crate::models::distillation_column::DistillationColumnResult;
 use crate::models::dynamic_psv_sizing::DynamicPsvSizingResult;
 use crate::models::ejector::EjectorResult;
@@ -535,6 +536,35 @@ impl CalcResult for DelugeNozzleLayoutResult {
         "pressure_adequate",
         "density_met",
         "clearance_adequate",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for DepressurizationResult {
+    const CALC_ID: &'static str = "process.depressurization";
+    const FIELDS: &'static [&'static str] = &[
+        "points",
+        "initial_pressure",
+        "fire_heat_input",
+        "fire_heat_routed_to_wall",
+        "vu_flash_fallback_count",
+        "vapour_withdrawal_used",
+        "time_to_half_pressure",
+        "time_to_7_barg",
+        "min_fluid_temperature",
+        "min_wall_temperature",
+        "max_pressure",
+        "max_fluid_temperature",
+        "max_wall_temperature",
+        "half_pressure_criterion_met",
+        "seven_barg_criterion_met",
+        "pressure_monotonic_non_increasing",
+        "mass_monotonic_non_increasing",
+        "recorded_points",
         "warnings",
     ];
 

@@ -39,6 +39,8 @@ from azoth.core.result import (
     ControlValveFailureReliefResult,
     CoolerResult,
     DelugeNozzleLayoutResult,
+    DepressurizationPoint,
+    DepressurizationResult,
     DistillationColumnResult,
     DynamicPsvSizingResult,
     EjectorResult,
@@ -313,6 +315,7 @@ _PSV_SIZING = "process.psv_sizing"
 _PSV_VALVE = "process.psv_valve"
 _DYNAMIC_PSV_SIZING = "process.dynamic_psv_sizing"
 _VESSEL_FILLING = "process.vessel_filling"
+_DEPRESSURIZATION = "process.depressurization"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
@@ -4091,6 +4094,66 @@ def vessel_filling(
         liner_max_temperature=liner_max_temperature,
         time_step=time_step,
         max_time=max_time,
+    )
+
+
+def depressurization(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: Q,
+    initial_p: Q,
+    vessel_volume: Q,
+    orifice_diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    fire_heat_input: Q | None = None,
+    fire_heat_input_to_wall: bool | None = None,
+    fire_exposed_area: Q | None = None,
+    fire_preset: str | None = None,
+    fire_emissivity: float | None = None,
+    fire_flame_temperature: Q | None = None,
+    fire_convective_coefficient: Q | None = None,
+    wall_mass: Q | None = None,
+    wall_area: Q | None = None,
+    wall_specific_heat: Q | None = None,
+    wall_heat_transfer_coefficient: Q | None = None,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+    stop_pressure: Q | None = None,
+    withdrawal_mode: str | None = None,
+) -> DepressurizationResult:
+    """The equilibrium vessel blowdown and its API 521 summary.
+
+    AUTO and VAPOUR take the lightest phase of a multiphase inventory when its density is at
+    most 300 kg/m3 and remove at most a quarter of it per step; the fire boundary is the
+    constant duty or a temperature-dependent flux over the exposed area.
+
+    See :func:`azoth.process.reference.depressurization`.
+    """
+    return resolve(_DEPRESSURIZATION)(  # type: ignore[no-any-return]
+        components=components,
+        initial_z=initial_z,
+        initial_t=initial_t,
+        initial_p=initial_p,
+        vessel_volume=vessel_volume,
+        orifice_diameter=orifice_diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        fire_heat_input=fire_heat_input,
+        fire_heat_input_to_wall=fire_heat_input_to_wall,
+        fire_exposed_area=fire_exposed_area,
+        fire_preset=fire_preset,
+        fire_emissivity=fire_emissivity,
+        fire_flame_temperature=fire_flame_temperature,
+        fire_convective_coefficient=fire_convective_coefficient,
+        wall_mass=wall_mass,
+        wall_area=wall_area,
+        wall_specific_heat=wall_specific_heat,
+        wall_heat_transfer_coefficient=wall_heat_transfer_coefficient,
+        time_step=time_step,
+        max_time=max_time,
+        stop_pressure=stop_pressure,
+        withdrawal_mode=withdrawal_mode,
     )
 
 
