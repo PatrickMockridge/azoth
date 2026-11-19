@@ -292,14 +292,14 @@ def real_gas_fanno_release(
     ambient = accepted
     if choked:
         try:
-            flash = ps_flash(
+            ps_result = ps_flash(
                 mixture,
                 ideal_gas,
                 quantity(back, "Pa"),
                 quantity(s0, "J/(mol*K)"),
                 list(upstream_z),
             )
-            temperature = flash.T.to("K").magnitude
+            temperature = ps_result.T.to("K").magnitude
             reduced = reduced_parameters(mixture, temperature, back)
             kij = mixture.effective_kij(reduced.t_kelvin)
             root = phase_state(reduced, kij, list(upstream_z), liquid=False).z
@@ -613,9 +613,11 @@ def _solid_gate(mixture: Any, names: Any, temperature: float, z: list[float]) ->
     for index, (component, fraction) in enumerate(zip(mixture.components, z, strict=True)):
         if fraction <= 1.0e-12:
             continue
-        triple = getattr(component, "triple_point_temperature", None)
-        if hasattr(triple, "to"):
-            triple = triple.to("K").magnitude
+        triple_value = getattr(component, "triple_point_temperature", None)
+        if triple_value is not None and hasattr(triple_value, "to"):
+            triple = triple_value.to("K").magnitude
+        else:
+            triple = triple_value
         if triple is not None and 0.0 < triple < 1000.0 and temperature <= triple:
             return (
                 f"component {index} is at or below its triple point, and this port does "
