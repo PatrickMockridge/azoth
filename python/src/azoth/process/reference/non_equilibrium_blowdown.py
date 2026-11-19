@@ -16,6 +16,7 @@ from typing import Any, NamedTuple
 from azoth.core.errors import InvalidInputError
 from azoth.core.result import NonEquilibriumBlowdownPoint, NonEquilibriumBlowdownResult
 from azoth.core.units import Q, from_si, input_to_si, quantity
+from azoth.core.warnings import Warning
 from azoth.eos import components as _components
 from azoth.eos.reference._entropy_state import molar_mass_of
 from azoth.eos.reference._heat_capacity import phase_capacity
@@ -94,6 +95,7 @@ def _zone_props(mixture: Any, ideal_gas: Any, t: float, p: float, z: list[float]
     flash = pt_flash(mixture, quantity(t, "K"), quantity(p, "Pa"), z)
     if flash.phase == "two_phase":
         beta = flash.vapour_fraction
+        assert beta is not None
         vapour = _phase_props(mixture, ideal_gas, reduced, kij, t, p, list(flash.y), flash.z_vapour)
         liquid = _phase_props(mixture, ideal_gas, reduced, kij, t, p, list(flash.x), flash.z_liquid)
         mass = beta * vapour.molar_mass + (1.0 - beta) * liquid.molar_mass

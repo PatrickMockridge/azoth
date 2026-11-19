@@ -64,7 +64,7 @@ def _evaluate(
     warnings: list[Warning] = []
     step = 1.0 if grid_step is None else input_to_si(spec, "grid_step", grid_step)
     limit = 0.70 if max_allowable_mach is None else float(max_allowable_mach)
-    rows = input_records_to_si(spec, "samples", samples)
+    rows: list[dict[str, Any]] = input_records_to_si(spec, "samples", samples)
     if not rows:
         raise InvalidInputError("samples", "the class requires at least one blowdown source")
     if step <= 0.0 or not math.isfinite(step):

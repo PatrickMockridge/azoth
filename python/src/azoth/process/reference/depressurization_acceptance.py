@@ -68,7 +68,7 @@ def _evaluate(
     warnings: list[Warning] = []
     apply_checks(checks_for(spec).on_input, lambda _: None, warnings)
 
-    rows = input_records_to_si(spec, "points", points)
+    rows: list[dict[str, Any]] = input_records_to_si(spec, "points", points)
     if not rows:
         raise InvalidInputError("points", "the class requires at least one time sample")
     for row in rows:

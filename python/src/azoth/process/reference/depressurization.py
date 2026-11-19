@@ -290,7 +290,7 @@ def _orifice_rate(
         )
     if rate < 0.0 or math.isnan(rate):
         rate = 0.0
-    return rate
+    return float(rate)
 
 
 def _spec() -> dict[str, Any]:
@@ -520,6 +520,7 @@ def _evaluate(
         if selected is not None:
             vapour_used = True
             beta = state.vapour_fraction
+            assert beta is not None
             phase_moles = (beta if selected == 1 else 1.0 - beta) * moles
             requested = dm / molar_mass
             removed = min(requested, phase_moles * MAX_VAPOUR_FRACTION_PER_STEP)
