@@ -11,6 +11,7 @@ stagnation-pressure ratio is kept.
 from __future__ import annotations
 
 import math
+from typing import Any
 
 from azoth.core.errors import InvalidInputError
 from azoth.core.range import apply_checks, checks_for
@@ -259,7 +260,7 @@ def _state(
     entropy0: float,
     inlet_mach: float,
     exit_mach: float,
-) -> tuple[float, float, float, float, float, float]:
+) -> tuple[float, ...]:
     ratio_exit = (1.0 / exit_mach) * (
         (2.0 + (gamma - 1.0) * exit_mach * exit_mach) / (gamma + 1.0)
     ) ** ((gamma + 1.0) / (2.0 * (gamma - 1.0)))
@@ -340,7 +341,7 @@ def _mass_flux(
     factor = 1.0 + 0.5 * (gamma - 1.0) * mach * mach
     temperature = temperature0 / factor
     pressure = pressure0 / factor ** (gamma / (gamma - 1.0))
-    return (
+    return float(
         pressure
         / (gas_constant * temperature)
         * mach
@@ -356,7 +357,7 @@ def _expanded(
     enthalpy0: float,
     entropy0: float,
     pressure: float,
-) -> tuple[float, float, float, float, float, float]:
+) -> tuple[float, ...]:
     pressure_ratio = pressure / pressure0
     temperature = temperature0 * pressure_ratio ** ((gamma - 1.0) / gamma)
     specific_gas_constant = MOLAR_GAS_CONSTANT / molar_mass
@@ -374,15 +375,18 @@ def _expanded(
 
 
 def _solid_gate(
-    mixture: object, names: tuple[str, ...] | list[str], temperature: float, z: list[float]
+    mixture: Any, names: tuple[str, ...] | list[str], temperature: float, z: list[float]
 ) -> str | None:
     for index, (component, fraction) in enumerate(zip(mixture.components, z, strict=True)):
         if fraction <= 1.0e-12:
             continue
-        triple = getattr(component, "triple_point_temperature", None)
-        if hasattr(triple, "to"):
-            triple = triple.to("K").magnitude
-        if triple is not None and 0.0 < triple < 1000.0 and temperature <= triple:
+        triple_value = getattr(component, "triple_point_temperature", None)
+        if triple_value is not None and hasattr(triple_value, "to"):
+            triple_value = triple_value.to("K").magnitude
+        if triple_value is None:
+            continue
+        triple = float(triple_value)
+        if 0.0 < triple < 1000.0 and temperature <= triple:
             return (
                 f"component {index} is at or below its triple point, and this port does "
                 "not reproduce the per-component solid flash"
@@ -398,13 +402,14 @@ def _solid_gate(
     return None
 
 
-def _component_mass_fractions(mixture: object, z: list[float]) -> tuple[float, ...]:
+def _component_mass_fractions(mixture: Any, z: list[float]) -> tuple[float, ...]:
     masses: list[float] = []
     total = 0.0
     for index, (component, fraction) in enumerate(zip(mixture.components, z, strict=True)):
-        if component.molar_mass is None:
+        molar_mass = component.molar_mass
+        if molar_mass is None:
             raise InvalidInputError("molar_mass", f"component {index} carries no molar mass")
-        mass = fraction * component.molar_mass.to("kg/mol").magnitude
+        mass = fraction * molar_mass.to("kg/mol").magnitude
         total += mass
         masses.append(mass)
     if not total > 0.0 or not math.isfinite(total):
@@ -412,9 +417,7 @@ def _component_mass_fractions(mixture: object, z: list[float]) -> tuple[float, .
     return tuple(mass / total for mass in masses)
 
 
-def _row(
-    station: str, state: tuple[float, float, float, float, float, float]
-) -> IdealGasFannoReleaseStation:
+def _row(station: str, state: tuple[float, ...]) -> IdealGasFannoReleaseStation:
     pressure, temperature, density, enthalpy, entropy, velocity = state
     gas_density = from_si(density, "kg/m**3")
     return IdealGasFannoReleaseStation(

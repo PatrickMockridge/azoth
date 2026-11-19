@@ -11,6 +11,7 @@ iterate.
 from __future__ import annotations
 
 import math
+from typing import Any
 
 from azoth.core.errors import InvalidInputError
 from azoth.core.range import apply_checks, checks_for
@@ -173,7 +174,7 @@ def bubble_transfer_zone_release(
         0.0 if throat.liquid_velocity is None else throat.liquid_velocity.to("m/s").magnitude
     )
 
-    previous: tuple[float, float, float, float, float] | None = None
+    previous: tuple[float, ...] | None = None
     previous_rate = math.nan
     for iteration in range(1, MAX_FIXED_POINT_ITERATIONS + 1):
         try:
@@ -347,7 +348,7 @@ def _relative(first: float, second: float) -> float:
     return abs(first - second) / max(1.0e-15, abs(first), abs(second))
 
 
-def _row(station: object) -> BubbleTransferZoneReleaseStation:
+def _row(station: Any) -> BubbleTransferZoneReleaseStation:
     """One delegate station as this model's row."""
     return BubbleTransferZoneReleaseStation(
         station=station.station,

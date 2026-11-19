@@ -234,14 +234,14 @@ def _screening_rate(
     ratio = back / pressure
     if ratio <= critical:
         factor = (2.0 / (gamma + 1.0)) ** ((gamma + 1.0) / (2.0 * (gamma - 1.0)))
-        return (
+        return float(
             coefficient
             * area
             * pressure
             * math.sqrt(gamma * molar_mass / (R * temperature))
             * factor
         )
-    return coefficient * area * math.sqrt(max(0.0, 2.0 * density * (pressure - back)))
+    return float(coefficient * area * math.sqrt(max(0.0, 2.0 * density * (pressure - back))))
 
 
 def _row(station: str, state: EntropyState, velocity: float) -> LegacyScreeningReleaseStation:

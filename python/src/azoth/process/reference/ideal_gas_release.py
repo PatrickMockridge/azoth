@@ -209,7 +209,7 @@ def _expanded(
     molar_mass: float,
     gamma: float,
     pressure: float,
-) -> tuple[float, float, float, float, float]:
+) -> tuple[float, ...]:
     """One isentropic expansion from the stagnation state.
 
     Returns ``(pressure, temperature, density, specific enthalpy, specific entropy,
@@ -227,7 +227,7 @@ def _expanded(
 
 def _row(
     station: str,
-    state: tuple[float, float, float, float, float, float],
+    state: tuple[float, ...],
     molar_mass: float,
 ) -> IdealGasReleaseStation:
     """One published station row from a ``(P, T, rho, h, s, u)`` state."""

@@ -10,6 +10,7 @@ component-selective model does the rest.
 from __future__ import annotations
 
 import math
+from typing import Any
 
 from azoth.core.errors import InvalidInputError
 from azoth.core.range import apply_checks, checks_for
@@ -236,7 +237,7 @@ def ranz_marshall_release(
     )
 
 
-def _row(station: object) -> RanzMarshallReleaseStation:
+def _row(station: Any) -> RanzMarshallReleaseStation:
     """One delegate station as this model's row."""
     return RanzMarshallReleaseStation(
         station=station.station,
