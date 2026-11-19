@@ -2600,6 +2600,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'process.bubble_transfer_zone_release': {
+        "calc_id": 'process.bubble_transfer_zone_release',
+        "name": 'Predictive bubble transfer-zone orifice release',
+        "spec": {'path': 'specs/models/process/bubble_transfer_zone_release.toml', 'sha256': 'a2f934802989112bc2e52f27e34cd54acfb7dfd1cd25339ea7c14c3b3df62aa6'},
+        "code": [{'path': 'python/src/azoth/process/reference/bubble_transfer_zone_release.py', 'sha256': 'd729a1ba9daea2c9c0af5bade72c4ca9c1da2d01286712a5c0a547af518fd85a'}, {'path': 'crates/azoth-process/src/models/bubble_transfer_zone_release.rs', 'sha256': 'b0638f4dc607da0fc0da77ed3a24f48d4be30c49edf994f1680c50931cfdd499'}],
+        "source": 'NeqSim process/safety/release/PredictiveBubbleTransferZoneReleaseModel.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 4,
+        "tests_skipped": 0,
+    },
     'process.check_valve_leak_relief': {
         "calc_id": 'process.check_valve_leak_relief',
         "name": 'Check valve leak relief',

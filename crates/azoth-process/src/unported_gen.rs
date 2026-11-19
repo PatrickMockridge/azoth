@@ -15,6 +15,7 @@
 //!   - specs/models/process/blocked_outlet_relief.toml
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
+//!   - specs/models/process/bubble_transfer_zone_release.toml
 //!   - specs/models/process/check_valve_leak_relief.toml
 //!   - specs/models/process/component_selective_release.toml
 //!   - specs/models/process/component_splitter.toml

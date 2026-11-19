@@ -15,20 +15,20 @@
 
 use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
-    PyCharacterizationComponent, PyChemicalWarningRow, PyComponentSelectiveReleaseStation,
-    PyConsequenceOutcomeResult, PyDepositionSegmentRow, PyDepressurizationPoint,
-    PyDriftFluxReleaseStation, PyEquilibriumSoundSpeedSample, PyEscalationItemResult,
-    PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry,
-    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
-    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
-    PyHydrateRiskPoint, PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent,
-    PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation,
-    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
-    PyMinimalCutSet, PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
-    PyNonEquilibriumBlowdownPoint, PyP002FindingResult, PyPipeFireRupturePoint,
-    PyPrescribedSlipReleaseStation, PyPulsationModeResult, PyRanzMarshallReleaseStation,
-    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
-    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
+    PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent, PyChemicalWarningRow,
+    PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult, PyDepositionSegmentRow,
+    PyDepressurizationPoint, PyDriftFluxReleaseStation, PyEquilibriumSoundSpeedSample,
+    PyEscalationItemResult, PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment,
+    PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
+    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
+    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasReleaseStation,
+    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
+    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
+    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
+    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyP002FindingResult,
+    PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation, PyPulsationModeResult,
+    PyRanzMarshallReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
     PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
     PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
     PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
@@ -14935,6 +14935,100 @@ impl From<&azoth_process::models::bow_tie::BowTieResult> for PyBowTieResult {
             mitigated_frequency_per_year: r.mitigated_frequency_per_year,
             total_rrf: r.total_rrf,
             max_severity: r.max_severity,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.bubble_transfer_zone_release`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BubbleTransferZoneReleaseResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBubbleTransferZoneReleaseResult {
+    /// `valid`, `invalid` or `unsupported`.
+    #[pyo3(get)]
+    pub status: String,
+    /// the delegate's release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    #[pyo3(get)]
+    pub mass_flow_rate: Option<PyQty>,
+    /// the base scan's choked flag; false on failure and on no forward flow.
+    #[pyo3(get)]
+    pub choked: bool,
+    /// absent: the derived model drops the base's throat sound speed.
+    #[pyo3(get)]
+    pub throat_sound_speed: Option<PyQty>,
+    /// the upstream overall mole fractions.
+    #[pyo3(get)]
+    pub component_mole_fractions: Vec<f64>,
+    /// the upstream overall mass fractions.
+    #[pyo3(get)]
+    pub component_mass_fractions: Vec<f64>,
+    /// the delegate's stations, with the correlation-driven relaxed phase velocities. Empty on failure.
+    #[pyo3(get)]
+    pub stations: Vec<PyBubbleTransferZoneReleaseStation>,
+    /// the model's assumptions and the delegate's retained records.
+    #[pyo3(get)]
+    pub diagnostics: Vec<PyHemReleaseDiagnostic>,
+    /// the codes alone, so a case can hold the contract without asserting prose.
+    #[pyo3(get)]
+    pub diagnostic_codes: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBubbleTransferZoneReleaseResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BubbleTransferZoneReleaseResult(status={:?}, mass_flow_rate={:?}, choked={:?}, throat_sound_speed={:?}, component_mole_fractions={:?}, component_mass_fractions={:?}, stations={:?}, diagnostics={:?}, diagnostic_codes={:?}, {} warning(s))",
+            self.status,
+            self.mass_flow_rate,
+            self.choked,
+            self.throat_sound_speed,
+            self.component_mole_fractions,
+            self.component_mass_fractions,
+            self.stations,
+            self.diagnostics,
+            self.diagnostic_codes,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::bubble_transfer_zone_release::BubbleTransferZoneReleaseResult>
+    for PyBubbleTransferZoneReleaseResult
+{
+    fn from(
+        r: &azoth_process::models::bubble_transfer_zone_release::BubbleTransferZoneReleaseResult,
+    ) -> Self {
+        Self {
+            status: r.status.clone(),
+            mass_flow_rate: r.mass_flow_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            choked: r.choked,
+            throat_sound_speed: r.throat_sound_speed.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            component_mole_fractions: r.component_mole_fractions.clone(),
+            component_mass_fractions: r.component_mass_fractions.clone(),
+            stations: r
+                .stations
+                .iter()
+                .map(PyBubbleTransferZoneReleaseStation::from)
+                .collect(),
+            diagnostics: r
+                .diagnostics
+                .iter()
+                .map(PyHemReleaseDiagnostic::from)
+                .collect(),
+            diagnostic_codes: r.diagnostic_codes.clone(),
             warnings: transport(&r.warnings),
         }
     }

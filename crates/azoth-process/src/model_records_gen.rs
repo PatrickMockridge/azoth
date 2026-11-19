@@ -25,6 +25,7 @@ use crate::models::blocked_outlet_overpressure::BlockedOutletOverpressureResult;
 use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
 use crate::models::blowdown_pressure_profile::BlowdownPressureProfileResult;
 use crate::models::bow_tie::BowTieResult;
+use crate::models::bubble_transfer_zone_release::BubbleTransferZoneReleaseResult;
 use crate::models::check_valve_leak_relief::CheckValveLeakReliefResult;
 use crate::models::component_selective_release::ComponentSelectiveReleaseResult;
 use crate::models::component_splitter::ComponentSplitterResult;
@@ -380,6 +381,26 @@ impl CalcResult for BowTieResult {
         "mitigated_frequency_per_year",
         "total_rrf",
         "max_severity",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for BubbleTransferZoneReleaseResult {
+    const CALC_ID: &'static str = "process.bubble_transfer_zone_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
         "warnings",
     ];
 

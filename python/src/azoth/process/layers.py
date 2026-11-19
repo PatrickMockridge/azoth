@@ -1434,6 +1434,31 @@ def _ranz_marshall_release(inputs: Mapping[str, Any]) -> dict[str, float]:
     return _release_station_layers(result)
 
 
+def _bubble_transfer_zone_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.bubble_transfer_zone_release`'s stations, from the reference arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.bubble_transfer_zone_release import (
+        bubble_transfer_zone_release,
+    )
+
+    result = bubble_transfer_zone_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["surface_tension"]), "N/m"),
+        quantity(float(inputs["transfer_zone_hydraulic_diameter"]), "m"),
+        quantity(float(inputs["transfer_zone_vertical_length"]), "m"),
+        quantity(float(inputs["continuous_phase_dynamic_viscosity"]), "Pa*s"),
+        [quantity(float(value), "m**2/s") for value in inputs["component_diffusivities"]],
+        str(inputs["parameter_provenance"]),
+    )
+    return _release_station_layers(result)
+
+
 def _toxic_library(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.toxic_library`'s layers, from the reference's own arithmetic.
 
@@ -4391,6 +4416,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.finite_rate_release": _finite_rate_release,
     "process.component_selective_release": _component_selective_release,
     "process.ranz_marshall_release": _ranz_marshall_release,
+    "process.bubble_transfer_zone_release": _bubble_transfer_zone_release,
     "process.leak_blowdown": _leak_blowdown,
     "process.hazardous_area": _hazardous_area,
     "process.toxic_library": _toxic_library,
@@ -4848,6 +4874,13 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_hem_release.tsv",
         block=0,
         identified_by=("#label", "methane_50bara_choked"),
+    ),
+    LayerCase(
+        model="process.bubble_transfer_zone_release",
+        case="short_contact_zone",
+        capture="process_bubble_transfer_zone_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_heptane_0.1125_vertical_0.5"),
     ),
     LayerCase(
         model="process.ranz_marshall_release",
@@ -8865,6 +8898,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The Ranz-Marshall capture's six: the droplet, Reynolds, Schmidt and stagnant rows,
     # the component-basis refusal and the SRK evidence row.
     "process_ranz_marshall_release.tsv": 6,
+    # The bubble-zone capture's five: the 0.125 and long-zone rows, the out-of-range
+    # refusal and the SRK evidence row.
+    "process_bubble_transfer_zone_release.tsv": 5,
     # The blowdown capture's ten: one block is layer-cased (the ten-second methane run); the
     # rest are the long horizons held to the capture as evidence, the SRK rows, the propane
     # row whose single-phase beta and cached density are class artefacts, and the refusals.

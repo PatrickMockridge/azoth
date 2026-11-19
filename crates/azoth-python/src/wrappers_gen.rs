@@ -5834,6 +5834,50 @@ pub fn bow_tie(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Predictive bubble transfer-zone orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, transfer_zone_hydraulic_diameter, transfer_zone_vertical_length, continuous_phase_dynamic_viscosity, component_diffusivities, parameter_provenance))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, transfer_zone_hydraulic_diameter, transfer_zone_vertical_length, continuous_phase_dynamic_viscosity, component_diffusivities, parameter_provenance)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn bubble_transfer_zone_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    surface_tension: f64,
+    transfer_zone_hydraulic_diameter: f64,
+    transfer_zone_vertical_length: f64,
+    continuous_phase_dynamic_viscosity: f64,
+    component_diffusivities: Vec<f64>,
+    parameter_provenance: &str,
+) -> PyResult<crate::transport_gen::PyBubbleTransferZoneReleaseResult> {
+    azoth_process::models::bubble_transfer_zone_release::bubble_transfer_zone_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        surface_tension,
+        transfer_zone_hydraulic_diameter,
+        transfer_zone_vertical_length,
+        continuous_phase_dynamic_viscosity,
+        &component_diffusivities,
+        parameter_provenance,
+    )
+    .map(|r| crate::transport_gen::PyBubbleTransferZoneReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Check valve leak relief.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

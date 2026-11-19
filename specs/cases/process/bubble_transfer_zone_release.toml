@@ -1,0 +1,88 @@
+model = "process.bubble_transfer_zone_release"
+[[cases]]
+id = "short_contact_zone"
+tolerance = 5.0e-5
+source = "Methane/n-heptane at 0.1125/0.8875, 300 K and 30 bar through a 1 cm opening with `Cd = 0.62` into 1 bar, `sigma = 0.02`, a 0.10 m hydraulic diameter, a 0.50 m vertical length, 1 mPa s viscosity and diffusivities `(1e-8, 2e-8)` m2/s (`pr_methane_heptane_0.1125_vertical_0.5`).\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+transfer_zone_hydraulic_diameter = 0.1
+transfer_zone_vertical_length = 0.5
+continuous_phase_dynamic_viscosity = 0.001
+component_diffusivities = [1.0e-8, 2.0e-8]
+parameter_provenance = "synthetic-transfer-zone:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.7175222717288527
+choked = true
+[[cases]]
+id = "upper_window_state"
+tolerance = 5.0e-5
+source = "The same geometry at a methane fraction of 0.125 (`pr_methane_heptane_0.125_vertical_0.5`).\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.125, 0.875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+transfer_zone_hydraulic_diameter = 0.1
+transfer_zone_vertical_length = 0.5
+continuous_phase_dynamic_viscosity = 0.001
+component_diffusivities = [1.0e-8, 2.0e-8]
+parameter_provenance = "synthetic-transfer-zone:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.6146187736549171
+choked = true
+[[cases]]
+id = "long_contact_zone"
+tolerance = 5.0e-5
+source = "The 0.1125 state at a 2.0 m vertical length (`pr_methane_heptane_0.1125_vertical_2.0`): the residence time quadruples and the relaxation saturates, so the rate is the same at the capture precision.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+transfer_zone_hydraulic_diameter = 0.1
+transfer_zone_vertical_length = 2.0
+continuous_phase_dynamic_viscosity = 0.001
+component_diffusivities = [1.0e-8, 2.0e-8]
+parameter_provenance = "synthetic-transfer-zone:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.7175222717288527
+choked = true
+[[cases]]
+id = "outside_correlation_range_is_unsupported"
+tolerance = 1.0e-12
+source = "Diffusivities of `(1e-10, 2e-10)` m2/s (`pr_outside_ranz_marshall_range_unsupported`) put the Schmidt number far above the correlation bound, and the delegate is `unsupported` with `TRANSFER_ZONE_RANZ_MARSHALL_RANGE_UNSUPPORTED`.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+transfer_zone_hydraulic_diameter = 0.1
+transfer_zone_vertical_length = 0.5
+continuous_phase_dynamic_viscosity = 0.001
+component_diffusivities = [1.0e-10, 2.0e-10]
+parameter_provenance = "outside-range:v1"
+[cases.expected]
+status = "unsupported"
+choked = false

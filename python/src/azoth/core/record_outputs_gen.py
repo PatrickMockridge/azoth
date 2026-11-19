@@ -66,6 +66,53 @@ class BrineMixingPointRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class BubbleTransferZoneReleaseStation:
+    """the delegate's stations, with the correlation-driven relaxed phase velocities. Empty on failure."""
+
+    #: which station this row is.
+    station: str
+
+    #: the station's absolute pressure.
+    pressure: Q
+
+    #: the station's temperature.
+    temperature: Q
+
+    #: the relaxed harmonic mixture density at the opening; the base's elsewhere.
+    density: Q
+
+    #: the station's molar enthalpy.
+    molar_enthalpy: Q
+
+    #: the station's molar entropy, which the expansion holds fixed.
+    molar_entropy: Q
+
+    #: the station's bulk velocity: the base's on the stagnation row, `mass_flux/rho` at the opening.
+    velocity: Q
+
+    #: the closure's mass flux at the opening, before the discharge coefficient.
+    mass_flux: Q
+
+    #: what the base flash found.
+    phase: str
+
+    #: the relaxed gas phase's share of the mass. **A mass fraction, not the molar vapour fraction.**
+    gas_mass_fraction: float
+
+    #: the gas phase's own density, when the base resolved one.
+    gas_density: Q | None
+
+    #: the liquid phase's own density, when the base resolved one.
+    liquid_density: Q | None
+
+    #: the solved gas velocity at the opening and the two-phase ambient; absent elsewhere.
+    gas_velocity: Q | None
+
+    #: the solved liquid velocity at the opening and the two-phase ambient; absent elsewhere.
+    liquid_velocity: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class CharacterizationComponent:
     """The blended fluid's components: its merged base components first, in the fluids' order, then the combined pseudo-components in ascending cut order, named `PC1_PC`, `PC2_PC` and so on."""
 

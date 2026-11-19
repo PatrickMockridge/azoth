@@ -33,6 +33,7 @@ from azoth.core.result import (
     BlockedOutletReliefResult,
     BlowdownPressureProfileResult,
     BowTieResult,
+    BubbleTransferZoneReleaseResult,
     CheckValveLeakReliefResult,
     ComponentSelectiveReleaseResult,
     ComponentSplitterResult,
@@ -317,6 +318,7 @@ _DRIFT_FLUX_RELEASE = "process.drift_flux_release"
 _FINITE_RATE_RELEASE = "process.finite_rate_release"
 _COMPONENT_SELECTIVE_RELEASE = "process.component_selective_release"
 _RANZ_MARSHALL_RELEASE = "process.ranz_marshall_release"
+_BUBBLE_TRANSFER_ZONE_RELEASE = "process.bubble_transfer_zone_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
@@ -3717,6 +3719,47 @@ def ranz_marshall_release(
         continuous_phase_density=continuous_phase_density,
         continuous_phase_dynamic_viscosity=continuous_phase_dynamic_viscosity,
         relative_velocity=relative_velocity,
+        component_diffusivities=component_diffusivities,
+        parameter_provenance=parameter_provenance,
+    )
+
+
+def bubble_transfer_zone_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    surface_tension: Q,
+    transfer_zone_hydraulic_diameter: Q,
+    transfer_zone_vertical_length: Q,
+    continuous_phase_dynamic_viscosity: Q,
+    component_diffusivities: list[Q],
+    parameter_provenance: str,
+) -> BubbleTransferZoneReleaseResult:
+    """The release rate of a predictive bubble transfer-zone orifice.
+
+    The drift-flux base supplies the phase velocities; a fixed point predicts the bubble
+    diameter (the minimum of the Eotvos, Weber, quarter-hydraulic and opening limits), the
+    relative velocity and the residence time, and the Ranz-Marshall adapter solves each
+    iterate.
+
+    See :func:`azoth.process.reference.bubble_transfer_zone_release`.
+    """
+    return resolve(_BUBBLE_TRANSFER_ZONE_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        surface_tension=surface_tension,
+        transfer_zone_hydraulic_diameter=transfer_zone_hydraulic_diameter,
+        transfer_zone_vertical_length=transfer_zone_vertical_length,
+        continuous_phase_dynamic_viscosity=continuous_phase_dynamic_viscosity,
         component_diffusivities=component_diffusivities,
         parameter_provenance=parameter_provenance,
     )

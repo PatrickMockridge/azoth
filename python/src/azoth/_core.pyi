@@ -1088,8 +1088,8 @@ class RegisterFinding:
     rule: str
 
 @final
-class ComponentSelectiveReleaseStation:
-    """the base stations, with the opening's relaxed phase velocities solved. Empty on failure."""
+class BubbleTransferZoneReleaseStation:
+    """the delegate's stations, with the correlation-driven relaxed phase velocities. Empty on failure."""
 
     station: str
     pressure: Qty
@@ -1112,6 +1112,25 @@ class HemReleaseDiagnostic:
 
     code: str
     message: str
+
+@final
+class ComponentSelectiveReleaseStation:
+    """the base stations, with the opening's relaxed phase velocities solved. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
 
 @final
 class ConsequenceOutcomeResult:
@@ -3730,6 +3749,19 @@ class BowTieResult:
     mitigated_frequency_per_year: float
     total_rrf: float
     max_severity: float
+    warnings: list[Warning]
+
+@final
+class BubbleTransferZoneReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[BubbleTransferZoneReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
     warnings: list[Warning]
 
 @final
@@ -8055,6 +8087,21 @@ def bow_tie(
     consequences: list[BowTieConsequence],
     barriers: list[BowTieBarrier],
 ) -> BowTieResult: ...
+def bubble_transfer_zone_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    surface_tension: float,
+    transfer_zone_hydraulic_diameter: float,
+    transfer_zone_vertical_length: float,
+    continuous_phase_dynamic_viscosity: float,
+    component_diffusivities: list[float],
+    parameter_provenance: str,
+) -> BubbleTransferZoneReleaseResult: ...
 def check_valve_leak_relief(
     components: list[str],
     mole_fractions: list[float],

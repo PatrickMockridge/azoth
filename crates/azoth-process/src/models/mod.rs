@@ -44,6 +44,7 @@ pub mod blocked_outlet_overpressure;
 pub mod blocked_outlet_relief;
 pub mod blowdown_pressure_profile;
 pub mod bow_tie;
+pub mod bubble_transfer_zone_release;
 pub mod check_valve_leak_relief;
 pub mod component_selective_release;
 pub mod component_splitter;
@@ -190,6 +191,9 @@ pub use blowdown_pressure_profile::{
     BlowdownPressureProfileResult, BlowdownProfilePoint, blowdown_pressure_profile,
 };
 pub use bow_tie::{BowTieBarrier, BowTieConsequence, BowTieResult, BowTieThreat, bow_tie};
+pub use bubble_transfer_zone_release::{
+    BubbleTransferZoneReleaseResult, bubble_transfer_zone_release,
+};
 pub use check_valve_leak_relief::{CheckValveLeakReliefResult, check_valve_leak_relief};
 pub use component_selective_release::{
     ComponentSelectiveReleaseResult, component_selective_release,

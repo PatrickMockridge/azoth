@@ -254,6 +254,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyBlockedOutletReliefResult>()?;
     m.add_class::<crate::transport_gen::PyBlowdownPressureProfileResult>()?;
     m.add_class::<crate::transport_gen::PyBowTieResult>()?;
+    m.add_class::<crate::transport_gen::PyBubbleTransferZoneReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyCheckValveLeakReliefResult>()?;
     m.add_class::<crate::transport_gen::PyComponentSelectiveReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyComponentSplitterResult>()?;
@@ -387,6 +388,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyAlarpEvaluationResult>()?;
     m.add_class::<crate::record_outputs_gen::PyAppliedStandardRow>()?;
     m.add_class::<crate::record_outputs_gen::PyBrineMixingPointRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyBubbleTransferZoneReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyCharacterizationComponent>()?;
     m.add_class::<crate::record_outputs_gen::PyChemicalWarningRow>()?;
     m.add_class::<crate::record_outputs_gen::PyComponentSelectiveReleaseStation>()?;
@@ -1030,6 +1032,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::bow_tie, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::bubble_transfer_zone_release,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::check_valve_leak_relief,
         m

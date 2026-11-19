@@ -22357,6 +22357,15 @@
       "sub_interface": "bowtie"
     },
     {
+      "family": "release",
+      "id": "process.bubble_transfer_zone_release",
+      "name": "Predictive bubble transfer-zone orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "overpressure",
       "id": "process.check_valve_leak_relief",
       "name": "Check valve leak relief",
