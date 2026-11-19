@@ -1326,6 +1326,18 @@ class MultiVesselContributionRow:
     peak_contribution: Qty
 
 @final
+class NonEquilibriumBlowdownPoint:
+    """one row per step, in time order."""
+
+    time: Qty
+    pressure: Qty
+    gas_temperature: Qty
+    liquid_temperature: Qty
+    wall_temperature: Qty
+    gas_mass: Qty
+    liquid_mass: Qty
+
+@final
 class P002FindingResult:
     """one row per check, in the caller's order."""
 
@@ -4466,6 +4478,17 @@ class Nog070SilDeterminationResult:
     achieved_sil: float
     compliant: bool
     required_pfd_reduction_factor: float | None
+    warnings: list[Warning]
+
+@final
+class NonEquilibriumBlowdownResult:
+    points: list[NonEquilibriumBlowdownPoint]
+    initial_pressure: Qty
+    flash_fallback_count: float
+    final_gas_temperature: Qty
+    final_liquid_temperature: Qty
+    max_temperature_bifurcation: Qty
+    recorded_points: float
     warnings: list[Warning]
 
 @final
@@ -8505,6 +8528,33 @@ def nog070_sil_determination(
     pfd_average: float,
     minimum_sil: float | None = None,
 ) -> Nog070SilDeterminationResult: ...
+def non_equilibrium_blowdown(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: float,
+    initial_p: float,
+    vessel_volume: float,
+    orifice_diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    fire_emissivity: float | None = None,
+    fire_flame_temperature: float | None = None,
+    fire_convective_coefficient: float | None = None,
+    fire_exposed_area: float | None = None,
+    wall_mass: float | None = None,
+    wall_specific_heat: float | None = None,
+    inside_gas_coefficient: float | None = None,
+    interfacial_coefficient: float | None = None,
+    interfacial_area: float | None = None,
+    latent_heat: float | None = None,
+    surface_tension: float | None = None,
+    surface_fluid_constant: float | None = None,
+    critical_heat_flux: float | None = None,
+    effective_boiling_coefficient: float | None = None,
+    time_step: float | None = None,
+    max_time: float | None = None,
+    stop_pressure: float | None = None,
+) -> NonEquilibriumBlowdownResult: ...
 def norsok_p002_compliance(checks: list[P002CheckRow]) -> NorsokP002ComplianceResult: ...
 def overpressure_acceptance(
     peak_pressure: float,

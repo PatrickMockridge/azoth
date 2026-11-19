@@ -74,6 +74,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.mixer`](./mixer.md) | `direct composition` | NeqSim process/equipment/mixer/Mixer.java |
 | [`process.multi_vessel_blowdown_study`](./multi_vessel_blowdown_study.md) | `profile_superposition` | NeqSim process/safety/depressurization/MultiVesselBlowdownStudy.java |
 | [`process.nog070_sil_determination`](./nog070_sil_determination.md) | `closed_form_nog070_sil_determination` | NeqSim process/safety/risk/sis/nog070/Nog070SilDetermination.java |
+| [`process.non_equilibrium_blowdown`](./non_equilibrium_blowdown.md) | `explicit_euler_two_zone_blowdown` | NeqSim process/safety/depressurization/NonEquilibriumBlowdownModel.java |
 | [`process.norsok_p002_compliance`](./norsok_p002_compliance.md) | `norsok_p002_point_checks` | NeqSim process/safety/compliance/NorsokP002ComplianceChecker.java |
 | [`process.overpressure_acceptance`](./overpressure_acceptance.md) | `closed_form_overpressure_acceptance` | NeqSim process/safety/overpressure/OverpressureAcceptanceChecker.java |
 | [`process.overpressure_protection_study`](./overpressure_protection_study.md) | `overpressure_protection_study` | NeqSim process/safety/overpressure/OverpressureProtectionStudy.java |

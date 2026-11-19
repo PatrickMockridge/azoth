@@ -57,6 +57,7 @@ from azoth.core.record_outputs_gen import (
     MultiVesselContributionRow,
     MultiVesselProfileRow,
     NaceIssueRow,
+    NonEquilibriumBlowdownPoint,
     P002FindingResult,
     PipeFireRupturePoint,
     PulsationModeResult,
@@ -8555,6 +8556,37 @@ class Nog070SilDeterminationResult(_HasWarnings):
 
     #: `10^(minimum - achieved)`, published only when the SIF is not compliant.
     required_pfd_reduction_factor: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class NonEquilibriumBlowdownResult(_HasWarnings):
+    """Result of ``process.non_equilibrium_blowdown``."""
+
+    CALC_ID: ClassVar[str] = "process.non_equilibrium_blowdown"
+
+    #: one row per step, in time order.
+    points: tuple[NonEquilibriumBlowdownPoint, ...]
+
+    #: the initial pressure.
+    initial_pressure: Q
+
+    #: the steps that hit a guarded flash failure.
+    flash_fallback_count: float
+
+    #: the final vapour-zone temperature.
+    final_gas_temperature: Q
+
+    #: the final liquid-zone temperature.
+    final_liquid_temperature: Q
+
+    #: the largest vapour-minus-liquid temperature difference.
+    max_temperature_bifurcation: Q
+
+    #: the recorded rows.
+    recorded_points: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]

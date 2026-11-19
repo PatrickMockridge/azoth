@@ -1,0 +1,30 @@
+model = "process.non_equilibrium_blowdown"
+[[cases]]
+id = "fire_exposed_two_phase"
+tolerance = 5.0e-3
+source = "`nem_fire_20s`: a methane/propane/butane inventory at 280 K and 50 bara in a 10 m3 vessel through a 0.012 m opening, with the 20 m2 fire exposure, a 4000 kg wall, the 50 W/(m2 K) inside coefficient, the 80 W/(m2 K) interface over 4 m2 and 350 kJ/kg latent heat, for 20 one-second steps. The vapour and liquid zones end at `280.0960285030623` K and `280.0001237418308` K. **Recorded divergence**: the port reaches a `0.1354` K maximum bifurcation where the class records `0.0959` K; the bifurcation is asserted only as positive in the model test.\n"
+[cases.inputs]
+components = ["methane", "propane", "n-butane"]
+initial_z = [0.6, 0.2, 0.2]
+initial_t = 280.0
+initial_p = 5000000.0
+vessel_volume = 10.0
+orifice_diameter = 0.012
+discharge_coefficient = 0.85
+back_pressure = 100000.0
+fire_exposed_area = 20.0
+wall_mass = 4000.0
+wall_specific_heat = 470.0
+inside_gas_coefficient = 50.0
+interfacial_coefficient = 80.0
+interfacial_area = 4.0
+latent_heat = 350000.0
+time_step = 1.0
+max_time = 20.0
+stop_pressure = 300000.0
+[cases.expected]
+initial_pressure = 5000000.0
+flash_fallback_count = 0.0
+final_gas_temperature = 280.0960285030623
+final_liquid_temperature = 280.0001237418308
+recorded_points = 21.0

@@ -301,6 +301,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyMixerResult>()?;
     m.add_class::<crate::transport_gen::PyMultiVesselBlowdownStudyResult>()?;
     m.add_class::<crate::transport_gen::PyNog070SilDeterminationResult>()?;
+    m.add_class::<crate::transport_gen::PyNonEquilibriumBlowdownResult>()?;
     m.add_class::<crate::transport_gen::PyNorsokP002ComplianceResult>()?;
     m.add_class::<crate::transport_gen::PyOverpressureAcceptanceResult>()?;
     m.add_class::<crate::transport_gen::PyOverpressureProtectionStudyResult>()?;
@@ -410,6 +411,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyMultiVesselContributionRow>()?;
     m.add_class::<crate::record_outputs_gen::PyMultiVesselProfileRow>()?;
     m.add_class::<crate::record_outputs_gen::PyNaceIssueRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyNonEquilibriumBlowdownPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyP002FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PyPipeFireRupturePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyPulsationModeResult>()?;
@@ -1110,6 +1112,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::nog070_sil_determination,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::non_equilibrium_blowdown,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(

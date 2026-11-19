@@ -3638,6 +3638,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.non_equilibrium_blowdown",
+        name: "Non-equilibrium blowdown",
+        family: "depressurization",
+        sub_interface: Some("depressurization"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.norsok_p002_compliance",
         name: "NORSOK P-002 point-check compliance",
         family: "compliance",

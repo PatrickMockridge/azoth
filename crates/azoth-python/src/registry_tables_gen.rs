@@ -302,6 +302,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.mixer" => azoth_process::models::mixer::MixerResult::FIELDS.to_vec(),
         "process.multi_vessel_blowdown_study" => azoth_process::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult::FIELDS.to_vec(),
         "process.nog070_sil_determination" => azoth_process::models::nog070_sil_determination::Nog070SilDeterminationResult::FIELDS.to_vec(),
+        "process.non_equilibrium_blowdown" => azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdownResult::FIELDS.to_vec(),
         "process.norsok_p002_compliance" => azoth_process::models::norsok_p002_compliance::NorsokP002ComplianceResult::FIELDS.to_vec(),
         "process.overpressure_acceptance" => azoth_process::models::overpressure_acceptance::OverpressureAcceptanceResult::FIELDS.to_vec(),
         "process.overpressure_protection_study" => azoth_process::models::overpressure_protection_study::OverpressureProtectionStudyResult::FIELDS.to_vec(),

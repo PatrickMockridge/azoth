@@ -388,6 +388,7 @@ Five sections, and the difference between them is the point:
 - [`process.mixer`](./process/mixer.md) — Mixer
 - [`process.multi_vessel_blowdown_study`](./process/multi_vessel_blowdown_study.md) — Multi-vessel blowdown study
 - [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
+- [`process.non_equilibrium_blowdown`](./process/non_equilibrium_blowdown.md) — Non-equilibrium blowdown
 - [`process.norsok_p002_compliance`](./process/norsok_p002_compliance.md) — NORSOK P-002 point-check compliance
 - [`process.overpressure_acceptance`](./process/overpressure_acceptance.md) — Overpressure acceptance
 - [`process.overpressure_protection_study`](./process/overpressure_protection_study.md) — Overpressure protection study

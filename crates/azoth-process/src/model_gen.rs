@@ -62,6 +62,7 @@
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/multi_vessel_blowdown_study.toml
 //!   - specs/models/process/nog070_sil_determination.toml
+//!   - specs/models/process/non_equilibrium_blowdown.toml
 //!   - specs/models/process/norsok_p002_compliance.toml
 //!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/overpressure_protection_study.toml
@@ -58091,6 +58092,72 @@ pub static NOG070_SIL_DETERMINATION_SPEC: ModelSpec = ModelSpec {
     cases: NOG070_SIL_DETERMINATION_CASES,
 };
 
+static NON_EQUILIBRIUM_BLOWDOWN_CHECKS: &[SpecCheck] = &[];
+
+static NON_EQUILIBRIUM_BLOWDOWN_CASES: &[TestCase] = &[TestCase {
+    id: "fire_exposed_two_phase",
+    kind: "case",
+    property: None,
+    status: "active",
+    skip_reason: None,
+    tolerance: 0.005,
+    numbers: &[
+        ("initial_t", 280.0),
+        ("initial_p", 5000000.0),
+        ("vessel_volume", 10.0),
+        ("orifice_diameter", 0.012),
+        ("discharge_coefficient", 0.85),
+        ("back_pressure", 100000.0),
+        ("fire_exposed_area", 20.0),
+        ("wall_mass", 4000.0),
+        ("wall_specific_heat", 470.0),
+        ("inside_gas_coefficient", 50.0),
+        ("interfacial_coefficient", 80.0),
+        ("interfacial_area", 4.0),
+        ("latent_heat", 350000.0),
+        ("time_step", 1.0),
+        ("max_time", 20.0),
+        ("stop_pressure", 300000.0),
+    ],
+    flags: &[],
+    lists: &[("components", &["methane", "propane", "n-butane"])],
+    strings: &[],
+    vectors: &[("initial_z", &[0.6, 0.2, 0.2])],
+    matrices: &[],
+    expected: &[
+        ("initial_pressure", 5000000.0),
+        ("flash_fallback_count", 0.0),
+        ("final_gas_temperature", 280.0960285030623),
+        ("final_liquid_temperature", 280.0001237418308),
+        ("recorded_points", 21.0),
+    ],
+    expected_vectors: &[],
+    expected_strings: &[],
+    records: &[],
+    expected_records: &[],
+}];
+
+static NON_EQUILIBRIUM_BLOWDOWN_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "explicit_euler_two_zone_blowdown",
+    convergence: "relative",
+    tolerance: 1e-12,
+    max_iterations: 1000000,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.non_equilibrium_blowdown`.
+pub static NON_EQUILIBRIUM_BLOWDOWN_SPEC: ModelSpec = ModelSpec {
+    id: "process.non_equilibrium_blowdown",
+    kind: "procedure",
+    algorithm: Some(&NON_EQUILIBRIUM_BLOWDOWN_ALGORITHM),
+    checks: NON_EQUILIBRIUM_BLOWDOWN_CHECKS,
+    cases: NON_EQUILIBRIUM_BLOWDOWN_CASES,
+};
+
 static NORSOK_P002_COMPLIANCE_CHECKS: &[SpecCheck] = &[];
 
 static NORSOK_P002_COMPLIANCE_CASES: &[TestCase] = &[
@@ -91278,6 +91345,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &MIXER_SPEC,
     &MULTI_VESSEL_BLOWDOWN_STUDY_SPEC,
     &NOG070_SIL_DETERMINATION_SPEC,
+    &NON_EQUILIBRIUM_BLOWDOWN_SPEC,
     &NORSOK_P002_COMPLIANCE_SPEC,
     &OVERPRESSURE_ACCEPTANCE_SPEC,
     &OVERPRESSURE_PROTECTION_STUDY_SPEC,

@@ -23,14 +23,14 @@ use crate::record_outputs_gen::{
     PyHydrateRiskPoint, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
     PyLeakBlowdownPoint, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat,
     PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
-    PyMultiVesselProfileRow, PyNaceIssueRow, PyP002FindingResult, PyPipeFireRupturePoint,
-    PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PyTr3001Finding, PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult,
-    PyZoneRatingRow,
+    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyP002FindingResult,
+    PyPipeFireRupturePoint, PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow,
+    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
+    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint,
+    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
+    PySts0131FindingResult, PySubFraction, PyTr3001Finding, PyVesselFillingPoint,
+    PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -21183,6 +21183,92 @@ impl From<&azoth_process::models::nog070_sil_determination::Nog070SilDeterminati
             achieved_sil: r.achieved_sil,
             compliant: r.compliant,
             required_pfd_reduction_factor: r.required_pfd_reduction_factor,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.non_equilibrium_blowdown`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "NonEquilibriumBlowdownResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyNonEquilibriumBlowdownResult {
+    /// one row per step, in time order.
+    #[pyo3(get)]
+    pub points: Vec<PyNonEquilibriumBlowdownPoint>,
+    /// the initial pressure.
+    #[pyo3(get)]
+    pub initial_pressure: PyQty,
+    /// the steps that hit a guarded flash failure.
+    #[pyo3(get)]
+    pub flash_fallback_count: f64,
+    /// the final vapour-zone temperature.
+    #[pyo3(get)]
+    pub final_gas_temperature: PyQty,
+    /// the final liquid-zone temperature.
+    #[pyo3(get)]
+    pub final_liquid_temperature: PyQty,
+    /// the largest vapour-minus-liquid temperature difference.
+    #[pyo3(get)]
+    pub max_temperature_bifurcation: PyQty,
+    /// the recorded rows.
+    #[pyo3(get)]
+    pub recorded_points: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyNonEquilibriumBlowdownResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "NonEquilibriumBlowdownResult(points={:?}, initial_pressure={:?}, flash_fallback_count={:?}, final_gas_temperature={:?}, final_liquid_temperature={:?}, max_temperature_bifurcation={:?}, recorded_points={:?}, {} warning(s))",
+            self.points,
+            self.initial_pressure,
+            self.flash_fallback_count,
+            self.final_gas_temperature,
+            self.final_liquid_temperature,
+            self.max_temperature_bifurcation,
+            self.recorded_points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdownResult>
+    for PyNonEquilibriumBlowdownResult
+{
+    fn from(
+        r: &azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdownResult,
+    ) -> Self {
+        Self {
+            points: r
+                .points
+                .iter()
+                .map(PyNonEquilibriumBlowdownPoint::from)
+                .collect(),
+            initial_pressure: PyQty {
+                magnitude_si: r.initial_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            flash_fallback_count: r.flash_fallback_count,
+            final_gas_temperature: PyQty {
+                magnitude_si: r.final_gas_temperature.value,
+                unit: "K".to_string(),
+            },
+            final_liquid_temperature: PyQty {
+                magnitude_si: r.final_liquid_temperature.value,
+                unit: "K".to_string(),
+            },
+            max_temperature_bifurcation: PyQty {
+                magnitude_si: r.max_temperature_bifurcation.value,
+                unit: "K".to_string(),
+            },
+            recorded_points: r.recorded_points,
             warnings: transport(&r.warnings),
         }
     }

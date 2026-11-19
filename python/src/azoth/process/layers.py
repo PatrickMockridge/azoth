@@ -2084,6 +2084,51 @@ def _multi_vessel_blowdown_study(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _non_equilibrium_blowdown(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.non_equilibrium_blowdown`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.non_equilibrium_blowdown import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["initial_z"]],
+        quantity(float(inputs["initial_t"]), "K"),
+        quantity(float(inputs["initial_p"]), "Pa"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["orifice_diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        inputs.get("fire_emissivity"),
+        optional("fire_flame_temperature", "K"),
+        optional("fire_convective_coefficient", "W/(m**2*K)"),
+        optional("fire_exposed_area", "m**2"),
+        optional("wall_mass", "kg"),
+        optional("wall_specific_heat", "J/(kg*K)"),
+        optional("inside_gas_coefficient", "W/(m**2*K)"),
+        optional("interfacial_coefficient", "W/(m**2*K)"),
+        optional("interfacial_area", "m**2"),
+        inputs.get("latent_heat"),
+        inputs.get("surface_tension"),
+        inputs.get("surface_fluid_constant"),
+        inputs.get("critical_heat_flux"),
+        optional("effective_boiling_coefficient", "W/(m**2*K)"),
+        optional("time_step", "s"),
+        optional("max_time", "s"),
+        optional("stop_pressure", "Pa"),
+    )
+    return {
+        "initial_pressure_pa": solution.initial_pressure,
+        "flash_fallback_count": solution.flash_fallback_count,
+        "final_gas_temperature_k": solution.final_gas_temperature,
+        "final_liquid_temperature_k": solution.final_liquid_temperature,
+        "recorded_points": solution.recorded_points,
+    }
+
+
 def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.inherent_safety`'s layers, from the reference's arithmetic."""
     from azoth.process.reference.inherent_safety import _evaluate
@@ -4171,6 +4216,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.depressurization_acceptance": _depressurization_acceptance,
     "process.blocked_outlet_overpressure": _blocked_outlet_overpressure,
     "process.multi_vessel_blowdown_study": _multi_vessel_blowdown_study,
+    "process.non_equilibrium_blowdown": _non_equilibrium_blowdown,
     "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.sts0131_gate": _sts0131_gate,
@@ -5354,6 +5400,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_multi_vessel_blowdown_study.tsv",
         block=0,
         identified_by=("#label", "mv_two_sources_no_header"),
+    ),
+    # The non-equilibrium blowdown's one: the fire-exposed state. The default-parameter
+    # state and the single-phase refusal are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.non_equilibrium_blowdown",
+        case="fire_exposed_two_phase",
+        capture="process_non_equilibrium_blowdown.tsv",
+        block=0,
+        identified_by=("#label", "nem_fire_20s"),
     ),
     # STS-0131's one: the PSV margin at equality. The five further cases, the seven
     # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
@@ -8274,6 +8329,7 @@ UNCASED_ROWS: dict[str, int] = {
     "process_depressurization_acceptance.tsv": 8,
     "process_blocked_outlet_overpressure.tsv": 1,
     "process_multi_vessel_blowdown_study.tsv": 3,
+    "process_non_equilibrium_blowdown.tsv": 2,
     # ALARP's eight: the five further states, the empty audit and the two refusals.
     "process_alarp_audit.tsv": 8,
     # Escalation's eight: the six further states and the two refusals.

@@ -72,6 +72,7 @@ use crate::models::mdmt::MdmtResult;
 use crate::models::mixer::MixerResult;
 use crate::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
+use crate::models::non_equilibrium_blowdown::NonEquilibriumBlowdownResult;
 use crate::models::norsok_p002_compliance::NorsokP002ComplianceResult;
 use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
 use crate::models::overpressure_protection_study::OverpressureProtectionStudyResult;
@@ -1561,6 +1562,24 @@ impl CalcResult for Nog070SilDeterminationResult {
         "achieved_sil",
         "compliant",
         "required_pfd_reduction_factor",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for NonEquilibriumBlowdownResult {
+    const CALC_ID: &'static str = "process.non_equilibrium_blowdown";
+    const FIELDS: &'static [&'static str] = &[
+        "points",
+        "initial_pressure",
+        "flash_fallback_count",
+        "final_gas_temperature",
+        "final_liquid_temperature",
+        "max_temperature_bifurcation",
+        "recorded_points",
         "warnings",
     ];
 

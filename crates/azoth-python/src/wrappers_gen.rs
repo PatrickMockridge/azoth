@@ -7512,6 +7512,74 @@ pub fn nog070_sil_determination(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Non-equilibrium blowdown.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, initial_z, initial_t, initial_p, vessel_volume, orifice_diameter, discharge_coefficient, back_pressure, fire_emissivity, fire_flame_temperature, fire_convective_coefficient, fire_exposed_area, wall_mass, wall_specific_heat, inside_gas_coefficient, interfacial_coefficient, interfacial_area, latent_heat, surface_tension, surface_fluid_constant, critical_heat_flux, effective_boiling_coefficient, time_step, max_time, stop_pressure))]
+#[pyo3(
+    text_signature = "(components, initial_z, initial_t, initial_p, vessel_volume, orifice_diameter, discharge_coefficient, back_pressure, fire_emissivity, fire_flame_temperature, fire_convective_coefficient, fire_exposed_area, wall_mass, wall_specific_heat, inside_gas_coefficient, interfacial_coefficient, interfacial_area, latent_heat, surface_tension, surface_fluid_constant, critical_heat_flux, effective_boiling_coefficient, time_step, max_time, stop_pressure)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn non_equilibrium_blowdown(
+    py: Python<'_>,
+    components: Vec<String>,
+    initial_z: Vec<f64>,
+    initial_t: f64,
+    initial_p: f64,
+    vessel_volume: f64,
+    orifice_diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    fire_emissivity: Option<f64>,
+    fire_flame_temperature: Option<f64>,
+    fire_convective_coefficient: Option<f64>,
+    fire_exposed_area: Option<f64>,
+    wall_mass: Option<f64>,
+    wall_specific_heat: Option<f64>,
+    inside_gas_coefficient: Option<f64>,
+    interfacial_coefficient: Option<f64>,
+    interfacial_area: Option<f64>,
+    latent_heat: Option<f64>,
+    surface_tension: Option<f64>,
+    surface_fluid_constant: Option<f64>,
+    critical_heat_flux: Option<f64>,
+    effective_boiling_coefficient: Option<f64>,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+    stop_pressure: Option<f64>,
+) -> PyResult<crate::transport_gen::PyNonEquilibriumBlowdownResult> {
+    azoth_process::models::non_equilibrium_blowdown::non_equilibrium_blowdown(
+        &components,
+        &initial_z,
+        kelvins(initial_t),
+        pascals(initial_p),
+        cubic_meters(vessel_volume),
+        meters(orifice_diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        fire_emissivity,
+        fire_flame_temperature.map(kelvins),
+        fire_convective_coefficient.map(watts_per_square_meter_kelvin),
+        fire_exposed_area.map(square_meters),
+        wall_mass.map(kilograms),
+        wall_specific_heat.map(joules_per_kilogram_kelvin),
+        inside_gas_coefficient.map(watts_per_square_meter_kelvin),
+        interfacial_coefficient.map(watts_per_square_meter_kelvin),
+        interfacial_area.map(square_meters),
+        latent_heat,
+        surface_tension,
+        surface_fluid_constant,
+        critical_heat_flux,
+        effective_boiling_coefficient.map(watts_per_square_meter_kelvin),
+        time_step.map(seconds),
+        max_time.map(seconds),
+        stop_pressure.map(pascals),
+    )
+    .map(|r| crate::transport_gen::PyNonEquilibriumBlowdownResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// NORSOK P-002 point-check compliance.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

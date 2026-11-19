@@ -92,6 +92,7 @@ pub mod mdmt;
 pub mod mixer;
 pub mod multi_vessel_blowdown_study;
 pub mod nog070_sil_determination;
+pub mod non_equilibrium_blowdown;
 pub mod norsok_p002_compliance;
 pub mod overpressure;
 pub mod overpressure_acceptance;
@@ -257,6 +258,9 @@ pub use multi_vessel_blowdown_study::{
     MultiVesselSample, multi_vessel_blowdown_study,
 };
 pub use nog070_sil_determination::{Nog070SilDeterminationResult, nog070_sil_determination};
+pub use non_equilibrium_blowdown::{
+    NonEquilibriumBlowdownPoint, NonEquilibriumBlowdownResult, non_equilibrium_blowdown,
+};
 pub use norsok_p002_compliance::{
     NorsokP002ComplianceResult, P002CheckRow, P002Criterion, P002FindingResult,
     norsok_p002_compliance,

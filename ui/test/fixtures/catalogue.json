@@ -25425,6 +25425,15 @@
       "sub_interface": "risk"
     },
     {
+      "family": "depressurization",
+      "id": "process.non_equilibrium_blowdown",
+      "name": "Non-equilibrium blowdown",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "depressurization"
+    },
+    {
       "family": "compliance",
       "id": "process.norsok_p002_compliance",
       "name": "NORSOK P-002 point-check compliance",

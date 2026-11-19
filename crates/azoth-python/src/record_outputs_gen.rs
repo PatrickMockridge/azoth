@@ -2256,6 +2256,93 @@ impl From<&azoth_thermal::results::NaceIssueRow> for PyNaceIssueRow {
     }
 }
 
+/// one row per step, in time order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "NonEquilibriumBlowdownPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyNonEquilibriumBlowdownPoint {
+    /// the step's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the shared pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the vapour-zone temperature.
+    #[pyo3(get)]
+    pub gas_temperature: PyQty,
+    /// the liquid-zone temperature.
+    #[pyo3(get)]
+    pub liquid_temperature: PyQty,
+    /// the wall metal temperature.
+    #[pyo3(get)]
+    pub wall_temperature: PyQty,
+    /// the vapour-zone mass.
+    #[pyo3(get)]
+    pub gas_mass: PyQty,
+    /// the liquid-zone mass.
+    #[pyo3(get)]
+    pub liquid_mass: PyQty,
+}
+
+#[pymethods]
+impl PyNonEquilibriumBlowdownPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "NonEquilibriumBlowdownPoint(time={:?}, pressure={:?}, gas_temperature={:?}, liquid_temperature={:?}, wall_temperature={:?}, gas_mass={:?}, liquid_mass={:?})",
+            self.time,
+            self.pressure,
+            self.gas_temperature,
+            self.liquid_temperature,
+            self.wall_temperature,
+            self.gas_mass,
+            self.liquid_mass
+        )
+    }
+}
+
+impl From<&azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdownPoint>
+    for PyNonEquilibriumBlowdownPoint
+{
+    fn from(
+        row: &azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdownPoint,
+    ) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            gas_temperature: PyQty {
+                magnitude_si: row.gas_temperature.value,
+                unit: "K".to_string(),
+            },
+            liquid_temperature: PyQty {
+                magnitude_si: row.liquid_temperature.value,
+                unit: "K".to_string(),
+            },
+            wall_temperature: PyQty {
+                magnitude_si: row.wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            gas_mass: PyQty {
+                magnitude_si: row.gas_mass.value,
+                unit: "kg".to_string(),
+            },
+            liquid_mass: PyQty {
+                magnitude_si: row.liquid_mass.value,
+                unit: "kg".to_string(),
+            },
+        }
+    }
+}
+
 /// one row per check, in the caller's order.
 #[pyclass(
     frozen,

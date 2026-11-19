@@ -809,6 +809,32 @@ class NaceIssueRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class NonEquilibriumBlowdownPoint:
+    """one row per step, in time order."""
+
+    #: the step's time.
+    time: Q
+
+    #: the shared pressure.
+    pressure: Q
+
+    #: the vapour-zone temperature.
+    gas_temperature: Q
+
+    #: the liquid-zone temperature.
+    liquid_temperature: Q
+
+    #: the wall metal temperature.
+    wall_temperature: Q
+
+    #: the vapour-zone mass.
+    gas_mass: Q
+
+    #: the liquid-zone mass.
+    liquid_mass: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class P002FindingResult:
     """one row per check, in the caller's order."""
 

@@ -283,6 +283,7 @@
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/multi_vessel_blowdown_study.toml
 //!   - specs/models/process/nog070_sil_determination.toml
+//!   - specs/models/process/non_equilibrium_blowdown.toml
 //!   - specs/models/process/norsok_p002_compliance.toml
 //!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/overpressure_protection_study.toml
@@ -4287,6 +4288,110 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.nog070_sil_determination",
         "minimum_sil",
         "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "initial_z",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "initial_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.non_equilibrium_blowdown", "initial_p", "pressure"),
+    (
+        "process.non_equilibrium_blowdown",
+        "vessel_volume",
+        "volume",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "orifice_diameter",
+        "length",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "fire_emissivity",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "fire_flame_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "fire_convective_coefficient",
+        "heat_transfer",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "fire_exposed_area",
+        "area",
+    ),
+    ("process.non_equilibrium_blowdown", "wall_mass", "mass"),
+    (
+        "process.non_equilibrium_blowdown",
+        "wall_specific_heat",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "inside_gas_coefficient",
+        "heat_transfer",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "interfacial_coefficient",
+        "heat_transfer",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "interfacial_area",
+        "area",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "latent_heat",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "surface_tension",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "surface_fluid_constant",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "critical_heat_flux",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "effective_boiling_coefficient",
+        "heat_transfer",
+    ),
+    ("process.non_equilibrium_blowdown", "time_step", "time"),
+    ("process.non_equilibrium_blowdown", "max_time", "time"),
+    (
+        "process.non_equilibrium_blowdown",
+        "stop_pressure",
+        "pressure",
     ),
     (
         "process.overpressure_acceptance",

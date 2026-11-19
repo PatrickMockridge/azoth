@@ -82,6 +82,7 @@ from azoth.core.result import (
     MultiVesselBlowdownStudyResult,
     MultiVesselContributionRow,
     MultiVesselProfileRow,
+    NonEquilibriumBlowdownResult,
     Nog070SilDeterminationResult,
     NorsokP002ComplianceResult,
     OverpressureAcceptanceResult,
@@ -324,6 +325,7 @@ _DEPRESSURIZATION = "process.depressurization"
 _DEPRESSURIZATION_ACCEPTANCE = "process.depressurization_acceptance"
 _BLOCKED_OUTLET_OVERPRESSURE = "process.blocked_outlet_overpressure"
 _MULTI_VESSEL_BLOWDOWN_STUDY = "process.multi_vessel_blowdown_study"
+_NON_EQUILIBRIUM_BLOWDOWN = "process.non_equilibrium_blowdown"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
@@ -4253,6 +4255,70 @@ def multi_vessel_blowdown_study(
         header_heat_capacity_ratio=header_heat_capacity_ratio,
         max_allowable_mach=max_allowable_mach,
         grid_step=grid_step,
+    )
+
+
+def non_equilibrium_blowdown(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: Q,
+    initial_p: Q,
+    vessel_volume: Q,
+    orifice_diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    fire_emissivity: float | None = None,
+    fire_flame_temperature: Q | None = None,
+    fire_convective_coefficient: Q | None = None,
+    fire_exposed_area: Q | None = None,
+    wall_mass: Q | None = None,
+    wall_specific_heat: Q | None = None,
+    inside_gas_coefficient: Q | None = None,
+    interfacial_coefficient: Q | None = None,
+    interfacial_area: Q | None = None,
+    latent_heat: float | None = None,
+    surface_tension: float | None = None,
+    surface_fluid_constant: float | None = None,
+    critical_heat_flux: float | None = None,
+    effective_boiling_coefficient: Q | None = None,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+    stop_pressure: Q | None = None,
+) -> NonEquilibriumBlowdownResult:
+    """The two-zone fire-exposed blowdown.
+
+    The vapour and liquid zones are flashed at their own temperatures and the shared
+    pressure; the wetted wall drives Rohsenow boiling and the boil-off moves liquid into
+    the vapour zone.
+
+    See :func:`azoth.process.reference.non_equilibrium_blowdown`.
+    """
+    return resolve(_NON_EQUILIBRIUM_BLOWDOWN)(  # type: ignore[no-any-return]
+        components=components,
+        initial_z=initial_z,
+        initial_t=initial_t,
+        initial_p=initial_p,
+        vessel_volume=vessel_volume,
+        orifice_diameter=orifice_diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        fire_emissivity=fire_emissivity,
+        fire_flame_temperature=fire_flame_temperature,
+        fire_convective_coefficient=fire_convective_coefficient,
+        fire_exposed_area=fire_exposed_area,
+        wall_mass=wall_mass,
+        wall_specific_heat=wall_specific_heat,
+        inside_gas_coefficient=inside_gas_coefficient,
+        interfacial_coefficient=interfacial_coefficient,
+        interfacial_area=interfacial_area,
+        latent_heat=latent_heat,
+        surface_tension=surface_tension,
+        surface_fluid_constant=surface_fluid_constant,
+        critical_heat_flux=critical_heat_flux,
+        effective_boiling_coefficient=effective_boiling_coefficient,
+        time_step=time_step,
+        max_time=max_time,
+        stop_pressure=stop_pressure,
     )
 
 

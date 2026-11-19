@@ -232,6 +232,8 @@ from azoth.core.result import (
     NaceIssueRow,
     NitricSulfuricAcidVaporPressureResult,
     Nog070SilDeterminationResult,
+    NonEquilibriumBlowdownPoint,
+    NonEquilibriumBlowdownResult,
     NorsokP002ComplianceResult,
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
@@ -664,6 +666,7 @@ __all__ = [
     "multiflash_stability_test",
     "nitric_sulfuric_acid_vapor_pressure",
     "nog070_sil_determination",
+    "non_equilibrium_blowdown",
     "norsok_p002_compliance",
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
@@ -7805,6 +7808,48 @@ def nog070_sil_determination(sif_type: str, pfd_average: float, minimum_sil: flo
         achieved_sil=result.achieved_sil,
         compliant=result.compliant,
         required_pfd_reduction_factor=result.required_pfd_reduction_factor,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def non_equilibrium_blowdown(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, orifice_diameter: Q, discharge_coefficient: float, back_pressure: Q, fire_emissivity: float | None=None, fire_flame_temperature: Q | None=None, fire_convective_coefficient: Q | None=None, fire_exposed_area: Q | None=None, wall_mass: Q | None=None, wall_specific_heat: Q | None=None, inside_gas_coefficient: Q | None=None, interfacial_coefficient: Q | None=None, interfacial_area: Q | None=None, latent_heat: float | None=None, surface_tension: float | None=None, surface_fluid_constant: float | None=None, critical_heat_flux: float | None=None, effective_boiling_coefficient: Q | None=None, time_step: Q | None=None, max_time: Q | None=None, stop_pressure: Q | None=None) -> NonEquilibriumBlowdownResult:
+    """``process.non_equilibrium_blowdown``, computed in Rust."""
+    spec = _models_gen.model("process.non_equilibrium_blowdown")
+    result = _core.non_equilibrium_blowdown(
+        list(components),
+        list(initial_z),
+        input_to_si(spec, "initial_t", initial_t),
+        input_to_si(spec, "initial_p", initial_p),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "orifice_diameter", orifice_diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        None if fire_emissivity is None else fire_emissivity,
+        None if fire_flame_temperature is None else input_to_si(spec, "fire_flame_temperature", fire_flame_temperature),
+        None if fire_convective_coefficient is None else input_to_si(spec, "fire_convective_coefficient", fire_convective_coefficient),
+        None if fire_exposed_area is None else input_to_si(spec, "fire_exposed_area", fire_exposed_area),
+        None if wall_mass is None else input_to_si(spec, "wall_mass", wall_mass),
+        None if wall_specific_heat is None else input_to_si(spec, "wall_specific_heat", wall_specific_heat),
+        None if inside_gas_coefficient is None else input_to_si(spec, "inside_gas_coefficient", inside_gas_coefficient),
+        None if interfacial_coefficient is None else input_to_si(spec, "interfacial_coefficient", interfacial_coefficient),
+        None if interfacial_area is None else input_to_si(spec, "interfacial_area", interfacial_area),
+        None if latent_heat is None else latent_heat,
+        None if surface_tension is None else surface_tension,
+        None if surface_fluid_constant is None else surface_fluid_constant,
+        None if critical_heat_flux is None else critical_heat_flux,
+        None if effective_boiling_coefficient is None else input_to_si(spec, "effective_boiling_coefficient", effective_boiling_coefficient),
+        None if time_step is None else input_to_si(spec, "time_step", time_step),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+        None if stop_pressure is None else input_to_si(spec, "stop_pressure", stop_pressure),
+    )
+    return NonEquilibriumBlowdownResult(
+        points=tuple(NonEquilibriumBlowdownPoint(time=from_si(c.time.magnitude_si, c.time.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), gas_temperature=from_si(c.gas_temperature.magnitude_si, c.gas_temperature.unit), liquid_temperature=from_si(c.liquid_temperature.magnitude_si, c.liquid_temperature.unit), wall_temperature=from_si(c.wall_temperature.magnitude_si, c.wall_temperature.unit), gas_mass=from_si(c.gas_mass.magnitude_si, c.gas_mass.unit), liquid_mass=from_si(c.liquid_mass.magnitude_si, c.liquid_mass.unit)) for c in result.points),
+        initial_pressure=from_si(result.initial_pressure.magnitude_si, result.initial_pressure.unit),
+        flash_fallback_count=result.flash_fallback_count,
+        final_gas_temperature=from_si(result.final_gas_temperature.magnitude_si, result.final_gas_temperature.unit),
+        final_liquid_temperature=from_si(result.final_liquid_temperature.magnitude_si, result.final_liquid_temperature.unit),
+        max_temperature_bifurcation=from_si(result.max_temperature_bifurcation.magnitude_si, result.max_temperature_bifurcation.unit),
+        recorded_points=result.recorded_points,
         warnings=_warnings(result.warnings),
     )
 
