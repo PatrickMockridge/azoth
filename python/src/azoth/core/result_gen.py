@@ -31,9 +31,11 @@ from azoth.core.record_outputs_gen import (
     ConsequenceOutcomeResult,
     DepositionSegmentRow,
     DepressurizationPoint,
+    DriftFluxReleaseStation,
     EquilibriumSoundSpeedSample,
     EscalationItemResult,
     EventTreeOutcome,
+    FiniteRateReleaseStation,
     FlowlineScaleSegment,
     FmeaRankedEntry,
     HazopPopulationRow,
@@ -6692,6 +6694,43 @@ class DistillationColumnResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class DriftFluxReleaseResult(_HasWarnings):
+    """Result of ``process.drift_flux_release``."""
+
+    CALC_ID: ClassVar[str] = "process.drift_flux_release"
+
+    #: `valid`, `invalid` or `unsupported`.
+    status: str
+
+    #: the closure's release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    mass_flow_rate: Q | None
+
+    #: the base scan's choked flag; false on failure and on no forward flow.
+    choked: bool
+
+    #: absent: the derived model drops the base's throat sound speed.
+    throat_sound_speed: Q | None
+
+    #: the upstream overall mole fractions.
+    component_mole_fractions: tuple[float, ...]
+
+    #: the upstream overall mass fractions.
+    component_mass_fractions: tuple[float, ...]
+
+    #: the base stations, with the opening's phase velocities solved. Empty on failure.
+    stations: tuple[DriftFluxReleaseStation, ...]
+
+    #: the model's assumptions and the base's retained records.
+    diagnostics: tuple[HemReleaseDiagnostic, ...]
+
+    #: the codes alone, so a case can hold the contract without asserting prose.
+    diagnostic_codes: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DynamicPsvSizingResult(_HasWarnings):
     """Result of ``process.dynamic_psv_sizing``."""
 
@@ -7122,6 +7161,43 @@ class FilterResult(_HasWarnings):
 
     #: the vessel cross-section a granular design writes to the filter's hydraulic area; absent for a cartridge type.
     design_media_area: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class FiniteRateReleaseResult(_HasWarnings):
+    """Result of ``process.finite_rate_release``."""
+
+    CALC_ID: ClassVar[str] = "process.finite_rate_release"
+
+    #: `valid`, `invalid` or `unsupported`.
+    status: str
+
+    #: the closure's release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    mass_flow_rate: Q | None
+
+    #: the base scan's choked flag; false on failure and on no forward flow.
+    choked: bool
+
+    #: absent: the derived model drops the base's throat sound speed.
+    throat_sound_speed: Q | None
+
+    #: the upstream overall mole fractions.
+    component_mole_fractions: tuple[float, ...]
+
+    #: the upstream overall mass fractions.
+    component_mass_fractions: tuple[float, ...]
+
+    #: the base stations, with the opening's relaxed phase velocities solved. Empty on failure.
+    stations: tuple[FiniteRateReleaseStation, ...]
+
+    #: the model's assumptions and the base's retained records.
+    diagnostics: tuple[HemReleaseDiagnostic, ...]
+
+    #: the codes alone, so a case can hold the contract without asserting prose.
+    diagnostic_codes: tuple[str, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

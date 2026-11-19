@@ -1109,6 +1109,32 @@ class DepressurizationPoint:
     mass_flow: Qty
 
 @final
+class DriftFluxReleaseStation:
+    """the base stations, with the opening's phase velocities solved. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
+class HemReleaseDiagnostic:
+    """the model's assumptions and the base's retained records."""
+
+    code: str
+    message: str
+
+@final
 class EscalationItemResult:
     """the largest propagation over every registered item, in the items order."""
 
@@ -1128,6 +1154,25 @@ class MinimalCutSet:
 
     members: str
     cardinality: float
+
+@final
+class FiniteRateReleaseStation:
+    """the base stations, with the opening's relaxed phase velocities solved. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
 
 @final
 class PulsationModeResult:
@@ -1248,13 +1293,6 @@ class HemReleaseStation:
     mass_flux: Qty
     phase: str
     gas_mass_fraction: float
-
-@final
-class HemReleaseDiagnostic:
-    """the model's assumptions and the base's retained records."""
-
-    code: str
-    message: str
 
 @final
 class IdealGasReleaseStation:
@@ -3889,6 +3927,19 @@ class DistillationColumnResult:
     warnings: list[Warning]
 
 @final
+class DriftFluxReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[DriftFluxReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
 class DynamicPsvSizingResult:
     steady_required_area: Qty
     dynamic_required_area: Qty
@@ -4036,6 +4087,19 @@ class FilterResult:
     collapse_pressure_utilization: float | None
     differential_pressure_design_acceptable: bool | None
     design_media_area: Qty | None
+    warnings: list[Warning]
+
+@final
+class FiniteRateReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[FiniteRateReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
     warnings: list[Warning]
 
 @final
@@ -8123,6 +8187,16 @@ def distillation_column(
     material_grade: str | None = None,
     max_operation_pressure: float | None = None,
 ) -> DistillationColumnResult: ...
+def drift_flux_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    surface_tension: float,
+) -> DriftFluxReleaseResult: ...
 def dynamic_psv_sizing(
     components: list[str],
     initial_z: list[float],
@@ -8233,6 +8307,19 @@ def filter(
     element_collapse_pressure: float | None = None,
     element_integrity_verified: bool | None = None,
 ) -> FilterResult: ...
+def finite_rate_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    surface_tension: float,
+    phase_transfer_relaxation_time: float,
+    residence_time: float,
+    parameter_provenance: str,
+) -> FiniteRateReleaseResult: ...
 def fire_case_relief(
     has_drainage: bool,
     has_fire_fighting: bool,

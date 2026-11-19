@@ -351,6 +351,7 @@ Five sections, and the difference between them is the point:
 - [`process.depressurization`](./process/depressurization.md) — Vessel depressurization
 - [`process.depressurization_acceptance`](./process/depressurization_acceptance.md) — Depressurization acceptance
 - [`process.distillation_column`](./process/distillation_column.md) — Distillation column
+- [`process.drift_flux_release`](./process/drift_flux_release.md) — Vertical drift-flux orifice release
 - [`process.dynamic_psv_sizing`](./process/dynamic_psv_sizing.md) — Dynamic PSV sizing
 - [`process.ejector`](./process/ejector.md) — Ejector
 - [`process.escalation_graph`](./process/escalation_graph.md) — Escalation graph analysis
@@ -358,6 +359,7 @@ Five sections, and the difference between them is the point:
 - [`process.expander`](./process/expander.md) — Expander
 - [`process.fault_tree`](./process/fault_tree.md) — Fault tree
 - [`process.filter`](./process/filter.md) — Filter
+- [`process.finite_rate_release`](./process/finite_rate_release.md) — Finite-rate drift-flux orifice release
 - [`process.fire_case_relief`](./process/fire_case_relief.md) — Fire case relief
 - [`process.fire_monitor_coverage`](./process/fire_monitor_coverage.md) — Fire monitor coverage
 - [`process.fire_water_coverage_assessment`](./process/fire_water_coverage_assessment.md) — Fire-water coverage assessment

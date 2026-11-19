@@ -246,6 +246,7 @@
 //!   - specs/models/process/depressurization.toml
 //!   - specs/models/process/depressurization_acceptance.toml
 //!   - specs/models/process/distillation_column.toml
+//!   - specs/models/process/drift_flux_release.toml
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/escalation_graph.toml
@@ -253,6 +254,7 @@
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
 //!   - specs/models/process/filter.toml
+//!   - specs/models/process/finite_rate_release.toml
 //!   - specs/models/process/fire_case_relief.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
 //!   - specs/models/process/fire_water_coverage_assessment.toml
@@ -3401,6 +3403,25 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "max_operation_pressure",
         "pressure",
     ),
+    ("process.drift_flux_release", "upstream_z", "dimensionless"),
+    (
+        "process.drift_flux_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.drift_flux_release", "upstream_p", "pressure"),
+    ("process.drift_flux_release", "diameter", "length"),
+    (
+        "process.drift_flux_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.drift_flux_release", "back_pressure", "pressure"),
+    (
+        "process.drift_flux_release",
+        "surface_tension",
+        "surface_tension",
+    ),
     ("process.dynamic_psv_sizing", "initial_z", "dimensionless"),
     (
         "process.dynamic_psv_sizing",
@@ -3540,6 +3561,31 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.filter", "joint_efficiency", "dimensionless"),
     ("process.filter", "corrosion_allowance", "length"),
     ("process.filter", "element_collapse_pressure", "pressure"),
+    ("process.finite_rate_release", "upstream_z", "dimensionless"),
+    (
+        "process.finite_rate_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.finite_rate_release", "upstream_p", "pressure"),
+    ("process.finite_rate_release", "diameter", "length"),
+    (
+        "process.finite_rate_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.finite_rate_release", "back_pressure", "pressure"),
+    (
+        "process.finite_rate_release",
+        "surface_tension",
+        "surface_tension",
+    ),
+    (
+        "process.finite_rate_release",
+        "phase_transfer_relaxation_time",
+        "time",
+    ),
+    ("process.finite_rate_release", "residence_time", "time"),
     ("process.fire_case_relief", "wetted_area", "area"),
     ("process.fire_case_relief", "vessel_diameter", "length"),
     ("process.fire_case_relief", "wetted_height", "length"),

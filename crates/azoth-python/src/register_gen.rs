@@ -264,6 +264,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyDepressurizationResult>()?;
     m.add_class::<crate::transport_gen::PyDepressurizationAcceptanceResult>()?;
     m.add_class::<crate::transport_gen::PyDistillationColumnResult>()?;
+    m.add_class::<crate::transport_gen::PyDriftFluxReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyDynamicPsvSizingResult>()?;
     m.add_class::<crate::transport_gen::PyEjectorResult>()?;
     m.add_class::<crate::transport_gen::PyEscalationGraphResult>()?;
@@ -271,6 +272,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyFaultTreeResult>()?;
     m.add_class::<crate::transport_gen::PyFilterResult>()?;
+    m.add_class::<crate::transport_gen::PyFiniteRateReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyFireCaseReliefResult>()?;
     m.add_class::<crate::transport_gen::PyFireMonitorCoverageResult>()?;
     m.add_class::<crate::transport_gen::PyFireWaterCoverageAssessmentResult>()?;
@@ -388,9 +390,11 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyConsequenceOutcomeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepressurizationPoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyDriftFluxReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyEquilibriumSoundSpeedSample>()?;
     m.add_class::<crate::record_outputs_gen::PyEscalationItemResult>()?;
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
+    m.add_class::<crate::record_outputs_gen::PyFiniteRateReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyFlowlineScaleSegment>()?;
     m.add_class::<crate::record_outputs_gen::PyFmeaRankedEntry>()?;
     m.add_class::<crate::record_outputs_gen::PyHazopPopulationRow>()?;
@@ -1054,6 +1058,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::drift_flux_release,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::dynamic_psv_sizing,
         m
     )?)?;
@@ -1063,6 +1071,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::expander, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::fault_tree, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::filter, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::finite_rate_release,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::fire_case_relief, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::fire_monitor_coverage,

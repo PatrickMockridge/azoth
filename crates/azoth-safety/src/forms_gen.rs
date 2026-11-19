@@ -1163,6 +1163,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.drift_flux_release",
+        name: "Vertical drift-flux orifice release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.dynamic_psv_sizing",
         name: "Dynamic PSV sizing",
         family: "depressurization",
@@ -1203,6 +1215,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         name: "Fault tree",
         family: "risk",
         sub_interface: Some("risk"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.finite_rate_release",
+        name: "Finite-rate drift-flux orifice release",
+        family: "release",
+        sub_interface: None,
         purpose: "",
         native: false,
         refusal: Some(

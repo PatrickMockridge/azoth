@@ -135,3 +135,208 @@ pub(crate) fn prescribed_slip(
         kinetic_energy_error,
     })
 }
+
+/// The class's distribution parameter.
+pub(crate) const DRIFT_DISTRIBUTION_PARAMETER: f64 = 1.2;
+/// The class's Harmathy coefficient.
+pub(crate) const HARMATHY_COEFFICIENT: f64 = 1.53;
+/// The class's bounded bubbly/dispersed gas area fraction.
+pub(crate) const MAX_GAS_AREA_FRACTION: f64 = 0.80;
+/// The class's largest bracketed slip ratio.
+pub(crate) const MAX_SLIP_RATIO: f64 = 128.0;
+/// The closure's bisection cap.
+const DRIFT_BISECTIONS: usize = 80;
+/// The closure's gravity.
+const GRAVITY: f64 = 9.80665;
+
+/// One station's drift-flux hydrodynamics.
+pub(crate) struct DriftOutcome {
+    /// The station with its bulk and phase velocities replaced.
+    pub state: TraceStation,
+    /// The closure's mass flux, kg/(m2 s).
+    pub mass_flux: f64,
+    /// The solved gas-to-liquid slip ratio.
+    pub slip_ratio: f64,
+    /// The gas phase's velocity, m/s.
+    pub gas_velocity: f64,
+    /// The liquid phase's velocity, m/s.
+    pub liquid_velocity: f64,
+    /// The gas phase's area fraction.
+    pub gas_area_fraction: f64,
+    /// The phase area fractions' sum.
+    pub phase_area_sum: f64,
+    /// The phase kinetic energy minus the homogeneous kinetic energy, J/kg.
+    pub kinetic_energy_error: f64,
+    /// The Harmathy drift velocity, m/s.
+    pub drift_velocity: f64,
+    /// The closure's drift residual, m/s.
+    pub drift_residual: f64,
+}
+
+/// One closure evaluation.
+struct DriftRaw {
+    mass_flux: f64,
+    gas_velocity: f64,
+    liquid_velocity: f64,
+    gas_area_fraction: f64,
+    phase_area_sum: f64,
+    kinetic_energy_error: f64,
+    drift_residual: f64,
+}
+
+/// The drift-flux closure at one slip ratio.
+fn drift_raw(
+    state: &TraceStation,
+    basis: &PhaseBasis,
+    slip_ratio: f64,
+    drift_velocity: f64,
+) -> Result<DriftRaw, ReleaseRefusal> {
+    let homogeneous_velocity = state.velocity;
+    if !homogeneous_velocity.is_finite() || homogeneous_velocity <= 0.0 {
+        return Err(ReleaseRefusal::Invalid(
+            "homogeneous throat velocity must be positive".to_string(),
+        ));
+    }
+    let denominator = basis.gas_fraction * slip_ratio * slip_ratio + basis.liquid_fraction;
+    let liquid_velocity = homogeneous_velocity / denominator.sqrt();
+    let gas_velocity = slip_ratio * liquid_velocity;
+    let specific_area = basis.gas_fraction / (basis.gas_density * gas_velocity)
+        + basis.liquid_fraction / (basis.liquid_density * liquid_velocity);
+    let mass_flux = 1.0 / specific_area;
+    let gas_area_fraction = mass_flux * basis.gas_fraction / (basis.gas_density * gas_velocity);
+    let liquid_area_fraction =
+        mass_flux * basis.liquid_fraction / (basis.liquid_density * liquid_velocity);
+    let phase_area_sum = gas_area_fraction + liquid_area_fraction;
+    let volumetric_flux = mass_flux
+        * (basis.gas_fraction / basis.gas_density + basis.liquid_fraction / basis.liquid_density);
+    let drift_residual =
+        gas_velocity - DRIFT_DISTRIBUTION_PARAMETER * volumetric_flux - drift_velocity;
+    let phase_kinetic_energy = 0.5
+        * (basis.gas_fraction * gas_velocity * gas_velocity
+            + basis.liquid_fraction * liquid_velocity * liquid_velocity);
+    let homogeneous_kinetic_energy = 0.5 * homogeneous_velocity * homogeneous_velocity;
+    let kinetic_energy_error = phase_kinetic_energy - homogeneous_kinetic_energy;
+    if !mass_flux.is_finite()
+        || mass_flux <= 0.0
+        || !drift_residual.is_finite()
+        || (phase_area_sum - 1.0).abs() > 1.0e-10
+        || kinetic_energy_error.abs() > 1.0e-9 * 1.0_f64.max(homogeneous_kinetic_energy)
+    {
+        return Err(ReleaseRefusal::Invalid(
+            "Phase area, drift-flux or kinetic-energy closure failed".to_string(),
+        ));
+    }
+    Ok(DriftRaw {
+        mass_flux,
+        gas_velocity,
+        liquid_velocity,
+        gas_area_fraction,
+        phase_area_sum,
+        kinetic_energy_error,
+        drift_residual,
+    })
+}
+
+/// The drift-flux partition of one station, with the shared closure solved.
+///
+/// # Errors
+/// The class's unsupported phase basis, its bracket and closure failures, and its gas-area
+/// cap.
+pub(crate) fn drift_flux(
+    state: &TraceStation,
+    surface_tension: f64,
+) -> Result<DriftOutcome, ReleaseRefusal> {
+    let basis = phase_basis(state)?;
+    if basis.liquid_density <= basis.gas_density {
+        return Err(ReleaseRefusal::Unsupported(
+            "Harmathy closure requires liquid density greater than gas density".to_string(),
+        ));
+    }
+    let drift_velocity = HARMATHY_COEFFICIENT
+        * (GRAVITY * surface_tension * (basis.liquid_density - basis.gas_density)
+            / (basis.liquid_density * basis.liquid_density))
+            .powf(0.25);
+    if !drift_velocity.is_finite() || drift_velocity <= 0.0 {
+        return Err(ReleaseRefusal::Invalid(
+            "Harmathy drift velocity must be positive".to_string(),
+        ));
+    }
+    let mut lower = 1.0_f64;
+    let mut lower_residual = drift_raw(state, &basis, lower, drift_velocity)?.drift_residual;
+    let mut upper = 2.0_f64;
+    let mut upper_residual = drift_raw(state, &basis, upper, drift_velocity)?.drift_residual;
+    while upper_residual <= 0.0 && upper < MAX_SLIP_RATIO {
+        upper *= 2.0;
+        upper_residual = drift_raw(state, &basis, upper, drift_velocity)?.drift_residual;
+    }
+    if !(lower_residual < 0.0) || !(upper_residual > 0.0) {
+        return Err(ReleaseRefusal::Invalid(
+            "Unable to bracket positive drift-flux slip solution".to_string(),
+        ));
+    }
+    for _ in 0..DRIFT_BISECTIONS {
+        let middle = 0.5 * (lower + upper);
+        let middle_residual = drift_raw(state, &basis, middle, drift_velocity)?.drift_residual;
+        if middle_residual > 0.0 {
+            upper = middle;
+        } else {
+            lower = middle;
+        }
+    }
+    let slip_ratio = 0.5 * (lower + upper);
+    let raw = drift_raw(state, &basis, slip_ratio, drift_velocity)?;
+    if raw.gas_area_fraction > MAX_GAS_AREA_FRACTION {
+        return Err(ReleaseRefusal::Unsupported(format!(
+            "Predicted gas area fraction {:.6} exceeds the bounded bubbly/dispersed screening \
+             limit {}",
+            raw.gas_area_fraction, MAX_GAS_AREA_FRACTION
+        )));
+    }
+    let bulk_velocity = raw.mass_flux / state.density;
+    let mut partitioned = state.clone();
+    partitioned.velocity = bulk_velocity;
+    partitioned.mass_flux = state.density * bulk_velocity;
+    partitioned.gas_velocity = Some(raw.gas_velocity);
+    partitioned.liquid_velocity = Some(raw.liquid_velocity);
+    Ok(DriftOutcome {
+        state: partitioned,
+        mass_flux: raw.mass_flux,
+        slip_ratio,
+        gas_velocity: raw.gas_velocity,
+        liquid_velocity: raw.liquid_velocity,
+        gas_area_fraction: raw.gas_area_fraction,
+        phase_area_sum: raw.phase_area_sum,
+        kinetic_energy_error: raw.kinetic_energy_error,
+        drift_velocity,
+        drift_residual: raw.drift_residual,
+    })
+}
+
+/// The uniform first-order relaxation of the equilibrium station toward equilibrium.
+///
+/// # Errors
+/// The class's exactly-two-phase requirement and its relaxed-fraction bounds.
+pub(crate) fn relax_uniform(
+    upstream_gas_fraction: f64,
+    equilibrium: &TraceStation,
+    progress: f64,
+) -> Result<TraceStation, ReleaseRefusal> {
+    let basis = phase_basis(equilibrium)?;
+    let relaxed = upstream_gas_fraction + progress * (basis.gas_fraction - upstream_gas_fraction);
+    if relaxed <= 1.0e-10 || relaxed >= 1.0 - 1.0e-10 {
+        return Err(ReleaseRefusal::Unsupported(
+            "Relaxed state must retain positive gas and liquid mass fractions".to_string(),
+        ));
+    }
+    let density = 1.0 / (relaxed / basis.gas_density + (1.0 - relaxed) / basis.liquid_density);
+    let mut out = equilibrium.clone();
+    out.density = density;
+    out.gas_mass_fraction = relaxed;
+    if let Some(gas) = out.gas_phase.as_mut() {
+        gas.mass_fraction = relaxed;
+    }
+    if let Some(liquid) = out.liquid_phase.as_mut() {
+        liquid.mass_fraction = 1.0 - relaxed;
+    }
+    Ok(out)
+}

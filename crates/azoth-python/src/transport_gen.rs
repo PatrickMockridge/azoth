@@ -16,14 +16,15 @@
 use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
-    PyDepositionSegmentRow, PyDepressurizationPoint, PyEquilibriumSoundSpeedSample,
-    PyEscalationItemResult, PyEventTreeOutcome, PyFlowlineScaleSegment, PyFmeaRankedEntry,
-    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
-    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
-    PyHydrateRiskPoint, PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent,
-    PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation,
-    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
-    PyMinimalCutSet, PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
+    PyDepositionSegmentRow, PyDepressurizationPoint, PyDriftFluxReleaseStation,
+    PyEquilibriumSoundSpeedSample, PyEscalationItemResult, PyEventTreeOutcome,
+    PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
+    PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
+    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
+    PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
+    PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier,
+    PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
+    PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
     PyNonEquilibriumBlowdownPoint, PyP002FindingResult, PyPipeFireRupturePoint,
     PyPrescribedSlipReleaseStation, PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow,
     PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
@@ -16577,6 +16578,98 @@ impl From<&azoth_process::models::distillation_column::DistillationColumnResult>
         }
     }
 }
+/// Result of `process.drift_flux_release`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DriftFluxReleaseResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDriftFluxReleaseResult {
+    /// `valid`, `invalid` or `unsupported`.
+    #[pyo3(get)]
+    pub status: String,
+    /// the closure's release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    #[pyo3(get)]
+    pub mass_flow_rate: Option<PyQty>,
+    /// the base scan's choked flag; false on failure and on no forward flow.
+    #[pyo3(get)]
+    pub choked: bool,
+    /// absent: the derived model drops the base's throat sound speed.
+    #[pyo3(get)]
+    pub throat_sound_speed: Option<PyQty>,
+    /// the upstream overall mole fractions.
+    #[pyo3(get)]
+    pub component_mole_fractions: Vec<f64>,
+    /// the upstream overall mass fractions.
+    #[pyo3(get)]
+    pub component_mass_fractions: Vec<f64>,
+    /// the base stations, with the opening's phase velocities solved. Empty on failure.
+    #[pyo3(get)]
+    pub stations: Vec<PyDriftFluxReleaseStation>,
+    /// the model's assumptions and the base's retained records.
+    #[pyo3(get)]
+    pub diagnostics: Vec<PyHemReleaseDiagnostic>,
+    /// the codes alone, so a case can hold the contract without asserting prose.
+    #[pyo3(get)]
+    pub diagnostic_codes: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDriftFluxReleaseResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DriftFluxReleaseResult(status={:?}, mass_flow_rate={:?}, choked={:?}, throat_sound_speed={:?}, component_mole_fractions={:?}, component_mass_fractions={:?}, stations={:?}, diagnostics={:?}, diagnostic_codes={:?}, {} warning(s))",
+            self.status,
+            self.mass_flow_rate,
+            self.choked,
+            self.throat_sound_speed,
+            self.component_mole_fractions,
+            self.component_mass_fractions,
+            self.stations,
+            self.diagnostics,
+            self.diagnostic_codes,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::drift_flux_release::DriftFluxReleaseResult>
+    for PyDriftFluxReleaseResult
+{
+    fn from(r: &azoth_process::models::drift_flux_release::DriftFluxReleaseResult) -> Self {
+        Self {
+            status: r.status.clone(),
+            mass_flow_rate: r.mass_flow_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            choked: r.choked,
+            throat_sound_speed: r.throat_sound_speed.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            component_mole_fractions: r.component_mole_fractions.clone(),
+            component_mass_fractions: r.component_mass_fractions.clone(),
+            stations: r
+                .stations
+                .iter()
+                .map(PyDriftFluxReleaseStation::from)
+                .collect(),
+            diagnostics: r
+                .diagnostics
+                .iter()
+                .map(PyHemReleaseDiagnostic::from)
+                .collect(),
+            diagnostic_codes: r.diagnostic_codes.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.dynamic_psv_sizing`, transported.
 #[pyclass(
     frozen,
@@ -17665,6 +17758,98 @@ impl From<&azoth_process::models::filter::FilterResult> for PyFilterResult {
                 magnitude_si: v.value,
                 unit: "m**2".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.finite_rate_release`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "FiniteRateReleaseResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyFiniteRateReleaseResult {
+    /// `valid`, `invalid` or `unsupported`.
+    #[pyo3(get)]
+    pub status: String,
+    /// the closure's release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    #[pyo3(get)]
+    pub mass_flow_rate: Option<PyQty>,
+    /// the base scan's choked flag; false on failure and on no forward flow.
+    #[pyo3(get)]
+    pub choked: bool,
+    /// absent: the derived model drops the base's throat sound speed.
+    #[pyo3(get)]
+    pub throat_sound_speed: Option<PyQty>,
+    /// the upstream overall mole fractions.
+    #[pyo3(get)]
+    pub component_mole_fractions: Vec<f64>,
+    /// the upstream overall mass fractions.
+    #[pyo3(get)]
+    pub component_mass_fractions: Vec<f64>,
+    /// the base stations, with the opening's relaxed phase velocities solved. Empty on failure.
+    #[pyo3(get)]
+    pub stations: Vec<PyFiniteRateReleaseStation>,
+    /// the model's assumptions and the base's retained records.
+    #[pyo3(get)]
+    pub diagnostics: Vec<PyHemReleaseDiagnostic>,
+    /// the codes alone, so a case can hold the contract without asserting prose.
+    #[pyo3(get)]
+    pub diagnostic_codes: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyFiniteRateReleaseResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "FiniteRateReleaseResult(status={:?}, mass_flow_rate={:?}, choked={:?}, throat_sound_speed={:?}, component_mole_fractions={:?}, component_mass_fractions={:?}, stations={:?}, diagnostics={:?}, diagnostic_codes={:?}, {} warning(s))",
+            self.status,
+            self.mass_flow_rate,
+            self.choked,
+            self.throat_sound_speed,
+            self.component_mole_fractions,
+            self.component_mass_fractions,
+            self.stations,
+            self.diagnostics,
+            self.diagnostic_codes,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::finite_rate_release::FiniteRateReleaseResult>
+    for PyFiniteRateReleaseResult
+{
+    fn from(r: &azoth_process::models::finite_rate_release::FiniteRateReleaseResult) -> Self {
+        Self {
+            status: r.status.clone(),
+            mass_flow_rate: r.mass_flow_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            choked: r.choked,
+            throat_sound_speed: r.throat_sound_speed.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            component_mole_fractions: r.component_mole_fractions.clone(),
+            component_mass_fractions: r.component_mass_fractions.clone(),
+            stations: r
+                .stations
+                .iter()
+                .map(PyFiniteRateReleaseStation::from)
+                .collect(),
+            diagnostics: r
+                .diagnostics
+                .iter()
+                .map(PyHemReleaseDiagnostic::from)
+                .collect(),
+            diagnostic_codes: r.diagnostic_codes.clone(),
             warnings: transport(&r.warnings),
         }
     }

@@ -43,6 +43,7 @@ from azoth.core.result import (
     DepressurizationAcceptanceResult,
     DepressurizationResult,
     DistillationColumnResult,
+    DriftFluxReleaseResult,
     DynamicPsvSizingResult,
     EjectorResult,
     EscalationGraphResult,
@@ -50,6 +51,7 @@ from azoth.core.result import (
     ExpanderResult,
     FaultTreeResult,
     FilterResult,
+    FiniteRateReleaseResult,
     FireCaseReliefResult,
     FireMonitorCoverageResult,
     FireWaterCoverageAssessmentResult,
@@ -97,8 +99,8 @@ from azoth.core.result import (
     PlugFlowReactorResult,
     PoolFireResult,
     PorousMediaSelfHeatingResult,
-    ProbitResult,
     PrescribedSlipReleaseResult,
+    ProbitResult,
     PsvFireSizingResult,
     PsvSizingResult,
     PsvValveResult,
@@ -309,6 +311,8 @@ _HEM_RELEASE = "process.hem_release"
 _IDEAL_GAS_RELEASE = "process.ideal_gas_release"
 _LEGACY_SCREENING_RELEASE = "process.legacy_screening_release"
 _PRESCRIBED_SLIP_RELEASE = "process.prescribed_slip_release"
+_DRIFT_FLUX_RELEASE = "process.drift_flux_release"
+_FINITE_RATE_RELEASE = "process.finite_rate_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
@@ -3561,6 +3565,73 @@ def prescribed_slip_release(
         discharge_coefficient=discharge_coefficient,
         back_pressure=back_pressure,
         gas_to_liquid_slip_ratio=gas_to_liquid_slip_ratio,
+    )
+
+
+def drift_flux_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    surface_tension: Q,
+) -> DriftFluxReleaseResult:
+    """The release rate of a vertical drift-flux short-opening orifice.
+
+    The homogeneous-equilibrium scan supplies the stations; the shared Zuber-Findlay/Harmathy
+    closure solves the opening's slip ratio and the rate is the closure's mass flux times the
+    effective area. A single-phase opening or a gas area fraction above 0.80 is
+    ``unsupported``.
+
+    See :func:`azoth.process.reference.drift_flux_release`.
+    """
+    return resolve(_DRIFT_FLUX_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        surface_tension=surface_tension,
+    )
+
+
+def finite_rate_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    surface_tension: Q,
+    phase_transfer_relaxation_time: Q,
+    residence_time: Q,
+    parameter_provenance: str,
+) -> FiniteRateReleaseResult:
+    """The release rate of a finite-rate short-opening orifice.
+
+    The opening's phase split relaxes from the upstream value toward equilibrium by
+    ``1 - exp(-residence/relaxation)``, then the shared drift-flux closure solves the station.
+    An upstream without a liquid is ``unsupported``.
+
+    See :func:`azoth.process.reference.finite_rate_release`.
+    """
+    return resolve(_FINITE_RATE_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        surface_tension=surface_tension,
+        phase_transfer_relaxation_time=phase_transfer_relaxation_time,
+        residence_time=residence_time,
+        parameter_provenance=parameter_provenance,
     )
 
 

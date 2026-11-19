@@ -93,6 +93,8 @@ from azoth.core.result import (
     DewPressureResult,
     DewTemperatureResult,
     DistillationColumnResult,
+    DriftFluxReleaseResult,
+    DriftFluxReleaseStation,
     DynamicPsvSizingResult,
     EffectiveDiffusionResult,
     EjectorResult,
@@ -115,6 +117,8 @@ from azoth.core.result import (
     FeSMorphology,
     FilippovConductivityResult,
     FilterResult,
+    FiniteRateReleaseResult,
+    FiniteRateReleaseStation,
     FireCaseReliefResult,
     FireMonitorCoverageResult,
     FireWaterCoverageAssessmentResult,
@@ -567,6 +571,7 @@ __all__ = [
     "dew_pressure",
     "dew_temperature",
     "distillation_column",
+    "drift_flux_release",
     "dynamic_psv_sizing",
     "effective_diffusion",
     "ejector",
@@ -583,6 +588,7 @@ __all__ = [
     "fault_tree",
     "filippov_conductivity",
     "filter",
+    "finite_rate_release",
     "fire_case_relief",
     "fire_monitor_coverage",
     "fire_water_coverage_assessment",
@@ -6518,6 +6524,33 @@ def distillation_column(components: list[str], feed_n: Q, feed_z: list[float], f
     )
 
 
+def drift_flux_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, surface_tension: Q) -> DriftFluxReleaseResult:
+    """``process.drift_flux_release``, computed in Rust."""
+    spec = _models_gen.model("process.drift_flux_release")
+    result = _core.drift_flux_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "surface_tension", surface_tension),
+    )
+    return DriftFluxReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(DriftFluxReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def dynamic_psv_sizing(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, fire_heat_input: Q, set_pressure: Q, overpressure_fraction: float, back_pressure: Q, blowdown_fraction: float | None=None, discharge_coefficient: float | None=None, latent_heat: float | None=None, time_step: Q | None=None, max_time: Q | None=None, initial_pressure_fraction: float | None=None) -> DynamicPsvSizingResult:
     """``process.dynamic_psv_sizing``, computed in Rust."""
     spec = _models_gen.model("process.dynamic_psv_sizing")
@@ -6805,6 +6838,36 @@ def filter(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
         collapse_pressure_utilization=result.collapse_pressure_utilization,
         differential_pressure_design_acceptable=result.differential_pressure_design_acceptable,
         design_media_area=None if result.design_media_area is None else from_si(result.design_media_area.magnitude_si, result.design_media_area.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def finite_rate_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, surface_tension: Q, phase_transfer_relaxation_time: Q, residence_time: Q, parameter_provenance: str) -> FiniteRateReleaseResult:
+    """``process.finite_rate_release``, computed in Rust."""
+    spec = _models_gen.model("process.finite_rate_release")
+    result = _core.finite_rate_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "surface_tension", surface_tension),
+        input_to_si(spec, "phase_transfer_relaxation_time", phase_transfer_relaxation_time),
+        input_to_si(spec, "residence_time", residence_time),
+        parameter_provenance,
+    )
+    return FiniteRateReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(FiniteRateReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
         warnings=_warnings(result.warnings),
     )
 

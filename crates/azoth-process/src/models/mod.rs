@@ -54,6 +54,7 @@ pub mod deluge_nozzle_layout;
 pub mod depressurization;
 pub mod depressurization_acceptance;
 pub mod distillation_column;
+pub mod drift_flux_release;
 pub mod dynamic_psv_sizing;
 pub mod ejector;
 pub mod escalation_graph;
@@ -61,6 +62,7 @@ pub mod event_tree;
 pub mod expander;
 pub mod fault_tree;
 pub mod filter;
+pub mod finite_rate_release;
 pub mod fire_case_relief;
 pub mod fire_monitor_coverage;
 pub mod fire_water_coverage_assessment;
@@ -205,6 +207,7 @@ pub use depressurization_acceptance::{
     DepressurizationAcceptancePoint, DepressurizationAcceptanceResult, depressurization_acceptance,
 };
 pub use distillation_column::{DistillationColumnResult, distillation_column};
+pub use drift_flux_release::{DriftFluxReleaseResult, drift_flux_release};
 pub use dynamic_psv_sizing::{DynamicPsvSizingResult, dynamic_psv_sizing};
 pub use ejector::{EjectorResult, ejector};
 pub use escalation_graph::{
@@ -215,6 +218,7 @@ pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_t
 pub use expander::{ExpanderResult, expander};
 pub use fault_tree::{FaultTreeNodeSpec, FaultTreeResult, MinimalCutSet, fault_tree};
 pub use filter::{FilterResult, filter};
+pub use finite_rate_release::{FiniteRateReleaseResult, finite_rate_release};
 pub use fire_case_relief::{FireCaseReliefResult, fire_case_relief};
 pub use fire_monitor_coverage::{FireMonitorCoverageResult, fire_monitor_coverage};
 pub use fire_water_coverage_assessment::{

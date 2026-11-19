@@ -37,6 +37,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.depressurization`](./depressurization.md) | `explicit_euler_equilibrium_blowdown` | NeqSim process/safety/depressurization/DepressurizationSimulator.java |
 | [`process.depressurization_acceptance`](./depressurization_acceptance.md) | `trajectory_acceptance` | NeqSim process/safety/depressurization/STS0131AcceptanceCriteria.java |
 | [`process.distillation_column`](./distillation_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/DistillationColumn.java |
+| [`process.drift_flux_release`](./drift_flux_release.md) | `drift_flux_partition` | NeqSim process/safety/release/DriftFluxHomogeneousEquilibriumReleaseModel.java |
 | [`process.dynamic_psv_sizing`](./dynamic_psv_sizing.md) | `bisection_over_psv_area` | NeqSim process/safety/depressurization/DynamicPsvSizingStudy.java |
 | [`process.ejector`](./ejector.md) | `direct composition` | NeqSim process/equipment/ejector/Ejector.java |
 | [`process.escalation_graph`](./escalation_graph.md) | `domino_failure_propagation` | NeqSim process/safety/escalation/EscalationGraphAnalyzer.java |
@@ -44,6 +45,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.expander`](./expander.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
 | [`process.fault_tree`](./fault_tree.md) | `recursive_gate_evaluation` | NeqSim process/safety/risk/fta/FaultTreeAnalyzer.java |
 | [`process.filter`](./filter.md) | `direct composition` | NeqSim process/equipment/filter/Filter.java |
+| [`process.finite_rate_release`](./finite_rate_release.md) | `finite_rate_relaxation` | NeqSim process/safety/release/FiniteRateDriftFluxReleaseModel.java |
 | [`process.fire_case_relief`](./fire_case_relief.md) | `closed_form_fire_case_relief` | NeqSim process/safety/overpressure/FireCaseRelief.java |
 | [`process.fire_monitor_coverage`](./fire_monitor_coverage.md) | `closed_form_fire_monitor_coverage` | NeqSim process/safety/firewater/FireMonitorCoverage.java |
 | [`process.fire_water_coverage_assessment`](./fire_water_coverage_assessment.md) | `closed_form_fire_water_coverage_assessment` | NeqSim process/safety/firewater/FireWaterCoverageAssessment.java |

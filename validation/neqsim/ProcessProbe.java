@@ -12678,6 +12678,10 @@ public class ProcessProbe {
         new String[] {"methane", "n-heptane"}, new double[] {0.1125, 0.8875}, 300.0, 30.0, 0.01, 0.62,
         1.0e5, new DriftFluxHomogeneousEquilibriumReleaseModel(0.05),
         "surface_tension_n_per_m=0.05");
+    releaseRow("pr_methane_heptane_0_8_gas_area_breach_unsupported", false,
+        new String[] {"methane", "n-heptane"}, new double[] {0.8, 0.2}, 300.0, 30.0, 0.01, 0.62,
+        1.0e5, new DriftFluxHomogeneousEquilibriumReleaseModel(0.020),
+        "surface_tension_n_per_m=0.02");
     releaseRow("pr_methane_heptane_0_5_gas_area_breach_unsupported", false,
         new String[] {"methane", "n-heptane"}, new double[] {0.5, 0.5}, 300.0, 30.0, 0.01, 0.62,
         1.0e5, new DriftFluxHomogeneousEquilibriumReleaseModel(0.020),

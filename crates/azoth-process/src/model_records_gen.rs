@@ -35,6 +35,7 @@ use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::depressurization::DepressurizationResult;
 use crate::models::depressurization_acceptance::DepressurizationAcceptanceResult;
 use crate::models::distillation_column::DistillationColumnResult;
+use crate::models::drift_flux_release::DriftFluxReleaseResult;
 use crate::models::dynamic_psv_sizing::DynamicPsvSizingResult;
 use crate::models::ejector::EjectorResult;
 use crate::models::escalation_graph::EscalationGraphResult;
@@ -42,6 +43,7 @@ use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
 use crate::models::fault_tree::FaultTreeResult;
 use crate::models::filter::FilterResult;
+use crate::models::finite_rate_release::FiniteRateReleaseResult;
 use crate::models::fire_case_relief::FireCaseReliefResult;
 use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
@@ -683,6 +685,26 @@ impl CalcResult for DistillationColumnResult {
     }
 }
 
+impl CalcResult for DriftFluxReleaseResult {
+    const CALC_ID: &'static str = "process.drift_flux_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for DynamicPsvSizingResult {
     const CALC_ID: &'static str = "process.dynamic_psv_sizing";
     const FIELDS: &'static [&'static str] = &[
@@ -871,6 +893,26 @@ impl CalcResult for FilterResult {
         "collapse_pressure_utilization",
         "differential_pressure_design_acceptable",
         "design_media_area",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FiniteRateReleaseResult {
+    const CALC_ID: &'static str = "process.finite_rate_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
         "warnings",
     ];
 

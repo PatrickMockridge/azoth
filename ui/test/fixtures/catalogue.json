@@ -22777,6 +22777,15 @@
       "sub_interface": "depressurization"
     },
     {
+      "family": "release",
+      "id": "process.drift_flux_release",
+      "name": "Vertical drift-flux orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "depressurization",
       "id": "process.dynamic_psv_sizing",
       "name": "Dynamic PSV sizing",
@@ -22811,6 +22820,15 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": "risk"
+    },
+    {
+      "family": "release",
+      "id": "process.finite_rate_release",
+      "name": "Finite-rate drift-flux orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
     },
     {
       "family": "overpressure",
