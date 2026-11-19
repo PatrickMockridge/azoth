@@ -520,7 +520,8 @@ def _evaluate(
         if selected is not None:
             vapour_used = True
             beta = state.vapour_fraction
-            assert beta is not None
+            if beta is None:
+                raise InvalidInputError("initial_p", "the flash reported no vapour fraction")
             phase_moles = (beta if selected == 1 else 1.0 - beta) * moles
             requested = dm / molar_mass
             removed = min(requested, phase_moles * MAX_VAPOUR_FRACTION_PER_STEP)

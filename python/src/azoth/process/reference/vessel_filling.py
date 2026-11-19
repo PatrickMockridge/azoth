@@ -92,7 +92,8 @@ def _bulk_cp(mixture: Any, ideal_gas: Any, t: float, p: float, z: list[float]) -
         liquid = phase_capacity(
             mixture, ideal_gas, reduced, kij, t, p, list(flash.x), flash.z_liquid
         )
-        assert beta is not None
+        if beta is None:
+            raise InvalidInputError("initial_p", "the flash reported no vapour fraction")
         return float(beta * vapour.cp + (1.0 - beta) * liquid.cp)
     from azoth.eos.reference._mixture_state import phase_state
 

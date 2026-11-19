@@ -95,7 +95,8 @@ def _zone_props(mixture: Any, ideal_gas: Any, t: float, p: float, z: list[float]
     flash = pt_flash(mixture, quantity(t, "K"), quantity(p, "Pa"), z)
     if flash.phase == "two_phase":
         beta = flash.vapour_fraction
-        assert beta is not None
+        if beta is None:
+            raise InvalidInputError("initial_p", "the flash reported no vapour fraction")
         vapour = _phase_props(mixture, ideal_gas, reduced, kij, t, p, list(flash.y), flash.z_vapour)
         liquid = _phase_props(mixture, ideal_gas, reduced, kij, t, p, list(flash.x), flash.z_liquid)
         mass = beta * vapour.molar_mass + (1.0 - beta) * liquid.molar_mass
