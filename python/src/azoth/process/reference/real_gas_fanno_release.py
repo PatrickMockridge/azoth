@@ -6,7 +6,8 @@ The Python twin of ``crates/azoth-process/src/models/real_gas_fanno_release.rs``
 one-sided adiabatic constant-area pipe of a single equilibrium gas, marched in ten axial
 steps with a predictor-corrector pressure gradient and a PH flash at every energy state.
 **The march is slow in pure Python** - thousands of PH flashes per state - so its
-cross-implementation cases run in the slow sweep, not the lane.
+cross-implementation cases run in the slow sweep, not the lane. The Rust twin is
+`process.real_gas_fanno_release` and the case is held at `1e-3`.
 """
 
 from __future__ import annotations
