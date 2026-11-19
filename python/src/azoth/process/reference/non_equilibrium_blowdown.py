@@ -148,7 +148,7 @@ def _rohsenow(
         * superheat
         / (surface_constant * latent_heat * prandtl**ROHSENOW_PRANDTL_EXPONENT)
     )
-    flux = liquid_viscosity * latent_heat * buoyancy * bracket**3.0
+    flux = liquid_viscosity * latent_heat * buoyancy * bracket**3
     return flux if math.isfinite(flux) else None
 
 
