@@ -539,6 +539,14 @@ class ConsequenceOutcomeSpec(TypedDict):
     temperature: float | None
     pressure: float | None
 
+class DepressurizationAcceptancePoint(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    time: float
+    pressure: float
+    mass: float
+    mass_flow: float
+
 class EscalationItem(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -628,6 +636,13 @@ class MapCurvePoint(TypedDict):
     flow: float
     head: float
     efficiency: float
+
+class MultiVesselSample(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    source: str
+    time: float
+    mass_flow: float
 
 class P002CheckRow(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -1083,6 +1098,17 @@ class ConsequenceOutcomeResult:
     fatality_frequency_per_year: float
 
 @final
+class DepressurizationPoint:
+    """one row per step, in time order."""
+
+    time: Qty
+    pressure: Qty
+    temperature: Qty
+    mass: Qty
+    wall_temperature: Qty
+    mass_flow: Qty
+
+@final
 class EscalationItemResult:
     """the largest propagation over every registered item, in the items order."""
 
@@ -1286,6 +1312,32 @@ class MahBarrier:
     pfd: float
 
 @final
+class MultiVesselProfileRow:
+    """the combined header load at each grid time."""
+
+    time: Qty
+    total_mass_flow: Qty
+
+@final
+class MultiVesselContributionRow:
+    """each source's contribution at the peak, in first-appearance order."""
+
+    source: str
+    peak_contribution: Qty
+
+@final
+class NonEquilibriumBlowdownPoint:
+    """one row per step, in time order."""
+
+    time: Qty
+    pressure: Qty
+    gas_temperature: Qty
+    liquid_temperature: Qty
+    wall_temperature: Qty
+    gas_mass: Qty
+    liquid_mass: Qty
+
+@final
 class P002FindingResult:
     """one row per check, in the caller's order."""
 
@@ -1404,6 +1456,16 @@ class Tr3001Finding:
 
     check: str
     status: str
+
+@final
+class VesselFillingPoint:
+    """one row per step, in time order."""
+
+    time: Qty
+    pressure: Qty
+    temperature: Qty
+    mass: Qty
+    wall_temperature: Qty
 
 @final
 class VesselRuptureStep:
@@ -3500,6 +3562,18 @@ class BleveResult:
     warnings: list[Warning]
 
 @final
+class BlockedOutletOverpressureResult:
+    relief_set_pressure: Qty
+    max_pressure: Qty
+    final_pressure: Qty
+    final_mass: Qty
+    inlet_mass_flow: Qty
+    simulated_horizon: Qty
+    time_to_relief_set: Qty | None
+    relief_demand: bool
+    warnings: list[Warning]
+
+@final
 class BlockedOutletReliefResult:
     name: str
     relief_rate: Qty
@@ -3666,6 +3740,43 @@ class DelugeNozzleLayoutResult:
     warnings: list[Warning]
 
 @final
+class DepressurizationResult:
+    points: list[DepressurizationPoint]
+    initial_pressure: Qty
+    fire_heat_input: Qty
+    fire_heat_routed_to_wall: bool
+    vu_flash_fallback_count: float
+    vapour_withdrawal_used: bool
+    time_to_half_pressure: Qty | None
+    time_to_7_barg: Qty | None
+    min_fluid_temperature: Qty
+    min_wall_temperature: Qty
+    max_pressure: Qty
+    max_fluid_temperature: Qty
+    max_wall_temperature: Qty
+    half_pressure_criterion_met: bool
+    seven_barg_criterion_met: bool
+    pressure_monotonic_non_increasing: bool
+    mass_monotonic_non_increasing: bool
+    recorded_points: float
+    warnings: list[Warning]
+
+@final
+class DepressurizationAcceptanceResult:
+    limiting_time: Qty
+    pressure_at_limiting_time: Qty
+    remaining_mass_at_limiting_time: Qty
+    peak_discharge_rate: Qty
+    pressure_configured: bool
+    pressure_criterion_met: bool
+    mass_configured: bool
+    mass_criterion_met: bool
+    fire_rate_configured: bool
+    fire_rate_criterion_met: bool
+    acceptable: bool
+    warnings: list[Warning]
+
+@final
 class DistillationColumnResult:
     tray_temperature: list[Qty]
     tray_pressure: list[Qty]
@@ -3718,6 +3829,16 @@ class DistillationColumnResult:
     reboiler_duty_kw: Qty
     condenser_duty_kw: Qty
     material_grade: str
+    warnings: list[Warning]
+
+@final
+class DynamicPsvSizingResult:
+    steady_required_area: Qty
+    dynamic_required_area: Qty
+    oversizing_ratio: float | None
+    allowable_pressure: Qty
+    peak_dynamic_pressure: Qty
+    steady_relief_rate: Qty
     warnings: list[Warning]
 
 @final
@@ -4339,12 +4460,35 @@ class MixerResult:
     warnings: list[Warning]
 
 @final
+class MultiVesselBlowdownStudyResult:
+    profile: list[MultiVesselProfileRow]
+    contributions: list[MultiVesselContributionRow]
+    peak_total_mass_flow: Qty
+    peak_time: Qty
+    header_velocity: Qty | None
+    header_mach: float | None
+    max_allowable_mach: float
+    header_mach_acceptable: bool
+    warnings: list[Warning]
+
+@final
 class Nog070SilDeterminationResult:
     catalogue_minimum_sil: float
     minimum_sil: float
     achieved_sil: float
     compliant: bool
     required_pfd_reduction_factor: float | None
+    warnings: list[Warning]
+
+@final
+class NonEquilibriumBlowdownResult:
+    points: list[NonEquilibriumBlowdownPoint]
+    initial_pressure: Qty
+    flash_fallback_count: float
+    final_gas_temperature: Qty
+    final_liquid_temperature: Qty
+    max_temperature_bifurcation: Qty
+    recorded_points: float
     warnings: list[Warning]
 
 @final
@@ -4603,6 +4747,13 @@ class PsvSizingResult:
     viscosity_correction: float | None
     mass_flow_rate: Qty | None
     mass_flow_capacity: Qty | None
+    warnings: list[Warning]
+
+@final
+class PsvValveResult:
+    open: bool
+    cycle_count: float
+    mass_flow: Qty
     warnings: list[Warning]
 
 @final
@@ -5271,6 +5422,23 @@ class VceResult:
     dimensionless_overpressure: float | None
     overpressure: Qty | None
     distance_to_overpressure: Qty | None
+    warnings: list[Warning]
+
+@final
+class VesselFillingResult:
+    points: list[VesselFillingPoint]
+    inlet_temperature: Qty
+    inlet_mass_flow: Qty
+    vu_flash_fallback_count: float
+    max_fluid_temperature: Qty
+    min_fluid_temperature: Qty
+    max_pressure: Qty
+    final_pressure: Qty
+    final_mass: Qty
+    liner_over_temperature: bool
+    liner_under_temperature: bool
+    liner_limits_met: bool
+    recorded_points: float
     warnings: list[Warning]
 
 @final
@@ -7631,6 +7799,19 @@ def bleve(
     distance: float | None = None,
     target_flux: float | None = None,
 ) -> BleveResult: ...
+def blocked_outlet_overpressure(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: float,
+    initial_p: float,
+    vessel_volume: float,
+    inlet_temperature: float,
+    supply_pressure: float,
+    inlet_mass_flow: float,
+    relief_set_pressure: float,
+    time_step: float | None = None,
+    max_time: float | None = None,
+) -> BlockedOutletOverpressureResult: ...
 def blocked_outlet_relief(
     components: list[str],
     mole_fractions: list[float],
@@ -7752,6 +7933,39 @@ def deluge_nozzle_layout(
     operating_pressure: float | None = None,
     coverage_efficiency: float | None = None,
 ) -> DelugeNozzleLayoutResult: ...
+def depressurization(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: float,
+    initial_p: float,
+    vessel_volume: float,
+    orifice_diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    fire_heat_input: float | None = None,
+    fire_heat_input_to_wall: bool | None = None,
+    fire_exposed_area: float | None = None,
+    fire_preset: str | None = None,
+    fire_emissivity: float | None = None,
+    fire_flame_temperature: float | None = None,
+    fire_convective_coefficient: float | None = None,
+    wall_mass: float | None = None,
+    wall_area: float | None = None,
+    wall_specific_heat: float | None = None,
+    wall_heat_transfer_coefficient: float | None = None,
+    time_step: float | None = None,
+    max_time: float | None = None,
+    stop_pressure: float | None = None,
+    withdrawal_mode: str | None = None,
+) -> DepressurizationResult: ...
+def depressurization_acceptance(
+    points: list[DepressurizationAcceptancePoint],
+    time_to_escape: float | None = None,
+    estimated_time_to_rupture: float | None = None,
+    maximum_pressure_at_rupture: float | None = None,
+    maximum_remaining_mass: float | None = None,
+    maximum_escalated_fire_rate: float | None = None,
+) -> DepressurizationAcceptanceResult: ...
 def distillation_column(
     components: list[str],
     feed_n: float,
@@ -7813,6 +8027,23 @@ def distillation_column(
     material_grade: str | None = None,
     max_operation_pressure: float | None = None,
 ) -> DistillationColumnResult: ...
+def dynamic_psv_sizing(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: float,
+    initial_p: float,
+    vessel_volume: float,
+    fire_heat_input: float,
+    set_pressure: float,
+    overpressure_fraction: float,
+    back_pressure: float,
+    blowdown_fraction: float | None = None,
+    discharge_coefficient: float | None = None,
+    latent_heat: float | None = None,
+    time_step: float | None = None,
+    max_time: float | None = None,
+    initial_pressure_fraction: float | None = None,
+) -> DynamicPsvSizingResult: ...
 def ejector(
     motive_components: list[str],
     suction_components: list[str],
@@ -8282,11 +8513,48 @@ def mixer(
     feed_t: list[float],
     outlet_pressure: float | None = None,
 ) -> MixerResult: ...
+def multi_vessel_blowdown_study(
+    samples: list[MultiVesselSample],
+    header_diameter: float | None = None,
+    header_pressure: float | None = None,
+    header_temperature: float | None = None,
+    header_molar_mass: float | None = None,
+    header_heat_capacity_ratio: float | None = None,
+    max_allowable_mach: float | None = None,
+    grid_step: float | None = None,
+) -> MultiVesselBlowdownStudyResult: ...
 def nog070_sil_determination(
     sif_type: str,
     pfd_average: float,
     minimum_sil: float | None = None,
 ) -> Nog070SilDeterminationResult: ...
+def non_equilibrium_blowdown(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: float,
+    initial_p: float,
+    vessel_volume: float,
+    orifice_diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    fire_emissivity: float | None = None,
+    fire_flame_temperature: float | None = None,
+    fire_convective_coefficient: float | None = None,
+    fire_exposed_area: float | None = None,
+    wall_mass: float | None = None,
+    wall_specific_heat: float | None = None,
+    inside_gas_coefficient: float | None = None,
+    interfacial_coefficient: float | None = None,
+    interfacial_area: float | None = None,
+    latent_heat: float | None = None,
+    surface_tension: float | None = None,
+    surface_fluid_constant: float | None = None,
+    critical_heat_flux: float | None = None,
+    effective_boiling_coefficient: float | None = None,
+    time_step: float | None = None,
+    max_time: float | None = None,
+    stop_pressure: float | None = None,
+) -> NonEquilibriumBlowdownResult: ...
 def norsok_p002_compliance(checks: list[P002CheckRow]) -> NorsokP002ComplianceResult: ...
 def overpressure_acceptance(
     peak_pressure: float,
@@ -8532,6 +8800,20 @@ def psv_sizing(
     orifice_area: float | None = None,
     capacity_discharge_coefficient: float | None = None,
 ) -> PsvSizingResult: ...
+def psv_valve(
+    set_pressure: float,
+    blowdown_fraction: float,
+    discharge_coefficient: float,
+    orifice_area: float,
+    back_pressure: float,
+    upstream_pressure: float,
+    upstream_temperature: float,
+    molar_mass: float,
+    heat_capacity_ratio: float,
+    compressibility: float,
+    was_open: bool | None = None,
+    prior_cycle_count: float | None = None,
+) -> PsvValveResult: ...
 def pump(
     components: list[str],
     inlet_n: float,
@@ -8991,6 +9273,27 @@ def vce(
     distance: float | None = None,
     target_overpressure: float | None = None,
 ) -> VceResult: ...
+def vessel_filling(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: float,
+    initial_p: float,
+    vessel_volume: float,
+    inlet_temperature: float,
+    supply_pressure: float,
+    inlet_mass_flow: float,
+    target_pressure: float | None = None,
+    wall_mass: float | None = None,
+    wall_area: float | None = None,
+    wall_specific_heat: float | None = None,
+    wall_heat_transfer_coefficient: float | None = None,
+    woodfield_nozzle_diameter: float | None = None,
+    vessel_height: float | None = None,
+    liner_min_temperature: float | None = None,
+    liner_max_temperature: float | None = None,
+    time_step: float | None = None,
+    max_time: float | None = None,
+) -> VesselFillingResult: ...
 def vessel_rupture(
     inner_radius: float,
     wall_thickness: float,

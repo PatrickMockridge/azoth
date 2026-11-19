@@ -1,0 +1,122 @@
+model = "process.psv_valve"
+[[cases]]
+id = "closed_below_set"
+tolerance = 1.0e-12
+source = "`valve_closed_below_set`: 4.8 MPa against a 5 MPa set, closed, so the latch stays shut and no flow passes.\n"
+[cases.inputs]
+set_pressure = 5000000.0
+blowdown_fraction = 0.1
+discharge_coefficient = 0.975
+orifice_area = 0.001
+back_pressure = 100000.0
+upstream_pressure = 4800000.0
+upstream_temperature = 350.0
+molar_mass = 0.018
+heat_capacity_ratio = 1.3
+compressibility = 0.95
+[cases.expected]
+open = false
+cycle_count = 0.0
+mass_flow = 0.0
+[[cases]]
+id = "pops_at_set"
+tolerance = 1.0e-12
+source = "`valve_pops_at_set`: exactly at the 5 MPa set, so the valve opens, the counter increments once and the choked API 520 flow is `8.300545970532687` kg/s.\n"
+[cases.inputs]
+set_pressure = 5000000.0
+blowdown_fraction = 0.1
+discharge_coefficient = 0.975
+orifice_area = 0.001
+back_pressure = 100000.0
+upstream_pressure = 5000000.0
+upstream_temperature = 350.0
+molar_mass = 0.018
+heat_capacity_ratio = 1.3
+compressibility = 0.95
+[cases.expected]
+open = true
+cycle_count = 1.0
+mass_flow = 8.300545970532687
+[[cases]]
+id = "latched_above_reseat"
+tolerance = 1.0e-12
+source = "`valve_latched_above_reseat`: open with one pop and 4.6 MPa, above the 4.5 MPa reseat, so the state holds and the flow is `7.636502292890071` kg/s.\n"
+[cases.inputs]
+set_pressure = 5000000.0
+blowdown_fraction = 0.1
+discharge_coefficient = 0.975
+orifice_area = 0.001
+back_pressure = 100000.0
+upstream_pressure = 4600000.0
+upstream_temperature = 350.0
+molar_mass = 0.018
+heat_capacity_ratio = 1.3
+compressibility = 0.95
+was_open = true
+prior_cycle_count = 1.0
+[cases.expected]
+open = true
+cycle_count = 1.0
+mass_flow = 7.636502292890071
+[[cases]]
+id = "reseats_below_reseat"
+tolerance = 1.0e-12
+source = "`valve_reseats_below_reseat`: open with one pop and 4.4 MPa, below the 4.5 MPa reseat, so the valve closes and the flow is zero.\n"
+[cases.inputs]
+set_pressure = 5000000.0
+blowdown_fraction = 0.1
+discharge_coefficient = 0.975
+orifice_area = 0.001
+back_pressure = 100000.0
+upstream_pressure = 4400000.0
+upstream_temperature = 350.0
+molar_mass = 0.018
+heat_capacity_ratio = 1.3
+compressibility = 0.95
+was_open = true
+prior_cycle_count = 1.0
+[cases.expected]
+open = false
+cycle_count = 1.0
+mass_flow = 0.0
+[[cases]]
+id = "second_pop"
+tolerance = 1.0e-12
+source = "`valve_second_pop`: closed after two pops, then 5.1 MPa, so the third pop is counted and the flow is `8.466556889943341` kg/s.\n"
+[cases.inputs]
+set_pressure = 5000000.0
+blowdown_fraction = 0.1
+discharge_coefficient = 0.975
+orifice_area = 0.001
+back_pressure = 100000.0
+upstream_pressure = 5100000.0
+upstream_temperature = 350.0
+molar_mass = 0.018
+heat_capacity_ratio = 1.3
+compressibility = 0.95
+prior_cycle_count = 2.0
+[cases.expected]
+open = true
+cycle_count = 3.0
+mass_flow = 8.466556889943341
+[[cases]]
+id = "subcritical_branch"
+tolerance = 1.0e-12
+source = "`valve_subcritical`: open at 0.52 MPa against a 0.5 MPa set and a 0.4 MPa back pressure, where the pressure ratio is above the critical ratio and the subcritical branch gives `0.7544344197817343` kg/s.\n"
+[cases.inputs]
+set_pressure = 500000.0
+blowdown_fraction = 0.1
+discharge_coefficient = 0.975
+orifice_area = 0.001
+back_pressure = 400000.0
+upstream_pressure = 520000.0
+upstream_temperature = 350.0
+molar_mass = 0.018
+heat_capacity_ratio = 1.3
+compressibility = 0.95
+was_open = true
+prior_cycle_count = 1.0
+[cases.expected]
+open = true
+cycle_count = 1.0
+mass_flow = 0.7544344197817343

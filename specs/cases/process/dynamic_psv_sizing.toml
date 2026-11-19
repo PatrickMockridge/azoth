@@ -1,0 +1,43 @@
+model = "process.dynamic_psv_sizing"
+[[cases]]
+id = "fifty_bara_gas"
+tolerance = 1.0e-6
+source = "`dpsv_50bara`: a methane/ethane/propane gas at 350 K and 50 bara, a 5 m3 vessel, 0.5 MW of fire, a 50 bara set pressure at 21 % accumulation and a 1 bara back pressure. The steady area is `1.3484834741989848e-4` m2 and the dynamic `5.401978650632388e-5`, an oversizing of `2.496276941118831`.\n"
+[cases.inputs]
+components = ["methane", "ethane", "propane"]
+initial_z = [0.85, 0.1, 0.05]
+initial_t = 350.0
+initial_p = 5000000.0
+vessel_volume = 5.0
+fire_heat_input = 500000.0
+set_pressure = 5000000.0
+overpressure_fraction = 0.21
+back_pressure = 100000.0
+[cases.expected]
+steady_required_area = 1.3484834741989848e-4
+dynamic_required_area = 5.401978650632388e-5
+oversizing_ratio = 2.496276941118831
+allowable_pressure = 6050000.0
+peak_dynamic_pressure = 6049999.996251063
+steady_relief_rate = 1.4285714285714286
+[[cases]]
+id = "low_pressure_small_vessel"
+tolerance = 1.0e-6
+source = "`dpsv_11bara_small_vessel`: the same gas at 350 K and 11 bara in a 1 m3 vessel with 0.15 MW of fire, a 11 bara set pressure and 21 % accumulation, where the steady sizing is more strongly conservative: a `3.1871277792055692` oversizing.\n"
+[cases.inputs]
+components = ["methane", "ethane", "propane"]
+initial_z = [0.85, 0.1, 0.05]
+initial_t = 350.0
+initial_p = 1100000.0
+vessel_volume = 1.0
+fire_heat_input = 150000.0
+set_pressure = 1100000.0
+overpressure_fraction = 0.21
+back_pressure = 100000.0
+[cases.expected]
+steady_required_area = 1.9424246655211374e-4
+dynamic_required_area = 6.094593000614838e-5
+oversizing_ratio = 3.1871277792055692
+allowable_pressure = 1331000.0
+peak_dynamic_pressure = 1330999.9986886573
+steady_relief_rate = 0.42857142857142855

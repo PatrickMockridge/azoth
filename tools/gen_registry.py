@@ -462,6 +462,32 @@ SELF_ASSERTED_EXPECTATIONS: frozenset[str] = frozenset(
         "proof_test_configured",
         "proof_test_criterion_met",
         "acceptable",
+        # `psv_valve`'s latch state, a boolean with no slot in `TestCase`.
+        # `crates/azoth-process/tests/psv_valve.rs` asserts it against the capture, and
+        # `test_cross_impl` compares it on both results.
+        "open",
+        # The depressurization family's boolean outputs, which have no slot in `TestCase`.
+        # Their model tests assert them against the captures and `test_cross_impl` compares
+        # them on both results.
+        "fire_heat_routed_to_wall",
+        "vapour_withdrawal_used",
+        "half_pressure_criterion_met",
+        "seven_barg_criterion_met",
+        "pressure_monotonic_non_increasing",
+        "mass_monotonic_non_increasing",
+        "liner_over_temperature",
+        "liner_under_temperature",
+        "liner_limits_met",
+        "relief_demand",
+        "header_mach_acceptable",
+        # The acceptance's six configured/met predicates, booleans with no slot in `TestCase`.
+        # Its model test asserts them against the capture and `test_cross_impl` compares them.
+        "pressure_configured",
+        "pressure_criterion_met",
+        "mass_configured",
+        "mass_criterion_met",
+        "fire_rate_configured",
+        "fire_rate_criterion_met",
     }
 )
 

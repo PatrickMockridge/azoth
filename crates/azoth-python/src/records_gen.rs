@@ -242,6 +242,19 @@ pub struct DepositMass {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct DepressurizationAcceptancePoint {
+    #[pyo3(item)]
+    pub time: f64,
+    #[pyo3(item)]
+    pub pressure: f64,
+    #[pyo3(item)]
+    pub mass: f64,
+    #[pyo3(item)]
+    pub mass_flow: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct EfficiencyPoint {
     #[pyo3(item)]
     pub diameter: f64,
@@ -547,6 +560,17 @@ pub struct MapCurvePoint {
     pub head: f64,
     #[pyo3(item)]
     pub efficiency: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct MultiVesselSample {
+    #[pyo3(item)]
+    pub source: String,
+    #[pyo3(item)]
+    pub time: f64,
+    #[pyo3(item)]
+    pub mass_flow: f64,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

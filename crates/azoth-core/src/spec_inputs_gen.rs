@@ -232,6 +232,7 @@
 //!   - specs/models/process/barrier_register_validation.toml
 //!   - specs/models/process/basket_test_regression.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/blocked_outlet_overpressure.toml
 //!   - specs/models/process/blocked_outlet_relief.toml
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
@@ -242,7 +243,10 @@
 //!   - specs/models/process/control_valve_failure_relief.toml
 //!   - specs/models/process/cooler.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
+//!   - specs/models/process/depressurization.toml
+//!   - specs/models/process/depressurization_acceptance.toml
 //!   - specs/models/process/distillation_column.toml
+//!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/escalation_graph.toml
 //!   - specs/models/process/event_tree.toml
@@ -277,7 +281,9 @@
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
+//!   - specs/models/process/multi_vessel_blowdown_study.toml
 //!   - specs/models/process/nog070_sil_determination.toml
+//!   - specs/models/process/non_equilibrium_blowdown.toml
 //!   - specs/models/process/norsok_p002_compliance.toml
 //!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/overpressure_protection_study.toml
@@ -295,6 +301,7 @@
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
+//!   - specs/models/process/psv_valve.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/pump_deadhead.toml
 //!   - specs/models/process/rate_based_packed_column.toml
@@ -325,6 +332,7 @@
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vacuum_collapse.toml
 //!   - specs/models/process/vce.toml
+//!   - specs/models/process/vessel_filling.toml
 //!   - specs/models/process/vessel_rupture.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
@@ -2871,6 +2879,48 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.bleve", "distance", "length"),
     ("process.bleve", "target_flux", "heat_flux_density"),
     (
+        "process.blocked_outlet_overpressure",
+        "initial_z",
+        "dimensionless",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "initial_t",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "initial_p",
+        "pressure",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "vessel_volume",
+        "volume",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "inlet_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "supply_pressure",
+        "pressure",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "inlet_mass_flow",
+        "mass_rate",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "relief_set_pressure",
+        "pressure",
+    ),
+    ("process.blocked_outlet_overpressure", "time_step", "time"),
+    ("process.blocked_outlet_overpressure", "max_time", "time"),
+    (
         "process.blocked_outlet_relief",
         "mole_fractions",
         "dimensionless",
@@ -3101,6 +3151,78 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "coverage_efficiency",
         "dimensionless",
     ),
+    ("process.depressurization", "initial_z", "dimensionless"),
+    (
+        "process.depressurization",
+        "initial_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.depressurization", "initial_p", "pressure"),
+    ("process.depressurization", "vessel_volume", "volume"),
+    ("process.depressurization", "orifice_diameter", "length"),
+    (
+        "process.depressurization",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.depressurization", "back_pressure", "pressure"),
+    ("process.depressurization", "fire_heat_input", "power"),
+    ("process.depressurization", "fire_exposed_area", "area"),
+    (
+        "process.depressurization",
+        "fire_emissivity",
+        "dimensionless",
+    ),
+    (
+        "process.depressurization",
+        "fire_flame_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.depressurization",
+        "fire_convective_coefficient",
+        "heat_transfer",
+    ),
+    ("process.depressurization", "wall_mass", "mass"),
+    ("process.depressurization", "wall_area", "area"),
+    (
+        "process.depressurization",
+        "wall_specific_heat",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.depressurization",
+        "wall_heat_transfer_coefficient",
+        "heat_transfer",
+    ),
+    ("process.depressurization", "time_step", "time"),
+    ("process.depressurization", "max_time", "time"),
+    ("process.depressurization", "stop_pressure", "pressure"),
+    (
+        "process.depressurization_acceptance",
+        "time_to_escape",
+        "time",
+    ),
+    (
+        "process.depressurization_acceptance",
+        "estimated_time_to_rupture",
+        "time",
+    ),
+    (
+        "process.depressurization_acceptance",
+        "maximum_pressure_at_rupture",
+        "pressure",
+    ),
+    (
+        "process.depressurization_acceptance",
+        "maximum_remaining_mass",
+        "mass",
+    ),
+    (
+        "process.depressurization_acceptance",
+        "maximum_escalated_fire_rate",
+        "mass_rate",
+    ),
     ("process.distillation_column", "feed_n", "molar_flow"),
     ("process.distillation_column", "feed_z", "dimensionless"),
     ("process.distillation_column", "feed_p", "pressure"),
@@ -3275,6 +3397,40 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.distillation_column",
         "max_operation_pressure",
         "pressure",
+    ),
+    ("process.dynamic_psv_sizing", "initial_z", "dimensionless"),
+    (
+        "process.dynamic_psv_sizing",
+        "initial_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.dynamic_psv_sizing", "initial_p", "pressure"),
+    ("process.dynamic_psv_sizing", "vessel_volume", "volume"),
+    ("process.dynamic_psv_sizing", "fire_heat_input", "power"),
+    ("process.dynamic_psv_sizing", "set_pressure", "pressure"),
+    (
+        "process.dynamic_psv_sizing",
+        "overpressure_fraction",
+        "dimensionless",
+    ),
+    ("process.dynamic_psv_sizing", "back_pressure", "pressure"),
+    (
+        "process.dynamic_psv_sizing",
+        "blowdown_fraction",
+        "dimensionless",
+    ),
+    (
+        "process.dynamic_psv_sizing",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.dynamic_psv_sizing", "latent_heat", "dimensionless"),
+    ("process.dynamic_psv_sizing", "time_step", "time"),
+    ("process.dynamic_psv_sizing", "max_time", "time"),
+    (
+        "process.dynamic_psv_sizing",
+        "initial_pressure_fraction",
+        "dimensionless",
     ),
     ("process.ejector", "motive_n", "molar_flow"),
     ("process.ejector", "motive_z", "dimensionless"),
@@ -4093,6 +4249,37 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.mixer", "feed_t", "thermodynamic_temperature"),
     ("process.mixer", "outlet_pressure", "pressure"),
     (
+        "process.multi_vessel_blowdown_study",
+        "header_diameter",
+        "length",
+    ),
+    (
+        "process.multi_vessel_blowdown_study",
+        "header_pressure",
+        "pressure",
+    ),
+    (
+        "process.multi_vessel_blowdown_study",
+        "header_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.multi_vessel_blowdown_study",
+        "header_molar_mass",
+        "molar_mass",
+    ),
+    (
+        "process.multi_vessel_blowdown_study",
+        "header_heat_capacity_ratio",
+        "dimensionless",
+    ),
+    (
+        "process.multi_vessel_blowdown_study",
+        "max_allowable_mach",
+        "dimensionless",
+    ),
+    ("process.multi_vessel_blowdown_study", "grid_step", "time"),
+    (
         "process.nog070_sil_determination",
         "pfd_average",
         "dimensionless",
@@ -4101,6 +4288,110 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.nog070_sil_determination",
         "minimum_sil",
         "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "initial_z",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "initial_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.non_equilibrium_blowdown", "initial_p", "pressure"),
+    (
+        "process.non_equilibrium_blowdown",
+        "vessel_volume",
+        "volume",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "orifice_diameter",
+        "length",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "fire_emissivity",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "fire_flame_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "fire_convective_coefficient",
+        "heat_transfer",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "fire_exposed_area",
+        "area",
+    ),
+    ("process.non_equilibrium_blowdown", "wall_mass", "mass"),
+    (
+        "process.non_equilibrium_blowdown",
+        "wall_specific_heat",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "inside_gas_coefficient",
+        "heat_transfer",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "interfacial_coefficient",
+        "heat_transfer",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "interfacial_area",
+        "area",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "latent_heat",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "surface_tension",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "surface_fluid_constant",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "critical_heat_flux",
+        "dimensionless",
+    ),
+    (
+        "process.non_equilibrium_blowdown",
+        "effective_boiling_coefficient",
+        "heat_transfer",
+    ),
+    ("process.non_equilibrium_blowdown", "time_step", "time"),
+    ("process.non_equilibrium_blowdown", "max_time", "time"),
+    (
+        "process.non_equilibrium_blowdown",
+        "stop_pressure",
+        "pressure",
     ),
     (
         "process.overpressure_acceptance",
@@ -4654,6 +4945,25 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "capacity_discharge_coefficient",
         "dimensionless",
     ),
+    ("process.psv_valve", "set_pressure", "pressure"),
+    ("process.psv_valve", "blowdown_fraction", "dimensionless"),
+    (
+        "process.psv_valve",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.psv_valve", "orifice_area", "area"),
+    ("process.psv_valve", "back_pressure", "pressure"),
+    ("process.psv_valve", "upstream_pressure", "pressure"),
+    (
+        "process.psv_valve",
+        "upstream_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.psv_valve", "molar_mass", "molar_mass"),
+    ("process.psv_valve", "heat_capacity_ratio", "dimensionless"),
+    ("process.psv_valve", "compressibility", "dimensionless"),
+    ("process.psv_valve", "prior_cycle_count", "dimensionless"),
     ("process.pump", "inlet_n", "molar_flow"),
     ("process.pump", "inlet_z", "dimensionless"),
     ("process.pump", "inlet_p", "pressure"),
@@ -5749,6 +6059,52 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.vce", "ambient_pressure", "pressure"),
     ("process.vce", "distance", "length"),
     ("process.vce", "target_overpressure", "pressure"),
+    ("process.vessel_filling", "initial_z", "dimensionless"),
+    (
+        "process.vessel_filling",
+        "initial_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.vessel_filling", "initial_p", "pressure"),
+    ("process.vessel_filling", "vessel_volume", "volume"),
+    (
+        "process.vessel_filling",
+        "inlet_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.vessel_filling", "supply_pressure", "pressure"),
+    ("process.vessel_filling", "inlet_mass_flow", "mass_rate"),
+    ("process.vessel_filling", "target_pressure", "pressure"),
+    ("process.vessel_filling", "wall_mass", "mass"),
+    ("process.vessel_filling", "wall_area", "area"),
+    (
+        "process.vessel_filling",
+        "wall_specific_heat",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.vessel_filling",
+        "wall_heat_transfer_coefficient",
+        "heat_transfer",
+    ),
+    (
+        "process.vessel_filling",
+        "woodfield_nozzle_diameter",
+        "length",
+    ),
+    ("process.vessel_filling", "vessel_height", "length"),
+    (
+        "process.vessel_filling",
+        "liner_min_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.vessel_filling",
+        "liner_max_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.vessel_filling", "time_step", "time"),
+    ("process.vessel_filling", "max_time", "time"),
     ("process.vessel_rupture", "inner_radius", "length"),
     ("process.vessel_rupture", "wall_thickness", "length"),
     ("process.vessel_rupture", "yield_strength", "pressure"),

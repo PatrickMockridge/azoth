@@ -23,6 +23,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.barrier_register_validation`](./barrier_register_validation.md) | `barrier_register_validation` | NeqSim process/safety/barrier/BarrierRegister.java |
 | [`process.basket_test_regression`](./basket_test_regression.md) | `basket_least_squares` | NeqSim process/safety/selfheating/BasketTestRegression.java |
 | [`process.bleve`](./bleve.md) | `ccps_fireball_point_source` | NeqSim process/safety/fire/BLEVECalculator.java |
+| [`process.blocked_outlet_overpressure`](./blocked_outlet_overpressure.md) | `vessel_pressure_transient` | NeqSim process/safety/depressurization/BlockedOutletOverpressureAnalyzer.java |
 | [`process.blocked_outlet_relief`](./blocked_outlet_relief.md) | `blocked_outlet_full_inflow` | NeqSim process/safety/overpressure/BlockedOutletRelief.java |
 | [`process.blowdown_pressure_profile`](./blowdown_pressure_profile.md) | `piecewise_step_or_linear_pressure_profile` | NeqSim process/safety/rupture/BlowdownPressureProfile.java |
 | [`process.bow_tie`](./bow_tie.md) | `closed_form_bow_tie` | NeqSim process/safety/risk/bowtie/BowTieModel.java |
@@ -33,7 +34,10 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.control_valve_failure_relief`](./control_valve_failure_relief.md) | `control_valve_fail_open_nozzle` | NeqSim process/safety/overpressure/ControlValveFailureRelief.java |
 | [`process.cooler`](./cooler.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Cooler.java |
 | [`process.deluge_nozzle_layout`](./deluge_nozzle_layout.md) | `closed_form_deluge_nozzle_layout` | NeqSim process/safety/firewater/DelugeNozzleLayout.java |
+| [`process.depressurization`](./depressurization.md) | `explicit_euler_equilibrium_blowdown` | NeqSim process/safety/depressurization/DepressurizationSimulator.java |
+| [`process.depressurization_acceptance`](./depressurization_acceptance.md) | `trajectory_acceptance` | NeqSim process/safety/depressurization/STS0131AcceptanceCriteria.java |
 | [`process.distillation_column`](./distillation_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/DistillationColumn.java |
+| [`process.dynamic_psv_sizing`](./dynamic_psv_sizing.md) | `bisection_over_psv_area` | NeqSim process/safety/depressurization/DynamicPsvSizingStudy.java |
 | [`process.ejector`](./ejector.md) | `direct composition` | NeqSim process/equipment/ejector/Ejector.java |
 | [`process.escalation_graph`](./escalation_graph.md) | `domino_failure_propagation` | NeqSim process/safety/escalation/EscalationGraphAnalyzer.java |
 | [`process.event_tree`](./event_tree.md) | `full_binary_enumeration` | NeqSim process/safety/risk/eta/EventTreeAnalyzer.java |
@@ -68,7 +72,9 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.map_turbo_expander_compressor`](./map_turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/MapTurboExpanderCompressor.java |
 | [`process.mdmt`](./mdmt.md) | `ucs66_analytic_mdmt` | NeqSim process/safety/mdmt/MDMTCalculator.java |
 | [`process.mixer`](./mixer.md) | `direct composition` | NeqSim process/equipment/mixer/Mixer.java |
+| [`process.multi_vessel_blowdown_study`](./multi_vessel_blowdown_study.md) | `profile_superposition` | NeqSim process/safety/depressurization/MultiVesselBlowdownStudy.java |
 | [`process.nog070_sil_determination`](./nog070_sil_determination.md) | `closed_form_nog070_sil_determination` | NeqSim process/safety/risk/sis/nog070/Nog070SilDetermination.java |
+| [`process.non_equilibrium_blowdown`](./non_equilibrium_blowdown.md) | `explicit_euler_two_zone_blowdown` | NeqSim process/safety/depressurization/NonEquilibriumBlowdownModel.java |
 | [`process.norsok_p002_compliance`](./norsok_p002_compliance.md) | `norsok_p002_point_checks` | NeqSim process/safety/compliance/NorsokP002ComplianceChecker.java |
 | [`process.overpressure_acceptance`](./overpressure_acceptance.md) | `closed_form_overpressure_acceptance` | NeqSim process/safety/overpressure/OverpressureAcceptanceChecker.java |
 | [`process.overpressure_protection_study`](./overpressure_protection_study.md) | `overpressure_protection_study` | NeqSim process/safety/overpressure/OverpressureProtectionStudy.java |
@@ -86,6 +92,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.probit`](./probit.md) | `closed_form_probit` | NeqSim process/safety/dispersion/ProbitModel.java |
 | [`process.psv_fire_sizing`](./psv_fire_sizing.md) | `closed_form_psv_fire_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
 | [`process.psv_sizing`](./psv_sizing.md) | `closed_form_psv_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
+| [`process.psv_valve`](./psv_valve.md) | `psv_latch_one_step` | NeqSim process/safety/depressurization/PsvValveModel.java |
 | [`process.pump`](./pump.md) | `direct composition` | NeqSim process/equipment/pump/Pump.java and process/equipment/pump/PumpChart.java |
 | [`process.pump_deadhead`](./pump_deadhead.md) | `centrifugal_pump_deadhead_screen` | NeqSim process/safety/pump/PumpDeadheadAnalyzer.java |
 | [`process.rate_based_packed_column`](./rate_based_packed_column.md) | `counter_current_fixed_point_profile` | NeqSim process/equipment/distillation/RateBasedPackedColumn.java |
@@ -116,4 +123,5 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.turbo_expander_compressor`](./turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/TurboExpanderCompressor.java |
 | [`process.vacuum_collapse`](./vacuum_collapse.md) | `constant_volume_cooling_sweep` | NeqSim process/safety/vacuum/VacuumCollapseAnalyzer.java |
 | [`process.vce`](./vce.md) | `tno_multi_energy_scaled_overpressure` | NeqSim process/safety/fire/VCEModel.java |
+| [`process.vessel_filling`](./vessel_filling.md) | `explicit_euler_vessel_filling` | NeqSim process/safety/depressurization/VesselFillingSimulator.java |
 | [`process.vessel_rupture`](./vessel_rupture.md) | `thin_wall_vessel_rupture_crossover` | NeqSim process/safety/rupture/VesselRuptureAnalyzer.java |

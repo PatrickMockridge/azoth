@@ -37,6 +37,7 @@ from azoth.core.result import (
     BeggsBrillRegime,
     BeggsBrillSegmentResult,
     BleveResult,
+    BlockedOutletOverpressureResult,
     BlockedOutletReliefResult,
     BlowbyVerdict,
     BlowdownPressureProfileResult,
@@ -84,11 +85,15 @@ from azoth.core.result import (
     DelugeNozzleLayoutResult,
     DelumpingResult,
     DepositionSegmentRow,
+    DepressurizationAcceptanceResult,
+    DepressurizationPoint,
+    DepressurizationResult,
     DesmukhMatherPhaseResult,
     DeWaardMilliamsCorrosionResult,
     DewPressureResult,
     DewTemperatureResult,
     DistillationColumnResult,
+    DynamicPsvSizingResult,
     EffectiveDiffusionResult,
     EjectorResult,
     ElectrolyteCpaStatoilPhaseResult,
@@ -221,9 +226,14 @@ from azoth.core.result import (
     MollerupAlphaResult,
     MultiflashStabilityTestResult,
     MultiMineralScaleEquilibriumResult,
+    MultiVesselBlowdownStudyResult,
+    MultiVesselContributionRow,
+    MultiVesselProfileRow,
     NaceIssueRow,
     NitricSulfuricAcidVaporPressureResult,
     Nog070SilDeterminationResult,
+    NonEquilibriumBlowdownPoint,
+    NonEquilibriumBlowdownResult,
     NorsokP002ComplianceResult,
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
@@ -278,6 +288,7 @@ from azoth.core.result import (
     PsFlashResult,
     PsvFireSizingResult,
     PsvSizingResult,
+    PsvValveResult,
     PtFlashResult,
     PtPhaseEnvelopeResult,
     PuFlashResult,
@@ -427,6 +438,8 @@ from azoth.core.result import (
     VanLaarAcidActivityCoefficientsResult,
     VceResult,
     Vdw1fMixBinaryResult,
+    VesselFillingPoint,
+    VesselFillingResult,
     VesselRuptureResult,
     VesselRuptureStep,
     VhFlashResult,
@@ -502,6 +515,7 @@ __all__ = [
     "basket_test_regression",
     "beggs_brill_segment",
     "bleve",
+    "blocked_outlet_overpressure",
     "blocked_outlet_relief",
     "blowdown_pressure_profile",
     "boiling_heat_transfer",
@@ -541,10 +555,13 @@ __all__ = [
     "de_waard_milliams_corrosion",
     "deluge_nozzle_layout",
     "delumping",
+    "depressurization",
+    "depressurization_acceptance",
     "desmukh_mather_phase",
     "dew_pressure",
     "dew_temperature",
     "distillation_column",
+    "dynamic_psv_sizing",
     "effective_diffusion",
     "ejector",
     "electrolyte_cpa_statoil_phase",
@@ -645,9 +662,11 @@ __all__ = [
     "molar_enthalpy_entropy",
     "mollerup_alpha",
     "multi_mineral_scale_equilibrium",
+    "multi_vessel_blowdown_study",
     "multiflash_stability_test",
     "nitric_sulfuric_acid_vapor_pressure",
     "nog070_sil_determination",
+    "non_equilibrium_blowdown",
     "norsok_p002_compliance",
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
@@ -699,6 +718,7 @@ __all__ = [
     "ps_flash",
     "psv_fire_sizing",
     "psv_sizing",
+    "psv_valve",
     "pt_flash",
     "pt_phase_envelope",
     "pu_flash",
@@ -815,6 +835,7 @@ __all__ = [
     "van_laar_acid_activity_coefficients",
     "vce",
     "vdw1f_mix_binary",
+    "vessel_filling",
     "vessel_rupture",
     "vh_flash",
     "viscosity",
@@ -5934,6 +5955,35 @@ def bleve(fuel_mass: Q, heat_of_combustion: float, radiative_fraction: float, re
     )
 
 
+def blocked_outlet_overpressure(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, inlet_temperature: Q, supply_pressure: Q, inlet_mass_flow: Q, relief_set_pressure: Q, time_step: Q | None=None, max_time: Q | None=None) -> BlockedOutletOverpressureResult:
+    """``process.blocked_outlet_overpressure``, computed in Rust."""
+    spec = _models_gen.model("process.blocked_outlet_overpressure")
+    result = _core.blocked_outlet_overpressure(
+        list(components),
+        list(initial_z),
+        input_to_si(spec, "initial_t", initial_t),
+        input_to_si(spec, "initial_p", initial_p),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "inlet_temperature", inlet_temperature),
+        input_to_si(spec, "supply_pressure", supply_pressure),
+        input_to_si(spec, "inlet_mass_flow", inlet_mass_flow),
+        input_to_si(spec, "relief_set_pressure", relief_set_pressure),
+        None if time_step is None else input_to_si(spec, "time_step", time_step),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+    )
+    return BlockedOutletOverpressureResult(
+        relief_set_pressure=from_si(result.relief_set_pressure.magnitude_si, result.relief_set_pressure.unit),
+        max_pressure=from_si(result.max_pressure.magnitude_si, result.max_pressure.unit),
+        final_pressure=from_si(result.final_pressure.magnitude_si, result.final_pressure.unit),
+        final_mass=from_si(result.final_mass.magnitude_si, result.final_mass.unit),
+        inlet_mass_flow=from_si(result.inlet_mass_flow.magnitude_si, result.inlet_mass_flow.unit),
+        simulated_horizon=from_si(result.simulated_horizon.magnitude_si, result.simulated_horizon.unit),
+        time_to_relief_set=None if result.time_to_relief_set is None else from_si(result.time_to_relief_set.magnitude_si, result.time_to_relief_set.unit),
+        relief_demand=result.relief_demand,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def blocked_outlet_relief(components: list[str], mole_fractions: list[float], inflow_rate: Q, relief_pressure: Q, relief_temperature: Q, scenario_name: str | None=None) -> BlockedOutletReliefResult:
     """``process.blocked_outlet_relief``, computed in Rust."""
     spec = _models_gen.model("process.blocked_outlet_relief")
@@ -6261,6 +6311,84 @@ def deluge_nozzle_layout(protected_area: Q, required_density: float, nozzle_k: f
     )
 
 
+def depressurization(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, orifice_diameter: Q, discharge_coefficient: float, back_pressure: Q, fire_heat_input: Q | None=None, fire_heat_input_to_wall: bool | None=None, fire_exposed_area: Q | None=None, fire_preset: str | None=None, fire_emissivity: float | None=None, fire_flame_temperature: Q | None=None, fire_convective_coefficient: Q | None=None, wall_mass: Q | None=None, wall_area: Q | None=None, wall_specific_heat: Q | None=None, wall_heat_transfer_coefficient: Q | None=None, time_step: Q | None=None, max_time: Q | None=None, stop_pressure: Q | None=None, withdrawal_mode: str | None=None) -> DepressurizationResult:
+    """``process.depressurization``, computed in Rust."""
+    spec = _models_gen.model("process.depressurization")
+    result = _core.depressurization(
+        list(components),
+        list(initial_z),
+        input_to_si(spec, "initial_t", initial_t),
+        input_to_si(spec, "initial_p", initial_p),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "orifice_diameter", orifice_diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        None if fire_heat_input is None else input_to_si(spec, "fire_heat_input", fire_heat_input),
+        fire_heat_input_to_wall,
+        None if fire_exposed_area is None else input_to_si(spec, "fire_exposed_area", fire_exposed_area),
+        fire_preset,
+        None if fire_emissivity is None else fire_emissivity,
+        None if fire_flame_temperature is None else input_to_si(spec, "fire_flame_temperature", fire_flame_temperature),
+        None if fire_convective_coefficient is None else input_to_si(spec, "fire_convective_coefficient", fire_convective_coefficient),
+        None if wall_mass is None else input_to_si(spec, "wall_mass", wall_mass),
+        None if wall_area is None else input_to_si(spec, "wall_area", wall_area),
+        None if wall_specific_heat is None else input_to_si(spec, "wall_specific_heat", wall_specific_heat),
+        None if wall_heat_transfer_coefficient is None else input_to_si(spec, "wall_heat_transfer_coefficient", wall_heat_transfer_coefficient),
+        None if time_step is None else input_to_si(spec, "time_step", time_step),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+        None if stop_pressure is None else input_to_si(spec, "stop_pressure", stop_pressure),
+        withdrawal_mode,
+    )
+    return DepressurizationResult(
+        points=tuple(DepressurizationPoint(time=from_si(c.time.magnitude_si, c.time.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), mass=from_si(c.mass.magnitude_si, c.mass.unit), wall_temperature=from_si(c.wall_temperature.magnitude_si, c.wall_temperature.unit), mass_flow=from_si(c.mass_flow.magnitude_si, c.mass_flow.unit)) for c in result.points),
+        initial_pressure=from_si(result.initial_pressure.magnitude_si, result.initial_pressure.unit),
+        fire_heat_input=from_si(result.fire_heat_input.magnitude_si, result.fire_heat_input.unit),
+        fire_heat_routed_to_wall=result.fire_heat_routed_to_wall,
+        vu_flash_fallback_count=result.vu_flash_fallback_count,
+        vapour_withdrawal_used=result.vapour_withdrawal_used,
+        time_to_half_pressure=None if result.time_to_half_pressure is None else from_si(result.time_to_half_pressure.magnitude_si, result.time_to_half_pressure.unit),
+        time_to_7_barg=None if result.time_to_7_barg is None else from_si(result.time_to_7_barg.magnitude_si, result.time_to_7_barg.unit),
+        min_fluid_temperature=from_si(result.min_fluid_temperature.magnitude_si, result.min_fluid_temperature.unit),
+        min_wall_temperature=from_si(result.min_wall_temperature.magnitude_si, result.min_wall_temperature.unit),
+        max_pressure=from_si(result.max_pressure.magnitude_si, result.max_pressure.unit),
+        max_fluid_temperature=from_si(result.max_fluid_temperature.magnitude_si, result.max_fluid_temperature.unit),
+        max_wall_temperature=from_si(result.max_wall_temperature.magnitude_si, result.max_wall_temperature.unit),
+        half_pressure_criterion_met=result.half_pressure_criterion_met,
+        seven_barg_criterion_met=result.seven_barg_criterion_met,
+        pressure_monotonic_non_increasing=result.pressure_monotonic_non_increasing,
+        mass_monotonic_non_increasing=result.mass_monotonic_non_increasing,
+        recorded_points=result.recorded_points,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def depressurization_acceptance(points: list[dict[str, object]], time_to_escape: Q | None=None, estimated_time_to_rupture: Q | None=None, maximum_pressure_at_rupture: Q | None=None, maximum_remaining_mass: Q | None=None, maximum_escalated_fire_rate: Q | None=None) -> DepressurizationAcceptanceResult:
+    """``process.depressurization_acceptance``, computed in Rust."""
+    spec = _models_gen.model("process.depressurization_acceptance")
+    result = _core.depressurization_acceptance(
+        input_records_to_si(spec, "points", points),
+        None if time_to_escape is None else input_to_si(spec, "time_to_escape", time_to_escape),
+        None if estimated_time_to_rupture is None else input_to_si(spec, "estimated_time_to_rupture", estimated_time_to_rupture),
+        None if maximum_pressure_at_rupture is None else input_to_si(spec, "maximum_pressure_at_rupture", maximum_pressure_at_rupture),
+        None if maximum_remaining_mass is None else input_to_si(spec, "maximum_remaining_mass", maximum_remaining_mass),
+        None if maximum_escalated_fire_rate is None else input_to_si(spec, "maximum_escalated_fire_rate", maximum_escalated_fire_rate),
+    )
+    return DepressurizationAcceptanceResult(
+        limiting_time=from_si(result.limiting_time.magnitude_si, result.limiting_time.unit),
+        pressure_at_limiting_time=from_si(result.pressure_at_limiting_time.magnitude_si, result.pressure_at_limiting_time.unit),
+        remaining_mass_at_limiting_time=from_si(result.remaining_mass_at_limiting_time.magnitude_si, result.remaining_mass_at_limiting_time.unit),
+        peak_discharge_rate=from_si(result.peak_discharge_rate.magnitude_si, result.peak_discharge_rate.unit),
+        pressure_configured=result.pressure_configured,
+        pressure_criterion_met=result.pressure_criterion_met,
+        mass_configured=result.mass_configured,
+        mass_criterion_met=result.mass_criterion_met,
+        fire_rate_configured=result.fire_rate_configured,
+        fire_rate_criterion_met=result.fire_rate_criterion_met,
+        acceptable=result.acceptable,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def distillation_column(components: list[str], feed_n: Q, feed_z: list[float], feed_p: Q, feed_t: Q, number_of_stages: int, feed_stage: int, has_reboiler: bool, has_condenser: bool, top_pressure: Q, bottom_pressure: Q, temperature_tolerance: float=1e-06, max_iterations: int=200, reboiler_temperature: Q | None=None, condenser_temperature: Q | None=None, murphree_efficiency: float | None=None, tray_murphree_efficiency: list[float] | None=None, reactive: bool | None=None, reactive_start_tray: int | None=None, reactive_end_tray: int | None=None, solver_type: str | None=None, top_specification_type: str | None=None, top_specification_target: float | None=None, top_specification_component: str | None=None, bottom_specification_type: str | None=None, bottom_specification_target: float | None=None, bottom_specification_component: str | None=None, gas_side_draw_fractions: list[float] | None=None, liquid_side_draw_fractions: list[float] | None=None, pumparound_fractions: list[float] | None=None, side_draw_flow_tray: int | None=None, side_draw_flow_phase: str | None=None, side_draw_flow_target: Q | None=None, side_draw_flow_tolerance: float | None=None, side_draw_flow_max_iterations: int | None=None, pumparound_return_tray: int | None=None, pumparound_draw_tray: int | None=None, pumparound_draw_fraction: float | None=None, pumparound_temperature_drop: Q | None=None, pumparound_tolerance: float | None=None, pumparound_max_iterations: int | None=None, column_diameter: Q | None=None, max_allowable_fs_factor: float | None=None, internals_type: str | None=None, tray_spacing: Q | None=None, weir_height: Q | None=None, hole_diameter: Q | None=None, hole_area_fraction: float | None=None, downcommer_area_fraction: float | None=None, design_flood_fraction: float | None=None, column_diameter_override: Q | None=None, hydraulic_pressure_drop_coupling: bool | None=None, hydraulic_pressure_drop_internals_type: str | None=None, tray_efficiency: float | None=None, max_flooding_factor: float | None=None, tray_type: str | None=None, contactor_internals_type: str | None=None, material_grade: str | None=None, max_operation_pressure: float | None=None) -> DistillationColumnResult:
     """``process.distillation_column``, computed in Rust."""
     spec = _models_gen.model("process.distillation_column")
@@ -6377,6 +6505,37 @@ def distillation_column(components: list[str], feed_n: Q, feed_z: list[float], f
         reboiler_duty_kw=from_si(result.reboiler_duty_kw.magnitude_si, result.reboiler_duty_kw.unit),
         condenser_duty_kw=from_si(result.condenser_duty_kw.magnitude_si, result.condenser_duty_kw.unit),
         material_grade=result.material_grade,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def dynamic_psv_sizing(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, fire_heat_input: Q, set_pressure: Q, overpressure_fraction: float, back_pressure: Q, blowdown_fraction: float | None=None, discharge_coefficient: float | None=None, latent_heat: float | None=None, time_step: Q | None=None, max_time: Q | None=None, initial_pressure_fraction: float | None=None) -> DynamicPsvSizingResult:
+    """``process.dynamic_psv_sizing``, computed in Rust."""
+    spec = _models_gen.model("process.dynamic_psv_sizing")
+    result = _core.dynamic_psv_sizing(
+        list(components),
+        list(initial_z),
+        input_to_si(spec, "initial_t", initial_t),
+        input_to_si(spec, "initial_p", initial_p),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "fire_heat_input", fire_heat_input),
+        input_to_si(spec, "set_pressure", set_pressure),
+        overpressure_fraction,
+        input_to_si(spec, "back_pressure", back_pressure),
+        None if blowdown_fraction is None else blowdown_fraction,
+        None if discharge_coefficient is None else discharge_coefficient,
+        None if latent_heat is None else latent_heat,
+        None if time_step is None else input_to_si(spec, "time_step", time_step),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+        None if initial_pressure_fraction is None else initial_pressure_fraction,
+    )
+    return DynamicPsvSizingResult(
+        steady_required_area=from_si(result.steady_required_area.magnitude_si, result.steady_required_area.unit),
+        dynamic_required_area=from_si(result.dynamic_required_area.magnitude_si, result.dynamic_required_area.unit),
+        oversizing_ratio=result.oversizing_ratio,
+        allowable_pressure=from_si(result.allowable_pressure.magnitude_si, result.allowable_pressure.unit),
+        peak_dynamic_pressure=from_si(result.peak_dynamic_pressure.magnitude_si, result.peak_dynamic_pressure.unit),
+        steady_relief_rate=from_si(result.steady_relief_rate.magnitude_si, result.steady_relief_rate.unit),
         warnings=_warnings(result.warnings),
     )
 
@@ -7610,6 +7769,32 @@ def mixer(components: list[str], feed_n: list[Q], feed_z: list[list[float]], fee
     )
 
 
+def multi_vessel_blowdown_study(samples: list[dict[str, object]], header_diameter: Q | None=None, header_pressure: Q | None=None, header_temperature: Q | None=None, header_molar_mass: Q | None=None, header_heat_capacity_ratio: float | None=None, max_allowable_mach: float | None=None, grid_step: Q | None=None) -> MultiVesselBlowdownStudyResult:
+    """``process.multi_vessel_blowdown_study``, computed in Rust."""
+    spec = _models_gen.model("process.multi_vessel_blowdown_study")
+    result = _core.multi_vessel_blowdown_study(
+        input_records_to_si(spec, "samples", samples),
+        None if header_diameter is None else input_to_si(spec, "header_diameter", header_diameter),
+        None if header_pressure is None else input_to_si(spec, "header_pressure", header_pressure),
+        None if header_temperature is None else input_to_si(spec, "header_temperature", header_temperature),
+        None if header_molar_mass is None else input_to_si(spec, "header_molar_mass", header_molar_mass),
+        None if header_heat_capacity_ratio is None else header_heat_capacity_ratio,
+        None if max_allowable_mach is None else max_allowable_mach,
+        None if grid_step is None else input_to_si(spec, "grid_step", grid_step),
+    )
+    return MultiVesselBlowdownStudyResult(
+        profile=tuple(MultiVesselProfileRow(time=from_si(c.time.magnitude_si, c.time.unit), total_mass_flow=from_si(c.total_mass_flow.magnitude_si, c.total_mass_flow.unit)) for c in result.profile),
+        contributions=tuple(MultiVesselContributionRow(source=c.source, peak_contribution=from_si(c.peak_contribution.magnitude_si, c.peak_contribution.unit)) for c in result.contributions),
+        peak_total_mass_flow=from_si(result.peak_total_mass_flow.magnitude_si, result.peak_total_mass_flow.unit),
+        peak_time=from_si(result.peak_time.magnitude_si, result.peak_time.unit),
+        header_velocity=None if result.header_velocity is None else from_si(result.header_velocity.magnitude_si, result.header_velocity.unit),
+        header_mach=result.header_mach,
+        max_allowable_mach=result.max_allowable_mach,
+        header_mach_acceptable=result.header_mach_acceptable,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def nog070_sil_determination(sif_type: str, pfd_average: float, minimum_sil: float | None=None) -> Nog070SilDeterminationResult:
     """``process.nog070_sil_determination``, computed in Rust."""
     result = _core.nog070_sil_determination(
@@ -7623,6 +7808,48 @@ def nog070_sil_determination(sif_type: str, pfd_average: float, minimum_sil: flo
         achieved_sil=result.achieved_sil,
         compliant=result.compliant,
         required_pfd_reduction_factor=result.required_pfd_reduction_factor,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def non_equilibrium_blowdown(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, orifice_diameter: Q, discharge_coefficient: float, back_pressure: Q, fire_emissivity: float | None=None, fire_flame_temperature: Q | None=None, fire_convective_coefficient: Q | None=None, fire_exposed_area: Q | None=None, wall_mass: Q | None=None, wall_specific_heat: Q | None=None, inside_gas_coefficient: Q | None=None, interfacial_coefficient: Q | None=None, interfacial_area: Q | None=None, latent_heat: float | None=None, surface_tension: float | None=None, surface_fluid_constant: float | None=None, critical_heat_flux: float | None=None, effective_boiling_coefficient: Q | None=None, time_step: Q | None=None, max_time: Q | None=None, stop_pressure: Q | None=None) -> NonEquilibriumBlowdownResult:
+    """``process.non_equilibrium_blowdown``, computed in Rust."""
+    spec = _models_gen.model("process.non_equilibrium_blowdown")
+    result = _core.non_equilibrium_blowdown(
+        list(components),
+        list(initial_z),
+        input_to_si(spec, "initial_t", initial_t),
+        input_to_si(spec, "initial_p", initial_p),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "orifice_diameter", orifice_diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        None if fire_emissivity is None else fire_emissivity,
+        None if fire_flame_temperature is None else input_to_si(spec, "fire_flame_temperature", fire_flame_temperature),
+        None if fire_convective_coefficient is None else input_to_si(spec, "fire_convective_coefficient", fire_convective_coefficient),
+        None if fire_exposed_area is None else input_to_si(spec, "fire_exposed_area", fire_exposed_area),
+        None if wall_mass is None else input_to_si(spec, "wall_mass", wall_mass),
+        None if wall_specific_heat is None else input_to_si(spec, "wall_specific_heat", wall_specific_heat),
+        None if inside_gas_coefficient is None else input_to_si(spec, "inside_gas_coefficient", inside_gas_coefficient),
+        None if interfacial_coefficient is None else input_to_si(spec, "interfacial_coefficient", interfacial_coefficient),
+        None if interfacial_area is None else input_to_si(spec, "interfacial_area", interfacial_area),
+        None if latent_heat is None else latent_heat,
+        None if surface_tension is None else surface_tension,
+        None if surface_fluid_constant is None else surface_fluid_constant,
+        None if critical_heat_flux is None else critical_heat_flux,
+        None if effective_boiling_coefficient is None else input_to_si(spec, "effective_boiling_coefficient", effective_boiling_coefficient),
+        None if time_step is None else input_to_si(spec, "time_step", time_step),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+        None if stop_pressure is None else input_to_si(spec, "stop_pressure", stop_pressure),
+    )
+    return NonEquilibriumBlowdownResult(
+        points=tuple(NonEquilibriumBlowdownPoint(time=from_si(c.time.magnitude_si, c.time.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), gas_temperature=from_si(c.gas_temperature.magnitude_si, c.gas_temperature.unit), liquid_temperature=from_si(c.liquid_temperature.magnitude_si, c.liquid_temperature.unit), wall_temperature=from_si(c.wall_temperature.magnitude_si, c.wall_temperature.unit), gas_mass=from_si(c.gas_mass.magnitude_si, c.gas_mass.unit), liquid_mass=from_si(c.liquid_mass.magnitude_si, c.liquid_mass.unit)) for c in result.points),
+        initial_pressure=from_si(result.initial_pressure.magnitude_si, result.initial_pressure.unit),
+        flash_fallback_count=result.flash_fallback_count,
+        final_gas_temperature=from_si(result.final_gas_temperature.magnitude_si, result.final_gas_temperature.unit),
+        final_liquid_temperature=from_si(result.final_liquid_temperature.magnitude_si, result.final_liquid_temperature.unit),
+        max_temperature_bifurcation=from_si(result.max_temperature_bifurcation.magnitude_si, result.max_temperature_bifurcation.unit),
+        recorded_points=result.recorded_points,
         warnings=_warnings(result.warnings),
     )
 
@@ -8196,6 +8423,31 @@ def psv_sizing(service: str, set_pressure: Q, overpressure_fraction: float, back
         viscosity_correction=result.viscosity_correction,
         mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
         mass_flow_capacity=None if result.mass_flow_capacity is None else from_si(result.mass_flow_capacity.magnitude_si, result.mass_flow_capacity.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def psv_valve(set_pressure: Q, blowdown_fraction: float, discharge_coefficient: float, orifice_area: Q, back_pressure: Q, upstream_pressure: Q, upstream_temperature: Q, molar_mass: Q, heat_capacity_ratio: float, compressibility: float, was_open: bool | None=None, prior_cycle_count: float | None=None) -> PsvValveResult:
+    """``process.psv_valve``, computed in Rust."""
+    spec = _models_gen.model("process.psv_valve")
+    result = _core.psv_valve(
+        input_to_si(spec, "set_pressure", set_pressure),
+        blowdown_fraction,
+        discharge_coefficient,
+        input_to_si(spec, "orifice_area", orifice_area),
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "upstream_pressure", upstream_pressure),
+        input_to_si(spec, "upstream_temperature", upstream_temperature),
+        input_to_si(spec, "molar_mass", molar_mass),
+        heat_capacity_ratio,
+        compressibility,
+        was_open,
+        None if prior_cycle_count is None else prior_cycle_count,
+    )
+    return PsvValveResult(
+        open=result.open,
+        cycle_count=result.cycle_count,
+        mass_flow=from_si(result.mass_flow.magnitude_si, result.mass_flow.unit),
         warnings=_warnings(result.warnings),
     )
 
@@ -9443,6 +9695,48 @@ def vce(cloud_fuel_mass: Q, heat_of_combustion: float, strength_class: float, am
         dimensionless_overpressure=result.dimensionless_overpressure,
         overpressure=None if result.overpressure is None else from_si(result.overpressure.magnitude_si, result.overpressure.unit),
         distance_to_overpressure=None if result.distance_to_overpressure is None else from_si(result.distance_to_overpressure.magnitude_si, result.distance_to_overpressure.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def vessel_filling(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, inlet_temperature: Q, supply_pressure: Q, inlet_mass_flow: Q, target_pressure: Q | None=None, wall_mass: Q | None=None, wall_area: Q | None=None, wall_specific_heat: Q | None=None, wall_heat_transfer_coefficient: Q | None=None, woodfield_nozzle_diameter: Q | None=None, vessel_height: Q | None=None, liner_min_temperature: Q | None=None, liner_max_temperature: Q | None=None, time_step: Q | None=None, max_time: Q | None=None) -> VesselFillingResult:
+    """``process.vessel_filling``, computed in Rust."""
+    spec = _models_gen.model("process.vessel_filling")
+    result = _core.vessel_filling(
+        list(components),
+        list(initial_z),
+        input_to_si(spec, "initial_t", initial_t),
+        input_to_si(spec, "initial_p", initial_p),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "inlet_temperature", inlet_temperature),
+        input_to_si(spec, "supply_pressure", supply_pressure),
+        input_to_si(spec, "inlet_mass_flow", inlet_mass_flow),
+        None if target_pressure is None else input_to_si(spec, "target_pressure", target_pressure),
+        None if wall_mass is None else input_to_si(spec, "wall_mass", wall_mass),
+        None if wall_area is None else input_to_si(spec, "wall_area", wall_area),
+        None if wall_specific_heat is None else input_to_si(spec, "wall_specific_heat", wall_specific_heat),
+        None if wall_heat_transfer_coefficient is None else input_to_si(spec, "wall_heat_transfer_coefficient", wall_heat_transfer_coefficient),
+        None if woodfield_nozzle_diameter is None else input_to_si(spec, "woodfield_nozzle_diameter", woodfield_nozzle_diameter),
+        None if vessel_height is None else input_to_si(spec, "vessel_height", vessel_height),
+        None if liner_min_temperature is None else input_to_si(spec, "liner_min_temperature", liner_min_temperature),
+        None if liner_max_temperature is None else input_to_si(spec, "liner_max_temperature", liner_max_temperature),
+        None if time_step is None else input_to_si(spec, "time_step", time_step),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+    )
+    return VesselFillingResult(
+        points=tuple(VesselFillingPoint(time=from_si(c.time.magnitude_si, c.time.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), mass=from_si(c.mass.magnitude_si, c.mass.unit), wall_temperature=from_si(c.wall_temperature.magnitude_si, c.wall_temperature.unit)) for c in result.points),
+        inlet_temperature=from_si(result.inlet_temperature.magnitude_si, result.inlet_temperature.unit),
+        inlet_mass_flow=from_si(result.inlet_mass_flow.magnitude_si, result.inlet_mass_flow.unit),
+        vu_flash_fallback_count=result.vu_flash_fallback_count,
+        max_fluid_temperature=from_si(result.max_fluid_temperature.magnitude_si, result.max_fluid_temperature.unit),
+        min_fluid_temperature=from_si(result.min_fluid_temperature.magnitude_si, result.min_fluid_temperature.unit),
+        max_pressure=from_si(result.max_pressure.magnitude_si, result.max_pressure.unit),
+        final_pressure=from_si(result.final_pressure.magnitude_si, result.final_pressure.unit),
+        final_mass=from_si(result.final_mass.magnitude_si, result.final_mass.unit),
+        liner_over_temperature=result.liner_over_temperature,
+        liner_under_temperature=result.liner_under_temperature,
+        liner_limits_met=result.liner_limits_met,
+        recorded_points=result.recorded_points,
         warnings=_warnings(result.warnings),
     )
 

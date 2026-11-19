@@ -29,6 +29,7 @@ from azoth.core.result import (
     BarrierRegisterValidationResult,
     BasketTestRegressionResult,
     BleveResult,
+    BlockedOutletOverpressureResult,
     BlockedOutletReliefResult,
     BlowdownPressureProfileResult,
     BowTieResult,
@@ -39,7 +40,10 @@ from azoth.core.result import (
     ControlValveFailureReliefResult,
     CoolerResult,
     DelugeNozzleLayoutResult,
+    DepressurizationAcceptanceResult,
+    DepressurizationResult,
     DistillationColumnResult,
+    DynamicPsvSizingResult,
     EjectorResult,
     EscalationGraphResult,
     EventTreeResult,
@@ -74,7 +78,9 @@ from azoth.core.result import (
     MapTurboExpanderResult,
     MdmtResult,
     MixerResult,
+    MultiVesselBlowdownStudyResult,
     Nog070SilDeterminationResult,
+    NonEquilibriumBlowdownResult,
     NorsokP002ComplianceResult,
     OverpressureAcceptanceResult,
     OverpressureProtectionStudyResult,
@@ -92,6 +98,7 @@ from azoth.core.result import (
     ProbitResult,
     PsvFireSizingResult,
     PsvSizingResult,
+    PsvValveResult,
     PumpDeadheadResult,
     PumpResult,
     RateBasedPackedColumnResult,
@@ -122,6 +129,7 @@ from azoth.core.result import (
     TurboExpanderResult,
     VacuumCollapseResult,
     VceResult,
+    VesselFillingResult,
     VesselRuptureResult,
 )
 from azoth.core.units import Q
@@ -306,6 +314,14 @@ _HEAVY_GAS_DISPERSION = "process.heavy_gas_dispersion"
 _PROBIT = "process.probit"
 _PSV_FIRE_SIZING = "process.psv_fire_sizing"
 _PSV_SIZING = "process.psv_sizing"
+_PSV_VALVE = "process.psv_valve"
+_DYNAMIC_PSV_SIZING = "process.dynamic_psv_sizing"
+_VESSEL_FILLING = "process.vessel_filling"
+_DEPRESSURIZATION = "process.depressurization"
+_DEPRESSURIZATION_ACCEPTANCE = "process.depressurization_acceptance"
+_BLOCKED_OUTLET_OVERPRESSURE = "process.blocked_outlet_overpressure"
+_MULTI_VESSEL_BLOWDOWN_STUDY = "process.multi_vessel_blowdown_study"
+_NON_EQUILIBRIUM_BLOWDOWN = "process.non_equilibrium_blowdown"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
@@ -3950,6 +3966,355 @@ def psv_sizing(
         liquid_heat_capacity=liquid_heat_capacity,
         orifice_area=orifice_area,
         capacity_discharge_coefficient=capacity_discharge_coefficient,
+    )
+
+
+def psv_valve(
+    set_pressure: Q,
+    blowdown_fraction: float,
+    discharge_coefficient: float,
+    orifice_area: Q,
+    back_pressure: Q,
+    upstream_pressure: Q,
+    upstream_temperature: Q,
+    molar_mass: Q,
+    heat_capacity_ratio: float,
+    compressibility: float,
+    was_open: bool | None = None,
+    prior_cycle_count: float | None = None,
+) -> PsvValveResult:
+    """One step of the PSV latch and its relieving flow.
+
+    The valve opens at the set pressure, counts the pop once, and closes only at the
+    reseat pressure ``set (1 - blowdown)``; the flow is the API 520 compressible-orifice
+    relation and is zero when closed.
+
+    See :func:`azoth.process.reference.psv_valve`.
+    """
+    return resolve(_PSV_VALVE)(  # type: ignore[no-any-return]
+        set_pressure=set_pressure,
+        blowdown_fraction=blowdown_fraction,
+        discharge_coefficient=discharge_coefficient,
+        orifice_area=orifice_area,
+        back_pressure=back_pressure,
+        upstream_pressure=upstream_pressure,
+        upstream_temperature=upstream_temperature,
+        molar_mass=molar_mass,
+        heat_capacity_ratio=heat_capacity_ratio,
+        compressibility=compressibility,
+        was_open=was_open,
+        prior_cycle_count=prior_cycle_count,
+    )
+
+
+def dynamic_psv_sizing(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: Q,
+    initial_p: Q,
+    vessel_volume: Q,
+    fire_heat_input: Q,
+    set_pressure: Q,
+    overpressure_fraction: float,
+    back_pressure: Q,
+    blowdown_fraction: float | None = None,
+    discharge_coefficient: float | None = None,
+    latent_heat: float | None = None,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+    initial_pressure_fraction: float | None = None,
+) -> DynamicPsvSizingResult:
+    """The steady API 521 area and the dynamically required area for a cycling PSV.
+
+    The dynamic march is an ideal-gas lumped vessel seeded from one TP flash; its start
+    pressure is ``set_pressure x initial_pressure_fraction``, so the fluid's stated
+    pressure enters only through the flash and the compressibility.
+
+    See :func:`azoth.process.reference.dynamic_psv_sizing`.
+    """
+    return resolve(_DYNAMIC_PSV_SIZING)(  # type: ignore[no-any-return]
+        components=components,
+        initial_z=initial_z,
+        initial_t=initial_t,
+        initial_p=initial_p,
+        vessel_volume=vessel_volume,
+        fire_heat_input=fire_heat_input,
+        set_pressure=set_pressure,
+        overpressure_fraction=overpressure_fraction,
+        back_pressure=back_pressure,
+        blowdown_fraction=blowdown_fraction,
+        discharge_coefficient=discharge_coefficient,
+        latent_heat=latent_heat,
+        time_step=time_step,
+        max_time=max_time,
+        initial_pressure_fraction=initial_pressure_fraction,
+    )
+
+
+def vessel_filling(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: Q,
+    initial_p: Q,
+    vessel_volume: Q,
+    inlet_temperature: Q,
+    supply_pressure: Q,
+    inlet_mass_flow: Q,
+    target_pressure: Q | None = None,
+    wall_mass: Q | None = None,
+    wall_area: Q | None = None,
+    wall_specific_heat: Q | None = None,
+    wall_heat_transfer_coefficient: Q | None = None,
+    woodfield_nozzle_diameter: Q | None = None,
+    vessel_height: Q | None = None,
+    liner_min_temperature: Q | None = None,
+    liner_max_temperature: Q | None = None,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+) -> VesselFillingResult:
+    """The gas-charging transient of a vessel.
+
+    The inlet specific enthalpy is flashed once; each step adds the charge, exchanges heat
+    with the lumped wall and VU-flashes at the vessel volume and the new internal energy.
+    The Woodfield coefficient is used when both the nozzle diameter and the height are given.
+
+    See :func:`azoth.process.reference.vessel_filling`.
+    """
+    return resolve(_VESSEL_FILLING)(  # type: ignore[no-any-return]
+        components=components,
+        initial_z=initial_z,
+        initial_t=initial_t,
+        initial_p=initial_p,
+        vessel_volume=vessel_volume,
+        inlet_temperature=inlet_temperature,
+        supply_pressure=supply_pressure,
+        inlet_mass_flow=inlet_mass_flow,
+        target_pressure=target_pressure,
+        wall_mass=wall_mass,
+        wall_area=wall_area,
+        wall_specific_heat=wall_specific_heat,
+        wall_heat_transfer_coefficient=wall_heat_transfer_coefficient,
+        woodfield_nozzle_diameter=woodfield_nozzle_diameter,
+        vessel_height=vessel_height,
+        liner_min_temperature=liner_min_temperature,
+        liner_max_temperature=liner_max_temperature,
+        time_step=time_step,
+        max_time=max_time,
+    )
+
+
+def depressurization(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: Q,
+    initial_p: Q,
+    vessel_volume: Q,
+    orifice_diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    fire_heat_input: Q | None = None,
+    fire_heat_input_to_wall: bool | None = None,
+    fire_exposed_area: Q | None = None,
+    fire_preset: str | None = None,
+    fire_emissivity: float | None = None,
+    fire_flame_temperature: Q | None = None,
+    fire_convective_coefficient: Q | None = None,
+    wall_mass: Q | None = None,
+    wall_area: Q | None = None,
+    wall_specific_heat: Q | None = None,
+    wall_heat_transfer_coefficient: Q | None = None,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+    stop_pressure: Q | None = None,
+    withdrawal_mode: str | None = None,
+) -> DepressurizationResult:
+    """The equilibrium vessel blowdown and its API 521 summary.
+
+    AUTO and VAPOUR take the lightest phase of a multiphase inventory when its density is at
+    most 300 kg/m3 and remove at most a quarter of it per step; the fire boundary is the
+    constant duty or a temperature-dependent flux over the exposed area.
+
+    See :func:`azoth.process.reference.depressurization`.
+    """
+    return resolve(_DEPRESSURIZATION)(  # type: ignore[no-any-return]
+        components=components,
+        initial_z=initial_z,
+        initial_t=initial_t,
+        initial_p=initial_p,
+        vessel_volume=vessel_volume,
+        orifice_diameter=orifice_diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        fire_heat_input=fire_heat_input,
+        fire_heat_input_to_wall=fire_heat_input_to_wall,
+        fire_exposed_area=fire_exposed_area,
+        fire_preset=fire_preset,
+        fire_emissivity=fire_emissivity,
+        fire_flame_temperature=fire_flame_temperature,
+        fire_convective_coefficient=fire_convective_coefficient,
+        wall_mass=wall_mass,
+        wall_area=wall_area,
+        wall_specific_heat=wall_specific_heat,
+        wall_heat_transfer_coefficient=wall_heat_transfer_coefficient,
+        time_step=time_step,
+        max_time=max_time,
+        stop_pressure=stop_pressure,
+        withdrawal_mode=withdrawal_mode,
+    )
+
+
+def depressurization_acceptance(
+    points: list[dict[str, object]],
+    time_to_escape: Q | None = None,
+    estimated_time_to_rupture: Q | None = None,
+    maximum_pressure_at_rupture: Q | None = None,
+    maximum_remaining_mass: Q | None = None,
+    maximum_escalated_fire_rate: Q | None = None,
+) -> DepressurizationAcceptanceResult:
+    """The STS-0131 acceptance of a stored blowdown trajectory.
+
+    The limiting time is the last sample's time reduced by the positive escape and rupture
+    times; pressure and mass are linearly interpolated and the peak rate is the maximum at
+    or before that time.
+
+    See :func:`azoth.process.reference.depressurization_acceptance`.
+    """
+    return resolve(_DEPRESSURIZATION_ACCEPTANCE)(  # type: ignore[no-any-return]
+        points=points,
+        time_to_escape=time_to_escape,
+        estimated_time_to_rupture=estimated_time_to_rupture,
+        maximum_pressure_at_rupture=maximum_pressure_at_rupture,
+        maximum_remaining_mass=maximum_remaining_mass,
+        maximum_escalated_fire_rate=maximum_escalated_fire_rate,
+    )
+
+
+def blocked_outlet_overpressure(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: Q,
+    initial_p: Q,
+    vessel_volume: Q,
+    inlet_temperature: Q,
+    supply_pressure: Q,
+    inlet_mass_flow: Q,
+    relief_set_pressure: Q,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+) -> BlockedOutletOverpressureResult:
+    """The blocked-outlet pressure build-up to the relief set pressure.
+
+    A vessel filling run whose target is the relief set pressure; the time to demand is the
+    first recorded sample at or above it.
+
+    See :func:`azoth.process.reference.blocked_outlet_overpressure`.
+    """
+    return resolve(_BLOCKED_OUTLET_OVERPRESSURE)(  # type: ignore[no-any-return]
+        components=components,
+        initial_z=initial_z,
+        initial_t=initial_t,
+        initial_p=initial_p,
+        vessel_volume=vessel_volume,
+        inlet_temperature=inlet_temperature,
+        supply_pressure=supply_pressure,
+        inlet_mass_flow=inlet_mass_flow,
+        relief_set_pressure=relief_set_pressure,
+        time_step=time_step,
+        max_time=max_time,
+    )
+
+
+def multi_vessel_blowdown_study(
+    samples: list[dict[str, object]],
+    header_diameter: Q | None = None,
+    header_pressure: Q | None = None,
+    header_temperature: Q | None = None,
+    header_molar_mass: Q | None = None,
+    header_heat_capacity_ratio: float | None = None,
+    max_allowable_mach: float | None = None,
+    grid_step: Q | None = None,
+) -> MultiVesselBlowdownStudyResult:
+    """The simultaneous blowdown of sources into a shared header.
+
+    Each source's profile is linearly interpolated onto a common grid; the peak total and
+    its per-source contributions are published. The header Mach check runs only when the
+    header diameter is given.
+
+    See :func:`azoth.process.reference.multi_vessel_blowdown_study`.
+    """
+    return resolve(_MULTI_VESSEL_BLOWDOWN_STUDY)(  # type: ignore[no-any-return]
+        samples=samples,
+        header_diameter=header_diameter,
+        header_pressure=header_pressure,
+        header_temperature=header_temperature,
+        header_molar_mass=header_molar_mass,
+        header_heat_capacity_ratio=header_heat_capacity_ratio,
+        max_allowable_mach=max_allowable_mach,
+        grid_step=grid_step,
+    )
+
+
+def non_equilibrium_blowdown(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: Q,
+    initial_p: Q,
+    vessel_volume: Q,
+    orifice_diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    fire_emissivity: float | None = None,
+    fire_flame_temperature: Q | None = None,
+    fire_convective_coefficient: Q | None = None,
+    fire_exposed_area: Q | None = None,
+    wall_mass: Q | None = None,
+    wall_specific_heat: Q | None = None,
+    inside_gas_coefficient: Q | None = None,
+    interfacial_coefficient: Q | None = None,
+    interfacial_area: Q | None = None,
+    latent_heat: float | None = None,
+    surface_tension: float | None = None,
+    surface_fluid_constant: float | None = None,
+    critical_heat_flux: float | None = None,
+    effective_boiling_coefficient: Q | None = None,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+    stop_pressure: Q | None = None,
+) -> NonEquilibriumBlowdownResult:
+    """The two-zone fire-exposed blowdown.
+
+    The vapour and liquid zones are flashed at their own temperatures and the shared
+    pressure; the wetted wall drives Rohsenow boiling and the boil-off moves liquid into
+    the vapour zone.
+
+    See :func:`azoth.process.reference.non_equilibrium_blowdown`.
+    """
+    return resolve(_NON_EQUILIBRIUM_BLOWDOWN)(  # type: ignore[no-any-return]
+        components=components,
+        initial_z=initial_z,
+        initial_t=initial_t,
+        initial_p=initial_p,
+        vessel_volume=vessel_volume,
+        orifice_diameter=orifice_diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        fire_emissivity=fire_emissivity,
+        fire_flame_temperature=fire_flame_temperature,
+        fire_convective_coefficient=fire_convective_coefficient,
+        fire_exposed_area=fire_exposed_area,
+        wall_mass=wall_mass,
+        wall_specific_heat=wall_specific_heat,
+        inside_gas_coefficient=inside_gas_coefficient,
+        interfacial_coefficient=interfacial_coefficient,
+        interfacial_area=interfacial_area,
+        latent_heat=latent_heat,
+        surface_tension=surface_tension,
+        surface_fluid_constant=surface_fluid_constant,
+        critical_heat_flux=critical_heat_flux,
+        effective_boiling_coefficient=effective_boiling_coefficient,
+        time_step=time_step,
+        max_time=max_time,
+        stop_pressure=stop_pressure,
     )
 
 

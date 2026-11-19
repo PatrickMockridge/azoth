@@ -1,0 +1,119 @@
+id = "process.multi_vessel_blowdown_study"
+name = "Multi-vessel blowdown study"
+kind = "procedure"
+assumptions = [
+    "**the class's `run` over precomputed source trajectories**: each source's discharge profile is linearly interpolated onto a common grid, the totals are summed, and the peak total and its per-source contributions are published.",
+    "**a source returns its first flow at or before its first sample and zero at or after its last**, so a finished source stops contributing; the grid ends at the latest source time.",
+    "**the peak is the first strictly positive total**, so ties select the earliest grid index and an all-zero study peaks at 0.",
+    "**the header Mach check runs only when the header diameter is given**: density `P MW/(R T)`, velocity `peak/(rho A)` and sonic speed `sqrt(gamma R T/MW)` with `R = 8.314`.",
+    "**the input is a long-form list of `(source, time, mass_flow)` samples**, grouped by source in first-appearance order; the class's simulator-registration arm is not a record row.",
+]
+references = [
+    "API STD 521. Pressure-relieving and Depressuring Systems, section 7; NORSOK P-002 flare-header velocity.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/depressurization/MultiVesselBlowdownStudy.java` is the port source, through `run`.",
+    "`validation/neqsim/captures/process_multi_vessel_blowdown_study.tsv` - two linear-decay sources with no header, a small header that exceeds Mach 0.7 and a large one that passes.",
+]
+[source]
+standard = "NeqSim process/safety/depressurization/MultiVesselBlowdownStudy.java"
+edition = "Its `run` over `addSourceResult` sources: the grid, the interpolation, the peak total and the header Mach check."
+[algorithm]
+scheme = "profile_superposition"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.samples]
+type = "record_list"
+row_type = "MultiVesselSample"
+description = "the precomputed source trajectories in long form, grouped by source in first-appearance order; at least one row.\n"
+[inputs.samples.fields.source]
+type = "string"
+description = "the source's name.\n"
+[inputs.samples.fields.time]
+unit = "s"
+description = "the sample's time; strictly increasing within a source.\n"
+[inputs.samples.fields.mass_flow]
+unit = "kg/s"
+description = "the source's discharge rate at the sample.\n"
+[inputs.header_diameter]
+unit = "m"
+optional = true
+description = "the header's internal diameter; absent runs no Mach check. Must be positive.\n"
+[inputs.header_pressure]
+unit = "Pa"
+optional = true
+description = "the header gas pressure. **Absent takes 1.5e5 Pa.**\n"
+[inputs.header_temperature]
+unit = "K"
+optional = true
+description = "the header gas temperature. **Absent takes 288.15 K.**\n"
+[inputs.header_molar_mass]
+unit = "kg/mol"
+optional = true
+description = "the header gas's molar mass. **Absent takes 0.020 kg/mol.**\n"
+[inputs.header_heat_capacity_ratio]
+unit = "dimensionless"
+optional = true
+description = "the header gas's isentropic exponent. **Absent takes 1.30.**\n"
+[inputs.max_allowable_mach]
+unit = "dimensionless"
+optional = true
+description = "the header Mach limit. **Absent takes 0.70.**\n"
+[inputs.grid_step]
+unit = "s"
+optional = true
+description = "the common-grid step. **Absent takes 1 s.**\n"
+[outputs]
+[outputs.profile]
+type = "record_list"
+description = "the combined header load at each grid time.\n"
+[outputs.profile.fields.time]
+unit = "s"
+description = "the grid time.\n"
+[outputs.profile.fields.total_mass_flow]
+unit = "kg/s"
+description = "the summed discharge rate at the grid time.\n"
+[outputs.contributions]
+type = "record_list"
+description = "each source's contribution at the peak, in first-appearance order.\n"
+[outputs.contributions.fields.source]
+type = "string"
+description = "the source's name.\n"
+[outputs.contributions.fields.peak_contribution]
+unit = "kg/s"
+description = "the source's interpolated rate at the peak time.\n"
+[outputs.peak_total_mass_flow]
+unit = "kg/s"
+description = "the controlling combined load.\n"
+[outputs.peak_time]
+unit = "s"
+description = "the time of the controlling load.\n"
+[outputs.header_velocity]
+unit = "m/s"
+optional = true
+description = "the header gas velocity at the peak; absent when no header is configured.\n"
+[outputs.header_mach]
+unit = "dimensionless"
+optional = true
+description = "the header Mach number at the peak; absent when no header is configured.\n"
+[outputs.max_allowable_mach]
+unit = "dimensionless"
+description = "the Mach limit the run used.\n"
+[outputs.header_mach_acceptable]
+type = "boolean"
+description = "whether the Mach number is within the limit, or no header is configured.\n"
+[[valid_range]]
+quantity = "header_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive header diameter"
+[[valid_range]]
+quantity = "grid_step"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive grid step"
+[implementations]
+python = "azoth.process.multi_vessel_blowdown_study"
+rust = "azoth_process::multi_vessel_blowdown_study"

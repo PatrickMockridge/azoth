@@ -483,6 +483,83 @@ impl From<&azoth_eos::results::DepositionSegmentRow> for PyDepositionSegmentRow 
     }
 }
 
+/// one row per step, in time order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DepressurizationPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDepressurizationPoint {
+    /// the step's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the vessel pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the fluid temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// the vessel inventory.
+    #[pyo3(get)]
+    pub mass: PyQty,
+    /// the wall metal temperature, equal to the fluid's when no wall is modelled.
+    #[pyo3(get)]
+    pub wall_temperature: PyQty,
+    /// the instantaneous discharge rate.
+    #[pyo3(get)]
+    pub mass_flow: PyQty,
+}
+
+#[pymethods]
+impl PyDepressurizationPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "DepressurizationPoint(time={:?}, pressure={:?}, temperature={:?}, mass={:?}, wall_temperature={:?}, mass_flow={:?})",
+            self.time,
+            self.pressure,
+            self.temperature,
+            self.mass,
+            self.wall_temperature,
+            self.mass_flow
+        )
+    }
+}
+
+impl From<&azoth_process::models::depressurization::DepressurizationPoint>
+    for PyDepressurizationPoint
+{
+    fn from(row: &azoth_process::models::depressurization::DepressurizationPoint) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            temperature: PyQty {
+                magnitude_si: row.temperature.value,
+                unit: "K".to_string(),
+            },
+            mass: PyQty {
+                magnitude_si: row.mass.value,
+                unit: "kg".to_string(),
+            },
+            wall_temperature: PyQty {
+                magnitude_si: row.wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            mass_flow: PyQty {
+                magnitude_si: row.mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+        }
+    }
+}
+
 /// the accepted stencil's states, centre first.
 #[pyclass(
     frozen,
@@ -2061,6 +2138,95 @@ impl From<&azoth_process::models::fault_tree::MinimalCutSet> for PyMinimalCutSet
     }
 }
 
+/// each source's contribution at the peak, in first-appearance order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MultiVesselContributionRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMultiVesselContributionRow {
+    /// the source's name.
+    #[pyo3(get)]
+    pub source: String,
+    /// the source's interpolated rate at the peak time.
+    #[pyo3(get)]
+    pub peak_contribution: PyQty,
+}
+
+#[pymethods]
+impl PyMultiVesselContributionRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "MultiVesselContributionRow(source={}, peak_contribution={:?})",
+            self.source, self.peak_contribution
+        )
+    }
+}
+
+impl From<&azoth_process::models::multi_vessel_blowdown_study::MultiVesselContributionRow>
+    for PyMultiVesselContributionRow
+{
+    fn from(
+        row: &azoth_process::models::multi_vessel_blowdown_study::MultiVesselContributionRow,
+    ) -> Self {
+        Self {
+            source: row.source.clone(),
+            peak_contribution: PyQty {
+                magnitude_si: row.peak_contribution.value,
+                unit: "kg/s".to_string(),
+            },
+        }
+    }
+}
+
+/// the combined header load at each grid time.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MultiVesselProfileRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMultiVesselProfileRow {
+    /// the grid time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the summed discharge rate at the grid time.
+    #[pyo3(get)]
+    pub total_mass_flow: PyQty,
+}
+
+#[pymethods]
+impl PyMultiVesselProfileRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "MultiVesselProfileRow(time={:?}, total_mass_flow={:?})",
+            self.time, self.total_mass_flow
+        )
+    }
+}
+
+impl From<&azoth_process::models::multi_vessel_blowdown_study::MultiVesselProfileRow>
+    for PyMultiVesselProfileRow
+{
+    fn from(
+        row: &azoth_process::models::multi_vessel_blowdown_study::MultiVesselProfileRow,
+    ) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            total_mass_flow: PyQty {
+                magnitude_si: row.total_mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+        }
+    }
+}
+
 /// The NACE assessment's issue strings.
 #[pyclass(
     frozen,
@@ -2086,6 +2252,93 @@ impl From<&azoth_thermal::results::NaceIssueRow> for PyNaceIssueRow {
     fn from(row: &azoth_thermal::results::NaceIssueRow) -> Self {
         Self {
             message: row.message.clone(),
+        }
+    }
+}
+
+/// one row per step, in time order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "NonEquilibriumBlowdownPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyNonEquilibriumBlowdownPoint {
+    /// the step's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the shared pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the vapour-zone temperature.
+    #[pyo3(get)]
+    pub gas_temperature: PyQty,
+    /// the liquid-zone temperature.
+    #[pyo3(get)]
+    pub liquid_temperature: PyQty,
+    /// the wall metal temperature.
+    #[pyo3(get)]
+    pub wall_temperature: PyQty,
+    /// the vapour-zone mass.
+    #[pyo3(get)]
+    pub gas_mass: PyQty,
+    /// the liquid-zone mass.
+    #[pyo3(get)]
+    pub liquid_mass: PyQty,
+}
+
+#[pymethods]
+impl PyNonEquilibriumBlowdownPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "NonEquilibriumBlowdownPoint(time={:?}, pressure={:?}, gas_temperature={:?}, liquid_temperature={:?}, wall_temperature={:?}, gas_mass={:?}, liquid_mass={:?})",
+            self.time,
+            self.pressure,
+            self.gas_temperature,
+            self.liquid_temperature,
+            self.wall_temperature,
+            self.gas_mass,
+            self.liquid_mass
+        )
+    }
+}
+
+impl From<&azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdownPoint>
+    for PyNonEquilibriumBlowdownPoint
+{
+    fn from(
+        row: &azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdownPoint,
+    ) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            gas_temperature: PyQty {
+                magnitude_si: row.gas_temperature.value,
+                unit: "K".to_string(),
+            },
+            liquid_temperature: PyQty {
+                magnitude_si: row.liquid_temperature.value,
+                unit: "K".to_string(),
+            },
+            wall_temperature: PyQty {
+                magnitude_si: row.wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            gas_mass: PyQty {
+                magnitude_si: row.gas_mass.value,
+                unit: "kg".to_string(),
+            },
+            liquid_mass: PyQty {
+                magnitude_si: row.liquid_mass.value,
+                unit: "kg".to_string(),
+            },
         }
     }
 }
@@ -3354,6 +3607,69 @@ impl From<&azoth_process::models::tr3001_compliance::Tr3001Finding> for PyTr3001
         Self {
             check: row.check.as_str().to_string(),
             status: row.status.as_str().to_string(),
+        }
+    }
+}
+
+/// one row per step, in time order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "VesselFillingPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyVesselFillingPoint {
+    /// the step's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the vessel pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the gas temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// the vessel inventory.
+    #[pyo3(get)]
+    pub mass: PyQty,
+    /// the wall metal temperature, equal to the fluid's when no wall is modelled.
+    #[pyo3(get)]
+    pub wall_temperature: PyQty,
+}
+
+#[pymethods]
+impl PyVesselFillingPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "VesselFillingPoint(time={:?}, pressure={:?}, temperature={:?}, mass={:?}, wall_temperature={:?})",
+            self.time, self.pressure, self.temperature, self.mass, self.wall_temperature
+        )
+    }
+}
+
+impl From<&azoth_process::models::vessel_filling::VesselFillingPoint> for PyVesselFillingPoint {
+    fn from(row: &azoth_process::models::vessel_filling::VesselFillingPoint) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            temperature: PyQty {
+                magnitude_si: row.temperature.value,
+                unit: "K".to_string(),
+            },
+            mass: PyQty {
+                magnitude_si: row.mass.value,
+                unit: "kg".to_string(),
+            },
+            wall_temperature: PyQty {
+                magnitude_si: row.wall_temperature.value,
+                unit: "K".to_string(),
+            },
         }
     }
 }

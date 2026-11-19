@@ -22,7 +22,7 @@ with [calculation sheets](./calculations.md).
 
 Choose **Safety study** from the **Case** menu to open a study of safety scenarios and bow-ties:
 a third TOML document, with its own diagram and its own forms. A bow-tie computes its frequency
-and RRF with `process.bow_tie`; a scenario runs one of the thirty scalar safety models in nine
+and RRF with `process.bow_tie`; a scenario runs one of the thirty-one scalar safety models in ten
 families, and a fire-style model also shows the distance to each threshold. Start with
 [safety studies](./safety.md).
 

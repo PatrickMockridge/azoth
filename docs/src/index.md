@@ -337,6 +337,7 @@ Five sections, and the difference between them is the point:
 - [`process.barrier_register_validation`](./process/barrier_register_validation.md) — Barrier register validation
 - [`process.basket_test_regression`](./process/basket_test_regression.md) — Basket-test regression
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation
+- [`process.blocked_outlet_overpressure`](./process/blocked_outlet_overpressure.md) — Blocked-outlet overpressure
 - [`process.blocked_outlet_relief`](./process/blocked_outlet_relief.md) — Blocked outlet relief
 - [`process.blowdown_pressure_profile`](./process/blowdown_pressure_profile.md) — Blowdown pressure profile
 - [`process.bow_tie`](./process/bow_tie.md) — Bow-tie risk
@@ -347,7 +348,10 @@ Five sections, and the difference between them is the point:
 - [`process.control_valve_failure_relief`](./process/control_valve_failure_relief.md) — Control valve failure relief
 - [`process.cooler`](./process/cooler.md) — Cooler
 - [`process.deluge_nozzle_layout`](./process/deluge_nozzle_layout.md) — Deluge nozzle layout
+- [`process.depressurization`](./process/depressurization.md) — Vessel depressurization
+- [`process.depressurization_acceptance`](./process/depressurization_acceptance.md) — Depressurization acceptance
 - [`process.distillation_column`](./process/distillation_column.md) — Distillation column
+- [`process.dynamic_psv_sizing`](./process/dynamic_psv_sizing.md) — Dynamic PSV sizing
 - [`process.ejector`](./process/ejector.md) — Ejector
 - [`process.escalation_graph`](./process/escalation_graph.md) — Escalation graph analysis
 - [`process.event_tree`](./process/event_tree.md) — Event tree
@@ -382,7 +386,9 @@ Five sections, and the difference between them is the point:
 - [`process.map_turbo_expander_compressor`](./process/map_turbo_expander_compressor.md) — Map turbo-expander compressor
 - [`process.mdmt`](./process/mdmt.md) — Minimum design metal temperature
 - [`process.mixer`](./process/mixer.md) — Mixer
+- [`process.multi_vessel_blowdown_study`](./process/multi_vessel_blowdown_study.md) — Multi-vessel blowdown study
 - [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
+- [`process.non_equilibrium_blowdown`](./process/non_equilibrium_blowdown.md) — Non-equilibrium blowdown
 - [`process.norsok_p002_compliance`](./process/norsok_p002_compliance.md) — NORSOK P-002 point-check compliance
 - [`process.overpressure_acceptance`](./process/overpressure_acceptance.md) — Overpressure acceptance
 - [`process.overpressure_protection_study`](./process/overpressure_protection_study.md) — Overpressure protection study
@@ -400,6 +406,7 @@ Five sections, and the difference between them is the point:
 - [`process.probit`](./process/probit.md) — Probit dose-response
 - [`process.psv_fire_sizing`](./process/psv_fire_sizing.md) — PSV fire sizing
 - [`process.psv_sizing`](./process/psv_sizing.md) — PSV sizing
+- [`process.psv_valve`](./process/psv_valve.md) — PSV latch and relief flow
 - [`process.pump`](./process/pump.md) — Pump
 - [`process.pump_deadhead`](./process/pump_deadhead.md) — Pump deadhead and minimum-flow temperature rise
 - [`process.rate_based_packed_column`](./process/rate_based_packed_column.md) — Rate-based packed column
@@ -430,6 +437,7 @@ Five sections, and the difference between them is the point:
 - [`process.turbo_expander_compressor`](./process/turbo_expander_compressor.md) — Turbo-expander compressor
 - [`process.vacuum_collapse`](./process/vacuum_collapse.md) — Vacuum collapse screening
 - [`process.vce`](./process/vce.md) — Vapour-cloud explosion overpressure
+- [`process.vessel_filling`](./process/vessel_filling.md) — Vessel filling
 - [`process.vessel_rupture`](./process/vessel_rupture.md) — Vessel rupture
 
 **Reactions** - [`reactions/index.md`](./reactions/index.md):

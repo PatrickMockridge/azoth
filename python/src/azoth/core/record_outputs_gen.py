@@ -182,6 +182,29 @@ class DepositionSegmentRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class DepressurizationPoint:
+    """one row per step, in time order."""
+
+    #: the step's time.
+    time: Q
+
+    #: the vessel pressure.
+    pressure: Q
+
+    #: the fluid temperature.
+    temperature: Q
+
+    #: the vessel inventory.
+    mass: Q
+
+    #: the wall metal temperature, equal to the fluid's when no wall is modelled.
+    wall_temperature: Q
+
+    #: the instantaneous discharge rate.
+    mass_flow: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class EquilibriumSoundSpeedSample:
     """the accepted stencil's states, centre first."""
 
@@ -756,11 +779,59 @@ class MinimalCutSet:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MultiVesselContributionRow:
+    """each source's contribution at the peak, in first-appearance order."""
+
+    #: the source's name.
+    source: str
+
+    #: the source's interpolated rate at the peak time.
+    peak_contribution: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MultiVesselProfileRow:
+    """the combined header load at each grid time."""
+
+    #: the grid time.
+    time: Q
+
+    #: the summed discharge rate at the grid time.
+    total_mass_flow: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class NaceIssueRow:
     """The NACE assessment's issue strings."""
 
     #: one issue.
     message: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class NonEquilibriumBlowdownPoint:
+    """one row per step, in time order."""
+
+    #: the step's time.
+    time: Q
+
+    #: the shared pressure.
+    pressure: Q
+
+    #: the vapour-zone temperature.
+    gas_temperature: Q
+
+    #: the liquid-zone temperature.
+    liquid_temperature: Q
+
+    #: the wall metal temperature.
+    wall_temperature: Q
+
+    #: the vapour-zone mass.
+    gas_mass: Q
+
+    #: the liquid-zone mass.
+    liquid_mass: Q
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -1208,6 +1279,26 @@ class Tr3001Finding:
 
     #: the check's status; the checker emits pass, fail and needs-review, never info.
     status: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class VesselFillingPoint:
+    """one row per step, in time order."""
+
+    #: the step's time.
+    time: Q
+
+    #: the vessel pressure.
+    pressure: Q
+
+    #: the gas temperature.
+    temperature: Q
+
+    #: the vessel inventory.
+    mass: Q
+
+    #: the wall metal temperature, equal to the fluid's when no wall is modelled.
+    wall_temperature: Q
 
 
 @dataclass(frozen=True, slots=True, eq=False)

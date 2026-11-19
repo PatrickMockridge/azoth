@@ -1792,6 +1792,343 @@ def _alarp_audit(inputs: Mapping[str, Any]) -> dict[str, float]:
     return {"measure_count": float(len(evaluations))}
 
 
+def _psv_valve(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.psv_valve`'s layers, from the reference's arithmetic.
+
+    The open state is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.psv_valve import _evaluate
+
+    solution, _ = _evaluate(
+        quantity(float(inputs["set_pressure"]), "Pa"),
+        float(inputs["blowdown_fraction"]),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["orifice_area"]), "m**2"),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["upstream_pressure"]), "Pa"),
+        quantity(float(inputs["upstream_temperature"]), "K"),
+        quantity(float(inputs["molar_mass"]), "kg/mol"),
+        float(inputs["heat_capacity_ratio"]),
+        float(inputs["compressibility"]),
+        None if inputs.get("was_open") is None else bool(inputs["was_open"]),
+        (None if inputs.get("prior_cycle_count") is None else float(inputs["prior_cycle_count"])),
+    )
+    return {
+        "cycle_count": solution.cycle_count,
+        "mass_flow_kg_s": solution.mass_flow_kg_s,
+    }
+
+
+def _dynamic_psv_sizing(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.dynamic_psv_sizing`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.dynamic_psv_sizing import _evaluate
+
+    def optional(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    def optional_quantity(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["initial_z"]],
+        quantity(float(inputs["initial_t"]), "K"),
+        quantity(float(inputs["initial_p"]), "Pa"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["fire_heat_input"]), "W"),
+        quantity(float(inputs["set_pressure"]), "Pa"),
+        float(inputs["overpressure_fraction"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        optional("blowdown_fraction"),
+        optional("discharge_coefficient"),
+        optional("latent_heat"),
+        optional_quantity("time_step", "s"),
+        optional_quantity("max_time", "s"),
+        optional("initial_pressure_fraction"),
+    )
+    return {
+        "steady_required_area_m2": solution.steady_required_area,
+        "dynamic_required_area_m2": solution.dynamic_required_area,
+        "oversizing_ratio": solution.oversizing_ratio or 0.0,
+        "allowable_pressure_pa": solution.allowable_pressure,
+        "peak_dynamic_pressure_pa": solution.peak_dynamic_pressure,
+        "steady_relief_rate_kg_s": solution.steady_relief_rate,
+    }
+
+
+def _vessel_filling(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.vessel_filling`'s layers, from the reference's arithmetic.
+
+    The trajectory rows are held by the cases and the capture; the summary numbers are the
+    shared layers.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.vessel_filling import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["initial_z"]],
+        quantity(float(inputs["initial_t"]), "K"),
+        quantity(float(inputs["initial_p"]), "Pa"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["inlet_temperature"]), "K"),
+        quantity(float(inputs["supply_pressure"]), "Pa"),
+        quantity(float(inputs["inlet_mass_flow"]), "kg/s"),
+        optional("target_pressure", "Pa"),
+        optional("wall_mass", "kg"),
+        optional("wall_area", "m**2"),
+        optional("wall_specific_heat", "J/(kg*K)"),
+        optional("wall_heat_transfer_coefficient", "W/(m**2*K)"),
+        optional("woodfield_nozzle_diameter", "m"),
+        optional("vessel_height", "m"),
+        optional("liner_min_temperature", "K"),
+        optional("liner_max_temperature", "K"),
+        optional("time_step", "s"),
+        optional("max_time", "s"),
+    )
+    return {
+        "inlet_temperature_k": solution.inlet_temperature,
+        "inlet_mass_flow_kg_s": solution.inlet_mass_flow,
+        "vu_flash_fallback_count": solution.vu_flash_fallback_count,
+        "max_fluid_temperature_k": solution.max_fluid_temperature,
+        "min_fluid_temperature_k": solution.min_fluid_temperature,
+        "max_pressure_pa": solution.max_pressure,
+        "final_pressure_pa": solution.final_pressure,
+        "final_mass_kg": solution.final_mass,
+        "recorded_points": solution.recorded_points,
+    }
+
+
+def _depressurization(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.depressurization`'s layers, from the reference's arithmetic.
+
+    The trajectory rows and the flags are held by the cases and the capture; the summary
+    numbers are the shared layers.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.depressurization import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["initial_z"]],
+        quantity(float(inputs["initial_t"]), "K"),
+        quantity(float(inputs["initial_p"]), "Pa"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["orifice_diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        optional("fire_heat_input", "W"),
+        inputs.get("fire_heat_input_to_wall"),
+        optional("fire_exposed_area", "m**2"),
+        inputs.get("fire_preset"),
+        inputs.get("fire_emissivity"),
+        optional("fire_flame_temperature", "K"),
+        optional("fire_convective_coefficient", "W/(m**2*K)"),
+        optional("wall_mass", "kg"),
+        optional("wall_area", "m**2"),
+        optional("wall_specific_heat", "J/(kg*K)"),
+        optional("wall_heat_transfer_coefficient", "W/(m**2*K)"),
+        optional("time_step", "s"),
+        optional("max_time", "s"),
+        optional("stop_pressure", "Pa"),
+        inputs.get("withdrawal_mode"),
+    )
+    rows = {
+        "initial_pressure_pa": solution.initial_pressure,
+        "fire_heat_input_w_used": solution.fire_heat_input,
+        "vu_flash_fallback_count": solution.vu_flash_fallback_count,
+        "min_fluid_temperature_k": solution.min_fluid_temperature,
+        "min_wall_temperature_k": solution.min_wall_temperature,
+        "max_pressure_pa": solution.max_pressure,
+        "max_fluid_temperature_k": solution.max_fluid_temperature,
+        "max_wall_temperature_k": solution.max_wall_temperature,
+        "recorded_points": solution.recorded_points,
+    }
+    if solution.time_to_half_pressure is not None:
+        rows["time_to_half_pressure_s"] = solution.time_to_half_pressure
+    if solution.time_to_7_barg is not None:
+        rows["time_to_7_barg_s"] = solution.time_to_7_barg
+    return rows
+
+
+def _depressurization_acceptance(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.depressurization_acceptance`'s layers, from the reference's arithmetic.
+
+    The criteria are the model's own words, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.depressurization_acceptance import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    rows: list[dict[str, object]] = [
+        {
+            "time": quantity(float(row["time"]), "s"),
+            "pressure": quantity(float(row["pressure"]), "Pa"),
+            "mass": quantity(float(row["mass"]), "kg"),
+            "mass_flow": quantity(float(row["mass_flow"]), "kg/s"),
+        }
+        for row in inputs["points"]
+    ]
+    solution, _ = _evaluate(
+        rows,
+        optional("time_to_escape", "s"),
+        optional("estimated_time_to_rupture", "s"),
+        optional("maximum_pressure_at_rupture", "Pa"),
+        optional("maximum_remaining_mass", "kg"),
+        optional("maximum_escalated_fire_rate", "kg/s"),
+    )
+    return {
+        "limiting_time_s": solution.limiting_time,
+        "pressure_at_limiting_time_pa": solution.pressure_at_limiting_time,
+        "remaining_mass_at_limiting_time_kg": solution.remaining_mass_at_limiting_time,
+        "peak_discharge_rate_kg_s": solution.peak_discharge_rate,
+    }
+
+
+def _blocked_outlet_overpressure(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.blocked_outlet_overpressure`'s layers, from the reference's arithmetic.
+
+    The relief-demand flag is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.blocked_outlet_overpressure import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["initial_z"]],
+        quantity(float(inputs["initial_t"]), "K"),
+        quantity(float(inputs["initial_p"]), "Pa"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["inlet_temperature"]), "K"),
+        quantity(float(inputs["supply_pressure"]), "Pa"),
+        quantity(float(inputs["inlet_mass_flow"]), "kg/s"),
+        quantity(float(inputs["relief_set_pressure"]), "Pa"),
+        optional("time_step", "s"),
+        optional("max_time", "s"),
+    )
+    rows = {
+        "relief_set_pressure_pa_used": solution.relief_set_pressure,
+        "max_pressure_pa": solution.max_pressure,
+        "final_pressure_pa": solution.final_pressure,
+        "final_mass_kg": solution.final_mass,
+        "inlet_mass_flow_kg_s_used": solution.inlet_mass_flow,
+        "simulated_horizon_s": solution.simulated_horizon,
+    }
+    if solution.time_to_relief_set is not None:
+        rows["time_to_relief_set_s"] = solution.time_to_relief_set
+    return rows
+
+
+def _multi_vessel_blowdown_study(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.multi_vessel_blowdown_study`'s layers, from the reference's arithmetic.
+
+    The profile and contribution rows and the Mach flag are held by the cases and the
+    capture; the summary numbers are the shared layers.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.multi_vessel_blowdown_study import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    rows: list[dict[str, object]] = [
+        {
+            "source": str(row["source"]),
+            "time": quantity(float(row["time"]), "s"),
+            "mass_flow": quantity(float(row["mass_flow"]), "kg/s"),
+        }
+        for row in inputs["samples"]
+    ]
+    solution, _ = _evaluate(
+        rows,
+        optional("header_diameter", "m"),
+        optional("header_pressure", "Pa"),
+        optional("header_temperature", "K"),
+        optional("header_molar_mass", "kg/mol"),
+        inputs.get("header_heat_capacity_ratio"),
+        inputs.get("max_allowable_mach"),
+        optional("grid_step", "s"),
+    )
+    layers = {
+        "peak_total_mass_flow_kg_s": solution.peak_total_mass_flow,
+        "peak_time_s": solution.peak_time,
+        "max_allowable_mach": solution.max_allowable_mach,
+    }
+    if solution.header_velocity is not None:
+        layers["header_velocity_m_s"] = solution.header_velocity
+    if solution.header_mach is not None:
+        layers["header_mach"] = solution.header_mach
+    return layers
+
+
+def _non_equilibrium_blowdown(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.non_equilibrium_blowdown`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.non_equilibrium_blowdown import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["initial_z"]],
+        quantity(float(inputs["initial_t"]), "K"),
+        quantity(float(inputs["initial_p"]), "Pa"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["orifice_diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        inputs.get("fire_emissivity"),
+        optional("fire_flame_temperature", "K"),
+        optional("fire_convective_coefficient", "W/(m**2*K)"),
+        optional("fire_exposed_area", "m**2"),
+        optional("wall_mass", "kg"),
+        optional("wall_specific_heat", "J/(kg*K)"),
+        optional("inside_gas_coefficient", "W/(m**2*K)"),
+        optional("interfacial_coefficient", "W/(m**2*K)"),
+        optional("interfacial_area", "m**2"),
+        inputs.get("latent_heat"),
+        inputs.get("surface_tension"),
+        inputs.get("surface_fluid_constant"),
+        inputs.get("critical_heat_flux"),
+        optional("effective_boiling_coefficient", "W/(m**2*K)"),
+        optional("time_step", "s"),
+        optional("max_time", "s"),
+        optional("stop_pressure", "Pa"),
+    )
+    return {
+        "initial_pressure_pa": solution.initial_pressure,
+        "flash_fallback_count": solution.flash_fallback_count,
+        "final_gas_temperature_k": solution.final_gas_temperature,
+        "final_liquid_temperature_k": solution.final_liquid_temperature,
+        "recorded_points": solution.recorded_points,
+    }
+
+
 def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.inherent_safety`'s layers, from the reference's arithmetic."""
     from azoth.process.reference.inherent_safety import _evaluate
@@ -3872,6 +4209,14 @@ DUMPERS: dict[str, Dumper] = {
     "process.alarp_audit": _alarp_audit,
     "process.escalation_graph": _escalation_graph,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
+    "process.psv_valve": _psv_valve,
+    "process.dynamic_psv_sizing": _dynamic_psv_sizing,
+    "process.vessel_filling": _vessel_filling,
+    "process.depressurization": _depressurization,
+    "process.depressurization_acceptance": _depressurization_acceptance,
+    "process.blocked_outlet_overpressure": _blocked_outlet_overpressure,
+    "process.multi_vessel_blowdown_study": _multi_vessel_blowdown_study,
+    "process.non_equilibrium_blowdown": _non_equilibrium_blowdown,
     "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.sts0131_gate": _sts0131_gate,
@@ -4992,6 +5337,78 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_inherent_safety.tsv",
         block=0,
         identified_by=("#label", "inherent_mixed"),
+    ),
+    # The valve's one: the pop at the set pressure. The six further states and the ten
+    # refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.psv_valve",
+        case="pops_at_set",
+        capture="process_psv_valve.tsv",
+        block=1,
+        identified_by=("#label", "valve_pops_at_set"),
+    ),
+    # The dynamic sizing's one: the 50 bara gas. The low-pressure state and the two refusals
+    # are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.dynamic_psv_sizing",
+        case="fifty_bara_gas",
+        capture="process_dynamic_psv_sizing.tsv",
+        block=0,
+        identified_by=("#label", "dpsv_50bara"),
+    ),
+    # Filling's one: the mixture with no wall. The four short pure states, the four long
+    # evidence runs and the four refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.vessel_filling",
+        case="mixture_no_wall",
+        capture="process_vessel_filling.tsv",
+        block=0,
+        identified_by=("#label", "fill_mixture_no_wall_20s"),
+    ),
+    # The blowdown's one: the cold gas. The nine further states, the 900 s evidence and the
+    # four refusals are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.depressurization",
+        case="cold_gas_60s",
+        capture="process_depressurization.tsv",
+        block=0,
+        identified_by=("#label", "dep_cold_gas_60s"),
+    ),
+    # The acceptance's one: the passing state. The seven further states and the empty-trace
+    # refusal are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.depressurization_acceptance",
+        case="pass_with_rupture_limit",
+        capture="process_depressurization_acceptance.tsv",
+        block=0,
+        identified_by=("#label", "acc_pass_rupture_limits"),
+    ),
+    # The blocked outlet's one: the state that reaches the set pressure. The low-flow state
+    # is declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.blocked_outlet_overpressure",
+        case="reaches_the_relief_set",
+        capture="process_blocked_outlet_overpressure.tsv",
+        block=0,
+        identified_by=("#label", "blocked_reaches_relief_600s"),
+    ),
+    # The multi-vessel study's one: the two sources with no header. The two header states
+    # and the empty-study refusal are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.multi_vessel_blowdown_study",
+        case="two_sources_no_header",
+        capture="process_multi_vessel_blowdown_study.tsv",
+        block=0,
+        identified_by=("#label", "mv_two_sources_no_header"),
+    ),
+    # The non-equilibrium blowdown's one: the fire-exposed state. The default-parameter
+    # state and the single-phase refusal are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.non_equilibrium_blowdown",
+        case="fire_exposed_two_phase",
+        capture="process_non_equilibrium_blowdown.tsv",
+        block=0,
+        identified_by=("#label", "nem_fire_20s"),
     ),
     # STS-0131's one: the PSV margin at equality. The five further cases, the seven
     # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
@@ -7905,6 +8322,14 @@ UNCASED_ROWS: dict[str, int] = {
     "process_sts0131_gate.tsv": 14,
     # Inherent safety's four: the zero and boundary states and the two refusals.
     "process_inherent_safety.tsv": 4,
+    "process_psv_valve.tsv": 16,
+    "process_dynamic_psv_sizing.tsv": 3,
+    "process_vessel_filling.tsv": 12,
+    "process_depressurization.tsv": 14,
+    "process_depressurization_acceptance.tsv": 8,
+    "process_blocked_outlet_overpressure.tsv": 1,
+    "process_multi_vessel_blowdown_study.tsv": 3,
+    "process_non_equilibrium_blowdown.tsv": 2,
     # ALARP's eight: the five further states, the empty audit and the two refusals.
     "process_alarp_audit.tsv": 8,
     # Escalation's eight: the six further states and the two refusals.

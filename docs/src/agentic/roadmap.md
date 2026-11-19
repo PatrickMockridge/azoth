@@ -8,12 +8,12 @@ the mapping, so an agent can tell "validated" from "placeholder" at a glance.
 
 ## What is `azoth`-basis, and what is still a placeholder
 
-A skill whose `calculation_basis` is `azoth` drives the validated library. Twenty-nine
+A skill whose `calculation_basis` is `azoth` drives the validated library. Thirty
 are: the four `library/` skills, four under `eos/`, five under `flow-assurance/`,
-two under `hydraulics/`, five under `process/`, eight under `safety/` and one under
-`thermal/`, driving the 98 calculations and 251 models the library implements.
+two under `hydraulics/`, five under `process/`, nine under `safety/` and one under
+`thermal/`, driving the 98 calculations and 259 models the library implements.
 
-The remaining 61 are placeholders — 33 `screening`, 18 `advisory` and 10
+The remaining 60 are placeholders — 32 `screening`, 18 `advisory` and 10
 `data-retrieval` — and each `screening` one names **what would back it**,
 which is a tranche where a tranche covers the physics and a named family where none does:
 
@@ -25,9 +25,7 @@ which is a tranche where a tranche covers the physics and a named family where n
   `automation`, `standards/` and `fluidmechanics/` *beyond* P12, so a skill whose physics
   belongs to one of those names the family rather than the nearest P-number. 14 are
   mechanical design (noise, wall thickness, flexibility, seals, turbines, vessel sizing),
-  3 `statistics/`, 3 `automation`, 2 `standards/` and 1 `fluidmechanics/`. The one
-  remaining `safety/` skill, `azoth-depressurization-screening`, names the live-object
-  machinery the safety tranches have not reached.
+  3 `statistics/`, 3 `automation`, 2 `standards/` and 1 `fluidmechanics/`.
 - **What is a unit operation and a flowsheet away** — `azoth-teg-dehydration-modeling`
   keeps the P11 label, because P11's palette is the tranche that built the absorber,
   flash, column, stripper and recycle it composes. What it does not have is the plant:
@@ -107,7 +105,7 @@ a P-number, or one of the beyond-P12 families the specification names. A domain'
 | `library` | `azoth` | P0 (done) |
 | `eos`, `hydraulics`, `thermal` | `azoth` | P0–P2 (done) |
 | `process` | `azoth`, `screening` | P11 (done), and the beyond-P12 families |
-| `safety` | `azoth`, `screening` | `safety` — beyond P12, so no tranche |
+| `safety` | `azoth` | `safety` — beyond P12, so no tranche |
 | `pvt` | `screening` | P4 |
 | `subsurface` | `screening` | P4 |
 | `flow-assurance` | `azoth`, `screening`, `advisory`, `data-retrieval` | P9 |

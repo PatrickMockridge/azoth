@@ -16,19 +16,21 @@
 use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
-    PyDepositionSegmentRow, PyEquilibriumSoundSpeedSample, PyEscalationItemResult,
-    PyEventTreeOutcome, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
-    PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
-    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
-    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
-    PyMinimalCutSet, PyNaceIssueRow, PyP002FindingResult, PyPipeFireRupturePoint,
-    PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PyTr3001Finding, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyDepositionSegmentRow, PyDepressurizationPoint, PyEquilibriumSoundSpeedSample,
+    PyEscalationItemResult, PyEventTreeOutcome, PyFlowlineScaleSegment, PyFmeaRankedEntry,
+    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
+    PyHydrateRiskPoint, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
+    PyLeakBlowdownPoint, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat,
+    PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
+    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyP002FindingResult,
+    PyPipeFireRupturePoint, PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow,
+    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
+    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
+    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint,
+    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
+    PySts0131FindingResult, PySubFraction, PyTr3001Finding, PyVesselFillingPoint,
+    PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -14654,6 +14656,102 @@ impl From<&azoth_process::models::bleve::BleveResult> for PyBleveResult {
         }
     }
 }
+/// Result of `process.blocked_outlet_overpressure`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BlockedOutletOverpressureResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBlockedOutletOverpressureResult {
+    /// the relief set pressure the run used.
+    #[pyo3(get)]
+    pub relief_set_pressure: PyQty,
+    /// the highest recorded pressure.
+    #[pyo3(get)]
+    pub max_pressure: PyQty,
+    /// the last recorded pressure.
+    #[pyo3(get)]
+    pub final_pressure: PyQty,
+    /// the last recorded inventory mass.
+    #[pyo3(get)]
+    pub final_mass: PyQty,
+    /// the continued feed mass flow.
+    #[pyo3(get)]
+    pub inlet_mass_flow: PyQty,
+    /// the configured horizon, not the elapsed time.
+    #[pyo3(get)]
+    pub simulated_horizon: PyQty,
+    /// the first sample's time at or above the set pressure; absent when not reached.
+    #[pyo3(get)]
+    pub time_to_relief_set: Option<PyQty>,
+    /// whether the set pressure was reached within the horizon.
+    #[pyo3(get)]
+    pub relief_demand: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBlockedOutletOverpressureResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BlockedOutletOverpressureResult(relief_set_pressure={:?}, max_pressure={:?}, final_pressure={:?}, final_mass={:?}, inlet_mass_flow={:?}, simulated_horizon={:?}, time_to_relief_set={:?}, relief_demand={:?}, {} warning(s))",
+            self.relief_set_pressure,
+            self.max_pressure,
+            self.final_pressure,
+            self.final_mass,
+            self.inlet_mass_flow,
+            self.simulated_horizon,
+            self.time_to_relief_set,
+            self.relief_demand,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::blocked_outlet_overpressure::BlockedOutletOverpressureResult>
+    for PyBlockedOutletOverpressureResult
+{
+    fn from(
+        r: &azoth_process::models::blocked_outlet_overpressure::BlockedOutletOverpressureResult,
+    ) -> Self {
+        Self {
+            relief_set_pressure: PyQty {
+                magnitude_si: r.relief_set_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            max_pressure: PyQty {
+                magnitude_si: r.max_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            final_pressure: PyQty {
+                magnitude_si: r.final_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            final_mass: PyQty {
+                magnitude_si: r.final_mass.value,
+                unit: "kg".to_string(),
+            },
+            inlet_mass_flow: PyQty {
+                magnitude_si: r.inlet_mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            simulated_horizon: PyQty {
+                magnitude_si: r.simulated_horizon.value,
+                unit: "s".to_string(),
+            },
+            time_to_relief_set: r.time_to_relief_set.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            relief_demand: r.relief_demand,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.blocked_outlet_relief`, transported.
 #[pyclass(
     frozen,
@@ -15825,6 +15923,258 @@ impl From<&azoth_process::models::deluge_nozzle_layout::DelugeNozzleLayoutResult
         }
     }
 }
+/// Result of `process.depressurization`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DepressurizationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDepressurizationResult {
+    /// one row per step, in time order.
+    #[pyo3(get)]
+    pub points: Vec<PyDepressurizationPoint>,
+    /// the pre-alignment flash's pressure, one of the class's two initial pressures.
+    #[pyo3(get)]
+    pub initial_pressure: PyQty,
+    /// the constant fire duty the run was given.
+    #[pyo3(get)]
+    pub fire_heat_input: PyQty,
+    /// whether the fire duty is routed through the wall model.
+    #[pyo3(get)]
+    pub fire_heat_routed_to_wall: bool,
+    /// the steps that used the ideal-gas fallback.
+    #[pyo3(get)]
+    pub vu_flash_fallback_count: f64,
+    /// whether any step discharged the vapour phase rather than the bulk.
+    #[pyo3(get)]
+    pub vapour_withdrawal_used: bool,
+    /// the interpolated time to half the initial pressure; absent when not reached.
+    #[pyo3(get)]
+    pub time_to_half_pressure: Option<PyQty>,
+    /// the interpolated time to 8 bara absolute; absent when not reached.
+    #[pyo3(get)]
+    pub time_to_7_barg: Option<PyQty>,
+    /// the coldest recorded fluid temperature.
+    #[pyo3(get)]
+    pub min_fluid_temperature: PyQty,
+    /// the coldest recorded wall temperature.
+    #[pyo3(get)]
+    pub min_wall_temperature: PyQty,
+    /// the highest recorded pressure.
+    #[pyo3(get)]
+    pub max_pressure: PyQty,
+    /// the hottest recorded fluid temperature.
+    #[pyo3(get)]
+    pub max_fluid_temperature: PyQty,
+    /// the hottest recorded wall temperature.
+    #[pyo3(get)]
+    pub max_wall_temperature: PyQty,
+    /// whether the half-pressure crossing is at or within 900 s.
+    #[pyo3(get)]
+    pub half_pressure_criterion_met: bool,
+    /// whether the 8 bara crossing is at or within 900 s.
+    #[pyo3(get)]
+    pub seven_barg_criterion_met: bool,
+    /// whether the pressure never rose beyond numerical tolerance.
+    #[pyo3(get)]
+    pub pressure_monotonic_non_increasing: bool,
+    /// whether the inventory never grew beyond numerical tolerance.
+    #[pyo3(get)]
+    pub mass_monotonic_non_increasing: bool,
+    /// the recorded rows.
+    #[pyo3(get)]
+    pub recorded_points: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDepressurizationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DepressurizationResult(points={:?}, initial_pressure={:?}, fire_heat_input={:?}, fire_heat_routed_to_wall={:?}, vu_flash_fallback_count={:?}, vapour_withdrawal_used={:?}, time_to_half_pressure={:?}, time_to_7_barg={:?}, min_fluid_temperature={:?}, min_wall_temperature={:?}, max_pressure={:?}, max_fluid_temperature={:?}, max_wall_temperature={:?}, half_pressure_criterion_met={:?}, seven_barg_criterion_met={:?}, pressure_monotonic_non_increasing={:?}, mass_monotonic_non_increasing={:?}, recorded_points={:?}, {} warning(s))",
+            self.points,
+            self.initial_pressure,
+            self.fire_heat_input,
+            self.fire_heat_routed_to_wall,
+            self.vu_flash_fallback_count,
+            self.vapour_withdrawal_used,
+            self.time_to_half_pressure,
+            self.time_to_7_barg,
+            self.min_fluid_temperature,
+            self.min_wall_temperature,
+            self.max_pressure,
+            self.max_fluid_temperature,
+            self.max_wall_temperature,
+            self.half_pressure_criterion_met,
+            self.seven_barg_criterion_met,
+            self.pressure_monotonic_non_increasing,
+            self.mass_monotonic_non_increasing,
+            self.recorded_points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::depressurization::DepressurizationResult>
+    for PyDepressurizationResult
+{
+    fn from(r: &azoth_process::models::depressurization::DepressurizationResult) -> Self {
+        Self {
+            points: r.points.iter().map(PyDepressurizationPoint::from).collect(),
+            initial_pressure: PyQty {
+                magnitude_si: r.initial_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            fire_heat_input: PyQty {
+                magnitude_si: r.fire_heat_input.value,
+                unit: "W".to_string(),
+            },
+            fire_heat_routed_to_wall: r.fire_heat_routed_to_wall,
+            vu_flash_fallback_count: r.vu_flash_fallback_count,
+            vapour_withdrawal_used: r.vapour_withdrawal_used,
+            time_to_half_pressure: r.time_to_half_pressure.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            time_to_7_barg: r.time_to_7_barg.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            min_fluid_temperature: PyQty {
+                magnitude_si: r.min_fluid_temperature.value,
+                unit: "K".to_string(),
+            },
+            min_wall_temperature: PyQty {
+                magnitude_si: r.min_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            max_pressure: PyQty {
+                magnitude_si: r.max_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            max_fluid_temperature: PyQty {
+                magnitude_si: r.max_fluid_temperature.value,
+                unit: "K".to_string(),
+            },
+            max_wall_temperature: PyQty {
+                magnitude_si: r.max_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            half_pressure_criterion_met: r.half_pressure_criterion_met,
+            seven_barg_criterion_met: r.seven_barg_criterion_met,
+            pressure_monotonic_non_increasing: r.pressure_monotonic_non_increasing,
+            mass_monotonic_non_increasing: r.mass_monotonic_non_increasing,
+            recorded_points: r.recorded_points,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.depressurization_acceptance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DepressurizationAcceptanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDepressurizationAcceptanceResult {
+    /// the earliest configured limiting time bounded by the trajectory.
+    #[pyo3(get)]
+    pub limiting_time: PyQty,
+    /// the interpolated pressure at the limiting time.
+    #[pyo3(get)]
+    pub pressure_at_limiting_time: PyQty,
+    /// the interpolated inventory at the limiting time.
+    #[pyo3(get)]
+    pub remaining_mass_at_limiting_time: PyQty,
+    /// the maximum discharge rate at or before the limiting time.
+    #[pyo3(get)]
+    pub peak_discharge_rate: PyQty,
+    /// whether a pressure limit was given.
+    #[pyo3(get)]
+    pub pressure_configured: bool,
+    /// whether the pressure is at or below its limit, or the limit is absent.
+    #[pyo3(get)]
+    pub pressure_criterion_met: bool,
+    /// whether a mass limit was given.
+    #[pyo3(get)]
+    pub mass_configured: bool,
+    /// whether the mass is at or below its limit, or the limit is absent.
+    #[pyo3(get)]
+    pub mass_criterion_met: bool,
+    /// whether a fire-rate limit was given.
+    #[pyo3(get)]
+    pub fire_rate_configured: bool,
+    /// whether the peak rate is at or below its limit, or the limit is absent.
+    #[pyo3(get)]
+    pub fire_rate_criterion_met: bool,
+    /// whether all three criteria pass.
+    #[pyo3(get)]
+    pub acceptable: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDepressurizationAcceptanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DepressurizationAcceptanceResult(limiting_time={:?}, pressure_at_limiting_time={:?}, remaining_mass_at_limiting_time={:?}, peak_discharge_rate={:?}, pressure_configured={:?}, pressure_criterion_met={:?}, mass_configured={:?}, mass_criterion_met={:?}, fire_rate_configured={:?}, fire_rate_criterion_met={:?}, acceptable={:?}, {} warning(s))",
+            self.limiting_time,
+            self.pressure_at_limiting_time,
+            self.remaining_mass_at_limiting_time,
+            self.peak_discharge_rate,
+            self.pressure_configured,
+            self.pressure_criterion_met,
+            self.mass_configured,
+            self.mass_criterion_met,
+            self.fire_rate_configured,
+            self.fire_rate_criterion_met,
+            self.acceptable,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::depressurization_acceptance::DepressurizationAcceptanceResult>
+    for PyDepressurizationAcceptanceResult
+{
+    fn from(
+        r: &azoth_process::models::depressurization_acceptance::DepressurizationAcceptanceResult,
+    ) -> Self {
+        Self {
+            limiting_time: PyQty {
+                magnitude_si: r.limiting_time.value,
+                unit: "s".to_string(),
+            },
+            pressure_at_limiting_time: PyQty {
+                magnitude_si: r.pressure_at_limiting_time.value,
+                unit: "Pa".to_string(),
+            },
+            remaining_mass_at_limiting_time: PyQty {
+                magnitude_si: r.remaining_mass_at_limiting_time.value,
+                unit: "kg".to_string(),
+            },
+            peak_discharge_rate: PyQty {
+                magnitude_si: r.peak_discharge_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            pressure_configured: r.pressure_configured,
+            pressure_criterion_met: r.pressure_criterion_met,
+            mass_configured: r.mass_configured,
+            mass_criterion_met: r.mass_criterion_met,
+            fire_rate_configured: r.fire_rate_configured,
+            fire_rate_criterion_met: r.fire_rate_criterion_met,
+            acceptable: r.acceptable,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.distillation_column`, transported.
 #[pyclass(
     frozen,
@@ -16222,6 +16572,84 @@ impl From<&azoth_process::models::distillation_column::DistillationColumnResult>
                 unit: "kW".to_string(),
             },
             material_grade: r.material_grade.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.dynamic_psv_sizing`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DynamicPsvSizingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDynamicPsvSizingResult {
+    /// the steady API 521 required orifice area.
+    #[pyo3(get)]
+    pub steady_required_area: PyQty,
+    /// the dynamically required orifice area.
+    #[pyo3(get)]
+    pub dynamic_required_area: PyQty,
+    /// the steady-to-dynamic oversizing; absent only at a zero dynamic area.
+    #[pyo3(get)]
+    pub oversizing_ratio: Option<f64>,
+    /// the allowable accumulated pressure `set_pressure (1 + overpressure_fraction)`.
+    #[pyo3(get)]
+    pub allowable_pressure: PyQty,
+    /// the peak vessel pressure at the dynamically required area.
+    #[pyo3(get)]
+    pub peak_dynamic_pressure: PyQty,
+    /// the steady relief rate `fire_heat_input / latent_heat`.
+    #[pyo3(get)]
+    pub steady_relief_rate: PyQty,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDynamicPsvSizingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DynamicPsvSizingResult(steady_required_area={:?}, dynamic_required_area={:?}, oversizing_ratio={:?}, allowable_pressure={:?}, peak_dynamic_pressure={:?}, steady_relief_rate={:?}, {} warning(s))",
+            self.steady_required_area,
+            self.dynamic_required_area,
+            self.oversizing_ratio,
+            self.allowable_pressure,
+            self.peak_dynamic_pressure,
+            self.steady_relief_rate,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::dynamic_psv_sizing::DynamicPsvSizingResult>
+    for PyDynamicPsvSizingResult
+{
+    fn from(r: &azoth_process::models::dynamic_psv_sizing::DynamicPsvSizingResult) -> Self {
+        Self {
+            steady_required_area: PyQty {
+                magnitude_si: r.steady_required_area.value,
+                unit: "m**2".to_string(),
+            },
+            dynamic_required_area: PyQty {
+                magnitude_si: r.dynamic_required_area.value,
+                unit: "m**2".to_string(),
+            },
+            oversizing_ratio: r.oversizing_ratio,
+            allowable_pressure: PyQty {
+                magnitude_si: r.allowable_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            peak_dynamic_pressure: PyQty {
+                magnitude_si: r.peak_dynamic_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            steady_relief_rate: PyQty {
+                magnitude_si: r.steady_relief_rate.value,
+                unit: "kg/s".to_string(),
+            },
             warnings: transport(&r.warnings),
         }
     }
@@ -20607,6 +21035,98 @@ impl From<&azoth_process::models::mixer::MixerResult> for PyMixerResult {
         }
     }
 }
+/// Result of `process.multi_vessel_blowdown_study`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MultiVesselBlowdownStudyResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMultiVesselBlowdownStudyResult {
+    /// the combined header load at each grid time.
+    #[pyo3(get)]
+    pub profile: Vec<PyMultiVesselProfileRow>,
+    /// each source's contribution at the peak, in first-appearance order.
+    #[pyo3(get)]
+    pub contributions: Vec<PyMultiVesselContributionRow>,
+    /// the controlling combined load.
+    #[pyo3(get)]
+    pub peak_total_mass_flow: PyQty,
+    /// the time of the controlling load.
+    #[pyo3(get)]
+    pub peak_time: PyQty,
+    /// the header gas velocity at the peak; absent when no header is configured.
+    #[pyo3(get)]
+    pub header_velocity: Option<PyQty>,
+    /// the header Mach number at the peak; absent when no header is configured.
+    #[pyo3(get)]
+    pub header_mach: Option<f64>,
+    /// the Mach limit the run used.
+    #[pyo3(get)]
+    pub max_allowable_mach: f64,
+    /// whether the Mach number is within the limit, or no header is configured.
+    #[pyo3(get)]
+    pub header_mach_acceptable: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyMultiVesselBlowdownStudyResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "MultiVesselBlowdownStudyResult(profile={:?}, contributions={:?}, peak_total_mass_flow={:?}, peak_time={:?}, header_velocity={:?}, header_mach={:?}, max_allowable_mach={:?}, header_mach_acceptable={:?}, {} warning(s))",
+            self.profile,
+            self.contributions,
+            self.peak_total_mass_flow,
+            self.peak_time,
+            self.header_velocity,
+            self.header_mach,
+            self.max_allowable_mach,
+            self.header_mach_acceptable,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult>
+    for PyMultiVesselBlowdownStudyResult
+{
+    fn from(
+        r: &azoth_process::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult,
+    ) -> Self {
+        Self {
+            profile: r
+                .profile
+                .iter()
+                .map(PyMultiVesselProfileRow::from)
+                .collect(),
+            contributions: r
+                .contributions
+                .iter()
+                .map(PyMultiVesselContributionRow::from)
+                .collect(),
+            peak_total_mass_flow: PyQty {
+                magnitude_si: r.peak_total_mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            peak_time: PyQty {
+                magnitude_si: r.peak_time.value,
+                unit: "s".to_string(),
+            },
+            header_velocity: r.header_velocity.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            header_mach: r.header_mach,
+            max_allowable_mach: r.max_allowable_mach,
+            header_mach_acceptable: r.header_mach_acceptable,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.nog070_sil_determination`, transported.
 #[pyclass(
     frozen,
@@ -20663,6 +21183,92 @@ impl From<&azoth_process::models::nog070_sil_determination::Nog070SilDeterminati
             achieved_sil: r.achieved_sil,
             compliant: r.compliant,
             required_pfd_reduction_factor: r.required_pfd_reduction_factor,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.non_equilibrium_blowdown`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "NonEquilibriumBlowdownResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyNonEquilibriumBlowdownResult {
+    /// one row per step, in time order.
+    #[pyo3(get)]
+    pub points: Vec<PyNonEquilibriumBlowdownPoint>,
+    /// the initial pressure.
+    #[pyo3(get)]
+    pub initial_pressure: PyQty,
+    /// the steps that hit a guarded flash failure.
+    #[pyo3(get)]
+    pub flash_fallback_count: f64,
+    /// the final vapour-zone temperature.
+    #[pyo3(get)]
+    pub final_gas_temperature: PyQty,
+    /// the final liquid-zone temperature.
+    #[pyo3(get)]
+    pub final_liquid_temperature: PyQty,
+    /// the largest vapour-minus-liquid temperature difference.
+    #[pyo3(get)]
+    pub max_temperature_bifurcation: PyQty,
+    /// the recorded rows.
+    #[pyo3(get)]
+    pub recorded_points: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyNonEquilibriumBlowdownResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "NonEquilibriumBlowdownResult(points={:?}, initial_pressure={:?}, flash_fallback_count={:?}, final_gas_temperature={:?}, final_liquid_temperature={:?}, max_temperature_bifurcation={:?}, recorded_points={:?}, {} warning(s))",
+            self.points,
+            self.initial_pressure,
+            self.flash_fallback_count,
+            self.final_gas_temperature,
+            self.final_liquid_temperature,
+            self.max_temperature_bifurcation,
+            self.recorded_points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdownResult>
+    for PyNonEquilibriumBlowdownResult
+{
+    fn from(
+        r: &azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdownResult,
+    ) -> Self {
+        Self {
+            points: r
+                .points
+                .iter()
+                .map(PyNonEquilibriumBlowdownPoint::from)
+                .collect(),
+            initial_pressure: PyQty {
+                magnitude_si: r.initial_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            flash_fallback_count: r.flash_fallback_count,
+            final_gas_temperature: PyQty {
+                magnitude_si: r.final_gas_temperature.value,
+                unit: "K".to_string(),
+            },
+            final_liquid_temperature: PyQty {
+                magnitude_si: r.final_liquid_temperature.value,
+                unit: "K".to_string(),
+            },
+            max_temperature_bifurcation: PyQty {
+                magnitude_si: r.max_temperature_bifurcation.value,
+                unit: "K".to_string(),
+            },
+            recorded_points: r.recorded_points,
             warnings: transport(&r.warnings),
         }
     }
@@ -22514,6 +23120,55 @@ impl From<&azoth_process::models::psv_sizing::PsvSizingResult> for PyPsvSizingRe
                 magnitude_si: v.value,
                 unit: "kg/s".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.psv_valve`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PsvValveResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPsvValveResult {
+    /// the valve's open state after the update.
+    #[pyo3(get)]
+    pub open: bool,
+    /// the pop count after the update.
+    #[pyo3(get)]
+    pub cycle_count: f64,
+    /// the relieving mass flow at the upstream state; zero when the valve is closed.
+    #[pyo3(get)]
+    pub mass_flow: PyQty,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPsvValveResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PsvValveResult(open={:?}, cycle_count={:?}, mass_flow={:?}, {} warning(s))",
+            self.open,
+            self.cycle_count,
+            self.mass_flow,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::psv_valve::PsvValveResult> for PyPsvValveResult {
+    fn from(r: &azoth_process::models::psv_valve::PsvValveResult) -> Self {
+        Self {
+            open: r.open,
+            cycle_count: r.cycle_count,
+            mass_flow: PyQty {
+                magnitude_si: r.mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
             warnings: transport(&r.warnings),
         }
     }
@@ -27365,6 +28020,123 @@ impl From<&azoth_process::models::vce::VceResult> for PyVceResult {
                 magnitude_si: v.value,
                 unit: "m".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.vessel_filling`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "VesselFillingResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyVesselFillingResult {
+    /// one row per step, in time order.
+    #[pyo3(get)]
+    pub points: Vec<PyVesselFillingPoint>,
+    /// the supply stagnation temperature the run used.
+    #[pyo3(get)]
+    pub inlet_temperature: PyQty,
+    /// the charging mass flow the run used.
+    #[pyo3(get)]
+    pub inlet_mass_flow: PyQty,
+    /// the steps that used the ideal-gas fallback.
+    #[pyo3(get)]
+    pub vu_flash_fallback_count: f64,
+    /// the hottest recorded gas temperature.
+    #[pyo3(get)]
+    pub max_fluid_temperature: PyQty,
+    /// the coldest recorded gas temperature.
+    #[pyo3(get)]
+    pub min_fluid_temperature: PyQty,
+    /// the highest recorded pressure.
+    #[pyo3(get)]
+    pub max_pressure: PyQty,
+    /// the last recorded pressure.
+    #[pyo3(get)]
+    pub final_pressure: PyQty,
+    /// the last recorded inventory mass.
+    #[pyo3(get)]
+    pub final_mass: PyQty,
+    /// whether any recorded gas temperature exceeded the upper liner limit.
+    #[pyo3(get)]
+    pub liner_over_temperature: bool,
+    /// whether any recorded gas temperature fell below the lower liner limit.
+    #[pyo3(get)]
+    pub liner_under_temperature: bool,
+    /// whether every recorded gas temperature stayed within the limits.
+    #[pyo3(get)]
+    pub liner_limits_met: bool,
+    /// the recorded rows.
+    #[pyo3(get)]
+    pub recorded_points: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyVesselFillingResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "VesselFillingResult(points={:?}, inlet_temperature={:?}, inlet_mass_flow={:?}, vu_flash_fallback_count={:?}, max_fluid_temperature={:?}, min_fluid_temperature={:?}, max_pressure={:?}, final_pressure={:?}, final_mass={:?}, liner_over_temperature={:?}, liner_under_temperature={:?}, liner_limits_met={:?}, recorded_points={:?}, {} warning(s))",
+            self.points,
+            self.inlet_temperature,
+            self.inlet_mass_flow,
+            self.vu_flash_fallback_count,
+            self.max_fluid_temperature,
+            self.min_fluid_temperature,
+            self.max_pressure,
+            self.final_pressure,
+            self.final_mass,
+            self.liner_over_temperature,
+            self.liner_under_temperature,
+            self.liner_limits_met,
+            self.recorded_points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::vessel_filling::VesselFillingResult> for PyVesselFillingResult {
+    fn from(r: &azoth_process::models::vessel_filling::VesselFillingResult) -> Self {
+        Self {
+            points: r.points.iter().map(PyVesselFillingPoint::from).collect(),
+            inlet_temperature: PyQty {
+                magnitude_si: r.inlet_temperature.value,
+                unit: "K".to_string(),
+            },
+            inlet_mass_flow: PyQty {
+                magnitude_si: r.inlet_mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            vu_flash_fallback_count: r.vu_flash_fallback_count,
+            max_fluid_temperature: PyQty {
+                magnitude_si: r.max_fluid_temperature.value,
+                unit: "K".to_string(),
+            },
+            min_fluid_temperature: PyQty {
+                magnitude_si: r.min_fluid_temperature.value,
+                unit: "K".to_string(),
+            },
+            max_pressure: PyQty {
+                magnitude_si: r.max_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            final_pressure: PyQty {
+                magnitude_si: r.final_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            final_mass: PyQty {
+                magnitude_si: r.final_mass.value,
+                unit: "kg".to_string(),
+            },
+            liner_over_temperature: r.liner_over_temperature,
+            liner_under_temperature: r.liner_under_temperature,
+            liner_limits_met: r.liner_limits_met,
+            recorded_points: r.recorded_points,
             warnings: transport(&r.warnings),
         }
     }

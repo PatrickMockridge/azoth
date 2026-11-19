@@ -5689,6 +5689,46 @@ pub fn bleve(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Blocked-outlet overpressure.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, initial_z, initial_t, initial_p, vessel_volume, inlet_temperature, supply_pressure, inlet_mass_flow, relief_set_pressure, time_step, max_time))]
+#[pyo3(
+    text_signature = "(components, initial_z, initial_t, initial_p, vessel_volume, inlet_temperature, supply_pressure, inlet_mass_flow, relief_set_pressure, time_step, max_time)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn blocked_outlet_overpressure(
+    py: Python<'_>,
+    components: Vec<String>,
+    initial_z: Vec<f64>,
+    initial_t: f64,
+    initial_p: f64,
+    vessel_volume: f64,
+    inlet_temperature: f64,
+    supply_pressure: f64,
+    inlet_mass_flow: f64,
+    relief_set_pressure: f64,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+) -> PyResult<crate::transport_gen::PyBlockedOutletOverpressureResult> {
+    azoth_process::models::blocked_outlet_overpressure::blocked_outlet_overpressure(
+        &components,
+        &initial_z,
+        kelvins(initial_t),
+        pascals(initial_p),
+        cubic_meters(vessel_volume),
+        kelvins(inlet_temperature),
+        pascals(supply_pressure),
+        kilograms_per_second(inlet_mass_flow),
+        pascals(relief_set_pressure),
+        time_step.map(seconds),
+        max_time.map(seconds),
+    )
+    .map(|r| crate::transport_gen::PyBlockedOutletOverpressureResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Blocked outlet relief.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6042,6 +6082,112 @@ pub fn deluge_nozzle_layout(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Vessel depressurization.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, initial_z, initial_t, initial_p, vessel_volume, orifice_diameter, discharge_coefficient, back_pressure, fire_heat_input, fire_heat_input_to_wall, fire_exposed_area, fire_preset, fire_emissivity, fire_flame_temperature, fire_convective_coefficient, wall_mass, wall_area, wall_specific_heat, wall_heat_transfer_coefficient, time_step, max_time, stop_pressure, withdrawal_mode))]
+#[pyo3(
+    text_signature = "(components, initial_z, initial_t, initial_p, vessel_volume, orifice_diameter, discharge_coefficient, back_pressure, fire_heat_input, fire_heat_input_to_wall, fire_exposed_area, fire_preset, fire_emissivity, fire_flame_temperature, fire_convective_coefficient, wall_mass, wall_area, wall_specific_heat, wall_heat_transfer_coefficient, time_step, max_time, stop_pressure, withdrawal_mode)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn depressurization(
+    py: Python<'_>,
+    components: Vec<String>,
+    initial_z: Vec<f64>,
+    initial_t: f64,
+    initial_p: f64,
+    vessel_volume: f64,
+    orifice_diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    fire_heat_input: Option<f64>,
+    fire_heat_input_to_wall: Option<bool>,
+    fire_exposed_area: Option<f64>,
+    fire_preset: Option<&str>,
+    fire_emissivity: Option<f64>,
+    fire_flame_temperature: Option<f64>,
+    fire_convective_coefficient: Option<f64>,
+    wall_mass: Option<f64>,
+    wall_area: Option<f64>,
+    wall_specific_heat: Option<f64>,
+    wall_heat_transfer_coefficient: Option<f64>,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+    stop_pressure: Option<f64>,
+    withdrawal_mode: Option<&str>,
+) -> PyResult<crate::transport_gen::PyDepressurizationResult> {
+    azoth_process::models::depressurization::depressurization(
+        &components,
+        &initial_z,
+        kelvins(initial_t),
+        pascals(initial_p),
+        cubic_meters(vessel_volume),
+        meters(orifice_diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        fire_heat_input,
+        fire_heat_input_to_wall,
+        fire_exposed_area.map(square_meters),
+        fire_preset,
+        fire_emissivity,
+        fire_flame_temperature.map(kelvins),
+        fire_convective_coefficient.map(watts_per_square_meter_kelvin),
+        wall_mass.map(kilograms),
+        wall_area.map(square_meters),
+        wall_specific_heat.map(joules_per_kilogram_kelvin),
+        wall_heat_transfer_coefficient.map(watts_per_square_meter_kelvin),
+        time_step.map(seconds),
+        max_time.map(seconds),
+        stop_pressure.map(pascals),
+        withdrawal_mode,
+    )
+    .map(|r| crate::transport_gen::PyDepressurizationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Depressurization acceptance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (points, time_to_escape, estimated_time_to_rupture, maximum_pressure_at_rupture, maximum_remaining_mass, maximum_escalated_fire_rate))]
+#[pyo3(
+    text_signature = "(points, time_to_escape, estimated_time_to_rupture, maximum_pressure_at_rupture, maximum_remaining_mass, maximum_escalated_fire_rate)"
+)]
+pub fn depressurization_acceptance(
+    py: Python<'_>,
+    points: Vec<crate::records_gen::DepressurizationAcceptancePoint>,
+    time_to_escape: Option<f64>,
+    estimated_time_to_rupture: Option<f64>,
+    maximum_pressure_at_rupture: Option<f64>,
+    maximum_remaining_mass: Option<f64>,
+    maximum_escalated_fire_rate: Option<f64>,
+) -> PyResult<crate::transport_gen::PyDepressurizationAcceptanceResult> {
+    let points_records: Vec<
+        azoth_process::models::depressurization_acceptance::DepressurizationAcceptancePoint,
+    > = points
+        .into_iter()
+        .map(|row| {
+            azoth_process::models::depressurization_acceptance::DepressurizationAcceptancePoint {
+                time: seconds(row.time),
+                pressure: pascals(row.pressure),
+                mass: kilograms(row.mass),
+                mass_flow: kilograms_per_second(row.mass_flow),
+            }
+        })
+        .collect();
+    azoth_process::models::depressurization_acceptance::depressurization_acceptance(
+        &points_records,
+        time_to_escape.map(seconds),
+        estimated_time_to_rupture.map(seconds),
+        maximum_pressure_at_rupture.map(pascals),
+        maximum_remaining_mass.map(kilograms),
+        maximum_escalated_fire_rate.map(kilograms_per_second),
+    )
+    .map(|r| crate::transport_gen::PyDepressurizationAcceptanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Distillation column.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6175,6 +6321,54 @@ pub fn distillation_column(
         max_operation_pressure,
     )
     .map(|r| crate::transport_gen::PyDistillationColumnResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Dynamic PSV sizing.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, initial_z, initial_t, initial_p, vessel_volume, fire_heat_input, set_pressure, overpressure_fraction, back_pressure, blowdown_fraction, discharge_coefficient, latent_heat, time_step, max_time, initial_pressure_fraction))]
+#[pyo3(
+    text_signature = "(components, initial_z, initial_t, initial_p, vessel_volume, fire_heat_input, set_pressure, overpressure_fraction, back_pressure, blowdown_fraction, discharge_coefficient, latent_heat, time_step, max_time, initial_pressure_fraction)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn dynamic_psv_sizing(
+    py: Python<'_>,
+    components: Vec<String>,
+    initial_z: Vec<f64>,
+    initial_t: f64,
+    initial_p: f64,
+    vessel_volume: f64,
+    fire_heat_input: f64,
+    set_pressure: f64,
+    overpressure_fraction: f64,
+    back_pressure: f64,
+    blowdown_fraction: Option<f64>,
+    discharge_coefficient: Option<f64>,
+    latent_heat: Option<f64>,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+    initial_pressure_fraction: Option<f64>,
+) -> PyResult<crate::transport_gen::PyDynamicPsvSizingResult> {
+    azoth_process::models::dynamic_psv_sizing::dynamic_psv_sizing(
+        &components,
+        &initial_z,
+        kelvins(initial_t),
+        pascals(initial_p),
+        cubic_meters(vessel_volume),
+        watts(fire_heat_input),
+        pascals(set_pressure),
+        overpressure_fraction,
+        pascals(back_pressure),
+        blowdown_fraction,
+        discharge_coefficient,
+        latent_heat,
+        time_step.map(seconds),
+        max_time.map(seconds),
+        initial_pressure_fraction,
+    )
+    .map(|r| crate::transport_gen::PyDynamicPsvSizingResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -7251,6 +7445,52 @@ pub fn mixer(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Multi-vessel blowdown study.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (samples, header_diameter, header_pressure, header_temperature, header_molar_mass, header_heat_capacity_ratio, max_allowable_mach, grid_step))]
+#[pyo3(
+    text_signature = "(samples, header_diameter, header_pressure, header_temperature, header_molar_mass, header_heat_capacity_ratio, max_allowable_mach, grid_step)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn multi_vessel_blowdown_study(
+    py: Python<'_>,
+    samples: Vec<crate::records_gen::MultiVesselSample>,
+    header_diameter: Option<f64>,
+    header_pressure: Option<f64>,
+    header_temperature: Option<f64>,
+    header_molar_mass: Option<f64>,
+    header_heat_capacity_ratio: Option<f64>,
+    max_allowable_mach: Option<f64>,
+    grid_step: Option<f64>,
+) -> PyResult<crate::transport_gen::PyMultiVesselBlowdownStudyResult> {
+    let samples_records: Vec<
+        azoth_process::models::multi_vessel_blowdown_study::MultiVesselSample,
+    > = samples
+        .into_iter()
+        .map(
+            |row| azoth_process::models::multi_vessel_blowdown_study::MultiVesselSample {
+                source: row.source,
+                time: seconds(row.time),
+                mass_flow: kilograms_per_second(row.mass_flow),
+            },
+        )
+        .collect();
+    azoth_process::models::multi_vessel_blowdown_study::multi_vessel_blowdown_study(
+        &samples_records,
+        header_diameter.map(meters),
+        header_pressure.map(pascals),
+        header_temperature.map(kelvins),
+        header_molar_mass.map(kilograms_per_mole),
+        header_heat_capacity_ratio,
+        max_allowable_mach,
+        grid_step.map(seconds),
+    )
+    .map(|r| crate::transport_gen::PyMultiVesselBlowdownStudyResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// NOG 070 SIL determination.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -7269,6 +7509,74 @@ pub fn nog070_sil_determination(
         minimum_sil,
     )
     .map(|r| crate::transport_gen::PyNog070SilDeterminationResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Non-equilibrium blowdown.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, initial_z, initial_t, initial_p, vessel_volume, orifice_diameter, discharge_coefficient, back_pressure, fire_emissivity, fire_flame_temperature, fire_convective_coefficient, fire_exposed_area, wall_mass, wall_specific_heat, inside_gas_coefficient, interfacial_coefficient, interfacial_area, latent_heat, surface_tension, surface_fluid_constant, critical_heat_flux, effective_boiling_coefficient, time_step, max_time, stop_pressure))]
+#[pyo3(
+    text_signature = "(components, initial_z, initial_t, initial_p, vessel_volume, orifice_diameter, discharge_coefficient, back_pressure, fire_emissivity, fire_flame_temperature, fire_convective_coefficient, fire_exposed_area, wall_mass, wall_specific_heat, inside_gas_coefficient, interfacial_coefficient, interfacial_area, latent_heat, surface_tension, surface_fluid_constant, critical_heat_flux, effective_boiling_coefficient, time_step, max_time, stop_pressure)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn non_equilibrium_blowdown(
+    py: Python<'_>,
+    components: Vec<String>,
+    initial_z: Vec<f64>,
+    initial_t: f64,
+    initial_p: f64,
+    vessel_volume: f64,
+    orifice_diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    fire_emissivity: Option<f64>,
+    fire_flame_temperature: Option<f64>,
+    fire_convective_coefficient: Option<f64>,
+    fire_exposed_area: Option<f64>,
+    wall_mass: Option<f64>,
+    wall_specific_heat: Option<f64>,
+    inside_gas_coefficient: Option<f64>,
+    interfacial_coefficient: Option<f64>,
+    interfacial_area: Option<f64>,
+    latent_heat: Option<f64>,
+    surface_tension: Option<f64>,
+    surface_fluid_constant: Option<f64>,
+    critical_heat_flux: Option<f64>,
+    effective_boiling_coefficient: Option<f64>,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+    stop_pressure: Option<f64>,
+) -> PyResult<crate::transport_gen::PyNonEquilibriumBlowdownResult> {
+    azoth_process::models::non_equilibrium_blowdown::non_equilibrium_blowdown(
+        &components,
+        &initial_z,
+        kelvins(initial_t),
+        pascals(initial_p),
+        cubic_meters(vessel_volume),
+        meters(orifice_diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        fire_emissivity,
+        fire_flame_temperature.map(kelvins),
+        fire_convective_coefficient.map(watts_per_square_meter_kelvin),
+        fire_exposed_area.map(square_meters),
+        wall_mass.map(kilograms),
+        wall_specific_heat.map(joules_per_kilogram_kelvin),
+        inside_gas_coefficient.map(watts_per_square_meter_kelvin),
+        interfacial_coefficient.map(watts_per_square_meter_kelvin),
+        interfacial_area.map(square_meters),
+        latent_heat,
+        surface_tension,
+        surface_fluid_constant,
+        critical_heat_flux,
+        effective_boiling_coefficient.map(watts_per_square_meter_kelvin),
+        time_step.map(seconds),
+        max_time.map(seconds),
+        stop_pressure.map(pascals),
+    )
+    .map(|r| crate::transport_gen::PyNonEquilibriumBlowdownResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -7870,6 +8178,48 @@ pub fn psv_sizing(
         capacity_discharge_coefficient,
     )
     .map(|r| crate::transport_gen::PyPsvSizingResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// PSV latch and relief flow.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (set_pressure, blowdown_fraction, discharge_coefficient, orifice_area, back_pressure, upstream_pressure, upstream_temperature, molar_mass, heat_capacity_ratio, compressibility, was_open, prior_cycle_count))]
+#[pyo3(
+    text_signature = "(set_pressure, blowdown_fraction, discharge_coefficient, orifice_area, back_pressure, upstream_pressure, upstream_temperature, molar_mass, heat_capacity_ratio, compressibility, was_open, prior_cycle_count)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn psv_valve(
+    py: Python<'_>,
+    set_pressure: f64,
+    blowdown_fraction: f64,
+    discharge_coefficient: f64,
+    orifice_area: f64,
+    back_pressure: f64,
+    upstream_pressure: f64,
+    upstream_temperature: f64,
+    molar_mass: f64,
+    heat_capacity_ratio: f64,
+    compressibility: f64,
+    was_open: Option<bool>,
+    prior_cycle_count: Option<f64>,
+) -> PyResult<crate::transport_gen::PyPsvValveResult> {
+    azoth_process::models::psv_valve::psv_valve(
+        pascals(set_pressure),
+        blowdown_fraction,
+        discharge_coefficient,
+        square_meters(orifice_area),
+        pascals(back_pressure),
+        pascals(upstream_pressure),
+        kelvins(upstream_temperature),
+        kilograms_per_mole(molar_mass),
+        heat_capacity_ratio,
+        compressibility,
+        was_open,
+        prior_cycle_count,
+    )
+    .map(|r| crate::transport_gen::PyPsvValveResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -8740,6 +9090,62 @@ pub fn vce(
         target_overpressure.map(pascals),
     )
     .map(|r| crate::transport_gen::PyVceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Vessel filling.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, initial_z, initial_t, initial_p, vessel_volume, inlet_temperature, supply_pressure, inlet_mass_flow, target_pressure, wall_mass, wall_area, wall_specific_heat, wall_heat_transfer_coefficient, woodfield_nozzle_diameter, vessel_height, liner_min_temperature, liner_max_temperature, time_step, max_time))]
+#[pyo3(
+    text_signature = "(components, initial_z, initial_t, initial_p, vessel_volume, inlet_temperature, supply_pressure, inlet_mass_flow, target_pressure, wall_mass, wall_area, wall_specific_heat, wall_heat_transfer_coefficient, woodfield_nozzle_diameter, vessel_height, liner_min_temperature, liner_max_temperature, time_step, max_time)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn vessel_filling(
+    py: Python<'_>,
+    components: Vec<String>,
+    initial_z: Vec<f64>,
+    initial_t: f64,
+    initial_p: f64,
+    vessel_volume: f64,
+    inlet_temperature: f64,
+    supply_pressure: f64,
+    inlet_mass_flow: f64,
+    target_pressure: Option<f64>,
+    wall_mass: Option<f64>,
+    wall_area: Option<f64>,
+    wall_specific_heat: Option<f64>,
+    wall_heat_transfer_coefficient: Option<f64>,
+    woodfield_nozzle_diameter: Option<f64>,
+    vessel_height: Option<f64>,
+    liner_min_temperature: Option<f64>,
+    liner_max_temperature: Option<f64>,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+) -> PyResult<crate::transport_gen::PyVesselFillingResult> {
+    azoth_process::models::vessel_filling::vessel_filling(
+        &components,
+        &initial_z,
+        kelvins(initial_t),
+        pascals(initial_p),
+        cubic_meters(vessel_volume),
+        kelvins(inlet_temperature),
+        pascals(supply_pressure),
+        kilograms_per_second(inlet_mass_flow),
+        target_pressure.map(pascals),
+        wall_mass.map(kilograms),
+        wall_area.map(square_meters),
+        wall_specific_heat.map(joules_per_kilogram_kelvin),
+        wall_heat_transfer_coefficient.map(watts_per_square_meter_kelvin),
+        woodfield_nozzle_diameter.map(meters),
+        vessel_height.map(meters),
+        liner_min_temperature.map(kelvins),
+        liner_max_temperature.map(kelvins),
+        time_step.map(seconds),
+        max_time.map(seconds),
+    )
+    .map(|r| crate::transport_gen::PyVesselFillingResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

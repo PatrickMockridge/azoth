@@ -1,0 +1,177 @@
+id = "process.dynamic_psv_sizing"
+name = "Dynamic PSV sizing"
+kind = "procedure"
+assumptions = [
+    "**the class's `run`**: one TP flash supplies the gas properties; the steady area is the API 521 gas equation with `Kd = 0.975` and no rupture disk; the dynamic area is a bisection whose inner march is an ideal-gas vessel with the valve latch.",
+    "**the dynamic march starts at `set_pressure x initial_pressure_fraction`**, so the fluid's own stated pressure enters only through the flash and the compressibility; the mole inventory and mass follow from that start, the vessel volume and the flash's Z.",
+    "**each candidate area runs a fresh valve** — closed, with a zero pop count — and the march's energy is `m cv T`, updated as `u' = u + Q dt - cp T dm`; the class's `cv = (R/MW)/(gamma - 1)` with `R = 8.314` and `MW` in kg/mol.",
+    "**the class's fallbacks are mirrored**: a capacity ratio at or below one becomes 1.3, and a non-positive or non-finite compressibility becomes 1.",
+    "**the bisection** starts at `steady x 1e-3` and `steady x 3`, expands the upper bound once to `steady x 10` when even that peak exceeds the allowable, runs 40 iterations to `1e-9 x steady`, and publishes the last feasible candidate's area and peak rather than re-scanning the final area.",
+    "**the oversizing ratio is `steady / dynamic`**, absent only at a zero dynamic area, which a positive steady area cannot give.",
+    "**the gas properties are the PR mixture's corrected density** (the EOS volume less the Peneloux shift), the same reading `process.leak_blowdown` takes.",
+    "**the class's logger line is presentation.**",
+]
+references = [
+    "API STD 521. Pressure-relieving and Depressuring Systems, 7th edition, sections 4.4 and 5.15.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/depressurization/DynamicPsvSizingStudy.java` is the port source, through `run`.",
+    "`validation/neqsim/captures/process_dynamic_psv_sizing.tsv` - a 50 bara gas and the low-pressure small-vessel corner, with the constructor and blowdown refusals.",
+]
+[source]
+standard = "NeqSim process/safety/depressurization/DynamicPsvSizingStudy.java"
+edition = "Its `run`: the steady API 521 area, the ideal-gas PSV-cycling march and the bisection over the orifice area."
+[algorithm]
+scheme = "bisection_over_psv_area"
+convergence = "relative"
+tolerance = 1.0e-9
+max_iterations = 42
+[inputs]
+[inputs.components]
+type = "components"
+description = "the vessel gas's substances, by name, resolved against the component databank.\n"
+[inputs.initial_z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the gas's composition, checked rather than renormalised.\n"
+[inputs.initial_t]
+unit = "K"
+description = "the gas temperature at the initial flash.\n"
+[inputs.initial_p]
+unit = "Pa"
+description = "the gas pressure at the initial flash; it sets the density and Z rather than the march's start pressure.\n"
+[inputs.vessel_volume]
+unit = "m**3"
+description = "the vessel's internal volume. Must be positive.\n"
+[inputs.fire_heat_input]
+unit = "W"
+description = "the constant fire heat input to the fluid. Must be positive.\n"
+[inputs.set_pressure]
+unit = "Pa"
+description = "the PSV set pressure, absolute. Must be positive.\n"
+[inputs.overpressure_fraction]
+unit = "dimensionless"
+description = "the allowable accumulation fraction, 0.21 for a fire. Must be positive.\n"
+[inputs.back_pressure]
+unit = "Pa"
+description = "the downstream back pressure, absolute. Must be positive.\n"
+[inputs.blowdown_fraction]
+unit = "dimensionless"
+optional = true
+description = "the PSV blowdown fraction in `(0, 1)`. **Absent takes the class's 0.1.**\n"
+[inputs.discharge_coefficient]
+unit = "dimensionless"
+optional = true
+description = "the PSV discharge coefficient. **Absent takes the class's 0.975.**\n"
+[inputs.latent_heat]
+unit = "dimensionless"
+optional = true
+description = "the latent heat in J/kg, declared dimensionless. **Absent takes the class's 350000.**\n"
+[inputs.time_step]
+unit = "s"
+optional = true
+description = "the march's step. **Absent takes the class's 0.5 s.**\n"
+[inputs.max_time]
+unit = "s"
+optional = true
+description = "the march's horizon. **Absent takes the class's 1200 s.**\n"
+[inputs.initial_pressure_fraction]
+unit = "dimensionless"
+optional = true
+description = "the march's start pressure as a fraction of the set pressure. **Absent takes the class's 0.9.**\n"
+[outputs]
+[outputs.steady_required_area]
+unit = "m**2"
+description = "the steady API 521 required orifice area.\n"
+[outputs.dynamic_required_area]
+unit = "m**2"
+description = "the dynamically required orifice area.\n"
+[outputs.oversizing_ratio]
+unit = "dimensionless"
+optional = true
+description = "the steady-to-dynamic oversizing; absent only at a zero dynamic area.\n"
+[outputs.allowable_pressure]
+unit = "Pa"
+description = "the allowable accumulated pressure `set_pressure (1 + overpressure_fraction)`.\n"
+[outputs.peak_dynamic_pressure]
+unit = "Pa"
+description = "the peak vessel pressure at the dynamically required area.\n"
+[outputs.steady_relief_rate]
+unit = "kg/s"
+description = "the steady relief rate `fire_heat_input / latent_heat`.\n"
+[[valid_range]]
+quantity = "initial_t"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "initial_p"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "vessel_volume"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive volume"
+[[valid_range]]
+quantity = "fire_heat_input"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive fire heat"
+[[valid_range]]
+quantity = "set_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive set pressure"
+[[valid_range]]
+quantity = "overpressure_fraction"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive overpressure"
+[[valid_range]]
+quantity = "back_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive back pressure"
+[[valid_range]]
+quantity = "blowdown_fraction"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = false
+severity = "error"
+rationale = "the class refuses a fraction outside (0, 1)"
+[[valid_range]]
+quantity = "discharge_coefficient"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive coefficient"
+[[valid_range]]
+quantity = "latent_heat"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive latent heat"
+[[valid_range]]
+quantity = "time_step"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive step"
+[[valid_range]]
+quantity = "max_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive horizon"
+[implementations]
+python = "azoth.process.dynamic_psv_sizing"
+rust = "azoth_process::dynamic_psv_sizing"

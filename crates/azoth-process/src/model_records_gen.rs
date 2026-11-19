@@ -21,6 +21,7 @@ use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
 use crate::models::barrier_register_validation::BarrierRegisterValidationResult;
 use crate::models::basket_test_regression::BasketTestRegressionResult;
 use crate::models::bleve::BleveResult;
+use crate::models::blocked_outlet_overpressure::BlockedOutletOverpressureResult;
 use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
 use crate::models::blowdown_pressure_profile::BlowdownPressureProfileResult;
 use crate::models::bow_tie::BowTieResult;
@@ -31,7 +32,10 @@ use crate::models::consequence_analysis::ConsequenceAnalysisResult;
 use crate::models::control_valve_failure_relief::ControlValveFailureReliefResult;
 use crate::models::cooler::CoolerResult;
 use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
+use crate::models::depressurization::DepressurizationResult;
+use crate::models::depressurization_acceptance::DepressurizationAcceptanceResult;
 use crate::models::distillation_column::DistillationColumnResult;
+use crate::models::dynamic_psv_sizing::DynamicPsvSizingResult;
 use crate::models::ejector::EjectorResult;
 use crate::models::escalation_graph::EscalationGraphResult;
 use crate::models::event_tree::EventTreeResult;
@@ -66,7 +70,9 @@ use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
 use crate::models::mdmt::MdmtResult;
 use crate::models::mixer::MixerResult;
+use crate::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
+use crate::models::non_equilibrium_blowdown::NonEquilibriumBlowdownResult;
 use crate::models::norsok_p002_compliance::NorsokP002ComplianceResult;
 use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
 use crate::models::overpressure_protection_study::OverpressureProtectionStudyResult;
@@ -84,6 +90,7 @@ use crate::models::porous_media_self_heating::PorousMediaSelfHeatingResult;
 use crate::models::probit::ProbitResult;
 use crate::models::psv_fire_sizing::PsvFireSizingResult;
 use crate::models::psv_sizing::PsvSizingResult;
+use crate::models::psv_valve::PsvValveResult;
 use crate::models::pump::PumpResult;
 use crate::models::pump_deadhead::PumpDeadheadResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
@@ -114,6 +121,7 @@ use crate::models::tube_rupture_relief::TubeRuptureReliefResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vacuum_collapse::VacuumCollapseResult;
 use crate::models::vce::VceResult;
+use crate::models::vessel_filling::VesselFillingResult;
 use crate::models::vessel_rupture::VesselRuptureResult;
 
 impl CalcResult for AbsorptionColumnResult {
@@ -303,6 +311,25 @@ impl CalcResult for BleveResult {
         "transmissivity",
         "incident_heat_flux",
         "distance_to_flux",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for BlockedOutletOverpressureResult {
+    const CALC_ID: &'static str = "process.blocked_outlet_overpressure";
+    const FIELDS: &'static [&'static str] = &[
+        "relief_set_pressure",
+        "max_pressure",
+        "final_pressure",
+        "final_mass",
+        "inlet_mass_flow",
+        "simulated_horizon",
+        "time_to_relief_set",
+        "relief_demand",
         "warnings",
     ];
 
@@ -540,6 +567,57 @@ impl CalcResult for DelugeNozzleLayoutResult {
     }
 }
 
+impl CalcResult for DepressurizationResult {
+    const CALC_ID: &'static str = "process.depressurization";
+    const FIELDS: &'static [&'static str] = &[
+        "points",
+        "initial_pressure",
+        "fire_heat_input",
+        "fire_heat_routed_to_wall",
+        "vu_flash_fallback_count",
+        "vapour_withdrawal_used",
+        "time_to_half_pressure",
+        "time_to_7_barg",
+        "min_fluid_temperature",
+        "min_wall_temperature",
+        "max_pressure",
+        "max_fluid_temperature",
+        "max_wall_temperature",
+        "half_pressure_criterion_met",
+        "seven_barg_criterion_met",
+        "pressure_monotonic_non_increasing",
+        "mass_monotonic_non_increasing",
+        "recorded_points",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for DepressurizationAcceptanceResult {
+    const CALC_ID: &'static str = "process.depressurization_acceptance";
+    const FIELDS: &'static [&'static str] = &[
+        "limiting_time",
+        "pressure_at_limiting_time",
+        "remaining_mass_at_limiting_time",
+        "peak_discharge_rate",
+        "pressure_configured",
+        "pressure_criterion_met",
+        "mass_configured",
+        "mass_criterion_met",
+        "fire_rate_configured",
+        "fire_rate_criterion_met",
+        "acceptable",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for DistillationColumnResult {
     const CALC_ID: &'static str = "process.distillation_column";
     const FIELDS: &'static [&'static str] = &[
@@ -594,6 +672,23 @@ impl CalcResult for DistillationColumnResult {
         "reboiler_duty_kw",
         "condenser_duty_kw",
         "material_grade",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for DynamicPsvSizingResult {
+    const CALC_ID: &'static str = "process.dynamic_psv_sizing";
+    const FIELDS: &'static [&'static str] = &[
+        "steady_required_area",
+        "dynamic_required_area",
+        "oversizing_ratio",
+        "allowable_pressure",
+        "peak_dynamic_pressure",
+        "steady_relief_rate",
         "warnings",
     ];
 
@@ -1440,6 +1535,25 @@ impl CalcResult for MixerResult {
     }
 }
 
+impl CalcResult for MultiVesselBlowdownStudyResult {
+    const CALC_ID: &'static str = "process.multi_vessel_blowdown_study";
+    const FIELDS: &'static [&'static str] = &[
+        "profile",
+        "contributions",
+        "peak_total_mass_flow",
+        "peak_time",
+        "header_velocity",
+        "header_mach",
+        "max_allowable_mach",
+        "header_mach_acceptable",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for Nog070SilDeterminationResult {
     const CALC_ID: &'static str = "process.nog070_sil_determination";
     const FIELDS: &'static [&'static str] = &[
@@ -1448,6 +1562,24 @@ impl CalcResult for Nog070SilDeterminationResult {
         "achieved_sil",
         "compliant",
         "required_pfd_reduction_factor",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for NonEquilibriumBlowdownResult {
+    const CALC_ID: &'static str = "process.non_equilibrium_blowdown";
+    const FIELDS: &'static [&'static str] = &[
+        "points",
+        "initial_pressure",
+        "flash_fallback_count",
+        "final_gas_temperature",
+        "final_liquid_temperature",
+        "max_temperature_bifurcation",
+        "recorded_points",
         "warnings",
     ];
 
@@ -1819,6 +1951,15 @@ impl CalcResult for PsvSizingResult {
         "mass_flow_capacity",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PsvValveResult {
+    const CALC_ID: &'static str = "process.psv_valve";
+    const FIELDS: &'static [&'static str] = &["open", "cycle_count", "mass_flow", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -2678,6 +2819,30 @@ impl CalcResult for VceResult {
         "dimensionless_overpressure",
         "overpressure",
         "distance_to_overpressure",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for VesselFillingResult {
+    const CALC_ID: &'static str = "process.vessel_filling";
+    const FIELDS: &'static [&'static str] = &[
+        "points",
+        "inlet_temperature",
+        "inlet_mass_flow",
+        "vu_flash_fallback_count",
+        "max_fluid_temperature",
+        "min_fluid_temperature",
+        "max_pressure",
+        "final_pressure",
+        "final_mass",
+        "liner_over_temperature",
+        "liner_under_temperature",
+        "liner_limits_met",
+        "recorded_points",
         "warnings",
     ];
 

@@ -40,6 +40,7 @@ pub mod api537_flare_flame_model;
 pub mod barrier_register_validation;
 pub mod basket_test_regression;
 pub mod bleve;
+pub mod blocked_outlet_overpressure;
 pub mod blocked_outlet_relief;
 pub mod blowdown_pressure_profile;
 pub mod bow_tie;
@@ -50,7 +51,10 @@ pub mod consequence_analysis;
 pub mod control_valve_failure_relief;
 pub mod cooler;
 pub mod deluge_nozzle_layout;
+pub mod depressurization;
+pub mod depressurization_acceptance;
 pub mod distillation_column;
+pub mod dynamic_psv_sizing;
 pub mod ejector;
 pub mod escalation_graph;
 pub mod event_tree;
@@ -86,7 +90,9 @@ pub mod manifold;
 pub mod map_turbo_expander_compressor;
 pub mod mdmt;
 pub mod mixer;
+pub mod multi_vessel_blowdown_study;
 pub mod nog070_sil_determination;
+pub mod non_equilibrium_blowdown;
 pub mod norsok_p002_compliance;
 pub mod overpressure;
 pub mod overpressure_acceptance;
@@ -105,6 +111,7 @@ pub mod porous_media_self_heating;
 pub mod probit;
 pub mod psv_fire_sizing;
 pub mod psv_sizing;
+pub mod psv_valve;
 pub mod pump;
 pub mod pump_deadhead;
 pub mod rate_based_packed_column;
@@ -137,7 +144,9 @@ pub mod tube_rupture_relief;
 pub mod turbo_expander_compressor;
 pub mod vacuum_collapse;
 pub mod vce;
+pub mod vessel_filling;
 pub mod vessel_rupture;
+pub(crate) mod vu_flash_route;
 
 pub use absorption_column::{AbsorptionColumnResult, absorption_column};
 pub use acoustic_induced_vibration_screening::{
@@ -165,6 +174,9 @@ pub use basket_test_regression::{
     BasketTestPoint, BasketTestRegressionResult, basket_test_regression,
 };
 pub use bleve::{BleveResult, bleve};
+pub use blocked_outlet_overpressure::{
+    BlockedOutletOverpressureResult, blocked_outlet_overpressure,
+};
 pub use blocked_outlet_relief::{BlockedOutletReliefResult, blocked_outlet_relief};
 pub use blowdown_pressure_profile::{
     BlowdownPressureProfileResult, BlowdownProfilePoint, blowdown_pressure_profile,
@@ -184,7 +196,12 @@ pub use cooler::{CoolerResult, cooler};
 pub use deluge_nozzle_layout::{
     DelugeNozzleLayoutResult, GoverningCriterion, deluge_nozzle_layout,
 };
+pub use depressurization::{DepressurizationPoint, DepressurizationResult, depressurization};
+pub use depressurization_acceptance::{
+    DepressurizationAcceptancePoint, DepressurizationAcceptanceResult, depressurization_acceptance,
+};
 pub use distillation_column::{DistillationColumnResult, distillation_column};
+pub use dynamic_psv_sizing::{DynamicPsvSizingResult, dynamic_psv_sizing};
 pub use ejector::{EjectorResult, ejector};
 pub use escalation_graph::{
     EscalationExposure, EscalationGraphResult, EscalationItem, EscalationItemResult,
@@ -236,7 +253,14 @@ pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};
 pub use mdmt::{MdmtResult, mdmt};
 pub use mixer::{MixerResult, mixer};
+pub use multi_vessel_blowdown_study::{
+    MultiVesselBlowdownStudyResult, MultiVesselContributionRow, MultiVesselProfileRow,
+    MultiVesselSample, multi_vessel_blowdown_study,
+};
 pub use nog070_sil_determination::{Nog070SilDeterminationResult, nog070_sil_determination};
+pub use non_equilibrium_blowdown::{
+    NonEquilibriumBlowdownPoint, NonEquilibriumBlowdownResult, non_equilibrium_blowdown,
+};
 pub use norsok_p002_compliance::{
     NorsokP002ComplianceResult, P002CheckRow, P002Criterion, P002FindingResult,
     norsok_p002_compliance,
@@ -265,6 +289,7 @@ pub use porous_media_self_heating::{PorousMediaSelfHeatingResult, porous_media_s
 pub use probit::{ProbitResult, probit};
 pub use psv_fire_sizing::{PsvFireSizingResult, psv_fire_sizing};
 pub use psv_sizing::{PsvSizingResult, psv_sizing};
+pub use psv_valve::{PsvValveResult, psv_valve};
 pub use pump::{PumpResult, pump};
 pub use pump_deadhead::{DeadheadVerdict, PumpDeadheadResult, pump_deadhead};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};
@@ -327,6 +352,7 @@ pub use tube_rupture_relief::{TubeRuptureReliefResult, tube_rupture_relief};
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};
 pub use vacuum_collapse::{VacuumCollapseResult, VacuumVerdict, vacuum_collapse};
 pub use vce::{VceResult, vce};
+pub use vessel_filling::{VesselFillingPoint, VesselFillingResult, vessel_filling};
 pub use vessel_rupture::{
     VesselRuptureResult, VesselRuptureState, VesselRuptureStep, vessel_rupture,
 };

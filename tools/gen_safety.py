@@ -87,6 +87,7 @@ NATIVE_SCENARIOS = (
     "process.probit",
     "process.psv_fire_sizing",
     "process.psv_sizing",
+    "process.psv_valve",
     "process.pump_deadhead",
     "process.runaway_reaction",
     "process.s001_secondary_pressure_protection",
@@ -101,6 +102,7 @@ BOWTIE = "process.bow_tie"
 #: The families with a deck of scenario cards. A family here gets a tab and a picker; the
 #: families without one are listed on the overview and linked to their manual pages.
 SCENARIO_FAMILIES = (
+    "depressurization",
     "dispersion",
     "equipmentsafety",
     "fire",
@@ -140,6 +142,7 @@ PURPOSES = {
     "process.probit": "The probit from a dose, or the probability at a stated probit.",
     "process.psv_fire_sizing": "The fire-case relief area, the selected API 520 orifice and the blowdown pressure.",
     "process.psv_sizing": "The API 520 gas, liquid or two-phase relief area and the selected orifice.",
+    "process.psv_valve": "One step of a pressure-safety-valve latch: whether it opens or reseats, its pop count and the API 520 relieving flow.",
     "process.pump_deadhead": "The shut-off deadhead pressure against the protected rating, and the minimum-flow recirculation temperature rise.",
     "process.runaway_reaction": "The adiabatic temperature rise, MTSR, margin, time to maximum rate and the two-phase relief flag.",
     "process.mdmt": "The UCS-66 curve's minimum design metal temperature and whether the cold service is acceptable.",

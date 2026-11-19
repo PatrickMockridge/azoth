@@ -30,6 +30,7 @@ from azoth.core.record_outputs_gen import (
     ChemicalWarningRow,
     ConsequenceOutcomeResult,
     DepositionSegmentRow,
+    DepressurizationPoint,
     EquilibriumSoundSpeedSample,
     EscalationItemResult,
     EventTreeOutcome,
@@ -53,7 +54,10 @@ from azoth.core.record_outputs_gen import (
     MahThreat,
     MineralEquilibriumRow,
     MinimalCutSet,
+    MultiVesselContributionRow,
+    MultiVesselProfileRow,
     NaceIssueRow,
+    NonEquilibriumBlowdownPoint,
     P002FindingResult,
     PipeFireRupturePoint,
     PulsationModeResult,
@@ -78,6 +82,7 @@ from azoth.core.record_outputs_gen import (
     Sts0131FindingResult,
     SubFraction,
     Tr3001Finding,
+    VesselFillingPoint,
     VesselRuptureStep,
     WaterMixingResult,
     ZoneRatingRow,
@@ -5902,6 +5907,40 @@ class BleveResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class BlockedOutletOverpressureResult(_HasWarnings):
+    """Result of ``process.blocked_outlet_overpressure``."""
+
+    CALC_ID: ClassVar[str] = "process.blocked_outlet_overpressure"
+
+    #: the relief set pressure the run used.
+    relief_set_pressure: Q
+
+    #: the highest recorded pressure.
+    max_pressure: Q
+
+    #: the last recorded pressure.
+    final_pressure: Q
+
+    #: the last recorded inventory mass.
+    final_mass: Q
+
+    #: the continued feed mass flow.
+    inlet_mass_flow: Q
+
+    #: the configured horizon, not the elapsed time.
+    simulated_horizon: Q
+
+    #: the first sample's time at or above the set pressure; absent when not reached.
+    time_to_relief_set: Q | None
+
+    #: whether the set pressure was reached within the horizon.
+    relief_demand: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class BlockedOutletReliefResult(_HasWarnings):
     """Result of ``process.blocked_outlet_relief``."""
 
@@ -6380,6 +6419,113 @@ class DelugeNozzleLayoutResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class DepressurizationResult(_HasWarnings):
+    """Result of ``process.depressurization``."""
+
+    CALC_ID: ClassVar[str] = "process.depressurization"
+
+    #: one row per step, in time order.
+    points: tuple[DepressurizationPoint, ...]
+
+    #: the pre-alignment flash's pressure, one of the class's two initial pressures.
+    initial_pressure: Q
+
+    #: the constant fire duty the run was given.
+    fire_heat_input: Q
+
+    #: whether the fire duty is routed through the wall model.
+    fire_heat_routed_to_wall: bool
+
+    #: the steps that used the ideal-gas fallback.
+    vu_flash_fallback_count: float
+
+    #: whether any step discharged the vapour phase rather than the bulk.
+    vapour_withdrawal_used: bool
+
+    #: the interpolated time to half the initial pressure; absent when not reached.
+    time_to_half_pressure: Q | None
+
+    #: the interpolated time to 8 bara absolute; absent when not reached.
+    time_to_7_barg: Q | None
+
+    #: the coldest recorded fluid temperature.
+    min_fluid_temperature: Q
+
+    #: the coldest recorded wall temperature.
+    min_wall_temperature: Q
+
+    #: the highest recorded pressure.
+    max_pressure: Q
+
+    #: the hottest recorded fluid temperature.
+    max_fluid_temperature: Q
+
+    #: the hottest recorded wall temperature.
+    max_wall_temperature: Q
+
+    #: whether the half-pressure crossing is at or within 900 s.
+    half_pressure_criterion_met: bool
+
+    #: whether the 8 bara crossing is at or within 900 s.
+    seven_barg_criterion_met: bool
+
+    #: whether the pressure never rose beyond numerical tolerance.
+    pressure_monotonic_non_increasing: bool
+
+    #: whether the inventory never grew beyond numerical tolerance.
+    mass_monotonic_non_increasing: bool
+
+    #: the recorded rows.
+    recorded_points: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class DepressurizationAcceptanceResult(_HasWarnings):
+    """Result of ``process.depressurization_acceptance``."""
+
+    CALC_ID: ClassVar[str] = "process.depressurization_acceptance"
+
+    #: the earliest configured limiting time bounded by the trajectory.
+    limiting_time: Q
+
+    #: the interpolated pressure at the limiting time.
+    pressure_at_limiting_time: Q
+
+    #: the interpolated inventory at the limiting time.
+    remaining_mass_at_limiting_time: Q
+
+    #: the maximum discharge rate at or before the limiting time.
+    peak_discharge_rate: Q
+
+    #: whether a pressure limit was given.
+    pressure_configured: bool
+
+    #: whether the pressure is at or below its limit, or the limit is absent.
+    pressure_criterion_met: bool
+
+    #: whether a mass limit was given.
+    mass_configured: bool
+
+    #: whether the mass is at or below its limit, or the limit is absent.
+    mass_criterion_met: bool
+
+    #: whether a fire-rate limit was given.
+    fire_rate_configured: bool
+
+    #: whether the peak rate is at or below its limit, or the limit is absent.
+    fire_rate_criterion_met: bool
+
+    #: whether all three criteria pass.
+    acceptable: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DistillationColumnResult(_HasWarnings):
     """Result of ``process.distillation_column``."""
 
@@ -6537,6 +6683,34 @@ class DistillationColumnResult(_HasWarnings):
 
     #: `getMaterialGrade()`, carried and reported.
     material_grade: str
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class DynamicPsvSizingResult(_HasWarnings):
+    """Result of ``process.dynamic_psv_sizing``."""
+
+    CALC_ID: ClassVar[str] = "process.dynamic_psv_sizing"
+
+    #: the steady API 521 required orifice area.
+    steady_required_area: Q
+
+    #: the dynamically required orifice area.
+    dynamic_required_area: Q
+
+    #: the steady-to-dynamic oversizing; absent only at a zero dynamic area.
+    oversizing_ratio: float | None
+
+    #: the allowable accumulated pressure `set_pressure (1 + overpressure_fraction)`.
+    allowable_pressure: Q
+
+    #: the peak vessel pressure at the dynamically required area.
+    peak_dynamic_pressure: Q
+
+    #: the steady relief rate `fire_heat_input / latent_heat`.
+    steady_relief_rate: Q
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -8329,6 +8503,40 @@ class MixerResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MultiVesselBlowdownStudyResult(_HasWarnings):
+    """Result of ``process.multi_vessel_blowdown_study``."""
+
+    CALC_ID: ClassVar[str] = "process.multi_vessel_blowdown_study"
+
+    #: the combined header load at each grid time.
+    profile: tuple[MultiVesselProfileRow, ...]
+
+    #: each source's contribution at the peak, in first-appearance order.
+    contributions: tuple[MultiVesselContributionRow, ...]
+
+    #: the controlling combined load.
+    peak_total_mass_flow: Q
+
+    #: the time of the controlling load.
+    peak_time: Q
+
+    #: the header gas velocity at the peak; absent when no header is configured.
+    header_velocity: Q | None
+
+    #: the header Mach number at the peak; absent when no header is configured.
+    header_mach: float | None
+
+    #: the Mach limit the run used.
+    max_allowable_mach: float
+
+    #: whether the Mach number is within the limit, or no header is configured.
+    header_mach_acceptable: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class Nog070SilDeterminationResult(_HasWarnings):
     """Result of ``process.nog070_sil_determination``."""
 
@@ -8348,6 +8556,37 @@ class Nog070SilDeterminationResult(_HasWarnings):
 
     #: `10^(minimum - achieved)`, published only when the SIF is not compliant.
     required_pfd_reduction_factor: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class NonEquilibriumBlowdownResult(_HasWarnings):
+    """Result of ``process.non_equilibrium_blowdown``."""
+
+    CALC_ID: ClassVar[str] = "process.non_equilibrium_blowdown"
+
+    #: one row per step, in time order.
+    points: tuple[NonEquilibriumBlowdownPoint, ...]
+
+    #: the initial pressure.
+    initial_pressure: Q
+
+    #: the steps that hit a guarded flash failure.
+    flash_fallback_count: float
+
+    #: the final vapour-zone temperature.
+    final_gas_temperature: Q
+
+    #: the final liquid-zone temperature.
+    final_liquid_temperature: Q
+
+    #: the largest vapour-minus-liquid temperature difference.
+    max_temperature_bifurcation: Q
+
+    #: the recorded rows.
+    recorded_points: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -9088,6 +9327,25 @@ class PsvSizingResult(_HasWarnings):
 
     #: `calculateMassFlowCapacity`'s result when `orifice_area` is stated. It is not the inverse of the sizing equation.
     mass_flow_capacity: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PsvValveResult(_HasWarnings):
+    """Result of ``process.psv_valve``."""
+
+    CALC_ID: ClassVar[str] = "process.psv_valve"
+
+    #: the valve's open state after the update.
+    open: bool
+
+    #: the pop count after the update.
+    cycle_count: float
+
+    #: the relieving mass flow at the upstream state; zero when the valve is closed.
+    mass_flow: Q
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -11032,6 +11290,55 @@ class VceResult(_HasWarnings):
 
     #: the distance at which the overpressure falls to the target. **Absent when the overpressure at 0.1 m is already below the target**, where the class answers that near bound.
     distance_to_overpressure: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class VesselFillingResult(_HasWarnings):
+    """Result of ``process.vessel_filling``."""
+
+    CALC_ID: ClassVar[str] = "process.vessel_filling"
+
+    #: one row per step, in time order.
+    points: tuple[VesselFillingPoint, ...]
+
+    #: the supply stagnation temperature the run used.
+    inlet_temperature: Q
+
+    #: the charging mass flow the run used.
+    inlet_mass_flow: Q
+
+    #: the steps that used the ideal-gas fallback.
+    vu_flash_fallback_count: float
+
+    #: the hottest recorded gas temperature.
+    max_fluid_temperature: Q
+
+    #: the coldest recorded gas temperature.
+    min_fluid_temperature: Q
+
+    #: the highest recorded pressure.
+    max_pressure: Q
+
+    #: the last recorded pressure.
+    final_pressure: Q
+
+    #: the last recorded inventory mass.
+    final_mass: Q
+
+    #: whether any recorded gas temperature exceeded the upper liner limit.
+    liner_over_temperature: bool
+
+    #: whether any recorded gas temperature fell below the lower liner limit.
+    liner_under_temperature: bool
+
+    #: whether every recorded gas temperature stayed within the limits.
+    liner_limits_met: bool
+
+    #: the recorded rows.
+    recorded_points: float
 
     #: Caveats.
     warnings: tuple[Warning, ...]
