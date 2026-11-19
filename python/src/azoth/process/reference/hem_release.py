@@ -25,6 +25,7 @@ from azoth.core.warnings import Warning
 from azoth.eos import components as _components
 from azoth.eos.reference._entropy_state import (
     HEM,
+    EntropyPhase,
     EntropyState,
     EntropyStateFailure,
     Evaluations,
@@ -93,6 +94,8 @@ class _Station(NamedTuple):
     mass_flux: float
     phase: str
     gas_mass_fraction: float
+    gas_phase: EntropyPhase | None
+    liquid_phase: EntropyPhase | None
 
 
 class _States(NamedTuple):
@@ -509,6 +512,8 @@ def _station(sample: _Sample, station: str) -> _Station:
         mass_flux=state.density * sample.velocity,
         phase=state.phase,
         gas_mass_fraction=state.gas_mass_fraction,
+        gas_phase=state.gas_phase,
+        liquid_phase=state.liquid_phase,
     )
 
 

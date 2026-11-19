@@ -38,6 +38,19 @@ BISECTION_STEPS = 100
 
 
 @dataclass(frozen=True, slots=True)
+class EntropyPhase:
+    """One phase's share of a fixed-entropy state.
+
+    The density is the phase's mass over its own unshifted EOS volume ``Z R T / P``.
+    """
+
+    mass_fraction: float
+    density: float
+    molar_mass: float
+    component_mass_fractions: tuple[float, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class EntropyState:
     """One equilibrium state at the target specific entropy."""
 
@@ -53,6 +66,8 @@ class EntropyState:
     phase: str
     vapour_fraction: float | None
     gas_mass_fraction: float
+    gas_phase: EntropyPhase | None
+    liquid_phase: EntropyPhase | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -298,6 +313,18 @@ def _quality_state(
         phase="two_phase",
         vapour_fraction=quality,
         gas_mass_fraction=quality,
+        gas_phase=EntropyPhase(
+            mass_fraction=quality,
+            density=molar_mass / v_vapour,
+            molar_mass=molar_mass,
+            component_mass_fractions=(1.0,),
+        ),
+        liquid_phase=EntropyPhase(
+            mass_fraction=1.0 - quality,
+            density=molar_mass / v_liquid,
+            molar_mass=molar_mass,
+            component_mass_fractions=(1.0,),
+        ),
     )
 
 
@@ -426,6 +453,26 @@ def _pure_root_state(
         phase="all_liquid" if liquid else "all_vapour",
         vapour_fraction=None,
         gas_mass_fraction=0.0 if liquid else 1.0,
+        gas_phase=(
+            None
+            if liquid
+            else EntropyPhase(
+                mass_fraction=1.0,
+                density=molar_mass / volume,
+                molar_mass=molar_mass,
+                component_mass_fractions=_phase_component_mass_fractions(mixture, z),
+            )
+        ),
+        liquid_phase=(
+            EntropyPhase(
+                mass_fraction=1.0,
+                density=molar_mass / volume,
+                molar_mass=molar_mass,
+                component_mass_fractions=_phase_component_mass_fractions(mixture, z),
+            )
+            if liquid
+            else None
+        ),
     )
 
 
@@ -571,8 +618,10 @@ def _assemble(
                 )
                 fugacity = max(fugacity, abs(ln_ratio))
         phase_residual = max(abs(sum(flash.x) - 1.0), abs(sum(flash.y) - 1.0))
-        liquid_mass = (1.0 - beta) * _phase_molar_mass(mixture, list(flash.x))
-        vapour_mass = beta * _phase_molar_mass(mixture, list(flash.y))
+        liquid_phase_mass = _phase_molar_mass(mixture, list(flash.x))
+        vapour_phase_mass = _phase_molar_mass(mixture, list(flash.y))
+        liquid_mass = (1.0 - beta) * liquid_phase_mass
+        vapour_mass = beta * vapour_phase_mass
         total_mass = liquid_mass + vapour_mass
         if not total_mass > 0.0 or not math.isfinite(total_mass):
             raise EntropyStateFailure(f"the two-phase mass at {pressure} Pa is {total_mass} kg/mol")
@@ -589,6 +638,18 @@ def _assemble(
             phase="two_phase",
             vapour_fraction=beta,
             gas_mass_fraction=vapour_mass / total_mass,
+            gas_phase=EntropyPhase(
+                mass_fraction=vapour_mass / total_mass,
+                density=vapour_phase_mass / v_vapour,
+                molar_mass=vapour_phase_mass,
+                component_mass_fractions=_phase_component_mass_fractions(mixture, list(flash.y)),
+            ),
+            liquid_phase=EntropyPhase(
+                mass_fraction=liquid_mass / total_mass,
+                density=liquid_phase_mass / v_liquid,
+                molar_mass=liquid_phase_mass,
+                component_mass_fractions=_phase_component_mass_fractions(mixture, list(flash.x)),
+            ),
         )
     reduced = reduced_parameters(mixture, temperature, pressure)
     kij = mixture.effective_kij(reduced.t_kelvin)
@@ -620,6 +681,26 @@ def _assemble(
         phase=flash.phase,
         vapour_fraction=None,
         gas_mass_fraction=1.0 if flash.phase == "all_vapour" else 0.0,
+        gas_phase=(
+            EntropyPhase(
+                mass_fraction=1.0,
+                density=molar_mass / volume,
+                molar_mass=molar_mass,
+                component_mass_fractions=_phase_component_mass_fractions(mixture, z),
+            )
+            if flash.phase == "all_vapour"
+            else None
+        ),
+        liquid_phase=(
+            None
+            if flash.phase == "all_vapour"
+            else EntropyPhase(
+                mass_fraction=1.0,
+                density=molar_mass / volume,
+                molar_mass=molar_mass,
+                component_mass_fractions=_phase_component_mass_fractions(mixture, z),
+            )
+        ),
     )
 
 
@@ -657,6 +738,19 @@ def molar_mass_of(mixture: Any, composition: list[float]) -> float:
     if not total > 0.0 or not math.isfinite(total):
         raise InvalidInputError("molar_mass", f"the mixture's molar mass is {total} kg/mol")
     return total
+
+
+def _phase_component_mass_fractions(mixture: Any, composition: list[float]) -> tuple[float, ...]:
+    """One phase composition's component mass fractions, in mixture order."""
+    masses = [
+        fraction
+        * (component.molar_mass.to("kg/mol").magnitude if component.molar_mass is not None else 0.0)
+        for component, fraction in zip(mixture.components, composition, strict=True)
+    ]
+    total = sum(masses)
+    if total > 0.0 and math.isfinite(total):
+        return tuple(mass / total for mass in masses)
+    return ()
 
 
 def _phase_molar_mass(mixture: Any, composition: list[float]) -> float:

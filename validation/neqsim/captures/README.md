@@ -1524,6 +1524,51 @@ class's, and a root one finds and the other does not is a fact about the two num
 routes rather than a tolerance to widen. The row stays evidence, and the port's answer is
 not cased against a class that has none.
 
+## The release source-term models
+
+Ten captures, one per `ReleaseFlowModel` implementation beside the homogeneous-equilibrium
+one: `ideal_gas_release`, `legacy_screening_release`, `prescribed_slip_release`,
+`drift_flux_release`, `finite_rate_release`, `component_selective_release`,
+`ranz_marshall_release`, `bubble_transfer_zone_release`, `ideal_gas_fanno_release` and
+`real_gas_fanno_release`. The states are the pinned tests' own, re-cased on PR; the SRK rows
+are the tests' EOS and evidence beside the oracle.
+
+```bash
+../../tools/gated.sh javac -proc:none -cp neqsim-118d9af.jar ProcessProbe.java
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe ideal_gas_release \
+  > captures/process_ideal_gas_release.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe legacy_screening_release \
+  > captures/process_legacy_screening_release.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe prescribed_slip_release \
+  > captures/process_prescribed_slip_release.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe drift_flux_release \
+  > captures/process_drift_flux_release.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe finite_rate_release \
+  > captures/process_finite_rate_release.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe component_selective_release \
+  > captures/process_component_selective_release.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe ranz_marshall_release \
+  > captures/process_ranz_marshall_release.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe bubble_transfer_zone_release \
+  > captures/process_bubble_transfer_zone_release.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe ideal_gas_fanno_release \
+  > captures/process_ideal_gas_fanno_release.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe real_gas_fanno_release \
+  > captures/process_real_gas_fanno_release.tsv
+```
+
+Each row carries the request (including the pipe path where the model takes one), the model
+id, the status, the rate, the choked flag, the sound speed, every diagnostic and every
+station's pressure, temperature, density, enthalpy, entropy, velocity, mass flux, phase mass
+fractions, phase densities, phase velocities and phase component mass fractions. Model
+parameters are printed as their own key=value lines so a case can state them as inputs.
+
+**The PR re-casing moves the two-phase windows.** The pinned tests flash methane/n-heptane
+at 300 K and 30 bar with SRK; under PR the same feed is two-phase at methane fractions around
+0.11 to 0.13 rather than 0.0875 to 0.1375. The usable PR rows are therefore at 0.1125 and
+0.125, and the class rows at 0.10 are kept as SRK evidence. A state that is single-phase at
+the opening under PR is a captured `unsupported` row, not a case.
+
 ## The legacy blowdown
 
 `process_leak_blowdown.tsv` is `LeakModel.calculateSourceTerm` on the `LeakModelTest`
