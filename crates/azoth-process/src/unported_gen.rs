@@ -79,6 +79,7 @@
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/porous_media_self_heating.toml
+//!   - specs/models/process/prescribed_slip_release.toml
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml

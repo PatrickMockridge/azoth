@@ -1251,7 +1251,7 @@ class HemReleaseStation:
 
 @final
 class HemReleaseDiagnostic:
-    """the model's screening and fallback records, in the order it forms them."""
+    """the model's assumptions and the base's retained records."""
 
     code: str
     message: str
@@ -1396,6 +1396,25 @@ class PipeFireRupturePoint:
     strain_rate: Qty
     accumulated_strain: float
     rupture_strain_limit: float
+
+@final
+class PrescribedSlipReleaseStation:
+    """the base stations, with the opening's phase velocities partitioned. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
 
 @final
 class ReliefDisposalRow:
@@ -4774,6 +4793,19 @@ class PorousMediaSelfHeatingResult:
     fk_temperature_scale: Qty
     verdict: str
     messages: list[str]
+    warnings: list[Warning]
+
+@final
+class PrescribedSlipReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[PrescribedSlipReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
     warnings: list[Warning]
 
 @final
@@ -8837,6 +8869,16 @@ def porous_media_self_heating(
     marginal_ratio: float | None = None,
     pipe_insulation_screening: bool | None = None,
 ) -> PorousMediaSelfHeatingResult: ...
+def prescribed_slip_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    gas_to_liquid_slip_ratio: float,
+) -> PrescribedSlipReleaseResult: ...
 def probit(
     a: float,
     b: float,

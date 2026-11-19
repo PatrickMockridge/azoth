@@ -91,6 +91,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.plug_flow_reactor`](./plug_flow_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/PlugFlowReactor.java |
 | [`process.pool_fire`](./pool_fire.md) | `api521_mudan_pool_fire` | NeqSim process/safety/fire/PoolFireModel.java |
 | [`process.porous_media_self_heating`](./porous_media_self_heating.md) | `frank_kamenetskii_criticality` | NeqSim process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.java |
+| [`process.prescribed_slip_release`](./prescribed_slip_release.md) | `prescribed_slip_partition` | NeqSim process/safety/release/SlipCorrectedHomogeneousEquilibriumReleaseModel.java |
 | [`process.probit`](./probit.md) | `closed_form_probit` | NeqSim process/safety/dispersion/ProbitModel.java |
 | [`process.psv_fire_sizing`](./psv_fire_sizing.md) | `closed_form_psv_fire_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
 | [`process.psv_sizing`](./psv_sizing.md) | `closed_form_psv_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |

@@ -96,6 +96,8 @@ class _Station(NamedTuple):
     gas_mass_fraction: float
     gas_phase: EntropyPhase | None
     liquid_phase: EntropyPhase | None
+    gas_velocity: float | None = None
+    liquid_velocity: float | None = None
 
 
 class _States(NamedTuple):

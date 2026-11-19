@@ -1281,6 +1281,45 @@ def _legacy_screening_release(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _prescribed_slip_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.prescribed_slip_release`'s stations, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.prescribed_slip_release import prescribed_slip_release
+
+    result = prescribed_slip_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        float(inputs["gas_to_liquid_slip_ratio"]),
+    )
+    dumped: dict[str, float] = {
+        "mass_flow_kg_s": (
+            0.0 if result.mass_flow_rate is None else result.mass_flow_rate.to("kg/s").magnitude
+        )
+    }
+    for index, row in enumerate(result.stations):
+        prefix = f"station_{index}_"
+        dumped[prefix + "p_pa"] = row.pressure.to("Pa").magnitude
+        dumped[prefix + "t_k"] = row.temperature.to("K").magnitude
+        dumped[prefix + "density_kg_m3"] = row.density.to("kg/m**3").magnitude
+        dumped[prefix + "velocity_m_per_s"] = row.velocity.to("m/s").magnitude
+        dumped[prefix + "mass_flux_kg_m2_s"] = row.mass_flux.to("kg/(m**2*s)").magnitude
+        dumped[prefix + "gas_mass_fraction"] = float(row.gas_mass_fraction)
+        if row.gas_density is not None:
+            dumped[prefix + "gas_density_kg_m3"] = row.gas_density.to("kg/m**3").magnitude
+        if row.liquid_density is not None:
+            dumped[prefix + "liquid_density_kg_m3"] = row.liquid_density.to("kg/m**3").magnitude
+        if row.gas_velocity is not None:
+            dumped[prefix + "gas_velocity_m_per_s"] = row.gas_velocity.to("m/s").magnitude
+        if row.liquid_velocity is not None:
+            dumped[prefix + "liquid_velocity_m_per_s"] = row.liquid_velocity.to("m/s").magnitude
+    return dumped
+
+
 def _toxic_library(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.toxic_library`'s layers, from the reference's own arithmetic.
 
@@ -4233,6 +4272,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.hem_release": _hem_release,
     "process.ideal_gas_release": _ideal_gas_release,
     "process.legacy_screening_release": _legacy_screening_release,
+    "process.prescribed_slip_release": _prescribed_slip_release,
     "process.leak_blowdown": _leak_blowdown,
     "process.hazardous_area": _hazardous_area,
     "process.toxic_library": _toxic_library,
@@ -4690,6 +4730,13 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_hem_release.tsv",
         block=0,
         identified_by=("#label", "methane_50bara_choked"),
+    ),
+    LayerCase(
+        model="process.prescribed_slip_release",
+        case="methane_propane_slip_two",
+        capture="process_prescribed_slip_release.tsv",
+        block=1,
+        identified_by=("#label", "pr_methane_propane_ratio_2.0"),
     ),
     LayerCase(
         model="process.legacy_screening_release",
@@ -8657,6 +8704,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The legacy capture's six: the larger opening, the 5-bar choked row, the liquid
     # propane row, the zero-flow row and the two SRK evidence rows.
     "process_legacy_screening_release.tsv": 6,
+    # The slip capture's five: the unity and four ratios, the single-gas refusal and the
+    # two SRK evidence rows.
+    "process_prescribed_slip_release.tsv": 5,
     # The blowdown capture's ten: one block is layer-cased (the ten-second methane run); the
     # rest are the long horizons held to the capture as evidence, the SRK rows, the propane
     # row whose single-phase beta and cached density are class artefacts, and the refusals.

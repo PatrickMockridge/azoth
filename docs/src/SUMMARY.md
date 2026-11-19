@@ -313,6 +313,7 @@
   - [Plug-flow reactor](./process/plug_flow_reactor.md)
   - [Pool fire radiation](./process/pool_fire.md)
   - [Porous media self-heating](./process/porous_media_self_heating.md)
+  - [Prescribed-slip orifice release](./process/prescribed_slip_release.md)
   - [Probit dose-response](./process/probit.md)
   - [PSV fire sizing](./process/psv_fire_sizing.md)
   - [PSV sizing](./process/psv_sizing.md)

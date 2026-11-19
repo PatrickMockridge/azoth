@@ -62,6 +62,7 @@ from azoth.core.record_outputs_gen import (
     NonEquilibriumBlowdownPoint,
     P002FindingResult,
     PipeFireRupturePoint,
+    PrescribedSlipReleaseStation,
     PulsationModeResult,
     RegisterFinding,
     ReliefDisposalRow,
@@ -9298,6 +9299,43 @@ class PorousMediaSelfHeatingResult(_HasWarnings):
 
     #: the class's warning strings, in the order it appends them.
     messages: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PrescribedSlipReleaseResult(_HasWarnings):
+    """Result of ``process.prescribed_slip_release``."""
+
+    CALC_ID: ClassVar[str] = "process.prescribed_slip_release"
+
+    #: `valid`, `invalid` or `unsupported`.
+    status: str
+
+    #: the closure's release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    mass_flow_rate: Q | None
+
+    #: the base scan's choked flag; false on failure and on no forward flow.
+    choked: bool
+
+    #: absent: the derived model drops the base's throat sound speed.
+    throat_sound_speed: Q | None
+
+    #: the upstream overall mole fractions.
+    component_mole_fractions: tuple[float, ...]
+
+    #: the upstream overall mass fractions.
+    component_mass_fractions: tuple[float, ...]
+
+    #: the base stations, with the opening's phase velocities partitioned. Empty on failure.
+    stations: tuple[PrescribedSlipReleaseStation, ...]
+
+    #: the model's assumptions and the base's retained records.
+    diagnostics: tuple[HemReleaseDiagnostic, ...]
+
+    #: the codes alone, so a case can hold the contract without asserting prose.
+    diagnostic_codes: tuple[str, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

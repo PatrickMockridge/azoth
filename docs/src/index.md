@@ -405,6 +405,7 @@ Five sections, and the difference between them is the point:
 - [`process.plug_flow_reactor`](./process/plug_flow_reactor.md) — Plug-flow reactor
 - [`process.pool_fire`](./process/pool_fire.md) — Pool fire radiation
 - [`process.porous_media_self_heating`](./process/porous_media_self_heating.md) — Porous media self-heating
+- [`process.prescribed_slip_release`](./process/prescribed_slip_release.md) — Prescribed-slip orifice release
 - [`process.probit`](./process/probit.md) — Probit dose-response
 - [`process.psv_fire_sizing`](./process/psv_fire_sizing.md) — PSV fire sizing
 - [`process.psv_sizing`](./process/psv_sizing.md) — PSV sizing

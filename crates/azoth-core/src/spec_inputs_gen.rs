@@ -300,6 +300,7 @@
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/porous_media_self_heating.toml
+//!   - specs/models/process/prescribed_slip_release.toml
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
@@ -4905,6 +4906,33 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.porous_media_self_heating",
         "marginal_ratio",
+        "dimensionless",
+    ),
+    (
+        "process.prescribed_slip_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.prescribed_slip_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.prescribed_slip_release", "upstream_p", "pressure"),
+    ("process.prescribed_slip_release", "diameter", "length"),
+    (
+        "process.prescribed_slip_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.prescribed_slip_release",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.prescribed_slip_release",
+        "gas_to_liquid_slip_ratio",
         "dimensionless",
     ),
     ("process.probit", "a", "dimensionless"),

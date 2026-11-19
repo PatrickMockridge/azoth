@@ -318,6 +318,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPlugFlowReactorResult>()?;
     m.add_class::<crate::transport_gen::PyPoolFireResult>()?;
     m.add_class::<crate::transport_gen::PyPorousMediaSelfHeatingResult>()?;
+    m.add_class::<crate::transport_gen::PyPrescribedSlipReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyProbitResult>()?;
     m.add_class::<crate::transport_gen::PyPsvFireSizingResult>()?;
     m.add_class::<crate::transport_gen::PyPsvSizingResult>()?;
@@ -418,6 +419,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyNonEquilibriumBlowdownPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyP002FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PyPipeFireRupturePoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyPrescribedSlipReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyPulsationModeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyRegisterFinding>()?;
     m.add_class::<crate::record_outputs_gen::PyReliefDisposalRow>()?;
@@ -1157,6 +1159,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::pool_fire, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::porous_media_self_heating,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::prescribed_slip_release,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::probit, m)?)?;

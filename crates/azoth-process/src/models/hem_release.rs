@@ -403,6 +403,10 @@ pub(crate) struct TraceStation {
     pub gas_phase: Option<EntropyPhase>,
     /// The liquid phase's mass share, density and composition, when one exists.
     pub liquid_phase: Option<EntropyPhase>,
+    /// The gas phase's velocity, when a derived model resolves slip.
+    pub gas_velocity: Option<f64>,
+    /// The liquid phase's velocity, when a derived model resolves slip.
+    pub liquid_velocity: Option<f64>,
 }
 
 /// The homogeneous-equilibrium calculation with each station's phase records.
@@ -694,6 +698,8 @@ fn trace_station(sample: &SampleState, station: ReleaseStation) -> TraceStation 
         gas_mass_fraction: sample.state.gas_mass_fraction,
         gas_phase: sample.state.gas_phase.clone(),
         liquid_phase: sample.state.liquid_phase.clone(),
+        gas_velocity: None,
+        liquid_velocity: None,
     }
 }
 

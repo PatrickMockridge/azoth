@@ -8122,6 +8122,40 @@ pub fn porous_media_self_heating(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Prescribed-slip orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, gas_to_liquid_slip_ratio))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, gas_to_liquid_slip_ratio)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn prescribed_slip_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    gas_to_liquid_slip_ratio: f64,
+) -> PyResult<crate::transport_gen::PyPrescribedSlipReleaseResult> {
+    azoth_process::models::prescribed_slip_release::prescribed_slip_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        gas_to_liquid_slip_ratio,
+    )
+    .map(|r| crate::transport_gen::PyPrescribedSlipReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Probit dose-response.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

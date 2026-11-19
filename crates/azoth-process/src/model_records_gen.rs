@@ -89,6 +89,7 @@ use crate::models::piping_fiv_liquid::PipingFivLiquidResult;
 use crate::models::plug_flow_reactor::PlugFlowReactorResult;
 use crate::models::pool_fire::PoolFireResult;
 use crate::models::porous_media_self_heating::PorousMediaSelfHeatingResult;
+use crate::models::prescribed_slip_release::PrescribedSlipReleaseResult;
 use crate::models::probit::ProbitResult;
 use crate::models::psv_fire_sizing::PsvFireSizingResult;
 use crate::models::psv_sizing::PsvSizingResult;
@@ -1937,6 +1938,26 @@ impl CalcResult for PorousMediaSelfHeatingResult {
         "fk_temperature_scale",
         "verdict",
         "messages",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PrescribedSlipReleaseResult {
+    const CALC_ID: &'static str = "process.prescribed_slip_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
         "warnings",
     ];
 

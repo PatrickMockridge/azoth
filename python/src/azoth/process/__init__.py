@@ -98,6 +98,7 @@ from azoth.core.result import (
     PoolFireResult,
     PorousMediaSelfHeatingResult,
     ProbitResult,
+    PrescribedSlipReleaseResult,
     PsvFireSizingResult,
     PsvSizingResult,
     PsvValveResult,
@@ -307,6 +308,7 @@ _HEATER = "process.heater"
 _HEM_RELEASE = "process.hem_release"
 _IDEAL_GAS_RELEASE = "process.ideal_gas_release"
 _LEGACY_SCREENING_RELEASE = "process.legacy_screening_release"
+_PRESCRIBED_SLIP_RELEASE = "process.prescribed_slip_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
@@ -3524,6 +3526,41 @@ def legacy_screening_release(
         diameter=diameter,
         discharge_coefficient=discharge_coefficient,
         back_pressure=back_pressure,
+    )
+
+
+def prescribed_slip_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    gas_to_liquid_slip_ratio: float,
+) -> PrescribedSlipReleaseResult:
+    """The release rate of a prescribed-slip short-opening orifice.
+
+    The homogeneous-equilibrium scan supplies the stations; the opening's phase velocities
+    are partitioned by the caller's gas-to-liquid ratio, and the rate is the partition's
+    mass flux times the effective area. A single-phase opening is ``unsupported``.
+
+    Raises:
+        InvalidInputError: for a non-positive state or opening, a slip ratio below one, a
+            coefficient outside ``(0, 1]``, or a composition that is not one entry per
+            component and sums to one.
+
+    See :func:`azoth.process.reference.prescribed_slip_release`.
+    """
+    return resolve(_PRESCRIBED_SLIP_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        gas_to_liquid_slip_ratio=gas_to_liquid_slip_ratio,
     )
 
 

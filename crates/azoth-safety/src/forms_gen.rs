@@ -5040,6 +5040,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.prescribed_slip_release",
+        name: "Prescribed-slip orifice release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.probit",
         name: "Probit dose-response",
         family: "dispersion",

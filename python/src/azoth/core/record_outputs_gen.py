@@ -496,7 +496,7 @@ class HeaterMechanicalType:
 
 @dataclass(frozen=True, slots=True, eq=False)
 class HemReleaseDiagnostic:
-    """the model's screening and fallback records, in the order it forms them."""
+    """the model's assumptions and the base's retained records."""
 
     #: the stable machine code.
     code: str
@@ -972,6 +972,53 @@ class PipeFireRupturePoint:
 
     #: the step's temperature-dependent rupture strain limit.
     rupture_strain_limit: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PrescribedSlipReleaseStation:
+    """the base stations, with the opening's phase velocities partitioned. Empty on failure."""
+
+    #: which station this row is.
+    station: str
+
+    #: the station's absolute pressure.
+    pressure: Q
+
+    #: the station's temperature.
+    temperature: Q
+
+    #: mass over the EOS total volume, the base's value.
+    density: Q
+
+    #: the station's molar enthalpy.
+    molar_enthalpy: Q
+
+    #: the station's molar entropy, which the expansion holds fixed.
+    molar_entropy: Q
+
+    #: the station's bulk velocity: the base's on the stagnation row, `mass_flux/rho` at the opening.
+    velocity: Q
+
+    #: the closure's mass flux at the opening, before the discharge coefficient.
+    mass_flux: Q
+
+    #: what the base flash found.
+    phase: str
+
+    #: the gas phase's share of the mass. **A mass fraction, not the molar vapour fraction.**
+    gas_mass_fraction: float
+
+    #: the gas phase's own density, when the base resolved one.
+    gas_density: Q | None
+
+    #: the liquid phase's own density, when the base resolved one.
+    liquid_density: Q | None
+
+    #: the partitioned gas velocity at the opening and the two-phase ambient; absent elsewhere.
+    gas_velocity: Q | None
+
+    #: the partitioned liquid velocity at the opening and the two-phase ambient; absent elsewhere.
+    liquid_velocity: Q | None
 
 
 @dataclass(frozen=True, slots=True, eq=False)

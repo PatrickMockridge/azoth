@@ -26922,6 +26922,15 @@
       "sub_interface": null
     },
     {
+      "family": "release",
+      "id": "process.prescribed_slip_release",
+      "name": "Prescribed-slip orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "dispersion",
       "form": {
         "assumptions": [
