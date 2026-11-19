@@ -1329,7 +1329,7 @@ impl From<&azoth_process::models::heater::HeaterMechanicalType> for PyHeaterMech
     }
 }
 
-/// the model's assumption and warning records, in the order it forms them.
+/// the model's screening and fallback records, in the order it forms them.
 #[pyclass(
     frozen,
     skip_from_py_object,
@@ -1531,6 +1531,138 @@ impl From<&azoth_eos::results::HydrateRiskPoint> for PyHydrateRiskPoint {
                 unit: "K".to_string(),
             }),
             risk_level: row.risk_level.clone(),
+        }
+    }
+}
+
+/// the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "IdealGasReleaseStation"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyIdealGasReleaseStation {
+    /// which station this row is.
+    #[pyo3(get)]
+    pub station: String,
+    /// the station's absolute pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the station's temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// the station's ideal-gas density, `P M/(R T)`.
+    #[pyo3(get)]
+    pub density: PyQty,
+    /// the station's molar enthalpy, read against the stagnation value.
+    #[pyo3(get)]
+    pub molar_enthalpy: PyQty,
+    /// the station's molar entropy, which the expansion holds fixed.
+    #[pyo3(get)]
+    pub molar_entropy: PyQty,
+    /// `sqrt(2 cp (T0 - T))`, the isentropic acceleration from the stagnation enthalpy.
+    #[pyo3(get)]
+    pub velocity: PyQty,
+    /// `rho times velocity`, before the discharge coefficient.
+    #[pyo3(get)]
+    pub mass_flux: PyQty,
+    /// what the feed flash found; one gas phase for this model.
+    #[pyo3(get)]
+    pub phase: String,
+    /// the gas phase's share of the mass; one for this model. **A mass fraction, not the molar vapour fraction.**
+    #[pyo3(get)]
+    pub gas_mass_fraction: f64,
+    /// the gas phase's own density; equal to the station density here, and absent only on failure.
+    #[pyo3(get)]
+    pub gas_density: Option<PyQty>,
+    /// the liquid phase's density; absent because this model admits one gas phase.
+    #[pyo3(get)]
+    pub liquid_density: Option<PyQty>,
+    /// the gas phase's velocity; absent because this model resolves no slip.
+    #[pyo3(get)]
+    pub gas_velocity: Option<PyQty>,
+    /// the liquid phase's velocity; absent because this model resolves no slip.
+    #[pyo3(get)]
+    pub liquid_velocity: Option<PyQty>,
+}
+
+#[pymethods]
+impl PyIdealGasReleaseStation {
+    fn __repr__(&self) -> String {
+        format!(
+            "IdealGasReleaseStation(station={}, pressure={:?}, temperature={:?}, density={:?}, molar_enthalpy={:?}, molar_entropy={:?}, velocity={:?}, mass_flux={:?}, phase={}, gas_mass_fraction={}, gas_density={:?}, liquid_density={:?}, gas_velocity={:?}, liquid_velocity={:?})",
+            self.station,
+            self.pressure,
+            self.temperature,
+            self.density,
+            self.molar_enthalpy,
+            self.molar_entropy,
+            self.velocity,
+            self.mass_flux,
+            self.phase,
+            self.gas_mass_fraction,
+            self.gas_density,
+            self.liquid_density,
+            self.gas_velocity,
+            self.liquid_velocity
+        )
+    }
+}
+
+impl From<&azoth_process::models::ideal_gas_release::IdealGasReleaseStation>
+    for PyIdealGasReleaseStation
+{
+    fn from(row: &azoth_process::models::ideal_gas_release::IdealGasReleaseStation) -> Self {
+        Self {
+            station: row.station.as_str().to_string(),
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            temperature: PyQty {
+                magnitude_si: row.temperature.value,
+                unit: "K".to_string(),
+            },
+            density: PyQty {
+                magnitude_si: row.density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            molar_enthalpy: PyQty {
+                magnitude_si: row.molar_enthalpy.value,
+                unit: "J/mol".to_string(),
+            },
+            molar_entropy: PyQty {
+                magnitude_si: row.molar_entropy.value,
+                unit: "J/(mol*K)".to_string(),
+            },
+            velocity: PyQty {
+                magnitude_si: row.velocity.value,
+                unit: "m/s".to_string(),
+            },
+            mass_flux: PyQty {
+                magnitude_si: row.mass_flux.value,
+                unit: "kg/(m**2*s)".to_string(),
+            },
+            phase: row.phase.as_str().to_string(),
+            gas_mass_fraction: row.gas_mass_fraction,
+            gas_density: row.gas_density.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/m**3".to_string(),
+            }),
+            liquid_density: row.liquid_density.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/m**3".to_string(),
+            }),
+            gas_velocity: row.gas_velocity.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            liquid_velocity: row.liquid_velocity.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
         }
     }
 }
@@ -1840,6 +1972,140 @@ impl From<&azoth_process::models::leak_blowdown::LeakBlowdownPoint> for PyLeakBl
                 magnitude_si: row.droplet_smd.value,
                 unit: "m".to_string(),
             },
+        }
+    }
+}
+
+/// three stations, upstream first: the stagnation state and the throat and exit aliases. Empty on failure.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "LegacyScreeningReleaseStation"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyLegacyScreeningReleaseStation {
+    /// which station this row is; the legacy model reports no ambient station.
+    #[pyo3(get)]
+    pub station: String,
+    /// the station's absolute pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the station's temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// mass over the EOS total volume.
+    #[pyo3(get)]
+    pub density: PyQty,
+    /// the station's molar enthalpy.
+    #[pyo3(get)]
+    pub molar_enthalpy: PyQty,
+    /// the station's molar entropy.
+    #[pyo3(get)]
+    pub molar_entropy: PyQty,
+    /// zero at the stagnation row; the opening velocity `mdot/(rho A_eff)` on the aliases.
+    #[pyo3(get)]
+    pub velocity: PyQty,
+    /// `rho times velocity`, before the discharge coefficient.
+    #[pyo3(get)]
+    pub mass_flux: PyQty,
+    /// what the feed flash found.
+    #[pyo3(get)]
+    pub phase: String,
+    /// the gas phase's share of the mass. **A mass fraction, not the molar vapour fraction.**
+    #[pyo3(get)]
+    pub gas_mass_fraction: f64,
+    /// the gas phase's own density, when the flash resolved one.
+    #[pyo3(get)]
+    pub gas_density: Option<PyQty>,
+    /// the liquid phase's density, when the flash resolved one.
+    #[pyo3(get)]
+    pub liquid_density: Option<PyQty>,
+    /// the gas phase's velocity; absent, because the screening model resolves no slip.
+    #[pyo3(get)]
+    pub gas_velocity: Option<PyQty>,
+    /// the liquid phase's velocity; absent, because the screening model resolves no slip.
+    #[pyo3(get)]
+    pub liquid_velocity: Option<PyQty>,
+}
+
+#[pymethods]
+impl PyLegacyScreeningReleaseStation {
+    fn __repr__(&self) -> String {
+        format!(
+            "LegacyScreeningReleaseStation(station={}, pressure={:?}, temperature={:?}, density={:?}, molar_enthalpy={:?}, molar_entropy={:?}, velocity={:?}, mass_flux={:?}, phase={}, gas_mass_fraction={}, gas_density={:?}, liquid_density={:?}, gas_velocity={:?}, liquid_velocity={:?})",
+            self.station,
+            self.pressure,
+            self.temperature,
+            self.density,
+            self.molar_enthalpy,
+            self.molar_entropy,
+            self.velocity,
+            self.mass_flux,
+            self.phase,
+            self.gas_mass_fraction,
+            self.gas_density,
+            self.liquid_density,
+            self.gas_velocity,
+            self.liquid_velocity
+        )
+    }
+}
+
+impl From<&azoth_process::models::legacy_screening_release::LegacyScreeningReleaseStation>
+    for PyLegacyScreeningReleaseStation
+{
+    fn from(
+        row: &azoth_process::models::legacy_screening_release::LegacyScreeningReleaseStation,
+    ) -> Self {
+        Self {
+            station: row.station.as_str().to_string(),
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            temperature: PyQty {
+                magnitude_si: row.temperature.value,
+                unit: "K".to_string(),
+            },
+            density: PyQty {
+                magnitude_si: row.density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            molar_enthalpy: PyQty {
+                magnitude_si: row.molar_enthalpy.value,
+                unit: "J/mol".to_string(),
+            },
+            molar_entropy: PyQty {
+                magnitude_si: row.molar_entropy.value,
+                unit: "J/(mol*K)".to_string(),
+            },
+            velocity: PyQty {
+                magnitude_si: row.velocity.value,
+                unit: "m/s".to_string(),
+            },
+            mass_flux: PyQty {
+                magnitude_si: row.mass_flux.value,
+                unit: "kg/(m**2*s)".to_string(),
+            },
+            phase: row.phase.as_str().to_string(),
+            gas_mass_fraction: row.gas_mass_fraction,
+            gas_density: row.gas_density.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/m**3".to_string(),
+            }),
+            liquid_density: row.liquid_density.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/m**3".to_string(),
+            }),
+            gas_velocity: row.gas_velocity.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            liquid_velocity: row.liquid_velocity.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
         }
     }
 }

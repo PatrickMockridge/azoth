@@ -440,6 +440,8 @@ NON_UNIT_MODELS = {
     "process.nog070_sil_determination": "the NOG 070 SIL table lookup, not a unit",
     "process.risk_matrix": "the risk matrix over equipment rows, not a unit",
     "process.hem_release": "a release source term is a calculation over a fluid, not a unit",
+    "process.ideal_gas_release": "a release source term is a calculation over a fluid, not a unit",
+    "process.legacy_screening_release": "a release source term is a calculation over a fluid, not a unit",
     "process.pfp_demand": "the PFP demand screen over scalars, not a unit",
     "process.fire_case_relief": "the fire-case relief load over scalars, not a unit",
     "process.gas_blowby": "the choked/subcritical blowby rate over scalars, not a unit",

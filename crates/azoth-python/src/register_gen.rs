@@ -290,9 +290,11 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyHeaterResult>()?;
     m.add_class::<crate::transport_gen::PyHeavyGasDispersionResult>()?;
     m.add_class::<crate::transport_gen::PyHemReleaseResult>()?;
+    m.add_class::<crate::transport_gen::PyIdealGasReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyInherentSafetyResult>()?;
     m.add_class::<crate::transport_gen::PyJetFireResult>()?;
     m.add_class::<crate::transport_gen::PyLeakBlowdownResult>()?;
+    m.add_class::<crate::transport_gen::PyLegacyScreeningReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyLopaResult>()?;
     m.add_class::<crate::transport_gen::PyMahBowTieSkeletonResult>()?;
     m.add_class::<crate::transport_gen::PyManifoldResult>()?;
@@ -398,10 +400,12 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyHemReleaseDiagnostic>()?;
     m.add_class::<crate::record_outputs_gen::PyHemReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyHydrateRiskPoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyIdealGasReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyIncrementalZoneRow>()?;
     m.add_class::<crate::record_outputs_gen::PyKComponent>()?;
     m.add_class::<crate::record_outputs_gen::PyLeakBlowdownDiagnostic>()?;
     m.add_class::<crate::record_outputs_gen::PyLeakBlowdownPoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyLegacyScreeningReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyLopaLayerContribution>()?;
     m.add_class::<crate::record_outputs_gen::PyMahBarrier>()?;
     m.add_class::<crate::record_outputs_gen::PyMahConsequence>()?;
@@ -1091,9 +1095,14 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::hem_release, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::ideal_gas_release, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::inherent_safety, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::jet_fire, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::leak_blowdown, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::legacy_screening_release,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::lopa, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::mah_bow_tie_skeleton,

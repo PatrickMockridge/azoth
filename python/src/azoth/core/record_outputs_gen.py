@@ -496,7 +496,7 @@ class HeaterMechanicalType:
 
 @dataclass(frozen=True, slots=True, eq=False)
 class HemReleaseDiagnostic:
-    """the model's assumption and warning records, in the order it forms them."""
+    """the model's screening and fallback records, in the order it forms them."""
 
     #: the stable machine code.
     code: str
@@ -561,6 +561,53 @@ class HydrateRiskPoint:
 
     #: the point's band: critical, high, medium, low or unknown.
     risk_level: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class IdealGasReleaseStation:
+    """the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow."""
+
+    #: which station this row is.
+    station: str
+
+    #: the station's absolute pressure.
+    pressure: Q
+
+    #: the station's temperature.
+    temperature: Q
+
+    #: the station's ideal-gas density, `P M/(R T)`.
+    density: Q
+
+    #: the station's molar enthalpy, read against the stagnation value.
+    molar_enthalpy: Q
+
+    #: the station's molar entropy, which the expansion holds fixed.
+    molar_entropy: Q
+
+    #: `sqrt(2 cp (T0 - T))`, the isentropic acceleration from the stagnation enthalpy.
+    velocity: Q
+
+    #: `rho times velocity`, before the discharge coefficient.
+    mass_flux: Q
+
+    #: what the feed flash found; one gas phase for this model.
+    phase: str
+
+    #: the gas phase's share of the mass; one for this model. **A mass fraction, not the molar vapour fraction.**
+    gas_mass_fraction: float
+
+    #: the gas phase's own density; equal to the station density here, and absent only on failure.
+    gas_density: Q | None
+
+    #: the liquid phase's density; absent because this model admits one gas phase.
+    liquid_density: Q | None
+
+    #: the gas phase's velocity; absent because this model resolves no slip.
+    gas_velocity: Q | None
+
+    #: the liquid phase's velocity; absent because this model resolves no slip.
+    liquid_velocity: Q | None
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -668,6 +715,53 @@ class LeakBlowdownPoint:
 
     #: the liquid Sauter mean diameter, zero for a single phase or a trace liquid.
     droplet_smd: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class LegacyScreeningReleaseStation:
+    """three stations, upstream first: the stagnation state and the throat and exit aliases. Empty on failure."""
+
+    #: which station this row is; the legacy model reports no ambient station.
+    station: str
+
+    #: the station's absolute pressure.
+    pressure: Q
+
+    #: the station's temperature.
+    temperature: Q
+
+    #: mass over the EOS total volume.
+    density: Q
+
+    #: the station's molar enthalpy.
+    molar_enthalpy: Q
+
+    #: the station's molar entropy.
+    molar_entropy: Q
+
+    #: zero at the stagnation row; the opening velocity `mdot/(rho A_eff)` on the aliases.
+    velocity: Q
+
+    #: `rho times velocity`, before the discharge coefficient.
+    mass_flux: Q
+
+    #: what the feed flash found.
+    phase: str
+
+    #: the gas phase's share of the mass. **A mass fraction, not the molar vapour fraction.**
+    gas_mass_fraction: float
+
+    #: the gas phase's own density, when the flash resolved one.
+    gas_density: Q | None
+
+    #: the liquid phase's density, when the flash resolved one.
+    liquid_density: Q | None
+
+    #: the gas phase's velocity; absent, because the screening model resolves no slip.
+    gas_velocity: Q | None
+
+    #: the liquid phase's velocity; absent, because the screening model resolves no slip.
+    liquid_velocity: Q | None
 
 
 @dataclass(frozen=True, slots=True, eq=False)

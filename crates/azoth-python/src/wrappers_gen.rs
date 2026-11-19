@@ -7218,6 +7218,38 @@ pub fn hem_release(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Ideal-gas isentropic orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn ideal_gas_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+) -> PyResult<crate::transport_gen::PyIdealGasReleaseResult> {
+    azoth_process::models::ideal_gas_release::ideal_gas_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+    )
+    .map(|r| crate::transport_gen::PyIdealGasReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Inherent-safety index.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -7307,6 +7339,38 @@ pub fn leak_blowdown(
         scenario_name,
     )
     .map(|r| crate::transport_gen::PyLeakBlowdownResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Legacy orifice screening release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn legacy_screening_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+) -> PyResult<crate::transport_gen::PyLegacyScreeningReleaseResult> {
+    azoth_process::models::legacy_screening_release::legacy_screening_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+    )
+    .map(|r| crate::transport_gen::PyLegacyScreeningReleaseResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

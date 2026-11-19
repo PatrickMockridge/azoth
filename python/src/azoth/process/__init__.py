@@ -69,9 +69,11 @@ from azoth.core.result import (
     HeatExchangerResult,
     HeavyGasDispersionResult,
     HemReleaseResult,
+    IdealGasReleaseResult,
     InherentSafetyResult,
     JetFireResult,
     LeakBlowdownResult,
+    LegacyScreeningReleaseResult,
     LopaResult,
     MahBowTieSkeletonResult,
     ManifoldResult,
@@ -303,6 +305,8 @@ _FIRE_CASE_RELIEF = "process.fire_case_relief"
 _FLARE = "process.flare"
 _HEATER = "process.heater"
 _HEM_RELEASE = "process.hem_release"
+_IDEAL_GAS_RELEASE = "process.ideal_gas_release"
+_LEGACY_SCREENING_RELEASE = "process.legacy_screening_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
@@ -3443,6 +3447,76 @@ def hem_release(
     See :func:`azoth.process.reference.hem_release`.
     """
     return resolve(_HEM_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+    )
+
+
+def ideal_gas_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+) -> IdealGasReleaseResult:
+    """The release rate of an ideal-gas isentropic short-opening orifice.
+
+    One gas phase at a constant heat-capacity ratio. The upstream density is ``P M/(R T)``,
+    the stagnation enthalpy and entropy are the EOS flash's, and the throat is the critical
+    ratio or the receiving-pressure state. The answer is **four stations** with the rate,
+    the choked flag and the throat's ideal-gas sound speed.
+
+    A failure is the class's own result and not an exception: ``status`` is ``invalid`` or
+    ``unsupported``, the rate and stations are absent, and one diagnostic says why. **No
+    NaN crosses the boundary.**
+
+    Raises:
+        InvalidInputError: for a non-positive state or opening, a coefficient outside
+            ``(0, 1]``, or a composition that is not one entry per component and sums to one.
+
+    See :func:`azoth.process.reference.ideal_gas_release`.
+    """
+    return resolve(_IDEAL_GAS_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+    )
+
+
+def legacy_screening_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+) -> LegacyScreeningReleaseResult:
+    """The historical screening release rate through a circular opening.
+
+    The compatibility equation: a choked branch from ``P``, ``gamma``, ``T`` and ``MW``, and
+    a subcritical branch from ``2 rho (P - P_back)``. The stations alias the flashed upstream
+    state because no throat is solved, and the result is always ``valid_with_warnings`` on a
+    usable state.
+
+    Raises:
+        InvalidInputError: for a non-positive state or opening, a coefficient outside
+            ``(0, 1]``, or a composition that is not one entry per component and sums to one.
+
+    See :func:`azoth.process.reference.legacy_screening_release`.
+    """
+    return resolve(_LEGACY_SCREENING_RELEASE)(  # type: ignore[no-any-return]
         components=components,
         upstream_z=upstream_z,
         upstream_t=upstream_t,

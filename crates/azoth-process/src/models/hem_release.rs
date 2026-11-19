@@ -814,7 +814,7 @@ pub fn hem_release(
 }
 
 /// The upstream overall mass fractions.
-fn component_mass_fractions(mixture: &Mixture, z: &[f64]) -> Result<Vec<f64>> {
+pub(crate) fn component_mass_fractions(mixture: &Mixture, z: &[f64]) -> Result<Vec<f64>> {
     let mut masses = Vec::with_capacity(z.len());
     let mut total = 0.0;
     for (index, (component, fraction)) in mixture.components().iter().zip(z).enumerate() {

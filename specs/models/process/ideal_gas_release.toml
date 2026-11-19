@@ -1,0 +1,175 @@
+id = "process.ideal_gas_release"
+name = "Ideal-gas isentropic orifice release"
+kind = "procedure"
+assumptions = [
+    "**a calorically perfect gas** with constant `gamma`, isentropic acceleration and no real-gas departure, phase change, pipe friction or heat transfer.",
+    "**one gas phase is required**: a feed that flashes to two phases or to a liquid is `unsupported` rather than a fit to a gas model.",
+    "**the upstream density is ideal-gas** `P M/(R T)`, while the stagnation enthalpy and entropy come from the EOS flash at the same state.",
+    "**the critical ratio is** `(2/(gamma+1))^(gamma/(gamma-1))`; a receiving ratio at or below it is choked and the throat sits at `P0` times that ratio.",
+    "**each station expands isentropically** by `T = T0 (P/P0)^((gamma-1)/gamma)`, with `u = sqrt(2 cp (T0 - T))` and `h = h0 - u^2/2`; the zero-length opening aliases the exit to the throat.",
+    "**no forward flow is a valid zero**: a receiving pressure at or above the upstream pressure reports `valid`, zero rate, three stations and no sound speed.",
+    "**a failure carries no numeric payload**: the rate and stations are absent and one diagnostic says why. No `NaN` crosses the boundary.",
+    "**the port's phase words are `all_vapour`, `all_liquid` and `two_phase`**, and its station words are snake case.",
+    "**the fluid is PR with the classic mixing rule**, because this library's databank route resolves Peng-Robinson and no other; the class's own SRK tests are captured as evidence.",
+    "**there is no inventory input**: the fluid amount sets the composition and not the rate.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/release/IdealGasReleaseModel.java` is the port source, through its `calculate`.",
+    "`validation/neqsim/captures/process_ideal_gas_release.tsv` - the pinned adapter and benchmark states re-cased on PR, the unchoked and zero-flow rows, nitrogen and CO2 gas, and the two-phase refusal.",
+]
+[source]
+standard = "NeqSim process/safety/release/IdealGasReleaseModel.java"
+edition = "Its `calculate`: the one-gas-phase check, the critical ratio, the isentropic stations, the choked test and the sound speed."
+[algorithm]
+scheme = "ideal_gas_isentropic_orifice"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.components]
+type = "components"
+description = "the gas's substances, by name, resolved against the component databank.\n"
+[inputs.upstream_z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream stagnation composition, checked rather than renormalised.\n"
+[inputs.upstream_t]
+unit = "K"
+description = "the upstream stagnation temperature.\n"
+[inputs.upstream_p]
+unit = "Pa"
+description = "the upstream stagnation pressure, absolute.\n"
+[inputs.diameter]
+unit = "m"
+description = "the circular opening's diameter; the physical area is `pi d^2 / 4`.\n"
+[inputs.discharge_coefficient]
+unit = "dimensionless"
+description = "the effective-area factor in `(0, 1]`.\n"
+[inputs.back_pressure]
+unit = "Pa"
+description = "the receiving absolute pressure. At or above `upstream_p` the model reports no forward flow.\n"
+[outputs]
+[outputs.status]
+type = "string"
+description = "`valid`, `valid_with_warnings`, `invalid` or `unsupported`.\n"
+[outputs.mass_flow_rate]
+unit = "kg/s"
+optional = true
+description = "the release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.\n"
+[outputs.choked]
+type = "boolean"
+description = "whether the accepted flow is choked; false on failure and on no forward flow.\n"
+[outputs.throat_sound_speed]
+unit = "m/s"
+optional = true
+description = "the throat's ideal-gas sound speed, present on every non-zero result; absent on failure and on no forward flow.\n"
+[outputs.component_mole_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream overall mole fractions.\n"
+[outputs.component_mass_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream overall mass fractions, `z_i M_i / sum(z M)`.\n"
+[outputs.stations]
+type = "record_list"
+description = "the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow.\n"
+[outputs.stations.fields.station]
+type = "enum"
+values = ["upstream_stagnation", "throat_critical", "orifice_exit", "ambient_expanded"]
+description = "which station this row is.\n"
+[outputs.stations.fields.pressure]
+unit = "Pa"
+description = "the station's absolute pressure.\n"
+[outputs.stations.fields.temperature]
+unit = "K"
+description = "the station's temperature.\n"
+[outputs.stations.fields.density]
+unit = "kg/m**3"
+description = "the station's ideal-gas density, `P M/(R T)`.\n"
+[outputs.stations.fields.molar_enthalpy]
+unit = "J/mol"
+description = "the station's molar enthalpy, read against the stagnation value.\n"
+[outputs.stations.fields.molar_entropy]
+unit = "J/(mol*K)"
+description = "the station's molar entropy, which the expansion holds fixed.\n"
+[outputs.stations.fields.velocity]
+unit = "m/s"
+description = "`sqrt(2 cp (T0 - T))`, the isentropic acceleration from the stagnation enthalpy.\n"
+[outputs.stations.fields.mass_flux]
+unit = "kg/(m**2*s)"
+description = "`rho times velocity`, before the discharge coefficient.\n"
+[outputs.stations.fields.phase]
+type = "enum"
+values = ["all_vapour", "all_liquid", "two_phase"]
+description = "what the feed flash found; one gas phase for this model.\n"
+[outputs.stations.fields.gas_mass_fraction]
+unit = "dimensionless"
+description = "the gas phase's share of the mass; one for this model. **A mass fraction, not the molar vapour fraction.**\n"
+[outputs.stations.fields.gas_density]
+unit = "kg/m**3"
+optional = true
+description = "the gas phase's own density; equal to the station density here, and absent only on failure.\n"
+[outputs.stations.fields.liquid_density]
+unit = "kg/m**3"
+optional = true
+description = "the liquid phase's density; absent because this model admits one gas phase.\n"
+[outputs.stations.fields.gas_velocity]
+unit = "m/s"
+optional = true
+description = "the gas phase's velocity; absent because this model resolves no slip.\n"
+[outputs.stations.fields.liquid_velocity]
+unit = "m/s"
+optional = true
+description = "the liquid phase's velocity; absent because this model resolves no slip.\n"
+[outputs.diagnostics]
+type = "record_list"
+description = "the model's assumption and warning records, in the order it forms them.\n"
+[outputs.diagnostics.fields.code]
+type = "string"
+description = "the stable machine code.\n"
+[outputs.diagnostics.fields.message]
+type = "string"
+description = "the engineering detail.\n"
+[outputs.diagnostic_codes]
+type = "vector_string"
+length = "one per diagnostic"
+description = "the codes alone, so a case can hold the contract without asserting prose.\n"
+[[valid_range]]
+quantity = "upstream_t"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "upstream_p"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an opening has a positive diameter"
+[[valid_range]]
+quantity = "discharge_coefficient"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "`ReleaseFlowRequest` refuses a coefficient outside `(0, 1]`"
+[[valid_range]]
+quantity = "back_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[implementations]
+python = "azoth.process.ideal_gas_release"
+rust = "azoth_process::ideal_gas_release"

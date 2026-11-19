@@ -81,9 +81,11 @@ pub mod heat_exchanger;
 pub mod heater;
 pub mod heavy_gas_dispersion;
 pub mod hem_release;
+pub mod ideal_gas_release;
 pub mod inherent_safety;
 pub mod jet_fire;
 pub mod leak_blowdown;
+pub mod legacy_screening_release;
 pub mod lopa;
 pub mod mah_bow_tie_skeleton;
 pub mod manifold;
@@ -240,9 +242,11 @@ pub use heat_exchanger::{HeatExchangerResult, heat_exchanger};
 pub use heater::{HeaterResult, heater};
 pub use heavy_gas_dispersion::{HeavyGasDispersionResult, heavy_gas_dispersion};
 pub use hem_release::{HemReleaseResult, hem_release};
+pub use ideal_gas_release::{IdealGasReleaseResult, ideal_gas_release};
 pub use inherent_safety::{InherentSafetyResult, inherent_safety};
 pub use jet_fire::{JetFireResult, jet_fire};
 pub use leak_blowdown::{LeakBlowdownResult, leak_blowdown};
+pub use legacy_screening_release::{LegacyScreeningReleaseResult, legacy_screening_release};
 pub use lopa::{
     LopaLayerContribution, LopaProtectionLayer, LopaResult, Sts0131PressureCategory, lopa,
 };

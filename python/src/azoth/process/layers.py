@@ -1211,6 +1211,76 @@ def _hem_release(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _ideal_gas_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.ideal_gas_release`'s stations, from the reference's own arithmetic.
+
+    **The enthalpy and entropy are not dumped**, for the datum reason `_hem_release` gives.
+    The stations are the record's own rows.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.ideal_gas_release import ideal_gas_release
+
+    result = ideal_gas_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+    )
+    dumped: dict[str, float] = {
+        "mass_flow_kg_s": (
+            0.0 if result.mass_flow_rate is None else result.mass_flow_rate.to("kg/s").magnitude
+        )
+    }
+    for index, row in enumerate(result.stations):
+        prefix = f"station_{index}_"
+        dumped[prefix + "p_pa"] = row.pressure.to("Pa").magnitude
+        dumped[prefix + "t_k"] = row.temperature.to("K").magnitude
+        dumped[prefix + "density_kg_m3"] = row.density.to("kg/m**3").magnitude
+        dumped[prefix + "velocity_m_per_s"] = row.velocity.to("m/s").magnitude
+        dumped[prefix + "mass_flux_kg_m2_s"] = row.mass_flux.to("kg/(m**2*s)").magnitude
+        dumped[prefix + "gas_mass_fraction"] = float(row.gas_mass_fraction)
+        if row.gas_density is not None:
+            dumped[prefix + "gas_density_kg_m3"] = row.gas_density.to("kg/m**3").magnitude
+    return dumped
+
+
+def _legacy_screening_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.legacy_screening_release`'s stations, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.legacy_screening_release import legacy_screening_release
+
+    result = legacy_screening_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+    )
+    dumped: dict[str, float] = {
+        "mass_flow_kg_s": (
+            0.0 if result.mass_flow_rate is None else result.mass_flow_rate.to("kg/s").magnitude
+        )
+    }
+    for index, row in enumerate(result.stations):
+        prefix = f"station_{index}_"
+        dumped[prefix + "p_pa"] = row.pressure.to("Pa").magnitude
+        dumped[prefix + "t_k"] = row.temperature.to("K").magnitude
+        dumped[prefix + "density_kg_m3"] = row.density.to("kg/m**3").magnitude
+        dumped[prefix + "velocity_m_per_s"] = row.velocity.to("m/s").magnitude
+        dumped[prefix + "mass_flux_kg_m2_s"] = row.mass_flux.to("kg/(m**2*s)").magnitude
+        dumped[prefix + "gas_mass_fraction"] = float(row.gas_mass_fraction)
+        if row.gas_density is not None:
+            dumped[prefix + "gas_density_kg_m3"] = row.gas_density.to("kg/m**3").magnitude
+        if row.liquid_density is not None:
+            dumped[prefix + "liquid_density_kg_m3"] = row.liquid_density.to("kg/m**3").magnitude
+    return dumped
+
+
 def _toxic_library(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.toxic_library`'s layers, from the reference's own arithmetic.
 
@@ -4161,6 +4231,8 @@ def _vessel_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
+    "process.ideal_gas_release": _ideal_gas_release,
+    "process.legacy_screening_release": _legacy_screening_release,
     "process.leak_blowdown": _leak_blowdown,
     "process.hazardous_area": _hazardous_area,
     "process.toxic_library": _toxic_library,
@@ -4618,6 +4690,34 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_hem_release.tsv",
         block=0,
         identified_by=("#label", "methane_50bara_choked"),
+    ),
+    LayerCase(
+        model="process.legacy_screening_release",
+        case="methane_50bara_choked",
+        capture="process_legacy_screening_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_50bara_0_01"),
+    ),
+    LayerCase(
+        model="process.legacy_screening_release",
+        case="methane_5bara_subcritical",
+        capture="process_legacy_screening_release.tsv",
+        block=4,
+        identified_by=("#label", "pr_methane_5bara_subcritical"),
+    ),
+    LayerCase(
+        model="process.ideal_gas_release",
+        case="methane_50bara_choked",
+        capture="process_ideal_gas_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_50bara_choked"),
+    ),
+    LayerCase(
+        model="process.ideal_gas_release",
+        case="methane_5bara_no_forward_flow",
+        capture="process_ideal_gas_release.tsv",
+        block=4,
+        identified_by=("#label", "pr_methane_5bara_no_flow"),
     ),
     LayerCase(
         model="process.hem_release",
@@ -8551,6 +8651,12 @@ UNCASED_ROWS: dict[str, int] = {
     # reads the choked methane block and the flashing propane block; the rest are cases
     # asserted on the rate and the sound speed, or evidence with no state to compare.
     "process_hem_release.tsv": 21,
+    # The ideal-gas capture's eight: the unchoked, dilute, mixture, nitrogen, CO2 and
+    # two-phase-refusal rows, the SRK evidence row and the high-back-pressure row.
+    "process_ideal_gas_release.tsv": 8,
+    # The legacy capture's six: the larger opening, the 5-bar choked row, the liquid
+    # propane row, the zero-flow row and the two SRK evidence rows.
+    "process_legacy_screening_release.tsv": 6,
     # The blowdown capture's ten: one block is layer-cased (the ten-second methane run); the
     # rest are the long horizons held to the capture as evidence, the SRK rows, the propane
     # row whose single-phase beta and cached density are class artefacts, and the refusals.

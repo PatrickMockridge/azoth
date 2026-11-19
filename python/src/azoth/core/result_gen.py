@@ -44,10 +44,12 @@ from azoth.core.record_outputs_gen import (
     HemReleaseDiagnostic,
     HemReleaseStation,
     HydrateRiskPoint,
+    IdealGasReleaseStation,
     IncrementalZoneRow,
     KComponent,
     LeakBlowdownDiagnostic,
     LeakBlowdownPoint,
+    LegacyScreeningReleaseStation,
     LopaLayerContribution,
     MahBarrier,
     MahConsequence,
@@ -8233,6 +8235,43 @@ class HemReleaseResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class IdealGasReleaseResult(_HasWarnings):
+    """Result of ``process.ideal_gas_release``."""
+
+    CALC_ID: ClassVar[str] = "process.ideal_gas_release"
+
+    #: `valid`, `valid_with_warnings`, `invalid` or `unsupported`.
+    status: str
+
+    #: the release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    mass_flow_rate: Q | None
+
+    #: whether the accepted flow is choked; false on failure and on no forward flow.
+    choked: bool
+
+    #: the throat's ideal-gas sound speed, present on every non-zero result; absent on failure and on no forward flow.
+    throat_sound_speed: Q | None
+
+    #: the upstream overall mole fractions.
+    component_mole_fractions: tuple[float, ...]
+
+    #: the upstream overall mass fractions, `z_i M_i / sum(z M)`.
+    component_mass_fractions: tuple[float, ...]
+
+    #: the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow.
+    stations: tuple[IdealGasReleaseStation, ...]
+
+    #: the model's assumption and warning records, in the order it forms them.
+    diagnostics: tuple[HemReleaseDiagnostic, ...]
+
+    #: the codes alone, so a case can hold the contract without asserting prose.
+    diagnostic_codes: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class InherentSafetyResult(_HasWarnings):
     """Result of ``process.inherent_safety``."""
 
@@ -8304,6 +8343,43 @@ class LeakBlowdownResult(_HasWarnings):
     diagnostics: tuple[LeakBlowdownDiagnostic, ...]
 
     #: the codes alone.
+    diagnostic_codes: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class LegacyScreeningReleaseResult(_HasWarnings):
+    """Result of ``process.legacy_screening_release``."""
+
+    CALC_ID: ClassVar[str] = "process.legacy_screening_release"
+
+    #: `valid_with_warnings` on a usable state, `invalid` or `unsupported` otherwise.
+    status: str
+
+    #: the screening rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    mass_flow_rate: Q | None
+
+    #: whether the screening equation's critical ratio admits the receiving pressure; false on zero flow and on failure.
+    choked: bool
+
+    #: absent: the historical equation reports no sound speed.
+    throat_sound_speed: Q | None
+
+    #: the upstream overall mole fractions.
+    component_mole_fractions: tuple[float, ...]
+
+    #: the upstream overall mass fractions, `z_i M_i / sum(z M)`.
+    component_mass_fractions: tuple[float, ...]
+
+    #: three stations, upstream first: the stagnation state and the throat and exit aliases. Empty on failure.
+    stations: tuple[LegacyScreeningReleaseStation, ...]
+
+    #: the model's screening and fallback records, in the order it forms them.
+    diagnostics: tuple[HemReleaseDiagnostic, ...]
+
+    #: the codes alone, so a case can hold the contract without asserting prose.
     diagnostic_codes: tuple[str, ...]
 
     #: Caveats.

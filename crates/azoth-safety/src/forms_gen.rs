@@ -2988,6 +2988,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.ideal_gas_release",
+        name: "Ideal-gas isentropic orifice release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.inherent_safety",
         name: "Inherent-safety index",
         family: "safetyassessment",
@@ -3318,6 +3330,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
     SafetyCalculation {
         id: "process.leak_blowdown",
         name: "Vessel leak blowdown",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.legacy_screening_release",
+        name: "Legacy orifice screening release",
         family: "release",
         sub_interface: None,
         purpose: "",

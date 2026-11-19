@@ -12638,10 +12638,14 @@ public class ProcessProbe {
         5.0, 0.01, 0.62, 101325.0, new LegacyScreeningReleaseModel());
     releaseRow("pr_propane_11bara_two_phase", false, new String[] {"propane"}, new double[] {1.0},
         300.0, 11.0, 0.01, 0.62, 101325.0, new LegacyScreeningReleaseModel());
+    releaseRow("pr_methane_5bara_subcritical", false, new String[] {"methane"},
+        new double[] {1.0}, 300.0, 5.0, 0.01, 0.62, 4.0e5, new LegacyScreeningReleaseModel());
     releaseRow("pr_methane_5bara_no_flow", false, new String[] {"methane"}, new double[] {1.0},
         300.0, 5.0, 0.01, 0.62, 6.0e5, new LegacyScreeningReleaseModel());
     releaseRow("srk_methane_50bara_0_01", true, new String[] {"methane"}, new double[] {1.0},
         300.0, 50.0, 0.01, 0.62, 101325.0, new LegacyScreeningReleaseModel());
+    releaseRow("srk_methane_5bara_subcritical", true, new String[] {"methane"},
+        new double[] {1.0}, 300.0, 5.0, 0.01, 0.62, 4.0e5, new LegacyScreeningReleaseModel());
   }
 
   static void prescribedSlipReleaseRows() {

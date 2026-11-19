@@ -272,9 +272,11 @@
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
 //!   - specs/models/process/hem_release.toml
+//!   - specs/models/process/ideal_gas_release.toml
 //!   - specs/models/process/inherent_safety.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
+//!   - specs/models/process/legacy_screening_release.toml
 //!   - specs/models/process/lopa.toml
 //!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
@@ -4091,6 +4093,20 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "dimensionless",
     ),
     ("process.hem_release", "back_pressure", "pressure"),
+    ("process.ideal_gas_release", "upstream_z", "dimensionless"),
+    (
+        "process.ideal_gas_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.ideal_gas_release", "upstream_p", "pressure"),
+    ("process.ideal_gas_release", "diameter", "length"),
+    (
+        "process.ideal_gas_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.ideal_gas_release", "back_pressure", "pressure"),
     (
         "process.inherent_safety",
         "substitute_score",
@@ -4122,6 +4138,28 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ),
     ("process.leak_blowdown", "back_pressure", "pressure"),
     ("process.leak_blowdown", "time_step", "time"),
+    (
+        "process.legacy_screening_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.legacy_screening_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.legacy_screening_release", "upstream_p", "pressure"),
+    ("process.legacy_screening_release", "diameter", "length"),
+    (
+        "process.legacy_screening_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.legacy_screening_release",
+        "back_pressure",
+        "pressure",
+    ),
     (
         "process.lopa",
         "initiating_event_frequency_per_year",

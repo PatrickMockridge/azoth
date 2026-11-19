@@ -1251,10 +1251,29 @@ class HemReleaseStation:
 
 @final
 class HemReleaseDiagnostic:
-    """the model's assumption and warning records, in the order it forms them."""
+    """the model's screening and fallback records, in the order it forms them."""
 
     code: str
     message: str
+
+@final
+class IdealGasReleaseStation:
+    """the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
 
 @final
 class LeakBlowdownPoint:
@@ -1275,6 +1294,25 @@ class LeakBlowdownDiagnostic:
 
     code: str
     message: str
+
+@final
+class LegacyScreeningReleaseStation:
+    """three stations, upstream first: the stagnation state and the throat and exit aliases. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
 
 @final
 class LopaLayerContribution:
@@ -4364,6 +4402,19 @@ class HemReleaseResult:
     warnings: list[Warning]
 
 @final
+class IdealGasReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[IdealGasReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
 class InherentSafetyResult:
     overall_index: float
     warnings: list[Warning]
@@ -4388,6 +4439,19 @@ class LeakBlowdownResult:
     peak_mass_flow_rate: Qty | None
     time_to_empty: Qty | None
     diagnostics: list[LeakBlowdownDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
+class LegacyScreeningReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[LegacyScreeningReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
     diagnostic_codes: list[str]
     warnings: list[Warning]
 
@@ -8428,6 +8492,15 @@ def hem_release(
     discharge_coefficient: float,
     back_pressure: float,
 ) -> HemReleaseResult: ...
+def ideal_gas_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+) -> IdealGasReleaseResult: ...
 def inherent_safety(
     substitute_score: float | None = None,
     minimize_score: float | None = None,
@@ -8455,6 +8528,15 @@ def leak_blowdown(
     time_step: float | None = None,
     scenario_name: str | None = None,
 ) -> LeakBlowdownResult: ...
+def legacy_screening_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+) -> LegacyScreeningReleaseResult: ...
 def lopa(
     initiating_event_frequency_per_year: float,
     target_frequency_per_year: float,

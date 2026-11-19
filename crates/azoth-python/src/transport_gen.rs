@@ -20,17 +20,18 @@ use crate::record_outputs_gen::{
     PyEscalationItemResult, PyEventTreeOutcome, PyFlowlineScaleSegment, PyFmeaRankedEntry,
     PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
     PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
-    PyHydrateRiskPoint, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
-    PyLeakBlowdownPoint, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat,
-    PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
-    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyP002FindingResult,
-    PyPipeFireRupturePoint, PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow,
-    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
-    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint,
-    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
-    PySts0131FindingResult, PySubFraction, PyTr3001Finding, PyVesselFillingPoint,
-    PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyHydrateRiskPoint, PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent,
+    PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation,
+    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
+    PyMinimalCutSet, PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
+    PyNonEquilibriumBlowdownPoint, PyP002FindingResult, PyPipeFireRupturePoint,
+    PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
+    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyTr3001Finding, PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult,
+    PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -20340,6 +20341,98 @@ impl From<&azoth_process::models::hem_release::HemReleaseResult> for PyHemReleas
         }
     }
 }
+/// Result of `process.ideal_gas_release`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "IdealGasReleaseResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyIdealGasReleaseResult {
+    /// `valid`, `valid_with_warnings`, `invalid` or `unsupported`.
+    #[pyo3(get)]
+    pub status: String,
+    /// the release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    #[pyo3(get)]
+    pub mass_flow_rate: Option<PyQty>,
+    /// whether the accepted flow is choked; false on failure and on no forward flow.
+    #[pyo3(get)]
+    pub choked: bool,
+    /// the throat's ideal-gas sound speed, present on every non-zero result; absent on failure and on no forward flow.
+    #[pyo3(get)]
+    pub throat_sound_speed: Option<PyQty>,
+    /// the upstream overall mole fractions.
+    #[pyo3(get)]
+    pub component_mole_fractions: Vec<f64>,
+    /// the upstream overall mass fractions, `z_i M_i / sum(z M)`.
+    #[pyo3(get)]
+    pub component_mass_fractions: Vec<f64>,
+    /// the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow.
+    #[pyo3(get)]
+    pub stations: Vec<PyIdealGasReleaseStation>,
+    /// the model's assumption and warning records, in the order it forms them.
+    #[pyo3(get)]
+    pub diagnostics: Vec<PyHemReleaseDiagnostic>,
+    /// the codes alone, so a case can hold the contract without asserting prose.
+    #[pyo3(get)]
+    pub diagnostic_codes: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyIdealGasReleaseResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "IdealGasReleaseResult(status={:?}, mass_flow_rate={:?}, choked={:?}, throat_sound_speed={:?}, component_mole_fractions={:?}, component_mass_fractions={:?}, stations={:?}, diagnostics={:?}, diagnostic_codes={:?}, {} warning(s))",
+            self.status,
+            self.mass_flow_rate,
+            self.choked,
+            self.throat_sound_speed,
+            self.component_mole_fractions,
+            self.component_mass_fractions,
+            self.stations,
+            self.diagnostics,
+            self.diagnostic_codes,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::ideal_gas_release::IdealGasReleaseResult>
+    for PyIdealGasReleaseResult
+{
+    fn from(r: &azoth_process::models::ideal_gas_release::IdealGasReleaseResult) -> Self {
+        Self {
+            status: r.status.clone(),
+            mass_flow_rate: r.mass_flow_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            choked: r.choked,
+            throat_sound_speed: r.throat_sound_speed.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            component_mole_fractions: r.component_mole_fractions.clone(),
+            component_mass_fractions: r.component_mass_fractions.clone(),
+            stations: r
+                .stations
+                .iter()
+                .map(PyIdealGasReleaseStation::from)
+                .collect(),
+            diagnostics: r
+                .diagnostics
+                .iter()
+                .map(PyHemReleaseDiagnostic::from)
+                .collect(),
+            diagnostic_codes: r.diagnostic_codes.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.inherent_safety`, transported.
 #[pyclass(
     frozen,
@@ -20534,6 +20627,100 @@ impl From<&azoth_process::models::leak_blowdown::LeakBlowdownResult> for PyLeakB
                 .diagnostics
                 .iter()
                 .map(PyLeakBlowdownDiagnostic::from)
+                .collect(),
+            diagnostic_codes: r.diagnostic_codes.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.legacy_screening_release`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "LegacyScreeningReleaseResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyLegacyScreeningReleaseResult {
+    /// `valid_with_warnings` on a usable state, `invalid` or `unsupported` otherwise.
+    #[pyo3(get)]
+    pub status: String,
+    /// the screening rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    #[pyo3(get)]
+    pub mass_flow_rate: Option<PyQty>,
+    /// whether the screening equation's critical ratio admits the receiving pressure; false on zero flow and on failure.
+    #[pyo3(get)]
+    pub choked: bool,
+    /// absent: the historical equation reports no sound speed.
+    #[pyo3(get)]
+    pub throat_sound_speed: Option<PyQty>,
+    /// the upstream overall mole fractions.
+    #[pyo3(get)]
+    pub component_mole_fractions: Vec<f64>,
+    /// the upstream overall mass fractions, `z_i M_i / sum(z M)`.
+    #[pyo3(get)]
+    pub component_mass_fractions: Vec<f64>,
+    /// three stations, upstream first: the stagnation state and the throat and exit aliases. Empty on failure.
+    #[pyo3(get)]
+    pub stations: Vec<PyLegacyScreeningReleaseStation>,
+    /// the model's screening and fallback records, in the order it forms them.
+    #[pyo3(get)]
+    pub diagnostics: Vec<PyHemReleaseDiagnostic>,
+    /// the codes alone, so a case can hold the contract without asserting prose.
+    #[pyo3(get)]
+    pub diagnostic_codes: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyLegacyScreeningReleaseResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "LegacyScreeningReleaseResult(status={:?}, mass_flow_rate={:?}, choked={:?}, throat_sound_speed={:?}, component_mole_fractions={:?}, component_mass_fractions={:?}, stations={:?}, diagnostics={:?}, diagnostic_codes={:?}, {} warning(s))",
+            self.status,
+            self.mass_flow_rate,
+            self.choked,
+            self.throat_sound_speed,
+            self.component_mole_fractions,
+            self.component_mass_fractions,
+            self.stations,
+            self.diagnostics,
+            self.diagnostic_codes,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::legacy_screening_release::LegacyScreeningReleaseResult>
+    for PyLegacyScreeningReleaseResult
+{
+    fn from(
+        r: &azoth_process::models::legacy_screening_release::LegacyScreeningReleaseResult,
+    ) -> Self {
+        Self {
+            status: r.status.clone(),
+            mass_flow_rate: r.mass_flow_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            choked: r.choked,
+            throat_sound_speed: r.throat_sound_speed.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            component_mole_fractions: r.component_mole_fractions.clone(),
+            component_mass_fractions: r.component_mass_fractions.clone(),
+            stations: r
+                .stations
+                .iter()
+                .map(PyLegacyScreeningReleaseStation::from)
+                .collect(),
+            diagnostics: r
+                .diagnostics
+                .iter()
+                .map(PyHemReleaseDiagnostic::from)
                 .collect(),
             diagnostic_codes: r.diagnostic_codes.clone(),
             warnings: transport(&r.warnings),

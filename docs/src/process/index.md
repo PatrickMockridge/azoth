@@ -63,9 +63,11 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.heater`](./heater.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Heater.java |
 | [`process.heavy_gas_dispersion`](./heavy_gas_dispersion.md) | `britter_mcquaid_continuous_dense_gas` | NeqSim process/safety/dispersion/HeavyGasDispersion.java |
 | [`process.hem_release`](./hem_release.md) | `log_pressure_scan_golden_section` | NeqSim process/safety/release/HomogeneousEquilibriumReleaseModel.java |
+| [`process.ideal_gas_release`](./ideal_gas_release.md) | `ideal_gas_isentropic_orifice` | NeqSim process/safety/release/IdealGasReleaseModel.java |
 | [`process.inherent_safety`](./inherent_safety.md) | `kletz_inherent_safety_index` | NeqSim process/safety/inherent/InherentSafetyEvaluator.java |
 | [`process.jet_fire`](./jet_fire.md) | `api521_point_source_wayne_transmissivity` | NeqSim process/safety/fire/JetFireModel.java |
 | [`process.leak_blowdown`](./leak_blowdown.md) | `explicit_euler_isentropic_blowdown` | NeqSim process/safety/release/LeakModel.java |
+| [`process.legacy_screening_release`](./legacy_screening_release.md) | `legacy_orifice_screening` | NeqSim process/safety/release/LegacyScreeningReleaseModel.java |
 | [`process.lopa`](./lopa.md) | `closed_form_lopa` | NeqSim process/safety/risk/sis/LOPAResult.java |
 | [`process.mah_bow_tie_skeleton`](./mah_bow_tie_skeleton.md) | `mah_bow_tie_catalogue` | NeqSim process/safety/hazid/MahBowTieBuilder.java |
 | [`process.manifold`](./manifold.md) | `direct composition` | NeqSim process/equipment/manifold/Manifold.java |
