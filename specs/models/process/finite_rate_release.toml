@@ -8,7 +8,7 @@ assumptions = [
     "**the closure is the shared Zuber-Findlay/Harmathy drift flux** on the relaxed station, with its area, kinetic-energy and gas-area bounds.",
     "**the component and stagnation-energy closures are checked**: the overall component mass fractions equal the upstream within `1e-12`, and the station enthalpy plus kinetic energy equals the upstream stagnation enthalpy within `1e-6` J/kg.",
     "**the rate is the closure's mass flux** times the effective area; the ambient station is relaxed only when it keeps two phases.",
-    "**the base's Mach and acoustic diagnostics are dropped** and its throat sound speed is not carried.",
+    "**the base's Mach and acoustic diagnostics are dropped** and the model reports no throat sound speed.",
     "**no forward flow passes through unchanged** with `FINITE_RATE_NOT_APPLIED`; a base failure carries `EQUILIBRIUM_BASE_<code>`.",
     "**the fluid is PR with the classic mixing rule**, because this library's databank route resolves Peng-Robinson and no other; the class's own SRK tests are captured as evidence.",
 ]

@@ -95,7 +95,7 @@ exclusion list, and the port's NeqSim probe and its capture.
 
 **Three surfaces the tranche has taken are not in that nine, because it took them: the pyo3
 wrapper, the bridge adapter and the Python result dataclass.** The wrapper is generated for
-**294** of the registered ids and hand-written for **72**: a kernel that takes a record or a
+**295** of the registered ids and hand-written for **72**: a kernel that takes a record or a
 mixture the spec does not name is one the generator refuses rather than guesses at, and so is one
 whose signature disagrees with the order the bridge passes it in. The bridge adapter is generated
 for **364** and hand-written for **2**, and its rule is narrower because its boundary is a Python

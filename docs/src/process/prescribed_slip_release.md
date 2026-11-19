@@ -68,7 +68,7 @@ not an equation, and both implementations read it from here.
 - **the partition holds the homogeneous velocity**: `u_liquid = u / sqrt(gamma_slip^2 w_gas + w_liquid)`, `u_gas = gamma_slip u_liquid`.
 - **the closures are the class's**: the phase area fractions sum to one within `1e-10`, and the phase kinetic energy equals the homogeneous kinetic energy within `1e-9 max(1, KE)`.
 - **the rate is the closure's mass flux** times the effective area, not the base rate; the ambient station is re-partitioned only when it keeps two phases.
-- **the base's Mach and acoustic diagnostics are dropped** and its throat sound speed is not carried, as the class does.
+- **the base's Mach and acoustic diagnostics are dropped** and the model reports no throat sound speed, as the class does.
 - **no forward flow passes through unchanged** with `SLIP_NOT_APPLIED`; a base failure carries `EQUILIBRIUM_BASE_<code>` and the base's status.
 - **the fluid is PR with the classic mixing rule**, because this library's databank route resolves Peng-Robinson and no other; the class's own SRK tests are captured as evidence.
 

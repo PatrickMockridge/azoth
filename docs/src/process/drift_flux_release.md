@@ -69,7 +69,7 @@ not an equation, and both implementations read it from here.
 - **the bracket starts at one and doubles** to at most `128` until the drift residual changes sign; a bracket that never does is `invalid`.
 - **the closures are the class's**: the phase area fractions sum to one within `1e-10`, the phase kinetic energy matches the homogeneous within `1e-9 max(1, KE)`, and a gas area fraction above `0.80` is `unsupported`.
 - **the rate is the closure's mass flux** times the effective area; the ambient station is re-solved only when it keeps two phases.
-- **the base's Mach and acoustic diagnostics are dropped** and its throat sound speed is not carried.
+- **the base's Mach and acoustic diagnostics are dropped** and the model reports no throat sound speed.
 - **no forward flow passes through unchanged** with `DRIFT_FLUX_NOT_APPLIED`; a base failure carries `EQUILIBRIUM_BASE_<code>`.
 - **the fluid is PR with the classic mixing rule**, because this library's databank route resolves Peng-Robinson and no other; the class's own SRK tests are captured as evidence.
 

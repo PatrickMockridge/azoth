@@ -801,14 +801,26 @@ a claim nothing holds.
   its cached density is not reproduced (the port flashes every step), and its single-phase
   `getBeta()` is recorded as the molar artefact it is. `SourceTermFrame`'s payload is that
   result; its schema, UUID, sequence, time and fingerprint are session state, with this
-  library's provenance block as the envelope. What remains owed in `process/safety/release/` is
+  library's provenance block as the envelope. **The rest of the source-term family landed as
+  nine ids**: `process.ideal_gas_release`, `process.legacy_screening_release`,
+  `process.prescribed_slip_release`, `process.drift_flux_release`, `process.finite_rate_release`,
+  `process.component_selective_release`, `process.ranz_marshall_release`,
+  `process.bubble_transfer_zone_release` and `process.ideal_gas_fanno_release`, held to their
+  eight captures and the NASA GFSSP case. The shared machinery is the equilibrium station's
+  phase records, the prescribed-slip and Zuber-Findlay/Harmathy closures, the Ranz-Marshall
+  correlation and the uniform and component-selective relaxations; the Fanno pair carries a
+  conservative solid and hydrate gate that refuses what its per-component solid flash cannot
+  reproduce. What remains owed in `process/safety/release/` is `RealGasFannoPipeReleaseModel`
+  - the Rust march matches the capture, but the pure-Python mirror runs thousands of PH flashes
+  per state and needs a performance approach before it can carry a cross-impl case -
   `SourceTermResult`'s six file exporters (PHAST, FLACS, KFX, OpenFOAM, CSV, JSON - the
   time-series container is the result, the writers are session output), `ReleaseOrientation`
-  (stored and read by no arithmetic), `ReleaseFlowEnsemble` (zero callers), `SourceTermSession`
-  and the Fanno/pipe-decompression pair (they need `runTransient`), and the frame's canonical
-  JSON envelope if byte-compatible output is ever required. The package's `ReleaseInventory`,
-  `ReleaseModelEvidence`, `ReleaseSolidRiskAssessment` and `CoupledReleaseSource` are named here
-  as neither ported nor refused: they are a later scoping, not silently dropped.
+  (stored and read by no arithmetic), `ReleaseFlowEnsemble` (zero callers), `SourceTermSession`,
+  the two pipe-decompression units and the two coupled inventories (they need `runTransient`),
+  and the frame's canonical JSON envelope if byte-compatible output is ever required. The
+  package's `ReleaseInventory`, `NonEquilibriumReleaseInventory`, `ReleaseModelEvidence` and
+  `CoupledReleaseSource` are named here as neither ported nor refused: they are a later
+  scoping, not silently dropped.
 - **The dispersion family** — `process/safety/dispersion/` is six ids.
   **`process.gas_dispersion` is `GasDispersionAnalyzer.analyze`**: the ambient TP flash of the
   released composition, the gas phase's Le Chatelier LFL and fuel data, the density-ratio model
@@ -929,7 +941,7 @@ a claim nothing holds.
   `blowby/`, `vacuum/`, `settleout/`, `pump/`, `reaction/`, `inventory/`,
   `mdmt/`, `leakdetection/`, `cfd/`, `envelope/`, `scenario/` and `dto/`, plus the risk
   subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
-  own classes - the risk core, the two release models, the five overpressure calculators,
+  own classes - the risk core, the eleven release models, the five overpressure calculators,
   the six dispersion ids, the four rupture ids, the four self-heating ids, the four hazid
   worksheet ids, the four safety-review worksheet ids, the six safety screens, the nine
   safety worksheets and vibration screens and the eight depressurization ids; the types
