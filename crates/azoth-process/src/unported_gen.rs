@@ -60,6 +60,7 @@
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
+//!   - specs/models/process/multi_vessel_blowdown_study.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/norsok_p002_compliance.toml
 //!   - specs/models/process/overpressure_acceptance.toml

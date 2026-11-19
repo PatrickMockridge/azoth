@@ -281,6 +281,7 @@
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
+//!   - specs/models/process/multi_vessel_blowdown_study.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/norsok_p002_compliance.toml
 //!   - specs/models/process/overpressure_acceptance.toml
@@ -4246,6 +4247,37 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.mixer", "feed_p", "pressure"),
     ("process.mixer", "feed_t", "thermodynamic_temperature"),
     ("process.mixer", "outlet_pressure", "pressure"),
+    (
+        "process.multi_vessel_blowdown_study",
+        "header_diameter",
+        "length",
+    ),
+    (
+        "process.multi_vessel_blowdown_study",
+        "header_pressure",
+        "pressure",
+    ),
+    (
+        "process.multi_vessel_blowdown_study",
+        "header_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.multi_vessel_blowdown_study",
+        "header_molar_mass",
+        "molar_mass",
+    ),
+    (
+        "process.multi_vessel_blowdown_study",
+        "header_heat_capacity_ratio",
+        "dimensionless",
+    ),
+    (
+        "process.multi_vessel_blowdown_study",
+        "max_allowable_mach",
+        "dimensionless",
+    ),
+    ("process.multi_vessel_blowdown_study", "grid_step", "time"),
     (
         "process.nog070_sil_determination",
         "pfd_average",

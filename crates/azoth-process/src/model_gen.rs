@@ -60,6 +60,7 @@
 //!   - specs/models/process/map_turbo_expander_compressor.toml
 //!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
+//!   - specs/models/process/multi_vessel_blowdown_study.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/norsok_p002_compliance.toml
 //!   - specs/models/process/overpressure_acceptance.toml
@@ -57341,6 +57342,580 @@ pub static MIXER_SPEC: ModelSpec = ModelSpec {
     cases: MIXER_CASES,
 };
 
+static MULTI_VESSEL_BLOWDOWN_STUDY_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "header_diameter",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive header diameter",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "grid_step",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a non-positive grid step",
+        },
+    },
+];
+
+static MULTI_VESSEL_BLOWDOWN_STUDY_CASES: &[TestCase] = &[
+    TestCase {
+        id: "two_sources_no_header",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("peak_total_mass_flow", 65.0),
+            ("peak_time", 0.0),
+            ("max_allowable_mach", 0.7),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "samples",
+            &[
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(40.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(32.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(24.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(16.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(7.999999999999998),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(25.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(16.666666666666668),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(8.333333333333334),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "small_header_exceeded",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("header_diameter", 0.2),
+            ("header_pressure", 150000.0),
+            ("header_temperature", 288.15),
+            ("header_molar_mass", 0.02),
+            ("header_heat_capacity_ratio", 1.3),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("peak_total_mass_flow", 65.0),
+            ("peak_time", 0.0),
+            ("header_velocity", 1652.231406916753),
+            ("header_mach", 4.186970229513444),
+            ("max_allowable_mach", 0.7),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "samples",
+            &[
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(40.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(32.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(24.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(16.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(7.999999999999998),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(25.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(16.666666666666668),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(8.333333333333334),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "large_header_acceptable",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("header_diameter", 0.8),
+            ("header_pressure", 150000.0),
+            ("header_temperature", 288.15),
+            ("header_molar_mass", 0.02),
+            ("header_heat_capacity_ratio", 1.3),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("peak_total_mass_flow", 65.0),
+            ("peak_time", 0.0),
+            ("header_velocity", 103.26446293229706),
+            ("header_mach", 0.26168563934459027),
+            ("max_allowable_mach", 0.7),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "samples",
+            &[
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(40.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(32.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(24.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(16.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(4.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(7.999999999999998),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("HP-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(25.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(16.666666666666668),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(2.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(8.333333333333334),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("Inlet-sep"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "mass_flow",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static MULTI_VESSEL_BLOWDOWN_STUDY_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "profile_superposition",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.multi_vessel_blowdown_study`.
+pub static MULTI_VESSEL_BLOWDOWN_STUDY_SPEC: ModelSpec = ModelSpec {
+    id: "process.multi_vessel_blowdown_study",
+    kind: "procedure",
+    algorithm: Some(&MULTI_VESSEL_BLOWDOWN_STUDY_ALGORITHM),
+    checks: MULTI_VESSEL_BLOWDOWN_STUDY_CHECKS,
+    cases: MULTI_VESSEL_BLOWDOWN_STUDY_CASES,
+};
+
 static NOG070_SIL_DETERMINATION_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -90701,6 +91276,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &MAP_TURBO_EXPANDER_COMPRESSOR_SPEC,
     &MDMT_SPEC,
     &MIXER_SPEC,
+    &MULTI_VESSEL_BLOWDOWN_STUDY_SPEC,
     &NOG070_SIL_DETERMINATION_SPEC,
     &NORSOK_P002_COMPLIANCE_SPEC,
     &OVERPRESSURE_ACCEPTANCE_SPEC,

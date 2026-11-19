@@ -54,6 +54,8 @@ from azoth.core.record_outputs_gen import (
     MahThreat,
     MineralEquilibriumRow,
     MinimalCutSet,
+    MultiVesselContributionRow,
+    MultiVesselProfileRow,
     NaceIssueRow,
     P002FindingResult,
     PipeFireRupturePoint,
@@ -8494,6 +8496,40 @@ class MixerResult(_HasWarnings):
 
     #: the outlet molar enthalpy, the flow-weighted average of the feeds'. Mixing adds no heat and no work, so this is the whole of the energy balance.
     product_h: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MultiVesselBlowdownStudyResult(_HasWarnings):
+    """Result of ``process.multi_vessel_blowdown_study``."""
+
+    CALC_ID: ClassVar[str] = "process.multi_vessel_blowdown_study"
+
+    #: the combined header load at each grid time.
+    profile: tuple[MultiVesselProfileRow, ...]
+
+    #: each source's contribution at the peak, in first-appearance order.
+    contributions: tuple[MultiVesselContributionRow, ...]
+
+    #: the controlling combined load.
+    peak_total_mass_flow: Q
+
+    #: the time of the controlling load.
+    peak_time: Q
+
+    #: the header gas velocity at the peak; absent when no header is configured.
+    header_velocity: Q | None
+
+    #: the header Mach number at the peak; absent when no header is configured.
+    header_mach: float | None
+
+    #: the Mach limit the run used.
+    max_allowable_mach: float
+
+    #: whether the Mach number is within the limit, or no header is configured.
+    header_mach_acceptable: bool
 
     #: Caveats.
     warnings: tuple[Warning, ...]

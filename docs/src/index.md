@@ -386,6 +386,7 @@ Five sections, and the difference between them is the point:
 - [`process.map_turbo_expander_compressor`](./process/map_turbo_expander_compressor.md) — Map turbo-expander compressor
 - [`process.mdmt`](./process/mdmt.md) — Minimum design metal temperature
 - [`process.mixer`](./process/mixer.md) — Mixer
+- [`process.multi_vessel_blowdown_study`](./process/multi_vessel_blowdown_study.md) — Multi-vessel blowdown study
 - [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
 - [`process.norsok_p002_compliance`](./process/norsok_p002_compliance.md) — NORSOK P-002 point-check compliance
 - [`process.overpressure_acceptance`](./process/overpressure_acceptance.md) — Overpressure acceptance

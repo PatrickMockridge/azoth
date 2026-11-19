@@ -226,6 +226,9 @@ from azoth.core.result import (
     MollerupAlphaResult,
     MultiflashStabilityTestResult,
     MultiMineralScaleEquilibriumResult,
+    MultiVesselBlowdownStudyResult,
+    MultiVesselContributionRow,
+    MultiVesselProfileRow,
     NaceIssueRow,
     NitricSulfuricAcidVaporPressureResult,
     Nog070SilDeterminationResult,
@@ -657,6 +660,7 @@ __all__ = [
     "molar_enthalpy_entropy",
     "mollerup_alpha",
     "multi_mineral_scale_equilibrium",
+    "multi_vessel_blowdown_study",
     "multiflash_stability_test",
     "nitric_sulfuric_acid_vapor_pressure",
     "nog070_sil_determination",
@@ -7758,6 +7762,32 @@ def mixer(components: list[str], feed_n: list[Q], feed_z: list[list[float]], fee
         inlet_pressure_spread=from_si(result.inlet_pressure_spread.magnitude_si, result.inlet_pressure_spread.unit),
         pressure_mismatch=result.pressure_mismatch,
         product_h=from_si(result.product_h.magnitude_si, result.product_h.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def multi_vessel_blowdown_study(samples: list[dict[str, object]], header_diameter: Q | None=None, header_pressure: Q | None=None, header_temperature: Q | None=None, header_molar_mass: Q | None=None, header_heat_capacity_ratio: float | None=None, max_allowable_mach: float | None=None, grid_step: Q | None=None) -> MultiVesselBlowdownStudyResult:
+    """``process.multi_vessel_blowdown_study``, computed in Rust."""
+    spec = _models_gen.model("process.multi_vessel_blowdown_study")
+    result = _core.multi_vessel_blowdown_study(
+        input_records_to_si(spec, "samples", samples),
+        None if header_diameter is None else input_to_si(spec, "header_diameter", header_diameter),
+        None if header_pressure is None else input_to_si(spec, "header_pressure", header_pressure),
+        None if header_temperature is None else input_to_si(spec, "header_temperature", header_temperature),
+        None if header_molar_mass is None else input_to_si(spec, "header_molar_mass", header_molar_mass),
+        None if header_heat_capacity_ratio is None else header_heat_capacity_ratio,
+        None if max_allowable_mach is None else max_allowable_mach,
+        None if grid_step is None else input_to_si(spec, "grid_step", grid_step),
+    )
+    return MultiVesselBlowdownStudyResult(
+        profile=tuple(MultiVesselProfileRow(time=from_si(c.time.magnitude_si, c.time.unit), total_mass_flow=from_si(c.total_mass_flow.magnitude_si, c.total_mass_flow.unit)) for c in result.profile),
+        contributions=tuple(MultiVesselContributionRow(source=c.source, peak_contribution=from_si(c.peak_contribution.magnitude_si, c.peak_contribution.unit)) for c in result.contributions),
+        peak_total_mass_flow=from_si(result.peak_total_mass_flow.magnitude_si, result.peak_total_mass_flow.unit),
+        peak_time=from_si(result.peak_time.magnitude_si, result.peak_time.unit),
+        header_velocity=None if result.header_velocity is None else from_si(result.header_velocity.magnitude_si, result.header_velocity.unit),
+        header_mach=result.header_mach,
+        max_allowable_mach=result.max_allowable_mach,
+        header_mach_acceptable=result.header_mach_acceptable,
         warnings=_warnings(result.warnings),
     )
 

@@ -2041,6 +2041,49 @@ def _blocked_outlet_overpressure(inputs: Mapping[str, Any]) -> dict[str, float]:
     return rows
 
 
+def _multi_vessel_blowdown_study(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.multi_vessel_blowdown_study`'s layers, from the reference's arithmetic.
+
+    The profile and contribution rows and the Mach flag are held by the cases and the
+    capture; the summary numbers are the shared layers.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.multi_vessel_blowdown_study import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    rows: list[dict[str, object]] = [
+        {
+            "source": str(row["source"]),
+            "time": quantity(float(row["time"]), "s"),
+            "mass_flow": quantity(float(row["mass_flow"]), "kg/s"),
+        }
+        for row in inputs["samples"]
+    ]
+    solution, _ = _evaluate(
+        rows,
+        optional("header_diameter", "m"),
+        optional("header_pressure", "Pa"),
+        optional("header_temperature", "K"),
+        optional("header_molar_mass", "kg/mol"),
+        inputs.get("header_heat_capacity_ratio"),
+        inputs.get("max_allowable_mach"),
+        optional("grid_step", "s"),
+    )
+    layers = {
+        "peak_total_mass_flow_kg_s": solution.peak_total_mass_flow,
+        "peak_time_s": solution.peak_time,
+        "max_allowable_mach": solution.max_allowable_mach,
+    }
+    if solution.header_velocity is not None:
+        layers["header_velocity_m_s"] = solution.header_velocity
+    if solution.header_mach is not None:
+        layers["header_mach"] = solution.header_mach
+    return layers
+
+
 def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.inherent_safety`'s layers, from the reference's arithmetic."""
     from azoth.process.reference.inherent_safety import _evaluate
@@ -4127,6 +4170,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.depressurization": _depressurization,
     "process.depressurization_acceptance": _depressurization_acceptance,
     "process.blocked_outlet_overpressure": _blocked_outlet_overpressure,
+    "process.multi_vessel_blowdown_study": _multi_vessel_blowdown_study,
     "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.sts0131_gate": _sts0131_gate,
@@ -5301,6 +5345,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_blocked_outlet_overpressure.tsv",
         block=0,
         identified_by=("#label", "blocked_reaches_relief_600s"),
+    ),
+    # The multi-vessel study's one: the two sources with no header. The two header states
+    # and the empty-study refusal are declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.multi_vessel_blowdown_study",
+        case="two_sources_no_header",
+        capture="process_multi_vessel_blowdown_study.tsv",
+        block=0,
+        identified_by=("#label", "mv_two_sources_no_header"),
     ),
     # STS-0131's one: the PSV margin at equality. The five further cases, the seven
     # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
@@ -8220,6 +8273,7 @@ UNCASED_ROWS: dict[str, int] = {
     "process_depressurization.tsv": 14,
     "process_depressurization_acceptance.tsv": 8,
     "process_blocked_outlet_overpressure.tsv": 1,
+    "process_multi_vessel_blowdown_study.tsv": 3,
     # ALARP's eight: the five further states, the empty audit and the two refusals.
     "process_alarp_audit.tsv": 8,
     # Escalation's eight: the six further states and the two refusals.

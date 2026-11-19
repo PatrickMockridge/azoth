@@ -119,7 +119,7 @@ describe("the catalogue", () => {
     // listed, plus the two relief ids upstream files elsewhere; every scalar-shaped one can run
     // as a scenario, and the bow-tie has its own view.
     const safetyCalcs = catalogue.safety ?? [];
-    expect(safetyCalcs).toHaveLength(77);
+    expect(safetyCalcs).toHaveLength(78);
     expect(new Set(safetyCalcs.map((entry) => entry.family))).toEqual(
       new Set([
         "api14c",
@@ -184,7 +184,7 @@ describe("the catalogue", () => {
       expect(entry.purpose.length).toBeLessThanOrEqual(300);
     }
     const listed = safetyCalcs.filter((entry) => !entry.native);
-    expect(listed).toHaveLength(45);
+    expect(listed).toHaveLength(46);
     for (const entry of listed) {
       expect(entry.refusal, `${entry.id} has no refusal`).toBeTruthy();
       expect(entry.form, `${entry.id} has a form but no arm`).toBeUndefined();

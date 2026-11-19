@@ -25251,6 +25251,15 @@
       "sub_interface": "equipmentsafety"
     },
     {
+      "family": "depressurization",
+      "id": "process.multi_vessel_blowdown_study",
+      "name": "Multi-vessel blowdown study",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": "depressurization"
+    },
+    {
       "family": "risk",
       "form": {
         "assumptions": [

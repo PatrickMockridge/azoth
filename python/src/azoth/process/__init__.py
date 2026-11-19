@@ -79,6 +79,9 @@ from azoth.core.result import (
     MapTurboExpanderResult,
     MdmtResult,
     MixerResult,
+    MultiVesselBlowdownStudyResult,
+    MultiVesselContributionRow,
+    MultiVesselProfileRow,
     Nog070SilDeterminationResult,
     NorsokP002ComplianceResult,
     OverpressureAcceptanceResult,
@@ -320,6 +323,7 @@ _VESSEL_FILLING = "process.vessel_filling"
 _DEPRESSURIZATION = "process.depressurization"
 _DEPRESSURIZATION_ACCEPTANCE = "process.depressurization_acceptance"
 _BLOCKED_OUTLET_OVERPRESSURE = "process.blocked_outlet_overpressure"
+_MULTI_VESSEL_BLOWDOWN_STUDY = "process.multi_vessel_blowdown_study"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
@@ -4219,6 +4223,36 @@ def blocked_outlet_overpressure(
         relief_set_pressure=relief_set_pressure,
         time_step=time_step,
         max_time=max_time,
+    )
+
+
+def multi_vessel_blowdown_study(
+    samples: list[dict[str, object]],
+    header_diameter: Q | None = None,
+    header_pressure: Q | None = None,
+    header_temperature: Q | None = None,
+    header_molar_mass: Q | None = None,
+    header_heat_capacity_ratio: float | None = None,
+    max_allowable_mach: float | None = None,
+    grid_step: Q | None = None,
+) -> MultiVesselBlowdownStudyResult:
+    """The simultaneous blowdown of sources into a shared header.
+
+    Each source's profile is linearly interpolated onto a common grid; the peak total and
+    its per-source contributions are published. The header Mach check runs only when the
+    header diameter is given.
+
+    See :func:`azoth.process.reference.multi_vessel_blowdown_study`.
+    """
+    return resolve(_MULTI_VESSEL_BLOWDOWN_STUDY)(  # type: ignore[no-any-return]
+        samples=samples,
+        header_diameter=header_diameter,
+        header_pressure=header_pressure,
+        header_temperature=header_temperature,
+        header_molar_mass=header_molar_mass,
+        header_heat_capacity_ratio=header_heat_capacity_ratio,
+        max_allowable_mach=max_allowable_mach,
+        grid_step=grid_step,
     )
 
 

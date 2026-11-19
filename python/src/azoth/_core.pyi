@@ -637,6 +637,13 @@ class MapCurvePoint(TypedDict):
     head: float
     efficiency: float
 
+class MultiVesselSample(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    source: str
+    time: float
+    mass_flow: float
+
 class P002CheckRow(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1303,6 +1310,20 @@ class MahBarrier:
     id: str
     description: str
     pfd: float
+
+@final
+class MultiVesselProfileRow:
+    """the combined header load at each grid time."""
+
+    time: Qty
+    total_mass_flow: Qty
+
+@final
+class MultiVesselContributionRow:
+    """each source's contribution at the peak, in first-appearance order."""
+
+    source: str
+    peak_contribution: Qty
 
 @final
 class P002FindingResult:
@@ -4424,6 +4445,18 @@ class MixerResult:
     inlet_pressure_spread: Qty
     pressure_mismatch: bool
     product_h: Qty
+    warnings: list[Warning]
+
+@final
+class MultiVesselBlowdownStudyResult:
+    profile: list[MultiVesselProfileRow]
+    contributions: list[MultiVesselContributionRow]
+    peak_total_mass_flow: Qty
+    peak_time: Qty
+    header_velocity: Qty | None
+    header_mach: float | None
+    max_allowable_mach: float
+    header_mach_acceptable: bool
     warnings: list[Warning]
 
 @final
@@ -8457,6 +8490,16 @@ def mixer(
     feed_t: list[float],
     outlet_pressure: float | None = None,
 ) -> MixerResult: ...
+def multi_vessel_blowdown_study(
+    samples: list[MultiVesselSample],
+    header_diameter: float | None = None,
+    header_pressure: float | None = None,
+    header_temperature: float | None = None,
+    header_molar_mass: float | None = None,
+    header_heat_capacity_ratio: float | None = None,
+    max_allowable_mach: float | None = None,
+    grid_step: float | None = None,
+) -> MultiVesselBlowdownStudyResult: ...
 def nog070_sil_determination(
     sif_type: str,
     pfd_average: float,

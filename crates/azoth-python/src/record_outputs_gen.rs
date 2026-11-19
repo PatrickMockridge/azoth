@@ -2138,6 +2138,95 @@ impl From<&azoth_process::models::fault_tree::MinimalCutSet> for PyMinimalCutSet
     }
 }
 
+/// each source's contribution at the peak, in first-appearance order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MultiVesselContributionRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMultiVesselContributionRow {
+    /// the source's name.
+    #[pyo3(get)]
+    pub source: String,
+    /// the source's interpolated rate at the peak time.
+    #[pyo3(get)]
+    pub peak_contribution: PyQty,
+}
+
+#[pymethods]
+impl PyMultiVesselContributionRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "MultiVesselContributionRow(source={}, peak_contribution={:?})",
+            self.source, self.peak_contribution
+        )
+    }
+}
+
+impl From<&azoth_process::models::multi_vessel_blowdown_study::MultiVesselContributionRow>
+    for PyMultiVesselContributionRow
+{
+    fn from(
+        row: &azoth_process::models::multi_vessel_blowdown_study::MultiVesselContributionRow,
+    ) -> Self {
+        Self {
+            source: row.source.clone(),
+            peak_contribution: PyQty {
+                magnitude_si: row.peak_contribution.value,
+                unit: "kg/s".to_string(),
+            },
+        }
+    }
+}
+
+/// the combined header load at each grid time.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MultiVesselProfileRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMultiVesselProfileRow {
+    /// the grid time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the summed discharge rate at the grid time.
+    #[pyo3(get)]
+    pub total_mass_flow: PyQty,
+}
+
+#[pymethods]
+impl PyMultiVesselProfileRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "MultiVesselProfileRow(time={:?}, total_mass_flow={:?})",
+            self.time, self.total_mass_flow
+        )
+    }
+}
+
+impl From<&azoth_process::models::multi_vessel_blowdown_study::MultiVesselProfileRow>
+    for PyMultiVesselProfileRow
+{
+    fn from(
+        row: &azoth_process::models::multi_vessel_blowdown_study::MultiVesselProfileRow,
+    ) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            total_mass_flow: PyQty {
+                magnitude_si: row.total_mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+        }
+    }
+}
+
 /// The NACE assessment's issue strings.
 #[pyclass(
     frozen,

@@ -90,6 +90,7 @@ pub mod manifold;
 pub mod map_turbo_expander_compressor;
 pub mod mdmt;
 pub mod mixer;
+pub mod multi_vessel_blowdown_study;
 pub mod nog070_sil_determination;
 pub mod norsok_p002_compliance;
 pub mod overpressure;
@@ -251,6 +252,10 @@ pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};
 pub use mdmt::{MdmtResult, mdmt};
 pub use mixer::{MixerResult, mixer};
+pub use multi_vessel_blowdown_study::{
+    MultiVesselBlowdownStudyResult, MultiVesselContributionRow, MultiVesselProfileRow,
+    MultiVesselSample, multi_vessel_blowdown_study,
+};
 pub use nog070_sil_determination::{Nog070SilDeterminationResult, nog070_sil_determination};
 pub use norsok_p002_compliance::{
     NorsokP002ComplianceResult, P002CheckRow, P002Criterion, P002FindingResult,

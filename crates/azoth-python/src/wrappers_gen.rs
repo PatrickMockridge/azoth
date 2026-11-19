@@ -7445,6 +7445,52 @@ pub fn mixer(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Multi-vessel blowdown study.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (samples, header_diameter, header_pressure, header_temperature, header_molar_mass, header_heat_capacity_ratio, max_allowable_mach, grid_step))]
+#[pyo3(
+    text_signature = "(samples, header_diameter, header_pressure, header_temperature, header_molar_mass, header_heat_capacity_ratio, max_allowable_mach, grid_step)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn multi_vessel_blowdown_study(
+    py: Python<'_>,
+    samples: Vec<crate::records_gen::MultiVesselSample>,
+    header_diameter: Option<f64>,
+    header_pressure: Option<f64>,
+    header_temperature: Option<f64>,
+    header_molar_mass: Option<f64>,
+    header_heat_capacity_ratio: Option<f64>,
+    max_allowable_mach: Option<f64>,
+    grid_step: Option<f64>,
+) -> PyResult<crate::transport_gen::PyMultiVesselBlowdownStudyResult> {
+    let samples_records: Vec<
+        azoth_process::models::multi_vessel_blowdown_study::MultiVesselSample,
+    > = samples
+        .into_iter()
+        .map(
+            |row| azoth_process::models::multi_vessel_blowdown_study::MultiVesselSample {
+                source: row.source,
+                time: seconds(row.time),
+                mass_flow: kilograms_per_second(row.mass_flow),
+            },
+        )
+        .collect();
+    azoth_process::models::multi_vessel_blowdown_study::multi_vessel_blowdown_study(
+        &samples_records,
+        header_diameter.map(meters),
+        header_pressure.map(pascals),
+        header_temperature.map(kelvins),
+        header_molar_mass.map(kilograms_per_mole),
+        header_heat_capacity_ratio,
+        max_allowable_mach,
+        grid_step.map(seconds),
+    )
+    .map(|r| crate::transport_gen::PyMultiVesselBlowdownStudyResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// NOG 070 SIL determination.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

@@ -3472,6 +3472,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.multi_vessel_blowdown_study",
+        name: "Multi-vessel blowdown study",
+        family: "depressurization",
+        sub_interface: Some("depressurization"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.nog070_sil_determination",
         name: "NOG 070 SIL determination",
         family: "risk",

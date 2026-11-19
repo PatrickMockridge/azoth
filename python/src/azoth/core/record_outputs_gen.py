@@ -779,6 +779,28 @@ class MinimalCutSet:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MultiVesselContributionRow:
+    """each source's contribution at the peak, in first-appearance order."""
+
+    #: the source's name.
+    source: str
+
+    #: the source's interpolated rate at the peak time.
+    peak_contribution: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MultiVesselProfileRow:
+    """the combined header load at each grid time."""
+
+    #: the grid time.
+    time: Q
+
+    #: the summed discharge rate at the grid time.
+    total_mass_flow: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class NaceIssueRow:
     """The NACE assessment's issue strings."""
 

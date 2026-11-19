@@ -3095,6 +3095,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 3,
         "tests_skipped": 0,
     },
+    'process.multi_vessel_blowdown_study': {
+        "calc_id": 'process.multi_vessel_blowdown_study',
+        "name": 'Multi-vessel blowdown study',
+        "spec": {'path': 'specs/models/process/multi_vessel_blowdown_study.toml', 'sha256': '32c61c807561219d57d04b3aec028d7dcc1e01b12f85bc5b7c4d4c66b6fcd318'},
+        "code": [{'path': 'python/src/azoth/process/reference/multi_vessel_blowdown_study.py', 'sha256': '98c948c6823b334338792fb4436950736b1583ca92f774753e25e986fedfa6d7'}, {'path': 'crates/azoth-process/src/models/multi_vessel_blowdown_study.rs', 'sha256': 'edfe9078b36c1aeecac0fd305b498737a9e725979cd9aa66727e85d4bf56bb50'}],
+        "source": 'NeqSim process/safety/depressurization/MultiVesselBlowdownStudy.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 3,
+        "tests_skipped": 0,
+    },
     'process.nog070_sil_determination': {
         "calc_id": 'process.nog070_sil_determination',
         "name": 'NOG 070 SIL determination',

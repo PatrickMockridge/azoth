@@ -22,14 +22,15 @@ use crate::record_outputs_gen::{
     PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
     PyHydrateRiskPoint, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
     PyLeakBlowdownPoint, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat,
-    PyMineralEquilibriumRow, PyMinimalCutSet, PyNaceIssueRow, PyP002FindingResult,
-    PyPipeFireRupturePoint, PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow,
-    PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
-    PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow,
-    PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint,
-    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
-    PySts0131FindingResult, PySubFraction, PyTr3001Finding, PyVesselFillingPoint,
-    PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
+    PyMultiVesselProfileRow, PyNaceIssueRow, PyP002FindingResult, PyPipeFireRupturePoint,
+    PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
+    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyTr3001Finding, PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult,
+    PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -21030,6 +21031,98 @@ impl From<&azoth_process::models::mixer::MixerResult> for PyMixerResult {
                 magnitude_si: r.product_h.value,
                 unit: "J/mol".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.multi_vessel_blowdown_study`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MultiVesselBlowdownStudyResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMultiVesselBlowdownStudyResult {
+    /// the combined header load at each grid time.
+    #[pyo3(get)]
+    pub profile: Vec<PyMultiVesselProfileRow>,
+    /// each source's contribution at the peak, in first-appearance order.
+    #[pyo3(get)]
+    pub contributions: Vec<PyMultiVesselContributionRow>,
+    /// the controlling combined load.
+    #[pyo3(get)]
+    pub peak_total_mass_flow: PyQty,
+    /// the time of the controlling load.
+    #[pyo3(get)]
+    pub peak_time: PyQty,
+    /// the header gas velocity at the peak; absent when no header is configured.
+    #[pyo3(get)]
+    pub header_velocity: Option<PyQty>,
+    /// the header Mach number at the peak; absent when no header is configured.
+    #[pyo3(get)]
+    pub header_mach: Option<f64>,
+    /// the Mach limit the run used.
+    #[pyo3(get)]
+    pub max_allowable_mach: f64,
+    /// whether the Mach number is within the limit, or no header is configured.
+    #[pyo3(get)]
+    pub header_mach_acceptable: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyMultiVesselBlowdownStudyResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "MultiVesselBlowdownStudyResult(profile={:?}, contributions={:?}, peak_total_mass_flow={:?}, peak_time={:?}, header_velocity={:?}, header_mach={:?}, max_allowable_mach={:?}, header_mach_acceptable={:?}, {} warning(s))",
+            self.profile,
+            self.contributions,
+            self.peak_total_mass_flow,
+            self.peak_time,
+            self.header_velocity,
+            self.header_mach,
+            self.max_allowable_mach,
+            self.header_mach_acceptable,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult>
+    for PyMultiVesselBlowdownStudyResult
+{
+    fn from(
+        r: &azoth_process::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult,
+    ) -> Self {
+        Self {
+            profile: r
+                .profile
+                .iter()
+                .map(PyMultiVesselProfileRow::from)
+                .collect(),
+            contributions: r
+                .contributions
+                .iter()
+                .map(PyMultiVesselContributionRow::from)
+                .collect(),
+            peak_total_mass_flow: PyQty {
+                magnitude_si: r.peak_total_mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            peak_time: PyQty {
+                magnitude_si: r.peak_time.value,
+                unit: "s".to_string(),
+            },
+            header_velocity: r.header_velocity.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            header_mach: r.header_mach,
+            max_allowable_mach: r.max_allowable_mach,
+            header_mach_acceptable: r.header_mach_acceptable,
             warnings: transport(&r.warnings),
         }
     }
