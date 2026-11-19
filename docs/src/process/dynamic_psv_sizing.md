@@ -72,7 +72,7 @@ not an equation, and both implementations read it from here.
 
 ## Assumptions
 
-- **the class's `run`**: one TP flash supplies the gas's molar mass, capacity ratio, density and compressibility; the steady area is the API 521 gas equation with `Kd = 0.975`, the conventional back-pressure correction and no rupture disk; and the dynamic area is a bisection whose inner march is an ideal-gas lumped vessel with the PSV latch.
+- **the class's `run`**: one TP flash supplies the gas properties; the steady area is the API 521 gas equation with `Kd = 0.975` and no rupture disk; the dynamic area is a bisection whose inner march is an ideal-gas vessel with the valve latch.
 - **the dynamic march starts at `set_pressure x initial_pressure_fraction`**, so the fluid's own stated pressure enters only through the flash and the compressibility; the mole inventory and mass follow from that start, the vessel volume and the flash's Z.
 - **each candidate area runs a fresh valve** — closed, with a zero pop count — and the march's energy is `m cv T`, updated as `u' = u + Q dt - cp T dm`; the class's `cv = (R/MW)/(gamma - 1)` with `R = 8.314` and `MW` in kg/mol.
 - **the class's fallbacks are mirrored**: a capacity ratio at or below one becomes 1.3, and a non-positive or non-finite compressibility becomes 1.

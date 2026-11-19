@@ -28117,7 +28117,7 @@
           "**the latch**: the valve opens when closed and the upstream pressure reaches the set pressure, increments the pop count only on the closed-to-open transition, and closes only at or below the reseat pressure `set (1 - blowdown)`.",
           "**the flow** is the API 520 compressible-orifice relation with `R = 8.314`, choked at `(2/(gamma+1))^(gamma/(gamma-1))` and subcritical above it; the subcritical radicand is floored at 0 and a negative or NaN rate is published as 0.",
           "**a closed valve passes no flow**, whatever the upstream state.",
-          "**the constructor's guards are mirrored**: a negative back pressure, a set pressure at or below the back pressure, a blowdown fraction outside `(0, 1)`, a non-positive discharge coefficient or a non-positive orifice area is refused. The mass-flow guards refuse a non-positive pressure or temperature, molar mass or compressibility, and a heat-capacity ratio at or below one.",
+          "**the constructor's guards are mirrored**: a negative back pressure, a set pressure at or below it, a fraction outside `(0, 1)`, a non-positive coefficient or area is refused; the flow guards refuse a non-positive pressure, temperature, molar mass or compressibility and a ratio at or below one.",
           "**`reset()` is the state inputs**: `was_open = false` with `prior_cycle_count = 0`.",
           "**a negative or fractional `prior_cycle_count` is refused**, which the class cannot hold: its counter is a whole number, and a fractional one is not a state this step can continue from."
         ],
@@ -28424,7 +28424,7 @@
         "provenance": {
           "python_sha256": "bcf27899d5dc1e52b07d3da9490256aef0492ae6e758d667804ca131756accef",
           "rust_sha256": "5bf488d2c434a7660d63040405ebe914a568fe88e98a6d50b8e0b10eaf8d5d3d",
-          "spec_sha256": "958334b3515880666b5cd880349436f07b2b4383a2e0392353ad724b73636333",
+          "spec_sha256": "113cb0e05437223339ce287776f82e6a3c239178271b2f14ec40157c0487a2f8",
           "tests_active": 6,
           "tests_skipped": 0,
           "validation_cases": 0,

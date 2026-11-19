@@ -2,8 +2,8 @@ id = "process.vessel_filling"
 name = "Vessel filling"
 kind = "procedure"
 assumptions = [
-    "**the class's `run`**: the inlet specific enthalpy is flashed once at the supply state on a separate fluid, the vessel's moles are aligned to `density x volume`, and each step adds `mdot dt`, exchanges heat with the lumped wall, scales the moles and VU-flashes at the vessel volume and the new internal energy.",
-    "**the VU flash is the class's dispatch**: a pure feed whose pressure and temperature are subcritical and whose internal energy lies between the saturated values takes `VUflashSingleComp` at the system's pressure (which it reads and never uses the volume for); every other feed takes `OptimizedVUflash`.",
+    "**the class's `run`**: the inlet enthalpy is flashed once at the supply state, the moles are aligned to `density x volume`, and each step adds `mdot dt`, exchanges heat with the wall, scales the moles and VU-flashes at the vessel volume and the new internal energy.",
+    "**the VU flash is the class's dispatch**: a pure subcritical feed whose internal energy lies between the saturated values takes `VUflashSingleComp` at the system pressure (it reads no volume); every other feed takes `OptimizedVUflash`.",
     "**a VU-flash failure takes the class's fallback**: the pressure is set to `P = m R T/(MW V)` — no Z and no back-pressure floor — and a TP flash follows. The fallback count is published.",
     "**the inside film coefficient is the fixed configured value**, or the Woodfield mixed-convection correlation `Nu = 0.56 Re_d^0.67 + 0.104 Ra_H^0.352` when both the inlet-nozzle diameter and the vessel height are given.",
     "**the wall is a lump**: the fluid loses `h A (T_wall - T)` and the wall gains it; a zero wall mass disables the wall and leaves the wall temperature equal to the initial fluid temperature.",
