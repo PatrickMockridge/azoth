@@ -419,6 +419,7 @@ Five sections, and the difference between them is the point:
 - [`process.pump_deadhead`](./process/pump_deadhead.md) — Pump deadhead and minimum-flow temperature rise
 - [`process.ranz_marshall_release`](./process/ranz_marshall_release.md) — Ranz-Marshall component-transfer orifice release
 - [`process.rate_based_packed_column`](./process/rate_based_packed_column.md) — Rate-based packed column
+- [`process.real_gas_fanno_release`](./process/real_gas_fanno_release.md) — Real-gas Fanno pipe release
 - [`process.relief_disposal_network`](./process/relief_disposal_network.md) — Relief disposal network
 - [`process.risk_matrix`](./process/risk_matrix.md) — Risk matrix
 - [`process.runaway_reaction`](./process/runaway_reaction.md) — Runaway reaction screening

@@ -93,6 +93,7 @@
 //!   - specs/models/process/pump_deadhead.toml
 //!   - specs/models/process/ranz_marshall_release.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/real_gas_fanno_release.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/runaway_reaction.toml
@@ -75327,6 +75328,219 @@ pub static RATE_BASED_PACKED_COLUMN_SPEC: ModelSpec = ModelSpec {
     cases: RATE_BASED_PACKED_COLUMN_CASES,
 };
 
+static REAL_GAS_FANNO_RELEASE_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "upstream_t",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "upstream_p",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "diameter",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an opening has a positive diameter",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "discharge_coefficient",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "`ReleaseFlowRequest` refuses a coefficient outside `(0, 1]`",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "back_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "flow_path_length",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the request refuses a negative length",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "darcy_friction_factor",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the request refuses a friction factor outside [0, 1]",
+        },
+    },
+];
+
+static REAL_GAS_FANNO_RELEASE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "dilute_nitrogen",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.001,
+        numbers: &[
+            ("upstream_t", 300.0),
+            ("upstream_p", 200000.0),
+            ("diameter", 0.08),
+            ("discharge_coefficient", 0.9),
+            ("back_pressure", 101325.0),
+            ("flow_path_length", 12.0),
+            ("darcy_friction_factor", 0.015),
+        ],
+        flags: &[],
+        lists: &[("components", &["nitrogen"])],
+        strings: &[],
+        vectors: &[("upstream_z", &[1.0])],
+        matrices: &[],
+        expected: &[("mass_flow_rate", 1.277278966897692)],
+        expected_vectors: &[],
+        expected_strings: &[("status", "valid")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "two_phase_refuses",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("upstream_t", 285.0),
+            ("upstream_p", 6000000.0),
+            ("diameter", 0.08),
+            ("discharge_coefficient", 0.9),
+            ("back_pressure", 101325.0),
+            ("flow_path_length", 12.0),
+            ("darcy_friction_factor", 0.015),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "n-hexane"])],
+        strings: &[],
+        vectors: &[("upstream_z", &[0.55, 0.45])],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("status", "unsupported")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "no_flow_path_is_unsupported",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("upstream_t", 300.0),
+            ("upstream_p", 200000.0),
+            ("diameter", 0.08),
+            ("discharge_coefficient", 0.9),
+            ("back_pressure", 101325.0),
+            ("flow_path_length", 0.0),
+            ("darcy_friction_factor", 0.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["nitrogen"])],
+        strings: &[],
+        vectors: &[("upstream_z", &[1.0])],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("status", "unsupported")],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static REAL_GAS_FANNO_RELEASE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "real_gas_fanno_march",
+    convergence: "relative",
+    tolerance: 2e-07,
+    max_iterations: 42,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.real_gas_fanno_release`.
+pub static REAL_GAS_FANNO_RELEASE_SPEC: ModelSpec = ModelSpec {
+    id: "process.real_gas_fanno_release",
+    kind: "procedure",
+    algorithm: Some(&REAL_GAS_FANNO_RELEASE_ALGORITHM),
+    checks: REAL_GAS_FANNO_RELEASE_CHECKS,
+    cases: REAL_GAS_FANNO_RELEASE_CASES,
+};
+
 static RELIEF_DISPOSAL_NETWORK_CHECKS: &[SpecCheck] = &[];
 
 static RELIEF_DISPOSAL_NETWORK_CASES: &[TestCase] = &[
@@ -93906,6 +94120,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &PUMP_DEADHEAD_SPEC,
     &RANZ_MARSHALL_RELEASE_SPEC,
     &RATE_BASED_PACKED_COLUMN_SPEC,
+    &REAL_GAS_FANNO_RELEASE_SPEC,
     &RELIEF_DISPOSAL_NETWORK_SPEC,
     &RISK_MATRIX_SPEC,
     &RUNAWAY_REACTION_SPEC,

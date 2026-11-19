@@ -805,14 +805,14 @@ a claim nothing holds.
   nine ids**: `process.ideal_gas_release`, `process.legacy_screening_release`,
   `process.prescribed_slip_release`, `process.drift_flux_release`, `process.finite_rate_release`,
   `process.component_selective_release`, `process.ranz_marshall_release`,
-  `process.bubble_transfer_zone_release` and `process.ideal_gas_fanno_release`, held to their
-  eight captures and the NASA GFSSP case. The shared machinery is the equilibrium station's
+  `process.bubble_transfer_zone_release`, `process.ideal_gas_fanno_release` and
+  `process.real_gas_fanno_release`, held to their nine captures and the NASA GFSSP case. The
+  real-gas march runs thousands of PH flashes per state in its Python mirror, so its
+  cross-implementation cases live in the `slow_sweep` module and the nightly carries them. The shared machinery is the equilibrium station's
   phase records, the prescribed-slip and Zuber-Findlay/Harmathy closures, the Ranz-Marshall
   correlation and the uniform and component-selective relaxations; the Fanno pair carries a
   conservative solid and hydrate gate that refuses what its per-component solid flash cannot
-  reproduce. What remains owed in `process/safety/release/` is `RealGasFannoPipeReleaseModel`
-  - the Rust march matches the capture, but the pure-Python mirror runs thousands of PH flashes
-  per state and needs a performance approach before it can carry a cross-impl case -
+  reproduce. What remains owed in `process/safety/release/` is
   `SourceTermResult`'s six file exporters (PHAST, FLACS, KFX, OpenFOAM, CSV, JSON - the
   time-series container is the result, the writers are session output), `ReleaseOrientation`
   (stored and read by no arithmetic), `ReleaseFlowEnsemble` (zero callers), `SourceTermSession`,
@@ -941,7 +941,7 @@ a claim nothing holds.
   `blowby/`, `vacuum/`, `settleout/`, `pump/`, `reaction/`, `inventory/`,
   `mdmt/`, `leakdetection/`, `cfd/`, `envelope/`, `scenario/` and `dto/`, plus the risk
   subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
-  own classes - the risk core, the eleven release models, the five overpressure calculators,
+  own classes - the risk core, the twelve release models, the five overpressure calculators,
   the six dispersion ids, the four rupture ids, the four self-heating ids, the four hazid
   worksheet ids, the four safety-review worksheet ids, the six safety screens, the nine
   safety worksheets and vibration screens and the eight depressurization ids; the types

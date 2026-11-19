@@ -111,6 +111,7 @@ from azoth.core.result import (
     PumpResult,
     RanzMarshallReleaseResult,
     RateBasedPackedColumnResult,
+    RealGasFannoReleaseResult,
     ReliefDisposalNetworkResult,
     RiskMatrixResult,
     RunawayReactionResult,
@@ -321,6 +322,7 @@ _COMPONENT_SELECTIVE_RELEASE = "process.component_selective_release"
 _RANZ_MARSHALL_RELEASE = "process.ranz_marshall_release"
 _BUBBLE_TRANSFER_ZONE_RELEASE = "process.bubble_transfer_zone_release"
 _IDEAL_GAS_FANNO_RELEASE = "process.ideal_gas_fanno_release"
+_REAL_GAS_FANNO_RELEASE = "process.real_gas_fanno_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
@@ -3787,6 +3789,39 @@ def ideal_gas_fanno_release(
     See :func:`azoth.process.reference.ideal_gas_fanno_release`.
     """
     return resolve(_IDEAL_GAS_FANNO_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        flow_path_length=flow_path_length,
+        darcy_friction_factor=darcy_friction_factor,
+    )
+
+
+def real_gas_fanno_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    flow_path_length: Q,
+    darcy_friction_factor: float,
+) -> RealGasFannoReleaseResult:
+    """The release rate of a real-gas Fanno pipe.
+
+    A one-sided adiabatic constant-area pipe of a single equilibrium gas with EOS
+    properties: ten axial predictor-corrector steps, a PH flash at every energy state, the
+    entropy inlet root and nested flux bisections. A two-phase state is ``unsupported``.
+    **The pure-Python mirror is slow**; its cross-implementation cases run in the slow sweep.
+
+    See :func:`azoth.process.reference.real_gas_fanno_release`.
+    """
+    return resolve(_REAL_GAS_FANNO_RELEASE)(  # type: ignore[no-any-return]
         components=components,
         upstream_z=upstream_z,
         upstream_t=upstream_t,

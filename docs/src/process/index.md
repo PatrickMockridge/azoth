@@ -105,6 +105,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.pump_deadhead`](./pump_deadhead.md) | `centrifugal_pump_deadhead_screen` | NeqSim process/safety/pump/PumpDeadheadAnalyzer.java |
 | [`process.ranz_marshall_release`](./ranz_marshall_release.md) | `ranz_marshall_component_transfer` | NeqSim process/safety/release/RanzMarshallFiniteRateReleaseModel.java |
 | [`process.rate_based_packed_column`](./rate_based_packed_column.md) | `counter_current_fixed_point_profile` | NeqSim process/equipment/distillation/RateBasedPackedColumn.java |
+| [`process.real_gas_fanno_release`](./real_gas_fanno_release.md) | `real_gas_fanno_march` | NeqSim process/safety/release/RealGasFannoPipeReleaseModel.java |
 | [`process.relief_disposal_network`](./relief_disposal_network.md) | `closed_form_relief_disposal_network` | NeqSim process/safety/overpressure/ReliefDisposalNetwork.java |
 | [`process.risk_matrix`](./risk_matrix.md) | `closed_form_risk_matrix` | NeqSim process/safety/risk/RiskMatrix.java |
 | [`process.runaway_reaction`](./runaway_reaction.md) | `adiabatic_runaway_screen` | NeqSim process/safety/reaction/RunawayReactionAnalyzer.java |

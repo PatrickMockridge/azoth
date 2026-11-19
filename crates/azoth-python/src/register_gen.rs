@@ -332,6 +332,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPumpDeadheadResult>()?;
     m.add_class::<crate::transport_gen::PyRanzMarshallReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyRateBasedPackedColumnResult>()?;
+    m.add_class::<crate::transport_gen::PyRealGasFannoReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyReliefDisposalNetworkResult>()?;
     m.add_class::<crate::transport_gen::PyRiskMatrixResult>()?;
     m.add_class::<crate::transport_gen::PyRunawayReactionResult>()?;
@@ -433,6 +434,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyPrescribedSlipReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyPulsationModeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyRanzMarshallReleaseStation>()?;
+    m.add_class::<crate::record_outputs_gen::PyRealGasFannoReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyRegisterFinding>()?;
     m.add_class::<crate::record_outputs_gen::PyReliefDisposalRow>()?;
     m.add_class::<crate::record_outputs_gen::PyRemediationOptionRow>()?;
@@ -1209,6 +1211,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(
         crate::process::rate_based_packed_column,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::real_gas_fanno_release,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(

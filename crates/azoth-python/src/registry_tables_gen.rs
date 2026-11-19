@@ -333,6 +333,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.pump_deadhead" => azoth_process::models::pump_deadhead::PumpDeadheadResult::FIELDS.to_vec(),
         "process.ranz_marshall_release" => azoth_process::models::ranz_marshall_release::RanzMarshallReleaseResult::FIELDS.to_vec(),
         "process.rate_based_packed_column" => azoth_process::models::rate_based_packed_column::RateBasedPackedColumnResult::FIELDS.to_vec(),
+        "process.real_gas_fanno_release" => azoth_process::models::real_gas_fanno_release::RealGasFannoReleaseResult::FIELDS.to_vec(),
         "process.relief_disposal_network" => azoth_process::models::relief_disposal_network::ReliefDisposalNetworkResult::FIELDS.to_vec(),
         "process.risk_matrix" => azoth_process::models::risk_matrix::RiskMatrixResult::FIELDS.to_vec(),
         "process.runaway_reaction" => azoth_process::models::runaway_reaction::RunawayReactionResult::FIELDS.to_vec(),

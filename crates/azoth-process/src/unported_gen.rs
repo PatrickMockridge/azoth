@@ -93,6 +93,7 @@
 //!   - specs/models/process/pump_deadhead.toml
 //!   - specs/models/process/ranz_marshall_release.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/real_gas_fanno_release.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/runaway_reaction.toml

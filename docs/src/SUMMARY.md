@@ -327,6 +327,7 @@
   - [Pump deadhead and minimum-flow temperature rise](./process/pump_deadhead.md)
   - [Ranz-Marshall component-transfer orifice release](./process/ranz_marshall_release.md)
   - [Rate-based packed column](./process/rate_based_packed_column.md)
+  - [Real-gas Fanno pipe release](./process/real_gas_fanno_release.md)
   - [Relief disposal network](./process/relief_disposal_network.md)
   - [Risk matrix](./process/risk_matrix.md)
   - [Runaway reaction screening](./process/runaway_reaction.md)

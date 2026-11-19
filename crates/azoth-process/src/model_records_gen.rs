@@ -103,6 +103,7 @@ use crate::models::pump::PumpResult;
 use crate::models::pump_deadhead::PumpDeadheadResult;
 use crate::models::ranz_marshall_release::RanzMarshallReleaseResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
+use crate::models::real_gas_fanno_release::RealGasFannoReleaseResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
 use crate::models::runaway_reaction::RunawayReactionResult;
@@ -2298,6 +2299,29 @@ impl CalcResult for RateBasedPackedColumnResult {
         "segment_percent_flood",
         "segment_net_molar_transfer",
         "segment_enthalpy_balance_residual",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for RealGasFannoReleaseResult {
+    const CALC_ID: &'static str = "process.real_gas_fanno_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "friction_length",
+        "inlet_mach",
+        "exit_mach",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
         "warnings",
     ];
 

@@ -124,6 +124,7 @@ pub mod pump;
 pub mod pump_deadhead;
 pub mod ranz_marshall_release;
 pub mod rate_based_packed_column;
+pub mod real_gas_fanno_release;
 pub(crate) mod release;
 pub mod relief_disposal_network;
 pub mod risk_matrix;
@@ -316,6 +317,7 @@ pub use pump::{PumpResult, pump};
 pub use pump_deadhead::{DeadheadVerdict, PumpDeadheadResult, pump_deadhead};
 pub use ranz_marshall_release::{RanzMarshallReleaseResult, ranz_marshall_release};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};
+pub use real_gas_fanno_release::{RealGasFannoReleaseResult, real_gas_fanno_release};
 pub use relief_disposal_network::{
     ReliefCause, ReliefContribution, ReliefDisposalNetworkResult, ReliefDisposalRow, ReliefPhase,
     relief_disposal_network,

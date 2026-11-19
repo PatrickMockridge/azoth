@@ -314,6 +314,7 @@
 //!   - specs/models/process/pump_deadhead.toml
 //!   - specs/models/process/ranz_marshall_release.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/real_gas_fanno_release.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/runaway_reaction.toml
@@ -5352,6 +5353,38 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.rate_based_packed_column",
         "mass_transfer_correction",
+        "dimensionless",
+    ),
+    (
+        "process.real_gas_fanno_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.real_gas_fanno_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.real_gas_fanno_release", "upstream_p", "pressure"),
+    ("process.real_gas_fanno_release", "diameter", "length"),
+    (
+        "process.real_gas_fanno_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.real_gas_fanno_release",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.real_gas_fanno_release",
+        "flow_path_length",
+        "length",
+    ),
+    (
+        "process.real_gas_fanno_release",
+        "darcy_friction_factor",
         "dimensionless",
     ),
     (

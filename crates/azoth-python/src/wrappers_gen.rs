@@ -8599,6 +8599,42 @@ pub fn ranz_marshall_release(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Real-gas Fanno pipe release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, flow_path_length, darcy_friction_factor))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, flow_path_length, darcy_friction_factor)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn real_gas_fanno_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    flow_path_length: f64,
+    darcy_friction_factor: f64,
+) -> PyResult<crate::transport_gen::PyRealGasFannoReleaseResult> {
+    azoth_process::models::real_gas_fanno_release::real_gas_fanno_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        flow_path_length,
+        darcy_friction_factor,
+    )
+    .map(|r| crate::transport_gen::PyRealGasFannoReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Relief disposal network.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

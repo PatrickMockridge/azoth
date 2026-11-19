@@ -1108,7 +1108,7 @@ class BubbleTransferZoneReleaseStation:
 
 @final
 class HemReleaseDiagnostic:
-    """the model's assumptions and the delegate's retained records."""
+    """the model's assumption and check records, in the order it forms them."""
 
     code: str
     message: str
@@ -1514,6 +1514,25 @@ class PrescribedSlipReleaseStation:
 @final
 class RanzMarshallReleaseStation:
     """the delegate's stations, with the correlation-driven relaxed phase velocities. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
+class RealGasFannoReleaseStation:
+    """the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow."""
 
     station: str
     pressure: Qty
@@ -5172,6 +5191,22 @@ class RateBasedPackedColumnResult:
     segment_percent_flood: list[float]
     segment_net_molar_transfer: list[Qty]
     segment_enthalpy_balance_residual: list[Qty]
+    warnings: list[Warning]
+
+@final
+class RealGasFannoReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    friction_length: float | None
+    inlet_mach: float | None
+    exit_mach: float | None
+    stations: list[RealGasFannoReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
     warnings: list[Warning]
 
 @final
@@ -9276,6 +9311,17 @@ def rate_based_packed_column(
     segment_solver: str | None = None,
     column_solver: str | None = None,
 ) -> RateBasedPackedColumnResult: ...
+def real_gas_fanno_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    flow_path_length: float,
+    darcy_friction_factor: float,
+) -> RealGasFannoReleaseResult: ...
 def relief_disposal_network(
     contributions: list[ReliefContribution],
 ) -> ReliefDisposalNetworkResult: ...
