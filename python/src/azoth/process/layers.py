@@ -4549,6 +4549,12 @@ DUMPERS: dict[str, Dumper] = {
 #: **This is not "the model is too simple to check".** Each entry names the arithmetic and
 #: what would have to exist for there to be a layer.
 NO_INTERIOR: dict[str, str] = {
+    "process.real_gas_fanno_release": (
+        "the real-gas Fanno march is thousands of PH flashes per state, and its Python "
+        "reference takes about sixteen minutes for one case; a layer diff would run it "
+        "again. The cases are the oracle, the capture is their evidence, and the "
+        "cross-implementation cases live in the slow sweep"
+    ),
     "process.event_tree": (
         "the kernel is the class's own ``evaluate``: a full 2^n enumeration over the branch "
         "probabilities the caller states, with no composed model beneath it. The case set is "
