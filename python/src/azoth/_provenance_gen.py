@@ -3414,6 +3414,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 7,
         "tests_skipped": 0,
     },
+    'process.ranz_marshall_release': {
+        "calc_id": 'process.ranz_marshall_release',
+        "name": 'Ranz-Marshall component-transfer orifice release',
+        "spec": {'path': 'specs/models/process/ranz_marshall_release.toml', 'sha256': 'a3720411cd473b57a38b17953ba3dff45c4b7707f426894e87f8998f2d411e58'},
+        "code": [{'path': 'python/src/azoth/process/reference/ranz_marshall_release.py', 'sha256': 'f5b27b2d32585d2356e51262f9ac304764a61c6e5da2b0c0b3a2472b51686e1c'}, {'path': 'crates/azoth-process/src/models/ranz_marshall_release.rs', 'sha256': '6ee5a8c818123acfd4082a69dfe93ac1d431955835e767f8284bbacbe1150c55'}],
+        "source": 'NeqSim process/safety/release/RanzMarshallFiniteRateReleaseModel.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'process.rate_based_packed_column': {
         "calc_id": 'process.rate_based_packed_column',
         "name": 'Rate-based packed column',

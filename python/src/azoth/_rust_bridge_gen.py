@@ -314,6 +314,8 @@ from azoth.core.result import (
     RachfordRiceBinaryResult,
     RachfordRiceResult,
     RackettMolarVolumeResult,
+    RanzMarshallReleaseResult,
+    RanzMarshallReleaseStation,
     RateBasedPackedColumnResult,
     ReactiveCo2BrinePhaseEquilibriumResult,
     ReactiveHybridEosGeFlashResult,
@@ -749,6 +751,7 @@ __all__ = [
     "rachford_rice",
     "rachford_rice_binary",
     "rackett_molar_volume",
+    "ranz_marshall_release",
     "rate_based_packed_column",
     "reactive_co2_brine_phase_equilibrium",
     "reactive_hybrid_eos_ge_flash",
@@ -8760,6 +8763,41 @@ def pump_deadhead(suction_pressure: Q, normal_discharge_pressure: Q, shutoff_hea
         recirculation_temperature_rise=None if result.recirculation_temperature_rise is None else from_si(result.recirculation_temperature_rise.magnitude_si, result.recirculation_temperature_rise.unit),
         temp_rise_exceeded=result.temp_rise_exceeded,
         verdict=DeadheadVerdict(result.verdict),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def ranz_marshall_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, surface_tension: Q, residence_time: Q, morphology: str, sauter_mean_diameter: Q, continuous_phase_density: Q, continuous_phase_dynamic_viscosity: Q, relative_velocity: Q, component_diffusivities: list[Q], parameter_provenance: str) -> RanzMarshallReleaseResult:
+    """``process.ranz_marshall_release``, computed in Rust."""
+    spec = _models_gen.model("process.ranz_marshall_release")
+    result = _core.ranz_marshall_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "surface_tension", surface_tension),
+        input_to_si(spec, "residence_time", residence_time),
+        morphology,
+        input_to_si(spec, "sauter_mean_diameter", sauter_mean_diameter),
+        input_to_si(spec, "continuous_phase_density", continuous_phase_density),
+        input_to_si(spec, "continuous_phase_dynamic_viscosity", continuous_phase_dynamic_viscosity),
+        input_to_si(spec, "relative_velocity", relative_velocity),
+        [input_to_si(spec, "component_diffusivities", v) for v in component_diffusivities],
+        parameter_provenance,
+    )
+    return RanzMarshallReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(RanzMarshallReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
         warnings=_warnings(result.warnings),
     )
 

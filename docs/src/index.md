@@ -415,6 +415,7 @@ Five sections, and the difference between them is the point:
 - [`process.psv_valve`](./process/psv_valve.md) — PSV latch and relief flow
 - [`process.pump`](./process/pump.md) — Pump
 - [`process.pump_deadhead`](./process/pump_deadhead.md) — Pump deadhead and minimum-flow temperature rise
+- [`process.ranz_marshall_release`](./process/ranz_marshall_release.md) — Ranz-Marshall component-transfer orifice release
 - [`process.rate_based_packed_column`](./process/rate_based_packed_column.md) — Rate-based packed column
 - [`process.relief_disposal_network`](./process/relief_disposal_network.md) — Relief disposal network
 - [`process.risk_matrix`](./process/risk_matrix.md) — Risk matrix

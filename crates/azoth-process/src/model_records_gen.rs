@@ -99,6 +99,7 @@ use crate::models::psv_sizing::PsvSizingResult;
 use crate::models::psv_valve::PsvValveResult;
 use crate::models::pump::PumpResult;
 use crate::models::pump_deadhead::PumpDeadheadResult;
+use crate::models::ranz_marshall_release::RanzMarshallReleaseResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
@@ -2180,6 +2181,26 @@ impl CalcResult for PumpDeadheadResult {
         "recirculation_temperature_rise",
         "temp_rise_exceeded",
         "verdict",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for RanzMarshallReleaseResult {
+    const CALC_ID: &'static str = "process.ranz_marshall_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
         "warnings",
     ];
 

@@ -6792,6 +6792,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.ranz_marshall_release",
+        name: "Ranz-Marshall component-transfer orifice release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.relief_disposal_network",
         name: "Relief disposal network",
         family: "overpressure",

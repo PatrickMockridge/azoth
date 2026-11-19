@@ -310,6 +310,7 @@
 //!   - specs/models/process/psv_valve.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/pump_deadhead.toml
+//!   - specs/models/process/ranz_marshall_release.toml
 //!   - specs/models/process/rate_based_packed_column.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
@@ -5168,6 +5169,55 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.pump_deadhead",
         "max_allowable_temperature_rise",
         "thermodynamic_temperature",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.ranz_marshall_release", "upstream_p", "pressure"),
+    ("process.ranz_marshall_release", "diameter", "length"),
+    (
+        "process.ranz_marshall_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.ranz_marshall_release", "back_pressure", "pressure"),
+    (
+        "process.ranz_marshall_release",
+        "surface_tension",
+        "surface_tension",
+    ),
+    ("process.ranz_marshall_release", "residence_time", "time"),
+    (
+        "process.ranz_marshall_release",
+        "sauter_mean_diameter",
+        "length",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "continuous_phase_density",
+        "mass_density",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "continuous_phase_dynamic_viscosity",
+        "dynamic_viscosity",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "relative_velocity",
+        "velocity",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "component_diffusivities",
+        "diffusion_coefficient",
     ),
     ("process.rate_based_packed_column", "gas_n", "molar_flow"),
     ("process.rate_based_packed_column", "gas_z", "dimensionless"),

@@ -89,6 +89,7 @@
 //!   - specs/models/process/psv_valve.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/pump_deadhead.toml
+//!   - specs/models/process/ranz_marshall_release.toml
 //!   - specs/models/process/rate_based_packed_column.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml

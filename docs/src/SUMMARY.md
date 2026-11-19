@@ -323,6 +323,7 @@
   - [PSV latch and relief flow](./process/psv_valve.md)
   - [Pump](./process/pump.md)
   - [Pump deadhead and minimum-flow temperature rise](./process/pump_deadhead.md)
+  - [Ranz-Marshall component-transfer orifice release](./process/ranz_marshall_release.md)
   - [Rate-based packed column](./process/rate_based_packed_column.md)
   - [Relief disposal network](./process/relief_disposal_network.md)
   - [Risk matrix](./process/risk_matrix.md)

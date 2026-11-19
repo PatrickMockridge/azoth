@@ -1,0 +1,241 @@
+id = "process.ranz_marshall_release"
+name = "Ranz-Marshall component-transfer orifice release"
+kind = "procedure"
+assumptions = [
+    "**the homogeneous-equilibrium base, then a Ranz-Marshall external-film relaxation**: `Sh_i = 2 + 0.6 sqrt(Re) cbrt(Sc_i)`, `k_i = Sh_i D_i / d32`, `tau_i = d32 / (6 k_i)`, then the component-selective partition.",
+    "**the applicability is checked before the morphology**: a Reynolds number at or above 200 or a Schmidt number outside `(0, 250)` is `unsupported`, whatever the morphology.",
+    "**only gas bubbles are supported**: the droplet coefficients are resolved, but the release adapter has only a gas-bubble drift-flux closure, so `liquid_droplets` is `unsupported`.",
+    "**the diffusivity components must match the fluid components exactly**, otherwise the result is `invalid`.",
+    "**the delegate is the component-selective model** at the computed relaxation times; its area, conservation and energy closures apply unchanged.",
+    "**a delegated failure carries its code prefixed** with `RANZ_MARSHALL_` and its own status.",
+    "**no forward flow passes through unchanged** with the delegate's `COMPONENT_TRANSFER_NOT_APPLIED`; a base failure carries `EQUILIBRIUM_BASE_<code>`.",
+    "**the fluid is PR with the classic mixing rule**, because this library databank route resolves Peng-Robinson and no other; the class own SRK tests are captured as evidence.",
+]
+references = [
+    "Ranz, W. E.; Marshall, W. R. (1952). Evaporation from drops. Chemical Engineering Progress, 48, 141-146 and 173-180.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/release/RanzMarshallFiniteRateReleaseModel.java` is the port source, through its `calculate`; `RanzMarshallMassTransferCorrelation` is the correlation.",
+    "`validation/neqsim/captures/process_ranz_marshall_release.tsv` - methane/n-heptane at 300 K and 30 bar for an in-range bubble state, the droplet refusal, the Reynolds and Schmidt bounds, the stagnant limit and the component-basis refusal.",
+]
+[source]
+standard = "NeqSim process/safety/release/RanzMarshallFiniteRateReleaseModel.java"
+edition = "Its `calculate`: the correlation applicability, the morphology check, the component-set check and the component-selective delegate at the correlation times."
+[algorithm]
+scheme = "ranz_marshall_component_transfer"
+initialisation = "hem_isentropic_pressure_scan"
+convergence = "absolute"
+tolerance = 1.0e-10
+max_iterations = 1
+[inputs]
+[inputs.components]
+type = "components"
+description = "the fluid's substances, by name, resolved against the component databank.\n"
+[inputs.upstream_z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream stagnation composition, checked rather than renormalised.\n"
+[inputs.upstream_t]
+unit = "K"
+description = "the upstream stagnation temperature.\n"
+[inputs.upstream_p]
+unit = "Pa"
+description = "the upstream stagnation pressure, absolute.\n"
+[inputs.diameter]
+unit = "m"
+description = "the circular opening's diameter; the physical area is `pi d^2 / 4`.\n"
+[inputs.discharge_coefficient]
+unit = "dimensionless"
+description = "the effective-area factor in `(0, 1]`.\n"
+[inputs.back_pressure]
+unit = "Pa"
+description = "the receiving absolute pressure. At or above `upstream_p` the model reports no forward flow.\n"
+[inputs.surface_tension]
+unit = "N/m"
+description = "the gas/liquid interfacial tension the drift closure reads. Must be positive.\n"
+[inputs.residence_time]
+unit = "s"
+description = "the transfer time available to the opening. Must be positive.\n"
+[inputs.morphology]
+type = "enum"
+values = ["gas_bubbles", "liquid_droplets"]
+description = "the dispersed-phase morphology. Only gas bubbles have a release closure.\n"
+[inputs.sauter_mean_diameter]
+unit = "m"
+description = "the Sauter mean bubble diameter d32. Must be positive.\n"
+[inputs.continuous_phase_density]
+unit = "kg/m**3"
+description = "the continuous liquid phase density. Must be positive.\n"
+[inputs.continuous_phase_dynamic_viscosity]
+unit = "Pa*s"
+description = "the continuous liquid phase dynamic viscosity. Must be positive.\n"
+[inputs.relative_velocity]
+unit = "m/s"
+description = "the dispersed-to-continuous relative speed; non-negative.\n"
+[inputs.component_diffusivities]
+type = "vector"
+unit = "m**2/s"
+length = "one per component"
+description = "the continuous-phase diffusivity of each component, in the components order. Each must be positive.\n"
+[inputs.parameter_provenance]
+type = "string"
+description = "the source or calibration identity of the correlation inputs; must not be empty.\n"
+[outputs]
+[outputs.status]
+type = "string"
+description = "`valid`, `invalid` or `unsupported`.\n"
+[outputs.mass_flow_rate]
+unit = "kg/s"
+optional = true
+description = "the delegate's release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.\n"
+[outputs.choked]
+type = "boolean"
+description = "the base scan's choked flag; false on failure and on no forward flow.\n"
+[outputs.throat_sound_speed]
+unit = "m/s"
+optional = true
+description = "absent: the derived model drops the base's throat sound speed.\n"
+[outputs.component_mole_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream overall mole fractions.\n"
+[outputs.component_mass_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream overall mass fractions.\n"
+[outputs.stations]
+type = "record_list"
+description = "the delegate's stations, with the correlation-driven relaxed phase velocities. Empty on failure.\n"
+[outputs.stations.fields.station]
+type = "enum"
+values = ["upstream_stagnation", "throat_critical", "orifice_exit", "ambient_expanded"]
+description = "which station this row is.\n"
+[outputs.stations.fields.pressure]
+unit = "Pa"
+description = "the station's absolute pressure.\n"
+[outputs.stations.fields.temperature]
+unit = "K"
+description = "the station's temperature.\n"
+[outputs.stations.fields.density]
+unit = "kg/m**3"
+description = "the relaxed harmonic mixture density at the opening; the base's elsewhere.\n"
+[outputs.stations.fields.molar_enthalpy]
+unit = "J/mol"
+description = "the station's molar enthalpy.\n"
+[outputs.stations.fields.molar_entropy]
+unit = "J/(mol*K)"
+description = "the station's molar entropy, which the expansion holds fixed.\n"
+[outputs.stations.fields.velocity]
+unit = "m/s"
+description = "the station's bulk velocity: the base's on the stagnation row, `mass_flux/rho` at the opening.\n"
+[outputs.stations.fields.mass_flux]
+unit = "kg/(m**2*s)"
+description = "the closure's mass flux at the opening, before the discharge coefficient.\n"
+[outputs.stations.fields.phase]
+type = "enum"
+values = ["all_vapour", "all_liquid", "two_phase"]
+description = "what the base flash found.\n"
+[outputs.stations.fields.gas_mass_fraction]
+unit = "dimensionless"
+description = "the relaxed gas phase's share of the mass. **A mass fraction, not the molar vapour fraction.**\n"
+[outputs.stations.fields.gas_density]
+unit = "kg/m**3"
+optional = true
+description = "the gas phase's own density, when the base resolved one.\n"
+[outputs.stations.fields.liquid_density]
+unit = "kg/m**3"
+optional = true
+description = "the liquid phase's own density, when the base resolved one.\n"
+[outputs.stations.fields.gas_velocity]
+unit = "m/s"
+optional = true
+description = "the solved gas velocity at the opening and the two-phase ambient; absent elsewhere.\n"
+[outputs.stations.fields.liquid_velocity]
+unit = "m/s"
+optional = true
+description = "the solved liquid velocity at the opening and the two-phase ambient; absent elsewhere.\n"
+[outputs.diagnostics]
+type = "record_list"
+description = "the model's assumptions and the delegate's retained records.\n"
+[outputs.diagnostics.fields.code]
+type = "string"
+description = "the stable machine code.\n"
+[outputs.diagnostics.fields.message]
+type = "string"
+description = "the engineering detail.\n"
+[outputs.diagnostic_codes]
+type = "vector_string"
+length = "one per diagnostic"
+description = "the codes alone, so a case can hold the contract without asserting prose.\n"
+[[valid_range]]
+quantity = "upstream_t"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "upstream_p"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an opening has a positive diameter"
+[[valid_range]]
+quantity = "discharge_coefficient"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "`ReleaseFlowRequest` refuses a coefficient outside `(0, 1]`"
+[[valid_range]]
+quantity = "back_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "surface_tension"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive surface tension"
+[[valid_range]]
+quantity = "residence_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive residence time"
+[[valid_range]]
+quantity = "sauter_mean_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive diameter"
+[[valid_range]]
+quantity = "continuous_phase_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive density"
+[[valid_range]]
+quantity = "continuous_phase_dynamic_viscosity"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive viscosity"
+[[valid_range]]
+quantity = "relative_velocity"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the class refuses a negative relative velocity"
+[implementations]
+python = "azoth.process.ranz_marshall_release"
+rust = "azoth_process::ranz_marshall_release"

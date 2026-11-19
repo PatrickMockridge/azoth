@@ -120,6 +120,7 @@ pub mod psv_sizing;
 pub mod psv_valve;
 pub mod pump;
 pub mod pump_deadhead;
+pub mod ranz_marshall_release;
 pub mod rate_based_packed_column;
 pub(crate) mod release;
 pub mod relief_disposal_network;
@@ -307,6 +308,7 @@ pub use psv_sizing::{PsvSizingResult, psv_sizing};
 pub use psv_valve::{PsvValveResult, psv_valve};
 pub use pump::{PumpResult, pump};
 pub use pump_deadhead::{DeadheadVerdict, PumpDeadheadResult, pump_deadhead};
+pub use ranz_marshall_release::{RanzMarshallReleaseResult, ranz_marshall_release};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};
 pub use relief_disposal_network::{
     ReliefCause, ReliefContribution, ReliefDisposalNetworkResult, ReliefDisposalRow, ReliefPhase,

@@ -67,6 +67,7 @@ from azoth.core.record_outputs_gen import (
     PipeFireRupturePoint,
     PrescribedSlipReleaseStation,
     PulsationModeResult,
+    RanzMarshallReleaseStation,
     RegisterFinding,
     ReliefDisposalRow,
     RemediationOptionRow,
@@ -9816,6 +9817,43 @@ class PumpDeadheadResult(_HasWarnings):
 
     #: the class's verdict: no rating, within it, or exceeded.
     verdict: DeadheadVerdict
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class RanzMarshallReleaseResult(_HasWarnings):
+    """Result of ``process.ranz_marshall_release``."""
+
+    CALC_ID: ClassVar[str] = "process.ranz_marshall_release"
+
+    #: `valid`, `invalid` or `unsupported`.
+    status: str
+
+    #: the delegate's release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    mass_flow_rate: Q | None
+
+    #: the base scan's choked flag; false on failure and on no forward flow.
+    choked: bool
+
+    #: absent: the derived model drops the base's throat sound speed.
+    throat_sound_speed: Q | None
+
+    #: the upstream overall mole fractions.
+    component_mole_fractions: tuple[float, ...]
+
+    #: the upstream overall mass fractions.
+    component_mass_fractions: tuple[float, ...]
+
+    #: the delegate's stations, with the correlation-driven relaxed phase velocities. Empty on failure.
+    stations: tuple[RanzMarshallReleaseStation, ...]
+
+    #: the model's assumptions and the delegate's retained records.
+    diagnostics: tuple[HemReleaseDiagnostic, ...]
+
+    #: the codes alone, so a case can hold the contract without asserting prose.
+    diagnostic_codes: tuple[str, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

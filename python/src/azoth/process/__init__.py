@@ -107,6 +107,7 @@ from azoth.core.result import (
     PsvValveResult,
     PumpDeadheadResult,
     PumpResult,
+    RanzMarshallReleaseResult,
     RateBasedPackedColumnResult,
     ReliefDisposalNetworkResult,
     RiskMatrixResult,
@@ -315,6 +316,7 @@ _PRESCRIBED_SLIP_RELEASE = "process.prescribed_slip_release"
 _DRIFT_FLUX_RELEASE = "process.drift_flux_release"
 _FINITE_RATE_RELEASE = "process.finite_rate_release"
 _COMPONENT_SELECTIVE_RELEASE = "process.component_selective_release"
+_RANZ_MARSHALL_RELEASE = "process.ranz_marshall_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
@@ -3669,6 +3671,53 @@ def component_selective_release(
         surface_tension=surface_tension,
         component_relaxation_times=component_relaxation_times,
         residence_time=residence_time,
+        parameter_provenance=parameter_provenance,
+    )
+
+
+def ranz_marshall_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    surface_tension: Q,
+    residence_time: Q,
+    morphology: str,
+    sauter_mean_diameter: Q,
+    continuous_phase_density: Q,
+    continuous_phase_dynamic_viscosity: Q,
+    relative_velocity: Q,
+    component_diffusivities: list[Q],
+    parameter_provenance: str,
+) -> RanzMarshallReleaseResult:
+    """The release rate of a Ranz-Marshall short-opening orifice.
+
+    The external-film correlation supplies one relaxation time per component and the
+    component-selective model solves the station. Out-of-range Reynolds or Schmidt numbers
+    and the droplet morphology are ``unsupported``; a diffusivity list that does not match
+    the fluid is ``invalid``.
+
+    See :func:`azoth.process.reference.ranz_marshall_release`.
+    """
+    return resolve(_RANZ_MARSHALL_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        surface_tension=surface_tension,
+        residence_time=residence_time,
+        morphology=morphology,
+        sauter_mean_diameter=sauter_mean_diameter,
+        continuous_phase_density=continuous_phase_density,
+        continuous_phase_dynamic_viscosity=continuous_phase_dynamic_viscosity,
+        relative_velocity=relative_velocity,
+        component_diffusivities=component_diffusivities,
         parameter_provenance=parameter_provenance,
     )
 

@@ -1108,7 +1108,7 @@ class ComponentSelectiveReleaseStation:
 
 @final
 class HemReleaseDiagnostic:
-    """the model's assumptions and the base's retained records."""
+    """the model's assumptions and the delegate's retained records."""
 
     code: str
     message: str
@@ -1457,6 +1457,25 @@ class PipeFireRupturePoint:
 @final
 class PrescribedSlipReleaseStation:
     """the base stations, with the opening's phase velocities partitioned. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
+class RanzMarshallReleaseStation:
+    """the delegate's stations, with the correlation-driven relaxed phase velocities. Empty on failure."""
 
     station: str
     pressure: Qty
@@ -5028,6 +5047,19 @@ class PumpDeadheadResult:
     recirculation_temperature_rise: Qty | None
     temp_rise_exceeded: bool
     verdict: str
+    warnings: list[Warning]
+
+@final
+class RanzMarshallReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[RanzMarshallReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
     warnings: list[Warning]
 
 @final
@@ -9108,6 +9140,24 @@ def pump_deadhead(
     minimum_flow_efficiency: float | None = None,
     max_allowable_temperature_rise: float | None = None,
 ) -> PumpDeadheadResult: ...
+def ranz_marshall_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    surface_tension: float,
+    residence_time: float,
+    morphology: str,
+    sauter_mean_diameter: float,
+    continuous_phase_density: float,
+    continuous_phase_dynamic_viscosity: float,
+    relative_velocity: float,
+    component_diffusivities: list[float],
+    parameter_provenance: str,
+) -> RanzMarshallReleaseResult: ...
 def rate_based_packed_column(
     gas_components: list[str],
     liquid_components: list[str],
