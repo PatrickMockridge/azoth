@@ -795,7 +795,10 @@ fn trace_pipe(
             }
         };
         let predicted_pressure = state.pressure + gradient * step_length;
-        if !(predicted_pressure > 0.0) || predicted_pressure >= state.pressure {
+        if predicted_pressure.is_nan()
+            || predicted_pressure <= 0.0
+            || predicted_pressure >= state.pressure
+        {
             return Trace {
                 completed: false,
                 inlet: Some(inlet),
@@ -845,7 +848,10 @@ fn trace_pipe(
             }
         };
         let corrected_pressure = state.pressure + corrected_gradient * step_length;
-        if !(corrected_pressure > 0.0) || corrected_pressure >= state.pressure {
+        if corrected_pressure.is_nan()
+            || corrected_pressure <= 0.0
+            || corrected_pressure >= state.pressure
+        {
             return Trace {
                 completed: false,
                 inlet: Some(inlet),

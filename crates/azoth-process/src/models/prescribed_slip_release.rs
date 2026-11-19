@@ -101,6 +101,7 @@ pub struct PrescribedSlipReleaseResult {
 /// # Errors
 /// A non-positive input, a slip ratio below one, a composition that is not one entry per
 /// component, or a mixture the databank cannot resolve.
+#[allow(clippy::too_many_arguments)] // one argument per spec input
 pub fn prescribed_slip_release(
     components: &[String],
     upstream_z: &[f64],

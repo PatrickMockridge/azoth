@@ -238,7 +238,11 @@ pub(crate) fn drift_flux(
         upper *= 2.0;
         upper_residual = drift_raw(state, &basis, upper, drift_velocity)?.drift_residual;
     }
-    if !(lower_residual < 0.0) || !(upper_residual > 0.0) {
+    if lower_residual.is_nan()
+        || lower_residual >= 0.0
+        || upper_residual.is_nan()
+        || upper_residual <= 0.0
+    {
         return Err(ReleaseRefusal::Invalid(
             "Unable to bracket positive drift-flux slip solution".to_string(),
         ));

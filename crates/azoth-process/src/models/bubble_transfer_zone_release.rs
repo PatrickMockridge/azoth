@@ -238,7 +238,7 @@ pub fn bubble_transfer_zone_release(
             base.warnings,
         ));
     }
-    if base.mass_flow_rate.map_or(false, |rate| rate.value == 0.0) {
+    if base.mass_flow_rate.is_some_and(|rate| rate.value == 0.0) {
         return Ok(success(
             Some(0.0),
             false,

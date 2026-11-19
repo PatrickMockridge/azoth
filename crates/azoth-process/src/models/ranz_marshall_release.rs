@@ -213,7 +213,7 @@ pub fn ranz_marshall_release(
 
     let reynolds = continuous_phase_density * relative_velocity * sauter_mean_diameter
         / continuous_phase_dynamic_viscosity;
-    if !reynolds.is_finite() || reynolds < 0.0 || reynolds >= MAX_REYNOLDS {
+    if !reynolds.is_finite() || !(0.0..MAX_REYNOLDS).contains(&reynolds) {
         return Ok(failure(
             "unsupported",
             "RANZ_MARSHALL_RANGE_UNSUPPORTED",

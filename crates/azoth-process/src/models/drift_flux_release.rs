@@ -101,6 +101,7 @@ pub struct DriftFluxReleaseResult {
 /// # Errors
 /// A non-positive input, a non-positive surface tension, a composition that is not one entry per
 /// component, or a mixture the databank cannot resolve.
+#[allow(clippy::too_many_arguments)] // one argument per spec input
 pub fn drift_flux_release(
     components: &[String],
     upstream_z: &[f64],
