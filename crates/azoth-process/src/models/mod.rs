@@ -40,6 +40,7 @@ pub mod api537_flare_flame_model;
 pub mod barrier_register_validation;
 pub mod basket_test_regression;
 pub mod bleve;
+pub mod blocked_outlet_overpressure;
 pub mod blocked_outlet_relief;
 pub mod blowdown_pressure_profile;
 pub mod bow_tie;
@@ -171,6 +172,9 @@ pub use basket_test_regression::{
     BasketTestPoint, BasketTestRegressionResult, basket_test_regression,
 };
 pub use bleve::{BleveResult, bleve};
+pub use blocked_outlet_overpressure::{
+    BlockedOutletOverpressureResult, blocked_outlet_overpressure,
+};
 pub use blocked_outlet_relief::{BlockedOutletReliefResult, blocked_outlet_relief};
 pub use blowdown_pressure_profile::{
     BlowdownPressureProfileResult, BlowdownProfilePoint, blowdown_pressure_profile,

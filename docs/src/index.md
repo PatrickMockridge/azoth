@@ -337,6 +337,7 @@ Five sections, and the difference between them is the point:
 - [`process.barrier_register_validation`](./process/barrier_register_validation.md) — Barrier register validation
 - [`process.basket_test_regression`](./process/basket_test_regression.md) — Basket-test regression
 - [`process.bleve`](./process/bleve.md) — BLEVE fireball radiation
+- [`process.blocked_outlet_overpressure`](./process/blocked_outlet_overpressure.md) — Blocked-outlet overpressure
 - [`process.blocked_outlet_relief`](./process/blocked_outlet_relief.md) — Blocked outlet relief
 - [`process.blowdown_pressure_profile`](./process/blowdown_pressure_profile.md) — Blowdown pressure profile
 - [`process.bow_tie`](./process/bow_tie.md) — Bow-tie risk

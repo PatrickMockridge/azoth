@@ -21,6 +21,7 @@ use crate::models::api537_flare_flame_model::Api537FlareFlameModelResult;
 use crate::models::barrier_register_validation::BarrierRegisterValidationResult;
 use crate::models::basket_test_regression::BasketTestRegressionResult;
 use crate::models::bleve::BleveResult;
+use crate::models::blocked_outlet_overpressure::BlockedOutletOverpressureResult;
 use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
 use crate::models::blowdown_pressure_profile::BlowdownPressureProfileResult;
 use crate::models::bow_tie::BowTieResult;
@@ -308,6 +309,25 @@ impl CalcResult for BleveResult {
         "transmissivity",
         "incident_heat_flux",
         "distance_to_flux",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for BlockedOutletOverpressureResult {
+    const CALC_ID: &'static str = "process.blocked_outlet_overpressure";
+    const FIELDS: &'static [&'static str] = &[
+        "relief_set_pressure",
+        "max_pressure",
+        "final_pressure",
+        "final_mass",
+        "inlet_mass_flow",
+        "simulated_horizon",
+        "time_to_relief_set",
+        "relief_demand",
         "warnings",
     ];
 

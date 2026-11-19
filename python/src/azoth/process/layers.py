@@ -2002,6 +2002,45 @@ def _depressurization_acceptance(inputs: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
+def _blocked_outlet_overpressure(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.blocked_outlet_overpressure`'s layers, from the reference's arithmetic.
+
+    The relief-demand flag is the model's own word, asserted by its test and the cross-impl
+    comparison rather than dumped here.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.blocked_outlet_overpressure import _evaluate
+
+    def optional(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    solution, _ = _evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["initial_z"]],
+        quantity(float(inputs["initial_t"]), "K"),
+        quantity(float(inputs["initial_p"]), "Pa"),
+        quantity(float(inputs["vessel_volume"]), "m**3"),
+        quantity(float(inputs["inlet_temperature"]), "K"),
+        quantity(float(inputs["supply_pressure"]), "Pa"),
+        quantity(float(inputs["inlet_mass_flow"]), "kg/s"),
+        quantity(float(inputs["relief_set_pressure"]), "Pa"),
+        optional("time_step", "s"),
+        optional("max_time", "s"),
+    )
+    rows = {
+        "relief_set_pressure_pa_used": solution.relief_set_pressure,
+        "max_pressure_pa": solution.max_pressure,
+        "final_pressure_pa": solution.final_pressure,
+        "final_mass_kg": solution.final_mass,
+        "inlet_mass_flow_kg_s_used": solution.inlet_mass_flow,
+        "simulated_horizon_s": solution.simulated_horizon,
+    }
+    if solution.time_to_relief_set is not None:
+        rows["time_to_relief_set_s"] = solution.time_to_relief_set
+    return rows
+
+
 def _inherent_safety(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.inherent_safety`'s layers, from the reference's arithmetic."""
     from azoth.process.reference.inherent_safety import _evaluate
@@ -4087,6 +4126,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.vessel_filling": _vessel_filling,
     "process.depressurization": _depressurization,
     "process.depressurization_acceptance": _depressurization_acceptance,
+    "process.blocked_outlet_overpressure": _blocked_outlet_overpressure,
     "process.inherent_safety": _inherent_safety,
     "process.norsok_p002_compliance": _norsok_p002_compliance,
     "process.sts0131_gate": _sts0131_gate,
@@ -5252,6 +5292,15 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_depressurization_acceptance.tsv",
         block=0,
         identified_by=("#label", "acc_pass_rupture_limits"),
+    ),
+    # The blocked outlet's one: the state that reaches the set pressure. The low-flow state
+    # is declared in `UNCASED_ROWS`.
+    LayerCase(
+        model="process.blocked_outlet_overpressure",
+        case="reaches_the_relief_set",
+        capture="process_blocked_outlet_overpressure.tsv",
+        block=0,
+        identified_by=("#label", "blocked_reaches_relief_600s"),
     ),
     # STS-0131's one: the PSV margin at equality. The five further cases, the seven
     # single-arm states, the mixed gate, the empty gate and the area refusal are declared in
@@ -8170,6 +8219,7 @@ UNCASED_ROWS: dict[str, int] = {
     "process_vessel_filling.tsv": 12,
     "process_depressurization.tsv": 14,
     "process_depressurization_acceptance.tsv": 8,
+    "process_blocked_outlet_overpressure.tsv": 1,
     # ALARP's eight: the five further states, the empty audit and the two refusals.
     "process_alarp_audit.tsv": 8,
     # Escalation's eight: the six further states and the two refusals.

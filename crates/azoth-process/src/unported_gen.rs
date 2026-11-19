@@ -11,6 +11,7 @@
 //!   - specs/models/process/barrier_register_validation.toml
 //!   - specs/models/process/basket_test_regression.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/blocked_outlet_overpressure.toml
 //!   - specs/models/process/blocked_outlet_relief.toml
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml

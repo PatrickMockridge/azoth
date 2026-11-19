@@ -176,8 +176,9 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # side-branch pulsation screen; 345: the NORSOK P-002 point checks; 346: the STS-0131
     # gate; 347: the inherent-safety index; 348: the ALARP audit; 349: the escalation graph;
     # 350: the PSV latch; 351: the dynamic PSV sizing; 352: the vessel filling;
-    # 353: the depressurization; 354: the depressurization acceptance.
-    assert len(registered) == 354
+    # 353: the depressurization; 354: the depressurization acceptance; 355: the
+    # blocked-outlet overpressure.
+    assert len(registered) == 355
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

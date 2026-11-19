@@ -710,6 +710,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.blocked_outlet_overpressure",
+        name: "Blocked-outlet overpressure",
+        family: "depressurization",
+        sub_interface: Some("depressurization"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a fluid as input, which a scenario does not yet provide",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.blocked_outlet_relief",
         name: "Blocked outlet relief",
         family: "overpressure",

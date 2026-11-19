@@ -251,6 +251,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.barrier_register_validation" => azoth_process::models::barrier_register_validation::BarrierRegisterValidationResult::FIELDS.to_vec(),
         "process.basket_test_regression" => azoth_process::models::basket_test_regression::BasketTestRegressionResult::FIELDS.to_vec(),
         "process.bleve" => azoth_process::models::bleve::BleveResult::FIELDS.to_vec(),
+        "process.blocked_outlet_overpressure" => azoth_process::models::blocked_outlet_overpressure::BlockedOutletOverpressureResult::FIELDS.to_vec(),
         "process.blocked_outlet_relief" => azoth_process::models::blocked_outlet_relief::BlockedOutletReliefResult::FIELDS.to_vec(),
         "process.blowdown_pressure_profile" => azoth_process::models::blowdown_pressure_profile::BlowdownPressureProfileResult::FIELDS.to_vec(),
         "process.bow_tie" => azoth_process::models::bow_tie::BowTieResult::FIELDS.to_vec(),

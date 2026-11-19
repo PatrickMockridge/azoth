@@ -250,6 +250,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyBarrierRegisterValidationResult>()?;
     m.add_class::<crate::transport_gen::PyBasketTestRegressionResult>()?;
     m.add_class::<crate::transport_gen::PyBleveResult>()?;
+    m.add_class::<crate::transport_gen::PyBlockedOutletOverpressureResult>()?;
     m.add_class::<crate::transport_gen::PyBlockedOutletReliefResult>()?;
     m.add_class::<crate::transport_gen::PyBlowdownPressureProfileResult>()?;
     m.add_class::<crate::transport_gen::PyBowTieResult>()?;
@@ -997,6 +998,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::bleve, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::blocked_outlet_overpressure,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::blocked_outlet_relief,
         m

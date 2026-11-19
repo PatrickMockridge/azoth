@@ -3529,6 +3529,18 @@ class BleveResult:
     warnings: list[Warning]
 
 @final
+class BlockedOutletOverpressureResult:
+    relief_set_pressure: Qty
+    max_pressure: Qty
+    final_pressure: Qty
+    final_mass: Qty
+    inlet_mass_flow: Qty
+    simulated_horizon: Qty
+    time_to_relief_set: Qty | None
+    relief_demand: bool
+    warnings: list[Warning]
+
+@final
 class BlockedOutletReliefResult:
     name: str
     relief_rate: Qty
@@ -7731,6 +7743,19 @@ def bleve(
     distance: float | None = None,
     target_flux: float | None = None,
 ) -> BleveResult: ...
+def blocked_outlet_overpressure(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: float,
+    initial_p: float,
+    vessel_volume: float,
+    inlet_temperature: float,
+    supply_pressure: float,
+    inlet_mass_flow: float,
+    relief_set_pressure: float,
+    time_step: float | None = None,
+    max_time: float | None = None,
+) -> BlockedOutletOverpressureResult: ...
 def blocked_outlet_relief(
     components: list[str],
     mole_fractions: list[float],

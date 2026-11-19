@@ -14655,6 +14655,102 @@ impl From<&azoth_process::models::bleve::BleveResult> for PyBleveResult {
         }
     }
 }
+/// Result of `process.blocked_outlet_overpressure`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BlockedOutletOverpressureResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBlockedOutletOverpressureResult {
+    /// the relief set pressure the run used.
+    #[pyo3(get)]
+    pub relief_set_pressure: PyQty,
+    /// the highest recorded pressure.
+    #[pyo3(get)]
+    pub max_pressure: PyQty,
+    /// the last recorded pressure.
+    #[pyo3(get)]
+    pub final_pressure: PyQty,
+    /// the last recorded inventory mass.
+    #[pyo3(get)]
+    pub final_mass: PyQty,
+    /// the continued feed mass flow.
+    #[pyo3(get)]
+    pub inlet_mass_flow: PyQty,
+    /// the configured horizon, not the elapsed time.
+    #[pyo3(get)]
+    pub simulated_horizon: PyQty,
+    /// the first sample's time at or above the set pressure; absent when not reached.
+    #[pyo3(get)]
+    pub time_to_relief_set: Option<PyQty>,
+    /// whether the set pressure was reached within the horizon.
+    #[pyo3(get)]
+    pub relief_demand: bool,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBlockedOutletOverpressureResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BlockedOutletOverpressureResult(relief_set_pressure={:?}, max_pressure={:?}, final_pressure={:?}, final_mass={:?}, inlet_mass_flow={:?}, simulated_horizon={:?}, time_to_relief_set={:?}, relief_demand={:?}, {} warning(s))",
+            self.relief_set_pressure,
+            self.max_pressure,
+            self.final_pressure,
+            self.final_mass,
+            self.inlet_mass_flow,
+            self.simulated_horizon,
+            self.time_to_relief_set,
+            self.relief_demand,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::blocked_outlet_overpressure::BlockedOutletOverpressureResult>
+    for PyBlockedOutletOverpressureResult
+{
+    fn from(
+        r: &azoth_process::models::blocked_outlet_overpressure::BlockedOutletOverpressureResult,
+    ) -> Self {
+        Self {
+            relief_set_pressure: PyQty {
+                magnitude_si: r.relief_set_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            max_pressure: PyQty {
+                magnitude_si: r.max_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            final_pressure: PyQty {
+                magnitude_si: r.final_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            final_mass: PyQty {
+                magnitude_si: r.final_mass.value,
+                unit: "kg".to_string(),
+            },
+            inlet_mass_flow: PyQty {
+                magnitude_si: r.inlet_mass_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            simulated_horizon: PyQty {
+                magnitude_si: r.simulated_horizon.value,
+                unit: "s".to_string(),
+            },
+            time_to_relief_set: r.time_to_relief_set.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            relief_demand: r.relief_demand,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.blocked_outlet_relief`, transported.
 #[pyclass(
     frozen,

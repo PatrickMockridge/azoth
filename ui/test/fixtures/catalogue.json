@@ -22321,6 +22321,15 @@
       "sub_interface": "fire"
     },
     {
+      "family": "depressurization",
+      "id": "process.blocked_outlet_overpressure",
+      "name": "Blocked-outlet overpressure",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a fluid as input, which a scenario does not yet provide",
+      "sub_interface": "depressurization"
+    },
+    {
       "family": "overpressure",
       "id": "process.blocked_outlet_relief",
       "name": "Blocked outlet relief",

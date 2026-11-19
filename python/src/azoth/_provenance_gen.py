@@ -2556,6 +2556,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'process.blocked_outlet_overpressure': {
+        "calc_id": 'process.blocked_outlet_overpressure',
+        "name": 'Blocked-outlet overpressure',
+        "spec": {'path': 'specs/models/process/blocked_outlet_overpressure.toml', 'sha256': '5787283d452c5a55abc58519feab19c676efcf3412b33e8f0fec3bad4da89018'},
+        "code": [{'path': 'python/src/azoth/process/reference/blocked_outlet_overpressure.py', 'sha256': 'dbc4e8b76cf49021bb72d7d020d96c440a553a5f9102e31ca1182ec4a71790b3'}, {'path': 'crates/azoth-process/src/models/blocked_outlet_overpressure.rs', 'sha256': '164dfee138b300e6133ca9a7a59f5939b997e6f4c1717dbce9b7f86ee6b09da8'}],
+        "source": 'NeqSim process/safety/depressurization/BlockedOutletOverpressureAnalyzer.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 2,
+        "tests_skipped": 0,
+    },
     'process.blocked_outlet_relief': {
         "calc_id": 'process.blocked_outlet_relief',
         "name": 'Blocked outlet relief',

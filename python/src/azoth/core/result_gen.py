@@ -5904,6 +5904,40 @@ class BleveResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class BlockedOutletOverpressureResult(_HasWarnings):
+    """Result of ``process.blocked_outlet_overpressure``."""
+
+    CALC_ID: ClassVar[str] = "process.blocked_outlet_overpressure"
+
+    #: the relief set pressure the run used.
+    relief_set_pressure: Q
+
+    #: the highest recorded pressure.
+    max_pressure: Q
+
+    #: the last recorded pressure.
+    final_pressure: Q
+
+    #: the last recorded inventory mass.
+    final_mass: Q
+
+    #: the continued feed mass flow.
+    inlet_mass_flow: Q
+
+    #: the configured horizon, not the elapsed time.
+    simulated_horizon: Q
+
+    #: the first sample's time at or above the set pressure; absent when not reached.
+    time_to_relief_set: Q | None
+
+    #: whether the set pressure was reached within the horizon.
+    relief_demand: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class BlockedOutletReliefResult(_HasWarnings):
     """Result of ``process.blocked_outlet_relief``."""
 

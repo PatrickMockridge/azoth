@@ -37,6 +37,7 @@ from azoth.core.result import (
     BeggsBrillRegime,
     BeggsBrillSegmentResult,
     BleveResult,
+    BlockedOutletOverpressureResult,
     BlockedOutletReliefResult,
     BlowbyVerdict,
     BlowdownPressureProfileResult,
@@ -509,6 +510,7 @@ __all__ = [
     "basket_test_regression",
     "beggs_brill_segment",
     "bleve",
+    "blocked_outlet_overpressure",
     "blocked_outlet_relief",
     "blowdown_pressure_profile",
     "boiling_heat_transfer",
@@ -5942,6 +5944,35 @@ def bleve(fuel_mass: Q, heat_of_combustion: float, radiative_fraction: float, re
         transmissivity=result.transmissivity,
         incident_heat_flux=None if result.incident_heat_flux is None else from_si(result.incident_heat_flux.magnitude_si, result.incident_heat_flux.unit),
         distance_to_flux=None if result.distance_to_flux is None else from_si(result.distance_to_flux.magnitude_si, result.distance_to_flux.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def blocked_outlet_overpressure(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, inlet_temperature: Q, supply_pressure: Q, inlet_mass_flow: Q, relief_set_pressure: Q, time_step: Q | None=None, max_time: Q | None=None) -> BlockedOutletOverpressureResult:
+    """``process.blocked_outlet_overpressure``, computed in Rust."""
+    spec = _models_gen.model("process.blocked_outlet_overpressure")
+    result = _core.blocked_outlet_overpressure(
+        list(components),
+        list(initial_z),
+        input_to_si(spec, "initial_t", initial_t),
+        input_to_si(spec, "initial_p", initial_p),
+        input_to_si(spec, "vessel_volume", vessel_volume),
+        input_to_si(spec, "inlet_temperature", inlet_temperature),
+        input_to_si(spec, "supply_pressure", supply_pressure),
+        input_to_si(spec, "inlet_mass_flow", inlet_mass_flow),
+        input_to_si(spec, "relief_set_pressure", relief_set_pressure),
+        None if time_step is None else input_to_si(spec, "time_step", time_step),
+        None if max_time is None else input_to_si(spec, "max_time", max_time),
+    )
+    return BlockedOutletOverpressureResult(
+        relief_set_pressure=from_si(result.relief_set_pressure.magnitude_si, result.relief_set_pressure.unit),
+        max_pressure=from_si(result.max_pressure.magnitude_si, result.max_pressure.unit),
+        final_pressure=from_si(result.final_pressure.magnitude_si, result.final_pressure.unit),
+        final_mass=from_si(result.final_mass.magnitude_si, result.final_mass.unit),
+        inlet_mass_flow=from_si(result.inlet_mass_flow.magnitude_si, result.inlet_mass_flow.unit),
+        simulated_horizon=from_si(result.simulated_horizon.magnitude_si, result.simulated_horizon.unit),
+        time_to_relief_set=None if result.time_to_relief_set is None else from_si(result.time_to_relief_set.magnitude_si, result.time_to_relief_set.unit),
+        relief_demand=result.relief_demand,
         warnings=_warnings(result.warnings),
     )
 

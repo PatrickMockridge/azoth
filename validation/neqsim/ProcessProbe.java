@@ -18782,9 +18782,9 @@ public class ProcessProbe {
   static void blockedOutletRows() {
     String[] gas = {"methane", "ethane", "propane"};
     double[] gasZ = {90.0, 7.0, 3.0};
-    blockedRow("blocked_reaches_relief_1800s", gas, gasZ, 298.15, 5.0, 298.15, 90.0, 2.0, 50.0,
-        1.0, 1800.0);
-    blockedRow("blocked_not_reached_20s", gas, gasZ, 298.15, 5.0, 298.15, 90.0, 0.2, 50.0, 1.0,
+    blockedRow("blocked_reaches_relief_600s", gas, gasZ, 298.15, 5.0, 298.15, 150.0, 2.0, 50.0,
+        1.0, 600.0);
+    blockedRow("blocked_not_reached_20s", gas, gasZ, 298.15, 5.0, 298.15, 150.0, 0.2, 50.0, 1.0,
         20.0);
   }
 

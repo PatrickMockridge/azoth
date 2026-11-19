@@ -30,6 +30,7 @@ from azoth.core.result import (
     BasketTestRegressionResult,
     BleveResult,
     BlockedOutletReliefResult,
+    BlockedOutletOverpressureResult,
     BlowdownPressureProfileResult,
     BowTieResult,
     CheckValveLeakReliefResult,
@@ -318,6 +319,7 @@ _DYNAMIC_PSV_SIZING = "process.dynamic_psv_sizing"
 _VESSEL_FILLING = "process.vessel_filling"
 _DEPRESSURIZATION = "process.depressurization"
 _DEPRESSURIZATION_ACCEPTANCE = "process.depressurization_acceptance"
+_BLOCKED_OUTLET_OVERPRESSURE = "process.blocked_outlet_overpressure"
 _SEPARATOR = "process.separator"
 _SEPARATOR_CAPACITY_ASSESSMENT = "process.separator_capacity_assessment"
 _SEPARATOR_PERFORMANCE = "process.separator_performance"
@@ -4182,6 +4184,41 @@ def depressurization_acceptance(
         maximum_pressure_at_rupture=maximum_pressure_at_rupture,
         maximum_remaining_mass=maximum_remaining_mass,
         maximum_escalated_fire_rate=maximum_escalated_fire_rate,
+    )
+
+
+def blocked_outlet_overpressure(
+    components: list[str],
+    initial_z: list[float],
+    initial_t: Q,
+    initial_p: Q,
+    vessel_volume: Q,
+    inlet_temperature: Q,
+    supply_pressure: Q,
+    inlet_mass_flow: Q,
+    relief_set_pressure: Q,
+    time_step: Q | None = None,
+    max_time: Q | None = None,
+) -> BlockedOutletOverpressureResult:
+    """The blocked-outlet pressure build-up to the relief set pressure.
+
+    A vessel filling run whose target is the relief set pressure; the time to demand is the
+    first recorded sample at or above it.
+
+    See :func:`azoth.process.reference.blocked_outlet_overpressure`.
+    """
+    return resolve(_BLOCKED_OUTLET_OVERPRESSURE)(  # type: ignore[no-any-return]
+        components=components,
+        initial_z=initial_z,
+        initial_t=initial_t,
+        initial_p=initial_p,
+        vessel_volume=vessel_volume,
+        inlet_temperature=inlet_temperature,
+        supply_pressure=supply_pressure,
+        inlet_mass_flow=inlet_mass_flow,
+        relief_set_pressure=relief_set_pressure,
+        time_step=time_step,
+        max_time=max_time,
     )
 
 

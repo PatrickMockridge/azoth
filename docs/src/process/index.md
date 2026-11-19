@@ -23,6 +23,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.barrier_register_validation`](./barrier_register_validation.md) | `barrier_register_validation` | NeqSim process/safety/barrier/BarrierRegister.java |
 | [`process.basket_test_regression`](./basket_test_regression.md) | `basket_least_squares` | NeqSim process/safety/selfheating/BasketTestRegression.java |
 | [`process.bleve`](./bleve.md) | `ccps_fireball_point_source` | NeqSim process/safety/fire/BLEVECalculator.java |
+| [`process.blocked_outlet_overpressure`](./blocked_outlet_overpressure.md) | `vessel_pressure_transient` | NeqSim process/safety/depressurization/BlockedOutletOverpressureAnalyzer.java |
 | [`process.blocked_outlet_relief`](./blocked_outlet_relief.md) | `blocked_outlet_full_inflow` | NeqSim process/safety/overpressure/BlockedOutletRelief.java |
 | [`process.blowdown_pressure_profile`](./blowdown_pressure_profile.md) | `piecewise_step_or_linear_pressure_profile` | NeqSim process/safety/rupture/BlowdownPressureProfile.java |
 | [`process.bow_tie`](./bow_tie.md) | `closed_form_bow_tie` | NeqSim process/safety/risk/bowtie/BowTieModel.java |

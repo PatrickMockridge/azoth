@@ -232,6 +232,7 @@
 //!   - specs/models/process/barrier_register_validation.toml
 //!   - specs/models/process/basket_test_regression.toml
 //!   - specs/models/process/bleve.toml
+//!   - specs/models/process/blocked_outlet_overpressure.toml
 //!   - specs/models/process/blocked_outlet_relief.toml
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
@@ -2875,6 +2876,48 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.bleve", "relative_humidity", "dimensionless"),
     ("process.bleve", "distance", "length"),
     ("process.bleve", "target_flux", "heat_flux_density"),
+    (
+        "process.blocked_outlet_overpressure",
+        "initial_z",
+        "dimensionless",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "initial_t",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "initial_p",
+        "pressure",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "vessel_volume",
+        "volume",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "inlet_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "supply_pressure",
+        "pressure",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "inlet_mass_flow",
+        "mass_rate",
+    ),
+    (
+        "process.blocked_outlet_overpressure",
+        "relief_set_pressure",
+        "pressure",
+    ),
+    ("process.blocked_outlet_overpressure", "time_step", "time"),
+    ("process.blocked_outlet_overpressure", "max_time", "time"),
     (
         "process.blocked_outlet_relief",
         "mole_fractions",

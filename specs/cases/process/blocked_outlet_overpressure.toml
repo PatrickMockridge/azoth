@@ -1,0 +1,50 @@
+model = "process.blocked_outlet_overpressure"
+[[cases]]
+id = "reaches_the_relief_set"
+tolerance = 5.0e-3
+source = "`blocked_reaches_relief_600s`: a methane/ethane/propane gas at 298.15 K and 10 bara in a 5 m3 vessel, fed at 2 kg/s from 150 bara, reaches a 50 bara relief set pressure in 82 s and ends at `5015206.1502241455` Pa with `200.97649371567397` kg. **Tolerance**: the VU flash is the divergence.\n"
+[cases.inputs]
+components = ["methane", "ethane", "propane"]
+initial_z = [0.9, 0.07, 0.03]
+initial_t = 298.15
+initial_p = 1000000.0
+vessel_volume = 5.0
+inlet_temperature = 298.15
+supply_pressure = 15000000.0
+inlet_mass_flow = 2.0
+relief_set_pressure = 5000000.0
+time_step = 1.0
+max_time = 600.0
+[cases.expected]
+relief_set_pressure = 5000000.0
+max_pressure = 5015206.1502241455
+final_pressure = 5015206.1502241455
+final_mass = 200.97649371567397
+inlet_mass_flow = 2.0
+simulated_horizon = 600.0
+time_to_relief_set = 82.0
+relief_demand = true
+[[cases]]
+id = "not_reached_in_the_horizon"
+tolerance = 5.0e-3
+source = "`blocked_not_reached_20s`: the same vessel fed at 0.2 kg/s, which reaches only `1097816.1205359008` Pa in 20 s, so no relief demand is recorded.\n"
+[cases.inputs]
+components = ["methane", "ethane", "propane"]
+initial_z = [0.9, 0.07, 0.03]
+initial_t = 298.15
+initial_p = 1000000.0
+vessel_volume = 5.0
+inlet_temperature = 298.15
+supply_pressure = 15000000.0
+inlet_mass_flow = 0.2
+relief_set_pressure = 5000000.0
+time_step = 1.0
+max_time = 20.0
+[cases.expected]
+relief_set_pressure = 5000000.0
+max_pressure = 1097816.1205359008
+final_pressure = 1097816.1205359008
+final_mass = 40.976493715674025
+inlet_mass_flow = 0.2
+simulated_horizon = 20.0
+relief_demand = false

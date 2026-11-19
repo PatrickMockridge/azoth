@@ -5689,6 +5689,46 @@ pub fn bleve(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Blocked-outlet overpressure.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, initial_z, initial_t, initial_p, vessel_volume, inlet_temperature, supply_pressure, inlet_mass_flow, relief_set_pressure, time_step, max_time))]
+#[pyo3(
+    text_signature = "(components, initial_z, initial_t, initial_p, vessel_volume, inlet_temperature, supply_pressure, inlet_mass_flow, relief_set_pressure, time_step, max_time)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn blocked_outlet_overpressure(
+    py: Python<'_>,
+    components: Vec<String>,
+    initial_z: Vec<f64>,
+    initial_t: f64,
+    initial_p: f64,
+    vessel_volume: f64,
+    inlet_temperature: f64,
+    supply_pressure: f64,
+    inlet_mass_flow: f64,
+    relief_set_pressure: f64,
+    time_step: Option<f64>,
+    max_time: Option<f64>,
+) -> PyResult<crate::transport_gen::PyBlockedOutletOverpressureResult> {
+    azoth_process::models::blocked_outlet_overpressure::blocked_outlet_overpressure(
+        &components,
+        &initial_z,
+        kelvins(initial_t),
+        pascals(initial_p),
+        cubic_meters(vessel_volume),
+        kelvins(inlet_temperature),
+        pascals(supply_pressure),
+        kilograms_per_second(inlet_mass_flow),
+        pascals(relief_set_pressure),
+        time_step.map(seconds),
+        max_time.map(seconds),
+    )
+    .map(|r| crate::transport_gen::PyBlockedOutletOverpressureResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Blocked outlet relief.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

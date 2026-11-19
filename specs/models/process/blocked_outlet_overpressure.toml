@@ -1,0 +1,143 @@
+id = "process.blocked_outlet_overpressure"
+name = "Blocked-outlet overpressure"
+kind = "procedure"
+assumptions = [
+    "**the class's `run`**: a vessel filling run whose target is the relief set pressure, followed by the first recorded sample at or above that pressure.",
+    "**the time to demand is a sample's own time**, not an interpolation: the filling loop stops after appending the crossing sample.",
+    "**`simulated_horizon` is the configured horizon**, not the elapsed time; a run that reaches the set pressure early still reports the horizon.",
+    "**the pressure, mass and inventory are the filling run's own summary values.**",
+]
+references = [
+    "API STD 521. Pressure-relieving and Depressuring Systems.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/depressurization/BlockedOutletOverpressureAnalyzer.java` is the port source, through `run`.",
+    "`validation/neqsim/captures/process_blocked_outlet_overpressure.tsv` - a flow that reaches the relief set pressure in 71 s and a low flow that does not reach it.",
+]
+[source]
+standard = "NeqSim process/safety/depressurization/BlockedOutletOverpressureAnalyzer.java"
+edition = "Its `run`: the filling simulator with the relief set pressure as its target and the first crossing sample."
+[algorithm]
+scheme = "vessel_pressure_transient"
+convergence = "relative"
+tolerance = 1.0e-12
+max_iterations = 1000000
+[inputs]
+[inputs.components]
+type = "components"
+description = "the trapped gas's substances, by name, resolved against the component databank.\n"
+[inputs.initial_z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the trapped gas's composition, checked rather than renormalised.\n"
+[inputs.initial_t]
+unit = "K"
+description = "the trapped gas's temperature before the outlet blocks.\n"
+[inputs.initial_p]
+unit = "Pa"
+description = "the trapped gas's pressure before the outlet blocks.\n"
+[inputs.vessel_volume]
+unit = "m**3"
+description = "the vessel's internal volume. Must be positive.\n"
+[inputs.inlet_temperature]
+unit = "K"
+description = "the continued feed's stagnation temperature. Must be positive.\n"
+[inputs.supply_pressure]
+unit = "Pa"
+description = "the feed's supply pressure used for its enthalpy. Must be positive.\n"
+[inputs.inlet_mass_flow]
+unit = "kg/s"
+description = "the continued feed's mass flow. Must be positive.\n"
+[inputs.relief_set_pressure]
+unit = "Pa"
+description = "the relief device's set pressure, the overpressure threshold. Must be positive.\n"
+[inputs.time_step]
+unit = "s"
+optional = true
+description = "the explicit step. **Absent takes the class's 1.0 s.**\n"
+[inputs.max_time]
+unit = "s"
+optional = true
+description = "the pressure build-up horizon. **Absent takes the class's 3600 s.**\n"
+[outputs]
+[outputs.relief_set_pressure]
+unit = "Pa"
+description = "the relief set pressure the run used.\n"
+[outputs.max_pressure]
+unit = "Pa"
+description = "the highest recorded pressure.\n"
+[outputs.final_pressure]
+unit = "Pa"
+description = "the last recorded pressure.\n"
+[outputs.final_mass]
+unit = "kg"
+description = "the last recorded inventory mass.\n"
+[outputs.inlet_mass_flow]
+unit = "kg/s"
+description = "the continued feed mass flow.\n"
+[outputs.simulated_horizon]
+unit = "s"
+description = "the configured horizon, not the elapsed time.\n"
+[outputs.time_to_relief_set]
+unit = "s"
+optional = true
+description = "the first sample's time at or above the set pressure; absent when not reached.\n"
+[outputs.relief_demand]
+type = "boolean"
+description = "whether the set pressure was reached within the horizon.\n"
+[[valid_range]]
+quantity = "initial_t"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "initial_p"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "vessel_volume"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive volume"
+[[valid_range]]
+quantity = "inlet_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive inlet temperature"
+[[valid_range]]
+quantity = "supply_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive supply pressure"
+[[valid_range]]
+quantity = "inlet_mass_flow"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive feed flow"
+[[valid_range]]
+quantity = "relief_set_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive set pressure"
+[[valid_range]]
+quantity = "time_step"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive step"
+[[valid_range]]
+quantity = "max_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive horizon"
+[implementations]
+python = "azoth.process.blocked_outlet_overpressure"
+rust = "azoth_process::blocked_outlet_overpressure"
