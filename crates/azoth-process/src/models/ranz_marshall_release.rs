@@ -17,7 +17,7 @@ use serde::Serialize;
 use crate::executor::json::{optional_scalar, scalar, warnings as wire_warnings};
 use crate::model_gen;
 use crate::models::component_selective_release::{
-    ComponentSelectiveReleaseResult, ComponentSelectiveReleaseStation, component_selective_release,
+    ComponentSelectiveReleaseStation, component_selective_release,
 };
 use crate::models::hem_release::{HemReleaseDiagnostic, ReleasePhase, ReleaseStation};
 

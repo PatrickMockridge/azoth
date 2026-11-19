@@ -267,7 +267,7 @@ pub fn bubble_transfer_zone_release(
         .map_or(0.0, |value| value.value);
     let mut previous: Option<Prediction> = None;
     let mut previous_rate = f64::NAN;
-    for iteration in 1..=MAX_FIXED_POINT_ITERATIONS {
+    for _ in 1..=MAX_FIXED_POINT_ITERATIONS {
         let prediction = match predict(
             gas_density,
             liquid_density,
@@ -382,12 +382,6 @@ pub fn bubble_transfer_zone_release(
             .to_string(),
         base.warnings,
     ))
-}
-
-/// The fixed point's current result.
-enum Current {
-    Base(crate::models::drift_flux_release::DriftFluxReleaseResult),
-    Delegate(crate::models::ranz_marshall_release::RanzMarshallReleaseResult),
 }
 
 /// The predicted hydrodynamics of one station.

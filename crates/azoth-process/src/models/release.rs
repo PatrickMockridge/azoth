@@ -67,16 +67,6 @@ pub(crate) struct SlipOutcome {
     pub state: TraceStation,
     /// The closure's mass flux, kg/(m2 s).
     pub mass_flux: f64,
-    /// The gas phase's velocity, m/s.
-    pub gas_velocity: f64,
-    /// The liquid phase's velocity, m/s.
-    pub liquid_velocity: f64,
-    /// The gas phase's area fraction.
-    pub gas_area_fraction: f64,
-    /// The phase area fractions' sum.
-    pub phase_area_sum: f64,
-    /// The phase kinetic energy minus the homogeneous kinetic energy, J/kg.
-    pub kinetic_energy_error: f64,
 }
 
 /// The prescribed-slip partition of one station.
@@ -128,11 +118,6 @@ pub(crate) fn prescribed_slip(
     Ok(SlipOutcome {
         state: partitioned,
         mass_flux,
-        gas_velocity,
-        liquid_velocity,
-        gas_area_fraction,
-        phase_area_sum,
-        kinetic_energy_error,
     })
 }
 
@@ -155,22 +140,10 @@ pub(crate) struct DriftOutcome {
     pub state: TraceStation,
     /// The closure's mass flux, kg/(m2 s).
     pub mass_flux: f64,
-    /// The solved gas-to-liquid slip ratio.
-    pub slip_ratio: f64,
     /// The gas phase's velocity, m/s.
     pub gas_velocity: f64,
     /// The liquid phase's velocity, m/s.
     pub liquid_velocity: f64,
-    /// The gas phase's area fraction.
-    pub gas_area_fraction: f64,
-    /// The phase area fractions' sum.
-    pub phase_area_sum: f64,
-    /// The phase kinetic energy minus the homogeneous kinetic energy, J/kg.
-    pub kinetic_energy_error: f64,
-    /// The Harmathy drift velocity, m/s.
-    pub drift_velocity: f64,
-    /// The closure's drift residual, m/s.
-    pub drift_residual: f64,
 }
 
 /// One closure evaluation.
@@ -179,8 +152,6 @@ struct DriftRaw {
     gas_velocity: f64,
     liquid_velocity: f64,
     gas_area_fraction: f64,
-    phase_area_sum: f64,
-    kinetic_energy_error: f64,
     drift_residual: f64,
 }
 
@@ -231,8 +202,6 @@ fn drift_raw(
         gas_velocity,
         liquid_velocity,
         gas_area_fraction,
-        phase_area_sum,
-        kinetic_energy_error,
         drift_residual,
     })
 }
@@ -262,7 +231,7 @@ pub(crate) fn drift_flux(
         ));
     }
     let mut lower = 1.0_f64;
-    let mut lower_residual = drift_raw(state, &basis, lower, drift_velocity)?.drift_residual;
+    let lower_residual = drift_raw(state, &basis, lower, drift_velocity)?.drift_residual;
     let mut upper = 2.0_f64;
     let mut upper_residual = drift_raw(state, &basis, upper, drift_velocity)?.drift_residual;
     while upper_residual <= 0.0 && upper < MAX_SLIP_RATIO {
@@ -301,14 +270,8 @@ pub(crate) fn drift_flux(
     Ok(DriftOutcome {
         state: partitioned,
         mass_flux: raw.mass_flux,
-        slip_ratio,
         gas_velocity: raw.gas_velocity,
         liquid_velocity: raw.liquid_velocity,
-        gas_area_fraction: raw.gas_area_fraction,
-        phase_area_sum: raw.phase_area_sum,
-        kinetic_energy_error: raw.kinetic_energy_error,
-        drift_velocity,
-        drift_residual: raw.drift_residual,
     })
 }
 
