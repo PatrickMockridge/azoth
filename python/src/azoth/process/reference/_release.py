@@ -301,3 +301,91 @@ def relax_uniform(upstream_gas_fraction: float, equilibrium: Any, progress: floa
         gas_phase=gas,
         liquid_phase=liquid,
     )
+
+
+def relax_components(
+    upstream: Any,
+    equilibrium: Any,
+    times: list[float],
+    residence: float,
+    overall: list[float] | tuple[float, ...],
+) -> Any:
+    """The component-selective first-order relaxation of the equilibrium station."""
+    basis = phase_basis(equilibrium)
+    gas = equilibrium.gas_phase
+    liquid = equilibrium.liquid_phase
+    if gas is None or liquid is None:
+        raise ReleaseRefusal(
+            "Exactly one gas and one liquid phase are required at the opening",
+            unsupported=True,
+        )
+    count = len(overall)
+    if (
+        len(times) != count
+        or len(gas.component_mass_fractions) != count
+        or len(liquid.component_mass_fractions) != count
+    ):
+        raise ReleaseRefusal(
+            "Relaxation-time components must exactly match the fluid components",
+            unsupported=True,
+        )
+    held: list[float] = []
+    gas_mass_fraction = 0.0
+    for index in range(count):
+        upstream_gas = upstream.gas_phase
+        initial = (
+            0.0
+            if upstream_gas is None
+            else upstream_gas.mass_fraction * upstream_gas.component_mass_fractions[index]
+        )
+        target = basis.gas_fraction * gas.component_mass_fractions[index]
+        progress = 1.0 - math.exp(-residence / times[index])
+        relaxed = initial + progress * (target - initial)
+        if not math.isfinite(relaxed) or relaxed < -1.0e-14 or relaxed > overall[index] + 1.0e-14:
+            raise ReleaseRefusal(
+                "Component phase allocation is outside its conserved inventory",
+                unsupported=False,
+            )
+        relaxed = min(max(relaxed, 0.0), overall[index])
+        gas_mass_fraction += relaxed
+        held.append(relaxed)
+    if gas_mass_fraction <= 1.0e-10 or gas_mass_fraction >= 1.0 - 1.0e-10:
+        raise ReleaseRefusal(
+            "Relaxed state must retain positive gas and liquid mass fractions",
+            unsupported=True,
+        )
+    liquid_mass_fraction = 1.0 - gas_mass_fraction
+    gas_composition = tuple(value / gas_mass_fraction for value in held)
+    liquid_composition = tuple(
+        (overall[index] - held[index]) / liquid_mass_fraction for index in range(count)
+    )
+    density = 1.0 / (
+        gas_mass_fraction / basis.gas_density + liquid_mass_fraction / basis.liquid_density
+    )
+    return equilibrium._replace(
+        density=density,
+        gas_mass_fraction=gas_mass_fraction,
+        gas_phase=replace(
+            gas,
+            mass_fraction=gas_mass_fraction,
+            component_mass_fractions=gas_composition,
+        ),
+        liquid_phase=replace(
+            liquid,
+            mass_fraction=liquid_mass_fraction,
+            component_mass_fractions=liquid_composition,
+        ),
+    )
+
+
+def reconstructed_components(station: Any) -> list[float] | None:
+    """The reconstructed overall component mass fractions of a station."""
+    gas = station.gas_phase
+    liquid = station.liquid_phase
+    if gas is None or liquid is None:
+        return None
+    return [
+        gas.mass_fraction * gas.component_mass_fractions[index]
+        + liquid.mass_fraction * liquid.component_mass_fractions[index]
+        for index in range(len(gas.component_mass_fractions))
+    ]

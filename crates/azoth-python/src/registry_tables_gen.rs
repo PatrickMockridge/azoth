@@ -256,6 +256,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.blowdown_pressure_profile" => azoth_process::models::blowdown_pressure_profile::BlowdownPressureProfileResult::FIELDS.to_vec(),
         "process.bow_tie" => azoth_process::models::bow_tie::BowTieResult::FIELDS.to_vec(),
         "process.check_valve_leak_relief" => azoth_process::models::check_valve_leak_relief::CheckValveLeakReliefResult::FIELDS.to_vec(),
+        "process.component_selective_release" => azoth_process::models::component_selective_release::ComponentSelectiveReleaseResult::FIELDS.to_vec(),
         "process.component_splitter" => azoth_process::models::component_splitter::ComponentSplitterResult::FIELDS.to_vec(),
         "process.compressor" => azoth_process::models::compressor::CompressorResult::FIELDS.to_vec(),
         "process.consequence_analysis" => azoth_process::models::consequence_analysis::ConsequenceAnalysisResult::FIELDS.to_vec(),

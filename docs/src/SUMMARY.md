@@ -250,6 +250,7 @@
   - [Blowdown pressure profile](./process/blowdown_pressure_profile.md)
   - [Bow-tie risk](./process/bow_tie.md)
   - [Check valve leak relief](./process/check_valve_leak_relief.md)
+  - [Component-selective drift-flux orifice release](./process/component_selective_release.md)
   - [Component splitter](./process/component_splitter.md)
   - [Compressor](./process/compressor.md)
   - [Consequence analysis](./process/consequence_analysis.md)

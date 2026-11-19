@@ -15,16 +15,16 @@
 
 use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
-    PyCharacterizationComponent, PyChemicalWarningRow, PyConsequenceOutcomeResult,
-    PyDepositionSegmentRow, PyDepressurizationPoint, PyDriftFluxReleaseStation,
-    PyEquilibriumSoundSpeedSample, PyEscalationItemResult, PyEventTreeOutcome,
-    PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
-    PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
-    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
-    PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
-    PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier,
-    PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
+    PyCharacterizationComponent, PyChemicalWarningRow, PyComponentSelectiveReleaseStation,
+    PyConsequenceOutcomeResult, PyDepositionSegmentRow, PyDepressurizationPoint,
+    PyDriftFluxReleaseStation, PyEquilibriumSoundSpeedSample, PyEscalationItemResult,
+    PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry,
+    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
+    PyHydrateRiskPoint, PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent,
+    PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation,
+    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
+    PyMinimalCutSet, PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
     PyNonEquilibriumBlowdownPoint, PyP002FindingResult, PyPipeFireRupturePoint,
     PyPrescribedSlipReleaseStation, PyPulsationModeResult, PyRegisterFinding, PyReliefDisposalRow,
     PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage, PyReviewVerdict,
@@ -15018,6 +15018,100 @@ impl From<&azoth_process::models::check_valve_leak_relief::CheckValveLeakReliefR
             compressibility: r.compressibility,
             specific_heat_ratio: r.specific_heat_ratio,
             assumptions: r.assumptions.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.component_selective_release`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ComponentSelectiveReleaseResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyComponentSelectiveReleaseResult {
+    /// `valid`, `invalid` or `unsupported`.
+    #[pyo3(get)]
+    pub status: String,
+    /// the closure's release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    #[pyo3(get)]
+    pub mass_flow_rate: Option<PyQty>,
+    /// the base scan's choked flag; false on failure and on no forward flow.
+    #[pyo3(get)]
+    pub choked: bool,
+    /// absent: the derived model drops the base's throat sound speed.
+    #[pyo3(get)]
+    pub throat_sound_speed: Option<PyQty>,
+    /// the upstream overall mole fractions.
+    #[pyo3(get)]
+    pub component_mole_fractions: Vec<f64>,
+    /// the upstream overall mass fractions.
+    #[pyo3(get)]
+    pub component_mass_fractions: Vec<f64>,
+    /// the base stations, with the opening's relaxed phase velocities solved. Empty on failure.
+    #[pyo3(get)]
+    pub stations: Vec<PyComponentSelectiveReleaseStation>,
+    /// the model's assumptions and the base's retained records.
+    #[pyo3(get)]
+    pub diagnostics: Vec<PyHemReleaseDiagnostic>,
+    /// the codes alone, so a case can hold the contract without asserting prose.
+    #[pyo3(get)]
+    pub diagnostic_codes: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyComponentSelectiveReleaseResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "ComponentSelectiveReleaseResult(status={:?}, mass_flow_rate={:?}, choked={:?}, throat_sound_speed={:?}, component_mole_fractions={:?}, component_mass_fractions={:?}, stations={:?}, diagnostics={:?}, diagnostic_codes={:?}, {} warning(s))",
+            self.status,
+            self.mass_flow_rate,
+            self.choked,
+            self.throat_sound_speed,
+            self.component_mole_fractions,
+            self.component_mass_fractions,
+            self.stations,
+            self.diagnostics,
+            self.diagnostic_codes,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::component_selective_release::ComponentSelectiveReleaseResult>
+    for PyComponentSelectiveReleaseResult
+{
+    fn from(
+        r: &azoth_process::models::component_selective_release::ComponentSelectiveReleaseResult,
+    ) -> Self {
+        Self {
+            status: r.status.clone(),
+            mass_flow_rate: r.mass_flow_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            choked: r.choked,
+            throat_sound_speed: r.throat_sound_speed.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            component_mole_fractions: r.component_mole_fractions.clone(),
+            component_mass_fractions: r.component_mass_fractions.clone(),
+            stations: r
+                .stations
+                .iter()
+                .map(PyComponentSelectiveReleaseStation::from)
+                .collect(),
+            diagnostics: r
+                .diagnostics
+                .iter()
+                .map(PyHemReleaseDiagnostic::from)
+                .collect(),
+            diagnostic_codes: r.diagnostic_codes.clone(),
             warnings: transport(&r.warnings),
         }
     }

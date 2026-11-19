@@ -34,6 +34,7 @@ from azoth.core.result import (
     BlowdownPressureProfileResult,
     BowTieResult,
     CheckValveLeakReliefResult,
+    ComponentSelectiveReleaseResult,
     ComponentSplitterResult,
     CompressorResult,
     ConsequenceAnalysisResult,
@@ -313,6 +314,7 @@ _LEGACY_SCREENING_RELEASE = "process.legacy_screening_release"
 _PRESCRIBED_SLIP_RELEASE = "process.prescribed_slip_release"
 _DRIFT_FLUX_RELEASE = "process.drift_flux_release"
 _FINITE_RATE_RELEASE = "process.finite_rate_release"
+_COMPONENT_SELECTIVE_RELEASE = "process.component_selective_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
@@ -3630,6 +3632,42 @@ def finite_rate_release(
         back_pressure=back_pressure,
         surface_tension=surface_tension,
         phase_transfer_relaxation_time=phase_transfer_relaxation_time,
+        residence_time=residence_time,
+        parameter_provenance=parameter_provenance,
+    )
+
+
+def component_selective_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    surface_tension: Q,
+    component_relaxation_times: list[Q],
+    residence_time: Q,
+    parameter_provenance: str,
+) -> ComponentSelectiveReleaseResult:
+    """The release rate of a component-selective short-opening orifice.
+
+    Each component gas-held mass fraction relaxes by ``1 - exp(-residence/tau_i)``, then the
+    shared drift-flux closure solves the station. A relaxation-time list that does not match
+    the component set is ``unsupported``.
+
+    See :func:`azoth.process.reference.component_selective_release`.
+    """
+    return resolve(_COMPONENT_SELECTIVE_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        surface_tension=surface_tension,
+        component_relaxation_times=component_relaxation_times,
         residence_time=residence_time,
         parameter_provenance=parameter_provenance,
     )

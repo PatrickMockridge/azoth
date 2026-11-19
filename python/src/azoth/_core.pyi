@@ -1088,6 +1088,32 @@ class RegisterFinding:
     rule: str
 
 @final
+class ComponentSelectiveReleaseStation:
+    """the base stations, with the opening's relaxed phase velocities solved. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
+class HemReleaseDiagnostic:
+    """the model's assumptions and the base's retained records."""
+
+    code: str
+    message: str
+
+@final
 class ConsequenceOutcomeResult:
     """one row per input row, in caller order: the class's fixed label, the branch type, its frequency, fatality probability and fatality frequency."""
 
@@ -1126,13 +1152,6 @@ class DriftFluxReleaseStation:
     liquid_density: Qty | None
     gas_velocity: Qty | None
     liquid_velocity: Qty | None
-
-@final
-class HemReleaseDiagnostic:
-    """the model's assumptions and the base's retained records."""
-
-    code: str
-    message: str
 
 @final
 class EscalationItemResult:
@@ -3704,6 +3723,19 @@ class CheckValveLeakReliefResult:
     compressibility: float
     specific_heat_ratio: float
     assumptions: list[str]
+    warnings: list[Warning]
+
+@final
+class ComponentSelectiveReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[ComponentSelectiveReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
     warnings: list[Warning]
 
 @final
@@ -8002,6 +8034,19 @@ def check_valve_leak_relief(
     discharge_coefficient: float | None = None,
     scenario_name: str | None = None,
 ) -> CheckValveLeakReliefResult: ...
+def component_selective_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    surface_tension: float,
+    component_relaxation_times: list[float],
+    residence_time: float,
+    parameter_provenance: str,
+) -> ComponentSelectiveReleaseResult: ...
 def component_splitter(
     components: list[str],
     feed_n: float,

@@ -1385,6 +1385,29 @@ def _release_station_layers(result: Any) -> dict[str, float]:
     return dumped
 
 
+def _component_selective_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.component_selective_release`'s stations, from the reference arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.component_selective_release import (
+        component_selective_release,
+    )
+
+    result = component_selective_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["surface_tension"]), "N/m"),
+        [quantity(float(value), "s") for value in inputs["component_relaxation_times"]],
+        quantity(float(inputs["residence_time"]), "s"),
+        str(inputs["parameter_provenance"]),
+    )
+    return _release_station_layers(result)
+
+
 def _toxic_library(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.toxic_library`'s layers, from the reference's own arithmetic.
 
@@ -4340,6 +4363,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.prescribed_slip_release": _prescribed_slip_release,
     "process.drift_flux_release": _drift_flux_release,
     "process.finite_rate_release": _finite_rate_release,
+    "process.component_selective_release": _component_selective_release,
     "process.leak_blowdown": _leak_blowdown,
     "process.hazardous_area": _hazardous_area,
     "process.toxic_library": _toxic_library,
@@ -4797,6 +4821,13 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_hem_release.tsv",
         block=0,
         identified_by=("#label", "methane_50bara_choked"),
+    ),
+    LayerCase(
+        model="process.component_selective_release",
+        case="methane_faster_than_heptane",
+        capture="process_component_selective_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_heptane_times_0.1_1.0"),
     ),
     LayerCase(
         model="process.drift_flux_release",
@@ -8794,6 +8825,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The finite-rate capture's six: four further relaxation pairs, the 0.125 state and the
     # all-gas refusal.
     "process_finite_rate_release.tsv": 6,
+    # The component-selective capture's four: the uniform and reversed time sets, the
+    # incomplete-basis refusal and the SRK evidence row.
+    "process_component_selective_release.tsv": 4,
     # The blowdown capture's ten: one block is layer-cased (the ten-second methane run); the
     # rest are the long horizons held to the capture as evidence, the SRK rows, the propane
     # row whose single-phase beta and cached density are class artefacts, and the refusals.

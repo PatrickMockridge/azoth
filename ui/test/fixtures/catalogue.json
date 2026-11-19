@@ -22366,6 +22366,15 @@
       "sub_interface": "overpressure"
     },
     {
+      "family": "release",
+      "id": "process.component_selective_release",
+      "name": "Component-selective drift-flux orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "qra",
       "id": "process.consequence_analysis",
       "name": "Consequence analysis",

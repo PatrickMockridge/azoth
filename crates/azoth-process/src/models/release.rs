@@ -340,3 +340,95 @@ pub(crate) fn relax_uniform(
     }
     Ok(out)
 }
+
+/// The component-selective first-order relaxation of the equilibrium station.
+///
+/// `times` is one relaxation time per component, in mixture order; `overall` is the upstream
+/// overall component mass fractions.
+///
+/// # Errors
+/// The class's exactly-two-phase requirement, its per-component inventory bounds and its
+/// relaxed-fraction bounds.
+pub(crate) fn relax_components(
+    upstream: &TraceStation,
+    equilibrium: &TraceStation,
+    times: &[f64],
+    residence: f64,
+    overall: &[f64],
+) -> Result<TraceStation, ReleaseRefusal> {
+    let basis = phase_basis(equilibrium)?;
+    let (Some(gas_phase), Some(liquid_phase)) = (
+        equilibrium.gas_phase.as_ref(),
+        equilibrium.liquid_phase.as_ref(),
+    ) else {
+        return Err(ReleaseRefusal::Unsupported(
+            "Exactly one gas and one liquid phase are required at the opening".to_string(),
+        ));
+    };
+    let upstream_gas = upstream.gas_phase.as_ref();
+    if times.len() != overall.len()
+        || gas_phase.component_mass_fractions.len() != overall.len()
+        || liquid_phase.component_mass_fractions.len() != overall.len()
+    {
+        return Err(ReleaseRefusal::Unsupported(
+            "Relaxation-time components must exactly match the fluid components".to_string(),
+        ));
+    }
+    let mut held = Vec::with_capacity(overall.len());
+    let mut gas_mass_fraction = 0.0;
+    for index in 0..overall.len() {
+        let initial = upstream_gas.map_or(0.0, |gas| {
+            gas.mass_fraction * gas.component_mass_fractions[index]
+        });
+        let target = basis.gas_fraction * gas_phase.component_mass_fractions[index];
+        let progress = 1.0 - (-residence / times[index]).exp();
+        let relaxed = initial + progress * (target - initial);
+        if !relaxed.is_finite() || relaxed < -1.0e-14 || relaxed > overall[index] + 1.0e-14 {
+            return Err(ReleaseRefusal::Invalid(
+                "Component phase allocation is outside its conserved inventory".to_string(),
+            ));
+        }
+        let relaxed = relaxed.clamp(0.0, overall[index]);
+        gas_mass_fraction += relaxed;
+        held.push(relaxed);
+    }
+    if gas_mass_fraction <= 1.0e-10 || gas_mass_fraction >= 1.0 - 1.0e-10 {
+        return Err(ReleaseRefusal::Unsupported(
+            "Relaxed state must retain positive gas and liquid mass fractions".to_string(),
+        ));
+    }
+    let liquid_mass_fraction = 1.0 - gas_mass_fraction;
+    let mut gas_composition = Vec::with_capacity(overall.len());
+    let mut liquid_composition = Vec::with_capacity(overall.len());
+    for index in 0..overall.len() {
+        gas_composition.push(held[index] / gas_mass_fraction);
+        liquid_composition.push((overall[index] - held[index]) / liquid_mass_fraction);
+    }
+    let density =
+        1.0 / (gas_mass_fraction / basis.gas_density + liquid_mass_fraction / basis.liquid_density);
+    let mut out = equilibrium.clone();
+    out.density = density;
+    out.gas_mass_fraction = gas_mass_fraction;
+    if let Some(gas) = out.gas_phase.as_mut() {
+        gas.mass_fraction = gas_mass_fraction;
+        gas.component_mass_fractions = gas_composition;
+    }
+    if let Some(liquid) = out.liquid_phase.as_mut() {
+        liquid.mass_fraction = liquid_mass_fraction;
+        liquid.component_mass_fractions = liquid_composition;
+    }
+    Ok(out)
+}
+
+/// The reconstructed overall component mass fractions of a station.
+pub(crate) fn reconstructed_components(state: &TraceStation) -> Option<Vec<f64>> {
+    let (gas, liquid) = (state.gas_phase.as_ref()?, state.liquid_phase.as_ref()?);
+    let mut out = Vec::with_capacity(gas.component_mass_fractions.len());
+    for index in 0..gas.component_mass_fractions.len() {
+        out.push(
+            gas.mass_fraction * gas.component_mass_fractions[index]
+                + liquid.mass_fraction * liquid.component_mass_fractions[index],
+        );
+    }
+    Some(out)
+}

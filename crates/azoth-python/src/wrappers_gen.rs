@@ -5870,6 +5870,46 @@ pub fn check_valve_leak_relief(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Component-selective drift-flux orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, component_relaxation_times, residence_time, parameter_provenance))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, component_relaxation_times, residence_time, parameter_provenance)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn component_selective_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    surface_tension: f64,
+    component_relaxation_times: Vec<f64>,
+    residence_time: f64,
+    parameter_provenance: &str,
+) -> PyResult<crate::transport_gen::PyComponentSelectiveReleaseResult> {
+    azoth_process::models::component_selective_release::component_selective_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        surface_tension,
+        &component_relaxation_times,
+        residence_time,
+        parameter_provenance,
+    )
+    .map(|r| crate::transport_gen::PyComponentSelectiveReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Component splitter.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

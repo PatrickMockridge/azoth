@@ -26,6 +26,7 @@ use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
 use crate::models::blowdown_pressure_profile::BlowdownPressureProfileResult;
 use crate::models::bow_tie::BowTieResult;
 use crate::models::check_valve_leak_relief::CheckValveLeakReliefResult;
+use crate::models::component_selective_release::ComponentSelectiveReleaseResult;
 use crate::models::component_splitter::ComponentSplitterResult;
 use crate::models::compressor::CompressorResult;
 use crate::models::consequence_analysis::ConsequenceAnalysisResult;
@@ -397,6 +398,26 @@ impl CalcResult for CheckValveLeakReliefResult {
         "compressibility",
         "specific_heat_ratio",
         "assumptions",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ComponentSelectiveReleaseResult {
+    const CALC_ID: &'static str = "process.component_selective_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
         "warnings",
     ];
 

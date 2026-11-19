@@ -45,6 +45,7 @@ pub mod blocked_outlet_relief;
 pub mod blowdown_pressure_profile;
 pub mod bow_tie;
 pub mod check_valve_leak_relief;
+pub mod component_selective_release;
 pub mod component_splitter;
 pub mod compressor;
 pub mod consequence_analysis;
@@ -189,6 +190,9 @@ pub use blowdown_pressure_profile::{
 };
 pub use bow_tie::{BowTieBarrier, BowTieConsequence, BowTieResult, BowTieThreat, bow_tie};
 pub use check_valve_leak_relief::{CheckValveLeakReliefResult, check_valve_leak_relief};
+pub use component_selective_release::{
+    ComponentSelectiveReleaseResult, component_selective_release,
+};
 pub use component_splitter::{ComponentSplitterResult, component_splitter};
 pub use compressor::{CompressorResult, compressor};
 pub use consequence_analysis::{

@@ -81,7 +81,7 @@ not an equation, and both implementations read it from here.
 | `methane_heptane_0_125` | components = ['methane', 'n-heptane'], upstream_z = [0.125, 0.875], upstream_t = 300.0, upstream_p = 3000000.0, diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 100000.0, surface_tension = 0.02 | status = valid, mass_flow_rate = 1.6146187736549176, choked = True |
 | `surface_tension_changes_the_rate` | components = ['methane', 'n-heptane'], upstream_z = [0.1125, 0.8875], upstream_t = 300.0, upstream_p = 3000000.0, diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 100000.0, surface_tension = 0.05 | status = valid, mass_flow_rate = 1.7176345511565145, choked = True |
 | `single_phase_opening_is_unsupported` | components = ['methane'], upstream_z = [1.0], upstream_t = 300.0, upstream_p = 3000000.0, diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 100000.0, surface_tension = 0.02 | status = unsupported, choked = False |
-| `gas_area_bound_is_unsupported` | components = ['methane', 'n-heptane'], upstream_z = [0.1375, 0.8625], upstream_t = 300.0, upstream_p = 3000000.0, diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 100000.0, surface_tension = 0.02 | status = unsupported, choked = False |
+| `gas_area_bound_is_unsupported` | components = ['methane', 'n-heptane'], upstream_z = [0.8, 0.2], upstream_t = 300.0, upstream_p = 3000000.0, diameter = 0.01, discharge_coefficient = 0.62, back_pressure = 100000.0, surface_tension = 0.02 | status = unsupported, choked = False |
 
 ## How far this is checked
 **`partially_verified`** — exercised against expectations pinned in its own spec, with no independent oracle recorded for it - **the normal case rather than a defect**.

@@ -237,6 +237,7 @@
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
 //!   - specs/models/process/check_valve_leak_relief.toml
+//!   - specs/models/process/component_selective_release.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
@@ -2981,6 +2982,47 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.check_valve_leak_relief",
         "discharge_coefficient",
         "dimensionless",
+    ),
+    (
+        "process.component_selective_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.component_selective_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.component_selective_release",
+        "upstream_p",
+        "pressure",
+    ),
+    ("process.component_selective_release", "diameter", "length"),
+    (
+        "process.component_selective_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.component_selective_release",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.component_selective_release",
+        "surface_tension",
+        "surface_tension",
+    ),
+    (
+        "process.component_selective_release",
+        "component_relaxation_times",
+        "time",
+    ),
+    (
+        "process.component_selective_release",
+        "residence_time",
+        "time",
     ),
     ("process.component_splitter", "feed_n", "molar_flow"),
     ("process.component_splitter", "feed_z", "dimensionless"),

@@ -179,8 +179,9 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # 353: the depressurization; 354: the depressurization acceptance; 355: the
     # blocked-outlet overpressure; 356: the multi-vessel study; 357: the non-equilibrium
     # blowdown; 358: the ideal-gas release; 359: the legacy screening release; 360: the
-    # prescribed-slip release; 361: the drift-flux release; 362: the finite-rate release.
-    assert len(registered) == 362
+    # prescribed-slip release; 361: the drift-flux release; 362: the finite-rate release;
+    # 363: the component-selective release.
+    assert len(registered) == 363
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:
@@ -211,7 +212,7 @@ def test_an_unknown_id_is_refused_rather_than_answered_with_an_empty_block() -> 
 
 
 def test_every_block_is_complete_and_well_formed() -> None:
-    """The shape, for all 264, so the contract is the block's rather than one sample's."""
+    """The shape, for all 265, so the contract is the block's rather than one sample's."""
     for calc_id, block in PROVENANCE.items():
         assert set(block) == {
             "calc_id",

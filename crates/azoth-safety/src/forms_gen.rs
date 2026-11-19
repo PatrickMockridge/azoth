@@ -768,6 +768,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.component_selective_release",
+        name: "Component-selective drift-flux orifice release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.consequence_analysis",
         name: "Consequence analysis",
         family: "qra",

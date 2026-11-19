@@ -68,6 +68,8 @@ from azoth.core.result import (
     Co2WaterDiffusivityResult,
     ColebrookResult,
     CombineReservoirFluidsResult,
+    ComponentSelectiveReleaseResult,
+    ComponentSelectiveReleaseStation,
     ComponentSplitterResult,
     CompressorResult,
     ConductionPlaneWallResult,
@@ -551,6 +553,7 @@ __all__ = [
     "co2_phase",
     "co2_water_diffusivity",
     "combine_reservoir_fluids",
+    "component_selective_release",
     "component_splitter",
     "compressor",
     "conduction_plane_wall",
@@ -6079,6 +6082,36 @@ def check_valve_leak_relief(components: list[str], mole_fractions: list[float], 
         compressibility=result.compressibility,
         specific_heat_ratio=result.specific_heat_ratio,
         assumptions=tuple(result.assumptions),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def component_selective_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, surface_tension: Q, component_relaxation_times: list[Q], residence_time: Q, parameter_provenance: str) -> ComponentSelectiveReleaseResult:
+    """``process.component_selective_release``, computed in Rust."""
+    spec = _models_gen.model("process.component_selective_release")
+    result = _core.component_selective_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "surface_tension", surface_tension),
+        [input_to_si(spec, "component_relaxation_times", v) for v in component_relaxation_times],
+        input_to_si(spec, "residence_time", residence_time),
+        parameter_provenance,
+    )
+    return ComponentSelectiveReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(ComponentSelectiveReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
         warnings=_warnings(result.warnings),
     )
 

@@ -16,6 +16,7 @@
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
 //!   - specs/models/process/check_valve_leak_relief.toml
+//!   - specs/models/process/component_selective_release.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
