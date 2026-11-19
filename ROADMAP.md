@@ -931,8 +931,8 @@ a claim nothing holds.
   subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
   own classes - the risk core, the two release models, the five overpressure calculators,
   the six dispersion ids, the four rupture ids, the four self-heating ids, the four hazid
-  worksheet ids, the four safety-review worksheet ids, the six safety screens and the nine
-  safety worksheets and vibration screens; the types
+  worksheet ids, the four safety-review worksheet ids, the six safety screens, the nine
+  safety worksheets and vibration screens and the eight depressurization ids; the types
   no bullet names remain unported, each with its class.
 - **The self-heating family** - four ids. **`process.semenov_self_heating` is
   `SemenovSelfHeatingAnalyzer.analyze`**: `psi` against `1/e`, the critical-temperature
@@ -1027,6 +1027,35 @@ a claim nothing holds.
   every failed source, an inclusive threshold, a duplicate item's last threshold and the worst
   case in the items order. The classes' reports and recommendation strings are presentation.
   Held to nine captures.
+- **The depressurization family** - eight ids, the transient blowdown chain.
+  **`process.depressurization` is `DepressurizationSimulator.run`**: the vessel-volume mole
+  alignment, the lightest-phase vapour withdrawal capped at a quarter of the phase per step,
+  the choked/subsonic orifice, the mass and energy balance, the lumped wall and the two fire
+  boundaries, the VU flash with its single-component dispatch and ideal-gas fallback, and the
+  API 521 half-pressure/7 barg crossings, the monotonic flags and the min/max temperatures.
+  **`process.depressurization_acceptance` is `STS0131AcceptanceCriteria.evaluate`**: the
+  last-sample limiting time reduced by the positive escape and rupture times, the linear
+  interpolations, the peak rate at or before it and the three optional criteria.
+  **`process.psv_valve` is `PsvValveModel.update` and `massFlowKgPerS`**: the pop/reseat
+  hysteresis, the cycle counter and the API 520 choked/subcritical flow, one step per call
+  with the state as inputs. **`process.vessel_filling` is `VesselFillingSimulator.run`**: the
+  inlet stagnation enthalpy, the mole alignment, the VU march, the lumped wall, the Woodfield
+  mixed-convection coefficient and the liner limits. **`process.blocked_outlet_overpressure`
+  is `BlockedOutletOverpressureAnalyzer.run`**: the filling run to the relief set pressure
+  and the first crossing sample. **`process.non_equilibrium_blowdown` is
+  `NonEquilibriumBlowdownModel.run`**: the vapour and liquid zones, the vapour TV flash that
+  sets the pressure, the wetted-fraction wall split, the Rohsenow boiling capped at the
+  critical flux, the interfacial coupling, the boil-off transfer and the class's clamps.
+  **`process.multi_vessel_blowdown_study` is `MultiVesselBlowdownStudy.run` over
+  `addSourceResult` sources**: the common grid, the per-source interpolation that stops at a
+  source's last sample, the peak total and the header Mach check.
+  **`process.dynamic_psv_sizing` is `DynamicPsvSizingStudy.run`**: the steady API 521 area
+  against the ideal-gas PSV-cycling bisection, with the start pressure
+  `set_pressure x initial_pressure_fraction`. The tier-C governance classes
+  (`CoupledReliefBlowdownFlareCalculation` and its input and result, the dynamic
+  blowdown/flare runner, data source and handoff, and `LineEquipmentListEvidence`) are the
+  engineering-calculation module contract and session surface; they compose these ids and are
+  not carried. Held to eight captures.
 - **The relief and overpressure arithmetic** — seven ids. **`process.psv_sizing` is
   `ReliefValveSizing`'s three area methods and the API 520 D to T ladder**: gas with the
   conventional/balanced-bellows `Kb` and the rupture-disk `Kc`, liquid with `Kw`, the
@@ -1264,8 +1293,8 @@ study: safety scenarios, one registered model each, and bow-ties whose frequency
 `process.bow_tie`'s. Each has its own command model, envelope and route — `/sheets` and
 `/safety` — and its own bindings (`SheetEditor`/`SafetyEditor` in wasm, `azoth sheets`/`azoth
 safety` in the shell); the read-only drawing rides `/dexpi`. The **Case** menu switches the four
-interfaces from one registry in `ui/src/interfaces.ts`. The safety interface runs the thirty
-scalar safety models across nine families, and the bow-tie, natively; the record-shaped models
+interfaces from one registry in `ui/src/interfaces.ts`. The safety interface runs the thirty-one
+scalar safety models across ten families, and the bow-tie, natively; the record-shaped models
 and the rupture, release and QRA families are listed with their manual pages and no native view
 yet. A HAZOP worksheet, a printable safety report, a flux-versus-distance chart and scenario
 bundles remain unbuilt.
