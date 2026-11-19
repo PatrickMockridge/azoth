@@ -102,7 +102,7 @@ scenario whose inputs changed says its answer is out of date.
 
 A scenario stores scalar inputs and draws scalar outputs, so a table-shaped model is listed
 with the refusal its shape earns rather than given a field it cannot express.
-`process.gas_dispersion` and the two release models take a composition;
+`process.gas_dispersion` and the four release models take a composition;
 `process.fire_water_demand`, `process.relief_disposal_network`, `process.tr3001_compliance`,
 `process.consequence_analysis`, `process.risk_matrix`, `process.fault_tree`, `process.lopa` and
 `process.event_tree` take and/or return record lists; `process.sil_verification` returns one;
