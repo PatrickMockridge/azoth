@@ -855,6 +855,7 @@ fn crossing_time(
     if drop.abs() < 1.0e-12 {
         return current.time.value;
     }
+    // numerics-ok: the class clamps this interpolated crossing fraction
     let fraction = ((previous.pressure.value - target) / drop).clamp(0.0, 1.0);
     previous.time.value + fraction * (current.time.value - previous.time.value)
 }
