@@ -192,6 +192,8 @@ from azoth.core.result import (
     IapwsHenryLawResult,
     IapwsSaturationPressureResult,
     IdealGasCpResult,
+    IdealGasFannoReleaseResult,
+    IdealGasFannoReleaseStation,
     IdealGasReleaseResult,
     IdealGasReleaseStation,
     IncrementalZoneAnalysisResult,
@@ -652,6 +654,7 @@ __all__ = [
     "iapws_henry_law",
     "iapws_saturation_pressure",
     "ideal_gas_cp",
+    "ideal_gas_fanno_release",
     "ideal_gas_release",
     "incremental_zone_analysis",
     "inherent_safety",
@@ -7689,6 +7692,37 @@ def hem_release(components: list[str], upstream_z: list[float], upstream_t: Q, u
         component_mole_fractions=tuple(result.component_mole_fractions),
         component_mass_fractions=tuple(result.component_mass_fractions),
         stations=tuple(HemReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def ideal_gas_fanno_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, flow_path_length: Q, darcy_friction_factor: float) -> IdealGasFannoReleaseResult:
+    """``process.ideal_gas_fanno_release``, computed in Rust."""
+    spec = _models_gen.model("process.ideal_gas_fanno_release")
+    result = _core.ideal_gas_fanno_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "flow_path_length", flow_path_length),
+        darcy_friction_factor,
+    )
+    return IdealGasFannoReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        friction_length=result.friction_length,
+        inlet_mach=result.inlet_mach,
+        exit_mach=result.exit_mach,
+        stations=tuple(IdealGasFannoReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
         diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
         diagnostic_codes=tuple(result.diagnostic_codes),
         warnings=_warnings(result.warnings),

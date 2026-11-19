@@ -21,14 +21,15 @@ use crate::record_outputs_gen::{
     PyEscalationItemResult, PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment,
     PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
     PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
-    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasReleaseStation,
-    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
-    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
-    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyP002FindingResult,
-    PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation, PyPulsationModeResult,
-    PyRanzMarshallReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
+    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasFannoReleaseStation,
+    PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
+    PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier,
+    PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
+    PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
+    PyNonEquilibriumBlowdownPoint, PyP002FindingResult, PyPipeFireRupturePoint,
+    PyPrescribedSlipReleaseStation, PyPulsationModeResult, PyRanzMarshallReleaseStation,
+    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
+    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
     PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
     PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
     PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
@@ -20705,6 +20706,115 @@ impl From<&azoth_process::models::hem_release::HemReleaseResult> for PyHemReleas
             component_mole_fractions: r.component_mole_fractions.clone(),
             component_mass_fractions: r.component_mass_fractions.clone(),
             stations: r.stations.iter().map(PyHemReleaseStation::from).collect(),
+            diagnostics: r
+                .diagnostics
+                .iter()
+                .map(PyHemReleaseDiagnostic::from)
+                .collect(),
+            diagnostic_codes: r.diagnostic_codes.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.ideal_gas_fanno_release`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "IdealGasFannoReleaseResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyIdealGasFannoReleaseResult {
+    /// `valid`, `invalid` or `unsupported`.
+    #[pyo3(get)]
+    pub status: String,
+    /// the release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    #[pyo3(get)]
+    pub mass_flow_rate: Option<PyQty>,
+    /// whether the exit is sonic; false on failure and on no forward flow.
+    #[pyo3(get)]
+    pub choked: bool,
+    /// the exit sound speed, present on every non-zero result.
+    #[pyo3(get)]
+    pub throat_sound_speed: Option<PyQty>,
+    /// the upstream overall mole fractions.
+    #[pyo3(get)]
+    pub component_mole_fractions: Vec<f64>,
+    /// the upstream overall mass fractions.
+    #[pyo3(get)]
+    pub component_mass_fractions: Vec<f64>,
+    /// `f L / D`, absent on failure and on no forward flow.
+    #[pyo3(get)]
+    pub friction_length: Option<f64>,
+    /// the pipe-inlet Mach number, absent on failure and on no forward flow.
+    #[pyo3(get)]
+    pub inlet_mach: Option<f64>,
+    /// the pipe-exit Mach number, absent on failure and on no forward flow.
+    #[pyo3(get)]
+    pub exit_mach: Option<f64>,
+    /// the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow.
+    #[pyo3(get)]
+    pub stations: Vec<PyIdealGasFannoReleaseStation>,
+    /// the model's assumption and check records, in the order it forms them.
+    #[pyo3(get)]
+    pub diagnostics: Vec<PyHemReleaseDiagnostic>,
+    /// the codes alone, so a case can hold the contract without asserting prose.
+    #[pyo3(get)]
+    pub diagnostic_codes: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyIdealGasFannoReleaseResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "IdealGasFannoReleaseResult(status={:?}, mass_flow_rate={:?}, choked={:?}, throat_sound_speed={:?}, component_mole_fractions={:?}, component_mass_fractions={:?}, friction_length={:?}, inlet_mach={:?}, exit_mach={:?}, stations={:?}, diagnostics={:?}, diagnostic_codes={:?}, {} warning(s))",
+            self.status,
+            self.mass_flow_rate,
+            self.choked,
+            self.throat_sound_speed,
+            self.component_mole_fractions,
+            self.component_mass_fractions,
+            self.friction_length,
+            self.inlet_mach,
+            self.exit_mach,
+            self.stations,
+            self.diagnostics,
+            self.diagnostic_codes,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::ideal_gas_fanno_release::IdealGasFannoReleaseResult>
+    for PyIdealGasFannoReleaseResult
+{
+    fn from(
+        r: &azoth_process::models::ideal_gas_fanno_release::IdealGasFannoReleaseResult,
+    ) -> Self {
+        Self {
+            status: r.status.clone(),
+            mass_flow_rate: r.mass_flow_rate.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/s".to_string(),
+            }),
+            choked: r.choked,
+            throat_sound_speed: r.throat_sound_speed.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m/s".to_string(),
+            }),
+            component_mole_fractions: r.component_mole_fractions.clone(),
+            component_mass_fractions: r.component_mass_fractions.clone(),
+            friction_length: r.friction_length,
+            inlet_mach: r.inlet_mach,
+            exit_mach: r.exit_mach,
+            stations: r
+                .stations
+                .iter()
+                .map(PyIdealGasFannoReleaseStation::from)
+                .collect(),
             diagnostics: r
                 .diagnostics
                 .iter()

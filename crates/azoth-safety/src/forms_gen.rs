@@ -3036,6 +3036,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.ideal_gas_fanno_release",
+        name: "Ideal-gas Fanno pipe release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.ideal_gas_release",
         name: "Ideal-gas isentropic orifice release",
         family: "release",

@@ -55,6 +55,7 @@
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
 //!   - specs/models/process/hem_release.toml
+//!   - specs/models/process/ideal_gas_fanno_release.toml
 //!   - specs/models/process/ideal_gas_release.toml
 //!   - specs/models/process/inherent_safety.toml
 //!   - specs/models/process/jet_fire.toml

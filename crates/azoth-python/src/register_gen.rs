@@ -294,6 +294,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyHeaterResult>()?;
     m.add_class::<crate::transport_gen::PyHeavyGasDispersionResult>()?;
     m.add_class::<crate::transport_gen::PyHemReleaseResult>()?;
+    m.add_class::<crate::transport_gen::PyIdealGasFannoReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyIdealGasReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyInherentSafetyResult>()?;
     m.add_class::<crate::transport_gen::PyJetFireResult>()?;
@@ -410,6 +411,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyHemReleaseDiagnostic>()?;
     m.add_class::<crate::record_outputs_gen::PyHemReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyHydrateRiskPoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyIdealGasFannoReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyIdealGasReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyIncrementalZoneRow>()?;
     m.add_class::<crate::record_outputs_gen::PyKComponent>()?;
@@ -1123,6 +1125,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::hem_release, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::ideal_gas_fanno_release,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::ideal_gas_release, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::inherent_safety, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::jet_fire, m)?)?;

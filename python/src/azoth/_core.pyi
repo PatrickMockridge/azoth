@@ -1333,6 +1333,25 @@ class HemReleaseStation:
     gas_mass_fraction: float
 
 @final
+class IdealGasFannoReleaseStation:
+    """the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
 class IdealGasReleaseStation:
     """the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow."""
 
@@ -4563,6 +4582,22 @@ class HemReleaseResult:
     component_mole_fractions: list[float]
     component_mass_fractions: list[float]
     stations: list[HemReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
+class IdealGasFannoReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    friction_length: float | None
+    inlet_mach: float | None
+    exit_mach: float | None
+    stations: list[IdealGasFannoReleaseStation]
     diagnostics: list[HemReleaseDiagnostic]
     diagnostic_codes: list[str]
     warnings: list[Warning]
@@ -8735,6 +8770,17 @@ def hem_release(
     discharge_coefficient: float,
     back_pressure: float,
 ) -> HemReleaseResult: ...
+def ideal_gas_fanno_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    flow_path_length: float,
+    darcy_friction_factor: float,
+) -> IdealGasFannoReleaseResult: ...
 def ideal_gas_release(
     components: list[str],
     upstream_z: list[float],

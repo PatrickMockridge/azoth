@@ -289,6 +289,7 @@
   - [Heater](./process/heater.md)
   - [Heavy-gas dispersion](./process/heavy_gas_dispersion.md)
   - [Homogeneous-equilibrium orifice release](./process/hem_release.md)
+  - [Ideal-gas Fanno pipe release](./process/ideal_gas_fanno_release.md)
   - [Ideal-gas isentropic orifice release](./process/ideal_gas_release.md)
   - [Inherent-safety index](./process/inherent_safety.md)
   - [Jet fire radiation](./process/jet_fire.md)

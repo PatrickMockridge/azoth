@@ -24761,6 +24761,15 @@
     },
     {
       "family": "release",
+      "id": "process.ideal_gas_fanno_release",
+      "name": "Ideal-gas Fanno pipe release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
+      "family": "release",
       "id": "process.ideal_gas_release",
       "name": "Ideal-gas isentropic orifice release",
       "native": false,

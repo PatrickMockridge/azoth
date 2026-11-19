@@ -3040,6 +3040,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 10,
         "tests_skipped": 0,
     },
+    'process.ideal_gas_fanno_release': {
+        "calc_id": 'process.ideal_gas_fanno_release',
+        "name": 'Ideal-gas Fanno pipe release',
+        "spec": {'path': 'specs/models/process/ideal_gas_fanno_release.toml', 'sha256': '8c8a1fae7f1df47fcd80c1bcef4167dea268765674230e7a0f7b972311d7f490'},
+        "code": [{'path': 'python/src/azoth/process/reference/ideal_gas_fanno_release.py', 'sha256': '43631cd3fe178ac9cd836b2da1ef18ce5822e61b6b215e0323e130eb7db3169e'}, {'path': 'crates/azoth-process/src/models/ideal_gas_fanno_release.rs', 'sha256': 'bc7e5fc7e6ff46944f02c449543ff1bb18f9c68f5e7382eec2aaec74e6d23463'}],
+        "source": 'NeqSim process/safety/release/IdealGasFannoPipeReleaseModel.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 6,
+        "tests_skipped": 0,
+    },
     'process.ideal_gas_release': {
         "calc_id": 'process.ideal_gas_release',
         "name": 'Ideal-gas isentropic orifice release',

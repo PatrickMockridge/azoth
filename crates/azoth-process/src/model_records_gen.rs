@@ -65,6 +65,7 @@ use crate::models::heat_exchanger::HeatExchangerResult;
 use crate::models::heater::HeaterResult;
 use crate::models::heavy_gas_dispersion::HeavyGasDispersionResult;
 use crate::models::hem_release::HemReleaseResult;
+use crate::models::ideal_gas_fanno_release::IdealGasFannoReleaseResult;
 use crate::models::ideal_gas_release::IdealGasReleaseResult;
 use crate::models::inherent_safety::InherentSafetyResult;
 use crate::models::jet_fire::JetFireResult;
@@ -1460,6 +1461,29 @@ impl CalcResult for HemReleaseResult {
         "throat_sound_speed",
         "component_mole_fractions",
         "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for IdealGasFannoReleaseResult {
+    const CALC_ID: &'static str = "process.ideal_gas_fanno_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "friction_length",
+        "inlet_mach",
+        "exit_mach",
         "stations",
         "diagnostics",
         "diagnostic_codes",

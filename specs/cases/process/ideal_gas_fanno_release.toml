@@ -1,0 +1,108 @@
+model = "process.ideal_gas_fanno_release"
+[[cases]]
+id = "long_pipe_is_choked"
+tolerance = 1.0e-5
+source = "Nitrogen at 300 K and 50 bar through a 0.1 m pipe 100 m long with a Darcy friction factor of 0.02 and `Cd = 1` into 1 atm (`pr_nitrogen_50bara_L100_f0_02`). The exit is sonic.\n"
+[cases.inputs]
+components = ["nitrogen"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 5000000.0
+diameter = 0.1
+discharge_coefficient = 1.0
+back_pressure = 101325.0
+flow_path_length = 100.0
+darcy_friction_factor = 0.02
+[cases.expected]
+status = "valid"
+mass_flow_rate = 26.690230724521093
+choked = true
+[[cases]]
+id = "short_pipe_passes_more"
+tolerance = 1.0e-5
+source = "The same feed through a 10 m pipe at `f = 0.01` (`pr_nitrogen_50bara_L10_f0_01`).\n"
+[cases.inputs]
+components = ["nitrogen"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 5000000.0
+diameter = 0.1
+discharge_coefficient = 1.0
+back_pressure = 101325.0
+flow_path_length = 10.0
+darcy_friction_factor = 0.01
+[cases.expected]
+status = "valid"
+mass_flow_rate = 68.90592781512673
+choked = true
+[[cases]]
+id = "high_back_pressure_is_unchoked"
+tolerance = 1.0e-5
+source = "The long pipe against 45 bar (`pr_nitrogen_50bara_high_back_4_5MPa`): the flow is unchoked and the exit sits at the receiving pressure.\n"
+[cases.inputs]
+components = ["nitrogen"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 5000000.0
+diameter = 0.1
+discharge_coefficient = 1.0
+back_pressure = 4500000.0
+flow_path_length = 100.0
+darcy_friction_factor = 0.02
+[cases.expected]
+status = "valid"
+mass_flow_rate = 12.467507577150702
+choked = false
+[[cases]]
+id = "receiving_pressure_above_the_upstream_is_a_zero"
+tolerance = 1.0e-12
+source = "The same pipe against 51 bar (`pr_nitrogen_50bara_no_flow`): a valid zero with three stations.\n"
+[cases.inputs]
+components = ["nitrogen"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 5000000.0
+diameter = 0.1
+discharge_coefficient = 1.0
+back_pressure = 5100000.0
+flow_path_length = 100.0
+darcy_friction_factor = 0.02
+[cases.expected]
+status = "valid"
+mass_flow_rate = 0.0
+choked = false
+[[cases]]
+id = "nasa_gfssp_case"
+tolerance = 1.0e-5
+source = "The class's NASA GFSSP nitrogen case (`pr_nasa_gfssp_case_1`): 3.4474 bar, 299.82 K, a 0.1524 m pipe 81.4578 m long, `f = 0.002`, into 1 atm.\n"
+[cases.inputs]
+components = ["nitrogen"]
+upstream_z = [1.0]
+upstream_t = 299.8166666667
+upstream_p = 344737.8646584
+diameter = 0.1524
+discharge_coefficient = 1.0
+back_pressure = 101325.0
+flow_path_length = 81.4578
+darcy_friction_factor = 0.002
+[cases.expected]
+status = "valid"
+mass_flow_rate = 10.783603252875281
+choked = true
+[[cases]]
+id = "no_flow_path_is_unsupported"
+tolerance = 1.0e-12
+source = "The same state without a pipe path (`pr_no_flow_path_unsupported`) is `unsupported` with `UNSUPPORTED_FANNO_REGIME`.\n"
+[cases.inputs]
+components = ["nitrogen"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 5000000.0
+diameter = 0.1
+discharge_coefficient = 1.0
+back_pressure = 101325.0
+flow_path_length = 0.0
+darcy_friction_factor = 0.0
+[cases.expected]
+status = "unsupported"
+choked = false

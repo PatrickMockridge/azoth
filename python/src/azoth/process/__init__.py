@@ -73,6 +73,7 @@ from azoth.core.result import (
     HeatExchangerResult,
     HeavyGasDispersionResult,
     HemReleaseResult,
+    IdealGasFannoReleaseResult,
     IdealGasReleaseResult,
     InherentSafetyResult,
     JetFireResult,
@@ -319,6 +320,7 @@ _FINITE_RATE_RELEASE = "process.finite_rate_release"
 _COMPONENT_SELECTIVE_RELEASE = "process.component_selective_release"
 _RANZ_MARSHALL_RELEASE = "process.ranz_marshall_release"
 _BUBBLE_TRANSFER_ZONE_RELEASE = "process.bubble_transfer_zone_release"
+_IDEAL_GAS_FANNO_RELEASE = "process.ideal_gas_fanno_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
@@ -3762,6 +3764,38 @@ def bubble_transfer_zone_release(
         continuous_phase_dynamic_viscosity=continuous_phase_dynamic_viscosity,
         component_diffusivities=component_diffusivities,
         parameter_provenance=parameter_provenance,
+    )
+
+
+def ideal_gas_fanno_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    flow_path_length: Q,
+    darcy_friction_factor: float,
+) -> IdealGasFannoReleaseResult:
+    """The release rate of an ideal-gas Fanno pipe.
+
+    A quasi-steady adiabatic constant-area pipe with a specified Darcy friction factor. The
+    exit Mach is one when choked, otherwise the back-pressure bisection; the Fanno function
+    and the class's ``1/M`` stagnation-pressure ratio are the class's own.
+
+    See :func:`azoth.process.reference.ideal_gas_fanno_release`.
+    """
+    return resolve(_IDEAL_GAS_FANNO_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        flow_path_length=flow_path_length,
+        darcy_friction_factor=darcy_friction_factor,
     )
 
 

@@ -181,8 +181,8 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # blowdown; 358: the ideal-gas release; 359: the legacy screening release; 360: the
     # prescribed-slip release; 361: the drift-flux release; 362: the finite-rate release;
     # 363: the component-selective release; 364: the Ranz-Marshall release; 365: the
-    # bubble transfer zone.
-    assert len(registered) == 365
+    # bubble transfer zone; 366: the ideal-gas Fanno pipe.
+    assert len(registered) == 366
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:
@@ -213,7 +213,7 @@ def test_an_unknown_id_is_refused_rather_than_answered_with_an_empty_block() -> 
 
 
 def test_every_block_is_complete_and_well_formed() -> None:
-    """The shape, for all 267, so the contract is the block's rather than one sample's."""
+    """The shape, for all 268, so the contract is the block's rather than one sample's."""
     for calc_id, block in PROVENANCE.items():
         assert set(block) == {
             "calc_id",

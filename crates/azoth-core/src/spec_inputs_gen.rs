@@ -276,6 +276,7 @@
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
 //!   - specs/models/process/hem_release.toml
+//!   - specs/models/process/ideal_gas_fanno_release.toml
 //!   - specs/models/process/ideal_gas_release.toml
 //!   - specs/models/process/inherent_safety.toml
 //!   - specs/models/process/jet_fire.toml
@@ -4235,6 +4236,38 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "dimensionless",
     ),
     ("process.hem_release", "back_pressure", "pressure"),
+    (
+        "process.ideal_gas_fanno_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.ideal_gas_fanno_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.ideal_gas_fanno_release", "upstream_p", "pressure"),
+    ("process.ideal_gas_fanno_release", "diameter", "length"),
+    (
+        "process.ideal_gas_fanno_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.ideal_gas_fanno_release",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.ideal_gas_fanno_release",
+        "flow_path_length",
+        "length",
+    ),
+    (
+        "process.ideal_gas_fanno_release",
+        "darcy_friction_factor",
+        "dimensionless",
+    ),
     ("process.ideal_gas_release", "upstream_z", "dimensionless"),
     (
         "process.ideal_gas_release",

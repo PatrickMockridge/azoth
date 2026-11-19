@@ -48,6 +48,7 @@ from azoth.core.record_outputs_gen import (
     HemReleaseDiagnostic,
     HemReleaseStation,
     HydrateRiskPoint,
+    IdealGasFannoReleaseStation,
     IdealGasReleaseStation,
     IncrementalZoneRow,
     KComponent,
@@ -8379,6 +8380,52 @@ class HemReleaseResult(_HasWarnings):
     stations: tuple[HemReleaseStation, ...]
 
     #: the model's assumption and warning records, in the order it forms them.
+    diagnostics: tuple[HemReleaseDiagnostic, ...]
+
+    #: the codes alone, so a case can hold the contract without asserting prose.
+    diagnostic_codes: tuple[str, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class IdealGasFannoReleaseResult(_HasWarnings):
+    """Result of ``process.ideal_gas_fanno_release``."""
+
+    CALC_ID: ClassVar[str] = "process.ideal_gas_fanno_release"
+
+    #: `valid`, `invalid` or `unsupported`.
+    status: str
+
+    #: the release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.
+    mass_flow_rate: Q | None
+
+    #: whether the exit is sonic; false on failure and on no forward flow.
+    choked: bool
+
+    #: the exit sound speed, present on every non-zero result.
+    throat_sound_speed: Q | None
+
+    #: the upstream overall mole fractions.
+    component_mole_fractions: tuple[float, ...]
+
+    #: the upstream overall mass fractions.
+    component_mass_fractions: tuple[float, ...]
+
+    #: `f L / D`, absent on failure and on no forward flow.
+    friction_length: float | None
+
+    #: the pipe-inlet Mach number, absent on failure and on no forward flow.
+    inlet_mach: float | None
+
+    #: the pipe-exit Mach number, absent on failure and on no forward flow.
+    exit_mach: float | None
+
+    #: the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow.
+    stations: tuple[IdealGasFannoReleaseStation, ...]
+
+    #: the model's assumption and check records, in the order it forms them.
     diagnostics: tuple[HemReleaseDiagnostic, ...]
 
     #: the codes alone, so a case can hold the contract without asserting prose.

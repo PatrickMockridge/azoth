@@ -448,6 +448,7 @@ NON_UNIT_MODELS = {
     "process.component_selective_release": "a release source term is a calculation over a fluid, not a unit",
     "process.ranz_marshall_release": "a release source term is a calculation over a fluid, not a unit",
     "process.bubble_transfer_zone_release": "a release source term is a calculation over a fluid, not a unit",
+    "process.ideal_gas_fanno_release": "a release source term is a calculation over a fluid, not a unit",
     "process.pfp_demand": "the PFP demand screen over scalars, not a unit",
     "process.fire_case_relief": "the fire-case relief load over scalars, not a unit",
     "process.gas_blowby": "the choked/subcritical blowby rate over scalars, not a unit",

@@ -1459,6 +1459,27 @@ def _bubble_transfer_zone_release(inputs: Mapping[str, Any]) -> dict[str, float]
     return _release_station_layers(result)
 
 
+def _ideal_gas_fanno_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.ideal_gas_fanno_release`'s stations, from the reference arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.ideal_gas_fanno_release import (
+        ideal_gas_fanno_release,
+    )
+
+    result = ideal_gas_fanno_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["flow_path_length"]), "m"),
+        float(inputs["darcy_friction_factor"]),
+    )
+    return _release_station_layers(result)
+
+
 def _toxic_library(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.toxic_library`'s layers, from the reference's own arithmetic.
 
@@ -4417,6 +4438,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.component_selective_release": _component_selective_release,
     "process.ranz_marshall_release": _ranz_marshall_release,
     "process.bubble_transfer_zone_release": _bubble_transfer_zone_release,
+    "process.ideal_gas_fanno_release": _ideal_gas_fanno_release,
     "process.leak_blowdown": _leak_blowdown,
     "process.hazardous_area": _hazardous_area,
     "process.toxic_library": _toxic_library,
@@ -4874,6 +4896,13 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_hem_release.tsv",
         block=0,
         identified_by=("#label", "methane_50bara_choked"),
+    ),
+    LayerCase(
+        model="process.ideal_gas_fanno_release",
+        case="long_pipe_is_choked",
+        capture="process_ideal_gas_fanno_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_nitrogen_50bara_L100_f0_02"),
     ),
     LayerCase(
         model="process.bubble_transfer_zone_release",
@@ -8901,6 +8930,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The bubble-zone capture's five: the 0.125 and long-zone rows, the out-of-range
     # refusal and the SRK evidence row.
     "process_bubble_transfer_zone_release.tsv": 5,
+    # The Fanno capture's six: the short pipe, the high-back-pressure, no-flow, NASA and
+    # no-path rows and the SRK evidence row.
+    "process_ideal_gas_fanno_release.tsv": 6,
     # The blowdown capture's ten: one block is layer-cased (the ten-second methane run); the
     # rest are the long horizons held to the capture as evidence, the SRK rows, the propane
     # row whose single-phase beta and cached density are class artefacts, and the refusals.

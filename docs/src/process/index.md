@@ -67,6 +67,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.heater`](./heater.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Heater.java |
 | [`process.heavy_gas_dispersion`](./heavy_gas_dispersion.md) | `britter_mcquaid_continuous_dense_gas` | NeqSim process/safety/dispersion/HeavyGasDispersion.java |
 | [`process.hem_release`](./hem_release.md) | `log_pressure_scan_golden_section` | NeqSim process/safety/release/HomogeneousEquilibriumReleaseModel.java |
+| [`process.ideal_gas_fanno_release`](./ideal_gas_fanno_release.md) | `ideal_gas_fanno_pipe` | NeqSim process/safety/release/IdealGasFannoPipeReleaseModel.java |
 | [`process.ideal_gas_release`](./ideal_gas_release.md) | `ideal_gas_isentropic_orifice` | NeqSim process/safety/release/IdealGasReleaseModel.java |
 | [`process.inherent_safety`](./inherent_safety.md) | `kletz_inherent_safety_index` | NeqSim process/safety/inherent/InherentSafetyEvaluator.java |
 | [`process.jet_fire`](./jet_fire.md) | `api521_point_source_wayne_transmissivity` | NeqSim process/safety/fire/JetFireModel.java |
