@@ -70,7 +70,7 @@ not an equation, and both implementations read it from here.
 - **a quasi-steady adiabatic constant-area pipe** of a calorically perfect gas with a specified constant Darcy friction factor; one segment from the stagnation boundary to the release plane.
 - **the friction length is** `f L / D`; the exit Mach is one when choked, otherwise the inlet Mach for an exit at the receiving pressure is found by a 120-iteration bisection.
 - **the Fanno function is the class own**: `(1 - M^2)/(gamma M^2) + (gamma+1)/(2 gamma) ln((gamma+1) M^2/(2 + (gamma-1) M^2))`.
-- **the exit stagnation pressure ratio is `1/M`**, as the class writes it, not the isentropic ratio.
+- **the stagnation-pressure ratio is the Fanno `(1/M) ((2 + (gamma-1) M^2)/(gamma+1))^((gamma+1)/(2(gamma-1)))`**, applied at both the inlet and the exit Mach.
 - **the solid-risk gate is conservative**: a station whose component is at or below its triple point is refused as `invalid`, and a water-bearing hydrate-forming station likewise; the captured states are above every triple point and carry no water.
 - **one gas phase is required**, and the ambient expansion is isentropic from the exit stagnation pressure with the upstream stagnation temperature.
 - **the mass-flux closure is `1e-9`**: the exit flux must equal the inlet flux at the solved Mach.
