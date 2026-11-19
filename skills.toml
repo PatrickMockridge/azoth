@@ -638,9 +638,8 @@ tags = ["reporting"]
 name = "azoth-depressurization-screening"
 version = "0.1.0"
 description = "Educational blowdown and depressurization screening with time-to-target and low-temperature flags. USE WHEN: a task needs a public, screening-level blowdown time indicator and auto-refrigeration low-temperature triage without proprietary blowdown design methods."
-calculation_basis = "screening"
+calculation_basis = "azoth"
 path = "skills/safety/depressurization-screening/SKILL.md"
-tranche = "safety"
 tags = ["safety"]
 
 [[skill]]
