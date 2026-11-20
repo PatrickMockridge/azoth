@@ -468,6 +468,7 @@ NON_UNIT_MODELS = {
     "process.psv_valve": "the PSV latch over scalars, not a unit",
     "process.depressurization": "a vessel blowdown transient over a fluid, not a unit",
     "process.depressurization_acceptance": "the STS-0131 acceptance over rows, not a unit",
+    "process.esd_response_time": "the ESD response budget over contribution rows, not a unit",
     "process.vessel_filling": "a vessel filling transient over a fluid, not a unit",
     "process.blocked_outlet_overpressure": "the blocked-outlet build-up over a fluid, not a unit",
     "process.non_equilibrium_blowdown": "the two-zone blowdown over a fluid, not a unit",

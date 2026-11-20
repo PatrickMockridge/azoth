@@ -271,6 +271,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.dynamic_psv_sizing" => azoth_process::models::dynamic_psv_sizing::DynamicPsvSizingResult::FIELDS.to_vec(),
         "process.ejector" => azoth_process::models::ejector::EjectorResult::FIELDS.to_vec(),
         "process.escalation_graph" => azoth_process::models::escalation_graph::EscalationGraphResult::FIELDS.to_vec(),
+        "process.esd_response_time" => azoth_process::models::esd_response_time::EsdResponseTimeResult::FIELDS.to_vec(),
         "process.event_tree" => azoth_process::models::event_tree::EventTreeResult::FIELDS.to_vec(),
         "process.expander" => azoth_process::models::expander::ExpanderResult::FIELDS.to_vec(),
         "process.fault_tree" => azoth_process::models::fault_tree::FaultTreeResult::FIELDS.to_vec(),

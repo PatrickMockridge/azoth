@@ -1060,6 +1060,49 @@ impl From<&azoth_process::models::escalation_graph::EscalationItemResult>
     }
 }
 
+/// the contributions echoed in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EsdContribution"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEsdContribution {
+    /// the contribution's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the contribution's stage.
+    #[pyo3(get)]
+    pub stage: String,
+    /// the contribution's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+}
+
+#[pymethods]
+impl PyEsdContribution {
+    fn __repr__(&self) -> String {
+        format!(
+            "EsdContribution(name={}, stage={}, time={:?})",
+            self.name, self.stage, self.time
+        )
+    }
+}
+
+impl From<&azoth_process::models::esd_response_time::EsdContribution> for PyEsdContribution {
+    fn from(row: &azoth_process::models::esd_response_time::EsdContribution) -> Self {
+        Self {
+            name: row.name.clone(),
+            stage: row.stage.as_str().to_string(),
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+        }
+    }
+}
+
 /// one row per leaf, in the class's bit order: `2^n` rows, or one when there are no branches.
 #[pyclass(
     frozen,

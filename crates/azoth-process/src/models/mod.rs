@@ -60,6 +60,7 @@ pub mod drift_flux_release;
 pub mod dynamic_psv_sizing;
 pub mod ejector;
 pub mod escalation_graph;
+pub mod esd_response_time;
 pub mod event_tree;
 pub mod expander;
 pub mod fault_tree;
@@ -236,6 +237,9 @@ pub use ejector::{EjectorResult, ejector};
 pub use escalation_graph::{
     EscalationExposure, EscalationGraphResult, EscalationItem, EscalationItemResult,
     escalation_graph,
+};
+pub use esd_response_time::{
+    EsdContribution, EsdResponseTimeResult, EsdStage, esd_response_time,
 };
 pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_tree};
 pub use expander::{ExpanderResult, expander};

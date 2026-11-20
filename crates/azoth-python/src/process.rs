@@ -990,6 +990,38 @@ pub fn s001_clause10_review(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// `process.esd_response_time` - the ESD response-time budget.
+///
+/// The three stage sums, the inclusive budget test and the echoed contributions.
+#[pyfunction]
+#[pyo3(signature = (sif_tag = None, contributions = None, allowable_response_time = None))]
+#[pyo3(text_signature = "(sif_tag=None, contributions=None, allowable_response_time=None)")]
+pub fn esd_response_time(
+    py: Python<'_>,
+    sif_tag: Option<&str>,
+    contributions: Option<Vec<crate::records_gen::EsdContributionInput>>,
+    allowable_response_time: Option<f64>,
+) -> PyResult<crate::transport_gen::PyEsdResponseTimeResult> {
+    use azoth_process::models::esd_response_time as esd;
+    let rows = match contributions {
+        Some(rows) => rows
+            .into_iter()
+            .map(|row| {
+                let stage = esd::EsdStage::parse(&row.stage).map_err(|error| to_pyerr(py, error))?;
+                Ok(esd::EsdContribution {
+                    name: row.name,
+                    stage,
+                    time: seconds(row.time),
+                })
+            })
+            .collect::<PyResult<Vec<_>>>()?,
+        None => Vec::new(),
+    };
+    esd::esd_response_time(sif_tag, &rows, allowable_response_time.map(seconds))
+        .map(|result| crate::transport_gen::PyEsdResponseTimeResult::from(&result))
+        .map_err(|error| to_pyerr(py, error))
+}
+
 /// `process.absorption_column` - the tray absorber as a registered id.
 ///
 /// **The column's own profile shape with the class's own product names**, and two inlets where

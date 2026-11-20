@@ -105,7 +105,9 @@ BINDING = REPO_ROOT / "crates" / "azoth-python" / "src"
 #: `process.api14c_safe_chart`, `process.barrier_register_validation` and
 #: `process.s001_clause10_review`. The S-001 secondary-pressure screen is derived - its
 #: inputs are scalars - so the count moves by three.
-KNOWN_HAND_WRITTEN = 71
+#: 71 -> 72 when `process.esd_response_time` brought an optional record list whose stage is an
+#: enum, which the generator leaves to a hand wrapper for the same reason as the safety reviews.
+KNOWN_HAND_WRITTEN = 72
 
 
 def _tools_module(name: str) -> ModuleType:

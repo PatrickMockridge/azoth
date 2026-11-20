@@ -18,8 +18,8 @@ use crate::record_outputs_gen::{
     PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent, PyChemicalWarningRow,
     PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult, PyDepositionSegmentRow,
     PyDepressurizationPoint, PyDriftFluxReleaseStation, PyEquilibriumSoundSpeedSample,
-    PyEscalationItemResult, PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment,
-    PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
+    PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome, PyFiniteRateReleaseStation,
+    PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
     PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
     PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasFannoReleaseStation,
     PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
@@ -17244,6 +17244,106 @@ impl From<&azoth_process::models::escalation_graph::EscalationGraphResult>
                 .map(PyEscalationItemResult::from)
                 .collect(),
             worst_case_count: r.worst_case_count,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.esd_response_time`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EsdResponseTimeResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEsdResponseTimeResult {
+    /// the echoed SIF identifier.
+    #[pyo3(get)]
+    pub sif_tag: String,
+    /// the sum of the detection contributions.
+    #[pyo3(get)]
+    pub detection_time: PyQty,
+    /// the sum of the logic contributions.
+    #[pyo3(get)]
+    pub logic_time: PyQty,
+    /// the sum of the final-element contributions.
+    #[pyo3(get)]
+    pub final_element_time: PyQty,
+    /// the three stage totals' sum.
+    #[pyo3(get)]
+    pub total_response_time: PyQty,
+    /// the budget, absent when none is stated.
+    #[pyo3(get)]
+    pub allowable_response_time: Option<PyQty>,
+    /// `allowable - total`, absent when no budget is stated.
+    #[pyo3(get)]
+    pub margin: Option<PyQty>,
+    /// `total <= allowable`, and true when no budget is stated.
+    #[pyo3(get)]
+    pub within_budget: bool,
+    /// the contributions echoed in caller order.
+    #[pyo3(get)]
+    pub contributions: Vec<PyEsdContribution>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyEsdResponseTimeResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "EsdResponseTimeResult(sif_tag={:?}, detection_time={:?}, logic_time={:?}, final_element_time={:?}, total_response_time={:?}, allowable_response_time={:?}, margin={:?}, within_budget={:?}, contributions={:?}, {} warning(s))",
+            self.sif_tag,
+            self.detection_time,
+            self.logic_time,
+            self.final_element_time,
+            self.total_response_time,
+            self.allowable_response_time,
+            self.margin,
+            self.within_budget,
+            self.contributions,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::esd_response_time::EsdResponseTimeResult>
+    for PyEsdResponseTimeResult
+{
+    fn from(r: &azoth_process::models::esd_response_time::EsdResponseTimeResult) -> Self {
+        Self {
+            sif_tag: r.sif_tag.clone(),
+            detection_time: PyQty {
+                magnitude_si: r.detection_time.value,
+                unit: "s".to_string(),
+            },
+            logic_time: PyQty {
+                magnitude_si: r.logic_time.value,
+                unit: "s".to_string(),
+            },
+            final_element_time: PyQty {
+                magnitude_si: r.final_element_time.value,
+                unit: "s".to_string(),
+            },
+            total_response_time: PyQty {
+                magnitude_si: r.total_response_time.value,
+                unit: "s".to_string(),
+            },
+            allowable_response_time: r.allowable_response_time.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            margin: r.margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            within_budget: r.within_budget,
+            contributions: r
+                .contributions
+                .iter()
+                .map(PyEsdContribution::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }

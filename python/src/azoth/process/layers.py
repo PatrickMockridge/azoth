@@ -3912,6 +3912,46 @@ def _s001_clause10_review(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _esd_response_time(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.esd_response_time`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.esd_response_time import (
+        esd_response_time as evaluate,
+    )
+
+    rows = inputs.get("contributions")
+    contribution_rows = (
+        None
+        if rows is None
+        else [
+            {
+                "name": str(row["name"]),
+                "stage": str(row["stage"]),
+                "time": quantity(float(row["time"]), "s"),
+            }
+            for row in rows
+        ]
+    )
+    result = evaluate(
+        None if inputs.get("sif_tag") is None else str(inputs["sif_tag"]),
+        contribution_rows,
+        None
+        if inputs.get("allowable_response_time") is None
+        else quantity(float(inputs["allowable_response_time"]), "s"),
+    )
+    dumped: dict[str, float] = {
+        "detection_time_s": result.detection_time.to("s").magnitude,
+        "logic_time_s": result.logic_time.to("s").magnitude,
+        "final_element_time_s": result.final_element_time.to("s").magnitude,
+        "total_response_time_s": result.total_response_time.to("s").magnitude,
+    }
+    if result.allowable_response_time is not None:
+        dumped["allowable_response_time_s"] = result.allowable_response_time.to("s").magnitude
+    if result.margin is not None:
+        dumped["margin_s"] = result.margin.to("s").magnitude
+    return dumped
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -4486,6 +4526,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.acoustic_induced_vibration_screening": _acoustic_induced_vibration_screening,
     "process.alarp_audit": _alarp_audit,
     "process.escalation_graph": _escalation_graph,
+    "process.esd_response_time": _esd_response_time,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.psv_valve": _psv_valve,
     "process.dynamic_psv_sizing": _dynamic_psv_sizing,
@@ -6842,6 +6883,35 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=1,
         identified_by=("#label", "cl10_secondary_fail"),
     ),
+    # The ESD budget's four cased states; the empty-list refusal is uncased.
+    LayerCase(
+        model="process.esd_response_time",
+        case="within_budget",
+        capture="process_esd_response_time.tsv",
+        block=0,
+        identified_by=("#label", "esd_within_budget"),
+    ),
+    LayerCase(
+        model="process.esd_response_time",
+        case="exceeds_budget",
+        capture="process_esd_response_time.tsv",
+        block=1,
+        identified_by=("#label", "esd_exceeds_budget"),
+    ),
+    LayerCase(
+        model="process.esd_response_time",
+        case="no_budget",
+        capture="process_esd_response_time.tsv",
+        block=2,
+        identified_by=("#label", "esd_no_budget"),
+    ),
+    LayerCase(
+        model="process.esd_response_time",
+        case="zero_time_and_equal_budget",
+        capture="process_esd_response_time.tsv",
+        block=3,
+        identified_by=("#label", "esd_zero_time"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -8619,6 +8689,8 @@ UNCASED_ROWS: dict[str, int] = {
     # utility states, the gated and alias items, the duplicate id, the first-alias parse and
     # the coercion.
     "process_s001_clause10_review.tsv": 11,
+    # The ESD budget's one: the empty-list refusal has no result.
+    "process_esd_response_time.tsv": 1,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

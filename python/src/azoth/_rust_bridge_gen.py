@@ -114,6 +114,8 @@ from azoth.core.result import (
     ErosionRiskLevel,
     EscalationGraphResult,
     EscalationItemResult,
+    EsdContribution,
+    EsdResponseTimeResult,
     EventTreeOutcome,
     EventTreeResult,
     ExpanderResult,
@@ -595,6 +597,7 @@ __all__ = [
     "equilibrium_sound_speed",
     "erosion_prediction",
     "escalation_graph",
+    "esd_response_time",
     "event_tree",
     "expander",
     "fault_tree",
@@ -6725,6 +6728,28 @@ def escalation_graph(items: list[dict[str, object]], exposures: list[dict[str, o
         any_escalation=result.any_escalation,
         worst_case_items=tuple(EscalationItemResult(item_id=c.item_id) for c in result.worst_case_items),
         worst_case_count=result.worst_case_count,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def esd_response_time(sif_tag: str | None=None, contributions: list[dict[str, object]] | None=None, allowable_response_time: float | None=None) -> EsdResponseTimeResult:
+    """``process.esd_response_time``, computed in Rust."""
+    spec = _models_gen.model("process.esd_response_time")
+    result = _core.esd_response_time(
+        sif_tag,
+        input_records_to_si(spec, "contributions", contributions),
+        None if allowable_response_time is None else _si(spec, "allowable_response_time", allowable_response_time),
+    )
+    return EsdResponseTimeResult(
+        sif_tag=result.sif_tag,
+        detection_time=from_si(result.detection_time.magnitude_si, result.detection_time.unit),
+        logic_time=from_si(result.logic_time.magnitude_si, result.logic_time.unit),
+        final_element_time=from_si(result.final_element_time.magnitude_si, result.final_element_time.unit),
+        total_response_time=from_si(result.total_response_time.magnitude_si, result.total_response_time.unit),
+        allowable_response_time=None if result.allowable_response_time is None else from_si(result.allowable_response_time.magnitude_si, result.allowable_response_time.unit),
+        margin=None if result.margin is None else from_si(result.margin.magnitude_si, result.margin.unit),
+        within_budget=result.within_budget,
+        contributions=tuple(EsdContribution(name=c.name, stage=c.stage, time=from_si(c.time.magnitude_si, c.time.unit)) for c in result.contributions),
         warnings=_warnings(result.warnings),
     )
 

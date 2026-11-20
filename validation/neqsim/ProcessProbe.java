@@ -198,6 +198,8 @@ import neqsim.process.safety.dispersion.HazardousAreaCalculator;
 import neqsim.process.safety.dispersion.HazardousAreaCalculator.ReleaseGrade;
 import neqsim.process.safety.dispersion.HeavyGasDispersion;
 import neqsim.process.safety.dispersion.ProbitModel;
+import neqsim.process.safety.esd.EsdResponseTimeSimulator;
+import neqsim.process.safety.esd.EsdResponseTimeSimulator.EsdResponseTimeResult;
 import neqsim.process.safety.dispersion.ToxicLibrary;
 import neqsim.process.safety.fire.Api537FlareFlameModel;
 import neqsim.process.safety.fire.BLEVECalculator;
@@ -666,6 +668,9 @@ public class ProcessProbe {
         break;
       case "s001_clause10_review":
         s001Clause10ReviewRows();
+        break;
+      case "esd_response_time":
+        esdResponseTimeRows();
         break;
       case "gas_blowby":
         gasBlowbyRows();
@@ -17952,6 +17957,52 @@ public class ProcessProbe {
             .put("reliefLoadKgPerS", 10.0).put("psvCapacityKgPerS", 14.0)));
 
     printReviewCoercion();
+  }
+
+  static void esdResponseTimeRows() {
+    printEsd("esd_within_budget",
+        new EsdResponseTimeSimulator().setSifTag("ESD-1234")
+            .addDetection("PT-1001 high-pressure", 1.0)
+            .addLogic("Logic solver scan + 2oo3 vote", 0.5)
+            .addValve("ESDV-2001", 0.5, 8.0).setAllowableResponseTimeS(15.0).evaluate());
+    printEsd("esd_exceeds_budget",
+        new EsdResponseTimeSimulator().setSifTag("ESD-9999")
+            .addDetection("LT-3001 high-level", 2.0).addLogic("Logic solver", 0.5)
+            .addValve("ESDV-3002 (large bore)", 1.0, 20.0).setAllowableResponseTimeS(15.0)
+            .evaluate());
+    printEsd("esd_no_budget",
+        new EsdResponseTimeSimulator().setSifTag("ESD-NOBUDGET").addDetection("TT-1", 1.0)
+            .evaluate());
+    printEsd("esd_zero_time",
+        new EsdResponseTimeSimulator().setSifTag("ESD-ZERO").addDetection("DT-1", 0.0)
+            .addLogic("logic", 2.0).setAllowableResponseTimeS(2.0).evaluate());
+    try {
+      new EsdResponseTimeSimulator().evaluate();
+      System.out.println("esd_empty=NO_THROW");
+    } catch (RuntimeException failure) {
+      System.out.println("esd_empty=" + failure.getClass().getSimpleName());
+    }
+    System.out.println();
+  }
+
+  static void printEsd(String label, EsdResponseTimeResult result) {
+    System.out.println(label);
+    System.out.println("sif_tag=" + result.getSifTag());
+    System.out.println("detection_time_s=" + result.getDetectionTimeS());
+    System.out.println("logic_time_s=" + result.getLogicTimeS());
+    System.out.println("final_element_time_s=" + result.getFinalElementTimeS());
+    System.out.println("total_response_time_s=" + result.getTotalResponseTimeS());
+    System.out.println("allowable_response_time_s=" + result.getAllowableResponseTimeS());
+    System.out.println("margin_s=" + result.getMarginS());
+    System.out.println("within_budget=" + result.isWithinBudget());
+    System.out.println("contribution_count=" + result.getContributions().size());
+    for (int i = 0; i < result.getContributions().size(); i++) {
+      EsdResponseTimeSimulator.Contribution contribution = result.getContributions().get(i);
+      System.out.println("contribution_" + i + "_name=" + contribution.getName());
+      System.out.println("contribution_" + i + "_stage=" + contribution.getStage());
+      System.out.println("contribution_" + i + "_time_s=" + contribution.getTimeS());
+    }
+    System.out.println();
   }
 
   // ---- The safety screens ---------------------------------------------------

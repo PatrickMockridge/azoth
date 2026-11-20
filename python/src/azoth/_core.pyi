@@ -560,6 +560,13 @@ class EscalationExposure(TypedDict):
     target: str
     load: float
 
+class EsdContributionInput(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    stage: str
+    time: float
+
 class EventTreeBranch(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1177,6 +1184,14 @@ class EscalationItemResult:
     """the largest propagation over every registered item, in the items order."""
 
     item_id: str
+
+@final
+class EsdContribution:
+    """the contributions echoed in caller order."""
+
+    name: str
+    stage: str
+    time: Qty
 
 @final
 class EventTreeOutcome:
@@ -4108,6 +4123,19 @@ class EscalationGraphResult:
     any_escalation: bool
     worst_case_items: list[EscalationItemResult]
     worst_case_count: float
+    warnings: list[Warning]
+
+@final
+class EsdResponseTimeResult:
+    sif_tag: str
+    detection_time: Qty
+    logic_time: Qty
+    final_element_time: Qty
+    total_response_time: Qty
+    allowable_response_time: Qty | None
+    margin: Qty | None
+    within_budget: bool
+    contributions: list[EsdContribution]
     warnings: list[Warning]
 
 @final
@@ -8430,6 +8458,11 @@ def escalation_graph(
     exposures: list[EscalationExposure],
     initiator: str,
 ) -> EscalationGraphResult: ...
+def esd_response_time(
+    sif_tag: str | None = None,
+    contributions: list[EsdContributionInput] | None = None,
+    allowable_response_time: float | None = None,
+) -> EsdResponseTimeResult: ...
 def event_tree(
     initiating_frequency_per_year: float,
     branches: list[EventTreeBranch],

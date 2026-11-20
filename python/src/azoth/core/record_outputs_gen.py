@@ -377,6 +377,20 @@ class EscalationItemResult:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class EsdContribution:
+    """the contributions echoed in caller order."""
+
+    #: the contribution's name.
+    name: str
+
+    #: the contribution's stage.
+    stage: str
+
+    #: the contribution's time.
+    time: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class EventTreeOutcome:
     """one row per leaf, in the class's bit order: `2^n` rows, or one when there are no branches."""
 

@@ -3208,3 +3208,17 @@ pressure correction; the dynamic area is the bisection result that keeps the pea
 the allowable accumulation. The dynamic march is an ideal-gas lumped vessel seeded from one
 flash: `p_start = Pset x initial_pressure_fraction`, so the fluid's own stated pressure enters
 only through the flash and Z. The two states give oversizing ratios of 2.50 and 3.19.
+
+## The ESD response time
+
+`process_esd_response_time.tsv` is `EsdResponseTimeSimulator` on the class's two tests, a
+no-budget state, a zero-time detection against an equal budget and the empty-list refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe esd_response_time \
+  > captures/process_esd_response_time.tsv
+```
+
+The stage totals are plain sums, `within_budget` is inclusive, and a missing budget prints
+`NaN` for the allowance and the margin. `addValve` is one final-element contribution of the
+solenoid delay plus the stroke.

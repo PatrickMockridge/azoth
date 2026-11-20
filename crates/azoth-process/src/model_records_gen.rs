@@ -41,6 +41,7 @@ use crate::models::drift_flux_release::DriftFluxReleaseResult;
 use crate::models::dynamic_psv_sizing::DynamicPsvSizingResult;
 use crate::models::ejector::EjectorResult;
 use crate::models::escalation_graph::EscalationGraphResult;
+use crate::models::esd_response_time::EsdResponseTimeResult;
 use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
 use crate::models::fault_tree::FaultTreeResult;
@@ -813,6 +814,26 @@ impl CalcResult for EscalationGraphResult {
         "any_escalation",
         "worst_case_items",
         "worst_case_count",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for EsdResponseTimeResult {
+    const CALC_ID: &'static str = "process.esd_response_time";
+    const FIELDS: &'static [&'static str] = &[
+        "sif_tag",
+        "detection_time",
+        "logic_time",
+        "final_element_time",
+        "total_response_time",
+        "allowable_response_time",
+        "margin",
+        "within_budget",
+        "contributions",
         "warnings",
     ];
 

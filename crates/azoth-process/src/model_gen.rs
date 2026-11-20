@@ -31,6 +31,7 @@
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/escalation_graph.toml
+//!   - specs/models/process/esd_response_time.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
@@ -32223,6 +32224,326 @@ pub static ESCALATION_GRAPH_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&ESCALATION_GRAPH_ALGORITHM),
     checks: ESCALATION_GRAPH_CHECKS,
     cases: ESCALATION_GRAPH_CASES,
+};
+
+static ESD_RESPONSE_TIME_CHECKS: &[SpecCheck] = &[SpecCheck {
+    on_input: true,
+    check: RangeCheck {
+        quantity: "allowable_response_time",
+        min: Some(0.0),
+        min_inclusive: true,
+        max: None,
+        max_inclusive: true,
+        equals: None,
+        band: Band::Outside,
+        severity: Severity::Error,
+        code: WarningCode::OutOfValidRange,
+        rationale: "a negative budget is not a budget",
+    },
+}];
+
+static ESD_RESPONSE_TIME_CASES: &[TestCase] = &[
+    TestCase {
+        id: "within_budget",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("allowable_response_time", 15.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_tag", "ESD-1234")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("detection_time", 1.0),
+            ("logic_time", 0.5),
+            ("final_element_time", 8.5),
+            ("total_response_time", 10.0),
+            ("allowable_response_time", 15.0),
+            ("margin", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("sif_tag", "ESD-1234")],
+        records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("PT-1001 high-pressure"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("detection"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Logic solver scan + 2oo3 vote"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("logic"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ESDV-2001"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("final_element"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(8.5),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("PT-1001 high-pressure"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("detection"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Logic solver scan + 2oo3 vote"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("logic"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ESDV-2001"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("final_element"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(8.5),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "exceeds_budget",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("allowable_response_time", 15.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_tag", "ESD-9999")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("total_response_time", 23.5),
+            ("allowable_response_time", 15.0),
+            ("margin", -8.5),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("LT-3001 high-level"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("detection"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Logic solver"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("logic"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ESDV-3002 (large bore)"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("final_element"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(21.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "no_budget",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_tag", "ESD-NOBUDGET")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("total_response_time", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "contributions",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("TT-1"),
+                },
+                RecordField {
+                    name: "stage",
+                    value: FieldValue::Name("detection"),
+                },
+                RecordField {
+                    name: "time",
+                    value: FieldValue::Number(1.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "zero_time_and_equal_budget",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("allowable_response_time", 2.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_tag", "ESD-ZERO")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("detection_time", 0.0),
+            ("logic_time", 2.0),
+            ("final_element_time", 0.0),
+            ("total_response_time", 2.0),
+            ("allowable_response_time", 2.0),
+            ("margin", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("DT-1"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("detection"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("logic"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("logic"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static ESD_RESPONSE_TIME_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "esd_response_time",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.esd_response_time`.
+pub static ESD_RESPONSE_TIME_SPEC: ModelSpec = ModelSpec {
+    id: "process.esd_response_time",
+    kind: "procedure",
+    algorithm: Some(&ESD_RESPONSE_TIME_ALGORITHM),
+    checks: ESD_RESPONSE_TIME_CHECKS,
+    cases: ESD_RESPONSE_TIME_CASES,
 };
 
 static EVENT_TREE_CHECKS: &[SpecCheck] = &[SpecCheck {
@@ -94058,6 +94379,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &DYNAMIC_PSV_SIZING_SPEC,
     &EJECTOR_SPEC,
     &ESCALATION_GRAPH_SPEC,
+    &ESD_RESPONSE_TIME_SPEC,
     &EVENT_TREE_SPEC,
     &EXPANDER_SPEC,
     &FAULT_TREE_SPEC,

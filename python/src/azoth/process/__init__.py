@@ -49,6 +49,7 @@ from azoth.core.result import (
     DynamicPsvSizingResult,
     EjectorResult,
     EscalationGraphResult,
+    EsdResponseTimeResult,
     EventTreeResult,
     ExpanderResult,
     FaultTreeResult,
@@ -300,6 +301,7 @@ _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
 _ALARP_AUDIT = "process.alarp_audit"
 _ESCALATION_GRAPH = "process.escalation_graph"
+_ESD_RESPONSE_TIME = "process.esd_response_time"
 _INHERENT_SAFETY = "process.inherent_safety"
 _NORSOK_P002_COMPLIANCE = "process.norsok_p002_compliance"
 _STS0131_GATE = "process.sts0131_gate"
@@ -2824,6 +2826,25 @@ def ejector(
         suction_nozzle_efficiency=suction_nozzle_efficiency,
         mixing_efficiency=mixing_efficiency,
         diffuser_efficiency=diffuser_efficiency,
+    )
+
+
+def esd_response_time(
+    sif_tag: str | None = None,
+    contributions: list[dict[str, object]] | None = None,
+    allowable_response_time: float | None = None,
+) -> EsdResponseTimeResult:
+    """The ESD response-time budget.
+
+    The three stage sums, their total and the inclusive budget test. **An absent budget is
+    within budget and has no margin**, and the contributions are echoed in caller order.
+
+    See :func:`azoth.process.reference.esd_response_time`.
+    """
+    return resolve(_ESD_RESPONSE_TIME)(  # type: ignore[no-any-return]
+        sif_tag=sif_tag,
+        contributions=contributions,
+        allowable_response_time=allowable_response_time,
     )
 
 

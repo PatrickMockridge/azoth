@@ -36,6 +36,7 @@ from azoth.core.record_outputs_gen import (
     DriftFluxReleaseStation,
     EquilibriumSoundSpeedSample,
     EscalationItemResult,
+    EsdContribution,
     EventTreeOutcome,
     FiniteRateReleaseStation,
     FlowlineScaleSegment,
@@ -6948,6 +6949,43 @@ class EscalationGraphResult(_HasWarnings):
 
     #: the number of items in the worst case.
     worst_case_count: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EsdResponseTimeResult(_HasWarnings):
+    """Result of ``process.esd_response_time``."""
+
+    CALC_ID: ClassVar[str] = "process.esd_response_time"
+
+    #: the echoed SIF identifier.
+    sif_tag: str
+
+    #: the sum of the detection contributions.
+    detection_time: Q
+
+    #: the sum of the logic contributions.
+    logic_time: Q
+
+    #: the sum of the final-element contributions.
+    final_element_time: Q
+
+    #: the three stage totals' sum.
+    total_response_time: Q
+
+    #: the budget, absent when none is stated.
+    allowable_response_time: Q | None
+
+    #: `allowable - total`, absent when no budget is stated.
+    margin: Q | None
+
+    #: `total <= allowable`, and true when no budget is stated.
+    within_budget: bool
+
+    #: the contributions echoed in caller order.
+    contributions: tuple[EsdContribution, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

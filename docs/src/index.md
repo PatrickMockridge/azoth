@@ -357,6 +357,7 @@ Five sections, and the difference between them is the point:
 - [`process.dynamic_psv_sizing`](./process/dynamic_psv_sizing.md) — Dynamic PSV sizing
 - [`process.ejector`](./process/ejector.md) — Ejector
 - [`process.escalation_graph`](./process/escalation_graph.md) — Escalation graph analysis
+- [`process.esd_response_time`](./process/esd_response_time.md) — ESD response time
 - [`process.event_tree`](./process/event_tree.md) — Event tree
 - [`process.expander`](./process/expander.md) — Expander
 - [`process.fault_tree`](./process/fault_tree.md) — Fault tree
