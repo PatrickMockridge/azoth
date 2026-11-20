@@ -349,6 +349,7 @@ Five sections, and the difference between them is the point:
 - [`process.consequence_analysis`](./process/consequence_analysis.md) — Consequence analysis
 - [`process.control_valve_failure_relief`](./process/control_valve_failure_relief.md) — Control valve failure relief
 - [`process.cooler`](./process/cooler.md) — Cooler
+- [`process.cost_estimation`](./process/cost_estimation.md) — Cost-estimation calculator
 - [`process.deluge_nozzle_layout`](./process/deluge_nozzle_layout.md) — Deluge nozzle layout
 - [`process.depressurization`](./process/depressurization.md) — Vessel depressurization
 - [`process.depressurization_acceptance`](./process/depressurization_acceptance.md) — Depressurization acceptance

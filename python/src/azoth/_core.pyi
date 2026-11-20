@@ -539,6 +539,39 @@ class ConsequenceOutcomeSpec(TypedDict):
     temperature: float | None
     pressure: float | None
 
+class CostEstimationQuery(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    calculation: str
+    correlation: str | None
+    capacity: float | None
+    diameter: float | None
+    tray_count: float | None
+    packing_type: str | None
+    piping_length: float | None
+    piping_schedule: str | None
+    valve_cv: float | None
+    purchased_cost: float | None
+    design_pressure: float | None
+    pressure_factor: float | None
+    material_factor: float | None
+    weight: float | None
+    equipment_type: str | None
+    material: str | None
+    region: str | None
+    currency: str | None
+    exchange_rate: float | None
+    amount: float | None
+    currency_direction: str | None
+    shell_weight: float | None
+    heads_weight: float | None
+    nozzle_count: float | None
+    internals_weight: float | None
+    current_cepci: float | None
+    reference_cepci: float | None
+    contingency_factor: float | None
+    engineering_factor: float | None
+
 class DepressurizationAcceptancePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1307,6 +1340,44 @@ class ConsequenceOutcomeResult:
     frequency_per_year: float
     fatality_probability: float
     fatality_frequency_per_year: float
+
+@final
+class CostEstimationResultRow:
+    """one row per input row, in caller order."""
+
+    calculation: str
+    correlation: str
+    purchased_equipment_cost: float
+    pressure_factor: float
+    material_factor: float
+    location_factor: float
+    exchange_rate: float
+    bare_module_cost: float
+    total_module_cost: float
+    grass_roots_cost: float
+    installation_man_hours: Qty
+    converted_amount: float
+    cost_in_usd: float
+    current_cepci: float
+    reference_cepci: float
+    cepci_ratio: float
+    contingency_factor: float
+    engineering_factor: float
+    installation_factor: float
+
+@final
+class CostBomRow:
+    """the vessel bill of materials, one row per line the class adds."""
+
+    item: str
+    material: str
+    quantity: float
+    has_quantity: bool
+    unit: str
+    weight_kg: Qty
+    has_weight: bool
+    cost_usd: float
+    source: str
 
 @final
 class DepressurizationPoint:
@@ -4263,6 +4334,12 @@ class CoolerResult:
     outlet_duty: Qty
     cooling_valve_opening: float | None
     equilibrium_outlet_temperature: Qty | None
+    warnings: list[Warning]
+
+@final
+class CostEstimationResult:
+    queries: list[CostEstimationResultRow]
+    bom: list[CostBomRow]
     warnings: list[Warning]
 
 @final
@@ -8701,6 +8778,7 @@ def cooler(
     requested_valve_opening: float | None = None,
     dynamic_outlet_temperature: float | None = None,
 ) -> CoolerResult: ...
+def cost_estimation(queries: list[CostEstimationQuery]) -> CostEstimationResult: ...
 def deluge_nozzle_layout(
     protected_area: float,
     required_density: float,

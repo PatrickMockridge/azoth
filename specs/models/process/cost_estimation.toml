@@ -1,0 +1,253 @@
+id = "process.cost_estimation"
+name = "Cost-estimation calculator"
+kind = "procedure"
+assumptions = [
+    "**the calculator is the class's factor tables and correlations**: CEPCI 2019 = 607.5 to 2025 = 840, nine material factors, eleven location factors, six exchange rates and the pressure-factor step table.",
+    "**costs are USD magnitudes, declared dimensionless** because the vocabulary has no currency unit, the `total_pressure_drop_mbar` precedent; the currency code and cost year are outputs of the basis.",
+    "**the two weight-based vessel routes are the class's deprecated ones and are carried as it answers them**, the volume routes being the ones its subclasses reach.",
+    "**the summary route applies the material and location factors to the purchased cost and `Fm = 1.0` in the bare module**, where the unit estimators' stack reuses the same material factor; both are the class's own.",
+    "**`installation_factor` is stored and read by no formula**: it is published as 3.0 and applied nowhere.",
+    "**the class caches its lazy results**, so a selector changed after a first read does not recompute; the port evaluates one stated state per row.",
+    "**a negative capacity answers zero** for every correlation, the class's early return, while a non-finite value is refused.",
+    "**an unknown material name is refused**: the class's setter leaves its previous factor in place, which a record input cannot express.",
+    "**`toJson`, `toMap`, the reports and serialization are session surface**, not inputs or outputs of this id.",
+]
+references = [
+    "Turton, R., Shaeiwitz, J. A., Bhattacharyya, D. & Whiting, W. B. (2018). Analysis, Synthesis and Design of Chemical Processes, 5th Ed. Pearson.",
+    "Peters, M. S., Timmerhaus, K. D. & West, R. E. Plant Design and Economics for Chemical Engineers, 5th Ed. McGraw-Hill.",
+    "Ulrich, G. D. & Vasudevan, P. T. (2004). Chemical Engineering Process Design and Economics. Process Publishing.",
+    "Seider, W. D., Seader, J. D. & Lewin, D. R. Product and Process Design Principles. Wiley.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/costestimation/CostEstimationCalculator.java` is the port source.",
+    "`validation/neqsim/captures/process_cost_calculator.tsv` - factor boundaries, every correlation at and beyond its validity range, the module stack, labour hours and the vessel BOM.",
+]
+[source]
+standard = "NeqSim process/costestimation/CostEstimationCalculator.java"
+edition = "Its factor tables and correlation methods, `calcBareModuleCost`, `calcTotalModuleCost`, `calcGrassRootsCost`, `calcInstallationManHours`, `calcPipingInstallationManHours`, `generateVesselBOM` and `calculateCostEstimate`."
+[algorithm]
+scheme = "cost_correlation_dispatch"
+initialisation = "first_query_in_caller_order"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.queries]
+type = "record_list"
+row_type = "CostEstimationQuery"
+description = "one calculator call per row, in caller order; `calculation` selects the fields the row must carry.\n"
+[inputs.queries.fields.calculation]
+type = "enum"
+values = ["correlation", "module_stack", "summary", "installation_man_hours", "piping_man_hours", "currency_conversion", "pressure_factor", "material_factor", "location_factor", "vessel_bom"]
+description = "the calculator call this row asks for.\n"
+[inputs.queries.fields.correlation]
+type = "enum"
+values = ["vertical_vessel_by_volume", "horizontal_vessel_by_volume", "vertical_vessel_by_weight", "horizontal_vessel_by_weight", "shell_tube", "plate", "air_cooler", "sieve_trays", "valve_trays", "bubble_cap_trays", "packing", "centrifugal_pump", "centrifugal_compressor", "reciprocating_compressor", "piping", "control_valve"]
+optional = true
+description = "the correlation, required by a `correlation` row; the class's `calcColumnShellCost` delegates to `vertical_vessel_by_weight` and has no separate value.\n"
+[inputs.queries.fields.capacity]
+unit = "dimensionless"
+optional = true
+description = "the correlation's capacity: m3 for the vessels by volume and for packing, m2 for the exchangers, kW for the machines and kg for the two weight routes.\n"
+[inputs.queries.fields.diameter]
+unit = "m"
+optional = true
+description = "the tray or piping diameter.\n"
+[inputs.queries.fields.tray_count]
+unit = "dimensionless"
+optional = true
+description = "the whole tray count.\n"
+[inputs.queries.fields.packing_type]
+type = "enum"
+values = ["metal", "ceramic", "plastic"]
+optional = true
+description = "the packing material; anything but metal or ceramic is the class's plastic rate.\n"
+[inputs.queries.fields.piping_length]
+unit = "m"
+optional = true
+description = "the piping length.\n"
+[inputs.queries.fields.piping_schedule]
+type = "enum"
+values = ["40", "80", "160"]
+optional = true
+description = "the piping schedule; 80 is 1.5 times the base and 160 is 2.5.\n"
+[inputs.queries.fields.valve_cv]
+unit = "dimensionless"
+optional = true
+description = "the control valve's flow coefficient.\n"
+[inputs.queries.fields.purchased_cost]
+unit = "dimensionless"
+optional = true
+description = "the purchased equipment cost in USD, for the module stack and the summary route.\n"
+[inputs.queries.fields.design_pressure]
+unit = "bar"
+optional = true
+description = "the pressure the class's `getPressureFactor` receives, barg and passed unchanged.\n"
+[inputs.queries.fields.pressure_factor]
+unit = "dimensionless"
+optional = true
+description = "a stated pressure factor that supersedes the step table.\n"
+[inputs.queries.fields.material_factor]
+unit = "dimensionless"
+optional = true
+description = "a stated material factor that supersedes the material name.\n"
+[inputs.queries.fields.weight]
+unit = "kg"
+optional = true
+description = "the equipment weight, for the labour hours and the summary route.\n"
+[inputs.queries.fields.equipment_type]
+type = "string"
+optional = true
+description = "the class's labour vocabulary: `vessel`, `exchanger`, `pump`, `compressor`, `column`, or anything else at the 35 h/t default.\n"
+[inputs.queries.fields.material]
+type = "enum"
+values = ["carbon_steel", "ss304", "ss316", "ss316l", "monel", "hastelloy_c", "inconel", "titanium", "nickel"]
+optional = true
+description = "the material of construction, which sets the material factor.\n"
+[inputs.queries.fields.region]
+type = "enum"
+values = ["us_gulf_coast", "us_midwest", "us_west_coast", "western_europe", "north_sea", "middle_east", "southeast_asia", "china", "australia", "brazil", "west_africa"]
+optional = true
+description = "the location region, which sets the location factor.\n"
+[inputs.queries.fields.currency]
+type = "enum"
+values = ["usd", "eur", "nok", "gbp", "cny", "jpy"]
+optional = true
+description = "the currency, which sets the default exchange rate from USD.\n"
+[inputs.queries.fields.exchange_rate]
+unit = "dimensionless"
+optional = true
+description = "a stated exchange rate from USD that supersedes the currency's default.\n"
+[inputs.queries.fields.amount]
+unit = "dimensionless"
+optional = true
+description = "the amount the currency conversion converts.\n"
+[inputs.queries.fields.currency_direction]
+type = "enum"
+values = ["from_usd", "to_usd"]
+optional = true
+description = "the conversion's direction; `to_usd` divides by the rate as the class does.\n"
+[inputs.queries.fields.shell_weight]
+unit = "kg"
+optional = true
+description = "the vessel shell weight, for the bill of materials.\n"
+[inputs.queries.fields.heads_weight]
+unit = "kg"
+optional = true
+description = "the two heads' weight, for the bill of materials.\n"
+[inputs.queries.fields.nozzle_count]
+unit = "dimensionless"
+optional = true
+description = "the nozzle count, for the bill of materials.\n"
+[inputs.queries.fields.internals_weight]
+unit = "kg"
+optional = true
+description = "the internals weight, for the bill of materials.\n"
+[inputs.queries.fields.current_cepci]
+unit = "dimensionless"
+optional = true
+description = "the current cost index; absent is 840, the class's 2025 estimate.\n"
+[inputs.queries.fields.reference_cepci]
+unit = "dimensionless"
+optional = true
+description = "the index the correlations are referenced to; absent is 607.5, the class's 2019 value.\n"
+[inputs.queries.fields.contingency_factor]
+unit = "dimensionless"
+optional = true
+description = "the module stack's contingency; absent is 0.15.\n"
+[inputs.queries.fields.engineering_factor]
+unit = "dimensionless"
+optional = true
+description = "the module stack's engineering factor; absent is 0.10.\n"
+[outputs]
+[outputs.queries]
+type = "record_list"
+description = "one row per input row, in caller order.\n"
+[outputs.queries.fields.calculation]
+type = "string"
+description = "the call this row answered.\n"
+[outputs.queries.fields.correlation]
+type = "string"
+description = "the correlation, or the empty string where the row is not a correlation call.\n"
+[outputs.queries.fields.purchased_equipment_cost]
+unit = "dimensionless"
+description = "the correlation's USD answer, or the summary route's located purchased cost.\n"
+[outputs.queries.fields.pressure_factor]
+unit = "dimensionless"
+description = "the step table's factor at the stated pressure, or the stated override.\n"
+[outputs.queries.fields.material_factor]
+unit = "dimensionless"
+description = "the material factor the row used.\n"
+[outputs.queries.fields.location_factor]
+unit = "dimensionless"
+description = "the location factor the row used.\n"
+[outputs.queries.fields.exchange_rate]
+unit = "dimensionless"
+description = "the exchange rate the row used.\n"
+[outputs.queries.fields.bare_module_cost]
+unit = "dimensionless"
+description = "the bare module cost, USD.\n"
+[outputs.queries.fields.total_module_cost]
+unit = "dimensionless"
+description = "the total module cost, USD.\n"
+[outputs.queries.fields.grass_roots_cost]
+unit = "dimensionless"
+description = "the grass roots cost, USD.\n"
+[outputs.queries.fields.installation_man_hours]
+unit = "h"
+description = "the installation labour hours.\n"
+[outputs.queries.fields.converted_amount]
+unit = "dimensionless"
+description = "the currency conversion's answer.\n"
+[outputs.queries.fields.cost_in_usd]
+unit = "dimensionless"
+description = "the converted amount in USD.\n"
+[outputs.queries.fields.current_cepci]
+unit = "dimensionless"
+description = "the current cost index the row used.\n"
+[outputs.queries.fields.reference_cepci]
+unit = "dimensionless"
+description = "the reference cost index the row used.\n"
+[outputs.queries.fields.cepci_ratio]
+unit = "dimensionless"
+description = "current over reference.\n"
+[outputs.queries.fields.contingency_factor]
+unit = "dimensionless"
+description = "the contingency factor the row used.\n"
+[outputs.queries.fields.engineering_factor]
+unit = "dimensionless"
+description = "the engineering factor the row used.\n"
+[outputs.queries.fields.installation_factor]
+unit = "dimensionless"
+description = "the class's stored Lang factor, 3.0, read by no formula.\n"
+[outputs.bom]
+type = "record_list"
+description = "the vessel bill of materials, one row per line the class adds.\n"
+[outputs.bom.fields.item]
+type = "string"
+description = "the line's item.\n"
+[outputs.bom.fields.material]
+type = "string"
+description = "the material, or the empty string where the class states none.\n"
+[outputs.bom.fields.quantity]
+unit = "dimensionless"
+description = "the count, where the line is a count.\n"
+[outputs.bom.fields.has_quantity]
+type = "boolean"
+description = "whether the line carries a count rather than a weight.\n"
+[outputs.bom.fields.unit]
+type = "string"
+description = "the count's unit, or the empty string.\n"
+[outputs.bom.fields.weight_kg]
+unit = "kg"
+description = "the line's weight.\n"
+[outputs.bom.fields.has_weight]
+type = "boolean"
+description = "whether the line carries a weight.\n"
+[outputs.bom.fields.cost_usd]
+unit = "dimensionless"
+description = "the line's USD cost.\n"
+[outputs.bom.fields.source]
+type = "string"
+description = "the line's source, or the empty string.\n"
+[implementations]
+python = "azoth.process.cost_estimation"
+rust = "azoth_process::cost_estimation"

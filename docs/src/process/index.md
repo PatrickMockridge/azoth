@@ -35,6 +35,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.consequence_analysis`](./consequence_analysis.md) | `outcome_frequency_composition` | NeqSim process/safety/qra/ConsequenceAnalysisEngine.java |
 | [`process.control_valve_failure_relief`](./control_valve_failure_relief.md) | `control_valve_fail_open_nozzle` | NeqSim process/safety/overpressure/ControlValveFailureRelief.java |
 | [`process.cooler`](./cooler.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Cooler.java |
+| [`process.cost_estimation`](./cost_estimation.md) | `cost_correlation_dispatch` | NeqSim process/costestimation/CostEstimationCalculator.java |
 | [`process.deluge_nozzle_layout`](./deluge_nozzle_layout.md) | `closed_form_deluge_nozzle_layout` | NeqSim process/safety/firewater/DelugeNozzleLayout.java |
 | [`process.depressurization`](./depressurization.md) | `explicit_euler_equilibrium_blowdown` | NeqSim process/safety/depressurization/DepressurizationSimulator.java |
 | [`process.depressurization_acceptance`](./depressurization_acceptance.md) | `trajectory_acceptance` | NeqSim process/safety/depressurization/STS0131AcceptanceCriteria.java |

@@ -2688,6 +2688,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 14,
         "tests_skipped": 0,
     },
+    'process.cost_estimation': {
+        "calc_id": 'process.cost_estimation',
+        "name": 'Cost-estimation calculator',
+        "spec": {'path': 'specs/models/process/cost_estimation.toml', 'sha256': '36eba272493d4060379dd45f14481eca01a93a57b833b8a1b1eb613c0bbeae13'},
+        "code": [{'path': 'python/src/azoth/process/reference/cost_estimation.py', 'sha256': '53dec8e5ae9f03feabae432db44265e46005c3ac28958ca28f62461cf99b4af1'}, {'path': 'crates/azoth-process/src/models/cost_estimation.rs', 'sha256': '66588242b1f93dcd299217057fc1cdfee7e6583d58c89c64c99e3aa3af8dd0f1'}],
+        "source": 'NeqSim process/costestimation/CostEstimationCalculator.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 4,
+        "tests_skipped": 0,
+    },
     'process.deluge_nozzle_layout': {
         "calc_id": 'process.deluge_nozzle_layout',
         "name": 'Deluge nozzle layout',

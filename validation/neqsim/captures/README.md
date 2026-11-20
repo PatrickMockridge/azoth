@@ -3305,3 +3305,20 @@ message and severity, its instrument tags and its SIF names.
 The class's `setPfd` also sets the effectiveness to `1 - PFD`, so the fire-and-gas barrier's
 `0.99972` is the setter's arithmetic rather than a stored value. The finding messages are
 presentation; the port carries one stable rule per check site in the same order.
+
+### `process_cost_calculator.tsv`
+
+`CostEstimationCalculator` at the pin: the pressure-factor steps, the nine material factors,
+the eleven location factors, the six exchange rates, every correlation at and beyond its
+validity range, the module stack and labour rates, the summary route and the vessel bill of
+materials. Costs are USD magnitudes; the class's 2025 CEPCI of 840 against the correlations'
+2019 reference of 607.5 is the ratio every correlation carries.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe cost_estimation \
+  > captures/process_cost_calculator.tsv
+```
+
+The two deprecated weight-based vessel routes are printed as the class answers them; the
+volume routes are the ones its subclasses reach. `summary_purchased` is unchanged at 50 000
+because the calculator's material and location factors are at their defaults there.

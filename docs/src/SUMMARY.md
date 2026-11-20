@@ -257,6 +257,7 @@
   - [Consequence analysis](./process/consequence_analysis.md)
   - [Control valve failure relief](./process/control_valve_failure_relief.md)
   - [Cooler](./process/cooler.md)
+  - [Cost-estimation calculator](./process/cost_estimation.md)
   - [Deluge nozzle layout](./process/deluge_nozzle_layout.md)
   - [Vessel depressurization](./process/depressurization.md)
   - [Depressurization acceptance](./process/depressurization_acceptance.md)

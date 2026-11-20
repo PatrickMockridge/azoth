@@ -31,6 +31,8 @@ from azoth.core.record_outputs_gen import (
     ChemicalWarningRow,
     ComponentSelectiveReleaseStation,
     ConsequenceOutcomeResult,
+    CostBomRow,
+    CostEstimationResultRow,
     DepositionSegmentRow,
     DepressurizationPoint,
     DriftFluxReleaseStation,
@@ -6463,6 +6465,22 @@ class CoolerResult(_HasWarnings):
 
     #: the equilibrium the thermal lag moved toward. Present only on the dynamic branch, as evidence.
     equilibrium_outlet_temperature: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class CostEstimationResult(_HasWarnings):
+    """Result of ``process.cost_estimation``."""
+
+    CALC_ID: ClassVar[str] = "process.cost_estimation"
+
+    #: one row per input row, in caller order.
+    queries: tuple[CostEstimationResultRow, ...]
+
+    #: the vessel bill of materials, one row per line the class adds.
+    bom: tuple[CostBomRow, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

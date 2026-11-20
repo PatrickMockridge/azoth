@@ -705,6 +705,208 @@ impl From<&azoth_process::models::consequence_analysis::ConsequenceOutcomeResult
     }
 }
 
+/// the vessel bill of materials, one row per line the class adds.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "CostBomRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyCostBomRow {
+    /// the line's item.
+    #[pyo3(get)]
+    pub item: String,
+    /// the material, or the empty string where the class states none.
+    #[pyo3(get)]
+    pub material: String,
+    /// the count, where the line is a count.
+    #[pyo3(get)]
+    pub quantity: f64,
+    /// whether the line carries a count rather than a weight.
+    #[pyo3(get)]
+    pub has_quantity: bool,
+    /// the count's unit, or the empty string.
+    #[pyo3(get)]
+    pub unit: String,
+    /// the line's weight.
+    #[pyo3(get)]
+    pub weight_kg: PyQty,
+    /// whether the line carries a weight.
+    #[pyo3(get)]
+    pub has_weight: bool,
+    /// the line's USD cost.
+    #[pyo3(get)]
+    pub cost_usd: f64,
+    /// the line's source, or the empty string.
+    #[pyo3(get)]
+    pub source: String,
+}
+
+#[pymethods]
+impl PyCostBomRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "CostBomRow(item={}, material={}, quantity={}, has_quantity={:?}, unit={}, weight_kg={:?}, has_weight={:?}, cost_usd={}, source={})",
+            self.item,
+            self.material,
+            self.quantity,
+            self.has_quantity,
+            self.unit,
+            self.weight_kg,
+            self.has_weight,
+            self.cost_usd,
+            self.source
+        )
+    }
+}
+
+impl From<&azoth_process::models::cost_estimation::CostBomRow> for PyCostBomRow {
+    fn from(row: &azoth_process::models::cost_estimation::CostBomRow) -> Self {
+        Self {
+            item: row.item.clone(),
+            material: row.material.clone(),
+            quantity: row.quantity,
+            has_quantity: row.has_quantity,
+            unit: row.unit.clone(),
+            weight_kg: PyQty {
+                magnitude_si: row.weight_kg,
+                unit: "kg".to_string(),
+            },
+            has_weight: row.has_weight,
+            cost_usd: row.cost_usd,
+            source: row.source.clone(),
+        }
+    }
+}
+
+/// one row per input row, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "CostEstimationResultRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyCostEstimationResultRow {
+    /// the call this row answered.
+    #[pyo3(get)]
+    pub calculation: String,
+    /// the correlation, or the empty string where the row is not a correlation call.
+    #[pyo3(get)]
+    pub correlation: String,
+    /// the correlation's USD answer, or the summary route's located purchased cost.
+    #[pyo3(get)]
+    pub purchased_equipment_cost: f64,
+    /// the step table's factor at the stated pressure, or the stated override.
+    #[pyo3(get)]
+    pub pressure_factor: f64,
+    /// the material factor the row used.
+    #[pyo3(get)]
+    pub material_factor: f64,
+    /// the location factor the row used.
+    #[pyo3(get)]
+    pub location_factor: f64,
+    /// the exchange rate the row used.
+    #[pyo3(get)]
+    pub exchange_rate: f64,
+    /// the bare module cost, USD.
+    #[pyo3(get)]
+    pub bare_module_cost: f64,
+    /// the total module cost, USD.
+    #[pyo3(get)]
+    pub total_module_cost: f64,
+    /// the grass roots cost, USD.
+    #[pyo3(get)]
+    pub grass_roots_cost: f64,
+    /// the installation labour hours.
+    #[pyo3(get)]
+    pub installation_man_hours: PyQty,
+    /// the currency conversion's answer.
+    #[pyo3(get)]
+    pub converted_amount: f64,
+    /// the converted amount in USD.
+    #[pyo3(get)]
+    pub cost_in_usd: f64,
+    /// the current cost index the row used.
+    #[pyo3(get)]
+    pub current_cepci: f64,
+    /// the reference cost index the row used.
+    #[pyo3(get)]
+    pub reference_cepci: f64,
+    /// current over reference.
+    #[pyo3(get)]
+    pub cepci_ratio: f64,
+    /// the contingency factor the row used.
+    #[pyo3(get)]
+    pub contingency_factor: f64,
+    /// the engineering factor the row used.
+    #[pyo3(get)]
+    pub engineering_factor: f64,
+    /// the class's stored Lang factor, 3.0, read by no formula.
+    #[pyo3(get)]
+    pub installation_factor: f64,
+}
+
+#[pymethods]
+impl PyCostEstimationResultRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "CostEstimationResultRow(calculation={}, correlation={}, purchased_equipment_cost={}, pressure_factor={}, material_factor={}, location_factor={}, exchange_rate={}, bare_module_cost={}, total_module_cost={}, grass_roots_cost={}, installation_man_hours={:?}, converted_amount={}, cost_in_usd={}, current_cepci={}, reference_cepci={}, cepci_ratio={}, contingency_factor={}, engineering_factor={}, installation_factor={})",
+            self.calculation,
+            self.correlation,
+            self.purchased_equipment_cost,
+            self.pressure_factor,
+            self.material_factor,
+            self.location_factor,
+            self.exchange_rate,
+            self.bare_module_cost,
+            self.total_module_cost,
+            self.grass_roots_cost,
+            self.installation_man_hours,
+            self.converted_amount,
+            self.cost_in_usd,
+            self.current_cepci,
+            self.reference_cepci,
+            self.cepci_ratio,
+            self.contingency_factor,
+            self.engineering_factor,
+            self.installation_factor
+        )
+    }
+}
+
+impl From<&azoth_process::models::cost_estimation::CostEstimationResultRow>
+    for PyCostEstimationResultRow
+{
+    fn from(row: &azoth_process::models::cost_estimation::CostEstimationResultRow) -> Self {
+        Self {
+            calculation: row.calculation.clone(),
+            correlation: row.correlation.clone(),
+            purchased_equipment_cost: row.purchased_equipment_cost,
+            pressure_factor: row.pressure_factor,
+            material_factor: row.material_factor,
+            location_factor: row.location_factor,
+            exchange_rate: row.exchange_rate,
+            bare_module_cost: row.bare_module_cost,
+            total_module_cost: row.total_module_cost,
+            grass_roots_cost: row.grass_roots_cost,
+            installation_man_hours: PyQty {
+                magnitude_si: row.installation_man_hours,
+                unit: "h".to_string(),
+            },
+            converted_amount: row.converted_amount,
+            cost_in_usd: row.cost_in_usd,
+            current_cepci: row.current_cepci,
+            reference_cepci: row.reference_cepci,
+            cepci_ratio: row.cepci_ratio,
+            contingency_factor: row.contingency_factor,
+            engineering_factor: row.engineering_factor,
+            installation_factor: row.installation_factor,
+        }
+    }
+}
+
 /// One row per evaluated segment, in the profile's order.
 #[pyclass(
     frozen,

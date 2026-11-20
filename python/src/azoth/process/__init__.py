@@ -41,6 +41,7 @@ from azoth.core.result import (
     ConsequenceAnalysisResult,
     ControlValveFailureReliefResult,
     CoolerResult,
+    CostEstimationResult,
     DelugeNozzleLayoutResult,
     DepressurizationAcceptanceResult,
     DepressurizationResult,
@@ -290,6 +291,7 @@ _HEAT_EXCHANGER = "process.heat_exchanger"
 _COMPONENT_SPLITTER = "process.component_splitter"
 _COMPRESSOR = "process.compressor"
 _CONSEQUENCE_ANALYSIS = "process.consequence_analysis"
+_COST_ESTIMATION = "process.cost_estimation"
 _CONTROL_VALVE_FAILURE_RELIEF = "process.control_valve_failure_relief"
 _ABSORPTION_COLUMN = "process.absorption_column"
 _ACOUSTIC_INDUCED_VIBRATION_SCREENING = "process.acoustic_induced_vibration_screening"
@@ -2421,6 +2423,20 @@ def cooler(
         cooling_valve_opening=cooling_valve_opening,
         requested_valve_opening=requested_valve_opening,
         dynamic_outlet_temperature=dynamic_outlet_temperature,
+    )
+
+
+def cost_estimation(queries: list[dict[str, object]]) -> CostEstimationResult:
+    """The cost-estimation calculator over a row of stated calls.
+
+    The factor tables, the Turton correlations, the module stack and the vessel bill of
+    materials, one call per row. **Costs are USD magnitudes declared dimensionless**,
+    because the vocabulary has no currency unit.
+
+    See :func:`azoth.process.reference.cost_estimation`.
+    """
+    return resolve(_COST_ESTIMATION)(  # type: ignore[no-any-return]
+        queries=queries,
     )
 
 

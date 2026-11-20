@@ -262,6 +262,100 @@ class ConsequenceOutcomeResult:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class CostBomRow:
+    """the vessel bill of materials, one row per line the class adds."""
+
+    #: the line's item.
+    item: str
+
+    #: the material, or the empty string where the class states none.
+    material: str
+
+    #: the count, where the line is a count.
+    quantity: float
+
+    #: whether the line carries a count rather than a weight.
+    has_quantity: bool
+
+    #: the count's unit, or the empty string.
+    unit: str
+
+    #: the line's weight.
+    weight_kg: Q
+
+    #: whether the line carries a weight.
+    has_weight: bool
+
+    #: the line's USD cost.
+    cost_usd: float
+
+    #: the line's source, or the empty string.
+    source: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class CostEstimationResultRow:
+    """one row per input row, in caller order."""
+
+    #: the call this row answered.
+    calculation: str
+
+    #: the correlation, or the empty string where the row is not a correlation call.
+    correlation: str
+
+    #: the correlation's USD answer, or the summary route's located purchased cost.
+    purchased_equipment_cost: float
+
+    #: the step table's factor at the stated pressure, or the stated override.
+    pressure_factor: float
+
+    #: the material factor the row used.
+    material_factor: float
+
+    #: the location factor the row used.
+    location_factor: float
+
+    #: the exchange rate the row used.
+    exchange_rate: float
+
+    #: the bare module cost, USD.
+    bare_module_cost: float
+
+    #: the total module cost, USD.
+    total_module_cost: float
+
+    #: the grass roots cost, USD.
+    grass_roots_cost: float
+
+    #: the installation labour hours.
+    installation_man_hours: Q
+
+    #: the currency conversion's answer.
+    converted_amount: float
+
+    #: the converted amount in USD.
+    cost_in_usd: float
+
+    #: the current cost index the row used.
+    current_cepci: float
+
+    #: the reference cost index the row used.
+    reference_cepci: float
+
+    #: current over reference.
+    cepci_ratio: float
+
+    #: the contingency factor the row used.
+    contingency_factor: float
+
+    #: the engineering factor the row used.
+    engineering_factor: float
+
+    #: the class's stored Lang factor, 3.0, read by no formula.
+    installation_factor: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DepositionSegmentRow:
     """One row per evaluated segment, in the profile's order."""
 

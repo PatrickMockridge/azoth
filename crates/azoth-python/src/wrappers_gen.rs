@@ -6130,6 +6130,57 @@ pub fn cooler(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Cost-estimation calculator.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (queries))]
+#[pyo3(text_signature = "(queries)")]
+pub fn cost_estimation(
+    py: Python<'_>,
+    queries: Vec<crate::records_gen::CostEstimationQuery>,
+) -> PyResult<crate::transport_gen::PyCostEstimationResult> {
+    let queries_records: Vec<azoth_process::models::cost_estimation::CostEstimationQuery> = queries
+        .into_iter()
+        .map(
+            |row| azoth_process::models::cost_estimation::CostEstimationQuery {
+                calculation: row.calculation,
+                correlation: row.correlation,
+                capacity: row.capacity,
+                diameter: row.diameter.map(meters),
+                tray_count: row.tray_count,
+                packing_type: row.packing_type,
+                piping_length: row.piping_length.map(meters),
+                piping_schedule: row.piping_schedule,
+                valve_cv: row.valve_cv,
+                purchased_cost: row.purchased_cost,
+                design_pressure: row.design_pressure.map(pascals),
+                pressure_factor: row.pressure_factor,
+                material_factor: row.material_factor,
+                weight: row.weight.map(kilograms),
+                equipment_type: row.equipment_type,
+                material: row.material,
+                region: row.region,
+                currency: row.currency,
+                exchange_rate: row.exchange_rate,
+                amount: row.amount,
+                currency_direction: row.currency_direction,
+                shell_weight: row.shell_weight.map(kilograms),
+                heads_weight: row.heads_weight.map(kilograms),
+                nozzle_count: row.nozzle_count,
+                internals_weight: row.internals_weight.map(kilograms),
+                current_cepci: row.current_cepci,
+                reference_cepci: row.reference_cepci,
+                contingency_factor: row.contingency_factor,
+                engineering_factor: row.engineering_factor,
+            },
+        )
+        .collect();
+    azoth_process::models::cost_estimation::cost_estimation(&queries_records)
+        .map(|r| crate::transport_gen::PyCostEstimationResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Deluge nozzle layout.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

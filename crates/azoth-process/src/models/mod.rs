@@ -52,6 +52,7 @@ pub mod compressor;
 pub mod consequence_analysis;
 pub mod control_valve_failure_relief;
 pub mod cooler;
+pub mod cost_estimation;
 pub mod deluge_nozzle_layout;
 pub mod depressurization;
 pub mod depressurization_acceptance;
@@ -229,6 +230,9 @@ pub use control_valve_failure_relief::{
     ControlValveFailureReliefResult, control_valve_failure_relief,
 };
 pub use cooler::{CoolerResult, cooler};
+pub use cost_estimation::{
+    CostBomRow, CostEstimationQuery, CostEstimationResult, CostEstimationResultRow, cost_estimation,
+};
 pub use deluge_nozzle_layout::{
     DelugeNozzleLayoutResult, GoverningCriterion, deluge_nozzle_layout,
 };

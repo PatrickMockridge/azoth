@@ -5113,6 +5113,11 @@ DUMPERS: dict[str, Dumper] = {
 #: **This is not "the model is too simple to check".** Each entry names the arithmetic and
 #: what would have to exist for there to be a layer.
 NO_INTERIOR: dict[str, str] = {
+    "process.cost_estimation": (
+        "each row is one calculator method - a correlation, a factor lookup or the module "
+        "stack - so the kernel has no composed model beneath it. The cases are the oracle "
+        "and ``process_cost_calculator.tsv`` is their evidence"
+    ),
     "process.real_gas_fanno_release": (
         "the real-gas Fanno march is thousands of PH flashes per state, and its Python "
         "reference takes about sixteen minutes for one case; a layer diff would run it "
@@ -9377,6 +9382,9 @@ LAYER_CASES: tuple[LayerCase, ...] = (
 #: held to the `reference_pin_*` rows instead. Counting them here rather than leaving the
 #: block count open keeps the check exact: a probe row added without a case still fails.
 UNCASED_ROWS: dict[str, int] = {
+    # The calculator's five states - factors, correlations, the module stack, currencies
+    # and the vessel BOM - are the cases' evidence; the id is a `NO_INTERIOR` model.
+    "process_cost_calculator.tsv": 5,
     # The dispersion capture's five: four SRK rows, the class's own tests' cubic kept as
     # evidence beside the PR oracle, and the zero-rate refusal the port raises rather than
     # reproduces.

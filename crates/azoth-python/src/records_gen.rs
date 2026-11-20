@@ -242,6 +242,69 @@ pub struct ConsequenceOutcomeSpec {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct CostEstimationQuery {
+    #[pyo3(item)]
+    pub calculation: String,
+    #[pyo3(item)]
+    pub correlation: Option<String>,
+    #[pyo3(item)]
+    pub capacity: Option<f64>,
+    #[pyo3(item)]
+    pub diameter: Option<f64>,
+    #[pyo3(item)]
+    pub tray_count: Option<f64>,
+    #[pyo3(item)]
+    pub packing_type: Option<String>,
+    #[pyo3(item)]
+    pub piping_length: Option<f64>,
+    #[pyo3(item)]
+    pub piping_schedule: Option<String>,
+    #[pyo3(item)]
+    pub valve_cv: Option<f64>,
+    #[pyo3(item)]
+    pub purchased_cost: Option<f64>,
+    #[pyo3(item)]
+    pub design_pressure: Option<f64>,
+    #[pyo3(item)]
+    pub pressure_factor: Option<f64>,
+    #[pyo3(item)]
+    pub material_factor: Option<f64>,
+    #[pyo3(item)]
+    pub weight: Option<f64>,
+    #[pyo3(item)]
+    pub equipment_type: Option<String>,
+    #[pyo3(item)]
+    pub material: Option<String>,
+    #[pyo3(item)]
+    pub region: Option<String>,
+    #[pyo3(item)]
+    pub currency: Option<String>,
+    #[pyo3(item)]
+    pub exchange_rate: Option<f64>,
+    #[pyo3(item)]
+    pub amount: Option<f64>,
+    #[pyo3(item)]
+    pub currency_direction: Option<String>,
+    #[pyo3(item)]
+    pub shell_weight: Option<f64>,
+    #[pyo3(item)]
+    pub heads_weight: Option<f64>,
+    #[pyo3(item)]
+    pub nozzle_count: Option<f64>,
+    #[pyo3(item)]
+    pub internals_weight: Option<f64>,
+    #[pyo3(item)]
+    pub current_cepci: Option<f64>,
+    #[pyo3(item)]
+    pub reference_cepci: Option<f64>,
+    #[pyo3(item)]
+    pub contingency_factor: Option<f64>,
+    #[pyo3(item)]
+    pub engineering_factor: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct DepositMass {
     #[pyo3(item)]
     pub mechanism: String,

@@ -33,6 +33,7 @@ use crate::models::compressor::CompressorResult;
 use crate::models::consequence_analysis::ConsequenceAnalysisResult;
 use crate::models::control_valve_failure_relief::ControlValveFailureReliefResult;
 use crate::models::cooler::CoolerResult;
+use crate::models::cost_estimation::CostEstimationResult;
 use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::depressurization::DepressurizationResult;
 use crate::models::depressurization_acceptance::DepressurizationAcceptanceResult;
@@ -594,6 +595,15 @@ impl CalcResult for CoolerResult {
         "equilibrium_outlet_temperature",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for CostEstimationResult {
+    const CALC_ID: &'static str = "process.cost_estimation";
+    const FIELDS: &'static [&'static str] = &["queries", "bom", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

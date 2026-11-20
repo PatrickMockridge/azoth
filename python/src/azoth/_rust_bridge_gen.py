@@ -83,6 +83,9 @@ from azoth.core.result import (
     CoolerResult,
     CorrosionSeverity,
     CostaldMolarVolumeResult,
+    CostBomRow,
+    CostEstimationResult,
+    CostEstimationResultRow,
     CriticalPointResult,
     DarcyWeisbachResult,
     DeadheadVerdict,
@@ -589,6 +592,7 @@ __all__ = [
     "control_valve_cv",
     "control_valve_failure_relief",
     "cooler",
+    "cost_estimation",
     "costald_molar_volume",
     "crane_k_factors",
     "critical_point",
@@ -6392,6 +6396,19 @@ def cooler(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
         outlet_duty=from_si(result.outlet_duty.magnitude_si, result.outlet_duty.unit),
         cooling_valve_opening=result.cooling_valve_opening,
         equilibrium_outlet_temperature=None if result.equilibrium_outlet_temperature is None else from_si(result.equilibrium_outlet_temperature.magnitude_si, result.equilibrium_outlet_temperature.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def cost_estimation(queries: list[dict[str, object]]) -> CostEstimationResult:
+    """``process.cost_estimation``, computed in Rust."""
+    spec = _models_gen.model("process.cost_estimation")
+    result = _core.cost_estimation(
+        input_records_to_si(spec, "queries", queries),
+    )
+    return CostEstimationResult(
+        queries=tuple(CostEstimationResultRow(calculation=c.calculation, correlation=c.correlation, purchased_equipment_cost=c.purchased_equipment_cost, pressure_factor=c.pressure_factor, material_factor=c.material_factor, location_factor=c.location_factor, exchange_rate=c.exchange_rate, bare_module_cost=c.bare_module_cost, total_module_cost=c.total_module_cost, grass_roots_cost=c.grass_roots_cost, installation_man_hours=from_si(c.installation_man_hours.magnitude_si, c.installation_man_hours.unit), converted_amount=c.converted_amount, cost_in_usd=c.cost_in_usd, current_cepci=c.current_cepci, reference_cepci=c.reference_cepci, cepci_ratio=c.cepci_ratio, contingency_factor=c.contingency_factor, engineering_factor=c.engineering_factor, installation_factor=c.installation_factor) for c in result.queries),
+        bom=tuple(CostBomRow(item=c.item, material=c.material, quantity=c.quantity, has_quantity=c.has_quantity, unit=c.unit, weight_kg=from_si(c.weight_kg.magnitude_si, c.weight_kg.unit), has_weight=c.has_weight, cost_usd=c.cost_usd, source=c.source) for c in result.bom),
         warnings=_warnings(result.warnings),
     )
 

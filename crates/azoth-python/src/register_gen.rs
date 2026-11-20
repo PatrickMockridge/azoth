@@ -262,6 +262,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyConsequenceAnalysisResult>()?;
     m.add_class::<crate::transport_gen::PyControlValveFailureReliefResult>()?;
     m.add_class::<crate::transport_gen::PyCoolerResult>()?;
+    m.add_class::<crate::transport_gen::PyCostEstimationResult>()?;
     m.add_class::<crate::transport_gen::PyDelugeNozzleLayoutResult>()?;
     m.add_class::<crate::transport_gen::PyDepressurizationResult>()?;
     m.add_class::<crate::transport_gen::PyDepressurizationAcceptanceResult>()?;
@@ -402,6 +403,8 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyChemicalWarningRow>()?;
     m.add_class::<crate::record_outputs_gen::PyComponentSelectiveReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyConsequenceOutcomeResult>()?;
+    m.add_class::<crate::record_outputs_gen::PyCostBomRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyCostEstimationResultRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepressurizationPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyDriftFluxReleaseStation>()?;
@@ -1081,6 +1084,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::cooler, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::cost_estimation, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::deluge_nozzle_layout,
         m

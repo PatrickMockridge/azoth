@@ -536,6 +536,7 @@ NON_UNIT_MODELS = {
         "the S-001 clause 10.4.7 screen over scalars, not a unit"
     ),
     "process.s001_clause10_review": ("the Clause 10 rule review over normalized rows, not a unit"),
+    "process.cost_estimation": "the cost calculator's factor and correlation table, not a unit",
 }
 
 

@@ -263,6 +263,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.consequence_analysis" => azoth_process::models::consequence_analysis::ConsequenceAnalysisResult::FIELDS.to_vec(),
         "process.control_valve_failure_relief" => azoth_process::models::control_valve_failure_relief::ControlValveFailureReliefResult::FIELDS.to_vec(),
         "process.cooler" => azoth_process::models::cooler::CoolerResult::FIELDS.to_vec(),
+        "process.cost_estimation" => azoth_process::models::cost_estimation::CostEstimationResult::FIELDS.to_vec(),
         "process.deluge_nozzle_layout" => azoth_process::models::deluge_nozzle_layout::DelugeNozzleLayoutResult::FIELDS.to_vec(),
         "process.depressurization" => azoth_process::models::depressurization::DepressurizationResult::FIELDS.to_vec(),
         "process.depressurization_acceptance" => azoth_process::models::depressurization_acceptance::DepressurizationAcceptanceResult::FIELDS.to_vec(),

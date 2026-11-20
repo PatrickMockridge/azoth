@@ -361,6 +361,7 @@ import neqsim.process.safety.vibration.FlowInducedPulsationResult;
 import neqsim.process.safety.vibration.FlowInducedPulsationScreening;
 import neqsim.process.safety.vibration.FlowInducedPulsationScreening.AcousticTermination;
 import neqsim.process.safety.vibration.PipingFivScreening;
+import neqsim.process.costestimation.CostEstimationCalculator;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -692,6 +693,9 @@ public class ProcessProbe {
         break;
       case "esd_response_time":
         esdResponseTimeRows();
+        break;
+      case "cost_estimation":
+        costEstimationRows();
         break;
       case "mass_balance_leak_detection":
         massBalanceLeakRows();
@@ -20168,6 +20172,130 @@ public class ProcessProbe {
     System.out.println("allowable_pressure_pa=" + result.allowablePressurePa);
     System.out.println("peak_dynamic_pressure_pa=" + result.peakDynamicPressurePa);
     System.out.println("steady_relief_rate_kg_s=" + result.steadyReliefRateKgPerS);
+    System.out.println();
+  }
+
+  static void costEstimationRows() {
+    CostEstimationCalculator calc = new CostEstimationCalculator();
+
+    System.out.println("cost_factors");
+    double[] pressures = {5.0, 5.0001, 10.0, 20.0, 50.0, 100.0, 150.0, 200.0, 250.0};
+    for (double pressure : pressures) {
+      System.out
+          .println("pressure_factor_" + pressure + "=" + CostEstimationCalculator.getPressureFactor(pressure));
+    }
+    String[] materials = {"Carbon Steel", "SS304", "SS316", "SS316L", "Monel", "Hastelloy C",
+        "Inconel", "Titanium", "Nickel"};
+    for (String material : materials) {
+      calc.setMaterialOfConstruction(material);
+      System.out.println(
+          "material_factor_" + material.replace(' ', '_') + "=" + calc.getMaterialFactor());
+    }
+    calc.setMaterialOfConstruction("Carbon Steel");
+    String[] regions = {"US Gulf Coast", "US Midwest", "US West Coast", "Western Europe",
+        "North Sea / Norway", "Middle East", "Southeast Asia", "China", "Australia", "Brazil",
+        "West Africa"};
+    for (String region : regions) {
+      calc.setLocationByRegion(region);
+      System.out.println("location_factor_" + region.replace(' ', '_').replace('/', '_') + "="
+          + calc.getLocationFactor());
+    }
+    calc.setLocationFactor(1.0);
+    System.out.println("current_cepci=" + calc.getCurrentCepci());
+    System.out.println("material_factor_default=" + calc.getMaterialFactor());
+    System.out.println("installation_factor=" + calc.getInstallationFactor());
+    System.out.println("contingency_factor=" + calc.getContingencyFactor());
+    System.out.println("engineering_factor=" + calc.getEngineeringFactor());
+    System.out.println();
+
+    CostEstimationCalculator corr = new CostEstimationCalculator();
+    System.out.println("cost_correlations");
+    for (double volume : new double[] {0.1, 0.3, 100.0, 520.0, 600.0}) {
+      System.out
+          .println("vertical_vessel_by_volume_" + volume + "=" + corr.calcVerticalVesselCostByVolume(volume));
+    }
+    for (double volume : new double[] {0.1, 100.0, 628.0, 700.0}) {
+      System.out.println(
+          "horizontal_vessel_by_volume_" + volume + "=" + corr.calcHorizontalVesselCostByVolume(volume));
+    }
+    for (double weight : new double[] {250.0, 1000.0, 5000.0, 95000.0}) {
+      System.out.println("vertical_vessel_by_weight_" + weight + "=" + corr.calcVerticalVesselCost(weight));
+    }
+    System.out.println("horizontal_vessel_by_weight_1000=" + corr.calcHorizontalVesselCost(1000.0));
+    for (double area : new double[] {5.0, 10.0, 50.0, 1000.0}) {
+      System.out.println("shell_tube_" + area + "=" + corr.calcShellTubeHeatExchangerCost(area));
+    }
+    System.out.println("plate_50=" + corr.calcPlateHeatExchangerCost(50.0));
+    System.out.println("air_cooler_50=" + corr.calcAirCoolerCost(50.0));
+    System.out.println("sieve_trays_2_20=" + corr.calcSieveTraysCost(2.0, 20));
+    System.out.println("valve_trays_2_20=" + corr.calcValveTraysCost(2.0, 20));
+    System.out.println("bubble_cap_trays_2_20=" + corr.calcBubbleCapTraysCost(2.0, 20));
+    for (String packing : new String[] {"metal", "ceramic", "plastic"}) {
+      System.out.println("packing_10_" + packing + "=" + corr.calcPackingCost(10.0, packing));
+    }
+    for (double power : new double[] {1.0, 300.0, 301.0, 3000.0}) {
+      System.out.println("centrifugal_pump_" + power + "=" + corr.calcCentrifugalPumpCost(power));
+    }
+    for (double power : new double[] {450.0, 1500.0, 3000.0, 3001.0, 30000.0, 240000.0}) {
+      System.out.println("centrifugal_compressor_" + power + "=" + corr.calcCentrifugalCompressorCost(power));
+    }
+    for (double power : new double[] {2000.0, 60000.0}) {
+      System.out.println("reciprocating_compressor_" + power + "=" + corr.calcReciprocatingCompressorCost(power));
+    }
+    for (int schedule : new int[] {40, 80, 160}) {
+      System.out.println(
+          "piping_0.1524_100_" + schedule + "=" + corr.calcPipingCost(0.1524, 100.0, schedule));
+    }
+    for (double cv : new double[] {1.0, 150.0}) {
+      System.out.println("control_valve_" + cv + "=" + corr.calcControlValveCost(cv));
+    }
+    corr.setMaterialOfConstruction("SS316");
+    System.out.println("piping_0.1524_100_80_ss316=" + corr.calcPipingCost(0.1524, 100.0, 80));
+    System.out.println("control_valve_150_ss316=" + corr.calcControlValveCost(150.0));
+    System.out.println();
+
+    CostEstimationCalculator stack = new CostEstimationCalculator();
+    System.out.println("cost_module_stack");
+    double bmcBase = stack.calcBareModuleCost(100000.0, 1.0, 1.0);
+    double bmcHigh = stack.calcBareModuleCost(100000.0, 1.3, 2.1);
+    System.out.println("bare_module_100000_1.0_1.0=" + bmcBase);
+    System.out.println("bare_module_100000_1.3_2.1=" + bmcHigh);
+    System.out.println("bare_module_100000_1.05_2.1=" + stack.calcBareModuleCost(100000.0, 1.05, 2.1));
+    System.out.println("total_module_" + bmcBase + "=" + stack.calcTotalModuleCost(bmcBase));
+    System.out.println("grass_roots_" + bmcBase + "=" + stack.calcGrassRootsCost(bmcBase));
+    String[] types = {"vessel", "exchanger", "pump", "compressor", "column", "other"};
+    for (String type : types) {
+      System.out.println("man_hours_5000_" + type + "=" + stack.calcInstallationManHours(5000.0, type));
+    }
+    System.out.println("piping_man_hours_5000=" + stack.calcPipingInstallationManHours(5000.0));
+    CostEstimationCalculator summary = new CostEstimationCalculator();
+    summary.calculateCostEstimate(50000.0, 50.0, 1000.0, "vessel");
+    System.out.println("summary_purchased=" + summary.getPurchasedEquipmentCost());
+    System.out.println("summary_bare_module=" + summary.getBareModuleCost());
+    System.out.println("summary_total_module=" + summary.getTotalModuleCost());
+    System.out.println("summary_grass_roots=" + summary.getGrassRootsCost());
+    System.out.println();
+
+    CostEstimationCalculator money = new CostEstimationCalculator();
+    System.out.println("cost_currency");
+    for (String code : new String[] {"USD", "EUR", "NOK", "GBP", "CNY", "JPY"}) {
+      money.setCurrencyCode(code);
+      System.out.println("currency_" + code + "_rate=" + money.getExchangeRate());
+      System.out.println("currency_" + code + "_from_usd_1e6=" + money.convertFromUSD(1.0e6));
+      System.out.println("currency_" + code + "_to_usd_1e6=" + money.convertToUSD(1.0e6));
+    }
+    System.out.println();
+
+    System.out.println("cost_vessel_bom");
+    List<Map<String, Object>> bom = stack.generateVesselBOM(1000.0, 200.0, 4, 300.0);
+    for (int i = 0; i < bom.size(); i++) {
+      Map<String, Object> row = bom.get(i);
+      System.out.println("bom_" + i + "_item=" + row.get("item"));
+      System.out.println("bom_" + i + "_material=" + row.get("material"));
+      System.out.println("bom_" + i + "_weight_kg=" + row.get("weight_kg"));
+      System.out.println("bom_" + i + "_quantity=" + row.get("quantity"));
+      System.out.println("bom_" + i + "_unit_cost=" + row.get("unit_cost"));
+    }
     System.out.println();
   }
 }

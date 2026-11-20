@@ -16,25 +16,26 @@
 use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent, PyChemicalWarningRow,
-    PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult, PyDepositionSegmentRow,
-    PyDepressurizationPoint, PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery,
-    PyEnvelopeSummary, PyEquilibriumSoundSpeedSample, PyEscalationItemResult, PyEsdContribution,
-    PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry,
-    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
-    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
-    PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
-    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
-    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
-    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment,
-    PyOpenDrainResult, PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding,
-    PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint,
-    PyPrescribedSlipReleaseStation, PyPulsationModeResult, PyRanzMarshallReleaseStation,
-    PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
-    PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
-    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult,
-    PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult, PyCostBomRow,
+    PyCostEstimationResultRow, PyDepositionSegmentRow, PyDepressurizationPoint,
+    PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery, PyEnvelopeSummary,
+    PyEquilibriumSoundSpeedSample, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
+    PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
+    PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
+    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
+    PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent,
+    PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation,
+    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
+    PyMinimalCutSet, PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
+    PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyP002FindingResult,
+    PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument, PyPerformanceSif,
+    PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation, PyPulsationModeResult,
+    PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation, PyRegisterFinding,
+    PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage,
+    PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
+    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
     PyTr3001Finding, PyTrappedInventorySegmentResult, PyVesselFillingPoint, PyVesselRuptureStep,
     PyWaterMixingResult, PyZoneRatingRow,
 };
@@ -16000,6 +16001,53 @@ impl From<&azoth_process::models::cooler::CoolerResult> for PyCoolerResult {
                 magnitude_si: v.value,
                 unit: "K".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.cost_estimation`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "CostEstimationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyCostEstimationResult {
+    /// one row per input row, in caller order.
+    #[pyo3(get)]
+    pub queries: Vec<PyCostEstimationResultRow>,
+    /// the vessel bill of materials, one row per line the class adds.
+    #[pyo3(get)]
+    pub bom: Vec<PyCostBomRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyCostEstimationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "CostEstimationResult(queries={:?}, bom={:?}, {} warning(s))",
+            self.queries,
+            self.bom,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::cost_estimation::CostEstimationResult>
+    for PyCostEstimationResult
+{
+    fn from(r: &azoth_process::models::cost_estimation::CostEstimationResult) -> Self {
+        Self {
+            queries: r
+                .queries
+                .iter()
+                .map(PyCostEstimationResultRow::from)
+                .collect(),
+            bom: r.bom.iter().map(PyCostBomRow::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

@@ -23,6 +23,7 @@
 //!   - specs/models/process/consequence_analysis.toml
 //!   - specs/models/process/control_valve_failure_relief.toml
 //!   - specs/models/process/cooler.toml
+//!   - specs/models/process/cost_estimation.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/depressurization.toml
 //!   - specs/models/process/depressurization_acceptance.toml
@@ -27731,6 +27732,1787 @@ pub static COOLER_SPEC: ModelSpec = ModelSpec {
     algorithm: None,
     checks: COOLER_CHECKS,
     cases: COOLER_CASES,
+};
+
+static COST_ESTIMATION_CHECKS: &[SpecCheck] = &[];
+
+static COST_ESTIMATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "factor_boundaries",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "queries",
+            &[
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("pressure_factor"),
+                    },
+                    RecordField {
+                        name: "design_pressure",
+                        value: FieldValue::Number(5.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("pressure_factor"),
+                    },
+                    RecordField {
+                        name: "design_pressure",
+                        value: FieldValue::Number(50.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("material_factor"),
+                    },
+                    RecordField {
+                        name: "material",
+                        value: FieldValue::Name("ss316"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("location_factor"),
+                    },
+                    RecordField {
+                        name: "region",
+                        value: FieldValue::Name("north_sea"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("currency_conversion"),
+                    },
+                    RecordField {
+                        name: "amount",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "currency",
+                        value: FieldValue::Name("eur"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("piping_man_hours"),
+                    },
+                    RecordField {
+                        name: "weight",
+                        value: FieldValue::Number(5000.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "queries",
+            &[
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("pressure_factor"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name(""),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("pressure_factor"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name(""),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.3),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("material_factor"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name(""),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(2.1),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("location_factor"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name(""),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.35),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("currency_conversion"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name(""),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(0.92),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(920000.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("piping_man_hours"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name(""),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(500.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "correlations",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "queries",
+            &[
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("vertical_vessel_by_volume"),
+                    },
+                    RecordField {
+                        name: "capacity",
+                        value: FieldValue::Number(100.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("horizontal_vessel_by_volume"),
+                    },
+                    RecordField {
+                        name: "capacity",
+                        value: FieldValue::Number(100.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("shell_tube"),
+                    },
+                    RecordField {
+                        name: "capacity",
+                        value: FieldValue::Number(50.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("centrifugal_compressor"),
+                    },
+                    RecordField {
+                        name: "capacity",
+                        value: FieldValue::Number(1500.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("piping"),
+                    },
+                    RecordField {
+                        name: "diameter",
+                        value: FieldValue::Number(0.1524),
+                    },
+                    RecordField {
+                        name: "piping_length",
+                        value: FieldValue::Number(100.0),
+                    },
+                    RecordField {
+                        name: "piping_schedule",
+                        value: FieldValue::Name("80"),
+                    },
+                    RecordField {
+                        name: "material",
+                        value: FieldValue::Name("ss316"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("control_valve"),
+                    },
+                    RecordField {
+                        name: "valve_cv",
+                        value: FieldValue::Number(150.0),
+                    },
+                    RecordField {
+                        name: "material",
+                        value: FieldValue::Name("ss316"),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "queries",
+            &[
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("vertical_vessel_by_volume"),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(92200.44216287117),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("horizontal_vessel_by_volume"),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(65227.84098527246),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("shell_tube"),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(26442.288629302795),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("centrifugal_compressor"),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(519033.7321337709),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("piping"),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(320066.6597236687),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(2.1),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("correlation"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name("control_valve"),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(114220.09043285412),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(2.1),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "module_stack_and_summary",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "queries",
+            &[
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("module_stack"),
+                    },
+                    RecordField {
+                        name: "purchased_cost",
+                        value: FieldValue::Number(100000.0),
+                    },
+                    RecordField {
+                        name: "design_pressure",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "material",
+                        value: FieldValue::Name("ss316"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("summary"),
+                    },
+                    RecordField {
+                        name: "purchased_cost",
+                        value: FieldValue::Number(50000.0),
+                    },
+                    RecordField {
+                        name: "design_pressure",
+                        value: FieldValue::Number(50.0),
+                    },
+                    RecordField {
+                        name: "weight",
+                        value: FieldValue::Number(1000.0),
+                    },
+                    RecordField {
+                        name: "equipment_type",
+                        value: FieldValue::Name("vessel"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("installation_man_hours"),
+                    },
+                    RecordField {
+                        name: "weight",
+                        value: FieldValue::Number(5000.0),
+                    },
+                    RecordField {
+                        name: "equipment_type",
+                        value: FieldValue::Name("compressor"),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "queries",
+            &[
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("module_stack"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name(""),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(100000.0),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.05),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(2.1),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(486675.00000000006),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(608343.7500000001),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(912515.6250000002),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("summary"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name(""),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(50000.0),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.3),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(182250.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(227812.5),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(341718.75),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("installation_man_hours"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name(""),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(300.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "vessel_bom",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "queries",
+            &[&[
+                RecordField {
+                    name: "calculation",
+                    value: FieldValue::Name("vessel_bom"),
+                },
+                RecordField {
+                    name: "shell_weight",
+                    value: FieldValue::Number(1000.0),
+                },
+                RecordField {
+                    name: "heads_weight",
+                    value: FieldValue::Number(200.0),
+                },
+                RecordField {
+                    name: "nozzle_count",
+                    value: FieldValue::Number(4.0),
+                },
+                RecordField {
+                    name: "internals_weight",
+                    value: FieldValue::Number(300.0),
+                },
+                RecordField {
+                    name: "material",
+                    value: FieldValue::Name("carbon_steel"),
+                },
+            ]],
+        )],
+        expected_records: &[
+            (
+                "queries",
+                &[&[
+                    RecordField {
+                        name: "calculation",
+                        value: FieldValue::Name("vessel_bom"),
+                    },
+                    RecordField {
+                        name: "correlation",
+                        value: FieldValue::Name(""),
+                    },
+                    RecordField {
+                        name: "purchased_equipment_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "material_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "location_factor",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "exchange_rate",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "bare_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "total_module_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "grass_roots_cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "installation_man_hours",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "converted_amount",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "cost_in_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "current_cepci",
+                        value: FieldValue::Number(840.0),
+                    },
+                    RecordField {
+                        name: "reference_cepci",
+                        value: FieldValue::Number(607.5),
+                    },
+                    RecordField {
+                        name: "cepci_ratio",
+                        value: FieldValue::Number(1.382716049382716),
+                    },
+                    RecordField {
+                        name: "contingency_factor",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "engineering_factor",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "installation_factor",
+                        value: FieldValue::Number(3.0),
+                    },
+                ]],
+            ),
+            (
+                "bom",
+                &[
+                    &[
+                        RecordField {
+                            name: "item",
+                            value: FieldValue::Name("Vessel Shell"),
+                        },
+                        RecordField {
+                            name: "material",
+                            value: FieldValue::Name("Carbon Steel"),
+                        },
+                        RecordField {
+                            name: "quantity",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "has_quantity",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "unit",
+                            value: FieldValue::Name(""),
+                        },
+                        RecordField {
+                            name: "weight_kg",
+                            value: FieldValue::Number(1000.0),
+                        },
+                        RecordField {
+                            name: "has_weight",
+                            value: FieldValue::Flag(true),
+                        },
+                        RecordField {
+                            name: "cost_usd",
+                            value: FieldValue::Number(535037.5394461319),
+                        },
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name(""),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item",
+                            value: FieldValue::Name("Vessel Heads (2)"),
+                        },
+                        RecordField {
+                            name: "material",
+                            value: FieldValue::Name("Carbon Steel"),
+                        },
+                        RecordField {
+                            name: "quantity",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "has_quantity",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "unit",
+                            value: FieldValue::Name(""),
+                        },
+                        RecordField {
+                            name: "weight_kg",
+                            value: FieldValue::Number(200.0),
+                        },
+                        RecordField {
+                            name: "has_weight",
+                            value: FieldValue::Flag(true),
+                        },
+                        RecordField {
+                            name: "cost_usd",
+                            value: FieldValue::Number(1600.0),
+                        },
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name(""),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item",
+                            value: FieldValue::Name("Nozzles"),
+                        },
+                        RecordField {
+                            name: "material",
+                            value: FieldValue::Name(""),
+                        },
+                        RecordField {
+                            name: "quantity",
+                            value: FieldValue::Number(4.0),
+                        },
+                        RecordField {
+                            name: "has_quantity",
+                            value: FieldValue::Flag(true),
+                        },
+                        RecordField {
+                            name: "unit",
+                            value: FieldValue::Name(""),
+                        },
+                        RecordField {
+                            name: "weight_kg",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "has_weight",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "cost_usd",
+                            value: FieldValue::Number(2000.0),
+                        },
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name(""),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "item",
+                            value: FieldValue::Name("Internals"),
+                        },
+                        RecordField {
+                            name: "material",
+                            value: FieldValue::Name("Carbon Steel"),
+                        },
+                        RecordField {
+                            name: "quantity",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "has_quantity",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "unit",
+                            value: FieldValue::Name(""),
+                        },
+                        RecordField {
+                            name: "weight_kg",
+                            value: FieldValue::Number(300.0),
+                        },
+                        RecordField {
+                            name: "has_weight",
+                            value: FieldValue::Flag(true),
+                        },
+                        RecordField {
+                            name: "cost_usd",
+                            value: FieldValue::Number(4500.0),
+                        },
+                        RecordField {
+                            name: "source",
+                            value: FieldValue::Name(""),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+];
+
+static COST_ESTIMATION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "cost_correlation_dispatch",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: Some("first_query_in_caller_order"),
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.cost_estimation`.
+pub static COST_ESTIMATION_SPEC: ModelSpec = ModelSpec {
+    id: "process.cost_estimation",
+    kind: "procedure",
+    algorithm: Some(&COST_ESTIMATION_ALGORITHM),
+    checks: COST_ESTIMATION_CHECKS,
+    cases: COST_ESTIMATION_CASES,
 };
 
 static DELUGE_NOZZLE_LAYOUT_CHECKS: &[SpecCheck] = &[
@@ -102117,6 +103899,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &CONSEQUENCE_ANALYSIS_SPEC,
     &CONTROL_VALVE_FAILURE_RELIEF_SPEC,
     &COOLER_SPEC,
+    &COST_ESTIMATION_SPEC,
     &DELUGE_NOZZLE_LAYOUT_SPEC,
     &DEPRESSURIZATION_SPEC,
     &DEPRESSURIZATION_ACCEPTANCE_SPEC,

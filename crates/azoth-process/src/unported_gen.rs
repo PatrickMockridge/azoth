@@ -23,6 +23,7 @@
 //!   - specs/models/process/consequence_analysis.toml
 //!   - specs/models/process/control_valve_failure_relief.toml
 //!   - specs/models/process/cooler.toml
+//!   - specs/models/process/cost_estimation.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/depressurization.toml
 //!   - specs/models/process/depressurization_acceptance.toml
