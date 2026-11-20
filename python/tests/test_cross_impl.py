@@ -94,11 +94,6 @@ def _convergence_tolerance(
     return h.convergence_tolerance(spec_, case)
 
 
-@pytest.mark.parametrize(
-    ("model", "case"),
-    MODEL_CASES,
-    ids=lambda x: x["id"] if isinstance(x, dict) else "",
-)
 def assert_model_agrees(model: dict[str, Any], case: dict[str, Any]) -> None:
     """Run one model case through both implementations and compare.
 
@@ -121,6 +116,11 @@ def assert_model_agrees(model: dict[str, Any], case: dict[str, Any]) -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("model", "case"),
+    MODEL_CASES,
+    ids=lambda x: x["id"] if isinstance(x, dict) else "",
+)
 def test_python_and_rust_agree_on_models(model: dict[str, Any], case: dict[str, Any]) -> None:
     """Run one model case through both implementations and compare."""
     assert_model_agrees(model, case)
