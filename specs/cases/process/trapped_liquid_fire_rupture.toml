@@ -1,0 +1,136 @@
+model = "process.trapped_liquid_fire_rupture"
+[[cases]]
+id = "no_failure"
+tolerance = 1.0e-9
+source = "A 50 bar, 300 K, 10 m3 two-phase inventory on a 0.1 m, 10 m pipe at a 10 kW/m2 fixed flux for 20 s with the vapor-pocket test off: no event. From `validation/neqsim/captures/process_trapped_liquid_fire_rupture.tsv` (`tlf_no_failure`)."
+[cases.inputs]
+components = ["methane", "ethane", "n-butane"]
+z = [0.5, 0.3, 0.2]
+inventory_pressure = 5000000.0
+inventory_temperature = 300.0
+inventory_liquid_mass = 2246.059130169441
+inventory_total_mass = 2556.756576013232
+inventory_total_volume = 10.0
+pipe_internal_diameter = 0.1
+wall_thickness = 0.01
+exposed_length = 10.0
+fire_type = "fixed_heat_flux"
+fire_heat_flux = 10000.0
+max_time = 20.0
+time_step = 2.0
+vapor_pocket_detection = false
+[cases.expected]
+segment_id = "trapped-segment"
+limiting_failure_mode = "none"
+final_pressure = 5012760.306260937
+final_liquid_temperature = 300.01519084078683
+final_outer_wall_temperature = 305.30679875134905
+[[cases]]
+id = "flange_failure"
+tolerance = 1.0e-9
+source = "A 10 bar inventory on a 0.1 m, 10 m pipe, class 150 flange and a 500 kW/m2 fixed flux: the flange fails at 22 s. From (`tlf_flange`)."
+[cases.inputs]
+components = ["methane", "ethane", "n-butane"]
+z = [0.5, 0.3, 0.2]
+inventory_pressure = 1000000.0
+inventory_temperature = 300.0
+inventory_liquid_mass = 4000.0
+inventory_total_mass = 4061.735103001965
+inventory_total_volume = 10.0
+pipe_internal_diameter = 0.1
+wall_thickness = 0.01
+exposed_length = 10.0
+fire_type = "fixed_heat_flux"
+fire_heat_flux = 500000.0
+flange_class = "150"
+max_time = 600.0
+time_step = 2.0
+[cases.expected]
+limiting_failure_mode = "flange_failure"
+time_to_flange_failure = 22.0
+minimum_failure_time = 22.0
+final_pressure = 1465832.210042704
+final_liquid_temperature = 300.55456215481274
+final_outer_wall_temperature = 586.9348854255791
+[[cases]]
+id = "pipe_rupture"
+tolerance = 1.0e-9
+source = "The 50 bar inventory with no flange and a 500 kW/m2 fixed flux: the pipe ruptures at 62 s. From (`tlf_pipe`)."
+[cases.inputs]
+components = ["methane", "ethane", "n-butane"]
+z = [0.5, 0.3, 0.2]
+inventory_pressure = 5000000.0
+inventory_temperature = 300.0
+inventory_liquid_mass = 2246.059130169441
+inventory_total_mass = 2556.756576013232
+inventory_total_volume = 10.0
+pipe_internal_diameter = 0.1
+wall_thickness = 0.01
+exposed_length = 10.0
+fire_type = "fixed_heat_flux"
+fire_heat_flux = 500000.0
+max_time = 600.0
+time_step = 2.0
+[cases.expected]
+limiting_failure_mode = "pipe_rupture"
+time_to_pipe_rupture = 62.0
+minimum_failure_time = 62.0
+final_pressure = 10333528.154974353
+final_liquid_temperature = 306.3494382797314
+final_outer_wall_temperature = 893.3867869221738
+[[cases]]
+id = "relief_set"
+tolerance = 1.0e-9
+source = "The 50 bar inventory with the relief set at 60 bar and limiting: the relief set at 26 s and the pipe still ruptures at 74 s with the pressure capped. From (`tlf_relief`)."
+[cases.inputs]
+components = ["methane", "ethane", "n-butane"]
+z = [0.5, 0.3, 0.2]
+inventory_pressure = 5000000.0
+inventory_temperature = 300.0
+inventory_liquid_mass = 2246.059130169441
+inventory_total_mass = 2556.756576013232
+inventory_total_volume = 10.0
+pipe_internal_diameter = 0.1
+wall_thickness = 0.01
+exposed_length = 10.0
+fire_type = "fixed_heat_flux"
+fire_heat_flux = 500000.0
+relief_set_pressure = 6000000.0
+relief_limits_pressure = true
+max_time = 600.0
+time_step = 2.0
+[cases.expected]
+limiting_failure_mode = "pipe_rupture"
+time_to_relief_set = 26.0
+time_to_pipe_rupture = 74.0
+minimum_failure_time = 74.0
+final_pressure = 6000000.0
+final_liquid_temperature = 308.6854551230138
+final_outer_wall_temperature = 958.4451062177354
+[[cases]]
+id = "pfp_factor"
+tolerance = 1.0e-9
+source = "The 50 bar inventory with a passive-protection factor of 0.3: the pipe ruptures at 520 s. From (`tlf_pfp`)."
+[cases.inputs]
+components = ["methane", "ethane", "n-butane"]
+z = [0.5, 0.3, 0.2]
+inventory_pressure = 5000000.0
+inventory_temperature = 300.0
+inventory_liquid_mass = 2246.059130169441
+inventory_total_mass = 2556.756576013232
+inventory_total_volume = 10.0
+pipe_internal_diameter = 0.1
+wall_thickness = 0.01
+exposed_length = 10.0
+fire_type = "fixed_heat_flux"
+fire_heat_flux = 500000.0
+passive_protection_factor = 0.3
+max_time = 600.0
+time_step = 2.0
+[cases.expected]
+limiting_failure_mode = "pipe_rupture"
+time_to_pipe_rupture = 520.0
+minimum_failure_time = 520.0
+final_pressure = 41687831.037177796
+final_liquid_temperature = 343.67598932997356
+final_outer_wall_temperature = 642.2964759288351

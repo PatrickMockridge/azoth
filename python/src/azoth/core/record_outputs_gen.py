@@ -1624,6 +1624,35 @@ class RiskAssessmentRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class RupturePoint:
+    """the recorded time series, one row per step, the failure step included."""
+
+    #: the step's time.
+    time: Q
+
+    #: the step's absolute pressure.
+    pressure: Q
+
+    #: the step's liquid temperature.
+    liquid_temperature: Q
+
+    #: the inner wall surface's temperature.
+    inner_wall_temperature: Q
+
+    #: the outer wall surface's temperature.
+    outer_wall_temperature: Q
+
+    #: the thin-wall von Mises stress.
+    von_mises_stress: Q
+
+    #: the temperature-retained allowable stress.
+    allowable_stress: Q
+
+    #: the temperature-reduced flange rating.
+    flange_rating: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SafeChartItem:
     """one row per classified equipment, in caller order."""
 

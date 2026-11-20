@@ -203,6 +203,9 @@ import neqsim.process.safety.esd.EsdResponseTimeSimulator.EsdResponseTimeResult;
 import neqsim.process.safety.envelope.SafetyEnvelope;
 import neqsim.process.safety.envelope.SafetyEnvelopeCalculator;
 import neqsim.process.safety.inventory.TrappedInventoryCalculator;
+import neqsim.process.safety.rupture.FireExposureScenario;
+import neqsim.process.safety.rupture.TrappedLiquidFireRuptureStudy;
+import neqsim.process.safety.rupture.TrappedLiquidFireRuptureResult;
 import neqsim.process.safety.leakdetection.MassBalanceLeakDetector;
 import neqsim.process.safety.leakdetection.MassBalanceLeakDetector.LeakDetectionSensitivityResult;
 import neqsim.process.safety.dispersion.ToxicLibrary;
@@ -685,6 +688,9 @@ public class ProcessProbe {
         break;
       case "safety_envelope":
         safetyEnvelopeRows();
+        break;
+      case "trapped_liquid_fire_rupture":
+        trappedLiquidRows();
         break;
       case "gas_blowby":
         gasBlowbyRows();
@@ -18255,6 +18261,96 @@ public class ProcessProbe {
     SafetyEnvelope most = SafetyEnvelopeCalculator.getMostLimitingEnvelope(array,
         operatingPressureBara, operatingTemperatureK);
     System.out.println("most_limiting=" + (most == null ? "none" : most.getName()));
+    System.out.println();
+  }
+
+
+  static TrappedInventoryCalculator.InventoryResult ruptureInventory(double pressureBara) {
+    String[] names = {"methane", "ethane", "n-butane"};
+    double[] z = {0.5, 0.3, 0.2};
+    TrappedInventoryCalculator calculator = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(false, names, z, 300.0, pressureBara, false))
+        .setOperatingConditions(pressureBara, 300.0)
+        .addEquipmentVolume("SEG-1", 10.0, 0.5, inventoryEvidence("SEG-1"));
+    return calculator.calculate();
+  }
+
+  static SystemInterface ruptureFluid() {
+    String[] names = {"methane", "ethane", "n-butane"};
+    double[] z = {0.5, 0.3, 0.2};
+    return inventoryFluid(false, names, z, 300.0, 50.0, false);
+  }
+
+  static TrappedLiquidFireRuptureStudy buildRupture(double pressureBara, int flangeClass,
+      double flux, double maxTime, boolean relief, boolean vapor) {
+    double area = Math.PI * 0.12 * 10.0;
+    TrappedLiquidFireRuptureStudy.Builder builder = TrappedLiquidFireRuptureStudy.builder()
+        .segmentId("SEG-1").inventory(ruptureInventory(pressureBara)).fluid(ruptureFluid())
+        .pipeGeometry(0.1, 0.01, 10.0).flangeClass(flangeClass)
+        .fireScenario(FireExposureScenario.fixedHeatFlux(area, flux)).timeControls(maxTime, 2.0)
+        .vaporPocketDetectionEnabled(vapor);
+    if (relief) {
+      builder.reliefSetPressure(60.0, "bara", true);
+    }
+    return builder.build();
+  }
+
+  static void trappedLiquidRows() {
+    System.out.println("inventory_preamble");
+    for (double pressure : new double[] {10.0, 50.0}) {
+      TrappedInventoryCalculator.InventoryResult inventory = ruptureInventory(pressure);
+      System.out.println("inventory_" + (int) pressure + "_liquid_mass_kg="
+          + inventory.getTotalLiquidMassKg());
+      System.out.println("inventory_" + (int) pressure + "_total_mass_kg="
+          + inventory.getTotalMassKg());
+      System.out.println("inventory_" + (int) pressure + "_volume_m3="
+          + inventory.getTotalVolumeM3());
+    }
+    System.out.println();
+    printRupture("tlf_no_failure", buildRupture(50.0, 0, 10000.0, 20.0, false, false).run());
+    printRupture("tlf_flange", buildRupture(10.0, 150, 500000.0, 600.0, false, true).run());
+    printRupture("tlf_pipe", buildRupture(50.0, 0, 500000.0, 600.0, false, true).run());
+    printRupture("tlf_relief", buildRupture(50.0, 0, 500000.0, 600.0, true, true).run());
+    // The passive factor is a copy of the scenario, applied before the run.
+    double area = Math.PI * 0.12 * 10.0;
+    TrappedLiquidFireRuptureStudy pfpStudy = TrappedLiquidFireRuptureStudy.builder()
+        .segmentId("SEG-1").inventory(ruptureInventory(50.0)).fluid(ruptureFluid())
+        .pipeGeometry(0.1, 0.01, 10.0).flangeClass(0)
+        .fireScenario(FireExposureScenario.fixedHeatFlux(area, 500000.0).withPassiveProtectionFactor(0.3))
+        .timeControls(600.0, 2.0).build();
+    printRupture("tlf_pfp", pfpStudy.run());
+    printRupture("tlf_vapor", buildRupture(50.0, 0, 500000.0, 600.0, false, true).run());
+    System.out.println();
+  }
+
+  @SuppressWarnings("unchecked")
+  static void printRupture(String label, TrappedLiquidFireRuptureResult result) {
+    System.out.println(label);
+    System.out.println("segment_id=" + result.getSegmentId());
+    System.out.println("limiting_failure_mode=" + result.getLimitingFailureMode());
+    System.out.println("rupture_predicted=" + result.isRupturePredicted());
+    System.out.println("time_to_relief_set_s=" + result.getTimeToReliefSetSeconds());
+    System.out.println("time_to_vapor_pocket_s=" + result.getTimeToVaporPocketSeconds());
+    System.out.println("time_to_pipe_rupture_s=" + result.getTimeToPipeRuptureSeconds());
+    System.out.println("time_to_flange_failure_s=" + result.getTimeToFlangeFailureSeconds());
+    System.out.println("minimum_failure_time_s=" + result.getMinimumFailureTimeSeconds());
+    System.out.println("final_pressure_bara=" + result.getFinalPressureBara());
+    System.out.println("final_liquid_temperature_k=" + result.getFinalLiquidTemperatureK());
+    System.out.println("final_outer_wall_temperature_k=" + result.getFinalOuterWallTemperatureK());
+    System.out.println("warning_count=" + result.getWarnings().size());
+    for (int i = 0; i < result.getWarnings().size(); i++) {
+      System.out.println("warning_" + i + "=" + result.getWarnings().get(i));
+    }
+    System.out.println("recommendation_count=" + result.getRecommendations().size());
+    Map<String, Object> map = result.toMap();
+    Map<String, Object> series = (Map<String, Object>) map.get("timeSeries");
+    System.out.println("point_count=" + result.getTimeSeconds().size());
+    for (Map.Entry<String, Object> entry : series.entrySet()) {
+      List<Double> values = (List<Double>) entry.getValue();
+      for (int i = 0; i < values.size(); i++) {
+        System.out.println("series_" + entry.getKey() + "_" + i + "=" + values.get(i));
+      }
+    }
     System.out.println();
   }
 

@@ -3766,6 +3766,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 4,
         "tests_skipped": 0,
     },
+    'process.trapped_liquid_fire_rupture': {
+        "calc_id": 'process.trapped_liquid_fire_rupture',
+        "name": 'Trapped-liquid fire rupture',
+        "spec": {'path': 'specs/models/process/trapped_liquid_fire_rupture.toml', 'sha256': '342edce0ce7d89fdb5789cd17848a5ac991f7ef75d38304134b4ee3e56a323ab'},
+        "code": [{'path': 'python/src/azoth/process/reference/trapped_liquid_fire_rupture.py', 'sha256': '47c46cac2ceeab105217dbcbce34705d0ecc474e17affe595af23b7f974c96db'}, {'path': 'crates/azoth-process/src/models/trapped_liquid_fire_rupture.rs', 'sha256': '135a0ac2e14b32bd8843ba17901db9cf913fa7b94897c1af6879ab5c9c9b10e3'}],
+        "source": 'NeqSim process/safety/rupture/TrappedLiquidFireRuptureStudy.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 5,
+        "tests_skipped": 0,
+    },
     'process.tube_rupture_relief': {
         "calc_id": 'process.tube_rupture_relief',
         "name": 'Tube rupture relief',

@@ -159,6 +159,10 @@ KNOWN_SIGNATURE_DRIFT = frozenset(
         # this list when its wrapper was generated: the hand-written one omitted `alpha_params`
         # from its `text_signature`, so the stub was right and the human-readable signature was
         # the half that was wrong.
+        # **A model whose spec declares `eos` and `multiphase_check` before the inventory
+        # scalars.** The stub renders required parameters first; the `#[pyfunction]` follows the
+        # spec's declaration order, so the two lists are the same names in a different order.
+        "trapped_liquid_fire_rupture",
         "aqueous_viscosity",
         # **A calc, and the only entry here that is a *reordering* rather than a renaming.** The
         # spec declares `(reaction, source, T)`, the kernel and the `#[pyfunction]` take

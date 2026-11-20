@@ -360,6 +360,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyToxicLibraryResult>()?;
     m.add_class::<crate::transport_gen::PyTr3001ComplianceResult>()?;
     m.add_class::<crate::transport_gen::PyTrappedInventoryResult>()?;
+    m.add_class::<crate::transport_gen::PyTrappedLiquidFireRuptureResult>()?;
     m.add_class::<crate::transport_gen::PyTubeRuptureReliefResult>()?;
     m.add_class::<crate::transport_gen::PyTurboExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyVacuumCollapseResult>()?;
@@ -450,6 +451,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyReviewCoverage>()?;
     m.add_class::<crate::record_outputs_gen::PyReviewVerdict>()?;
     m.add_class::<crate::record_outputs_gen::PyRiskAssessmentRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyRupturePoint>()?;
     m.add_class::<crate::record_outputs_gen::PySafeChartItem>()?;
     m.add_class::<crate::record_outputs_gen::PySafeChartMissingDevice>()?;
     m.add_class::<crate::record_outputs_gen::PyScaleControlRiskRow>()?;
@@ -1283,6 +1285,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::toxic_library, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::tr3001_compliance, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::trapped_inventory, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::trapped_liquid_fire_rupture,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::tube_rupture_relief,
         m

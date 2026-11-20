@@ -472,6 +472,7 @@ NON_UNIT_MODELS = {
     "process.mass_balance_leak_detection": "the mass-balance leak sensitivity over scalars, not a unit",
     "process.trapped_inventory": "a trapped inventory over documented segments, not a unit",
     "process.safety_envelope": "the five safety curves over a fluid, not a unit",
+    "process.trapped_liquid_fire_rupture": "a trapped-liquid fire rupture transient over a fluid, not a unit",
     "process.vessel_filling": "a vessel filling transient over a fluid, not a unit",
     "process.blocked_outlet_overpressure": "the blocked-outlet build-up over a fluid, not a unit",
     "process.non_equilibrium_blowdown": "the two-zone blowdown over a fluid, not a unit",

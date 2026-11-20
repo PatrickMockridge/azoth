@@ -342,6 +342,7 @@
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/trapped_inventory.toml
+//!   - specs/models/process/trapped_liquid_fire_rupture.toml
 //!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vacuum_collapse.toml
@@ -6328,6 +6329,149 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.trapped_inventory",
         "fallback_liquid_density",
         "mass_density",
+    ),
+    ("process.trapped_liquid_fire_rupture", "z", "dimensionless"),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inventory_pressure",
+        "pressure",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inventory_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inventory_liquid_mass",
+        "mass",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inventory_total_mass",
+        "mass",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inventory_total_volume",
+        "volume",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "environmental_factor",
+        "dimensionless",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "fire_heat_flux",
+        "heat_flux_density",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "fire_emissivity",
+        "dimensionless",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "fire_view_factor",
+        "dimensionless",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "flame_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "ambient_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "passive_protection_factor",
+        "dimensionless",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "fire_exposed_area",
+        "area",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "ambient_tensile_strength",
+        "pressure",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "pipe_internal_diameter",
+        "length",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "wall_thickness",
+        "length",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "exposed_length",
+        "length",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "relief_set_pressure",
+        "pressure",
+    ),
+    ("process.trapped_liquid_fire_rupture", "max_time", "time"),
+    ("process.trapped_liquid_fire_rupture", "time_step", "time"),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "wall_density",
+        "mass_density",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "wall_heat_capacity",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "wall_conductivity",
+        "thermal_conductivity",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "liquid_heat_capacity",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "liquid_expansion",
+        "per_temperature",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "liquid_bulk_modulus",
+        "pressure",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inner_htc",
+        "heat_transfer",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "outer_htc",
+        "heat_transfer",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "tensile_strength_factor",
+        "dimensionless",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "wall_nodes",
+        "dimensionless",
     ),
     (
         "process.tube_rupture_relief",

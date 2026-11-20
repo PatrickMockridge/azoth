@@ -3271,3 +3271,19 @@ arm: it is a failed all-zero curve on the hydrate fluid and a low-pressure branc
 two, so the port takes the curve as a supplied trace and its own generated branch is not
 carried. The MDMT gamma is the port's EOS capacity ratio and runs up to `2.3e-1` below the
 class's at the top of the hydrate range; the case says so.
+
+## The trapped-liquid fire rupture
+
+`process_trapped_liquid_fire_rupture.tsv` is `TrappedLiquidFireRuptureStudy.run` on a 50 bar
+two-phase inventory and a 10 bar one, with the no-failure, flange, pipe, relief, passive-
+protection and vapor-pocket states; the preamble prints the two inventories' masses.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe trapped_liquid_fire_rupture \
+  > captures/process_trapped_liquid_fire_rupture.tsv
+```
+
+The wall is the class's explicit finite difference and the march records the point before the
+events, so the failure step is the last row. The vapor-pocket state's event is at `0` s, where
+the flashed inventory already carries gas; the pressure rise is `K beta dT` and the relief caps
+it only when `reliefLimitsPressure` is true.

@@ -1736,6 +1736,19 @@ class TrappedInventorySegmentResult:
     length: Qty | None
 
 @final
+class RupturePoint:
+    """the recorded time series, one row per step, the failure step included."""
+
+    time: Qty
+    pressure: Qty
+    liquid_temperature: Qty
+    inner_wall_temperature: Qty
+    outer_wall_temperature: Qty
+    von_mises_stress: Qty
+    allowable_stress: Qty
+    flange_rating: Qty
+
+@final
 class VesselFillingPoint:
     """one row per step, in time order."""
 
@@ -5778,6 +5791,24 @@ class TrappedInventoryResult:
     total_liquid_mass: Qty
     total_mass: Qty
     segments: list[TrappedInventorySegmentResult]
+    warnings: list[Warning]
+
+@final
+class TrappedLiquidFireRuptureResult:
+    segment_id: str
+    trajectory: list[RupturePoint]
+    limiting_failure_mode: FailureMode
+    rupture_predicted: bool
+    time_to_relief_set: Qty | None
+    time_to_vapor_pocket: Qty | None
+    time_to_pipe_rupture: Qty | None
+    time_to_flange_failure: Qty | None
+    minimum_failure_time: Qty | None
+    final_pressure: Qty
+    final_liquid_temperature: Qty
+    final_outer_wall_temperature: Qty
+    standards_applied: list[str]
+    recommendations: list[str]
     warnings: list[Warning]
 
 @final
@@ -9844,6 +9875,48 @@ def trapped_inventory(
     fallback_liquid_density: float | None = None,
     segment_evidence: list[TrappedInventoryEvidence] | None = None,
 ) -> TrappedInventoryResult: ...
+def trapped_liquid_fire_rupture(
+    components: list[str],
+    z: list[float],
+    inventory_pressure: float,
+    inventory_temperature: float,
+    inventory_liquid_mass: float,
+    inventory_total_mass: float,
+    inventory_total_volume: float,
+    pipe_internal_diameter: float,
+    wall_thickness: float,
+    exposed_length: float,
+    eos: str | None = None,
+    multiphase_check: bool | None = None,
+    segment_id: str | None = None,
+    fire_type: str | None = None,
+    environmental_factor: float | None = None,
+    fire_heat_flux: float | None = None,
+    fire_emissivity: float | None = None,
+    fire_view_factor: float | None = None,
+    flame_temperature: float | None = None,
+    ambient_temperature: float | None = None,
+    passive_protection_factor: float | None = None,
+    fire_exposed_area: float | None = None,
+    api5l_grade: str | None = None,
+    ambient_tensile_strength: float | None = None,
+    flange_class: str | None = None,
+    relief_set_pressure: float | None = None,
+    relief_limits_pressure: bool | None = None,
+    max_time: float | None = None,
+    time_step: float | None = None,
+    wall_density: float | None = None,
+    wall_heat_capacity: float | None = None,
+    wall_conductivity: float | None = None,
+    liquid_heat_capacity: float | None = None,
+    liquid_expansion: float | None = None,
+    liquid_bulk_modulus: float | None = None,
+    inner_htc: float | None = None,
+    outer_htc: float | None = None,
+    tensile_strength_factor: float | None = None,
+    wall_nodes: float | None = None,
+    vapor_pocket_detection: bool | None = None,
+) -> TrappedLiquidFireRuptureResult: ...
 def tube_rupture_relief(
     components: list[str],
     mole_fractions: list[float],

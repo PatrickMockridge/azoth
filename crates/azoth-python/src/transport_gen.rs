@@ -30,11 +30,11 @@ use crate::record_outputs_gen::{
     PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation, PyPulsationModeResult,
     PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation, PyRegisterFinding,
     PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage,
-    PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice,
-    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
-    PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue, PySterileRadius,
-    PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction, PyTr3001Finding,
-    PyTrappedInventorySegmentResult, PyVesselFillingPoint, PyVesselRuptureStep,
+    PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
+    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyTr3001Finding, PyTrappedInventorySegmentResult, PyVesselFillingPoint, PyVesselRuptureStep,
     PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
@@ -28586,6 +28586,135 @@ impl From<&azoth_process::models::trapped_inventory::TrappedInventoryResult>
                 .iter()
                 .map(PyTrappedInventorySegmentResult::from)
                 .collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.trapped_liquid_fire_rupture`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TrappedLiquidFireRuptureResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTrappedLiquidFireRuptureResult {
+    /// the echoed segment identifier.
+    #[pyo3(get)]
+    pub segment_id: String,
+    /// the recorded time series, one row per step, the failure step included.
+    #[pyo3(get)]
+    pub trajectory: Vec<PyRupturePoint>,
+    /// the class's limiting mode.
+    #[pyo3(get)]
+    pub limiting_failure_mode: String,
+    /// whether the limiting mode is a pipe or flange failure.
+    #[pyo3(get)]
+    pub rupture_predicted: bool,
+    /// the first time the relief set pressure is reached.
+    #[pyo3(get)]
+    pub time_to_relief_set: Option<PyQty>,
+    /// the first time the vapor pocket appears.
+    #[pyo3(get)]
+    pub time_to_vapor_pocket: Option<PyQty>,
+    /// the first time the pipe stress reaches its allowable.
+    #[pyo3(get)]
+    pub time_to_pipe_rupture: Option<PyQty>,
+    /// the first time the pressure reaches the flange rating.
+    #[pyo3(get)]
+    pub time_to_flange_failure: Option<PyQty>,
+    /// the earlier of the pipe and flange failure times.
+    #[pyo3(get)]
+    pub minimum_failure_time: Option<PyQty>,
+    /// the last recorded pressure.
+    #[pyo3(get)]
+    pub final_pressure: PyQty,
+    /// the last recorded liquid temperature.
+    #[pyo3(get)]
+    pub final_liquid_temperature: PyQty,
+    /// the last recorded outer wall temperature.
+    #[pyo3(get)]
+    pub final_outer_wall_temperature: PyQty,
+    /// the class's applied standard references.
+    #[pyo3(get)]
+    pub standards_applied: Vec<String>,
+    /// the class's recommendations.
+    #[pyo3(get)]
+    pub recommendations: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyTrappedLiquidFireRuptureResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "TrappedLiquidFireRuptureResult(segment_id={:?}, trajectory={:?}, limiting_failure_mode={:?}, rupture_predicted={:?}, time_to_relief_set={:?}, time_to_vapor_pocket={:?}, time_to_pipe_rupture={:?}, time_to_flange_failure={:?}, minimum_failure_time={:?}, final_pressure={:?}, final_liquid_temperature={:?}, final_outer_wall_temperature={:?}, standards_applied={:?}, recommendations={:?}, {} warning(s))",
+            self.segment_id,
+            self.trajectory,
+            self.limiting_failure_mode,
+            self.rupture_predicted,
+            self.time_to_relief_set,
+            self.time_to_vapor_pocket,
+            self.time_to_pipe_rupture,
+            self.time_to_flange_failure,
+            self.minimum_failure_time,
+            self.final_pressure,
+            self.final_liquid_temperature,
+            self.final_outer_wall_temperature,
+            self.standards_applied,
+            self.recommendations,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::trapped_liquid_fire_rupture::TrappedLiquidFireRuptureResult>
+    for PyTrappedLiquidFireRuptureResult
+{
+    fn from(
+        r: &azoth_process::models::trapped_liquid_fire_rupture::TrappedLiquidFireRuptureResult,
+    ) -> Self {
+        Self {
+            segment_id: r.segment_id.clone(),
+            trajectory: r.trajectory.iter().map(PyRupturePoint::from).collect(),
+            limiting_failure_mode: r.limiting_failure_mode.as_str().to_string(),
+            rupture_predicted: r.rupture_predicted,
+            time_to_relief_set: r.time_to_relief_set.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            time_to_vapor_pocket: r.time_to_vapor_pocket.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            time_to_pipe_rupture: r.time_to_pipe_rupture.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            time_to_flange_failure: r.time_to_flange_failure.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            minimum_failure_time: r.minimum_failure_time.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            final_pressure: PyQty {
+                magnitude_si: r.final_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            final_liquid_temperature: PyQty {
+                magnitude_si: r.final_liquid_temperature.value,
+                unit: "K".to_string(),
+            },
+            final_outer_wall_temperature: PyQty {
+                magnitude_si: r.final_outer_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            standards_applied: r.standards_applied.clone(),
+            recommendations: r.recommendations.clone(),
             warnings: transport(&r.warnings),
         }
     }

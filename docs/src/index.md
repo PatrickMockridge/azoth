@@ -447,6 +447,7 @@ Five sections, and the difference between them is the point:
 - [`process.toxic_library`](./process/toxic_library.md) — Toxic-exposure thresholds
 - [`process.tr3001_compliance`](./process/tr3001_compliance.md) — TR3001 compliance
 - [`process.trapped_inventory`](./process/trapped_inventory.md) — Trapped inventory
+- [`process.trapped_liquid_fire_rupture`](./process/trapped_liquid_fire_rupture.md) — Trapped-liquid fire rupture
 - [`process.tube_rupture_relief`](./process/tube_rupture_relief.md) — Tube rupture relief
 - [`process.turbo_expander_compressor`](./process/turbo_expander_compressor.md) — Turbo-expander compressor
 - [`process.vacuum_collapse`](./process/vacuum_collapse.md) — Vacuum collapse screening

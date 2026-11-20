@@ -165,6 +165,7 @@ pub mod tr3001_compliance;
 #[allow(dead_code)] // until the id slices consume the module
 pub(crate) mod transient_wall;
 pub mod trapped_inventory;
+pub mod trapped_liquid_fire_rupture;
 pub mod tube_rupture_relief;
 pub mod turbo_expander_compressor;
 pub mod vacuum_collapse;
@@ -400,6 +401,10 @@ pub use tr3001_compliance::{
 pub use trapped_inventory::{
     SegmentKind, TrappedInventoryEvidence, TrappedInventoryResult, TrappedInventorySegment,
     TrappedInventorySegmentResult, trapped_inventory,
+};
+pub use trapped_liquid_fire_rupture::{
+    FailureMode, FireKind, RupturePoint, TrappedLiquidFireRuptureResult,
+    trapped_liquid_fire_rupture,
 };
 pub use tube_rupture_relief::{TubeRuptureReliefResult, tube_rupture_relief};
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};

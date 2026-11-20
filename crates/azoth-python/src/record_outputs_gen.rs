@@ -4543,6 +4543,97 @@ impl From<&azoth_process::models::risk_matrix::RiskAssessmentRow> for PyRiskAsse
     }
 }
 
+/// the recorded time series, one row per step, the failure step included.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RupturePoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRupturePoint {
+    /// the step's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the step's absolute pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the step's liquid temperature.
+    #[pyo3(get)]
+    pub liquid_temperature: PyQty,
+    /// the inner wall surface's temperature.
+    #[pyo3(get)]
+    pub inner_wall_temperature: PyQty,
+    /// the outer wall surface's temperature.
+    #[pyo3(get)]
+    pub outer_wall_temperature: PyQty,
+    /// the thin-wall von Mises stress.
+    #[pyo3(get)]
+    pub von_mises_stress: PyQty,
+    /// the temperature-retained allowable stress.
+    #[pyo3(get)]
+    pub allowable_stress: PyQty,
+    /// the temperature-reduced flange rating.
+    #[pyo3(get)]
+    pub flange_rating: PyQty,
+}
+
+#[pymethods]
+impl PyRupturePoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "RupturePoint(time={:?}, pressure={:?}, liquid_temperature={:?}, inner_wall_temperature={:?}, outer_wall_temperature={:?}, von_mises_stress={:?}, allowable_stress={:?}, flange_rating={:?})",
+            self.time,
+            self.pressure,
+            self.liquid_temperature,
+            self.inner_wall_temperature,
+            self.outer_wall_temperature,
+            self.von_mises_stress,
+            self.allowable_stress,
+            self.flange_rating
+        )
+    }
+}
+
+impl From<&azoth_process::models::trapped_liquid_fire_rupture::RupturePoint> for PyRupturePoint {
+    fn from(row: &azoth_process::models::trapped_liquid_fire_rupture::RupturePoint) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            liquid_temperature: PyQty {
+                magnitude_si: row.liquid_temperature.value,
+                unit: "K".to_string(),
+            },
+            inner_wall_temperature: PyQty {
+                magnitude_si: row.inner_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            outer_wall_temperature: PyQty {
+                magnitude_si: row.outer_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            von_mises_stress: PyQty {
+                magnitude_si: row.von_mises_stress.value,
+                unit: "Pa".to_string(),
+            },
+            allowable_stress: PyQty {
+                magnitude_si: row.allowable_stress.value,
+                unit: "Pa".to_string(),
+            },
+            flange_rating: PyQty {
+                magnitude_si: row.flange_rating.value,
+                unit: "Pa".to_string(),
+            },
+        }
+    }
+}
+
 /// one row per classified equipment, in caller order.
 #[pyclass(
     frozen,

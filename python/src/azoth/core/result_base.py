@@ -141,6 +141,16 @@ class RuptureStatus(StrEnum):
     RUPTURE = "rupture"
 
 
+class FailureMode(StrEnum):
+    """The trapped-liquid study's limiting failure mode."""
+
+    NONE = "none"
+    RELIEF_SET_PRESSURE = "relief_set_pressure"
+    VAPOR_POCKET = "vapor_pocket"
+    PIPE_RUPTURE = "pipe_rupture"
+    FLANGE_FAILURE = "flange_failure"
+
+
 class FluidBasis(StrEnum):
     """The release branch the density switch selected."""
 

@@ -9416,6 +9416,104 @@ pub fn tr3001_compliance(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Trapped-liquid fire rupture.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, z, eos, multiphase_check, inventory_pressure, inventory_temperature, inventory_liquid_mass, inventory_total_mass, inventory_total_volume, segment_id, fire_type, environmental_factor, fire_heat_flux, fire_emissivity, fire_view_factor, flame_temperature, ambient_temperature, passive_protection_factor, fire_exposed_area, api5l_grade, ambient_tensile_strength, pipe_internal_diameter, wall_thickness, exposed_length, flange_class, relief_set_pressure, relief_limits_pressure, max_time, time_step, wall_density, wall_heat_capacity, wall_conductivity, liquid_heat_capacity, liquid_expansion, liquid_bulk_modulus, inner_htc, outer_htc, tensile_strength_factor, wall_nodes, vapor_pocket_detection))]
+#[pyo3(
+    text_signature = "(components, z, eos, multiphase_check, inventory_pressure, inventory_temperature, inventory_liquid_mass, inventory_total_mass, inventory_total_volume, segment_id, fire_type, environmental_factor, fire_heat_flux, fire_emissivity, fire_view_factor, flame_temperature, ambient_temperature, passive_protection_factor, fire_exposed_area, api5l_grade, ambient_tensile_strength, pipe_internal_diameter, wall_thickness, exposed_length, flange_class, relief_set_pressure, relief_limits_pressure, max_time, time_step, wall_density, wall_heat_capacity, wall_conductivity, liquid_heat_capacity, liquid_expansion, liquid_bulk_modulus, inner_htc, outer_htc, tensile_strength_factor, wall_nodes, vapor_pocket_detection)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn trapped_liquid_fire_rupture(
+    py: Python<'_>,
+    components: Vec<String>,
+    z: Vec<f64>,
+    eos: Option<&str>,
+    multiphase_check: Option<bool>,
+    inventory_pressure: f64,
+    inventory_temperature: f64,
+    inventory_liquid_mass: f64,
+    inventory_total_mass: f64,
+    inventory_total_volume: f64,
+    segment_id: Option<&str>,
+    fire_type: Option<&str>,
+    environmental_factor: Option<f64>,
+    fire_heat_flux: Option<f64>,
+    fire_emissivity: Option<f64>,
+    fire_view_factor: Option<f64>,
+    flame_temperature: Option<f64>,
+    ambient_temperature: Option<f64>,
+    passive_protection_factor: Option<f64>,
+    fire_exposed_area: Option<f64>,
+    api5l_grade: Option<&str>,
+    ambient_tensile_strength: Option<f64>,
+    pipe_internal_diameter: f64,
+    wall_thickness: f64,
+    exposed_length: f64,
+    flange_class: Option<i64>,
+    relief_set_pressure: Option<f64>,
+    relief_limits_pressure: Option<bool>,
+    max_time: Option<f64>,
+    time_step: Option<f64>,
+    wall_density: Option<f64>,
+    wall_heat_capacity: Option<f64>,
+    wall_conductivity: Option<f64>,
+    liquid_heat_capacity: Option<f64>,
+    liquid_expansion: Option<f64>,
+    liquid_bulk_modulus: Option<f64>,
+    inner_htc: Option<f64>,
+    outer_htc: Option<f64>,
+    tensile_strength_factor: Option<f64>,
+    wall_nodes: Option<usize>,
+    vapor_pocket_detection: Option<bool>,
+) -> PyResult<crate::transport_gen::PyTrappedLiquidFireRuptureResult> {
+    azoth_process::models::trapped_liquid_fire_rupture::trapped_liquid_fire_rupture(
+        &components,
+        &z,
+        pascals(inventory_pressure),
+        kelvins(inventory_temperature),
+        kilograms(inventory_liquid_mass),
+        kilograms(inventory_total_mass),
+        cubic_meters(inventory_total_volume),
+        meters(pipe_internal_diameter),
+        meters(wall_thickness),
+        meters(exposed_length),
+        eos,
+        multiphase_check,
+        segment_id,
+        fire_type,
+        environmental_factor,
+        fire_heat_flux,
+        fire_emissivity,
+        fire_view_factor,
+        flame_temperature.map(kelvins),
+        ambient_temperature.map(kelvins),
+        passive_protection_factor,
+        fire_exposed_area,
+        api5l_grade,
+        ambient_tensile_strength.map(pascals),
+        flange_class,
+        relief_set_pressure.map(pascals),
+        relief_limits_pressure,
+        max_time.map(seconds),
+        time_step.map(seconds),
+        wall_density.map(kilograms_per_cubic_meter),
+        wall_heat_capacity,
+        wall_conductivity,
+        liquid_heat_capacity,
+        liquid_expansion,
+        liquid_bulk_modulus.map(pascals),
+        inner_htc,
+        outer_htc,
+        tensile_strength_factor,
+        wall_nodes,
+        vapor_pocket_detection,
+    )
+    .map(|r| crate::transport_gen::PyTrappedLiquidFireRuptureResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Tube rupture relief.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

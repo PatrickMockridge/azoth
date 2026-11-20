@@ -139,6 +139,7 @@ from azoth.core.result import (
     ToxicLibraryResult,
     Tr3001ComplianceResult,
     TrappedInventoryResult,
+    TrappedLiquidFireRuptureResult,
     TubeRuptureReliefResult,
     TurboExpanderResult,
     VacuumCollapseResult,
@@ -359,6 +360,7 @@ _THROTTLING_VALVE = "process.throttling_valve"
 _TOXIC_LIBRARY = "process.toxic_library"
 _TR3001_COMPLIANCE = "process.tr3001_compliance"
 _TRAPPED_INVENTORY = "process.trapped_inventory"
+_TRAPPED_LIQUID_FIRE_RUPTURE = "process.trapped_liquid_fire_rupture"
 _TUBE_RUPTURE_RELIEF = "process.tube_rupture_relief"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
@@ -3280,6 +3282,100 @@ def trapped_inventory(
         multiphase_check=multiphase_check,
         fallback_liquid_density=fallback_liquid_density,
         segment_evidence=segment_evidence,
+    )
+
+
+def trapped_liquid_fire_rupture(
+    components: list[str],
+    z: list[float],
+    inventory_pressure: float,
+    inventory_temperature: float,
+    inventory_liquid_mass: float,
+    inventory_total_mass: float,
+    inventory_total_volume: float,
+    pipe_internal_diameter: float,
+    wall_thickness: float,
+    exposed_length: float,
+    eos: str | None = None,
+    multiphase_check: bool | None = None,
+    segment_id: str | None = None,
+    fire_type: str | None = None,
+    environmental_factor: float | None = None,
+    fire_heat_flux: float | None = None,
+    fire_emissivity: float | None = None,
+    fire_view_factor: float | None = None,
+    flame_temperature: float | None = None,
+    ambient_temperature: float | None = None,
+    passive_protection_factor: float | None = None,
+    fire_exposed_area: float | None = None,
+    api5l_grade: str | None = None,
+    ambient_tensile_strength: float | None = None,
+    flange_class: str | None = None,
+    relief_set_pressure: float | None = None,
+    relief_limits_pressure: bool | None = None,
+    max_time: float | None = None,
+    time_step: float | None = None,
+    wall_density: float | None = None,
+    wall_heat_capacity: float | None = None,
+    wall_conductivity: float | None = None,
+    liquid_heat_capacity: float | None = None,
+    liquid_expansion: float | None = None,
+    liquid_bulk_modulus: float | None = None,
+    inner_htc: float | None = None,
+    outer_htc: float | None = None,
+    tensile_strength_factor: float | None = None,
+    wall_nodes: int | None = None,
+    vapor_pocket_detection: bool | None = None,
+) -> TrappedLiquidFireRuptureResult:
+    """The trapped-liquid fire rupture study.
+
+    The explicit wall march, the fire exposure, the material and flange derating and the
+    four events. **The limiting mode is the earliest pipe or flange failure**, else the
+    relief set, else the vapor pocket.
+
+    See :func:`azoth.process.reference.trapped_liquid_fire_rupture`.
+    """
+    return resolve(_TRAPPED_LIQUID_FIRE_RUPTURE)(  # type: ignore[no-any-return]
+        components=components,
+        z=z,
+        inventory_pressure=inventory_pressure,
+        inventory_temperature=inventory_temperature,
+        inventory_liquid_mass=inventory_liquid_mass,
+        inventory_total_mass=inventory_total_mass,
+        inventory_total_volume=inventory_total_volume,
+        pipe_internal_diameter=pipe_internal_diameter,
+        wall_thickness=wall_thickness,
+        exposed_length=exposed_length,
+        eos=eos,
+        multiphase_check=multiphase_check,
+        segment_id=segment_id,
+        fire_type=fire_type,
+        environmental_factor=environmental_factor,
+        fire_heat_flux=fire_heat_flux,
+        fire_emissivity=fire_emissivity,
+        fire_view_factor=fire_view_factor,
+        flame_temperature=flame_temperature,
+        ambient_temperature=ambient_temperature,
+        passive_protection_factor=passive_protection_factor,
+        fire_exposed_area=fire_exposed_area,
+        api5l_grade=api5l_grade,
+        ambient_tensile_strength=ambient_tensile_strength,
+        flange_class=flange_class,
+        relief_set_pressure=relief_set_pressure,
+        relief_limits_pressure=relief_limits_pressure,
+        max_time=max_time,
+        time_step=time_step,
+        wall_density=wall_density,
+        wall_heat_capacity=wall_heat_capacity,
+        wall_conductivity=wall_conductivity,
+        liquid_heat_capacity=liquid_heat_capacity,
+        liquid_expansion=liquid_expansion,
+        liquid_bulk_modulus=liquid_bulk_modulus,
+        inner_htc=inner_htc,
+        outer_htc=outer_htc,
+        tensile_strength_factor=tensile_strength_factor,
+        wall_nodes=wall_nodes,
+        vapor_pocket_detection=vapor_pocket_detection,
     )
 
 

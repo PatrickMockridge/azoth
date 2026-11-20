@@ -40,8 +40,11 @@ from azoth.core.bridge_support import _association_spec as _association_spec
 from azoth.core.bridge_support import _si as _si
 from azoth.core.bridge_support import _warnings as _warnings
 from azoth.core.result import (
+    FailureMode,
     HydrogenPhaseResult,
     PureSaturationResult,
+    RupturePoint,
+    TrappedLiquidFireRuptureResult,
 )
 from azoth.core.units import Q, from_si, input_to_si
 
@@ -310,3 +313,145 @@ def _optional_si(quantity: object) -> Q | None:
     magnitude_si = quantity.magnitude_si  # type: ignore[attr-defined]
     unit = quantity.unit  # type: ignore[attr-defined]
     return from_si(magnitude_si, unit)
+
+
+def trapped_liquid_fire_rupture(
+    components: list[str],
+    z: list[float],
+    inventory_pressure: float,
+    inventory_temperature: float,
+    inventory_liquid_mass: float,
+    inventory_total_mass: float,
+    inventory_total_volume: float,
+    pipe_internal_diameter: float,
+    wall_thickness: float,
+    exposed_length: float,
+    eos: str | None = None,
+    multiphase_check: bool | None = None,
+    segment_id: str | None = None,
+    fire_type: str | None = None,
+    environmental_factor: float | None = None,
+    fire_heat_flux: float | None = None,
+    fire_emissivity: float | None = None,
+    fire_view_factor: float | None = None,
+    flame_temperature: float | None = None,
+    ambient_temperature: float | None = None,
+    passive_protection_factor: float | None = None,
+    fire_exposed_area: float | None = None,
+    api5l_grade: str | None = None,
+    ambient_tensile_strength: float | None = None,
+    flange_class: str | None = None,
+    relief_set_pressure: float | None = None,
+    relief_limits_pressure: bool | None = None,
+    max_time: float | None = None,
+    time_step: float | None = None,
+    wall_density: float | None = None,
+    wall_heat_capacity: float | None = None,
+    wall_conductivity: float | None = None,
+    liquid_heat_capacity: float | None = None,
+    liquid_expansion: float | None = None,
+    liquid_bulk_modulus: float | None = None,
+    inner_htc: float | None = None,
+    outer_htc: float | None = None,
+    tensile_strength_factor: float | None = None,
+    wall_nodes: int | None = None,
+    vapor_pocket_detection: bool | None = None,
+) -> TrappedLiquidFireRuptureResult:
+    """The trapped-liquid fire rupture study, computed in Rust.
+
+    The hand-written adapter exists because `flange_class` is an optional count whose
+    conversion the generator cannot place inside its expression.
+    """
+    spec = _models_gen.model("process.trapped_liquid_fire_rupture")
+
+    def si(name: str, value: Any) -> float | None:
+        return None if value is None else _si(spec, name, value)
+
+    result = _core.trapped_liquid_fire_rupture(
+        list(components),
+        list(z),
+        eos,
+        multiphase_check,
+        si("inventory_pressure", inventory_pressure),
+        si("inventory_temperature", inventory_temperature),
+        si("inventory_liquid_mass", inventory_liquid_mass),
+        si("inventory_total_mass", inventory_total_mass),
+        si("inventory_total_volume", inventory_total_volume),
+        segment_id,
+        fire_type,
+        si("environmental_factor", environmental_factor),
+        si("fire_heat_flux", fire_heat_flux),
+        si("fire_emissivity", fire_emissivity),
+        si("fire_view_factor", fire_view_factor),
+        si("flame_temperature", flame_temperature),
+        si("ambient_temperature", ambient_temperature),
+        si("passive_protection_factor", passive_protection_factor),
+        si("fire_exposed_area", fire_exposed_area),
+        api5l_grade,
+        si("ambient_tensile_strength", ambient_tensile_strength),
+        si("pipe_internal_diameter", pipe_internal_diameter),
+        si("wall_thickness", wall_thickness),
+        si("exposed_length", exposed_length),
+        None if flange_class is None else int(flange_class),
+        si("relief_set_pressure", relief_set_pressure),
+        relief_limits_pressure,
+        si("max_time", max_time),
+        si("time_step", time_step),
+        si("wall_density", wall_density),
+        si("wall_heat_capacity", wall_heat_capacity),
+        si("wall_conductivity", wall_conductivity),
+        si("liquid_heat_capacity", liquid_heat_capacity),
+        si("liquid_expansion", liquid_expansion),
+        si("liquid_bulk_modulus", liquid_bulk_modulus),
+        si("inner_htc", inner_htc),
+        si("outer_htc", outer_htc),
+        si("tensile_strength_factor", tensile_strength_factor),
+        wall_nodes,
+        vapor_pocket_detection,
+    )
+    trajectory = tuple(
+        RupturePoint(
+            time=from_si(row.time.magnitude_si, row.time.unit),
+            pressure=from_si(row.pressure.magnitude_si, row.pressure.unit),
+            liquid_temperature=from_si(
+                row.liquid_temperature.magnitude_si, row.liquid_temperature.unit
+            ),
+            inner_wall_temperature=from_si(
+                row.inner_wall_temperature.magnitude_si, row.inner_wall_temperature.unit
+            ),
+            outer_wall_temperature=from_si(
+                row.outer_wall_temperature.magnitude_si, row.outer_wall_temperature.unit
+            ),
+            von_mises_stress=from_si(row.von_mises_stress.magnitude_si, row.von_mises_stress.unit),
+            allowable_stress=from_si(row.allowable_stress.magnitude_si, row.allowable_stress.unit),
+            flange_rating=from_si(row.flange_rating.magnitude_si, row.flange_rating.unit),
+        )
+        for row in result.trajectory
+    )
+
+    def optional(name: str) -> Any:
+        value = getattr(result, name)
+        return None if value is None else from_si(value.magnitude_si, value.unit)
+
+    return TrappedLiquidFireRuptureResult(
+        segment_id=result.segment_id,
+        trajectory=trajectory,
+        limiting_failure_mode=FailureMode(result.limiting_failure_mode),
+        rupture_predicted=result.rupture_predicted,
+        time_to_relief_set=optional("time_to_relief_set"),
+        time_to_vapor_pocket=optional("time_to_vapor_pocket"),
+        time_to_pipe_rupture=optional("time_to_pipe_rupture"),
+        time_to_flange_failure=optional("time_to_flange_failure"),
+        minimum_failure_time=optional("minimum_failure_time"),
+        final_pressure=from_si(result.final_pressure.magnitude_si, result.final_pressure.unit),
+        final_liquid_temperature=from_si(
+            result.final_liquid_temperature.magnitude_si, result.final_liquid_temperature.unit
+        ),
+        final_outer_wall_temperature=from_si(
+            result.final_outer_wall_temperature.magnitude_si,
+            result.final_outer_wall_temperature.unit,
+        ),
+        standards_applied=tuple(result.standards_applied),
+        recommendations=tuple(result.recommendations),
+        warnings=_warnings(result.warnings),
+    )

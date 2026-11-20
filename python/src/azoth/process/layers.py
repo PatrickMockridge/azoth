@@ -3912,6 +3912,102 @@ def _s001_clause10_review(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _trapped_liquid_fire_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.trapped_liquid_fire_rupture`'s layers, from the reference's arithmetic."""
+    import math
+
+    from azoth.core.units import quantity
+    from azoth.process.reference.trapped_liquid_fire_rupture import (
+        trapped_liquid_fire_rupture as evaluate,
+    )
+
+    def optional_q(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    def optional_float(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    result = evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["z"]],
+        quantity(float(inputs["inventory_pressure"]), "Pa"),
+        quantity(float(inputs["inventory_temperature"]), "K"),
+        quantity(float(inputs["inventory_liquid_mass"]), "kg"),
+        quantity(float(inputs["inventory_total_mass"]), "kg"),
+        quantity(float(inputs["inventory_total_volume"]), "m**3"),
+        quantity(float(inputs["pipe_internal_diameter"]), "m"),
+        quantity(float(inputs["wall_thickness"]), "m"),
+        quantity(float(inputs["exposed_length"]), "m"),
+        None if inputs.get("eos") is None else str(inputs["eos"]),
+        None if inputs.get("multiphase_check") is None else bool(inputs["multiphase_check"]),
+        None if inputs.get("segment_id") is None else str(inputs["segment_id"]),
+        None if inputs.get("fire_type") is None else str(inputs["fire_type"]),
+        optional_float("environmental_factor"),
+        optional_float("fire_heat_flux"),
+        optional_float("fire_emissivity"),
+        optional_float("fire_view_factor"),
+        optional_q("flame_temperature", "K"),
+        optional_q("ambient_temperature", "K"),
+        optional_float("passive_protection_factor"),
+        optional_float("fire_exposed_area"),
+        None if inputs.get("api5l_grade") is None else str(inputs["api5l_grade"]),
+        optional_q("ambient_tensile_strength", "MPa"),
+        None if inputs.get("flange_class") is None else str(inputs["flange_class"]),
+        optional_q("relief_set_pressure", "Pa"),
+        None
+        if inputs.get("relief_limits_pressure") is None
+        else bool(inputs["relief_limits_pressure"]),
+        optional_q("max_time", "s"),
+        optional_q("time_step", "s"),
+        optional_q("wall_density", "kg/m**3"),
+        optional_float("wall_heat_capacity"),
+        optional_float("wall_conductivity"),
+        optional_float("liquid_heat_capacity"),
+        optional_float("liquid_expansion"),
+        optional_q("liquid_bulk_modulus", "Pa"),
+        optional_float("inner_htc"),
+        optional_float("outer_htc"),
+        optional_float("tensile_strength_factor"),
+        None if inputs.get("wall_nodes") is None else int(inputs["wall_nodes"]),
+        None
+        if inputs.get("vapor_pocket_detection") is None
+        else bool(inputs["vapor_pocket_detection"]),
+    )
+    dumped: dict[str, float] = {
+        "point_count": float(len(result.trajectory)),
+        "final_pressure_bara": result.final_pressure.to("bar").magnitude,
+        "final_liquid_temperature_k": result.final_liquid_temperature.to("K").magnitude,
+        "final_outer_wall_temperature_k": result.final_outer_wall_temperature.to("K").magnitude,
+    }
+    for name, value in (
+        ("time_to_relief_set_s", result.time_to_relief_set),
+        ("time_to_vapor_pocket_s", result.time_to_vapor_pocket),
+        ("time_to_pipe_rupture_s", result.time_to_pipe_rupture),
+        ("time_to_flange_failure_s", result.time_to_flange_failure),
+        ("minimum_failure_time_s", result.minimum_failure_time),
+    ):
+        if value is not None:
+            dumped[name] = value.to("s").magnitude
+    for index, row in enumerate(result.trajectory):
+        dumped[f"series_timeSeconds_{index}"] = row.time.to("s").magnitude
+        dumped[f"series_pressureBara_{index}"] = row.pressure.to("bar").magnitude
+        dumped[f"series_liquidTemperatureK_{index}"] = row.liquid_temperature.to("K").magnitude
+        dumped[f"series_innerWallTemperatureK_{index}"] = row.inner_wall_temperature.to(
+            "K"
+        ).magnitude
+        dumped[f"series_outerWallTemperatureK_{index}"] = row.outer_wall_temperature.to(
+            "K"
+        ).magnitude
+        dumped[f"series_vonMisesStressMPa_{index}"] = row.von_mises_stress.to("MPa").magnitude
+        dumped[f"series_allowableStressMPa_{index}"] = row.allowable_stress.to("MPa").magnitude
+        rating = row.flange_rating.to("bar").magnitude
+        if math.isfinite(rating):
+            dumped[f"series_flangeRatingBara_{index}"] = rating
+    return dumped
+
+
 def _safety_envelope(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.safety_envelope`'s layers, from the reference's arithmetic."""
     from azoth.core.units import quantity
@@ -3966,9 +4062,9 @@ def _safety_envelope(inputs: Mapping[str, Any]) -> dict[str, float]:
         if row.temperature is not None:
             dumped[f"envelope_{arm}_limit_at_operating_k"] = row.temperature.to("K").magnitude
         if row.safe_temperature is not None:
-            dumped[f"envelope_{arm}_safe_temperature_at_operating_k"] = (
-                row.safe_temperature.to("K").magnitude
-            )
+            dumped[f"envelope_{arm}_safe_temperature_at_operating_k"] = row.safe_temperature.to(
+                "K"
+            ).magnitude
         if row.margin is not None:
             dumped[f"envelope_{arm}_margin_at_operating_k"] = row.margin.to("K").magnitude
     return dumped
@@ -3988,9 +4084,7 @@ def _trapped_inventory(inputs: Mapping[str, Any]) -> dict[str, float]:
             "segment_id": str(row["segment_id"]),
             "kind": str(row["kind"]),
             "volume": optional_q(row, "volume", "m**3"),
-            "liquid_fill_fraction": quantity(
-                float(row["liquid_fill_fraction"]), "dimensionless"
-            ),
+            "liquid_fill_fraction": quantity(float(row["liquid_fill_fraction"]), "dimensionless"),
             "internal_diameter": optional_q(row, "internal_diameter", "m"),
             "length": optional_q(row, "length", "m"),
         }
@@ -4708,6 +4802,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.esd_response_time": _esd_response_time,
     "process.mass_balance_leak_detection": _mass_balance_leak_detection,
     "process.safety_envelope": _safety_envelope,
+    "process.trapped_liquid_fire_rupture": _trapped_liquid_fire_rupture,
     "process.trapped_inventory": _trapped_inventory,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.psv_valve": _psv_valve,
@@ -7176,6 +7271,42 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=2,
         identified_by=("#label", "se_phase"),
     ),
+    # The trapped-liquid study's five cased states; the vapor-pocket state is uncased.
+    LayerCase(
+        model="process.trapped_liquid_fire_rupture",
+        case="no_failure",
+        capture="process_trapped_liquid_fire_rupture.tsv",
+        block=1,
+        identified_by=("#label", "tlf_no_failure"),
+    ),
+    LayerCase(
+        model="process.trapped_liquid_fire_rupture",
+        case="flange_failure",
+        capture="process_trapped_liquid_fire_rupture.tsv",
+        block=2,
+        identified_by=("#label", "tlf_flange"),
+    ),
+    LayerCase(
+        model="process.trapped_liquid_fire_rupture",
+        case="pipe_rupture",
+        capture="process_trapped_liquid_fire_rupture.tsv",
+        block=3,
+        identified_by=("#label", "tlf_pipe"),
+    ),
+    LayerCase(
+        model="process.trapped_liquid_fire_rupture",
+        case="relief_set",
+        capture="process_trapped_liquid_fire_rupture.tsv",
+        block=4,
+        identified_by=("#label", "tlf_relief"),
+    ),
+    LayerCase(
+        model="process.trapped_liquid_fire_rupture",
+        case="pfp_factor",
+        capture="process_trapped_liquid_fire_rupture.tsv",
+        block=5,
+        identified_by=("#label", "tlf_pfp"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -8960,6 +9091,8 @@ UNCASED_ROWS: dict[str, int] = {
     # The trapped inventory's one: the SRK evidence row, whose liquid density is
     # `1.06e-1` relative below the class's.
     "process_trapped_inventory.tsv": 1,
+    # The trapped-liquid study's two: the inventory preamble and the vapor-pocket state.
+    "process_trapped_liquid_fire_rupture.tsv": 2,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

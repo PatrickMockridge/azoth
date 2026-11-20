@@ -82,6 +82,7 @@ from azoth.core.record_outputs_gen import (
     ReviewCoverage,
     ReviewVerdict,
     RiskAssessmentRow,
+    RupturePoint,
     SafeChartItem,
     SafeChartMissingDevice,
     ScaleControlRiskRow,
@@ -110,6 +111,7 @@ from azoth.core.result_base import (
     DeadheadVerdict,
     EmulsionType,
     ErosionRiskLevel,
+    FailureMode,
     FeSMorphology,
     FivLikelihood,
     FlowRegime,
@@ -11519,6 +11521,58 @@ class TrappedInventoryResult(_HasWarnings):
 
     #: one row per input segment, in caller order.
     segments: tuple[TrappedInventorySegmentResult, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TrappedLiquidFireRuptureResult(_HasWarnings):
+    """Result of ``process.trapped_liquid_fire_rupture``."""
+
+    CALC_ID: ClassVar[str] = "process.trapped_liquid_fire_rupture"
+
+    #: the echoed segment identifier.
+    segment_id: str
+
+    #: the recorded time series, one row per step, the failure step included.
+    trajectory: tuple[RupturePoint, ...]
+
+    #: the class's limiting mode.
+    limiting_failure_mode: FailureMode
+
+    #: whether the limiting mode is a pipe or flange failure.
+    rupture_predicted: bool
+
+    #: the first time the relief set pressure is reached.
+    time_to_relief_set: Q | None
+
+    #: the first time the vapor pocket appears.
+    time_to_vapor_pocket: Q | None
+
+    #: the first time the pipe stress reaches its allowable.
+    time_to_pipe_rupture: Q | None
+
+    #: the first time the pressure reaches the flange rating.
+    time_to_flange_failure: Q | None
+
+    #: the earlier of the pipe and flange failure times.
+    minimum_failure_time: Q | None
+
+    #: the last recorded pressure.
+    final_pressure: Q
+
+    #: the last recorded liquid temperature.
+    final_liquid_temperature: Q
+
+    #: the last recorded outer wall temperature.
+    final_outer_wall_temperature: Q
+
+    #: the class's applied standard references.
+    standards_applied: tuple[str, ...]
+
+    #: the class's recommendations.
+    recommendations: tuple[str, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

@@ -121,6 +121,7 @@
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/trapped_inventory.toml
+//!   - specs/models/process/trapped_liquid_fire_rupture.toml
 //!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vacuum_collapse.toml

@@ -361,6 +361,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.toxic_library" => azoth_process::models::toxic_library::ToxicLibraryResult::FIELDS.to_vec(),
         "process.tr3001_compliance" => azoth_process::models::tr3001_compliance::Tr3001ComplianceResult::FIELDS.to_vec(),
         "process.trapped_inventory" => azoth_process::models::trapped_inventory::TrappedInventoryResult::FIELDS.to_vec(),
+        "process.trapped_liquid_fire_rupture" => azoth_process::models::trapped_liquid_fire_rupture::TrappedLiquidFireRuptureResult::FIELDS.to_vec(),
         "process.tube_rupture_relief" => azoth_process::models::tube_rupture_relief::TubeRuptureReliefResult::FIELDS.to_vec(),
         "process.turbo_expander_compressor" => azoth_process::models::turbo_expander_compressor::TurboExpanderResult::FIELDS.to_vec(),
         "process.vacuum_collapse" => azoth_process::models::vacuum_collapse::VacuumCollapseResult::FIELDS.to_vec(),

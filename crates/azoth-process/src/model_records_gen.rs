@@ -131,6 +131,7 @@ use crate::models::throttling_valve::ThrottlingValveResult;
 use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
 use crate::models::trapped_inventory::TrappedInventoryResult;
+use crate::models::trapped_liquid_fire_rupture::TrappedLiquidFireRuptureResult;
 use crate::models::tube_rupture_relief::TubeRuptureReliefResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vacuum_collapse::VacuumCollapseResult;
@@ -2981,6 +2982,31 @@ impl CalcResult for TrappedInventoryResult {
         "total_liquid_mass",
         "total_mass",
         "segments",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for TrappedLiquidFireRuptureResult {
+    const CALC_ID: &'static str = "process.trapped_liquid_fire_rupture";
+    const FIELDS: &'static [&'static str] = &[
+        "segment_id",
+        "trajectory",
+        "limiting_failure_mode",
+        "rupture_predicted",
+        "time_to_relief_set",
+        "time_to_vapor_pocket",
+        "time_to_pipe_rupture",
+        "time_to_flange_failure",
+        "minimum_failure_time",
+        "final_pressure",
+        "final_liquid_temperature",
+        "final_outer_wall_temperature",
+        "standards_applied",
+        "recommendations",
         "warnings",
     ];
 
