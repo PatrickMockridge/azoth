@@ -3579,6 +3579,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'process.safety_system_performance': {
+        "calc_id": 'process.safety_system_performance',
+        "name": 'Safety-system performance assessment',
+        "spec": {'path': 'specs/models/process/safety_system_performance.toml', 'sha256': 'b289db43e31d76bf1a6f1034ecae297561ca2873059c83604b077182aa7d4477'},
+        "code": [{'path': 'python/src/azoth/process/reference/safety_system_performance.py', 'sha256': '16104fdc28c54dca48e1995482cae48a0ee9e5013495d8831d82bfadb5196103'}, {'path': 'crates/azoth-process/src/models/safety_system_performance.rs', 'sha256': 'e4b5d024123b4d7d70cf089cf40081e9f5bd293c311ccda8743b9647a0ff46a4'}],
+        "source": 'NeqSim process/safety/barrier/SafetySystemPerformanceAnalyzer.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 8,
+        "tests_skipped": 0,
+    },
     'process.self_heating_induction': {
         "calc_id": 'process.self_heating_induction',
         "name": 'Self-heating induction time',

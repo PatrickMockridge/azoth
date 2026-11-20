@@ -122,6 +122,7 @@ from azoth.core.result import (
     S001SecondaryPressureProtectionResult,
     SafetyEnvelopeResult,
     SafetyInstrumentedFunctionResult,
+    SafetySystemPerformanceResult,
     SelfHeatingInductionResult,
     SemenovSelfHeatingResult,
     SeparatorCapacityAssessmentResult,
@@ -363,6 +364,7 @@ _TR3001_COMPLIANCE = "process.tr3001_compliance"
 _TRAPPED_INVENTORY = "process.trapped_inventory"
 _TRAPPED_LIQUID_FIRE_RUPTURE = "process.trapped_liquid_fire_rupture"
 _OPEN_DRAIN_REVIEW = "process.open_drain_review"
+_SAFETY_SYSTEM_PERFORMANCE = "process.safety_system_performance"
 _TUBE_RUPTURE_RELIEF = "process.tube_rupture_relief"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
@@ -3405,6 +3407,49 @@ def open_drain_review(
         evidence=evidence,
         design_standards=design_standards,
         references=references,
+    )
+
+
+def safety_system_performance(
+    register_id: str,
+    register_name: str | None = None,
+    elements: list[dict[str, object]] | None = None,
+    links: list[dict[str, object]] | None = None,
+    barriers: list[dict[str, object]] | None = None,
+    barrier_tags: list[dict[str, object]] | None = None,
+    standards: list[dict[str, object]] | None = None,
+    standard_criteria: list[dict[str, object]] | None = None,
+    demands: list[dict[str, object]] | None = None,
+    measurement_devices: list[dict[str, object]] | None = None,
+    event_sifs: list[dict[str, object]] | None = None,
+    sif_detectors: list[dict[str, object]] | None = None,
+    quantitative_sifs: list[dict[str, object]] | None = None,
+    protected_equipment: list[dict[str, object]] | None = None,
+) -> SafetySystemPerformanceResult:
+    """The safety-system performance assessment over a barrier register.
+
+    The class's five check families per barrier and matching demand, the category
+    inference, the related instruments and SIFs, and a stable rule on every finding.
+    **A row naming an element, barrier, standard, SIF or equipment tag that is not in
+    the register is refused.**
+
+    See :func:`azoth.process.reference.safety_system_performance`.
+    """
+    return resolve(_SAFETY_SYSTEM_PERFORMANCE)(  # type: ignore[no-any-return]
+        register_id=register_id,
+        register_name=register_name,
+        elements=elements,
+        links=links,
+        barriers=barriers,
+        barrier_tags=barrier_tags,
+        standards=standards,
+        standard_criteria=standard_criteria,
+        demands=demands,
+        measurement_devices=measurement_devices,
+        event_sifs=event_sifs,
+        sif_detectors=sif_detectors,
+        quantitative_sifs=quantitative_sifs,
+        protected_equipment=protected_equipment,
     )
 
 

@@ -72,6 +72,10 @@ from azoth.core.record_outputs_gen import (
     OpenDrainAssessment,
     OpenDrainResult,
     P002FindingResult,
+    PerformanceAssessment,
+    PerformanceFinding,
+    PerformanceInstrument,
+    PerformanceSif,
     PipeFireRupturePoint,
     PrescribedSlipReleaseStation,
     PulsationModeResult,
@@ -125,6 +129,7 @@ from azoth.core.result_base import (
     MultiflashSeedPath,
     OpenDrainVerdict,
     OverallVerdict,
+    PerformanceVerdict,
     Phase,
     PlusModel,
     ReliefPhase,
@@ -10478,6 +10483,49 @@ class SafetyInstrumentedFunctionResult(_HasWarnings):
 
     #: `base (1 - rate mttr / 8760)`; absent when the base availability or the MTTR is absent.
     availability_with_spurious_trips: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SafetySystemPerformanceResult(_HasWarnings):
+    """Result of ``process.safety_system_performance``."""
+
+    CALC_ID: ClassVar[str] = "process.safety_system_performance"
+
+    #: the register id.
+    register_id: str
+
+    #: the register name, empty when absent.
+    register_name: str
+
+    #: the report's verdict: any fail, else any warning, else pass.
+    overall_verdict: PerformanceVerdict
+
+    #: the number of assessments.
+    assessment_count: float
+
+    #: the number of passing assessments.
+    pass_count: float
+
+    #: the number of pass-with-warnings assessments.
+    warning_count: float
+
+    #: the number of failing assessments.
+    fail_count: float
+
+    #: one row per barrier and matching demand, in register order.
+    assessments: tuple[PerformanceAssessment, ...]
+
+    #: every finding, assessment by assessment in the class's order.
+    findings: tuple[PerformanceFinding, ...]
+
+    #: the related measurement devices, assessment by assessment.
+    instruments: tuple[PerformanceInstrument, ...]
+
+    #: the related SIFs, assessment by assessment.
+    sifs: tuple[PerformanceSif, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

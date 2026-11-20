@@ -116,6 +116,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.s001_secondary_pressure_protection`](./s001_secondary_pressure_protection.md) | `norsok_s001_secondary_pressure_protection` | NeqSim process/safety/processsafetysystem/S001SecondaryPressureProtectionCriteria.java |
 | [`process.safety_envelope`](./safety_envelope.md) | `safety_envelope` | NeqSim process/safety/envelope/SafetyEnvelopeCalculator.java |
 | [`process.safety_instrumented_function`](./safety_instrumented_function.md) | `closed_form_safety_instrumented_function` | NeqSim process/safety/risk/sis/SafetyInstrumentedFunction.java |
+| [`process.safety_system_performance`](./safety_system_performance.md) | `safety_system_performance` | NeqSim process/safety/barrier/SafetySystemPerformanceAnalyzer.java |
 | [`process.self_heating_induction`](./self_heating_induction.md) | `explicit_euler_induction` | NeqSim process/safety/selfheating/SelfHeatingInductionSolver.java |
 | [`process.semenov_self_heating`](./semenov_self_heating.md) | `semenov_criticality` | NeqSim process/safety/selfheating/SemenovSelfHeatingAnalyzer.java |
 | [`process.separator`](./separator.md) | `direct composition` | NeqSim process/equipment/separator/Separator.java |

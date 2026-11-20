@@ -474,6 +474,7 @@ NON_UNIT_MODELS = {
     "process.safety_envelope": "the five safety curves over a fluid, not a unit",
     "process.trapped_liquid_fire_rupture": "a trapped-liquid fire rupture transient over a fluid, not a unit",
     "process.open_drain_review": "a NORSOK S-001 open-drain record review, not a unit",
+    "process.safety_system_performance": "a barrier performance review over register records, not a unit",
     "process.vessel_filling": "a vessel filling transient over a fluid, not a unit",
     "process.blocked_outlet_overpressure": "the blocked-outlet build-up over a fluid, not a unit",
     "process.non_equilibrium_blowdown": "the two-zone blowdown over a fluid, not a unit",

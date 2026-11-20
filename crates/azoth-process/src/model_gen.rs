@@ -104,6 +104,7 @@
 //!   - specs/models/process/s001_secondary_pressure_protection.toml
 //!   - specs/models/process/safety_envelope.toml
 //!   - specs/models/process/safety_instrumented_function.toml
+//!   - specs/models/process/safety_system_performance.toml
 //!   - specs/models/process/self_heating_induction.toml
 //!   - specs/models/process/semenov_self_heating.toml
 //!   - specs/models/process/separator.toml
@@ -84966,6 +84967,3040 @@ pub static SAFETY_INSTRUMENTED_FUNCTION_SPEC: ModelSpec = ModelSpec {
     cases: SAFETY_INSTRUMENTED_FUNCTION_CASES,
 };
 
+static SAFETY_SYSTEM_PERFORMANCE_CHECKS: &[SpecCheck] = &[];
+
+static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "deluge_pass",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-FIRE-001"),
+            ("register_name", "Fire protection"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 1.0),
+            ("warning_count", 0.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-FIRE-001"),
+            ("register_name", "Fire protection"),
+            ("overall_verdict", "pass"),
+        ],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-FW-001"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("fire_protection"),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-FW-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-DELUGE-001"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Deluge system"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name(
+                            "Mitigate jet fire exposure using deluge in module M01",
+                        ),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name(
+                            "Mitigate jet fire exposure using deluge in module M01",
+                        ),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.00028),
+                    },
+                    RecordField {
+                        name: "effectiveness",
+                        value: FieldValue::Number(0.95),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-DELUGE-001"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("Deluge system standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name(
+                            "Mitigate jet fire exposure using deluge in module M01",
+                        ),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+            (
+                "demands",
+                &[&[
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "scenario",
+                        value: FieldValue::Name("Jet fire on V-101"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("firewater_deluge"),
+                    },
+                    RecordField {
+                        name: "demand_value",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "capacity_value",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "demand_unit",
+                        value: FieldValue::Name("L/min/m2"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "actual_response_time_seconds",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "actual_availability",
+                        value: FieldValue::Number(0.995),
+                    },
+                    RecordField {
+                        name: "required_effectiveness",
+                        value: FieldValue::Number(0.9),
+                    },
+                    RecordField {
+                        name: "actual_effectiveness",
+                        value: FieldValue::Number(0.95),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[(
+            "assessments",
+            &[&[
+                RecordField {
+                    name: "barrier_id",
+                    value: FieldValue::Name("B-DELUGE-001"),
+                },
+                RecordField {
+                    name: "barrier_name",
+                    value: FieldValue::Name("Deluge system"),
+                },
+                RecordField {
+                    name: "category",
+                    value: FieldValue::Name("firewater_deluge"),
+                },
+                RecordField {
+                    name: "verdict",
+                    value: FieldValue::Name("pass"),
+                },
+                RecordField {
+                    name: "barrier_status",
+                    value: FieldValue::Name("available"),
+                },
+                RecordField {
+                    name: "demand_id",
+                    value: FieldValue::Name("D-DELUGE-001"),
+                },
+                RecordField {
+                    name: "barrier_pfd",
+                    value: FieldValue::Name("0.00028"),
+                },
+                RecordField {
+                    name: "barrier_effectiveness",
+                    value: FieldValue::Name("0.95"),
+                },
+                RecordField {
+                    name: "performance_standard_id",
+                    value: FieldValue::Name("PS-B-DELUGE-001"),
+                },
+                RecordField {
+                    name: "target_pfd",
+                    value: FieldValue::Name("0.001"),
+                },
+                RecordField {
+                    name: "actual_pfd",
+                    value: FieldValue::Name("0.00028"),
+                },
+                RecordField {
+                    name: "required_availability",
+                    value: FieldValue::Name("0.99"),
+                },
+                RecordField {
+                    name: "actual_availability",
+                    value: FieldValue::Name("0.995"),
+                },
+                RecordField {
+                    name: "required_response_time_seconds",
+                    value: FieldValue::Name("45.0"),
+                },
+                RecordField {
+                    name: "actual_response_time_seconds",
+                    value: FieldValue::Name("30.0"),
+                },
+                RecordField {
+                    name: "required_effectiveness",
+                    value: FieldValue::Name("0.9"),
+                },
+                RecordField {
+                    name: "actual_effectiveness",
+                    value: FieldValue::Name("0.95"),
+                },
+                RecordField {
+                    name: "scenario",
+                    value: FieldValue::Name("Jet fire on V-101"),
+                },
+                RecordField {
+                    name: "demand_value",
+                    value: FieldValue::Name("10.0"),
+                },
+                RecordField {
+                    name: "capacity_value",
+                    value: FieldValue::Name("15.0"),
+                },
+                RecordField {
+                    name: "demand_unit",
+                    value: FieldValue::Name("L/min/m2"),
+                },
+                RecordField {
+                    name: "capacity_margin",
+                    value: FieldValue::Name("5.0"),
+                },
+                RecordField {
+                    name: "related_instrument_count",
+                    value: FieldValue::Name("0.0"),
+                },
+                RecordField {
+                    name: "related_sif_count",
+                    value: FieldValue::Name("0.0"),
+                },
+                RecordField {
+                    name: "related_quantitative_sif_count",
+                    value: FieldValue::Name("0.0"),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "fire_gas",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-FG-001"),
+            ("register_name", "Fire and gas"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 1.0),
+            ("warning_count", 0.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-FG-001"),
+            ("register_name", "Fire and gas"),
+            ("overall_verdict", "pass"),
+        ],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-FGS-001"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("instrumented_function"),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-FGS-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-FGS-001"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Fire and gas detection"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Detect gas or fire and activate deluge"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Detect gas or fire and activate deluge"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.00028),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-FGS-001"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-FGS-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("V-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-FGS-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("FD-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-FGS-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("GD-101"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("Fire and gas detection standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Detect gas or fire and activate deluge"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+            (
+                "demands",
+                &[&[
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-FGS-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("fire_gas_detection"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "actual_response_time_seconds",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "actual_availability",
+                        value: FieldValue::Number(0.996),
+                    },
+                ]],
+            ),
+            (
+                "measurement_devices",
+                &[
+                    &[
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("FD-101"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("fire_detector"),
+                        },
+                        RecordField {
+                            name: "location",
+                            value: FieldValue::Name("Module M01"),
+                        },
+                        RecordField {
+                            name: "response_time_seconds",
+                            value: FieldValue::Number(2.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-101"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("gas_detector"),
+                        },
+                        RecordField {
+                            name: "location",
+                            value: FieldValue::Name("Module M01"),
+                        },
+                        RecordField {
+                            name: "response_time_seconds",
+                            value: FieldValue::Number(8.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "event_sifs",
+                &[&[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B-FGS-001 Deluge SIF"),
+                    },
+                    RecordField {
+                        name: "voting_notation",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                ]],
+            ),
+            (
+                "sif_detectors",
+                &[
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-FGS-001 Deluge SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("FD-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-FGS-001 Deluge SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-FGS-001 Deluge SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-102"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("Fire and gas detection"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("fire_gas_detection"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-FGS-001"),
+                    },
+                    RecordField {
+                        name: "barrier_pfd",
+                        value: FieldValue::Name("0.00028"),
+                    },
+                    RecordField {
+                        name: "barrier_effectiveness",
+                        value: FieldValue::Name("0.99972"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Name("0.001"),
+                    },
+                    RecordField {
+                        name: "actual_pfd",
+                        value: FieldValue::Name("0.00028"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "actual_availability",
+                        value: FieldValue::Name("0.996"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("20.0"),
+                    },
+                    RecordField {
+                        name: "actual_response_time_seconds",
+                        value: FieldValue::Name("10.0"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("2.0"),
+                    },
+                    RecordField {
+                        name: "max_instrument_response_time_seconds",
+                        value: FieldValue::Name("8.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("1.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                ]],
+            ),
+            (
+                "instruments",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-FGS-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("FD-101"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-FGS-001"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-FGS-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("GD-101"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-FGS-001"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "sifs",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "identifier",
+                        value: FieldValue::Name("B-FGS-001 Deluge SIF"),
+                    },
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-FGS-001"),
+                    },
+                    RecordField {
+                        name: "voting_notation",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                    RecordField {
+                        name: "detector_count",
+                        value: FieldValue::Name("3.0"),
+                    },
+                    RecordField {
+                        name: "bypassed_detector_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "faulty_detector_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "tripped_detector_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("event"),
+                    },
+                ]],
+            ),
+        ],
+    },
+    TestCase {
+        id: "pfp_capacity_fail",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-PFP-001"),
+            ("register_name", "PFP review"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 0.0),
+            ("warning_count", 0.0),
+            ("fail_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-PFP-001"),
+            ("register_name", "PFP review"),
+            ("overall_verdict", "fail"),
+        ],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-PFP-001"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("structural"),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-PFP-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PFP-001"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Passive fire protection"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("PFP coating on V-101 support steel"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("PFP coating on V-101 support steel"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "effectiveness",
+                        value: FieldValue::Number(0.8),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-PFP-001"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("Passive fire protection standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("PFP coating on V-101 support steel"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+            (
+                "demands",
+                &[&[
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-PFP-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "scenario",
+                        value: FieldValue::Name("Jet fire thermal radiation at support steel"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("passive_fire_protection"),
+                    },
+                    RecordField {
+                        name: "demand_value",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "capacity_value",
+                        value: FieldValue::Number(37.5),
+                    },
+                    RecordField {
+                        name: "demand_unit",
+                        value: FieldValue::Name("kW/m2"),
+                    },
+                    RecordField {
+                        name: "required_effectiveness",
+                        value: FieldValue::Number(0.9),
+                    },
+                    RecordField {
+                        name: "actual_effectiveness",
+                        value: FieldValue::Number(0.8),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("Passive fire protection"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("passive_fire_protection"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("fail"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-PFP-001"),
+                    },
+                    RecordField {
+                        name: "barrier_effectiveness",
+                        value: FieldValue::Name("0.8"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("60.0"),
+                    },
+                    RecordField {
+                        name: "required_effectiveness",
+                        value: FieldValue::Name("0.9"),
+                    },
+                    RecordField {
+                        name: "actual_effectiveness",
+                        value: FieldValue::Name("0.8"),
+                    },
+                    RecordField {
+                        name: "scenario",
+                        value: FieldValue::Name("Jet fire thermal radiation at support steel"),
+                    },
+                    RecordField {
+                        name: "demand_value",
+                        value: FieldValue::Name("45.0"),
+                    },
+                    RecordField {
+                        name: "capacity_value",
+                        value: FieldValue::Name("37.5"),
+                    },
+                    RecordField {
+                        name: "demand_unit",
+                        value: FieldValue::Name("kW/m2"),
+                    },
+                    RecordField {
+                        name: "capacity_margin",
+                        value: FieldValue::Name("-7.5"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                ]],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PFP-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_availability_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-PFP-001"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PFP-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_response_time_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-PFP-001"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PFP-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("effectiveness_below_required"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-PFP-001"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PFP-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("demand_exceeds_capacity"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-PFP-001"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "quantitative_sif",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-QSIF-001"),
+            ("register_name", "Quantitative SIF"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 0.0),
+            ("warning_count", 1.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-QSIF-001"),
+            ("register_name", "Quantitative SIF"),
+            ("overall_verdict", "pass_with_warnings"),
+        ],
+        records: &[
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("SIF shutdown"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("SIF shutdown protects V-101"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("SIF shutdown protects V-101"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.0008),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-SIF-101"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("SIF shutdown standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("SIF shutdown protects V-101"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+            (
+                "quantitative_sifs",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B-SIF-101 quantitative SIL"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("SIF shutdown protects V-101"),
+                    },
+                    RecordField {
+                        name: "architecture",
+                        value: FieldValue::Name("1oo2"),
+                    },
+                    RecordField {
+                        name: "claimed_sil",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "pfd_average",
+                        value: FieldValue::Number(0.0008),
+                    },
+                    RecordField {
+                        name: "test_interval_hours",
+                        value: FieldValue::Number(8760.0),
+                    },
+                ]],
+            ),
+            (
+                "protected_equipment",
+                &[&[
+                    RecordField {
+                        name: "sif_id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "equipment",
+                        value: FieldValue::Name("V-101"),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("SIF shutdown"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("unknown"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass_with_warnings"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "barrier_pfd",
+                        value: FieldValue::Name("0.0008"),
+                    },
+                    RecordField {
+                        name: "barrier_effectiveness",
+                        value: FieldValue::Name("0.9992"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Name("0.001"),
+                    },
+                    RecordField {
+                        name: "actual_pfd",
+                        value: FieldValue::Name("0.0008"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("60.0"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("1.0"),
+                    },
+                ]],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-SIF-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_availability_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-SIF-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_response_time_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-SIF-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("quantitative_sif_verification_warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "sifs",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "identifier",
+                        value: FieldValue::Name("B-SIF-101 quantitative SIL"),
+                    },
+                    RecordField {
+                        name: "claimed_sil",
+                        value: FieldValue::Name("3.0"),
+                    },
+                    RecordField {
+                        name: "achieved_sil",
+                        value: FieldValue::Name("3.0"),
+                    },
+                    RecordField {
+                        name: "pfd_average",
+                        value: FieldValue::Name("0.0008"),
+                    },
+                    RecordField {
+                        name: "pfd_upper",
+                        value: FieldValue::Name("0.0012000000000000001"),
+                    },
+                    RecordField {
+                        name: "risk_reduction_factor",
+                        value: FieldValue::Name("1250.0"),
+                    },
+                    RecordField {
+                        name: "architecture",
+                        value: FieldValue::Name("1oo2"),
+                    },
+                    RecordField {
+                        name: "proof_test_interval_hours",
+                        value: FieldValue::Name("8760.0"),
+                    },
+                    RecordField {
+                        name: "protected_equipment_count",
+                        value: FieldValue::Name("1.0"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("quantitative"),
+                    },
+                ]],
+            ),
+        ],
+    },
+    TestCase {
+        id: "psd_category",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-PSD-001"),
+            ("register_name", "PSD review"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 0.0),
+            ("warning_count", 1.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-PSD-001"),
+            ("register_name", "PSD review"),
+            ("overall_verdict", "pass_with_warnings"),
+        ],
+        records: &[
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("PSD valve"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Process shutdown closes shutdown valve SDV-101"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Process shutdown closes shutdown valve SDV-101"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.0008),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-PSD-101"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("PSD valve standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Process shutdown closes shutdown valve SDV-101"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("PSD valve"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("psd"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass_with_warnings"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "barrier_pfd",
+                        value: FieldValue::Name("0.0008"),
+                    },
+                    RecordField {
+                        name: "barrier_effectiveness",
+                        value: FieldValue::Name("0.9992"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Name("0.001"),
+                    },
+                    RecordField {
+                        name: "actual_pfd",
+                        value: FieldValue::Name("0.0008"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("60.0"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                ]],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PSD-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_availability_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PSD-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_response_time_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "rule_failures",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-RULES-001"),
+            ("register_name", "Rule coverage"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 2.0),
+            ("pass_count", 0.0),
+            ("warning_count", 0.0),
+            ("fail_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-RULES-001"),
+            ("register_name", "Rule coverage"),
+            ("overall_verdict", "fail"),
+        ],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-RULES-001"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("instrumented_function"),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-RULES-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-RULES-101"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-RULES-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Rules barrier"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Isolation duty"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Isolation duty"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("out_of_service"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(false),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-RULES-101"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("GD-201"),
+                    },
+                ]],
+            ),
+            (
+                "demands",
+                &[
+                    &[
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "scenario",
+                            value: FieldValue::Name("Loss of containment"),
+                        },
+                        RecordField {
+                            name: "required_pfd",
+                            value: FieldValue::Number(0.001),
+                        },
+                        RecordField {
+                            name: "actual_pfd",
+                            value: FieldValue::Number(0.01),
+                        },
+                        RecordField {
+                            name: "required_availability",
+                            value: FieldValue::Number(0.99),
+                        },
+                        RecordField {
+                            name: "actual_availability",
+                            value: FieldValue::Number(0.95),
+                        },
+                        RecordField {
+                            name: "required_response_time_seconds",
+                            value: FieldValue::Number(10.0),
+                        },
+                        RecordField {
+                            name: "actual_response_time_seconds",
+                            value: FieldValue::Number(20.0),
+                        },
+                        RecordField {
+                            name: "required_effectiveness",
+                            value: FieldValue::Number(0.9),
+                        },
+                        RecordField {
+                            name: "actual_effectiveness",
+                            value: FieldValue::Number(0.5),
+                        },
+                        RecordField {
+                            name: "demand_value",
+                            value: FieldValue::Number(10.0),
+                        },
+                        RecordField {
+                            name: "capacity_value",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "demand_unit",
+                            value: FieldValue::Name("kg/s"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "required_response_time_seconds",
+                            value: FieldValue::Number(5.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "measurement_devices",
+                &[&[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("GD-201"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("gas_detector"),
+                    },
+                    RecordField {
+                        name: "location",
+                        value: FieldValue::Name("Module M02"),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(30.0),
+                    },
+                ]],
+            ),
+            (
+                "event_sifs",
+                &[&[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B-RULES-101 SIF"),
+                    },
+                    RecordField {
+                        name: "voting_notation",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                    RecordField {
+                        name: "overridden",
+                        value: FieldValue::Flag(true),
+                    },
+                ]],
+            ),
+            (
+                "sif_detectors",
+                &[
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-RULES-101 SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-201"),
+                        },
+                        RecordField {
+                            name: "bypassed",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-RULES-101 SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-202"),
+                        },
+                        RecordField {
+                            name: "faulty",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-RULES-101 SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-203"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "barrier_name",
+                            value: FieldValue::Name("Rules barrier"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("esd_blowdown"),
+                        },
+                        RecordField {
+                            name: "verdict",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "barrier_status",
+                            value: FieldValue::Name("out_of_service"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                        RecordField {
+                            name: "scenario",
+                            value: FieldValue::Name("Loss of containment"),
+                        },
+                        RecordField {
+                            name: "demand_value",
+                            value: FieldValue::Name("10.0"),
+                        },
+                        RecordField {
+                            name: "capacity_value",
+                            value: FieldValue::Name("5.0"),
+                        },
+                        RecordField {
+                            name: "demand_unit",
+                            value: FieldValue::Name("kg/s"),
+                        },
+                        RecordField {
+                            name: "capacity_margin",
+                            value: FieldValue::Name("-5.0"),
+                        },
+                        RecordField {
+                            name: "related_instrument_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "max_instrument_response_time_seconds",
+                            value: FieldValue::Name("30.0"),
+                        },
+                        RecordField {
+                            name: "related_sif_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "related_quantitative_sif_count",
+                            value: FieldValue::Name("0.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "barrier_name",
+                            value: FieldValue::Name("Rules barrier"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("esd_blowdown"),
+                        },
+                        RecordField {
+                            name: "verdict",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "barrier_status",
+                            value: FieldValue::Name("out_of_service"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                        RecordField {
+                            name: "related_instrument_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "max_instrument_response_time_seconds",
+                            value: FieldValue::Name("30.0"),
+                        },
+                        RecordField {
+                            name: "related_sif_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "related_quantitative_sif_count",
+                            value: FieldValue::Name("0.0"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("barrier_not_available"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("barrier_untraceable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("no_performance_standard"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("demand_exceeds_capacity"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_overridden"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_healthy_channels_insufficient"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("barrier_not_available"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("barrier_untraceable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("no_performance_standard"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("detector_response_time_exceeded"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_overridden"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_healthy_channels_insufficient"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "instruments",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("GD-201"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("GD-201"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "sifs",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "identifier",
+                            value: FieldValue::Name("B-RULES-101 SIF"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                        RecordField {
+                            name: "voting_notation",
+                            value: FieldValue::Name("2oo3"),
+                        },
+                        RecordField {
+                            name: "detector_count",
+                            value: FieldValue::Name("3.0"),
+                        },
+                        RecordField {
+                            name: "bypassed_detector_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "faulty_detector_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "tripped_detector_count",
+                            value: FieldValue::Name("0.0"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("event"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "identifier",
+                            value: FieldValue::Name("B-RULES-101 SIF"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                        RecordField {
+                            name: "voting_notation",
+                            value: FieldValue::Name("2oo3"),
+                        },
+                        RecordField {
+                            name: "detector_count",
+                            value: FieldValue::Name("3.0"),
+                        },
+                        RecordField {
+                            name: "bypassed_detector_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "faulty_detector_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "tripped_detector_count",
+                            value: FieldValue::Name("0.0"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("event"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "instrumentation_warnings",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-INST-001"),
+            ("register_name", "Instrumentation"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 0.0),
+            ("warning_count", 0.0),
+            ("fail_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-INST-001"),
+            ("register_name", "Instrumentation"),
+            ("overall_verdict", "fail"),
+        ],
+        records: &[
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-INST-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Gas detection"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Detect gas and alarm"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Detect gas and alarm"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.00028),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-INST-001"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("V-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("GD-301"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-INST-001"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("Gas detection standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Detect gas and alarm"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-INST-001"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+            (
+                "event_sifs",
+                &[&[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B-INST-001 SIF"),
+                    },
+                    RecordField {
+                        name: "voting_notation",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                ]],
+            ),
+            (
+                "sif_detectors",
+                &[
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-INST-001 SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-301"),
+                        },
+                        RecordField {
+                            name: "bypassed",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-INST-001 SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-302"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-INST-001"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("Gas detection"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("fire_gas_detection"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("fail"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "barrier_pfd",
+                        value: FieldValue::Name("0.00028"),
+                    },
+                    RecordField {
+                        name: "barrier_effectiveness",
+                        value: FieldValue::Name("0.99972"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-INST-001"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Name("0.001"),
+                    },
+                    RecordField {
+                        name: "actual_pfd",
+                        value: FieldValue::Name("0.00028"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("60.0"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("1.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                ]],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_availability_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_response_time_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("no_fire_gas_detector"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_detector_count_mismatch"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_healthy_channels_insufficient"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "sifs",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-INST-001"),
+                    },
+                    RecordField {
+                        name: "identifier",
+                        value: FieldValue::Name("B-INST-001 SIF"),
+                    },
+                    RecordField {
+                        name: "voting_notation",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                    RecordField {
+                        name: "detector_count",
+                        value: FieldValue::Name("2.0"),
+                    },
+                    RecordField {
+                        name: "bypassed_detector_count",
+                        value: FieldValue::Name("1.0"),
+                    },
+                    RecordField {
+                        name: "faulty_detector_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "tripped_detector_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("event"),
+                    },
+                ]],
+            ),
+        ],
+    },
+    TestCase {
+        id: "element_inference",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-INF-001"),
+            ("register_name", "Inferred category"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 0.0),
+            ("warning_count", 1.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-INF-001"),
+            ("register_name", "Inferred category"),
+            ("overall_verdict", "pass_with_warnings"),
+        ],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-INF-001"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("fire_protection"),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-INF-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-INF-001"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-INF-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Bland barrier"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Isolation duty"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Isolation duty"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-INF-001"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-INF-001"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-301"),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-INF-001"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("Bland standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Isolation duty"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-INF-001"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("meet requirements"),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-INF-001"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("Bland barrier"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("firewater_deluge"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass_with_warnings"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-INF-001"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Name("0.001"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("60.0"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                ]],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INF-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("target_pfd_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INF-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_availability_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INF-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_response_time_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INF-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("fire_protection_demand_missing"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+];
+
+static SAFETY_SYSTEM_PERFORMANCE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "safety_system_performance",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.safety_system_performance`.
+pub static SAFETY_SYSTEM_PERFORMANCE_SPEC: ModelSpec = ModelSpec {
+    id: "process.safety_system_performance",
+    kind: "procedure",
+    algorithm: Some(&SAFETY_SYSTEM_PERFORMANCE_ALGORITHM),
+    checks: SAFETY_SYSTEM_PERFORMANCE_CHECKS,
+    cases: SAFETY_SYSTEM_PERFORMANCE_CASES,
+};
+
 static SELF_HEATING_INDUCTION_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -99163,6 +102198,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &S001_SECONDARY_PRESSURE_PROTECTION_SPEC,
     &SAFETY_ENVELOPE_SPEC,
     &SAFETY_INSTRUMENTED_FUNCTION_SPEC,
+    &SAFETY_SYSTEM_PERFORMANCE_SPEC,
     &SELF_HEATING_INDUCTION_SPEC,
     &SEMENOV_SELF_HEATING_SPEC,
     &SEPARATOR_SPEC,

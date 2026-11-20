@@ -27,13 +27,14 @@ use crate::record_outputs_gen::{
     PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
     PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
     PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment,
-    PyOpenDrainResult, PyP002FindingResult, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
-    PyPulsationModeResult, PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation,
-    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
-    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyOpenDrainResult, PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding,
+    PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint,
+    PyPrescribedSlipReleaseStation, PyPulsationModeResult, PyRanzMarshallReleaseStation,
+    PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
+    PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
+    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult,
+    PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
     PyTr3001Finding, PyTrappedInventorySegmentResult, PyVesselFillingPoint, PyVesselRuptureStep,
     PyWaterMixingResult, PyZoneRatingRow,
 };
@@ -25959,6 +25960,104 @@ impl From<&azoth_process::models::safety_instrumented_function::SafetyInstrument
             pfd_1oo2: r.pfd_1oo2,
             pfd_2oo3: r.pfd_2oo3,
             availability_with_spurious_trips: r.availability_with_spurious_trips,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.safety_system_performance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SafetySystemPerformanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySafetySystemPerformanceResult {
+    /// the register id.
+    #[pyo3(get)]
+    pub register_id: String,
+    /// the register name, empty when absent.
+    #[pyo3(get)]
+    pub register_name: String,
+    /// the report's verdict: any fail, else any warning, else pass.
+    #[pyo3(get)]
+    pub overall_verdict: String,
+    /// the number of assessments.
+    #[pyo3(get)]
+    pub assessment_count: f64,
+    /// the number of passing assessments.
+    #[pyo3(get)]
+    pub pass_count: f64,
+    /// the number of pass-with-warnings assessments.
+    #[pyo3(get)]
+    pub warning_count: f64,
+    /// the number of failing assessments.
+    #[pyo3(get)]
+    pub fail_count: f64,
+    /// one row per barrier and matching demand, in register order.
+    #[pyo3(get)]
+    pub assessments: Vec<PyPerformanceAssessment>,
+    /// every finding, assessment by assessment in the class's order.
+    #[pyo3(get)]
+    pub findings: Vec<PyPerformanceFinding>,
+    /// the related measurement devices, assessment by assessment.
+    #[pyo3(get)]
+    pub instruments: Vec<PyPerformanceInstrument>,
+    /// the related SIFs, assessment by assessment.
+    #[pyo3(get)]
+    pub sifs: Vec<PyPerformanceSif>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySafetySystemPerformanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SafetySystemPerformanceResult(register_id={:?}, register_name={:?}, overall_verdict={:?}, assessment_count={:?}, pass_count={:?}, warning_count={:?}, fail_count={:?}, assessments={:?}, findings={:?}, instruments={:?}, sifs={:?}, {} warning(s))",
+            self.register_id,
+            self.register_name,
+            self.overall_verdict,
+            self.assessment_count,
+            self.pass_count,
+            self.warning_count,
+            self.fail_count,
+            self.assessments,
+            self.findings,
+            self.instruments,
+            self.sifs,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_system_performance::SafetySystemPerformanceResult>
+    for PySafetySystemPerformanceResult
+{
+    fn from(
+        r: &azoth_process::models::safety_system_performance::SafetySystemPerformanceResult,
+    ) -> Self {
+        Self {
+            register_id: r.register_id.clone(),
+            register_name: r.register_name.clone(),
+            overall_verdict: r.overall_verdict.as_str().to_string(),
+            assessment_count: r.assessment_count,
+            pass_count: r.pass_count,
+            warning_count: r.warning_count,
+            fail_count: r.fail_count,
+            assessments: r
+                .assessments
+                .iter()
+                .map(PyPerformanceAssessment::from)
+                .collect(),
+            findings: r.findings.iter().map(PyPerformanceFinding::from).collect(),
+            instruments: r
+                .instruments
+                .iter()
+                .map(PyPerformanceInstrument::from)
+                .collect(),
+            sifs: r.sifs.iter().map(PyPerformanceSif::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

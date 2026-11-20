@@ -110,7 +110,8 @@ BINDING = REPO_ROOT / "crates" / "azoth-python" / "src"
 #: 72 -> 73 for `process.trapped_inventory`, whose segment and evidence record lists carry units.
 #: 73 -> 74 for `process.safety_envelope`, whose optional phase trace is a record list.
 #: 74 -> 75 for `process.open_drain_review`, whose four record lists are extracted by hand.
-KNOWN_HAND_WRITTEN = 75
+#: 75 -> 76 for `process.safety_system_performance`, whose fourteen record lists are.
+KNOWN_HAND_WRITTEN = 76
 
 
 def _tools_module(name: str) -> ModuleType:

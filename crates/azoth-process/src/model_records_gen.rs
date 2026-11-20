@@ -114,6 +114,7 @@ use crate::models::s001_clause10_review::S001Clause10ReviewResult;
 use crate::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult;
 use crate::models::safety_envelope::SafetyEnvelopeResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
+use crate::models::safety_system_performance::SafetySystemPerformanceResult;
 use crate::models::self_heating_induction::SelfHeatingInductionResult;
 use crate::models::semenov_self_heating::SemenovSelfHeatingResult;
 use crate::models::separator::SeparatorResult;
@@ -2517,6 +2518,28 @@ impl CalcResult for SafetyInstrumentedFunctionResult {
         "pfd_1oo2",
         "pfd_2oo3",
         "availability_with_spurious_trips",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SafetySystemPerformanceResult {
+    const CALC_ID: &'static str = "process.safety_system_performance";
+    const FIELDS: &'static [&'static str] = &[
+        "register_id",
+        "register_name",
+        "overall_verdict",
+        "assessment_count",
+        "pass_count",
+        "warning_count",
+        "fail_count",
+        "assessments",
+        "findings",
+        "instruments",
+        "sifs",
         "warnings",
     ];
 

@@ -189,6 +189,14 @@ import neqsim.process.safety.barrier.DocumentEvidence;
 import neqsim.process.safety.barrier.PerformanceStandard;
 import neqsim.process.safety.barrier.SafetyBarrier;
 import neqsim.process.safety.barrier.SafetyCriticalElement;
+import neqsim.process.safety.barrier.SafetySystemCategory;
+import neqsim.process.safety.barrier.SafetySystemDemand;
+import neqsim.process.safety.barrier.SafetySystemPerformanceAnalyzer;
+import neqsim.process.safety.barrier.SafetySystemPerformanceReport;
+import neqsim.process.measurementdevice.FireDetector;
+import neqsim.process.measurementdevice.GasDetector;
+import neqsim.process.logic.sis.Detector;
+import neqsim.process.logic.sis.VotingLogic;
 import neqsim.process.safety.blowby.GasBlowbyAnalyzer;
 import neqsim.process.safety.blowby.GasBlowbyResult;
 import neqsim.process.safety.dispersion.GasDispersionAnalyzer;
@@ -699,6 +707,9 @@ public class ProcessProbe {
         break;
       case "open_drain_review":
         openDrainRows();
+        break;
+      case "safety_system_performance":
+        safetySystemPerformanceRows();
         break;
       case "gas_blowby":
         gasBlowbyRows();
@@ -18453,6 +18464,229 @@ public class ProcessProbe {
         System.out.println("assessment_" + i + "_" + j + "_clause=" + map.get("clause"));
         System.out.println("assessment_" + i + "_" + j + "_status=" + map.get("status"));
         System.out.println("assessment_" + i + "_" + j + "_severity=" + map.get("severity"));
+      }
+    }
+    System.out.println();
+  }
+
+  static DocumentEvidence performanceEvidence(String id) {
+    return new DocumentEvidence(id, "STID-001", "Safety systems STID", "A", "4.2", 12,
+        "references/stid.pdf", "Barrier requirement extracted from STID and C&E documents.", 0.95);
+  }
+
+  static SafetyBarrier performanceBarrier(String id, String name, String function,
+      SafetySystemCategory category) {
+    PerformanceStandard standard = new PerformanceStandard("PS-" + id).setTitle(name + " standard")
+        .setSafetyFunction(function).setDemandMode(PerformanceStandard.DemandMode.LOW_DEMAND)
+        .setTargetPfd(category == SafetySystemCategory.PASSIVE_FIRE_PROTECTION ? Double.NaN : 1.0e-3)
+        .setRequiredAvailability(0.99).setResponseTimeSeconds(60.0)
+        .addAcceptanceCriterion("Barrier shall meet documented functional requirements.")
+        .addEvidence(performanceEvidence("E-" + id));
+    return new SafetyBarrier(id).setName(name).setDescription(function)
+        .setType(SafetyBarrier.BarrierType.MITIGATION).setStatus(SafetyBarrier.BarrierStatus.AVAILABLE)
+        .setSafetyFunction(function).setOwner("Technical safety").addEquipmentTag("V-101")
+        .addHazardId("LOC-V-101").setPerformanceStandard(standard)
+        .addEvidence(performanceEvidence("BE-" + id));
+  }
+
+  static void safetySystemPerformanceRows() {
+    BarrierRegister delugeRegister = new BarrierRegister("BR-FIRE-001").setName("Fire protection");
+    SafetyBarrier deluge = performanceBarrier("B-DELUGE-001", "Deluge system",
+        "Mitigate jet fire exposure using deluge in module M01", SafetySystemCategory.FIREWATER_DELUGE)
+        .setPfd(2.8e-4).setEffectiveness(0.95);
+    delugeRegister.addBarrier(deluge)
+        .addSafetyCriticalElement(new SafetyCriticalElement("SCE-FW-001").setTag("FW-001")
+            .setName("Deluge zone M01").setType(SafetyCriticalElement.ElementType.FIRE_PROTECTION)
+            .addBarrier(deluge));
+    SafetySystemDemand delugeDemand = new SafetySystemDemand("D-DELUGE-001")
+        .setBarrierId("B-DELUGE-001").setCategory(SafetySystemCategory.FIREWATER_DELUGE)
+        .setScenario("Jet fire on V-101").setDemandValue(10.0).setCapacityValue(15.0)
+        .setDemandUnit("L/min/m2").setRequiredResponseTimeSeconds(45.0)
+        .setActualResponseTimeSeconds(30.0).setRequiredAvailability(0.99)
+        .setActualAvailability(0.995).setRequiredEffectiveness(0.90)
+        .setActualEffectiveness(0.95);
+    printPerformance("ssp_deluge_pass",
+        new SafetySystemPerformanceAnalyzer(delugeRegister).addDemandCase(delugeDemand));
+
+    BarrierRegister fgsRegister = new BarrierRegister("BR-FG-001").setName("Fire and gas");
+    SafetyBarrier detection = performanceBarrier("B-FGS-001", "Fire and gas detection",
+        "Detect gas or fire and activate deluge", SafetySystemCategory.FIRE_GAS_DETECTION)
+        .setPfd(2.8e-4);
+    detection.addEquipmentTag("FD-101").addEquipmentTag("GD-101");
+    fgsRegister.addBarrier(detection)
+        .addSafetyCriticalElement(new SafetyCriticalElement("SCE-FGS-001").setTag("FGS-001")
+            .setName("Fire and gas detection")
+            .setType(SafetyCriticalElement.ElementType.INSTRUMENTED_FUNCTION).addBarrier(detection));
+    FireDetector fireDetector = new FireDetector("FD-101", "Module M01");
+    fireDetector.setDetectionDelay(2.0);
+    GasDetector gasDetector = new GasDetector("GD-101", GasDetector.GasType.COMBUSTIBLE, "Module M01");
+    gasDetector.setResponseTime(8.0);
+    neqsim.process.logic.sis.SafetyInstrumentedFunction fgsSif = new neqsim.process.logic.sis.SafetyInstrumentedFunction("B-FGS-001 Deluge SIF",
+        VotingLogic.TWO_OUT_OF_THREE);
+    fgsSif.addDetector(new Detector("FD-101", Detector.DetectorType.FIRE, Detector.AlarmLevel.HIGH,
+        1.0, "binary"));
+    fgsSif.addDetector(new Detector("GD-101", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL"));
+    fgsSif.addDetector(new Detector("GD-102", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL"));
+    SafetySystemDemand fgsDemand = new SafetySystemDemand("D-FGS-001").setBarrierId("B-FGS-001")
+        .setCategory(SafetySystemCategory.FIRE_GAS_DETECTION).setRequiredResponseTimeSeconds(20.0)
+        .setActualResponseTimeSeconds(10.0).setRequiredAvailability(0.99)
+        .setActualAvailability(0.996);
+    printPerformance("ssp_fire_gas", new SafetySystemPerformanceAnalyzer(fgsRegister)
+        .addMeasurementDevice(fireDetector).addMeasurementDevice(gasDetector)
+        .addSafetyInstrumentedFunction(fgsSif).addDemandCase(fgsDemand));
+
+    BarrierRegister pfpRegister = new BarrierRegister("BR-PFP-001").setName("PFP review");
+    SafetyBarrier pfp = performanceBarrier("B-PFP-001", "Passive fire protection",
+        "PFP coating on V-101 support steel", SafetySystemCategory.PASSIVE_FIRE_PROTECTION)
+        .setEffectiveness(0.80);
+    pfpRegister.addBarrier(pfp)
+        .addSafetyCriticalElement(new SafetyCriticalElement("SCE-PFP-001").setTag("PFP-V-101")
+            .setName("PFP on V-101").setType(SafetyCriticalElement.ElementType.STRUCTURAL)
+            .addBarrier(pfp));
+    SafetySystemDemand pfpDemand = new SafetySystemDemand("D-PFP-001").setBarrierId("B-PFP-001")
+        .setCategory(SafetySystemCategory.PASSIVE_FIRE_PROTECTION)
+        .setScenario("Jet fire thermal radiation at support steel").setDemandValue(45.0)
+        .setCapacityValue(37.5).setDemandUnit("kW/m2").setRequiredEffectiveness(0.90)
+        .setActualEffectiveness(0.80);
+    printPerformance("ssp_pfp_capacity_fail",
+        new SafetySystemPerformanceAnalyzer(pfpRegister).addDemandCase(pfpDemand));
+
+    BarrierRegister quantitativeRegister = new BarrierRegister("BR-QSIF-001")
+        .setName("Quantitative SIF");
+    SafetyBarrier sifBarrier = performanceBarrier("B-SIF-101", "SIF shutdown",
+        "SIF shutdown protects V-101", SafetySystemCategory.ESD_BLOWDOWN).setPfd(8.0e-4);
+    quantitativeRegister.addBarrier(sifBarrier);
+    neqsim.process.safety.risk.sis.SafetyInstrumentedFunction quantitativeSif =
+        neqsim.process.safety.risk.sis.SafetyInstrumentedFunction.builder().id("B-SIF-101")
+            .name("B-SIF-101 quantitative SIL").description("SIF shutdown protects V-101").sil(3)
+            .pfd(8.0e-4).architecture("1oo2").testIntervalHours(8760.0).addProtectedEquipment("V-101")
+            .build();
+    printPerformance("ssp_quantitative_sif", new SafetySystemPerformanceAnalyzer(quantitativeRegister)
+        .addQuantitativeSafetyInstrumentedFunction(quantitativeSif));
+
+    BarrierRegister psdRegister = new BarrierRegister("BR-PSD-001").setName("PSD review");
+    SafetyBarrier psd = performanceBarrier("B-PSD-101", "PSD valve",
+        "Process shutdown closes shutdown valve SDV-101", SafetySystemCategory.UNKNOWN)
+        .setPfd(8.0e-4);
+    psdRegister.addBarrier(psd);
+    printPerformance("ssp_psd_category", new SafetySystemPerformanceAnalyzer(psdRegister));
+
+    BarrierRegister rulesRegister = new BarrierRegister("BR-RULES-001").setName("Rule coverage");
+    SafetyBarrier rules = new SafetyBarrier("B-RULES-101").setName("Rules barrier")
+        .setDescription("Isolation duty").setSafetyFunction("Isolation duty")
+        .setStatus(SafetyBarrier.BarrierStatus.OUT_OF_SERVICE).addEquipmentTag("GD-201");
+    rulesRegister.addBarrier(rules)
+        .addSafetyCriticalElement(new SafetyCriticalElement("SCE-RULES-001").setTag("SCE-R")
+            .setName("Rules SCE").setType(SafetyCriticalElement.ElementType.INSTRUMENTED_FUNCTION)
+            .addBarrier(rules));
+    SafetySystemDemand rulesDemand = new SafetySystemDemand("D-RULES-101")
+        .setBarrierId("B-RULES-101").setRequiredPfd(1.0e-3).setActualPfd(1.0e-2)
+        .setRequiredAvailability(0.99).setActualAvailability(0.95)
+        .setRequiredResponseTimeSeconds(10.0).setActualResponseTimeSeconds(20.0)
+        .setRequiredEffectiveness(0.9).setActualEffectiveness(0.5).setScenario("Loss of containment")
+        .setDemandValue(10.0).setCapacityValue(5.0).setDemandUnit("kg/s");
+    SafetySystemDemand rulesDetectorDemand = new SafetySystemDemand("D-RULES-102")
+        .setBarrierId("B-RULES-101").setRequiredResponseTimeSeconds(5.0);
+    GasDetector rulesGas = new GasDetector("GD-201", GasDetector.GasType.COMBUSTIBLE, "Module M02");
+    rulesGas.setResponseTime(30.0);
+    neqsim.process.logic.sis.SafetyInstrumentedFunction rulesSif = new neqsim.process.logic.sis.SafetyInstrumentedFunction("B-RULES-101 SIF",
+        VotingLogic.TWO_OUT_OF_THREE);
+    Detector bypassed = new Detector("GD-201", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL");
+    bypassed.setBypass(true);
+    Detector faulty = new Detector("GD-202", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL");
+    faulty.setFaulty(true);
+    Detector healthy = new Detector("GD-203", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL");
+    rulesSif.addDetector(bypassed);
+    rulesSif.addDetector(faulty);
+    rulesSif.addDetector(healthy);
+    rulesSif.setOverride(true);
+    printPerformance("ssp_rule_failures", new SafetySystemPerformanceAnalyzer(rulesRegister)
+        .addMeasurementDevice(rulesGas).addSafetyInstrumentedFunction(rulesSif)
+        .addDemandCase(rulesDemand).addDemandCase(rulesDetectorDemand));
+
+    BarrierRegister instrumentRegister = new BarrierRegister("BR-INST-001").setName("Instrumentation");
+    SafetyBarrier instrumentBarrier = performanceBarrier("B-INST-001", "Gas detection",
+        "Detect gas and alarm", SafetySystemCategory.FIRE_GAS_DETECTION).setPfd(2.8e-4);
+    instrumentBarrier.addEquipmentTag("GD-301");
+    instrumentRegister.addBarrier(instrumentBarrier);
+    neqsim.process.logic.sis.SafetyInstrumentedFunction instrumentSif = new neqsim.process.logic.sis.SafetyInstrumentedFunction("B-INST-001 SIF",
+        VotingLogic.TWO_OUT_OF_THREE);
+    Detector instrumentBypassed = new Detector("GD-301", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL");
+    instrumentBypassed.setBypass(true);
+    Detector instrumentHealthy = new Detector("GD-302", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL");
+    instrumentSif.addDetector(instrumentBypassed);
+    instrumentSif.addDetector(instrumentHealthy);
+    printPerformance("ssp_instrumentation_warnings",
+        new SafetySystemPerformanceAnalyzer(instrumentRegister)
+            .addSafetyInstrumentedFunction(instrumentSif));
+
+    BarrierRegister inferredRegister = new BarrierRegister("BR-INF-001").setName("Inferred category");
+    SafetyBarrier inferred = new SafetyBarrier("B-INF-001").setName("Bland barrier")
+        .setDescription("Isolation duty").setSafetyFunction("Isolation duty")
+        .setStatus(SafetyBarrier.BarrierStatus.AVAILABLE).addEquipmentTag("V-301")
+        .addEvidence(performanceEvidence("BE-INF-001"));
+    inferred.setPerformanceStandard(new PerformanceStandard("PS-INF-001").setTitle("Bland standard")
+        .setSafetyFunction("Isolation duty").setTargetPfd(1.0e-3).setRequiredAvailability(0.99)
+        .setResponseTimeSeconds(60.0).addAcceptanceCriterion("meet requirements"));
+    inferredRegister.addBarrier(inferred)
+        .addSafetyCriticalElement(new SafetyCriticalElement("SCE-INF-001").setTag("SCE-I")
+            .setName("Fire equipment").setType(SafetyCriticalElement.ElementType.FIRE_PROTECTION)
+            .addBarrier(inferred));
+    printPerformance("ssp_element_inference", new SafetySystemPerformanceAnalyzer(inferredRegister));
+    System.out.println();
+  }
+
+  @SuppressWarnings("unchecked")
+  static void printPerformance(String label, SafetySystemPerformanceAnalyzer analyzer) {
+    SafetySystemPerformanceReport report = analyzer.analyze();
+    System.out.println(label);
+    System.out.println("register_id=" + report.getRegisterId());
+    System.out.println("register_name=" + report.getName());
+    System.out.println("overall_verdict=" + report.getOverallVerdict());
+    System.out.println("assessment_count=" + report.getAssessments().size());
+    System.out.println("pass_count="
+        + report.countAssessments(SafetySystemPerformanceReport.Verdict.PASS));
+    System.out.println("warning_count="
+        + report.countAssessments(SafetySystemPerformanceReport.Verdict.PASS_WITH_WARNINGS));
+    System.out.println("fail_count="
+        + report.countAssessments(SafetySystemPerformanceReport.Verdict.FAIL));
+    for (int i = 0; i < report.getAssessments().size(); i++) {
+      Map<String, Object> map = report.getAssessments().get(i).toMap();
+      String prefix = "assessment_" + i + "_";
+      System.out.println(prefix + "barrier_id=" + map.get("barrierId"));
+      System.out.println(prefix + "barrier_name=" + map.get("barrierName"));
+      System.out.println(prefix + "demand_id=" + map.get("demandId"));
+      System.out.println(prefix + "category=" + map.get("category"));
+      System.out.println(prefix + "verdict=" + map.get("verdict"));
+      Map<String, Object> metrics = (Map<String, Object>) map.get("metrics");
+      for (Map.Entry<String, Object> entry : metrics.entrySet()) {
+        Object value = entry.getValue();
+        if (value instanceof Number && Double.isNaN(((Number) value).doubleValue())) {
+          continue;
+        }
+        System.out.println(
+            prefix + "metric_" + entry.getKey() + "=" + String.valueOf(value).replace("\n", " "));
+      }
+      List<String> tags = (List<String>) map.get("instrumentTags");
+      for (int j = 0; j < tags.size(); j++) {
+        System.out.println(prefix + "instrument_" + j + "=" + tags.get(j));
+      }
+      List<String> sifs = (List<String>) map.get("safetyInstrumentedFunctions");
+      for (int j = 0; j < sifs.size(); j++) {
+        System.out.println(prefix + "sif_" + j + "=" + sifs.get(j));
+      }
+      List<Map<String, Object>> findings = (List<Map<String, Object>>) map.get("findings");
+      System.out.println(prefix + "finding_count=" + findings.size());
+      for (int j = 0; j < findings.size(); j++) {
+        System.out.println(prefix + "finding_" + j + "_severity=" + findings.get(j).get("severity"));
+        System.out.println(prefix + "finding_" + j + "_message=" + findings.get(j).get("message"));
       }
     }
     System.out.println();

@@ -1149,6 +1149,216 @@ pub fn open_drain_review(
     .map_err(|error| to_pyerr(py, error))
 }
 
+/// `process.safety_system_performance` - the safety-system performance assessment.
+///
+/// The five check families per barrier and matching demand, the category inference and
+/// the related instruments and SIFs.
+#[pyfunction]
+#[pyo3(signature = (register_id, register_name = None, elements = None, links = None, barriers = None, barrier_tags = None, standards = None, standard_criteria = None, demands = None, measurement_devices = None, event_sifs = None, sif_detectors = None, quantitative_sifs = None, protected_equipment = None))]
+#[pyo3(
+    text_signature = "(register_id, register_name=None, elements=None, links=None, barriers=None, barrier_tags=None, standards=None, standard_criteria=None, demands=None, measurement_devices=None, event_sifs=None, sif_detectors=None, quantitative_sifs=None, protected_equipment=None)"
+)]
+#[allow(clippy::too_many_arguments)] // the spec's declared inputs
+pub fn safety_system_performance(
+    py: Python<'_>,
+    register_id: &str,
+    register_name: Option<&str>,
+    elements: Option<Vec<crate::records_gen::PerformanceElement>>,
+    links: Option<Vec<crate::records_gen::SafetySystemLink>>,
+    barriers: Option<Vec<crate::records_gen::PerformanceBarrier>>,
+    barrier_tags: Option<Vec<crate::records_gen::BarrierEquipmentTag>>,
+    standards: Option<Vec<crate::records_gen::SafetyPerformanceStandard>>,
+    standard_criteria: Option<Vec<crate::records_gen::StandardCriterion>>,
+    demands: Option<Vec<crate::records_gen::SafetySystemDemandRow>>,
+    measurement_devices: Option<Vec<crate::records_gen::MeasurementDeviceRow>>,
+    event_sifs: Option<Vec<crate::records_gen::EventSifRow>>,
+    sif_detectors: Option<Vec<crate::records_gen::SifDetectorRow>>,
+    quantitative_sifs: Option<Vec<crate::records_gen::QuantitativeSifRow>>,
+    protected_equipment: Option<Vec<crate::records_gen::ProtectedEquipmentRow>>,
+) -> PyResult<crate::transport_gen::PySafetySystemPerformanceResult> {
+    use azoth_process::models::safety_system_performance as performance;
+    let elements = elements
+        .map(|rows| {
+            rows.into_iter()
+                .map(|row| {
+                    Ok(performance::PerformanceElement {
+                        id: row.id,
+                        element_type: performance::ElementKind::parse(&row.element_type)
+                            .map_err(|error| to_pyerr(py, error))?,
+                    })
+                })
+                .collect::<PyResult<Vec<_>>>()
+        })
+        .transpose()?;
+    let links = links.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::SafetySystemLink {
+                element_id: row.element_id,
+                barrier_id: row.barrier_id,
+            })
+            .collect::<Vec<_>>()
+    });
+    let barriers = barriers
+        .map(|rows| {
+            rows.into_iter()
+                .map(|row| {
+                    Ok(performance::PerformanceBarrier {
+                        id: row.id,
+                        status: performance::PerformanceBarrierStatus::parse(&row.status)
+                            .map_err(|error| to_pyerr(py, error))?,
+                        has_traceable_evidence: row.has_traceable_evidence.unwrap_or(false),
+                        name: row.name,
+                        description: row.description,
+                        safety_function: row.safety_function,
+                        pfd: row.pfd,
+                        effectiveness: row.effectiveness,
+                        performance_standard_id: row.performance_standard_id,
+                    })
+                })
+                .collect::<PyResult<Vec<_>>>()
+        })
+        .transpose()?;
+    let tags = barrier_tags.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::BarrierEquipmentTag {
+                barrier_id: row.barrier_id,
+                tag: row.tag,
+            })
+            .collect::<Vec<_>>()
+    });
+    let standards = standards.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::SafetyPerformanceStandard {
+                id: row.id,
+                title: row.title,
+                safety_function: row.safety_function,
+                target_pfd: row.target_pfd,
+                required_availability: row.required_availability,
+                response_time_seconds: row.response_time_seconds,
+            })
+            .collect::<Vec<_>>()
+    });
+    let criteria = standard_criteria.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::StandardCriterion {
+                standard_id: row.standard_id,
+                criterion: row.criterion,
+            })
+            .collect::<Vec<_>>()
+    });
+    let demands = demands
+        .map(|rows| {
+            rows.into_iter()
+                .map(|row| {
+                    let category = match row.category.as_deref() {
+                        None => performance::PerformanceCategory::Unknown,
+                        Some(text) => performance::PerformanceCategory::parse(text)
+                            .map_err(|error| to_pyerr(py, error))?,
+                    };
+                    Ok(performance::SafetySystemDemandRow {
+                        demand_id: row.demand_id,
+                        barrier_id: row.barrier_id,
+                        equipment_tag: row.equipment_tag,
+                        scenario: row.scenario,
+                        category,
+                        demand_value: row.demand_value,
+                        capacity_value: row.capacity_value,
+                        demand_unit: row.demand_unit,
+                        required_pfd: row.required_pfd,
+                        actual_pfd: row.actual_pfd,
+                        required_availability: row.required_availability,
+                        actual_availability: row.actual_availability,
+                        required_response_time_seconds: row.required_response_time_seconds,
+                        actual_response_time_seconds: row.actual_response_time_seconds,
+                        required_effectiveness: row.required_effectiveness,
+                        actual_effectiveness: row.actual_effectiveness,
+                    })
+                })
+                .collect::<PyResult<Vec<_>>>()
+        })
+        .transpose()?;
+    let devices = measurement_devices
+        .map(|rows| {
+            rows.into_iter()
+                .map(|row| {
+                    Ok(performance::MeasurementDeviceRow {
+                        name: row.name,
+                        kind: performance::DeviceKind::parse(&row.kind)
+                            .map_err(|error| to_pyerr(py, error))?,
+                        tag: row.tag,
+                        location: row.location,
+                        response_time_seconds: row.response_time_seconds,
+                    })
+                })
+                .collect::<PyResult<Vec<_>>>()
+        })
+        .transpose()?;
+    let event_sifs = event_sifs
+        .map(|rows| {
+            rows.into_iter()
+                .map(|row| {
+                    Ok(performance::EventSifRow {
+                        name: row.name,
+                        voting_notation: performance::VotingNotation::parse(&row.voting_notation)
+                            .map_err(|error| to_pyerr(py, error))?,
+                        overridden: row.overridden.unwrap_or(false),
+                    })
+                })
+                .collect::<PyResult<Vec<_>>>()
+        })
+        .transpose()?;
+    let detectors = sif_detectors.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::SifDetectorRow {
+                sif_name: row.sif_name,
+                name: row.name,
+                bypassed: row.bypassed.unwrap_or(false),
+                faulty: row.faulty.unwrap_or(false),
+                tripped: row.tripped.unwrap_or(false),
+            })
+            .collect::<Vec<_>>()
+    });
+    let quantitative = quantitative_sifs.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::QuantitativeSifRow {
+                id: row.id,
+                name: row.name,
+                description: row.description,
+                architecture: row.architecture,
+                claimed_sil: row.claimed_sil,
+                pfd_average: row.pfd_average,
+                test_interval_hours: row.test_interval_hours,
+            })
+            .collect::<Vec<_>>()
+    });
+    let protected = protected_equipment.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::ProtectedEquipmentRow {
+                sif_id: row.sif_id,
+                equipment: row.equipment,
+            })
+            .collect::<Vec<_>>()
+    });
+    performance::safety_system_performance(
+        register_id,
+        register_name,
+        elements.as_deref(),
+        links.as_deref(),
+        barriers.as_deref(),
+        tags.as_deref(),
+        standards.as_deref(),
+        criteria.as_deref(),
+        demands.as_deref(),
+        devices.as_deref(),
+        event_sifs.as_deref(),
+        detectors.as_deref(),
+        quantitative.as_deref(),
+        protected.as_deref(),
+    )
+    .map(|result| crate::transport_gen::PySafetySystemPerformanceResult::from(&result))
+    .map_err(|error| to_pyerr(py, error))
+}
+
 /// `process.safety_envelope` - the operational safety envelope.
 ///
 /// The five curves and the operating-point queries.

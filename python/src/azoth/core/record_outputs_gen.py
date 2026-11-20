@@ -1289,6 +1289,185 @@ class P002FindingResult:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PerformanceAssessment:
+    """one row per barrier and matching demand, in register order."""
+
+    #: the barrier id.
+    barrier_id: str
+
+    #: the barrier name, empty when absent.
+    barrier_name: str
+
+    #: the demand id; absent for a register-only assessment.
+    demand_id: str | None
+
+    #: the inferred safety-system category.
+    category: str
+
+    #: the assessment's verdict.
+    verdict: str
+
+    #: the barrier status, echoed.
+    barrier_status: str
+
+    #: the barrier PFD; absent for the class's NaN.
+    barrier_pfd: float | None
+
+    #: the barrier effectiveness; absent for the class's NaN.
+    barrier_effectiveness: float | None
+
+    #: the barrier's evidence flag, echoed.
+    has_traceable_evidence: bool
+
+    #: the linked standard's id; absent when no standard is linked.
+    performance_standard_id: str | None
+
+    #: the selected target PFD; absent when both sources are NaN.
+    target_pfd: float | None
+
+    #: the selected actual PFD; absent when both sources are NaN.
+    actual_pfd: float | None
+
+    #: the selected required availability; absent when both sources are NaN.
+    required_availability: float | None
+
+    #: the demand's actual availability; absent without a demand or a value.
+    actual_availability: float | None
+
+    #: the selected required response time; absent when both sources are NaN.
+    required_response_time_seconds: Q | None
+
+    #: the demand's actual response time; absent without a demand or a value.
+    actual_response_time_seconds: Q | None
+
+    #: the demand's required effectiveness; absent without it.
+    required_effectiveness: float | None
+
+    #: the selected actual effectiveness; absent when both sources are NaN.
+    actual_effectiveness: float | None
+
+    #: the demand's scenario; absent without a demand or text.
+    scenario: str | None
+
+    #: the demand's demand value; absent when NaN.
+    demand_value: float | None
+
+    #: the demand's capacity value; absent when NaN.
+    capacity_value: float | None
+
+    #: the demand's unit label; absent without a demand or text.
+    demand_unit: str | None
+
+    #: `capacity - demand`; absent unless both are finite.
+    capacity_margin: float | None
+
+    #: the number of related measurement devices.
+    related_instrument_count: float
+
+    #: the largest related detector response time; absent when none is finite.
+    max_instrument_response_time_seconds: Q | None
+
+    #: the number of related event SIFs.
+    related_sif_count: float
+
+    #: the number of related quantitative SIFs.
+    related_quantitative_sif_count: float
+
+    #: the number of findings the assessment carries.
+    finding_count: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PerformanceFinding:
+    """every finding, assessment by assessment in the class's order."""
+
+    #: the barrier the finding belongs to.
+    barrier_id: str
+
+    #: the assessment's demand id; absent for a register-only assessment.
+    demand_id: str | None
+
+    #: the stable rule identifier, one per check site.
+    rule: str
+
+    #: the finding's severity.
+    severity: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PerformanceInstrument:
+    """the related measurement devices, assessment by assessment."""
+
+    #: the barrier the device matched.
+    barrier_id: str
+
+    #: the assessment's demand id; absent for a register-only assessment.
+    demand_id: str | None
+
+    #: the device's tag, or its name when the tag is absent.
+    tag: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PerformanceSif:
+    """the related SIFs, assessment by assessment."""
+
+    #: the barrier the SIF matched.
+    barrier_id: str
+
+    #: the assessment's demand id; absent for a register-only assessment.
+    demand_id: str | None
+
+    #: the SIF's name, or the quantitative SIF's first non-empty name or id.
+    identifier: str
+
+    #: which SIF family the row is.
+    kind: str
+
+    #: the event SIF's voting notation.
+    voting_notation: str | None
+
+    #: the event SIF's detector count.
+    detector_count: float | None
+
+    #: the event SIF's bypassed detector count.
+    bypassed_detector_count: float | None
+
+    #: the event SIF's faulty detector count.
+    faulty_detector_count: float | None
+
+    #: the event SIF's tripped detector count.
+    tripped_detector_count: float | None
+
+    #: the quantitative SIF's claimed SIL.
+    claimed_sil: float | None
+
+    #: the verified achieved SIL.
+    achieved_sil: float | None
+
+    #: whether the achieved SIL meets the claim.
+    sil_achieved: bool | None
+
+    #: the quantitative SIF's average PFD.
+    pfd_average: float | None
+
+    #: `1.5 PFD`.
+    pfd_upper: float | None
+
+    #: `1 / PFD`; absent at a zero PFD.
+    risk_reduction_factor: float | None
+
+    #: the quantitative SIF's architecture.
+    architecture: str | None
+
+    #: the quantitative SIF's proof-test interval.
+    proof_test_interval_hours: float | None
+
+    #: the number of protected equipment tags the SIF names.
+    protected_equipment_count: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PipeFireRupturePoint:
     """one row per marching step, in time order, ending at the rupture step when one is found."""
 

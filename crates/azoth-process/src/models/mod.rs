@@ -145,6 +145,7 @@ pub mod s001_secondary_pressure_protection;
 pub mod safety_envelope;
 pub mod safety_instrumented_function;
 pub mod safety_review;
+pub mod safety_system_performance;
 pub mod self_heating_induction;
 pub mod selfheating;
 pub mod semenov_self_heating;
@@ -369,6 +370,15 @@ pub use safety_instrumented_function::{
     SafetyInstrumentedFunctionResult, safety_instrumented_function,
 };
 pub use safety_review::{Api14cCategory, Api14cDevice};
+pub use safety_system_performance::{
+    BarrierEquipmentTag, DeviceKind, ElementKind, EventSifRow, MeasurementDeviceRow,
+    PerformanceAssessment, PerformanceBarrier, PerformanceBarrierStatus, PerformanceCategory,
+    PerformanceElement, PerformanceFinding, PerformanceFindingSeverity, PerformanceInstrument,
+    PerformanceRule, PerformanceSif, PerformanceSifKind, PerformanceVerdict, ProtectedEquipmentRow,
+    QuantitativeSifRow, SafetyPerformanceStandard, SafetySystemDemandRow, SafetySystemLink,
+    SafetySystemPerformanceResult, SifDetectorRow, StandardCriterion, VotingNotation,
+    safety_system_performance,
+};
 pub use self_heating_induction::{
     SelfHeatingInductionResult, SelfHeatingTimePoint, self_heating_induction,
 };

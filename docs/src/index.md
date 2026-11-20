@@ -430,6 +430,7 @@ Five sections, and the difference between them is the point:
 - [`process.s001_secondary_pressure_protection`](./process/s001_secondary_pressure_protection.md) — NORSOK S-001 secondary pressure protection
 - [`process.safety_envelope`](./process/safety_envelope.md) — Safety envelope
 - [`process.safety_instrumented_function`](./process/safety_instrumented_function.md) — Safety instrumented function
+- [`process.safety_system_performance`](./process/safety_system_performance.md) — Safety-system performance assessment
 - [`process.self_heating_induction`](./process/self_heating_induction.md) — Self-heating induction time
 - [`process.semenov_self_heating`](./process/semenov_self_heating.md) — Semenov self-heating
 - [`process.separator`](./process/separator.md) — Separator

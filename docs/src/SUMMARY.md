@@ -338,6 +338,7 @@
   - [NORSOK S-001 secondary pressure protection](./process/s001_secondary_pressure_protection.md)
   - [Safety envelope](./process/safety_envelope.md)
   - [Safety instrumented function](./process/safety_instrumented_function.md)
+  - [Safety-system performance assessment](./process/safety_system_performance.md)
   - [Self-heating induction time](./process/self_heating_induction.md)
   - [Semenov self-heating](./process/semenov_self_heating.md)
   - [Separator](./process/separator.md)

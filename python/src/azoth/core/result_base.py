@@ -178,6 +178,14 @@ class OpenDrainVerdict(StrEnum):
     FAIL = "fail"
 
 
+class PerformanceVerdict(StrEnum):
+    """A barrier assessment's or report's verdict."""
+
+    PASS = "pass"
+    PASS_WITH_WARNINGS = "pass_with_warnings"
+    FAIL = "fail"
+
+
 class FluidBasis(StrEnum):
     """The release branch the density switch selected."""
 

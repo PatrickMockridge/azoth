@@ -65,6 +65,15 @@ pub struct BarrierElement {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BarrierEquipmentTag {
+    #[pyo3(item)]
+    pub barrier_id: String,
+    #[pyo3(item)]
+    pub tag: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct BarrierRow {
     #[pyo3(item)]
     pub id: String,
@@ -309,6 +318,17 @@ pub struct EsdContributionInput {
     pub stage: String,
     #[pyo3(item)]
     pub time: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct EventSifRow {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub voting_notation: String,
+    #[pyo3(item)]
+    pub overridden: Option<bool>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
@@ -584,6 +604,21 @@ pub struct MapCurvePoint {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct MeasurementDeviceRow {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub kind: String,
+    #[pyo3(item)]
+    pub tag: Option<String>,
+    #[pyo3(item)]
+    pub location: Option<String>,
+    #[pyo3(item)]
+    pub response_time_seconds: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct MultiVesselSample {
     #[pyo3(item)]
     pub source: String,
@@ -699,6 +734,38 @@ pub struct P002CheckRow {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct PerformanceBarrier {
+    #[pyo3(item)]
+    pub id: String,
+    #[pyo3(item)]
+    pub status: String,
+    #[pyo3(item)]
+    pub has_traceable_evidence: Option<bool>,
+    #[pyo3(item)]
+    pub name: Option<String>,
+    #[pyo3(item)]
+    pub description: Option<String>,
+    #[pyo3(item)]
+    pub safety_function: Option<String>,
+    #[pyo3(item)]
+    pub pfd: Option<f64>,
+    #[pyo3(item)]
+    pub effectiveness: Option<f64>,
+    #[pyo3(item)]
+    pub performance_standard_id: Option<String>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct PerformanceElement {
+    #[pyo3(item)]
+    pub id: String,
+    #[pyo3(item)]
+    pub element_type: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct PerformanceStandardRow {
     #[pyo3(item)]
     pub id: String,
@@ -761,6 +828,15 @@ pub struct ProductionChemicalDose {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct ProtectedEquipmentRow {
+    #[pyo3(item)]
+    pub sif_id: String,
+    #[pyo3(item)]
+    pub equipment: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct ProtectedObject {
     #[pyo3(item)]
     pub surface_area: f64,
@@ -781,6 +857,25 @@ pub struct PumpCurvePoint {
     pub efficiency: f64,
     #[pyo3(item)]
     pub npsh_required: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct QuantitativeSifRow {
+    #[pyo3(item)]
+    pub id: String,
+    #[pyo3(item)]
+    pub name: Option<String>,
+    #[pyo3(item)]
+    pub description: Option<String>,
+    #[pyo3(item)]
+    pub architecture: String,
+    #[pyo3(item)]
+    pub claimed_sil: f64,
+    #[pyo3(item)]
+    pub pfd_average: f64,
+    #[pyo3(item)]
+    pub test_interval_hours: Option<f64>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
@@ -892,6 +987,69 @@ pub struct SafeChartPresentDevice {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct SafetyPerformanceStandard {
+    #[pyo3(item)]
+    pub id: String,
+    #[pyo3(item)]
+    pub title: Option<String>,
+    #[pyo3(item)]
+    pub safety_function: Option<String>,
+    #[pyo3(item)]
+    pub target_pfd: Option<f64>,
+    #[pyo3(item)]
+    pub required_availability: Option<f64>,
+    #[pyo3(item)]
+    pub response_time_seconds: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct SafetySystemDemandRow {
+    #[pyo3(item)]
+    pub demand_id: String,
+    #[pyo3(item)]
+    pub barrier_id: Option<String>,
+    #[pyo3(item)]
+    pub equipment_tag: Option<String>,
+    #[pyo3(item)]
+    pub scenario: Option<String>,
+    #[pyo3(item)]
+    pub category: Option<String>,
+    #[pyo3(item)]
+    pub demand_value: Option<f64>,
+    #[pyo3(item)]
+    pub capacity_value: Option<f64>,
+    #[pyo3(item)]
+    pub demand_unit: Option<String>,
+    #[pyo3(item)]
+    pub required_pfd: Option<f64>,
+    #[pyo3(item)]
+    pub actual_pfd: Option<f64>,
+    #[pyo3(item)]
+    pub required_availability: Option<f64>,
+    #[pyo3(item)]
+    pub actual_availability: Option<f64>,
+    #[pyo3(item)]
+    pub required_response_time_seconds: Option<f64>,
+    #[pyo3(item)]
+    pub actual_response_time_seconds: Option<f64>,
+    #[pyo3(item)]
+    pub required_effectiveness: Option<f64>,
+    #[pyo3(item)]
+    pub actual_effectiveness: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct SafetySystemLink {
+    #[pyo3(item)]
+    pub element_id: String,
+    #[pyo3(item)]
+    pub barrier_id: String,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct ScaleInhibitor {
     #[pyo3(item)]
     pub scale_type: String,
@@ -924,6 +1082,21 @@ pub struct SettleOutCompartment {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct SifDetectorRow {
+    #[pyo3(item)]
+    pub sif_name: String,
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub bypassed: Option<bool>,
+    #[pyo3(item)]
+    pub faulty: Option<bool>,
+    #[pyo3(item)]
+    pub tripped: Option<bool>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct SourceRow {
     #[pyo3(item)]
     pub moles: f64,
@@ -933,6 +1106,15 @@ pub struct SourceRow {
     pub density: Option<f64>,
     #[pyo3(item)]
     pub boiling_point: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct StandardCriterion {
+    #[pyo3(item)]
+    pub standard_id: String,
+    #[pyo3(item)]
+    pub criterion: String,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

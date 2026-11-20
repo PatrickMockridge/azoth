@@ -343,6 +343,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyS001SecondaryPressureProtectionResult>()?;
     m.add_class::<crate::transport_gen::PySafetyEnvelopeResult>()?;
     m.add_class::<crate::transport_gen::PySafetyInstrumentedFunctionResult>()?;
+    m.add_class::<crate::transport_gen::PySafetySystemPerformanceResult>()?;
     m.add_class::<crate::transport_gen::PySelfHeatingInductionResult>()?;
     m.add_class::<crate::transport_gen::PySemenovSelfHeatingResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorResult>()?;
@@ -442,6 +443,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyOpenDrainAssessment>()?;
     m.add_class::<crate::record_outputs_gen::PyOpenDrainResult>()?;
     m.add_class::<crate::record_outputs_gen::PyP002FindingResult>()?;
+    m.add_class::<crate::record_outputs_gen::PyPerformanceAssessment>()?;
+    m.add_class::<crate::record_outputs_gen::PyPerformanceFinding>()?;
+    m.add_class::<crate::record_outputs_gen::PyPerformanceInstrument>()?;
+    m.add_class::<crate::record_outputs_gen::PyPerformanceSif>()?;
     m.add_class::<crate::record_outputs_gen::PyPipeFireRupturePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyPrescribedSlipReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyPulsationModeResult>()?;
@@ -1251,6 +1256,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::process::safety_envelope, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::safety_instrumented_function,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::process::safety_system_performance,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(

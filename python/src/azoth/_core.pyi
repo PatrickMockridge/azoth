@@ -781,6 +781,115 @@ class EnvelopeTracePoint(TypedDict):
     pressure: float
     temperature: float
 
+class PerformanceElement(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    element_type: str
+
+class SafetySystemLink(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    element_id: str
+    barrier_id: str
+
+class PerformanceBarrier(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    status: str
+    has_traceable_evidence: bool | None
+    name: str | None
+    description: str | None
+    safety_function: str | None
+    pfd: float | None
+    effectiveness: float | None
+    performance_standard_id: str | None
+
+class BarrierEquipmentTag(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    barrier_id: str
+    tag: str
+
+class SafetyPerformanceStandard(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    title: str | None
+    safety_function: str | None
+    target_pfd: float | None
+    required_availability: float | None
+    response_time_seconds: float | None
+
+class StandardCriterion(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    standard_id: str
+    criterion: str
+
+class SafetySystemDemandRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    demand_id: str
+    barrier_id: str | None
+    equipment_tag: str | None
+    scenario: str | None
+    category: str | None
+    demand_value: float | None
+    capacity_value: float | None
+    demand_unit: str | None
+    required_pfd: float | None
+    actual_pfd: float | None
+    required_availability: float | None
+    actual_availability: float | None
+    required_response_time_seconds: float | None
+    actual_response_time_seconds: float | None
+    required_effectiveness: float | None
+    actual_effectiveness: float | None
+
+class MeasurementDeviceRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    kind: str
+    tag: str | None
+    location: str | None
+    response_time_seconds: float | None
+
+class EventSifRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    voting_notation: str
+    overridden: bool | None
+
+class SifDetectorRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    sif_name: str
+    name: str
+    bypassed: bool | None
+    faulty: bool | None
+    tripped: bool | None
+
+class QuantitativeSifRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    name: str | None
+    description: str | None
+    architecture: str
+    claimed_sil: float
+    pfd_average: float
+    test_interval_hours: float | None
+
+class ProtectedEquipmentRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    sif_id: str
+    equipment: str
+
 class EfficiencyPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1718,6 +1827,79 @@ class EnvelopeQuery:
     safe_temperature: Qty | None
     margin: Qty | None
     safe: bool
+
+@final
+class PerformanceAssessment:
+    """one row per barrier and matching demand, in register order."""
+
+    barrier_id: str
+    barrier_name: str
+    demand_id: str | None
+    category: str
+    verdict: str
+    barrier_status: str
+    barrier_pfd: float | None
+    barrier_effectiveness: float | None
+    has_traceable_evidence: bool
+    performance_standard_id: str | None
+    target_pfd: float | None
+    actual_pfd: float | None
+    required_availability: float | None
+    actual_availability: float | None
+    required_response_time_seconds: Qty | None
+    actual_response_time_seconds: Qty | None
+    required_effectiveness: float | None
+    actual_effectiveness: float | None
+    scenario: str | None
+    demand_value: float | None
+    capacity_value: float | None
+    demand_unit: str | None
+    capacity_margin: float | None
+    related_instrument_count: float
+    max_instrument_response_time_seconds: Qty | None
+    related_sif_count: float
+    related_quantitative_sif_count: float
+    finding_count: float
+
+@final
+class PerformanceFinding:
+    """every finding, assessment by assessment in the class's order."""
+
+    barrier_id: str
+    demand_id: str | None
+    rule: str
+    severity: str
+
+@final
+class PerformanceInstrument:
+    """the related measurement devices, assessment by assessment."""
+
+    barrier_id: str
+    demand_id: str | None
+    tag: str
+
+@final
+class PerformanceSif:
+    """the related SIFs, assessment by assessment."""
+
+    barrier_id: str
+    demand_id: str | None
+    identifier: str
+    kind: str
+    voting_notation: str | None
+    detector_count: float | None
+    bypassed_detector_count: float | None
+    faulty_detector_count: float | None
+    tripped_detector_count: float | None
+    claimed_sil: float | None
+    achieved_sil: float | None
+    sil_achieved: bool | None
+    pfd_average: float | None
+    pfd_upper: float | None
+    risk_reduction_factor: float | None
+    architecture: str | None
+    proof_test_interval_hours: float | None
+    protected_equipment_count: float | None
 
 @final
 class SelfHeatingTimePoint:
@@ -5475,6 +5657,21 @@ class SafetyInstrumentedFunctionResult:
     pfd_1oo2: float | None
     pfd_2oo3: float | None
     availability_with_spurious_trips: float | None
+    warnings: list[Warning]
+
+@final
+class SafetySystemPerformanceResult:
+    register_id: str
+    register_name: str
+    overall_verdict: PerformanceVerdict
+    assessment_count: float
+    pass_count: float
+    warning_count: float
+    fail_count: float
+    assessments: list[PerformanceAssessment]
+    findings: list[PerformanceFinding]
+    instruments: list[PerformanceInstrument]
+    sifs: list[PerformanceSif]
     warnings: list[Warning]
 
 @final
@@ -9643,6 +9840,22 @@ def safety_instrumented_function(
     mttr_hours: float | None = None,
     base_availability: float | None = None,
 ) -> SafetyInstrumentedFunctionResult: ...
+def safety_system_performance(
+    register_id: str,
+    register_name: str | None = None,
+    elements: list[PerformanceElement] | None = None,
+    links: list[SafetySystemLink] | None = None,
+    barriers: list[PerformanceBarrier] | None = None,
+    barrier_tags: list[BarrierEquipmentTag] | None = None,
+    standards: list[SafetyPerformanceStandard] | None = None,
+    standard_criteria: list[StandardCriterion] | None = None,
+    demands: list[SafetySystemDemandRow] | None = None,
+    measurement_devices: list[MeasurementDeviceRow] | None = None,
+    event_sifs: list[EventSifRow] | None = None,
+    sif_detectors: list[SifDetectorRow] | None = None,
+    quantitative_sifs: list[QuantitativeSifRow] | None = None,
+    protected_equipment: list[ProtectedEquipmentRow] | None = None,
+) -> SafetySystemPerformanceResult: ...
 def self_heating_induction(
     geometry: str,
     characteristic_dimension: float,

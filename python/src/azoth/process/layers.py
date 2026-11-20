@@ -4188,6 +4188,196 @@ def _open_drain_review(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _safety_system_performance(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.safety_system_performance`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.safety_system_performance import (
+        safety_system_performance as evaluate,
+    )
+
+    def optional_q(row: Mapping[str, Any], name: str, unit: str) -> Any:
+        value = row.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    def optional_text(value: Any) -> str | None:
+        return None if value is None else str(value)
+
+    elements = [
+        {"id": str(row["id"]), "element_type": str(row["element_type"])}
+        for row in inputs.get("elements", [])
+    ]
+    links = [
+        {"element_id": str(row["element_id"]), "barrier_id": str(row["barrier_id"])}
+        for row in inputs.get("links", [])
+    ]
+    barriers = [
+        {
+            "id": str(row["id"]),
+            "status": str(row.get("status") or "unknown"),
+            "has_traceable_evidence": bool(row.get("has_traceable_evidence") or False),
+            "name": optional_text(row.get("name")),
+            "description": optional_text(row.get("description")),
+            "safety_function": optional_text(row.get("safety_function")),
+            "pfd": row.get("pfd"),
+            "effectiveness": row.get("effectiveness"),
+            "performance_standard_id": optional_text(row.get("performance_standard_id")),
+        }
+        for row in inputs.get("barriers", [])
+    ]
+    tags = [
+        {"barrier_id": str(row["barrier_id"]), "tag": str(row["tag"])}
+        for row in inputs.get("barrier_tags", [])
+    ]
+    standards = [
+        {
+            "id": str(row["id"]),
+            "title": optional_text(row.get("title")),
+            "safety_function": optional_text(row.get("safety_function")),
+            "target_pfd": row.get("target_pfd"),
+            "required_availability": row.get("required_availability"),
+            "response_time_seconds": optional_q(row, "response_time_seconds", "s"),
+        }
+        for row in inputs.get("standards", [])
+    ]
+    criteria = [
+        {"standard_id": str(row["standard_id"]), "criterion": str(row["criterion"])}
+        for row in inputs.get("standard_criteria", [])
+    ]
+    demands = [
+        {
+            "demand_id": str(row["demand_id"]),
+            "barrier_id": optional_text(row.get("barrier_id")),
+            "equipment_tag": optional_text(row.get("equipment_tag")),
+            "scenario": optional_text(row.get("scenario")),
+            "category": str(row.get("category") or "unknown"),
+            "demand_value": row.get("demand_value"),
+            "capacity_value": row.get("capacity_value"),
+            "demand_unit": optional_text(row.get("demand_unit")),
+            "required_pfd": row.get("required_pfd"),
+            "actual_pfd": row.get("actual_pfd"),
+            "required_availability": row.get("required_availability"),
+            "actual_availability": row.get("actual_availability"),
+            "required_response_time_seconds": optional_q(
+                row, "required_response_time_seconds", "s"
+            ),
+            "actual_response_time_seconds": optional_q(
+                row, "actual_response_time_seconds", "s"
+            ),
+            "required_effectiveness": row.get("required_effectiveness"),
+            "actual_effectiveness": row.get("actual_effectiveness"),
+        }
+        for row in inputs.get("demands", [])
+    ]
+    devices = [
+        {
+            "name": str(row["name"]),
+            "kind": str(row["kind"]),
+            "tag": optional_text(row.get("tag")),
+            "location": optional_text(row.get("location")),
+            "response_time_seconds": optional_q(row, "response_time_seconds", "s"),
+        }
+        for row in inputs.get("measurement_devices", [])
+    ]
+    event_sifs = [
+        {
+            "name": str(row["name"]),
+            "voting_notation": str(row["voting_notation"]),
+            "overridden": bool(row.get("overridden") or False),
+        }
+        for row in inputs.get("event_sifs", [])
+    ]
+    detectors = [
+        {
+            "sif_name": str(row["sif_name"]),
+            "name": str(row["name"]),
+            "bypassed": bool(row.get("bypassed") or False),
+            "faulty": bool(row.get("faulty") or False),
+            "tripped": bool(row.get("tripped") or False),
+        }
+        for row in inputs.get("sif_detectors", [])
+    ]
+    quantitative = [
+        {
+            "id": str(row["id"]),
+            "name": optional_text(row.get("name")),
+            "description": optional_text(row.get("description")),
+            "architecture": str(row["architecture"]),
+            "claimed_sil": row["claimed_sil"],
+            "pfd_average": row["pfd_average"],
+            "test_interval_hours": row.get("test_interval_hours"),
+        }
+        for row in inputs.get("quantitative_sifs", [])
+    ]
+    protected = [
+        {"sif_id": str(row["sif_id"]), "equipment": str(row["equipment"])}
+        for row in inputs.get("protected_equipment", [])
+    ]
+    result = evaluate(
+        str(inputs["register_id"]),
+        None if inputs.get("register_name") is None else str(inputs["register_name"]),
+        elements,
+        links,
+        barriers,
+        tags,
+        standards,
+        criteria,
+        demands,
+        devices,
+        event_sifs,
+        detectors,
+        quantitative,
+        protected,
+    )
+    dumped: dict[str, float] = {
+        "assessment_count": result.assessment_count,
+        "pass_count": result.pass_count,
+        "warning_count": result.warning_count,
+        "fail_count": result.fail_count,
+    }
+    metric_names = (
+        ("metric_barrierPfd", "barrier_pfd", None),
+        ("metric_barrierEffectiveness", "barrier_effectiveness", None),
+        ("metric_targetPfd", "target_pfd", None),
+        ("metric_actualPfd", "actual_pfd", None),
+        ("metric_requiredAvailability", "required_availability", None),
+        ("metric_actualAvailability", "actual_availability", None),
+        (
+            "metric_requiredResponseTimeSeconds",
+            "required_response_time_seconds",
+            "s",
+        ),
+        ("metric_actualResponseTimeSeconds", "actual_response_time_seconds", "s"),
+        ("metric_requiredEffectiveness", "required_effectiveness", None),
+        ("metric_actualEffectiveness", "actual_effectiveness", None),
+        ("metric_demandValue", "demand_value", None),
+        ("metric_capacityValue", "capacity_value", None),
+        ("metric_capacityMargin", "capacity_margin", None),
+        ("metric_relatedInstrumentCount", "related_instrument_count", None),
+        (
+            "metric_maxInstrumentResponseTimeSeconds",
+            "max_instrument_response_time_seconds",
+            "s",
+        ),
+        ("metric_relatedSafetyInstrumentedFunctionCount", "related_sif_count", None),
+        (
+            "metric_relatedQuantitativeSafetyInstrumentedFunctionCount",
+            "related_quantitative_sif_count",
+            None,
+        ),
+    )
+    for index, assessment in enumerate(result.assessments):
+        prefix = f"assessment_{index}_"
+        for dump_name, attribute, unit in metric_names:
+            value = getattr(assessment, attribute)
+            if value is None:
+                continue
+            dumped[prefix + dump_name] = (
+                value.to(unit).magnitude if unit is not None else value
+            )
+        dumped[prefix + "finding_count"] = assessment.finding_count
+    return dumped
+
+
 def _mass_balance_leak_detection(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.mass_balance_leak_detection`'s layers, from the reference's arithmetic."""
     from azoth.core.units import quantity
@@ -4863,6 +5053,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.trapped_liquid_fire_rupture": _trapped_liquid_fire_rupture,
     "process.trapped_inventory": _trapped_inventory,
     "process.open_drain_review": _open_drain_review,
+    "process.safety_system_performance": _safety_system_performance,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.psv_valve": _psv_valve,
     "process.dynamic_psv_sizing": _dynamic_psv_sizing,
@@ -7344,6 +7535,63 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_open_drain_review.tsv",
         block=7,
         identified_by=("#label", "drain_coercion"),
+    ),
+    # The barrier analyzer's eight states.
+    LayerCase(
+        model="process.safety_system_performance",
+        case="deluge_pass",
+        capture="process_safety_system_performance.tsv",
+        block=0,
+        identified_by=("#label", "ssp_deluge_pass"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="fire_gas",
+        capture="process_safety_system_performance.tsv",
+        block=1,
+        identified_by=("#label", "ssp_fire_gas"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="pfp_capacity_fail",
+        capture="process_safety_system_performance.tsv",
+        block=2,
+        identified_by=("#label", "ssp_pfp_capacity_fail"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="quantitative_sif",
+        capture="process_safety_system_performance.tsv",
+        block=3,
+        identified_by=("#label", "ssp_quantitative_sif"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="psd_category",
+        capture="process_safety_system_performance.tsv",
+        block=4,
+        identified_by=("#label", "ssp_psd_category"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="rule_failures",
+        capture="process_safety_system_performance.tsv",
+        block=5,
+        identified_by=("#label", "ssp_rule_failures"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="instrumentation_warnings",
+        capture="process_safety_system_performance.tsv",
+        block=6,
+        identified_by=("#label", "ssp_instrumentation_warnings"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="element_inference",
+        capture="process_safety_system_performance.tsv",
+        block=7,
+        identified_by=("#label", "ssp_element_inference"),
     ),
     # The safety envelope's three cased states.
     LayerCase(

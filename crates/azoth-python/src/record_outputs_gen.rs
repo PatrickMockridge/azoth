@@ -3628,6 +3628,391 @@ impl From<&azoth_process::models::norsok_p002_compliance::P002FindingResult>
     }
 }
 
+/// one row per barrier and matching demand, in register order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PerformanceAssessment"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPerformanceAssessment {
+    /// the barrier id.
+    #[pyo3(get)]
+    pub barrier_id: String,
+    /// the barrier name, empty when absent.
+    #[pyo3(get)]
+    pub barrier_name: String,
+    /// the demand id; absent for a register-only assessment.
+    #[pyo3(get)]
+    pub demand_id: Option<String>,
+    /// the inferred safety-system category.
+    #[pyo3(get)]
+    pub category: String,
+    /// the assessment's verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// the barrier status, echoed.
+    #[pyo3(get)]
+    pub barrier_status: String,
+    /// the barrier PFD; absent for the class's NaN.
+    #[pyo3(get)]
+    pub barrier_pfd: Option<f64>,
+    /// the barrier effectiveness; absent for the class's NaN.
+    #[pyo3(get)]
+    pub barrier_effectiveness: Option<f64>,
+    /// the barrier's evidence flag, echoed.
+    #[pyo3(get)]
+    pub has_traceable_evidence: bool,
+    /// the linked standard's id; absent when no standard is linked.
+    #[pyo3(get)]
+    pub performance_standard_id: Option<String>,
+    /// the selected target PFD; absent when both sources are NaN.
+    #[pyo3(get)]
+    pub target_pfd: Option<f64>,
+    /// the selected actual PFD; absent when both sources are NaN.
+    #[pyo3(get)]
+    pub actual_pfd: Option<f64>,
+    /// the selected required availability; absent when both sources are NaN.
+    #[pyo3(get)]
+    pub required_availability: Option<f64>,
+    /// the demand's actual availability; absent without a demand or a value.
+    #[pyo3(get)]
+    pub actual_availability: Option<f64>,
+    /// the selected required response time; absent when both sources are NaN.
+    #[pyo3(get)]
+    pub required_response_time_seconds: Option<PyQty>,
+    /// the demand's actual response time; absent without a demand or a value.
+    #[pyo3(get)]
+    pub actual_response_time_seconds: Option<PyQty>,
+    /// the demand's required effectiveness; absent without it.
+    #[pyo3(get)]
+    pub required_effectiveness: Option<f64>,
+    /// the selected actual effectiveness; absent when both sources are NaN.
+    #[pyo3(get)]
+    pub actual_effectiveness: Option<f64>,
+    /// the demand's scenario; absent without a demand or text.
+    #[pyo3(get)]
+    pub scenario: Option<String>,
+    /// the demand's demand value; absent when NaN.
+    #[pyo3(get)]
+    pub demand_value: Option<f64>,
+    /// the demand's capacity value; absent when NaN.
+    #[pyo3(get)]
+    pub capacity_value: Option<f64>,
+    /// the demand's unit label; absent without a demand or text.
+    #[pyo3(get)]
+    pub demand_unit: Option<String>,
+    /// `capacity - demand`; absent unless both are finite.
+    #[pyo3(get)]
+    pub capacity_margin: Option<f64>,
+    /// the number of related measurement devices.
+    #[pyo3(get)]
+    pub related_instrument_count: f64,
+    /// the largest related detector response time; absent when none is finite.
+    #[pyo3(get)]
+    pub max_instrument_response_time_seconds: Option<PyQty>,
+    /// the number of related event SIFs.
+    #[pyo3(get)]
+    pub related_sif_count: f64,
+    /// the number of related quantitative SIFs.
+    #[pyo3(get)]
+    pub related_quantitative_sif_count: f64,
+    /// the number of findings the assessment carries.
+    #[pyo3(get)]
+    pub finding_count: f64,
+}
+
+#[pymethods]
+impl PyPerformanceAssessment {
+    fn __repr__(&self) -> String {
+        format!(
+            "PerformanceAssessment(barrier_id={}, barrier_name={}, demand_id={:?}, category={}, verdict={}, barrier_status={}, barrier_pfd={:?}, barrier_effectiveness={:?}, has_traceable_evidence={:?}, performance_standard_id={:?}, target_pfd={:?}, actual_pfd={:?}, required_availability={:?}, actual_availability={:?}, required_response_time_seconds={:?}, actual_response_time_seconds={:?}, required_effectiveness={:?}, actual_effectiveness={:?}, scenario={:?}, demand_value={:?}, capacity_value={:?}, demand_unit={:?}, capacity_margin={:?}, related_instrument_count={}, max_instrument_response_time_seconds={:?}, related_sif_count={}, related_quantitative_sif_count={}, finding_count={})",
+            self.barrier_id,
+            self.barrier_name,
+            self.demand_id,
+            self.category,
+            self.verdict,
+            self.barrier_status,
+            self.barrier_pfd,
+            self.barrier_effectiveness,
+            self.has_traceable_evidence,
+            self.performance_standard_id,
+            self.target_pfd,
+            self.actual_pfd,
+            self.required_availability,
+            self.actual_availability,
+            self.required_response_time_seconds,
+            self.actual_response_time_seconds,
+            self.required_effectiveness,
+            self.actual_effectiveness,
+            self.scenario,
+            self.demand_value,
+            self.capacity_value,
+            self.demand_unit,
+            self.capacity_margin,
+            self.related_instrument_count,
+            self.max_instrument_response_time_seconds,
+            self.related_sif_count,
+            self.related_quantitative_sif_count,
+            self.finding_count
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_system_performance::PerformanceAssessment>
+    for PyPerformanceAssessment
+{
+    fn from(row: &azoth_process::models::safety_system_performance::PerformanceAssessment) -> Self {
+        Self {
+            barrier_id: row.barrier_id.clone(),
+            barrier_name: row.barrier_name.clone(),
+            demand_id: row.demand_id.clone(),
+            category: row.category.as_str().to_string(),
+            verdict: row.verdict.as_str().to_string(),
+            barrier_status: row.barrier_status.as_str().to_string(),
+            barrier_pfd: row.barrier_pfd,
+            barrier_effectiveness: row.barrier_effectiveness,
+            has_traceable_evidence: row.has_traceable_evidence,
+            performance_standard_id: row.performance_standard_id.clone(),
+            target_pfd: row.target_pfd,
+            actual_pfd: row.actual_pfd,
+            required_availability: row.required_availability,
+            actual_availability: row.actual_availability,
+            required_response_time_seconds: row.required_response_time_seconds.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "s".to_string(),
+            }),
+            actual_response_time_seconds: row.actual_response_time_seconds.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "s".to_string(),
+            }),
+            required_effectiveness: row.required_effectiveness,
+            actual_effectiveness: row.actual_effectiveness,
+            scenario: row.scenario.clone(),
+            demand_value: row.demand_value,
+            capacity_value: row.capacity_value,
+            demand_unit: row.demand_unit.clone(),
+            capacity_margin: row.capacity_margin,
+            related_instrument_count: row.related_instrument_count,
+            max_instrument_response_time_seconds: row.max_instrument_response_time_seconds.map(
+                |v| PyQty {
+                    magnitude_si: v,
+                    unit: "s".to_string(),
+                },
+            ),
+            related_sif_count: row.related_sif_count,
+            related_quantitative_sif_count: row.related_quantitative_sif_count,
+            finding_count: row.finding_count,
+        }
+    }
+}
+
+/// every finding, assessment by assessment in the class's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PerformanceFinding"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPerformanceFinding {
+    /// the barrier the finding belongs to.
+    #[pyo3(get)]
+    pub barrier_id: String,
+    /// the assessment's demand id; absent for a register-only assessment.
+    #[pyo3(get)]
+    pub demand_id: Option<String>,
+    /// the stable rule identifier, one per check site.
+    #[pyo3(get)]
+    pub rule: String,
+    /// the finding's severity.
+    #[pyo3(get)]
+    pub severity: String,
+}
+
+#[pymethods]
+impl PyPerformanceFinding {
+    fn __repr__(&self) -> String {
+        format!(
+            "PerformanceFinding(barrier_id={}, demand_id={:?}, rule={}, severity={})",
+            self.barrier_id, self.demand_id, self.rule, self.severity
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_system_performance::PerformanceFinding>
+    for PyPerformanceFinding
+{
+    fn from(row: &azoth_process::models::safety_system_performance::PerformanceFinding) -> Self {
+        Self {
+            barrier_id: row.barrier_id.clone(),
+            demand_id: row.demand_id.clone(),
+            rule: row.rule.as_str().to_string(),
+            severity: row.severity.as_str().to_string(),
+        }
+    }
+}
+
+/// the related measurement devices, assessment by assessment.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PerformanceInstrument"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPerformanceInstrument {
+    /// the barrier the device matched.
+    #[pyo3(get)]
+    pub barrier_id: String,
+    /// the assessment's demand id; absent for a register-only assessment.
+    #[pyo3(get)]
+    pub demand_id: Option<String>,
+    /// the device's tag, or its name when the tag is absent.
+    #[pyo3(get)]
+    pub tag: String,
+}
+
+#[pymethods]
+impl PyPerformanceInstrument {
+    fn __repr__(&self) -> String {
+        format!(
+            "PerformanceInstrument(barrier_id={}, demand_id={:?}, tag={})",
+            self.barrier_id, self.demand_id, self.tag
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_system_performance::PerformanceInstrument>
+    for PyPerformanceInstrument
+{
+    fn from(row: &azoth_process::models::safety_system_performance::PerformanceInstrument) -> Self {
+        Self {
+            barrier_id: row.barrier_id.clone(),
+            demand_id: row.demand_id.clone(),
+            tag: row.tag.clone(),
+        }
+    }
+}
+
+/// the related SIFs, assessment by assessment.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PerformanceSif"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPerformanceSif {
+    /// the barrier the SIF matched.
+    #[pyo3(get)]
+    pub barrier_id: String,
+    /// the assessment's demand id; absent for a register-only assessment.
+    #[pyo3(get)]
+    pub demand_id: Option<String>,
+    /// the SIF's name, or the quantitative SIF's first non-empty name or id.
+    #[pyo3(get)]
+    pub identifier: String,
+    /// which SIF family the row is.
+    #[pyo3(get)]
+    pub kind: String,
+    /// the event SIF's voting notation.
+    #[pyo3(get)]
+    pub voting_notation: Option<String>,
+    /// the event SIF's detector count.
+    #[pyo3(get)]
+    pub detector_count: Option<f64>,
+    /// the event SIF's bypassed detector count.
+    #[pyo3(get)]
+    pub bypassed_detector_count: Option<f64>,
+    /// the event SIF's faulty detector count.
+    #[pyo3(get)]
+    pub faulty_detector_count: Option<f64>,
+    /// the event SIF's tripped detector count.
+    #[pyo3(get)]
+    pub tripped_detector_count: Option<f64>,
+    /// the quantitative SIF's claimed SIL.
+    #[pyo3(get)]
+    pub claimed_sil: Option<f64>,
+    /// the verified achieved SIL.
+    #[pyo3(get)]
+    pub achieved_sil: Option<f64>,
+    /// whether the achieved SIL meets the claim.
+    #[pyo3(get)]
+    pub sil_achieved: Option<bool>,
+    /// the quantitative SIF's average PFD.
+    #[pyo3(get)]
+    pub pfd_average: Option<f64>,
+    /// `1.5 PFD`.
+    #[pyo3(get)]
+    pub pfd_upper: Option<f64>,
+    /// `1 / PFD`; absent at a zero PFD.
+    #[pyo3(get)]
+    pub risk_reduction_factor: Option<f64>,
+    /// the quantitative SIF's architecture.
+    #[pyo3(get)]
+    pub architecture: Option<String>,
+    /// the quantitative SIF's proof-test interval.
+    #[pyo3(get)]
+    pub proof_test_interval_hours: Option<f64>,
+    /// the number of protected equipment tags the SIF names.
+    #[pyo3(get)]
+    pub protected_equipment_count: Option<f64>,
+}
+
+#[pymethods]
+impl PyPerformanceSif {
+    fn __repr__(&self) -> String {
+        format!(
+            "PerformanceSif(barrier_id={}, demand_id={:?}, identifier={}, kind={}, voting_notation={:?}, detector_count={:?}, bypassed_detector_count={:?}, faulty_detector_count={:?}, tripped_detector_count={:?}, claimed_sil={:?}, achieved_sil={:?}, sil_achieved={:?}, pfd_average={:?}, pfd_upper={:?}, risk_reduction_factor={:?}, architecture={:?}, proof_test_interval_hours={:?}, protected_equipment_count={:?})",
+            self.barrier_id,
+            self.demand_id,
+            self.identifier,
+            self.kind,
+            self.voting_notation,
+            self.detector_count,
+            self.bypassed_detector_count,
+            self.faulty_detector_count,
+            self.tripped_detector_count,
+            self.claimed_sil,
+            self.achieved_sil,
+            self.sil_achieved,
+            self.pfd_average,
+            self.pfd_upper,
+            self.risk_reduction_factor,
+            self.architecture,
+            self.proof_test_interval_hours,
+            self.protected_equipment_count
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_system_performance::PerformanceSif> for PyPerformanceSif {
+    fn from(row: &azoth_process::models::safety_system_performance::PerformanceSif) -> Self {
+        Self {
+            barrier_id: row.barrier_id.clone(),
+            demand_id: row.demand_id.clone(),
+            identifier: row.identifier.clone(),
+            kind: row.kind.as_str().to_string(),
+            voting_notation: row.voting_notation.clone(),
+            detector_count: row.detector_count,
+            bypassed_detector_count: row.bypassed_detector_count,
+            faulty_detector_count: row.faulty_detector_count,
+            tripped_detector_count: row.tripped_detector_count,
+            claimed_sil: row.claimed_sil,
+            achieved_sil: row.achieved_sil,
+            sil_achieved: row.sil_achieved,
+            pfd_average: row.pfd_average,
+            pfd_upper: row.pfd_upper,
+            risk_reduction_factor: row.risk_reduction_factor,
+            architecture: row.architecture.clone(),
+            proof_test_interval_hours: row.proof_test_interval_hours,
+            protected_equipment_count: row.protected_equipment_count,
+        }
+    }
+}
+
 /// one row per marching step, in time order, ending at the rupture step when one is found.
 #[pyclass(
     frozen,

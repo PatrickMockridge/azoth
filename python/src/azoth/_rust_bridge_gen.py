@@ -274,6 +274,11 @@ from azoth.core.result import (
     ParahydrogenSolidPhaseResult,
     PcsaftRahmatPhaseResult,
     PedersenPlusSplitResult,
+    PerformanceAssessment,
+    PerformanceFinding,
+    PerformanceInstrument,
+    PerformanceSif,
+    PerformanceVerdict,
     PfpDemandResult,
     PhaseTransportResult,
     PhFlashResult,
@@ -362,6 +367,7 @@ from azoth.core.result import (
     SafeChartMissingDevice,
     SafetyEnvelopeResult,
     SafetyInstrumentedFunctionResult,
+    SafetySystemPerformanceResult,
     SaftVrMiePhaseResult,
     SaltPrecipitationResult,
     SaturateWithWaterResult,
@@ -794,6 +800,7 @@ __all__ = [
     "s001_secondary_pressure_protection",
     "safety_envelope",
     "safety_instrumented_function",
+    "safety_system_performance",
     "saft_vr_mie_phase",
     "salt_precipitation",
     "saturate_with_water",
@@ -9248,6 +9255,41 @@ def safety_instrumented_function(pfd_average: float, claimed_sil: float, unmitig
         pfd_1oo2=result.pfd_1oo2,
         pfd_2oo3=result.pfd_2oo3,
         availability_with_spurious_trips=result.availability_with_spurious_trips,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def safety_system_performance(register_id: str, register_name: str | None=None, elements: list[dict[str, object]] | None=None, links: list[dict[str, object]] | None=None, barriers: list[dict[str, object]] | None=None, barrier_tags: list[dict[str, object]] | None=None, standards: list[dict[str, object]] | None=None, standard_criteria: list[dict[str, object]] | None=None, demands: list[dict[str, object]] | None=None, measurement_devices: list[dict[str, object]] | None=None, event_sifs: list[dict[str, object]] | None=None, sif_detectors: list[dict[str, object]] | None=None, quantitative_sifs: list[dict[str, object]] | None=None, protected_equipment: list[dict[str, object]] | None=None) -> SafetySystemPerformanceResult:
+    """``process.safety_system_performance``, computed in Rust."""
+    spec = _models_gen.model("process.safety_system_performance")
+    result = _core.safety_system_performance(
+        register_id,
+        register_name,
+        None if elements is None else input_records_to_si(spec, "elements", elements),
+        None if links is None else input_records_to_si(spec, "links", links),
+        None if barriers is None else input_records_to_si(spec, "barriers", barriers),
+        None if barrier_tags is None else input_records_to_si(spec, "barrier_tags", barrier_tags),
+        None if standards is None else input_records_to_si(spec, "standards", standards),
+        None if standard_criteria is None else input_records_to_si(spec, "standard_criteria", standard_criteria),
+        None if demands is None else input_records_to_si(spec, "demands", demands),
+        None if measurement_devices is None else input_records_to_si(spec, "measurement_devices", measurement_devices),
+        None if event_sifs is None else input_records_to_si(spec, "event_sifs", event_sifs),
+        None if sif_detectors is None else input_records_to_si(spec, "sif_detectors", sif_detectors),
+        None if quantitative_sifs is None else input_records_to_si(spec, "quantitative_sifs", quantitative_sifs),
+        None if protected_equipment is None else input_records_to_si(spec, "protected_equipment", protected_equipment),
+    )
+    return SafetySystemPerformanceResult(
+        register_id=result.register_id,
+        register_name=result.register_name,
+        overall_verdict=PerformanceVerdict(result.overall_verdict),
+        assessment_count=result.assessment_count,
+        pass_count=result.pass_count,
+        warning_count=result.warning_count,
+        fail_count=result.fail_count,
+        assessments=tuple(PerformanceAssessment(barrier_id=c.barrier_id, barrier_name=c.barrier_name, demand_id=c.demand_id, category=c.category, verdict=c.verdict, barrier_status=c.barrier_status, barrier_pfd=c.barrier_pfd, barrier_effectiveness=c.barrier_effectiveness, has_traceable_evidence=c.has_traceable_evidence, performance_standard_id=c.performance_standard_id, target_pfd=c.target_pfd, actual_pfd=c.actual_pfd, required_availability=c.required_availability, actual_availability=c.actual_availability, required_response_time_seconds=None if c.required_response_time_seconds is None else from_si(c.required_response_time_seconds.magnitude_si, c.required_response_time_seconds.unit), actual_response_time_seconds=None if c.actual_response_time_seconds is None else from_si(c.actual_response_time_seconds.magnitude_si, c.actual_response_time_seconds.unit), required_effectiveness=c.required_effectiveness, actual_effectiveness=c.actual_effectiveness, scenario=c.scenario, demand_value=c.demand_value, capacity_value=c.capacity_value, demand_unit=c.demand_unit, capacity_margin=c.capacity_margin, related_instrument_count=c.related_instrument_count, max_instrument_response_time_seconds=None if c.max_instrument_response_time_seconds is None else from_si(c.max_instrument_response_time_seconds.magnitude_si, c.max_instrument_response_time_seconds.unit), related_sif_count=c.related_sif_count, related_quantitative_sif_count=c.related_quantitative_sif_count, finding_count=c.finding_count) for c in result.assessments),
+        findings=tuple(PerformanceFinding(barrier_id=c.barrier_id, demand_id=c.demand_id, rule=c.rule, severity=c.severity) for c in result.findings),
+        instruments=tuple(PerformanceInstrument(barrier_id=c.barrier_id, demand_id=c.demand_id, tag=c.tag) for c in result.instruments),
+        sifs=tuple(PerformanceSif(barrier_id=c.barrier_id, demand_id=c.demand_id, identifier=c.identifier, kind=c.kind, voting_notation=c.voting_notation, detector_count=c.detector_count, bypassed_detector_count=c.bypassed_detector_count, faulty_detector_count=c.faulty_detector_count, tripped_detector_count=c.tripped_detector_count, claimed_sil=c.claimed_sil, achieved_sil=c.achieved_sil, sil_achieved=c.sil_achieved, pfd_average=c.pfd_average, pfd_upper=c.pfd_upper, risk_reduction_factor=c.risk_reduction_factor, architecture=c.architecture, proof_test_interval_hours=c.proof_test_interval_hours, protected_equipment_count=c.protected_equipment_count) for c in result.sifs),
         warnings=_warnings(result.warnings),
     )
 

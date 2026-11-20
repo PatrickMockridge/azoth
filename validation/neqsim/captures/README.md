@@ -3287,3 +3287,21 @@ The wall is the class's explicit finite difference and the march records the poi
 events, so the failure step is the last row. The vapor-pocket state's event is at `0` s, where
 the flashed inventory already carries gas; the pressure rise is `K beta dT` and the relief caps
 it only when `reliefLimitsPressure` is true.
+
+## The safety-system performance assessment
+
+`process_safety_system_performance.tsv` is `SafetySystemPerformanceAnalyzer.analyze` on the
+upstream test's deluge, fire-and-gas, PFP and quantitative-SIF registers, the
+category-inference state, and the rule-coverage, instrumentation and element-fallback states.
+Each assessment prints its metrics (a NaN skipped), its findings in the class's order with
+message and severity, its instrument tags and its SIF names.
+
+```bash
+../../tools/gated.sh javac -proc:none -cp neqsim-118d9af.jar ProcessProbe.java
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe safety_system_performance \
+  > captures/process_safety_system_performance.tsv
+```
+
+The class's `setPfd` also sets the effectiveness to `1 - PFD`, so the fire-and-gas barrier's
+`0.99972` is the setter's arithmetic rather than a stored value. The finding messages are
+presentation; the port carries one stable rule per check site in the same order.
