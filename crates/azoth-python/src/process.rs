@@ -1007,7 +1007,8 @@ pub fn esd_response_time(
         Some(rows) => rows
             .into_iter()
             .map(|row| {
-                let stage = esd::EsdStage::parse(&row.stage).map_err(|error| to_pyerr(py, error))?;
+                let stage =
+                    esd::EsdStage::parse(&row.stage).map_err(|error| to_pyerr(py, error))?;
                 Ok(esd::EsdContribution {
                     name: row.name,
                     stage,
@@ -1027,7 +1028,9 @@ pub fn esd_response_time(
 /// The flash's densities over the documented equipment and pipe volumes.
 #[pyfunction]
 #[pyo3(signature = (components, z, pressure, temperature, segments, eos = None, multiphase_check = None, fallback_liquid_density = None, segment_evidence = None))]
-#[pyo3(text_signature = "(components, z, pressure, temperature, segments, eos=None, multiphase_check=None, fallback_liquid_density=None, segment_evidence=None)")]
+#[pyo3(
+    text_signature = "(components, z, pressure, temperature, segments, eos=None, multiphase_check=None, fallback_liquid_density=None, segment_evidence=None)"
+)]
 #[allow(clippy::too_many_arguments)] // the spec's declared inputs
 pub fn trapped_inventory(
     py: Python<'_>,
@@ -1082,12 +1085,78 @@ pub fn trapped_inventory(
     .map_err(|error| to_pyerr(py, error))
 }
 
+/// `process.open_drain_review` - the NORSOK S-001 open-drain review.
+///
+/// Nineteen assessments per item, the evidence confidence and the verdict cascade.
+#[pyfunction]
+#[pyo3(signature = (project_name = None, default_liquid_leak_rate = None, items = None, evidence = None, design_standards = None, references = None))]
+#[pyo3(
+    text_signature = "(project_name=None, default_liquid_leak_rate=None, items=None, evidence=None, design_standards=None, references=None)"
+)]
+pub fn open_drain_review(
+    py: Python<'_>,
+    project_name: Option<&str>,
+    default_liquid_leak_rate: Option<f64>,
+    items: Option<Vec<crate::records_gen::OpenDrainItem>>,
+    evidence: Option<Vec<crate::records_gen::OpenDrainEvidence>>,
+    design_standards: Option<Vec<crate::records_gen::OpenDrainStandard>>,
+    references: Option<Vec<crate::records_gen::OpenDrainReference>>,
+) -> PyResult<crate::transport_gen::PyOpenDrainReviewResult> {
+    use azoth_process::models::open_drain_review as review;
+    let items = items.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::OpenDrainItem {
+                area_id: row.area_id,
+                area_type: row.area_type,
+                drain_system_type: row.drain_system_type,
+            })
+            .collect::<Vec<_>>()
+    });
+    let evidence = evidence.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::OpenDrainEvidence {
+                area_id: row.area_id,
+                key: row.key,
+                value: row.value,
+            })
+            .collect::<Vec<_>>()
+    });
+    let standards = design_standards.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::OpenDrainStandard {
+                area_id: row.area_id,
+                standard: row.standard,
+            })
+            .collect::<Vec<_>>()
+    });
+    let references = references.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::OpenDrainReference {
+                area_id: row.area_id,
+                reference: row.reference,
+            })
+            .collect::<Vec<_>>()
+    });
+    review::open_drain_review(
+        project_name,
+        default_liquid_leak_rate,
+        items.as_deref(),
+        evidence.as_deref(),
+        standards.as_deref(),
+        references.as_deref(),
+    )
+    .map(|result| crate::transport_gen::PyOpenDrainReviewResult::from(&result))
+    .map_err(|error| to_pyerr(py, error))
+}
+
 /// `process.safety_envelope` - the operational safety envelope.
 ///
 /// The five curves and the operating-point queries.
 #[pyfunction]
 #[pyo3(signature = (components, z, min_pressure, max_pressure, num_points, eos = None, hydrate_margin = None, wax_margin = None, co2_margin = None, mdmt_margin = None, mdmt_design_temperature = None, operating_pressure = None, operating_temperature = None, phase_trace = None))]
-#[pyo3(text_signature = "(components, z, min_pressure, max_pressure, num_points, eos=None, hydrate_margin=None, wax_margin=None, co2_margin=None, mdmt_margin=None, mdmt_design_temperature=None, operating_pressure=None, operating_temperature=None, phase_trace=None)")]
+#[pyo3(
+    text_signature = "(components, z, min_pressure, max_pressure, num_points, eos=None, hydrate_margin=None, wax_margin=None, co2_margin=None, mdmt_margin=None, mdmt_design_temperature=None, operating_pressure=None, operating_temperature=None, phase_trace=None)"
+)]
 #[allow(clippy::too_many_arguments)] // the spec's declared inputs
 pub fn safety_envelope(
     py: Python<'_>,

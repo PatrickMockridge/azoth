@@ -1,0 +1,249 @@
+model = "process.open_drain_review"
+
+[[cases]]
+id = "compliant"
+tolerance = 1e-12
+source = "The complete NORSOK S-001 example: P-002 and ISO 13702 in the design standards, a 15 kg/s capacity against 10 kg/s fire water plus 2 kg/s leak, every applicable boolean true, and the utility-independence and operational-evidence rows. The evidence confidence reaches 0.85. From `validation/neqsim/captures/process_open_drain_review.tsv` (`drain_compliant`)."
+[cases.inputs]
+items = [
+  { area_id = "AREA-1", area_type = "process" },
+]
+evidence = [
+  { area_id = "AREA-1", key = "sourceHasFlammableOrHazardousLiquid", value = "true" },
+  { area_id = "AREA-1", key = "hasOpenDrainMeasures", value = "true" },
+  { area_id = "AREA-1", key = "fireWaterCapacityKgPerS", value = "10.0" },
+  { area_id = "AREA-1", key = "liquidLeakRateKgPerS", value = "2.0" },
+  { area_id = "AREA-1", key = "drainageCapacityKgPerS", value = "15.0" },
+  { area_id = "AREA-1", key = "backflowPrevented", value = "true" },
+  { area_id = "AREA-1", key = "closedOpenDrainInteractionPrevented", value = "true" },
+  { area_id = "AREA-1", key = "hazardousNonHazardousPhysicallySeparated", value = "true" },
+  { area_id = "AREA-1", key = "hazardousNonHazardousCombined", value = "false" },
+  { area_id = "AREA-1", key = "sealDesignedForMaxBackpressure", value = "true" },
+  { area_id = "AREA-1", key = "ventTerminatedSafe", value = "true" },
+  { area_id = "AREA-1", key = "openDrainDependsOnUtility", value = "false" },
+]
+design_standards = [
+  { area_id = "AREA-1", standard = "NORSOK P-002" },
+  { area_id = "AREA-1", standard = "ISO 13702" },
+]
+references = [
+  { area_id = "AREA-1", reference = "STID-AREA-1" },
+]
+[cases.expected]
+overall_verdict = "pass"
+item_count = 1.0
+failed_item_count = 0.0
+warning_item_count = 0.0
+assessment_count = 19.0
+fail_assessment_count = 0.0
+warning_assessment_count = 0.0
+results = [
+  { area_id = "AREA-1", verdict = "pass", confidence = 0.85 },
+]
+assessments = [
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.1-STANDARDS", clause = "9.4.1", status = "pass", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.1-COLLECTION", clause = "9.4.1", status = "pass", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.1-CAPACITY", clause = "9.4.1", status = "pass", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.1-BACKFLOW", clause = "9.4.1", status = "pass", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.1-BUNDING", clause = "9.4.1", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.1-FLOATER", clause = "9.4.1", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.2-INERTING", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.2-CLOSED-OPEN", clause = "9.4.2", status = "pass", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.2-HAZ-NONHAZ", clause = "9.4.2", status = "pass", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.2-COMMON-SUMP", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.2-SEAL-BACKPRESSURE", clause = "9.4.2", status = "pass", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.2-VENT", clause = "9.4.2", status = "pass", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.2-FIRE-SEALS", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.2-HELIDECK", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.2-DRILLING-PROD", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.2-TOTE", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.3-FIRE-DIVISION", clause = "9.4.3", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-S001-9.4.1-UTILITY", clause = "9.4.1", status = "pass", severity = "low" },
+  { area_id = "AREA-1", requirement_id = "OD-OPS-TAGREADER", clause = "Operational evidence", status = "info", severity = "low" },
+]
+
+[[cases]]
+id = "capacity_fail"
+tolerance = 1e-12
+source = "The capacity failure: 5 kg/s against 10 kg/s fire water plus 2 kg/s leak fails on `capacity + 1e-12 < required`, with no standards, no backflow evidence and no references; the confidence is the base plus the drain-measures and capacity increments, 0.55. From `drain_capacity_fail`."
+[cases.inputs]
+items = [
+  { area_id = "AREA-2", area_type = "process" },
+]
+evidence = [
+  { area_id = "AREA-2", key = "sourceHasFlammableOrHazardousLiquid", value = "true" },
+  { area_id = "AREA-2", key = "hasOpenDrainMeasures", value = "true" },
+  { area_id = "AREA-2", key = "fireWaterCapacityKgPerS", value = "10.0" },
+  { area_id = "AREA-2", key = "liquidLeakRateKgPerS", value = "2.0" },
+  { area_id = "AREA-2", key = "drainageCapacityKgPerS", value = "5.0" },
+]
+[cases.expected]
+overall_verdict = "fail"
+item_count = 1.0
+failed_item_count = 1.0
+warning_item_count = 0.0
+assessment_count = 19.0
+fail_assessment_count = 1.0
+warning_assessment_count = 6.0
+results = [
+  { area_id = "AREA-2", verdict = "fail", confidence = 0.55 },
+]
+assessments = [
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.1-STANDARDS", clause = "9.4.1", status = "warning", severity = "medium" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.1-COLLECTION", clause = "9.4.1", status = "pass", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.1-CAPACITY", clause = "9.4.1", status = "fail", severity = "critical" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.1-BACKFLOW", clause = "9.4.1", status = "warning", severity = "high" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.1-BUNDING", clause = "9.4.1", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.1-FLOATER", clause = "9.4.1", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.2-INERTING", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.2-CLOSED-OPEN", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.2-HAZ-NONHAZ", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.2-COMMON-SUMP", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.2-SEAL-BACKPRESSURE", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.2-VENT", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.2-FIRE-SEALS", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.2-HELIDECK", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.2-DRILLING-PROD", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.2-TOTE", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.3-FIRE-DIVISION", clause = "9.4.3", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-S001-9.4.1-UTILITY", clause = "9.4.1", status = "info", severity = "low" },
+  { area_id = "AREA-2", requirement_id = "OD-OPS-TAGREADER", clause = "Operational evidence", status = "info", severity = "low" },
+]
+
+[[cases]]
+id = "haz_combined"
+tolerance = 1e-12
+source = "Hazardous and non-hazardous drains combined with the separation documented as false: the separation row fails critical and the item fails with the base confidence 0.2. From `drain_haz_combined`."
+[cases.inputs]
+items = [
+  { area_id = "AREA-3", area_type = "process" },
+]
+evidence = [
+  { area_id = "AREA-3", key = "sourceHasFlammableOrHazardousLiquid", value = "true" },
+  { area_id = "AREA-3", key = "hazardousNonHazardousCombined", value = "true" },
+  { area_id = "AREA-3", key = "hazardousNonHazardousPhysicallySeparated", value = "false" },
+]
+[cases.expected]
+overall_verdict = "fail"
+item_count = 1.0
+failed_item_count = 1.0
+warning_item_count = 0.0
+assessment_count = 19.0
+fail_assessment_count = 1.0
+warning_assessment_count = 7.0
+results = [
+  { area_id = "AREA-3", verdict = "fail", confidence = 0.2 },
+]
+assessments = [
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.1-STANDARDS", clause = "9.4.1", status = "warning", severity = "medium" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.1-COLLECTION", clause = "9.4.1", status = "warning", severity = "high" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.1-CAPACITY", clause = "9.4.1", status = "warning", severity = "high" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.1-BACKFLOW", clause = "9.4.1", status = "warning", severity = "high" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.1-BUNDING", clause = "9.4.1", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.1-FLOATER", clause = "9.4.1", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.2-INERTING", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.2-CLOSED-OPEN", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.2-HAZ-NONHAZ", clause = "9.4.2", status = "fail", severity = "critical" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.2-COMMON-SUMP", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.2-SEAL-BACKPRESSURE", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.2-VENT", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.2-FIRE-SEALS", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.2-HELIDECK", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.2-DRILLING-PROD", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.2-TOTE", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.3-FIRE-DIVISION", clause = "9.4.3", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-3", requirement_id = "OD-S001-9.4.1-UTILITY", clause = "9.4.1", status = "info", severity = "low" },
+  { area_id = "AREA-3", requirement_id = "OD-OPS-TAGREADER", clause = "Operational evidence", status = "info", severity = "low" },
+]
+
+[[cases]]
+id = "missing"
+tolerance = 1e-12
+source = "One item and one evidence row: every required boolean is absent and warns high, the capacity is absent and warns, so the item passes with warnings at the base confidence 0.2. From `drain_missing`."
+[cases.inputs]
+items = [
+  { area_id = "AREA-4", area_type = "process" },
+]
+evidence = [
+  { area_id = "AREA-4", key = "sourceHasFlammableOrHazardousLiquid", value = "true" },
+]
+[cases.expected]
+overall_verdict = "pass_with_warnings"
+item_count = 1.0
+failed_item_count = 0.0
+warning_item_count = 1.0
+assessment_count = 19.0
+fail_assessment_count = 0.0
+warning_assessment_count = 8.0
+results = [
+  { area_id = "AREA-4", verdict = "pass_with_warnings", confidence = 0.2 },
+]
+assessments = [
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.1-STANDARDS", clause = "9.4.1", status = "warning", severity = "medium" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.1-COLLECTION", clause = "9.4.1", status = "warning", severity = "high" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.1-CAPACITY", clause = "9.4.1", status = "warning", severity = "high" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.1-BACKFLOW", clause = "9.4.1", status = "warning", severity = "high" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.1-BUNDING", clause = "9.4.1", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.1-FLOATER", clause = "9.4.1", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.2-INERTING", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.2-CLOSED-OPEN", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.2-HAZ-NONHAZ", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.2-COMMON-SUMP", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.2-SEAL-BACKPRESSURE", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.2-VENT", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.2-FIRE-SEALS", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.2-HELIDECK", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.2-DRILLING-PROD", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.2-TOTE", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.3-FIRE-DIVISION", clause = "9.4.3", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-4", requirement_id = "OD-S001-9.4.1-UTILITY", clause = "9.4.1", status = "info", severity = "low" },
+  { area_id = "AREA-4", requirement_id = "OD-OPS-TAGREADER", clause = "Operational evidence", status = "info", severity = "low" },
+]
+
+[[cases]]
+id = "coercion"
+tolerance = 1e-12
+source = "The Java coercion block: `yes` reads true, `1` reads true, the design standards arrive as one string containing both P-002 and ISO 13702, and the numeric values parse from text. The capacity passes at 20 against 10.5, and the confidence is 0.65. From `drain_coercion`."
+[cases.inputs]
+items = [
+  { area_id = "AREA-7", area_type = "process" },
+]
+evidence = [
+  { area_id = "AREA-7", key = "sourceHasFlammableOrHazardousLiquid", value = "yes" },
+  { area_id = "AREA-7", key = "hasOpenDrainMeasures", value = "1" },
+  { area_id = "AREA-7", key = "designStandards", value = "NORSOK P-002 and ISO 13702" },
+  { area_id = "AREA-7", key = "fireWaterCapacityKgPerS", value = "10.5" },
+  { area_id = "AREA-7", key = "drainageCapacityKgPerS", value = "20" },
+]
+[cases.expected]
+overall_verdict = "pass_with_warnings"
+item_count = 1.0
+failed_item_count = 0.0
+warning_item_count = 1.0
+assessment_count = 19.0
+fail_assessment_count = 0.0
+warning_assessment_count = 5.0
+results = [
+  { area_id = "AREA-7", verdict = "pass_with_warnings", confidence = 0.65 },
+]
+assessments = [
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.1-STANDARDS", clause = "9.4.1", status = "pass", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.1-COLLECTION", clause = "9.4.1", status = "pass", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.1-CAPACITY", clause = "9.4.1", status = "pass", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.1-BACKFLOW", clause = "9.4.1", status = "warning", severity = "high" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.1-BUNDING", clause = "9.4.1", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.1-FLOATER", clause = "9.4.1", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.2-INERTING", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.2-CLOSED-OPEN", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.2-HAZ-NONHAZ", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.2-COMMON-SUMP", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.2-SEAL-BACKPRESSURE", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.2-VENT", clause = "9.4.2", status = "warning", severity = "high" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.2-FIRE-SEALS", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.2-HELIDECK", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.2-DRILLING-PROD", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.2-TOTE", clause = "9.4.2", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.3-FIRE-DIVISION", clause = "9.4.3", status = "not_applicable", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-S001-9.4.1-UTILITY", clause = "9.4.1", status = "info", severity = "low" },
+  { area_id = "AREA-7", requirement_id = "OD-OPS-TAGREADER", clause = "Operational evidence", status = "info", severity = "low" },
+]

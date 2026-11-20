@@ -1241,6 +1241,40 @@ class NonEquilibriumBlowdownPoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class OpenDrainAssessment:
+    """every assessment, item by item."""
+
+    #: the item the assessment belongs to.
+    area_id: str
+
+    #: the stable requirement identifier, e.g. `OD-S001-9.4.1-CAPACITY`.
+    requirement_id: str
+
+    #: the clause, e.g. `9.4.1`, or the class's literal `Operational evidence` label.
+    clause: str
+
+    #: the assessment's status.
+    status: str
+
+    #: the class's severity band; a pass, info or not-applicable row is low.
+    severity: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class OpenDrainResult:
+    """one row per item, in caller order."""
+
+    #: the item's area id.
+    area_id: str
+
+    #: the item's verdict.
+    verdict: str
+
+    #: the item's evidence confidence.
+    confidence: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class P002FindingResult:
     """one row per check, in the caller's order."""
 

@@ -3496,6 +3496,96 @@ impl From<&azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdo
     }
 }
 
+/// every assessment, item by item.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OpenDrainAssessment"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOpenDrainAssessment {
+    /// the item the assessment belongs to.
+    #[pyo3(get)]
+    pub area_id: String,
+    /// the stable requirement identifier, e.g. `OD-S001-9.4.1-CAPACITY`.
+    #[pyo3(get)]
+    pub requirement_id: String,
+    /// the clause, e.g. `9.4.1`, or the class's literal `Operational evidence` label.
+    #[pyo3(get)]
+    pub clause: String,
+    /// the assessment's status.
+    #[pyo3(get)]
+    pub status: String,
+    /// the class's severity band; a pass, info or not-applicable row is low.
+    #[pyo3(get)]
+    pub severity: String,
+}
+
+#[pymethods]
+impl PyOpenDrainAssessment {
+    fn __repr__(&self) -> String {
+        format!(
+            "OpenDrainAssessment(area_id={}, requirement_id={}, clause={}, status={}, severity={})",
+            self.area_id, self.requirement_id, self.clause, self.status, self.severity
+        )
+    }
+}
+
+impl From<&azoth_process::models::open_drain_review::OpenDrainAssessment>
+    for PyOpenDrainAssessment
+{
+    fn from(row: &azoth_process::models::open_drain_review::OpenDrainAssessment) -> Self {
+        Self {
+            area_id: row.area_id.clone(),
+            requirement_id: row.requirement_id.clone(),
+            clause: row.clause.clone(),
+            status: row.status.as_str().to_string(),
+            severity: row.severity.as_str().to_string(),
+        }
+    }
+}
+
+/// one row per item, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OpenDrainResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOpenDrainResult {
+    /// the item's area id.
+    #[pyo3(get)]
+    pub area_id: String,
+    /// the item's verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// the item's evidence confidence.
+    #[pyo3(get)]
+    pub confidence: f64,
+}
+
+#[pymethods]
+impl PyOpenDrainResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "OpenDrainResult(area_id={}, verdict={}, confidence={})",
+            self.area_id, self.verdict, self.confidence
+        )
+    }
+}
+
+impl From<&azoth_process::models::open_drain_review::OpenDrainResult> for PyOpenDrainResult {
+    fn from(row: &azoth_process::models::open_drain_review::OpenDrainResult) -> Self {
+        Self {
+            area_id: row.area_id.clone(),
+            verdict: row.verdict.as_str().to_string(),
+            confidence: row.confidence,
+        }
+    }
+}
+
 /// one row per check, in the caller's order.
 #[pyclass(
     frozen,

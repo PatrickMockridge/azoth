@@ -666,6 +666,32 @@ class P002CheckRow(TypedDict):
     carry_over_limit: float | None
     recorded_ok: bool | None
 
+class OpenDrainItem(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    area_id: str
+    area_type: str | None
+    drain_system_type: str | None
+
+class OpenDrainEvidence(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    area_id: str
+    key: str
+    value: str | None
+
+class OpenDrainStandard(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    area_id: str
+    standard: str
+
+class OpenDrainReference(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    area_id: str
+    reference: str
+
 class OverpressureScenario(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1516,6 +1542,24 @@ class P002FindingResult:
     name: str
     criterion: str
     compliant: bool
+
+@final
+class OpenDrainResult:
+    """one row per item, in caller order."""
+
+    area_id: str
+    verdict: str
+    confidence: float
+
+@final
+class OpenDrainAssessment:
+    """every assessment, item by item."""
+
+    area_id: str
+    requirement_id: str
+    clause: str
+    status: str
+    severity: str
 
 @final
 class PipeFireRupturePoint:
@@ -4911,6 +4955,19 @@ class NorsokP002ComplianceResult:
     findings: list[P002FindingResult]
     compliant: bool
     non_compliant_count: float
+    warnings: list[Warning]
+
+@final
+class OpenDrainReviewResult:
+    overall_verdict: OpenDrainVerdict
+    item_count: float
+    failed_item_count: float
+    warning_item_count: float
+    assessment_count: float
+    fail_assessment_count: float
+    warning_assessment_count: float
+    results: list[OpenDrainResult]
+    assessments: list[OpenDrainAssessment]
     warnings: list[Warning]
 
 @final
@@ -9156,6 +9213,14 @@ def non_equilibrium_blowdown(
     stop_pressure: float | None = None,
 ) -> NonEquilibriumBlowdownResult: ...
 def norsok_p002_compliance(checks: list[P002CheckRow]) -> NorsokP002ComplianceResult: ...
+def open_drain_review(
+    project_name: str | None = None,
+    default_liquid_leak_rate: float | None = None,
+    items: list[OpenDrainItem] | None = None,
+    evidence: list[OpenDrainEvidence] | None = None,
+    design_standards: list[OpenDrainStandard] | None = None,
+    references: list[OpenDrainReference] | None = None,
+) -> OpenDrainReviewResult: ...
 def overpressure_acceptance(
     peak_pressure: float,
     mawp: float,

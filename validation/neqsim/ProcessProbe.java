@@ -203,6 +203,11 @@ import neqsim.process.safety.esd.EsdResponseTimeSimulator.EsdResponseTimeResult;
 import neqsim.process.safety.envelope.SafetyEnvelope;
 import neqsim.process.safety.envelope.SafetyEnvelopeCalculator;
 import neqsim.process.safety.inventory.TrappedInventoryCalculator;
+import neqsim.process.safety.opendrain.OpenDrainReviewEngine;
+import neqsim.process.safety.opendrain.OpenDrainReviewInput;
+import neqsim.process.safety.opendrain.OpenDrainReviewItem;
+import neqsim.process.safety.opendrain.OpenDrainReviewReport;
+import neqsim.process.safety.opendrain.OpenDrainReviewResult;
 import neqsim.process.safety.rupture.FireExposureScenario;
 import neqsim.process.safety.rupture.TrappedLiquidFireRuptureStudy;
 import neqsim.process.safety.rupture.TrappedLiquidFireRuptureResult;
@@ -691,6 +696,9 @@ public class ProcessProbe {
         break;
       case "trapped_liquid_fire_rupture":
         trappedLiquidRows();
+        break;
+      case "open_drain_review":
+        openDrainRows();
         break;
       case "gas_blowby":
         gasBlowbyRows();
@@ -18349,6 +18357,102 @@ public class ProcessProbe {
       List<Double> values = (List<Double>) entry.getValue();
       for (int i = 0; i < values.size(); i++) {
         System.out.println("series_" + entry.getKey() + "_" + i + "=" + values.get(i));
+      }
+    }
+    System.out.println();
+  }
+
+
+  static OpenDrainReviewItem drainItem(String areaId, String areaType) {
+    return new OpenDrainReviewItem().setAreaId(areaId).setAreaType(areaType);
+  }
+
+  static OpenDrainReviewInput drainInput(OpenDrainReviewItem... items) {
+    OpenDrainReviewInput input = new OpenDrainReviewInput().setProjectName("open-drain review");
+    for (OpenDrainReviewItem item : items) {
+      input.addItem(item);
+    }
+    return input;
+  }
+
+  static void openDrainRows() {
+    OpenDrainReviewItem compliant = drainItem("AREA-1", "process")
+        .put("designStandards", new ArrayList<String>(List.of("NORSOK P-002", "ISO 13702")))
+        .put("sourceHasFlammableOrHazardousLiquid", true)
+        .put("hasOpenDrainMeasures", true)
+        .put("fireWaterCapacityKgPerS", 10.0)
+        .put("liquidLeakRateKgPerS", 2.0)
+        .put("drainageCapacityKgPerS", 15.0)
+        .put("backflowPrevented", true)
+        .put("closedOpenDrainInteractionPrevented", true)
+        .put("hazardousNonHazardousPhysicallySeparated", true)
+        .put("hazardousNonHazardousCombined", false)
+        .put("sealDesignedForMaxBackpressure", true)
+        .put("ventTerminatedSafe", true)
+        .put("openDrainDependsOnUtility", false);
+    compliant.addSourceReference("STID-AREA-1");
+    printDrain("drain_compliant", drainInput(compliant));
+
+    OpenDrainReviewItem capacity = drainItem("AREA-2", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", true)
+        .put("hasOpenDrainMeasures", true)
+        .put("fireWaterCapacityKgPerS", 10.0)
+        .put("liquidLeakRateKgPerS", 2.0)
+        .put("drainageCapacityKgPerS", 5.0);
+    printDrain("drain_capacity_fail", drainInput(capacity));
+
+    OpenDrainReviewItem haz = drainItem("AREA-3", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", true)
+        .put("hazardousNonHazardousCombined", true)
+        .put("hazardousNonHazardousPhysicallySeparated", false);
+    printDrain("drain_haz_combined", drainInput(haz));
+
+    OpenDrainReviewItem missing = drainItem("AREA-4", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", true);
+    printDrain("drain_missing", drainInput(missing));
+
+    OpenDrainReviewItem utility = drainItem("AREA-5", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", true)
+        .put("openDrainDependsOnUtility", true);
+    printDrain("drain_utility", drainInput(utility));
+
+    OpenDrainReviewItem operational = drainItem("AREA-6", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", true)
+        .put("observedBackflowEvents", "1")
+        .put("sumpHighLevelEvents", "2");
+    printDrain("drain_operational", drainInput(operational));
+
+    printDrain("drain_empty", drainInput());
+
+    OpenDrainReviewItem coercion = drainItem("AREA-7", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", "yes")
+        .put("hasOpenDrainMeasures", "1")
+        .put("designStandards", "NORSOK P-002 and ISO 13702")
+        .put("fireWaterCapacityKgPerS", "10.5")
+        .put("drainageCapacityKgPerS", "20");
+    printDrain("drain_coercion", drainInput(coercion));
+    System.out.println();
+  }
+
+  @SuppressWarnings("unchecked")
+  static void printDrain(String label, OpenDrainReviewInput input) {
+    OpenDrainReviewReport report = new OpenDrainReviewEngine().evaluate(input);
+    System.out.println(label);
+    System.out.println("overall_verdict=" + report.getOverallVerdict());
+    System.out.println("result_count=" + report.getResults().size());
+    for (int i = 0; i < report.getResults().size(); i++) {
+      OpenDrainReviewResult result = report.getResults().get(i);
+      System.out.println("result_" + i + "_area_id=" + result.getItem().getAreaId());
+      System.out.println("result_" + i + "_verdict=" + result.getVerdict());
+      System.out.println("result_" + i + "_confidence=" + result.getConfidence());
+      System.out.println("result_" + i + "_assessment_count=" + result.getAssessments().size());
+      for (int j = 0; j < result.getAssessments().size(); j++) {
+        Map<String, Object> map = result.getAssessments().get(j).toMap();
+        System.out.println("assessment_" + i + "_" + j + "_requirement_id="
+            + map.get("requirementId"));
+        System.out.println("assessment_" + i + "_" + j + "_clause=" + map.get("clause"));
+        System.out.println("assessment_" + i + "_" + j + "_status=" + map.get("status"));
+        System.out.println("assessment_" + i + "_" + j + "_severity=" + map.get("severity"));
       }
     }
     System.out.println();

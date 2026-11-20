@@ -4130,6 +4130,64 @@ def _trapped_inventory(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _open_drain_review(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.open_drain_review`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.open_drain_review import open_drain_review as evaluate
+
+    def optional_text(value: Any) -> str | None:
+        return None if value is None else str(value)
+
+    items = [
+        {
+            "area_id": str(row["area_id"]),
+            "area_type": optional_text(row.get("area_type")),
+            "drain_system_type": optional_text(row.get("drain_system_type")),
+        }
+        for row in inputs.get("items", [])
+    ]
+    evidence = [
+        {
+            "area_id": str(row["area_id"]),
+            "key": str(row["key"]),
+            "value": optional_text(row.get("value")),
+        }
+        for row in inputs.get("evidence", [])
+    ]
+    standards = [
+        {"area_id": str(row["area_id"]), "standard": str(row["standard"])}
+        for row in inputs.get("design_standards", [])
+    ]
+    references = [
+        {"area_id": str(row["area_id"]), "reference": str(row["reference"])}
+        for row in inputs.get("references", [])
+    ]
+    leak = inputs.get("default_liquid_leak_rate")
+    result = evaluate(
+        None if inputs.get("project_name") is None else str(inputs["project_name"]),
+        None if leak is None else quantity(float(leak), "kg/s"),
+        items,
+        evidence,
+        standards,
+        references,
+    )
+    dumped: dict[str, float] = {
+        "result_count": float(len(result.results)),
+        "item_count": result.item_count,
+        "failed_item_count": result.failed_item_count,
+        "warning_item_count": result.warning_item_count,
+        "assessment_count": result.assessment_count,
+        "fail_assessment_count": result.fail_assessment_count,
+        "warning_assessment_count": result.warning_assessment_count,
+    }
+    for index, row in enumerate(result.results):
+        dumped[f"result_{index}_confidence"] = row.confidence
+        dumped[f"result_{index}_assessment_count"] = float(
+            sum(1 for a in result.assessments if a.area_id == row.area_id)
+        )
+    return dumped
+
+
 def _mass_balance_leak_detection(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.mass_balance_leak_detection`'s layers, from the reference's arithmetic."""
     from azoth.core.units import quantity
@@ -4804,6 +4862,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.safety_envelope": _safety_envelope,
     "process.trapped_liquid_fire_rupture": _trapped_liquid_fire_rupture,
     "process.trapped_inventory": _trapped_inventory,
+    "process.open_drain_review": _open_drain_review,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.psv_valve": _psv_valve,
     "process.dynamic_psv_sizing": _dynamic_psv_sizing,
@@ -7249,6 +7308,43 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     ),
     # The SRK evidence row is uncased: its liquid density is `1.06e-1` relative below
     # the class's, so it is a recorded divergence rather than a case.
+    # The open-drain review's five cased states; its utility, operational and empty
+    # states are declared uncased.
+    LayerCase(
+        model="process.open_drain_review",
+        case="compliant",
+        capture="process_open_drain_review.tsv",
+        block=0,
+        identified_by=("#label", "drain_compliant"),
+    ),
+    LayerCase(
+        model="process.open_drain_review",
+        case="capacity_fail",
+        capture="process_open_drain_review.tsv",
+        block=1,
+        identified_by=("#label", "drain_capacity_fail"),
+    ),
+    LayerCase(
+        model="process.open_drain_review",
+        case="haz_combined",
+        capture="process_open_drain_review.tsv",
+        block=2,
+        identified_by=("#label", "drain_haz_combined"),
+    ),
+    LayerCase(
+        model="process.open_drain_review",
+        case="missing",
+        capture="process_open_drain_review.tsv",
+        block=3,
+        identified_by=("#label", "drain_missing"),
+    ),
+    LayerCase(
+        model="process.open_drain_review",
+        case="coercion",
+        capture="process_open_drain_review.tsv",
+        block=7,
+        identified_by=("#label", "drain_coercion"),
+    ),
     # The safety envelope's three cased states.
     LayerCase(
         model="process.safety_envelope",
@@ -9093,6 +9189,10 @@ UNCASED_ROWS: dict[str, int] = {
     "process_trapped_inventory.tsv": 1,
     # The trapped-liquid study's two: the inventory preamble and the vapor-pocket state.
     "process_trapped_liquid_fire_rupture.tsv": 2,
+    # The open-drain review's three: the utility failure, the operational-evidence
+    # failure and the empty review are held by the Rust test rather than the layer diff,
+    # whose capture keys for those states are strings.
+    "process_open_drain_review.tsv": 3,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

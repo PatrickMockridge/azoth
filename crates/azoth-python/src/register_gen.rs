@@ -312,6 +312,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyNog070SilDeterminationResult>()?;
     m.add_class::<crate::transport_gen::PyNonEquilibriumBlowdownResult>()?;
     m.add_class::<crate::transport_gen::PyNorsokP002ComplianceResult>()?;
+    m.add_class::<crate::transport_gen::PyOpenDrainReviewResult>()?;
     m.add_class::<crate::transport_gen::PyOverpressureAcceptanceResult>()?;
     m.add_class::<crate::transport_gen::PyOverpressureProtectionStudyResult>()?;
     m.add_class::<crate::transport_gen::PyPackedColumnResult>()?;
@@ -438,6 +439,8 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyMultiVesselProfileRow>()?;
     m.add_class::<crate::record_outputs_gen::PyNaceIssueRow>()?;
     m.add_class::<crate::record_outputs_gen::PyNonEquilibriumBlowdownPoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyOpenDrainAssessment>()?;
+    m.add_class::<crate::record_outputs_gen::PyOpenDrainResult>()?;
     m.add_class::<crate::record_outputs_gen::PyP002FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PyPipeFireRupturePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyPrescribedSlipReleaseStation>()?;
@@ -1183,6 +1186,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::norsok_p002_compliance,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::process::open_drain_review, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::overpressure_acceptance,
         m

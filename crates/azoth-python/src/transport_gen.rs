@@ -26,11 +26,11 @@ use crate::record_outputs_gen::{
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
     PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
     PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
-    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyP002FindingResult,
-    PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation, PyPulsationModeResult,
-    PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation, PyRegisterFinding,
-    PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage,
-    PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
+    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment,
+    PyOpenDrainResult, PyP002FindingResult, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
+    PyPulsationModeResult, PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation,
+    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
+    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
     PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
     PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
     PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
@@ -22216,6 +22216,88 @@ impl From<&azoth_process::models::norsok_p002_compliance::NorsokP002ComplianceRe
             findings: r.findings.iter().map(PyP002FindingResult::from).collect(),
             compliant: r.compliant,
             non_compliant_count: r.non_compliant_count,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.open_drain_review`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OpenDrainReviewResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOpenDrainReviewResult {
+    /// the report's verdict: any fail, else any pass-with-warnings, else pass.
+    #[pyo3(get)]
+    pub overall_verdict: String,
+    /// the number of reviewed items.
+    #[pyo3(get)]
+    pub item_count: f64,
+    /// the number of items whose verdict is fail.
+    #[pyo3(get)]
+    pub failed_item_count: f64,
+    /// the number of items whose verdict is pass-with-warnings.
+    #[pyo3(get)]
+    pub warning_item_count: f64,
+    /// the total number of assessments.
+    #[pyo3(get)]
+    pub assessment_count: f64,
+    /// the number of failing assessments.
+    #[pyo3(get)]
+    pub fail_assessment_count: f64,
+    /// the number of warning assessments.
+    #[pyo3(get)]
+    pub warning_assessment_count: f64,
+    /// one row per item, in caller order.
+    #[pyo3(get)]
+    pub results: Vec<PyOpenDrainResult>,
+    /// every assessment, item by item.
+    #[pyo3(get)]
+    pub assessments: Vec<PyOpenDrainAssessment>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyOpenDrainReviewResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "OpenDrainReviewResult(overall_verdict={:?}, item_count={:?}, failed_item_count={:?}, warning_item_count={:?}, assessment_count={:?}, fail_assessment_count={:?}, warning_assessment_count={:?}, results={:?}, assessments={:?}, {} warning(s))",
+            self.overall_verdict,
+            self.item_count,
+            self.failed_item_count,
+            self.warning_item_count,
+            self.assessment_count,
+            self.fail_assessment_count,
+            self.warning_assessment_count,
+            self.results,
+            self.assessments,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::open_drain_review::OpenDrainReviewResult>
+    for PyOpenDrainReviewResult
+{
+    fn from(r: &azoth_process::models::open_drain_review::OpenDrainReviewResult) -> Self {
+        Self {
+            overall_verdict: r.overall_verdict.as_str().to_string(),
+            item_count: r.item_count,
+            failed_item_count: r.failed_item_count,
+            warning_item_count: r.warning_item_count,
+            assessment_count: r.assessment_count,
+            fail_assessment_count: r.fail_assessment_count,
+            warning_assessment_count: r.warning_assessment_count,
+            results: r.results.iter().map(PyOpenDrainResult::from).collect(),
+            assessments: r
+                .assessments
+                .iter()
+                .map(PyOpenDrainAssessment::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }

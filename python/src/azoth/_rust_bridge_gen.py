@@ -257,6 +257,10 @@ from azoth.core.result import (
     NorsokP002ComplianceResult,
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
+    OpenDrainAssessment,
+    OpenDrainResult,
+    OpenDrainReviewResult,
+    OpenDrainVerdict,
     OrificeFlowResult,
     OverallVerdict,
     OverpressureAcceptanceResult,
@@ -708,6 +712,7 @@ __all__ = [
     "norsok_p002_compliance",
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
+    "open_drain_review",
     "orifice_flow",
     "overpressure_acceptance",
     "overpressure_protection_study",
@@ -8170,6 +8175,31 @@ def norsok_p002_compliance(checks: list[dict[str, object]]) -> NorsokP002Complia
         findings=tuple(P002FindingResult(name=c.name, criterion=c.criterion, compliant=c.compliant) for c in result.findings),
         compliant=result.compliant,
         non_compliant_count=result.non_compliant_count,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def open_drain_review(project_name: str | None=None, default_liquid_leak_rate: float | None=None, items: list[dict[str, object]] | None=None, evidence: list[dict[str, object]] | None=None, design_standards: list[dict[str, object]] | None=None, references: list[dict[str, object]] | None=None) -> OpenDrainReviewResult:
+    """``process.open_drain_review``, computed in Rust."""
+    spec = _models_gen.model("process.open_drain_review")
+    result = _core.open_drain_review(
+        project_name,
+        None if default_liquid_leak_rate is None else _si(spec, "default_liquid_leak_rate", default_liquid_leak_rate),
+        None if items is None else input_records_to_si(spec, "items", items),
+        None if evidence is None else input_records_to_si(spec, "evidence", evidence),
+        None if design_standards is None else input_records_to_si(spec, "design_standards", design_standards),
+        None if references is None else input_records_to_si(spec, "references", references),
+    )
+    return OpenDrainReviewResult(
+        overall_verdict=OpenDrainVerdict(result.overall_verdict),
+        item_count=result.item_count,
+        failed_item_count=result.failed_item_count,
+        warning_item_count=result.warning_item_count,
+        assessment_count=result.assessment_count,
+        fail_assessment_count=result.fail_assessment_count,
+        warning_assessment_count=result.warning_assessment_count,
+        results=tuple(OpenDrainResult(area_id=c.area_id, verdict=c.verdict, confidence=c.confidence) for c in result.results),
+        assessments=tuple(OpenDrainAssessment(area_id=c.area_id, requirement_id=c.requirement_id, clause=c.clause, status=c.status, severity=c.severity) for c in result.assessments),
         warnings=_warnings(result.warnings),
     )
 

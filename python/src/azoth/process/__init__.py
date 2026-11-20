@@ -102,6 +102,7 @@ from azoth.core.result import (
     PipingFivGasResult,
     PipingFivLiquidResult,
     PlugFlowReactorResult,
+    OpenDrainReviewResult,
     PoolFireResult,
     PorousMediaSelfHeatingResult,
     PrescribedSlipReleaseResult,
@@ -361,6 +362,7 @@ _TOXIC_LIBRARY = "process.toxic_library"
 _TR3001_COMPLIANCE = "process.tr3001_compliance"
 _TRAPPED_INVENTORY = "process.trapped_inventory"
 _TRAPPED_LIQUID_FIRE_RUPTURE = "process.trapped_liquid_fire_rupture"
+_OPEN_DRAIN_REVIEW = "process.open_drain_review"
 _TUBE_RUPTURE_RELIEF = "process.tube_rupture_relief"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
@@ -3376,6 +3378,33 @@ def trapped_liquid_fire_rupture(
         tensile_strength_factor=tensile_strength_factor,
         wall_nodes=wall_nodes,
         vapor_pocket_detection=vapor_pocket_detection,
+    )
+
+
+def open_drain_review(
+    project_name: str | None = None,
+    default_liquid_leak_rate: float | None = None,
+    items: list[dict[str, object]] | None = None,
+    evidence: list[dict[str, object]] | None = None,
+    design_standards: list[dict[str, object]] | None = None,
+    references: list[dict[str, object]] | None = None,
+) -> OpenDrainReviewResult:
+    """The NORSOK S-001 Clause 9 open-drain review.
+
+    Nineteen assessments per item in the class's order, with a tri-state boolean
+    requirement, the capacity test against fire water plus the process leak, the
+    evidence confidence and the verdict cascade. **A duplicate area id, a duplicate
+    (area id, key) or a row naming no item is refused.**
+
+    See :func:`azoth.process.reference.open_drain_review`.
+    """
+    return resolve(_OPEN_DRAIN_REVIEW)(  # type: ignore[no-any-return]
+        project_name=project_name,
+        default_liquid_leak_rate=default_liquid_leak_rate,
+        items=items,
+        evidence=evidence,
+        design_standards=design_standards,
+        references=references,
     )
 
 

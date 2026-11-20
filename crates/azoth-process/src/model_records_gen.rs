@@ -83,6 +83,7 @@ use crate::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
 use crate::models::non_equilibrium_blowdown::NonEquilibriumBlowdownResult;
 use crate::models::norsok_p002_compliance::NorsokP002ComplianceResult;
+use crate::models::open_drain_review::OpenDrainReviewResult;
 use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
 use crate::models::overpressure_protection_study::OverpressureProtectionStudyResult;
 use crate::models::packed_column::PackedColumnResult;
@@ -1794,6 +1795,26 @@ impl CalcResult for NorsokP002ComplianceResult {
     const CALC_ID: &'static str = "process.norsok_p002_compliance";
     const FIELDS: &'static [&'static str] =
         &["findings", "compliant", "non_compliant_count", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for OpenDrainReviewResult {
+    const CALC_ID: &'static str = "process.open_drain_review";
+    const FIELDS: &'static [&'static str] = &[
+        "overall_verdict",
+        "item_count",
+        "failed_item_count",
+        "warning_item_count",
+        "assessment_count",
+        "fail_assessment_count",
+        "warning_assessment_count",
+        "results",
+        "assessments",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

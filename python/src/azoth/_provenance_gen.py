@@ -3238,6 +3238,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'process.open_drain_review': {
+        "calc_id": 'process.open_drain_review',
+        "name": 'NORSOK S-001 open-drain review',
+        "spec": {'path': 'specs/models/process/open_drain_review.toml', 'sha256': '5b74fc64483c0c0459acd62ac4f1963ef7b8928cf92c774864b3ce073d80386b'},
+        "code": [{'path': 'python/src/azoth/process/reference/open_drain_review.py', 'sha256': '817238253d56692dfaf85fb94fb40dbb1d34a43387af37141505b4727aa8c9f8'}, {'path': 'crates/azoth-process/src/models/open_drain_review.rs', 'sha256': '0fa0fa1f8e9d7727aacd5430e353daed43a8ee6c0a952a8c83c739f2bd5afd2a'}],
+        "source": 'NeqSim process/safety/opendrain/OpenDrainReviewEngine.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 5,
+        "tests_skipped": 0,
+    },
     'process.overpressure_acceptance': {
         "calc_id": 'process.overpressure_acceptance',
         "name": 'Overpressure acceptance',

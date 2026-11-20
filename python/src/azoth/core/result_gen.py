@@ -69,6 +69,8 @@ from azoth.core.record_outputs_gen import (
     MultiVesselProfileRow,
     NaceIssueRow,
     NonEquilibriumBlowdownPoint,
+    OpenDrainAssessment,
+    OpenDrainResult,
     P002FindingResult,
     PipeFireRupturePoint,
     PrescribedSlipReleaseStation,
@@ -121,6 +123,7 @@ from azoth.core.result_base import (
     HydrateRiskLevel,
     HydrateStructure,
     MultiflashSeedPath,
+    OpenDrainVerdict,
     OverallVerdict,
     Phase,
     PlusModel,
@@ -8977,6 +8980,43 @@ class NorsokP002ComplianceResult(_HasWarnings):
 
     #: the number of non-compliant findings.
     non_compliant_count: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class OpenDrainReviewResult(_HasWarnings):
+    """Result of ``process.open_drain_review``."""
+
+    CALC_ID: ClassVar[str] = "process.open_drain_review"
+
+    #: the report's verdict: any fail, else any pass-with-warnings, else pass.
+    overall_verdict: OpenDrainVerdict
+
+    #: the number of reviewed items.
+    item_count: float
+
+    #: the number of items whose verdict is fail.
+    failed_item_count: float
+
+    #: the number of items whose verdict is pass-with-warnings.
+    warning_item_count: float
+
+    #: the total number of assessments.
+    assessment_count: float
+
+    #: the number of failing assessments.
+    fail_assessment_count: float
+
+    #: the number of warning assessments.
+    warning_assessment_count: float
+
+    #: one row per item, in caller order.
+    results: tuple[OpenDrainResult, ...]
+
+    #: every assessment, item by item.
+    assessments: tuple[OpenDrainAssessment, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

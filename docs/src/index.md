@@ -399,6 +399,7 @@ Five sections, and the difference between them is the point:
 - [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
 - [`process.non_equilibrium_blowdown`](./process/non_equilibrium_blowdown.md) — Non-equilibrium blowdown
 - [`process.norsok_p002_compliance`](./process/norsok_p002_compliance.md) — NORSOK P-002 point-check compliance
+- [`process.open_drain_review`](./process/open_drain_review.md) — NORSOK S-001 open-drain review
 - [`process.overpressure_acceptance`](./process/overpressure_acceptance.md) — Overpressure acceptance
 - [`process.overpressure_protection_study`](./process/overpressure_protection_study.md) — Overpressure protection study
 - [`process.packed_column`](./process/packed_column.md) — Packed column

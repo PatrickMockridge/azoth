@@ -294,6 +294,7 @@
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/non_equilibrium_blowdown.toml
 //!   - specs/models/process/norsok_p002_compliance.toml
+//!   - specs/models/process/open_drain_review.toml
 //!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/overpressure_protection_study.toml
 //!   - specs/models/process/packed_column.toml
@@ -4672,6 +4673,11 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.non_equilibrium_blowdown",
         "stop_pressure",
         "pressure",
+    ),
+    (
+        "process.open_drain_review",
+        "default_liquid_leak_rate",
+        "mass_rate",
     ),
     (
         "process.overpressure_acceptance",
