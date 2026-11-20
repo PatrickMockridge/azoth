@@ -1,0 +1,207 @@
+id = "process.real_gas_fanno_release"
+name = "Real-gas Fanno pipe release"
+kind = "procedure"
+assumptions = [
+    "**a one-sided adiabatic constant-area pipe** of a single equilibrium gas with EOS properties and a specified constant Darcy friction factor; ten axial steps from the stagnation boundary to the release plane.",
+    "**the flux is found by nested bisections**: 16 root iterations pick the largest subsonic flux whose exit Mach stays below `0.9995`, and 16 more solve the receiving-pressure flux when unchoked.",
+    "**each axial step is a predictor-corrector**: the pressure gradient from two PH-flash energy states, a predicted pressure and state, then the averaged gradient and the corrected state.",
+    "**the energy state is a PH flash at `h0 - u^2/2`** iterated against the density to `2e-8` within 20 property iterations; the inlet is the entropy root against the upstream entropy.",
+    "**the solid-risk gate is conservative**: a station whose component is at or below its triple point is refused as `invalid`, and a water-bearing hydrate-forming station likewise; the captured states are above every triple point and carry no water.",
+    "**one gas phase is required at every state**, and the ambient expansion is the PS flash at the receiving pressure and the upstream entropy.",
+    "**the closures are the class own**: stagnation energy within `max(0.2 J/kg, 1e-6 |h0|)`, the exit flux within `2e-7` of the accepted flux, and the sonic limit `0.9995`.",
+    "**no forward flow is a valid zero** with three stations; a zero or one-sided flow path is `unsupported` or a typed refusal, and a two-phase state is `unsupported`.",
+    "**the fluid is PR with the classic mixing rule**, because this library databank route resolves Peng-Robinson and no other; the class own SRK tests are captured as evidence.",
+]
+references = [
+    "NASA NTRS 20070036728 - the GFSSP nitrogen Fanno case the class carries as an external benchmark.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/release/RealGasFannoPipeReleaseModel.java` is the port source, through its `calculate` and `trace`.",
+    "`validation/neqsim/captures/process_real_gas_fanno_release.tsv` - the pinned nitrogen state, the dilute and dense rich-gas states, the short and long pipes, the high-back-pressure row, the two-phase refusal and the no-path refusal.",
+]
+[source]
+standard = "NeqSim process/safety/release/RealGasFannoPipeReleaseModel.java"
+edition = "Its `calculate` and `trace`: the one-gas-phase check, the entropy inlet root, the ten-step predictor-corrector march, the nested flux bisections and the three closures."
+[algorithm]
+scheme = "real_gas_fanno_march"
+convergence = "relative"
+tolerance = 2.0e-7
+max_iterations = 42
+[inputs]
+[inputs.components]
+type = "components"
+description = "the gas's substances, by name, resolved against the component databank.\n"
+[inputs.upstream_z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream stagnation composition, checked rather than renormalised.\n"
+[inputs.upstream_t]
+unit = "K"
+description = "the upstream stagnation temperature.\n"
+[inputs.upstream_p]
+unit = "Pa"
+description = "the upstream stagnation pressure, absolute.\n"
+[inputs.diameter]
+unit = "m"
+description = "the pipe's internal diameter; the physical area is `pi d^2 / 4`.\n"
+[inputs.discharge_coefficient]
+unit = "dimensionless"
+description = "the effective full-bore area factor in `(0, 1]`.\n"
+[inputs.back_pressure]
+unit = "Pa"
+description = "the receiving absolute pressure. At or above `upstream_p` the model reports no forward flow.\n"
+[inputs.flow_path_length]
+unit = "m"
+description = "the pipe length from the inventory boundary to the release plane. Zero with a zero friction factor is `unsupported`.\n"
+[inputs.darcy_friction_factor]
+unit = "dimensionless"
+description = "the specified Darcy friction factor in `[0, 1]`; zero with a zero length is `unsupported`.\n"
+[outputs]
+[outputs.status]
+type = "string"
+description = "`valid`, `invalid` or `unsupported`.\n"
+[outputs.mass_flow_rate]
+unit = "kg/s"
+optional = true
+description = "the release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.\n"
+[outputs.choked]
+type = "boolean"
+description = "whether the exit is sonic; false on failure and on no forward flow.\n"
+[outputs.throat_sound_speed]
+unit = "m/s"
+optional = true
+description = "the exit sound speed, present on every non-zero result.\n"
+[outputs.component_mole_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream overall mole fractions.\n"
+[outputs.component_mass_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream overall mass fractions.\n"
+[outputs.friction_length]
+unit = "dimensionless"
+optional = true
+description = "`f L / D`, absent on failure and on no forward flow.\n"
+[outputs.inlet_mach]
+unit = "dimensionless"
+optional = true
+description = "the pipe-inlet Mach number, absent on failure and on no forward flow.\n"
+[outputs.exit_mach]
+unit = "dimensionless"
+optional = true
+description = "the pipe-exit Mach number, absent on failure and on no forward flow.\n"
+[outputs.stations]
+type = "record_list"
+description = "the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow.\n"
+[outputs.stations.fields.station]
+type = "enum"
+values = ["upstream_stagnation", "throat_critical", "orifice_exit", "ambient_expanded"]
+description = "which station this row is.\n"
+[outputs.stations.fields.pressure]
+unit = "Pa"
+description = "the station's absolute pressure.\n"
+[outputs.stations.fields.temperature]
+unit = "K"
+description = "the station's temperature.\n"
+[outputs.stations.fields.density]
+unit = "kg/m**3"
+description = "the station's ideal-gas density.\n"
+[outputs.stations.fields.molar_enthalpy]
+unit = "J/mol"
+description = "the station's molar enthalpy.\n"
+[outputs.stations.fields.molar_entropy]
+unit = "J/(mol*K)"
+description = "the station's molar entropy.\n"
+[outputs.stations.fields.velocity]
+unit = "m/s"
+description = "the station's axial velocity.\n"
+[outputs.stations.fields.mass_flux]
+unit = "kg/(m**2*s)"
+description = "`rho times velocity`, before the discharge coefficient.\n"
+[outputs.stations.fields.phase]
+type = "enum"
+values = ["all_vapour", "all_liquid", "two_phase"]
+description = "what the feed flash found; one gas phase for this model.\n"
+[outputs.stations.fields.gas_mass_fraction]
+unit = "dimensionless"
+description = "the gas phase's share of the mass; one for this model.\n"
+[outputs.stations.fields.gas_density]
+unit = "kg/m**3"
+optional = true
+description = "the gas phase's own density; equal to the station density here.\n"
+[outputs.stations.fields.liquid_density]
+unit = "kg/m**3"
+optional = true
+description = "the liquid phase's density; absent because this model admits one gas phase.\n"
+[outputs.stations.fields.gas_velocity]
+unit = "m/s"
+optional = true
+description = "the gas phase's velocity; absent because this model resolves no slip.\n"
+[outputs.stations.fields.liquid_velocity]
+unit = "m/s"
+optional = true
+description = "the liquid phase's velocity; absent because this model resolves no slip.\n"
+[outputs.diagnostics]
+type = "record_list"
+description = "the model's assumption and check records, in the order it forms them.\n"
+[outputs.diagnostics.fields.code]
+type = "string"
+description = "the stable machine code.\n"
+[outputs.diagnostics.fields.message]
+type = "string"
+description = "the engineering detail.\n"
+[outputs.diagnostic_codes]
+type = "vector_string"
+length = "one per diagnostic"
+description = "the codes alone, so a case can hold the contract without asserting prose.\n"
+[[valid_range]]
+quantity = "upstream_t"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "upstream_p"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an opening has a positive diameter"
+[[valid_range]]
+quantity = "discharge_coefficient"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "`ReleaseFlowRequest` refuses a coefficient outside `(0, 1]`"
+[[valid_range]]
+quantity = "back_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "flow_path_length"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "the request refuses a negative length"
+[[valid_range]]
+quantity = "darcy_friction_factor"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the request refuses a friction factor outside [0, 1]"
+[implementations]
+python = "azoth.process.real_gas_fanno_release"
+rust = "azoth_process::real_gas_fanno_release"

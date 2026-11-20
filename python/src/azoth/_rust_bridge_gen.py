@@ -47,6 +47,8 @@ from azoth.core.result import (
     BrineMixingScaleEvaluatorResult,
     BubblePressureResult,
     BubbleTemperatureResult,
+    BubbleTransferZoneReleaseResult,
+    BubbleTransferZoneReleaseStation,
     BwrsPhaseResult,
     CalcIonicCompositionResult,
     CapillaryDewPointResult,
@@ -68,6 +70,8 @@ from azoth.core.result import (
     Co2WaterDiffusivityResult,
     ColebrookResult,
     CombineReservoirFluidsResult,
+    ComponentSelectiveReleaseResult,
+    ComponentSelectiveReleaseStation,
     ComponentSplitterResult,
     CompressorResult,
     ConductionPlaneWallResult,
@@ -93,6 +97,8 @@ from azoth.core.result import (
     DewPressureResult,
     DewTemperatureResult,
     DistillationColumnResult,
+    DriftFluxReleaseResult,
+    DriftFluxReleaseStation,
     DynamicPsvSizingResult,
     EffectiveDiffusionResult,
     EjectorResult,
@@ -115,6 +121,8 @@ from azoth.core.result import (
     FeSMorphology,
     FilippovConductivityResult,
     FilterResult,
+    FiniteRateReleaseResult,
+    FiniteRateReleaseStation,
     FireCaseReliefResult,
     FireMonitorCoverageResult,
     FireWaterCoverageAssessmentResult,
@@ -184,6 +192,10 @@ from azoth.core.result import (
     IapwsHenryLawResult,
     IapwsSaturationPressureResult,
     IdealGasCpResult,
+    IdealGasFannoReleaseResult,
+    IdealGasFannoReleaseStation,
+    IdealGasReleaseResult,
+    IdealGasReleaseStation,
     IncrementalZoneAnalysisResult,
     IncrementalZoneRow,
     InherentSafetyResult,
@@ -198,6 +210,8 @@ from azoth.core.result import (
     LeakBlowdownDiagnostic,
     LeakBlowdownPoint,
     LeakBlowdownResult,
+    LegacyScreeningReleaseResult,
+    LegacyScreeningReleaseStation,
     LgtSurfaceTensionResult,
     LiquidConductivityPolynomResult,
     LiquidHeatCapacityResult,
@@ -275,6 +289,8 @@ from azoth.core.result import (
     PrDaneshAlphaResult,
     PrDelft1998AlphaResult,
     PrDepartureResult,
+    PrescribedSlipReleaseResult,
+    PrescribedSlipReleaseStation,
     PrGassem2001AlphaResult,
     PrKappaResult,
     PrLeeKeslerAlphaResult,
@@ -302,12 +318,16 @@ from azoth.core.result import (
     RachfordRiceBinaryResult,
     RachfordRiceResult,
     RackettMolarVolumeResult,
+    RanzMarshallReleaseResult,
+    RanzMarshallReleaseStation,
     RateBasedPackedColumnResult,
     ReactiveCo2BrinePhaseEquilibriumResult,
     ReactiveHybridEosGeFlashResult,
     ReactivePhaseEquilibriumResult,
     ReactivePhFlashResult,
     ReactiveTpFlashResult,
+    RealGasFannoReleaseResult,
+    RealGasFannoReleaseStation,
     ReferencePotentialsResult,
     RegisterFinding,
     ReliefDisposalNetworkResult,
@@ -523,6 +543,7 @@ __all__ = [
     "brine_mixing_scale_evaluator",
     "bubble_pressure",
     "bubble_temperature",
+    "bubble_transfer_zone_release",
     "bwrs_phase",
     "calc_ionic_composition",
     "capillary_dew_point",
@@ -541,6 +562,7 @@ __all__ = [
     "co2_phase",
     "co2_water_diffusivity",
     "combine_reservoir_fluids",
+    "component_selective_release",
     "component_splitter",
     "compressor",
     "conduction_plane_wall",
@@ -561,6 +583,7 @@ __all__ = [
     "dew_pressure",
     "dew_temperature",
     "distillation_column",
+    "drift_flux_release",
     "dynamic_psv_sizing",
     "effective_diffusion",
     "ejector",
@@ -577,6 +600,7 @@ __all__ = [
     "fault_tree",
     "filippov_conductivity",
     "filter",
+    "finite_rate_release",
     "fire_case_relief",
     "fire_monitor_coverage",
     "fire_water_coverage_assessment",
@@ -632,6 +656,8 @@ __all__ = [
     "iapws_henry_law",
     "iapws_saturation_pressure",
     "ideal_gas_cp",
+    "ideal_gas_fanno_release",
+    "ideal_gas_release",
     "incremental_zone_analysis",
     "inherent_safety",
     "interface_properties",
@@ -641,6 +667,7 @@ __all__ = [
     "kinetic_rate_law",
     "kinetics",
     "leak_blowdown",
+    "legacy_screening_release",
     "lgt_surface_tension",
     "liquid_conductivity_polynom",
     "liquid_heat_capacity",
@@ -712,6 +739,7 @@ __all__ = [
     "pr_molar_volume",
     "pr_peneloux_shift",
     "pr_z_factor",
+    "prescribed_slip_release",
     "probit",
     "production_chemical_scale_scenario",
     "prsv_kappa",
@@ -731,12 +759,14 @@ __all__ = [
     "rachford_rice",
     "rachford_rice_binary",
     "rackett_molar_volume",
+    "ranz_marshall_release",
     "rate_based_packed_column",
     "reactive_co2_brine_phase_equilibrium",
     "reactive_hybrid_eos_ge_flash",
     "reactive_ph_flash",
     "reactive_phase_equilibrium",
     "reactive_tp_flash",
+    "real_gas_fanno_release",
     "reference_potentials",
     "relief_disposal_network",
     "reynolds_number",
@@ -6041,6 +6071,38 @@ def bow_tie(threats: list[dict[str, object]], consequences: list[dict[str, objec
     )
 
 
+def bubble_transfer_zone_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, surface_tension: Q, transfer_zone_hydraulic_diameter: Q, transfer_zone_vertical_length: Q, continuous_phase_dynamic_viscosity: Q, component_diffusivities: list[Q], parameter_provenance: str) -> BubbleTransferZoneReleaseResult:
+    """``process.bubble_transfer_zone_release``, computed in Rust."""
+    spec = _models_gen.model("process.bubble_transfer_zone_release")
+    result = _core.bubble_transfer_zone_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "surface_tension", surface_tension),
+        input_to_si(spec, "transfer_zone_hydraulic_diameter", transfer_zone_hydraulic_diameter),
+        input_to_si(spec, "transfer_zone_vertical_length", transfer_zone_vertical_length),
+        input_to_si(spec, "continuous_phase_dynamic_viscosity", continuous_phase_dynamic_viscosity),
+        [input_to_si(spec, "component_diffusivities", v) for v in component_diffusivities],
+        parameter_provenance,
+    )
+    return BubbleTransferZoneReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(BubbleTransferZoneReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def check_valve_leak_relief(components: list[str], mole_fractions: list[float], nominal_diameter: Q, upstream_pressure: Q, leak_area_fraction: float | None=None, upstream_temperature: Q | None=None, downstream_pressure: Q | None=None, discharge_coefficient: float | None=None, scenario_name: str | None=None) -> CheckValveLeakReliefResult:
     """``process.check_valve_leak_relief``, computed in Rust."""
     spec = _models_gen.model("process.check_valve_leak_relief")
@@ -6064,6 +6126,36 @@ def check_valve_leak_relief(components: list[str], mole_fractions: list[float], 
         compressibility=result.compressibility,
         specific_heat_ratio=result.specific_heat_ratio,
         assumptions=tuple(result.assumptions),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def component_selective_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, surface_tension: Q, component_relaxation_times: list[Q], residence_time: Q, parameter_provenance: str) -> ComponentSelectiveReleaseResult:
+    """``process.component_selective_release``, computed in Rust."""
+    spec = _models_gen.model("process.component_selective_release")
+    result = _core.component_selective_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "surface_tension", surface_tension),
+        [input_to_si(spec, "component_relaxation_times", v) for v in component_relaxation_times],
+        input_to_si(spec, "residence_time", residence_time),
+        parameter_provenance,
+    )
+    return ComponentSelectiveReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(ComponentSelectiveReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
         warnings=_warnings(result.warnings),
     )
 
@@ -6509,6 +6601,33 @@ def distillation_column(components: list[str], feed_n: Q, feed_z: list[float], f
     )
 
 
+def drift_flux_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, surface_tension: Q) -> DriftFluxReleaseResult:
+    """``process.drift_flux_release``, computed in Rust."""
+    spec = _models_gen.model("process.drift_flux_release")
+    result = _core.drift_flux_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "surface_tension", surface_tension),
+    )
+    return DriftFluxReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(DriftFluxReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def dynamic_psv_sizing(components: list[str], initial_z: list[float], initial_t: Q, initial_p: Q, vessel_volume: Q, fire_heat_input: Q, set_pressure: Q, overpressure_fraction: float, back_pressure: Q, blowdown_fraction: float | None=None, discharge_coefficient: float | None=None, latent_heat: float | None=None, time_step: Q | None=None, max_time: Q | None=None, initial_pressure_fraction: float | None=None) -> DynamicPsvSizingResult:
     """``process.dynamic_psv_sizing``, computed in Rust."""
     spec = _models_gen.model("process.dynamic_psv_sizing")
@@ -6796,6 +6915,36 @@ def filter(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
         collapse_pressure_utilization=result.collapse_pressure_utilization,
         differential_pressure_design_acceptable=result.differential_pressure_design_acceptable,
         design_media_area=None if result.design_media_area is None else from_si(result.design_media_area.magnitude_si, result.design_media_area.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def finite_rate_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, surface_tension: Q, phase_transfer_relaxation_time: Q, residence_time: Q, parameter_provenance: str) -> FiniteRateReleaseResult:
+    """``process.finite_rate_release``, computed in Rust."""
+    spec = _models_gen.model("process.finite_rate_release")
+    result = _core.finite_rate_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "surface_tension", surface_tension),
+        input_to_si(spec, "phase_transfer_relaxation_time", phase_transfer_relaxation_time),
+        input_to_si(spec, "residence_time", residence_time),
+        parameter_provenance,
+    )
+    return FiniteRateReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(FiniteRateReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
         warnings=_warnings(result.warnings),
     )
 
@@ -7552,6 +7701,63 @@ def hem_release(components: list[str], upstream_z: list[float], upstream_t: Q, u
     )
 
 
+def ideal_gas_fanno_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, flow_path_length: Q, darcy_friction_factor: float) -> IdealGasFannoReleaseResult:
+    """``process.ideal_gas_fanno_release``, computed in Rust."""
+    spec = _models_gen.model("process.ideal_gas_fanno_release")
+    result = _core.ideal_gas_fanno_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "flow_path_length", flow_path_length),
+        darcy_friction_factor,
+    )
+    return IdealGasFannoReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        friction_length=result.friction_length,
+        inlet_mach=result.inlet_mach,
+        exit_mach=result.exit_mach,
+        stations=tuple(IdealGasFannoReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def ideal_gas_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q) -> IdealGasReleaseResult:
+    """``process.ideal_gas_release``, computed in Rust."""
+    spec = _models_gen.model("process.ideal_gas_release")
+    result = _core.ideal_gas_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+    )
+    return IdealGasReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(IdealGasReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def inherent_safety(substitute_score: float | None=None, minimize_score: float | None=None, moderate_score: float | None=None, simplify_score: float | None=None) -> InherentSafetyResult:
     """``process.inherent_safety``, computed in Rust."""
     result = _core.inherent_safety(
@@ -7613,6 +7819,32 @@ def leak_blowdown(components: list[str], initial_z: list[float], initial_t: Q, i
         peak_mass_flow_rate=None if result.peak_mass_flow_rate is None else from_si(result.peak_mass_flow_rate.magnitude_si, result.peak_mass_flow_rate.unit),
         time_to_empty=None if result.time_to_empty is None else from_si(result.time_to_empty.magnitude_si, result.time_to_empty.unit),
         diagnostics=tuple(LeakBlowdownDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def legacy_screening_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q) -> LegacyScreeningReleaseResult:
+    """``process.legacy_screening_release``, computed in Rust."""
+    spec = _models_gen.model("process.legacy_screening_release")
+    result = _core.legacy_screening_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+    )
+    return LegacyScreeningReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(LegacyScreeningReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
         diagnostic_codes=tuple(result.diagnostic_codes),
         warnings=_warnings(result.warnings),
     )
@@ -8333,6 +8565,33 @@ def porous_media_self_heating(geometry: str, characteristic_dimension: Q, effect
     )
 
 
+def prescribed_slip_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, gas_to_liquid_slip_ratio: float) -> PrescribedSlipReleaseResult:
+    """``process.prescribed_slip_release``, computed in Rust."""
+    spec = _models_gen.model("process.prescribed_slip_release")
+    result = _core.prescribed_slip_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        gas_to_liquid_slip_ratio,
+    )
+    return PrescribedSlipReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(PrescribedSlipReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def probit(a: float, b: float, n: float, dose: Q | None=None, probit_value: Q | None=None) -> ProbitResult:
     """``process.probit``, computed in Rust."""
     spec = _models_gen.model("process.probit")
@@ -8580,6 +8839,41 @@ def pump_deadhead(suction_pressure: Q, normal_discharge_pressure: Q, shutoff_hea
     )
 
 
+def ranz_marshall_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, surface_tension: Q, residence_time: Q, morphology: str, sauter_mean_diameter: Q, continuous_phase_density: Q, continuous_phase_dynamic_viscosity: Q, relative_velocity: Q, component_diffusivities: list[Q], parameter_provenance: str) -> RanzMarshallReleaseResult:
+    """``process.ranz_marshall_release``, computed in Rust."""
+    spec = _models_gen.model("process.ranz_marshall_release")
+    result = _core.ranz_marshall_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "surface_tension", surface_tension),
+        input_to_si(spec, "residence_time", residence_time),
+        morphology,
+        input_to_si(spec, "sauter_mean_diameter", sauter_mean_diameter),
+        input_to_si(spec, "continuous_phase_density", continuous_phase_density),
+        input_to_si(spec, "continuous_phase_dynamic_viscosity", continuous_phase_dynamic_viscosity),
+        input_to_si(spec, "relative_velocity", relative_velocity),
+        [input_to_si(spec, "component_diffusivities", v) for v in component_diffusivities],
+        parameter_provenance,
+    )
+    return RanzMarshallReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        stations=tuple(RanzMarshallReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def rate_based_packed_column(gas_components: list[str], gas_n: Q, gas_z: list[float], gas_p: Q, gas_t: Q, liquid_components: list[str], liquid_n: Q, liquid_z: list[float], liquid_p: Q, liquid_t: Q, transfer_components: list[str] | None=None, column_diameter: Q | None=None, packed_height: Q | None=None, number_of_segments: int | None=None, packing_type: str | None=None, max_iterations: int | None=None, convergence_tolerance: Q | None=None, mass_transfer_correction: float | None=None, mass_transfer_correlation: str | None=None, film_model: str | None=None, heat_transfer_model: str | None=None, segment_solver: str | None=None, column_solver: str | None=None) -> RateBasedPackedColumnResult:
     """``process.rate_based_packed_column``, computed in Rust."""
     spec = _models_gen.model("process.rate_based_packed_column")
@@ -8650,6 +8944,37 @@ def rate_based_packed_column(gas_components: list[str], gas_n: Q, gas_z: list[fl
         segment_percent_flood=tuple(result.segment_percent_flood),
         segment_net_molar_transfer=tuple(from_si(q.magnitude_si, q.unit) for q in result.segment_net_molar_transfer),
         segment_enthalpy_balance_residual=tuple(from_si(q.magnitude_si, q.unit) for q in result.segment_enthalpy_balance_residual),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def real_gas_fanno_release(components: list[str], upstream_z: list[float], upstream_t: Q, upstream_p: Q, diameter: Q, discharge_coefficient: float, back_pressure: Q, flow_path_length: Q, darcy_friction_factor: float) -> RealGasFannoReleaseResult:
+    """``process.real_gas_fanno_release``, computed in Rust."""
+    spec = _models_gen.model("process.real_gas_fanno_release")
+    result = _core.real_gas_fanno_release(
+        list(components),
+        list(upstream_z),
+        input_to_si(spec, "upstream_t", upstream_t),
+        input_to_si(spec, "upstream_p", upstream_p),
+        input_to_si(spec, "diameter", diameter),
+        discharge_coefficient,
+        input_to_si(spec, "back_pressure", back_pressure),
+        input_to_si(spec, "flow_path_length", flow_path_length),
+        darcy_friction_factor,
+    )
+    return RealGasFannoReleaseResult(
+        status=result.status,
+        mass_flow_rate=None if result.mass_flow_rate is None else from_si(result.mass_flow_rate.magnitude_si, result.mass_flow_rate.unit),
+        choked=result.choked,
+        throat_sound_speed=None if result.throat_sound_speed is None else from_si(result.throat_sound_speed.magnitude_si, result.throat_sound_speed.unit),
+        component_mole_fractions=tuple(result.component_mole_fractions),
+        component_mass_fractions=tuple(result.component_mass_fractions),
+        friction_length=result.friction_length,
+        inlet_mach=result.inlet_mach,
+        exit_mach=result.exit_mach,
+        stations=tuple(RealGasFannoReleaseStation(station=c.station, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), density=from_si(c.density.magnitude_si, c.density.unit), molar_enthalpy=from_si(c.molar_enthalpy.magnitude_si, c.molar_enthalpy.unit), molar_entropy=from_si(c.molar_entropy.magnitude_si, c.molar_entropy.unit), velocity=from_si(c.velocity.magnitude_si, c.velocity.unit), mass_flux=from_si(c.mass_flux.magnitude_si, c.mass_flux.unit), phase=c.phase, gas_mass_fraction=c.gas_mass_fraction, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=None if c.liquid_density is None else from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), gas_velocity=None if c.gas_velocity is None else from_si(c.gas_velocity.magnitude_si, c.gas_velocity.unit), liquid_velocity=None if c.liquid_velocity is None else from_si(c.liquid_velocity.magnitude_si, c.liquid_velocity.unit)) for c in result.stations),
+        diagnostics=tuple(HemReleaseDiagnostic(code=c.code, message=c.message) for c in result.diagnostics),
+        diagnostic_codes=tuple(result.diagnostic_codes),
         warnings=_warnings(result.warnings),
     )
 

@@ -25,7 +25,9 @@ use crate::models::blocked_outlet_overpressure::BlockedOutletOverpressureResult;
 use crate::models::blocked_outlet_relief::BlockedOutletReliefResult;
 use crate::models::blowdown_pressure_profile::BlowdownPressureProfileResult;
 use crate::models::bow_tie::BowTieResult;
+use crate::models::bubble_transfer_zone_release::BubbleTransferZoneReleaseResult;
 use crate::models::check_valve_leak_relief::CheckValveLeakReliefResult;
+use crate::models::component_selective_release::ComponentSelectiveReleaseResult;
 use crate::models::component_splitter::ComponentSplitterResult;
 use crate::models::compressor::CompressorResult;
 use crate::models::consequence_analysis::ConsequenceAnalysisResult;
@@ -35,6 +37,7 @@ use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::depressurization::DepressurizationResult;
 use crate::models::depressurization_acceptance::DepressurizationAcceptanceResult;
 use crate::models::distillation_column::DistillationColumnResult;
+use crate::models::drift_flux_release::DriftFluxReleaseResult;
 use crate::models::dynamic_psv_sizing::DynamicPsvSizingResult;
 use crate::models::ejector::EjectorResult;
 use crate::models::escalation_graph::EscalationGraphResult;
@@ -42,6 +45,7 @@ use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
 use crate::models::fault_tree::FaultTreeResult;
 use crate::models::filter::FilterResult;
+use crate::models::finite_rate_release::FiniteRateReleaseResult;
 use crate::models::fire_case_relief::FireCaseReliefResult;
 use crate::models::fire_monitor_coverage::FireMonitorCoverageResult;
 use crate::models::fire_water_coverage_assessment::FireWaterCoverageAssessmentResult;
@@ -61,9 +65,12 @@ use crate::models::heat_exchanger::HeatExchangerResult;
 use crate::models::heater::HeaterResult;
 use crate::models::heavy_gas_dispersion::HeavyGasDispersionResult;
 use crate::models::hem_release::HemReleaseResult;
+use crate::models::ideal_gas_fanno_release::IdealGasFannoReleaseResult;
+use crate::models::ideal_gas_release::IdealGasReleaseResult;
 use crate::models::inherent_safety::InherentSafetyResult;
 use crate::models::jet_fire::JetFireResult;
 use crate::models::leak_blowdown::LeakBlowdownResult;
+use crate::models::legacy_screening_release::LegacyScreeningReleaseResult;
 use crate::models::lopa::LopaResult;
 use crate::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult;
 use crate::models::manifold::ManifoldResult;
@@ -87,13 +94,16 @@ use crate::models::piping_fiv_liquid::PipingFivLiquidResult;
 use crate::models::plug_flow_reactor::PlugFlowReactorResult;
 use crate::models::pool_fire::PoolFireResult;
 use crate::models::porous_media_self_heating::PorousMediaSelfHeatingResult;
+use crate::models::prescribed_slip_release::PrescribedSlipReleaseResult;
 use crate::models::probit::ProbitResult;
 use crate::models::psv_fire_sizing::PsvFireSizingResult;
 use crate::models::psv_sizing::PsvSizingResult;
 use crate::models::psv_valve::PsvValveResult;
 use crate::models::pump::PumpResult;
 use crate::models::pump_deadhead::PumpDeadheadResult;
+use crate::models::ranz_marshall_release::RanzMarshallReleaseResult;
 use crate::models::rate_based_packed_column::RateBasedPackedColumnResult;
+use crate::models::real_gas_fanno_release::RealGasFannoReleaseResult;
 use crate::models::relief_disposal_network::ReliefDisposalNetworkResult;
 use crate::models::risk_matrix::RiskMatrixResult;
 use crate::models::runaway_reaction::RunawayReactionResult;
@@ -381,6 +391,26 @@ impl CalcResult for BowTieResult {
     }
 }
 
+impl CalcResult for BubbleTransferZoneReleaseResult {
+    const CALC_ID: &'static str = "process.bubble_transfer_zone_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for CheckValveLeakReliefResult {
     const CALC_ID: &'static str = "process.check_valve_leak_relief";
     const FIELDS: &'static [&'static str] = &[
@@ -392,6 +422,26 @@ impl CalcResult for CheckValveLeakReliefResult {
         "compressibility",
         "specific_heat_ratio",
         "assumptions",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ComponentSelectiveReleaseResult {
+    const CALC_ID: &'static str = "process.component_selective_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
         "warnings",
     ];
 
@@ -680,6 +730,26 @@ impl CalcResult for DistillationColumnResult {
     }
 }
 
+impl CalcResult for DriftFluxReleaseResult {
+    const CALC_ID: &'static str = "process.drift_flux_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for DynamicPsvSizingResult {
     const CALC_ID: &'static str = "process.dynamic_psv_sizing";
     const FIELDS: &'static [&'static str] = &[
@@ -868,6 +938,26 @@ impl CalcResult for FilterResult {
         "collapse_pressure_utilization",
         "differential_pressure_design_acceptable",
         "design_media_area",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for FiniteRateReleaseResult {
+    const CALC_ID: &'static str = "process.finite_rate_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
         "warnings",
     ];
 
@@ -1383,6 +1473,49 @@ impl CalcResult for HemReleaseResult {
     }
 }
 
+impl CalcResult for IdealGasFannoReleaseResult {
+    const CALC_ID: &'static str = "process.ideal_gas_fanno_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "friction_length",
+        "inlet_mach",
+        "exit_mach",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for IdealGasReleaseResult {
+    const CALC_ID: &'static str = "process.ideal_gas_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for InherentSafetyResult {
     const CALC_ID: &'static str = "process.inherent_safety";
     const FIELDS: &'static [&'static str] = &["overall_index", "warnings"];
@@ -1419,6 +1552,26 @@ impl CalcResult for LeakBlowdownResult {
         "total_mass_released",
         "peak_mass_flow_rate",
         "time_to_empty",
+        "diagnostics",
+        "diagnostic_codes",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for LegacyScreeningReleaseResult {
+    const CALC_ID: &'static str = "process.legacy_screening_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
         "diagnostics",
         "diagnostic_codes",
         "warnings",
@@ -1903,6 +2056,26 @@ impl CalcResult for PorousMediaSelfHeatingResult {
     }
 }
 
+impl CalcResult for PrescribedSlipReleaseResult {
+    const CALC_ID: &'static str = "process.prescribed_slip_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for ProbitResult {
     const CALC_ID: &'static str = "process.probit";
     const FIELDS: &'static [&'static str] = &["probit", "probability", "warnings"];
@@ -2062,6 +2235,26 @@ impl CalcResult for PumpDeadheadResult {
     }
 }
 
+impl CalcResult for RanzMarshallReleaseResult {
+    const CALC_ID: &'static str = "process.ranz_marshall_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for RateBasedPackedColumnResult {
     const CALC_ID: &'static str = "process.rate_based_packed_column";
     const FIELDS: &'static [&'static str] = &[
@@ -2106,6 +2299,29 @@ impl CalcResult for RateBasedPackedColumnResult {
         "segment_percent_flood",
         "segment_net_molar_transfer",
         "segment_enthalpy_balance_residual",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for RealGasFannoReleaseResult {
+    const CALC_ID: &'static str = "process.real_gas_fanno_release";
+    const FIELDS: &'static [&'static str] = &[
+        "status",
+        "mass_flow_rate",
+        "choked",
+        "throat_sound_speed",
+        "component_mole_fractions",
+        "component_mass_fractions",
+        "friction_length",
+        "inlet_mach",
+        "exit_mach",
+        "stations",
+        "diagnostics",
+        "diagnostic_codes",
         "warnings",
     ];
 

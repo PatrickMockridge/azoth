@@ -1211,6 +1211,275 @@ def _hem_release(inputs: Mapping[str, Any]) -> dict[str, float]:
     return dumped
 
 
+def _ideal_gas_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.ideal_gas_release`'s stations, from the reference's own arithmetic.
+
+    **The enthalpy and entropy are not dumped**, for the datum reason `_hem_release` gives.
+    The stations are the record's own rows.
+    """
+    from azoth.core.units import quantity
+    from azoth.process.reference.ideal_gas_release import ideal_gas_release
+
+    result = ideal_gas_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+    )
+    dumped: dict[str, float] = {
+        "mass_flow_kg_s": (
+            0.0 if result.mass_flow_rate is None else result.mass_flow_rate.to("kg/s").magnitude
+        )
+    }
+    for index, row in enumerate(result.stations):
+        prefix = f"station_{index}_"
+        dumped[prefix + "p_pa"] = row.pressure.to("Pa").magnitude
+        dumped[prefix + "t_k"] = row.temperature.to("K").magnitude
+        dumped[prefix + "density_kg_m3"] = row.density.to("kg/m**3").magnitude
+        dumped[prefix + "velocity_m_per_s"] = row.velocity.to("m/s").magnitude
+        dumped[prefix + "mass_flux_kg_m2_s"] = row.mass_flux.to("kg/(m**2*s)").magnitude
+        dumped[prefix + "gas_mass_fraction"] = float(row.gas_mass_fraction)
+        if row.gas_density is not None:
+            dumped[prefix + "gas_density_kg_m3"] = row.gas_density.to("kg/m**3").magnitude
+    return dumped
+
+
+def _legacy_screening_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.legacy_screening_release`'s stations, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.legacy_screening_release import legacy_screening_release
+
+    result = legacy_screening_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+    )
+    dumped: dict[str, float] = {
+        "mass_flow_kg_s": (
+            0.0 if result.mass_flow_rate is None else result.mass_flow_rate.to("kg/s").magnitude
+        )
+    }
+    for index, row in enumerate(result.stations):
+        prefix = f"station_{index}_"
+        dumped[prefix + "p_pa"] = row.pressure.to("Pa").magnitude
+        dumped[prefix + "t_k"] = row.temperature.to("K").magnitude
+        dumped[prefix + "density_kg_m3"] = row.density.to("kg/m**3").magnitude
+        dumped[prefix + "velocity_m_per_s"] = row.velocity.to("m/s").magnitude
+        dumped[prefix + "mass_flux_kg_m2_s"] = row.mass_flux.to("kg/(m**2*s)").magnitude
+        dumped[prefix + "gas_mass_fraction"] = float(row.gas_mass_fraction)
+        if row.gas_density is not None:
+            dumped[prefix + "gas_density_kg_m3"] = row.gas_density.to("kg/m**3").magnitude
+        if row.liquid_density is not None:
+            dumped[prefix + "liquid_density_kg_m3"] = row.liquid_density.to("kg/m**3").magnitude
+    return dumped
+
+
+def _prescribed_slip_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.prescribed_slip_release`'s stations, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.prescribed_slip_release import prescribed_slip_release
+
+    result = prescribed_slip_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        float(inputs["gas_to_liquid_slip_ratio"]),
+    )
+    dumped: dict[str, float] = {
+        "mass_flow_kg_s": (
+            0.0 if result.mass_flow_rate is None else result.mass_flow_rate.to("kg/s").magnitude
+        )
+    }
+    for index, row in enumerate(result.stations):
+        prefix = f"station_{index}_"
+        dumped[prefix + "p_pa"] = row.pressure.to("Pa").magnitude
+        dumped[prefix + "t_k"] = row.temperature.to("K").magnitude
+        dumped[prefix + "density_kg_m3"] = row.density.to("kg/m**3").magnitude
+        dumped[prefix + "velocity_m_per_s"] = row.velocity.to("m/s").magnitude
+        dumped[prefix + "mass_flux_kg_m2_s"] = row.mass_flux.to("kg/(m**2*s)").magnitude
+        dumped[prefix + "gas_mass_fraction"] = float(row.gas_mass_fraction)
+        if row.gas_density is not None:
+            dumped[prefix + "gas_density_kg_m3"] = row.gas_density.to("kg/m**3").magnitude
+        if row.liquid_density is not None:
+            dumped[prefix + "liquid_density_kg_m3"] = row.liquid_density.to("kg/m**3").magnitude
+        if row.gas_velocity is not None:
+            dumped[prefix + "gas_velocity_m_per_s"] = row.gas_velocity.to("m/s").magnitude
+        if row.liquid_velocity is not None:
+            dumped[prefix + "liquid_velocity_m_per_s"] = row.liquid_velocity.to("m/s").magnitude
+    return dumped
+
+
+def _drift_flux_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.drift_flux_release`'s stations, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.drift_flux_release import drift_flux_release
+
+    result = drift_flux_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["surface_tension"]), "N/m"),
+    )
+    return _release_station_layers(result)
+
+
+def _finite_rate_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.finite_rate_release`'s stations, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.finite_rate_release import finite_rate_release
+
+    result = finite_rate_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["surface_tension"]), "N/m"),
+        quantity(float(inputs["phase_transfer_relaxation_time"]), "s"),
+        quantity(float(inputs["residence_time"]), "s"),
+        str(inputs["parameter_provenance"]),
+    )
+    return _release_station_layers(result)
+
+
+def _release_station_layers(result: Any) -> dict[str, float]:
+    """The station fields every release dumper publishes."""
+    dumped: dict[str, float] = {
+        "mass_flow_kg_s": (
+            0.0 if result.mass_flow_rate is None else result.mass_flow_rate.to("kg/s").magnitude
+        )
+    }
+    for index, row in enumerate(result.stations):
+        prefix = f"station_{index}_"
+        dumped[prefix + "p_pa"] = row.pressure.to("Pa").magnitude
+        dumped[prefix + "t_k"] = row.temperature.to("K").magnitude
+        dumped[prefix + "density_kg_m3"] = row.density.to("kg/m**3").magnitude
+        dumped[prefix + "velocity_m_per_s"] = row.velocity.to("m/s").magnitude
+        dumped[prefix + "mass_flux_kg_m2_s"] = row.mass_flux.to("kg/(m**2*s)").magnitude
+        dumped[prefix + "gas_mass_fraction"] = float(row.gas_mass_fraction)
+        if row.gas_density is not None:
+            dumped[prefix + "gas_density_kg_m3"] = row.gas_density.to("kg/m**3").magnitude
+        if row.liquid_density is not None:
+            dumped[prefix + "liquid_density_kg_m3"] = row.liquid_density.to("kg/m**3").magnitude
+        if row.gas_velocity is not None:
+            dumped[prefix + "gas_velocity_m_per_s"] = row.gas_velocity.to("m/s").magnitude
+        if row.liquid_velocity is not None:
+            dumped[prefix + "liquid_velocity_m_per_s"] = row.liquid_velocity.to("m/s").magnitude
+    return dumped
+
+
+def _component_selective_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.component_selective_release`'s stations, from the reference arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.component_selective_release import (
+        component_selective_release,
+    )
+
+    result = component_selective_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["surface_tension"]), "N/m"),
+        [quantity(float(value), "s") for value in inputs["component_relaxation_times"]],
+        quantity(float(inputs["residence_time"]), "s"),
+        str(inputs["parameter_provenance"]),
+    )
+    return _release_station_layers(result)
+
+
+def _ranz_marshall_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.ranz_marshall_release`'s stations, from the reference arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.ranz_marshall_release import ranz_marshall_release
+
+    result = ranz_marshall_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["surface_tension"]), "N/m"),
+        quantity(float(inputs["residence_time"]), "s"),
+        str(inputs["morphology"]),
+        quantity(float(inputs["sauter_mean_diameter"]), "m"),
+        quantity(float(inputs["continuous_phase_density"]), "kg/m**3"),
+        quantity(float(inputs["continuous_phase_dynamic_viscosity"]), "Pa*s"),
+        quantity(float(inputs["relative_velocity"]), "m/s"),
+        [quantity(float(value), "m**2/s") for value in inputs["component_diffusivities"]],
+        str(inputs["parameter_provenance"]),
+    )
+    return _release_station_layers(result)
+
+
+def _bubble_transfer_zone_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.bubble_transfer_zone_release`'s stations, from the reference arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.bubble_transfer_zone_release import (
+        bubble_transfer_zone_release,
+    )
+
+    result = bubble_transfer_zone_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["surface_tension"]), "N/m"),
+        quantity(float(inputs["transfer_zone_hydraulic_diameter"]), "m"),
+        quantity(float(inputs["transfer_zone_vertical_length"]), "m"),
+        quantity(float(inputs["continuous_phase_dynamic_viscosity"]), "Pa*s"),
+        [quantity(float(value), "m**2/s") for value in inputs["component_diffusivities"]],
+        str(inputs["parameter_provenance"]),
+    )
+    return _release_station_layers(result)
+
+
+def _ideal_gas_fanno_release(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.ideal_gas_fanno_release`'s stations, from the reference arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.ideal_gas_fanno_release import (
+        ideal_gas_fanno_release,
+    )
+
+    result = ideal_gas_fanno_release(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["upstream_z"]],
+        quantity(float(inputs["upstream_t"]), "K"),
+        quantity(float(inputs["upstream_p"]), "Pa"),
+        quantity(float(inputs["diameter"]), "m"),
+        float(inputs["discharge_coefficient"]),
+        quantity(float(inputs["back_pressure"]), "Pa"),
+        quantity(float(inputs["flow_path_length"]), "m"),
+        float(inputs["darcy_friction_factor"]),
+    )
+    return _release_station_layers(result)
+
+
 def _toxic_library(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.toxic_library`'s layers, from the reference's own arithmetic.
 
@@ -4161,6 +4430,15 @@ def _vessel_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
 DUMPERS: dict[str, Dumper] = {
     "process.separator": _separator,
     "process.hem_release": _hem_release,
+    "process.ideal_gas_release": _ideal_gas_release,
+    "process.legacy_screening_release": _legacy_screening_release,
+    "process.prescribed_slip_release": _prescribed_slip_release,
+    "process.drift_flux_release": _drift_flux_release,
+    "process.finite_rate_release": _finite_rate_release,
+    "process.component_selective_release": _component_selective_release,
+    "process.ranz_marshall_release": _ranz_marshall_release,
+    "process.bubble_transfer_zone_release": _bubble_transfer_zone_release,
+    "process.ideal_gas_fanno_release": _ideal_gas_fanno_release,
     "process.leak_blowdown": _leak_blowdown,
     "process.hazardous_area": _hazardous_area,
     "process.toxic_library": _toxic_library,
@@ -4271,6 +4549,12 @@ DUMPERS: dict[str, Dumper] = {
 #: **This is not "the model is too simple to check".** Each entry names the arithmetic and
 #: what would have to exist for there to be a layer.
 NO_INTERIOR: dict[str, str] = {
+    "process.real_gas_fanno_release": (
+        "the real-gas Fanno march is thousands of PH flashes per state, and its Python "
+        "reference takes about sixteen minutes for one case; a layer diff would run it "
+        "again. The cases are the oracle, the capture is their evidence, and the "
+        "cross-implementation cases live in the slow sweep"
+    ),
     "process.event_tree": (
         "the kernel is the class's own ``evaluate``: a full 2^n enumeration over the branch "
         "probabilities the caller states, with no composed model beneath it. The case set is "
@@ -4618,6 +4902,83 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         capture="process_hem_release.tsv",
         block=0,
         identified_by=("#label", "methane_50bara_choked"),
+    ),
+    LayerCase(
+        model="process.ideal_gas_fanno_release",
+        case="long_pipe_is_choked",
+        capture="process_ideal_gas_fanno_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_nitrogen_50bara_L100_f0_02"),
+    ),
+    LayerCase(
+        model="process.bubble_transfer_zone_release",
+        case="short_contact_zone",
+        capture="process_bubble_transfer_zone_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_heptane_0.1125_vertical_0.5"),
+    ),
+    LayerCase(
+        model="process.ranz_marshall_release",
+        case="bubbles_in_range",
+        capture="process_ranz_marshall_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_heptane_bubbles_in_range"),
+    ),
+    LayerCase(
+        model="process.component_selective_release",
+        case="methane_faster_than_heptane",
+        capture="process_component_selective_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_heptane_times_0.1_1.0"),
+    ),
+    LayerCase(
+        model="process.drift_flux_release",
+        case="methane_heptane_0_1125",
+        capture="process_drift_flux_release.tsv",
+        block=2,
+        identified_by=("#label", "pr_methane_heptane_0.1125"),
+    ),
+    LayerCase(
+        model="process.finite_rate_release",
+        case="half_progress",
+        capture="process_finite_rate_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_heptane_0_1125_tau_0.5_res_0.25"),
+    ),
+    LayerCase(
+        model="process.prescribed_slip_release",
+        case="methane_propane_slip_two",
+        capture="process_prescribed_slip_release.tsv",
+        block=1,
+        identified_by=("#label", "pr_methane_propane_ratio_2.0"),
+    ),
+    LayerCase(
+        model="process.legacy_screening_release",
+        case="methane_50bara_choked",
+        capture="process_legacy_screening_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_50bara_0_01"),
+    ),
+    LayerCase(
+        model="process.legacy_screening_release",
+        case="methane_5bara_subcritical",
+        capture="process_legacy_screening_release.tsv",
+        block=4,
+        identified_by=("#label", "pr_methane_5bara_subcritical"),
+    ),
+    LayerCase(
+        model="process.ideal_gas_release",
+        case="methane_50bara_choked",
+        capture="process_ideal_gas_release.tsv",
+        block=0,
+        identified_by=("#label", "pr_methane_50bara_choked"),
+    ),
+    LayerCase(
+        model="process.ideal_gas_release",
+        case="methane_5bara_no_forward_flow",
+        capture="process_ideal_gas_release.tsv",
+        block=4,
+        identified_by=("#label", "pr_methane_5bara_no_flow"),
     ),
     LayerCase(
         model="process.hem_release",
@@ -8551,6 +8912,33 @@ UNCASED_ROWS: dict[str, int] = {
     # reads the choked methane block and the flashing propane block; the rest are cases
     # asserted on the rate and the sound speed, or evidence with no state to compare.
     "process_hem_release.tsv": 21,
+    # The ideal-gas capture's eight: the unchoked, dilute, mixture, nitrogen, CO2 and
+    # two-phase-refusal rows, the SRK evidence row and the high-back-pressure row.
+    "process_ideal_gas_release.tsv": 8,
+    # The legacy capture's six: the larger opening, the 5-bar choked row, the liquid
+    # propane row, the zero-flow row and the two SRK evidence rows.
+    "process_legacy_screening_release.tsv": 6,
+    # The slip capture's five: the unity and four ratios, the single-gas refusal and the
+    # two SRK evidence rows.
+    "process_prescribed_slip_release.tsv": 5,
+    # The drift capture's eight: four fractions outside the usable window, the gas-area
+    # breach, the single-gas refusal and the SRK evidence row.
+    "process_drift_flux_release.tsv": 9,
+    # The finite-rate capture's six: four further relaxation pairs, the 0.125 state and the
+    # all-gas refusal.
+    "process_finite_rate_release.tsv": 6,
+    # The component-selective capture's four: the uniform and reversed time sets, the
+    # incomplete-basis refusal and the SRK evidence row.
+    "process_component_selective_release.tsv": 4,
+    # The Ranz-Marshall capture's six: the droplet, Reynolds, Schmidt and stagnant rows,
+    # the component-basis refusal and the SRK evidence row.
+    "process_ranz_marshall_release.tsv": 6,
+    # The bubble-zone capture's five: the 0.125 and long-zone rows, the out-of-range
+    # refusal and the SRK evidence row.
+    "process_bubble_transfer_zone_release.tsv": 5,
+    # The Fanno capture's six: the short pipe, the high-back-pressure, no-flow, NASA and
+    # no-path rows and the SRK evidence row.
+    "process_ideal_gas_fanno_release.tsv": 6,
     # The blowdown capture's ten: one block is layer-cased (the ten-second methane run); the
     # rest are the long horizons held to the capture as evidence, the SRK rows, the propane
     # row whose single-phase beta and cached density are class artefacts, and the refusals.

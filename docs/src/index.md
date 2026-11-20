@@ -341,7 +341,9 @@ Five sections, and the difference between them is the point:
 - [`process.blocked_outlet_relief`](./process/blocked_outlet_relief.md) — Blocked outlet relief
 - [`process.blowdown_pressure_profile`](./process/blowdown_pressure_profile.md) — Blowdown pressure profile
 - [`process.bow_tie`](./process/bow_tie.md) — Bow-tie risk
+- [`process.bubble_transfer_zone_release`](./process/bubble_transfer_zone_release.md) — Predictive bubble transfer-zone orifice release
 - [`process.check_valve_leak_relief`](./process/check_valve_leak_relief.md) — Check valve leak relief
+- [`process.component_selective_release`](./process/component_selective_release.md) — Component-selective drift-flux orifice release
 - [`process.component_splitter`](./process/component_splitter.md) — Component splitter
 - [`process.compressor`](./process/compressor.md) — Compressor
 - [`process.consequence_analysis`](./process/consequence_analysis.md) — Consequence analysis
@@ -351,6 +353,7 @@ Five sections, and the difference between them is the point:
 - [`process.depressurization`](./process/depressurization.md) — Vessel depressurization
 - [`process.depressurization_acceptance`](./process/depressurization_acceptance.md) — Depressurization acceptance
 - [`process.distillation_column`](./process/distillation_column.md) — Distillation column
+- [`process.drift_flux_release`](./process/drift_flux_release.md) — Vertical drift-flux orifice release
 - [`process.dynamic_psv_sizing`](./process/dynamic_psv_sizing.md) — Dynamic PSV sizing
 - [`process.ejector`](./process/ejector.md) — Ejector
 - [`process.escalation_graph`](./process/escalation_graph.md) — Escalation graph analysis
@@ -358,6 +361,7 @@ Five sections, and the difference between them is the point:
 - [`process.expander`](./process/expander.md) — Expander
 - [`process.fault_tree`](./process/fault_tree.md) — Fault tree
 - [`process.filter`](./process/filter.md) — Filter
+- [`process.finite_rate_release`](./process/finite_rate_release.md) — Finite-rate drift-flux orifice release
 - [`process.fire_case_relief`](./process/fire_case_relief.md) — Fire case relief
 - [`process.fire_monitor_coverage`](./process/fire_monitor_coverage.md) — Fire monitor coverage
 - [`process.fire_water_coverage_assessment`](./process/fire_water_coverage_assessment.md) — Fire-water coverage assessment
@@ -377,9 +381,12 @@ Five sections, and the difference between them is the point:
 - [`process.heater`](./process/heater.md) — Heater
 - [`process.heavy_gas_dispersion`](./process/heavy_gas_dispersion.md) — Heavy-gas dispersion
 - [`process.hem_release`](./process/hem_release.md) — Homogeneous-equilibrium orifice release
+- [`process.ideal_gas_fanno_release`](./process/ideal_gas_fanno_release.md) — Ideal-gas Fanno pipe release
+- [`process.ideal_gas_release`](./process/ideal_gas_release.md) — Ideal-gas isentropic orifice release
 - [`process.inherent_safety`](./process/inherent_safety.md) — Inherent-safety index
 - [`process.jet_fire`](./process/jet_fire.md) — Jet fire radiation
 - [`process.leak_blowdown`](./process/leak_blowdown.md) — Vessel leak blowdown
+- [`process.legacy_screening_release`](./process/legacy_screening_release.md) — Legacy orifice screening release
 - [`process.lopa`](./process/lopa.md) — Layer of protection analysis
 - [`process.mah_bow_tie_skeleton`](./process/mah_bow_tie_skeleton.md) — MAH bow-tie skeleton
 - [`process.manifold`](./process/manifold.md) — Manifold
@@ -403,13 +410,16 @@ Five sections, and the difference between them is the point:
 - [`process.plug_flow_reactor`](./process/plug_flow_reactor.md) — Plug-flow reactor
 - [`process.pool_fire`](./process/pool_fire.md) — Pool fire radiation
 - [`process.porous_media_self_heating`](./process/porous_media_self_heating.md) — Porous media self-heating
+- [`process.prescribed_slip_release`](./process/prescribed_slip_release.md) — Prescribed-slip orifice release
 - [`process.probit`](./process/probit.md) — Probit dose-response
 - [`process.psv_fire_sizing`](./process/psv_fire_sizing.md) — PSV fire sizing
 - [`process.psv_sizing`](./process/psv_sizing.md) — PSV sizing
 - [`process.psv_valve`](./process/psv_valve.md) — PSV latch and relief flow
 - [`process.pump`](./process/pump.md) — Pump
 - [`process.pump_deadhead`](./process/pump_deadhead.md) — Pump deadhead and minimum-flow temperature rise
+- [`process.ranz_marshall_release`](./process/ranz_marshall_release.md) — Ranz-Marshall component-transfer orifice release
 - [`process.rate_based_packed_column`](./process/rate_based_packed_column.md) — Rate-based packed column
+- [`process.real_gas_fanno_release`](./process/real_gas_fanno_release.md) — Real-gas Fanno pipe release
 - [`process.relief_disposal_network`](./process/relief_disposal_network.md) — Relief disposal network
 - [`process.risk_matrix`](./process/risk_matrix.md) — Risk matrix
 - [`process.runaway_reaction`](./process/runaway_reaction.md) — Runaway reaction screening

@@ -15,7 +15,9 @@
 //!   - specs/models/process/blocked_outlet_relief.toml
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
+//!   - specs/models/process/bubble_transfer_zone_release.toml
 //!   - specs/models/process/check_valve_leak_relief.toml
+//!   - specs/models/process/component_selective_release.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
@@ -25,6 +27,7 @@
 //!   - specs/models/process/depressurization.toml
 //!   - specs/models/process/depressurization_acceptance.toml
 //!   - specs/models/process/distillation_column.toml
+//!   - specs/models/process/drift_flux_release.toml
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/escalation_graph.toml
@@ -32,6 +35,7 @@
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
 //!   - specs/models/process/filter.toml
+//!   - specs/models/process/finite_rate_release.toml
 //!   - specs/models/process/fire_case_relief.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
 //!   - specs/models/process/fire_water_coverage_assessment.toml
@@ -51,9 +55,12 @@
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
 //!   - specs/models/process/hem_release.toml
+//!   - specs/models/process/ideal_gas_fanno_release.toml
+//!   - specs/models/process/ideal_gas_release.toml
 //!   - specs/models/process/inherent_safety.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
+//!   - specs/models/process/legacy_screening_release.toml
 //!   - specs/models/process/lopa.toml
 //!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
@@ -77,13 +84,16 @@
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/porous_media_self_heating.toml
+//!   - specs/models/process/prescribed_slip_release.toml
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/psv_valve.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/pump_deadhead.toml
+//!   - specs/models/process/ranz_marshall_release.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/real_gas_fanno_release.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/runaway_reaction.toml

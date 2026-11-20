@@ -234,11 +234,23 @@ import neqsim.process.safety.processsafetysystem.ProcessSafetySystemReviewResult
 import neqsim.process.safety.processsafetysystem.S001SecondaryPressureProtectionCriteria;
 import neqsim.process.safety.processsafetysystem.S001SecondaryPressureProtectionResult;
 import neqsim.process.safety.qra.ConsequenceAnalysisEngine;
+import neqsim.process.safety.release.ComponentSelectiveFiniteRateReleaseModel;
+import neqsim.process.safety.release.DriftFluxHomogeneousEquilibriumReleaseModel;
+import neqsim.process.safety.release.FiniteRateDriftFluxReleaseModel;
 import neqsim.process.safety.release.HomogeneousEquilibriumReleaseModel;
+import neqsim.process.safety.release.IdealGasFannoPipeReleaseModel;
+import neqsim.process.safety.release.IdealGasReleaseModel;
+import neqsim.process.safety.release.LegacyScreeningReleaseModel;
 import neqsim.process.safety.release.LeakModel;
+import neqsim.process.safety.release.PredictiveBubbleTransferZoneReleaseModel;
+import neqsim.process.safety.release.RanzMarshallFiniteRateReleaseModel;
+import neqsim.process.safety.release.RanzMarshallMassTransferCorrelation;
+import neqsim.process.safety.release.RealGasFannoPipeReleaseModel;
+import neqsim.process.safety.release.ReleaseFlowModel;
 import neqsim.process.safety.release.ReleaseFlowRequest;
 import neqsim.process.safety.release.ReleaseFlowResult;
 import neqsim.process.safety.release.ReleaseState;
+import neqsim.process.safety.release.SlipCorrectedHomogeneousEquilibriumReleaseModel;
 import neqsim.process.safety.release.SourceTermResult;
 import neqsim.process.processmodel.ProcessSystem;
 import neqsim.process.safety.risk.RiskMatrix;
@@ -471,6 +483,36 @@ public class ProcessProbe {
         break;
       case "hem_release":
         hemReleaseRows();
+        break;
+      case "ideal_gas_release":
+        idealGasReleaseRows();
+        break;
+      case "legacy_screening_release":
+        legacyScreeningReleaseRows();
+        break;
+      case "prescribed_slip_release":
+        prescribedSlipReleaseRows();
+        break;
+      case "drift_flux_release":
+        driftFluxReleaseRows();
+        break;
+      case "finite_rate_release":
+        finiteRateReleaseRows();
+        break;
+      case "component_selective_release":
+        componentSelectiveReleaseRows();
+        break;
+      case "ranz_marshall_release":
+        ranzMarshallReleaseRows();
+        break;
+      case "bubble_transfer_zone_release":
+        bubbleTransferZoneReleaseRows();
+        break;
+      case "ideal_gas_fanno_release":
+        idealGasFannoReleaseRows();
+        break;
+      case "real_gas_fanno_release":
+        realGasFannoReleaseRows();
         break;
       case "leak_blowdown":
         leakBlowdownRows();
@@ -12553,6 +12595,402 @@ public class ProcessProbe {
         out.append(",");
       }
       out.append(entry.getKey()).append(":").append(entry.getValue());
+    }
+    return out.toString();
+  }
+
+  // === The release source-term models ==========================================
+  //
+  // One subcommand per `ReleaseFlowModel` implementation. The states are the pinned tests'
+  // own, re-cased on PR because azoth's databank route resolves Peng-Robinson; the SRK rows
+  // are the tests' EOS and are evidence beside the oracle.
+
+  static void idealGasReleaseRows() {
+    releaseRow("pr_methane_50bara_choked", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 50.0, 0.01, 0.75, 101325.0, new IdealGasReleaseModel());
+    releaseRow("pr_methane_50bara_high_back", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 50.0, 0.01, 0.75, 4.0e6, new IdealGasReleaseModel());
+    releaseRow("pr_methane_5bara_unchoked", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 5.0, 0.01, 0.62, 4.0e5, new IdealGasReleaseModel());
+    releaseRow("pr_methane_dilute_0_1bara", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 0.1, 0.01, 0.62, 500.0, new IdealGasReleaseModel());
+    releaseRow("pr_methane_5bara_no_flow", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 5.0, 0.01, 0.62, 5.0e5, new IdealGasReleaseModel());
+    releaseRow("pr_methane_ethane_gas", false, new String[] {"methane", "ethane"},
+        new double[] {0.9, 0.1}, 300.0, 50.0, 0.01, 0.62, 101325.0, new IdealGasReleaseModel());
+    releaseRow("pr_nitrogen_20bara", false, new String[] {"nitrogen"}, new double[] {1.0}, 300.0,
+        20.0, 0.01, 0.62, 101325.0, new IdealGasReleaseModel());
+    releaseRow("pr_co2_10bara_gas", false, new String[] {"CO2"}, new double[] {1.0}, 350.0,
+        10.0, 0.01, 0.62, 101325.0, new IdealGasReleaseModel());
+    releaseRow("pr_propane_230k_two_phase_unsupported", false, new String[] {"propane"},
+        new double[] {1.0}, 230.0, 10.0, 0.01, 0.62, 101325.0, new IdealGasReleaseModel());
+    // SRK rows are the pinned tests' own EOS, and evidence beside the PR oracle.
+    releaseRow("srk_methane_50bara_choked", true, new String[] {"methane"}, new double[] {1.0},
+        300.0, 50.0, 0.01, 0.75, 101325.0, new IdealGasReleaseModel());
+  }
+
+  static void legacyScreeningReleaseRows() {
+    releaseRow("pr_methane_50bara_0_01", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 50.0, 0.01, 0.62, 101325.0, new LegacyScreeningReleaseModel());
+    releaseRow("pr_methane_50bara_0_013", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 50.0, 0.013, 0.62, 1.01325e5, new LegacyScreeningReleaseModel());
+    releaseRow("pr_methane_5bara", false, new String[] {"methane"}, new double[] {1.0}, 300.0,
+        5.0, 0.01, 0.62, 101325.0, new LegacyScreeningReleaseModel());
+    releaseRow("pr_propane_11bara_two_phase", false, new String[] {"propane"}, new double[] {1.0},
+        300.0, 11.0, 0.01, 0.62, 101325.0, new LegacyScreeningReleaseModel());
+    releaseRow("pr_methane_5bara_subcritical", false, new String[] {"methane"},
+        new double[] {1.0}, 300.0, 5.0, 0.01, 0.62, 4.0e5, new LegacyScreeningReleaseModel());
+    releaseRow("pr_methane_5bara_no_flow", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 5.0, 0.01, 0.62, 6.0e5, new LegacyScreeningReleaseModel());
+    releaseRow("srk_methane_50bara_0_01", true, new String[] {"methane"}, new double[] {1.0},
+        300.0, 50.0, 0.01, 0.62, 101325.0, new LegacyScreeningReleaseModel());
+    releaseRow("srk_methane_5bara_subcritical", true, new String[] {"methane"},
+        new double[] {1.0}, 300.0, 5.0, 0.01, 0.62, 4.0e5, new LegacyScreeningReleaseModel());
+  }
+
+  static void prescribedSlipReleaseRows() {
+    for (double ratio : new double[] {1.0, 2.0, 4.0}) {
+      releaseRow("pr_methane_propane_ratio_" + ratio, false,
+          new String[] {"methane", "propane"}, new double[] {0.5, 0.5}, 270.0, 30.0, 0.01, 0.62,
+          1.0e5, new SlipCorrectedHomogeneousEquilibriumReleaseModel(ratio),
+          "gas_to_liquid_slip_ratio=" + ratio);
+    }
+    releaseRow("pr_single_gas_unsupported", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 20.0, 0.01, 0.62, 1.0e5, new SlipCorrectedHomogeneousEquilibriumReleaseModel(2.0),
+        "gas_to_liquid_slip_ratio=2.0");
+    // SRK rows are evidence beside the PR oracle.
+    for (double ratio : new double[] {1.0, 2.0}) {
+      releaseRow("srk_methane_propane_ratio_" + ratio, true,
+          new String[] {"methane", "propane"}, new double[] {0.5, 0.5}, 270.0, 30.0, 0.01, 0.62,
+          1.0e5, new SlipCorrectedHomogeneousEquilibriumReleaseModel(ratio),
+          "gas_to_liquid_slip_ratio=" + ratio);
+    }
+  }
+
+  static void driftFluxReleaseRows() {
+    for (double fraction : new double[] {0.0875, 0.10, 0.1125, 0.125, 0.1375}) {
+      releaseRow("pr_methane_heptane_" + fraction, false,
+          new String[] {"methane", "n-heptane"}, new double[] {fraction, 1.0 - fraction}, 300.0,
+          30.0, 0.01, 0.62, 1.0e5, new DriftFluxHomogeneousEquilibriumReleaseModel(0.020),
+          "surface_tension_n_per_m=0.02");
+    }
+    releaseRow("pr_methane_heptane_0_1125_sigma_0_05", false,
+        new String[] {"methane", "n-heptane"}, new double[] {0.1125, 0.8875}, 300.0, 30.0, 0.01, 0.62,
+        1.0e5, new DriftFluxHomogeneousEquilibriumReleaseModel(0.05),
+        "surface_tension_n_per_m=0.05");
+    releaseRow("pr_methane_heptane_0_8_gas_area_breach_unsupported", false,
+        new String[] {"methane", "n-heptane"}, new double[] {0.8, 0.2}, 300.0, 30.0, 0.01, 0.62,
+        1.0e5, new DriftFluxHomogeneousEquilibriumReleaseModel(0.020),
+        "surface_tension_n_per_m=0.02");
+    releaseRow("pr_methane_heptane_0_5_gas_area_breach_unsupported", false,
+        new String[] {"methane", "n-heptane"}, new double[] {0.5, 0.5}, 300.0, 30.0, 0.01, 0.62,
+        1.0e5, new DriftFluxHomogeneousEquilibriumReleaseModel(0.020),
+        "surface_tension_n_per_m=0.02");
+    releaseRow("pr_single_gas_unsupported", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 20.0, 0.01, 0.62, 1.0e5, new DriftFluxHomogeneousEquilibriumReleaseModel(0.020),
+        "surface_tension_n_per_m=0.02");
+    releaseRow("srk_methane_heptane_0_10", true, new String[] {"methane", "n-heptane"},
+        new double[] {0.10, 0.90}, 300.0, 30.0, 0.01, 0.62, 1.0e5,
+        new DriftFluxHomogeneousEquilibriumReleaseModel(0.020), "surface_tension_n_per_m=0.02");
+  }
+
+  static void finiteRateReleaseRows() {
+    double[][] pairs = {{0.50, 0.25}, {0.10, 0.25}, {0.50, 0.01}, {0.01, 0.50}, {0.50, 50.0}};
+    for (double[] pair : pairs) {
+      releaseRow("pr_methane_heptane_0_1125_tau_" + pair[0] + "_res_" + pair[1], false,
+          new String[] {"methane", "n-heptane"}, new double[] {0.1125, 0.8875}, 300.0, 30.0, 0.01, 0.62,
+          1.0e5,
+          new FiniteRateDriftFluxReleaseModel(0.020, pair[0], pair[1], "public-screening:v1"),
+          "surface_tension_n_per_m=0.02", "phase_transfer_relaxation_time_s=" + pair[0],
+          "residence_time_s=" + pair[1], "parameter_provenance=public-screening:v1");
+    }
+    releaseRow("pr_methane_heptane_0_125_tau_0_5_res_0_25", false,
+        new String[] {"methane", "n-heptane"}, new double[] {0.125, 0.875}, 300.0, 30.0, 0.01,
+        0.62, 1.0e5, new FiniteRateDriftFluxReleaseModel(0.020, 0.5, 0.25, "public-screening:v1"),
+        "surface_tension_n_per_m=0.02", "phase_transfer_relaxation_time_s=0.5",
+        "residence_time_s=0.25", "parameter_provenance=public-screening:v1");
+    releaseRow("pr_all_gas_unsupported", false, new String[] {"methane"}, new double[] {1.0},
+        300.0, 20.0, 0.01, 0.62, 1.0e5,
+        new FiniteRateDriftFluxReleaseModel(0.020, 0.5, 0.25, "public-screening:v1"),
+        "surface_tension_n_per_m=0.02", "phase_transfer_relaxation_time_s=0.5",
+        "residence_time_s=0.25", "parameter_provenance=public-screening:v1");
+  }
+
+  static void componentSelectiveReleaseRows() {
+    double[][] times = {{0.10, 1.00}, {0.50, 0.50}, {1.00, 0.10}};
+    for (double[] pair : times) {
+      releaseRow("pr_methane_heptane_times_" + pair[0] + "_" + pair[1], false,
+          new String[] {"methane", "n-heptane"}, new double[] {0.1125, 0.8875}, 300.0, 30.0, 0.01, 0.62,
+          1.0e5, new ComponentSelectiveFiniteRateReleaseModel(0.020,
+              releaseValues(new String[] {"methane", "n-heptane"}, pair), 0.25,
+              "public-component-screening:v1"),
+          "surface_tension_n_per_m=0.02",
+          "component_relaxation_times_s=methane:" + pair[0] + ",n-heptane:" + pair[1],
+          "residence_time_s=0.25", "parameter_provenance=public-component-screening:v1");
+    }
+    releaseRow("pr_incomplete_component_basis_unsupported", false,
+        new String[] {"methane", "n-heptane"}, new double[] {0.1125, 0.8875}, 300.0, 30.0, 0.01, 0.62,
+        1.0e5, new ComponentSelectiveFiniteRateReleaseModel(0.020,
+            releaseValues(new String[] {"methane"}, new double[] {0.10}), 0.25,
+            "incomplete-basis:v1"),
+        "surface_tension_n_per_m=0.02", "component_relaxation_times_s=methane:0.1",
+        "residence_time_s=0.25", "parameter_provenance=incomplete-basis:v1");
+    releaseRow("srk_methane_heptane_uniform", true, new String[] {"methane", "n-heptane"},
+        new double[] {0.10, 0.90}, 300.0, 30.0, 0.01, 0.62, 1.0e5,
+        new ComponentSelectiveFiniteRateReleaseModel(0.020,
+            releaseValues(new String[] {"methane", "n-heptane"}, new double[] {0.5, 0.5}), 0.25,
+            "uniform-limit:v1"),
+        "surface_tension_n_per_m=0.02",
+        "component_relaxation_times_s=methane:0.5,n-heptane:0.5",
+        "residence_time_s=0.25", "parameter_provenance=uniform-limit:v1");
+  }
+
+  static void ranzMarshallReleaseRows() {
+    releaseRanzRow("pr_methane_heptane_bubbles_in_range", false, 0.1125, 0.010,
+        RanzMarshallMassTransferCorrelation.Morphology.GAS_BUBBLES, new double[] {1.0e-8, 2.0e-8});
+    releaseRanzRow("pr_liquid_droplets_unsupported", false, 0.1125, 0.010,
+        RanzMarshallMassTransferCorrelation.Morphology.LIQUID_DROPLETS,
+        new double[] {1.0e-8, 2.0e-8});
+    releaseRanzRow("pr_reynolds_200_unsupported", false, 0.1125, 0.25,
+        RanzMarshallMassTransferCorrelation.Morphology.GAS_BUBBLES, new double[] {1.0e-8, 2.0e-8});
+    releaseRanzRow("pr_schmidt_250_unsupported", false, 0.1125, 0.010,
+        RanzMarshallMassTransferCorrelation.Morphology.GAS_BUBBLES, new double[] {5.0e-9, 2.0e-8});
+    releaseRanzRow("pr_stagnant_limit", false, 0.1125, 0.0,
+        RanzMarshallMassTransferCorrelation.Morphology.GAS_BUBBLES, new double[] {1.0e-8, 2.0e-8});
+    releaseRow("pr_incomplete_diffusivity_basis_invalid", false,
+        new String[] {"methane", "n-heptane"}, new double[] {0.1125, 0.8875}, 300.0, 30.0, 0.01, 0.62,
+        1.0e5, new RanzMarshallFiniteRateReleaseModel(0.020, 0.25,
+            new RanzMarshallMassTransferCorrelation(
+                RanzMarshallMassTransferCorrelation.Morphology.GAS_BUBBLES, 1.0e-3, 800.0, 1.0e-3,
+                0.010, releaseValues(new String[] {"methane"}, new double[] {1.0e-8}),
+                "incomplete-diffusivity:v1")),
+        "surface_tension_n_per_m=0.02", "residence_time_s=0.25",
+        "morphology=gas_bubbles", "sauter_mean_diameter_m=0.001",
+        "continuous_phase_density_kg_m3=800", "continuous_phase_dynamic_viscosity_pa_s=0.001",
+        "relative_velocity_m_per_s=0.01", "component_diffusivities_m2_s=methane:1.0e-8",
+        "parameter_provenance=incomplete-diffusivity:v1");
+    releaseRanzRow("srk_methane_heptane_bubbles_in_range", true, 0.10, 0.010,
+        RanzMarshallMassTransferCorrelation.Morphology.GAS_BUBBLES, new double[] {1.0e-8, 2.0e-8});
+  }
+
+  static void releaseRanzRow(String label, boolean srk, double methaneFraction,
+      double relativeVelocityMs, RanzMarshallMassTransferCorrelation.Morphology morphology,
+      double[] diffusivities) {
+    RanzMarshallMassTransferCorrelation correlation = new RanzMarshallMassTransferCorrelation(
+        morphology, 1.0e-3, 800.0, 1.0e-3, relativeVelocityMs,
+        releaseValues(new String[] {"methane", "n-heptane"}, diffusivities),
+        "public-correlation:v1");
+    releaseRow(label, srk, new String[] {"methane", "n-heptane"},
+        new double[] {methaneFraction, 1.0 - methaneFraction}, 300.0, 30.0, 0.01, 0.62, 1.0e5,
+        new RanzMarshallFiniteRateReleaseModel(0.020, 0.25, correlation),
+        "surface_tension_n_per_m=0.02", "residence_time_s=0.25",
+        "morphology=" + (morphology == RanzMarshallMassTransferCorrelation.Morphology.GAS_BUBBLES
+            ? "gas_bubbles" : "liquid_droplets"),
+        "sauter_mean_diameter_m=0.001", "continuous_phase_density_kg_m3=800",
+        "continuous_phase_dynamic_viscosity_pa_s=0.001",
+        "relative_velocity_m_per_s=" + relativeVelocityMs,
+        "component_diffusivities_m2_s=methane:" + diffusivities[0] + ",n-heptane:"
+            + diffusivities[1],
+        "parameter_provenance=public-correlation:v1");
+  }
+
+  static void bubbleTransferZoneReleaseRows() {
+    for (double vertical : new double[] {0.50, 2.00}) {
+      for (double fraction : new double[] {0.1125, 0.125}) {
+        releaseRow("pr_methane_heptane_" + fraction + "_vertical_" + vertical, false,
+            new String[] {"methane", "n-heptane"}, new double[] {fraction, 1.0 - fraction},
+            300.0, 30.0, 0.01, 0.62, 1.0e5,
+            new PredictiveBubbleTransferZoneReleaseModel(0.020, 0.10, vertical, 1.0e-3,
+                releaseValues(new String[] {"methane", "n-heptane"},
+                    new double[] {1.0e-8, 2.0e-8}), "synthetic-transfer-zone:v1"),
+            "surface_tension_n_per_m=0.02", "transfer_zone_hydraulic_diameter_m=0.1",
+            "transfer_zone_vertical_length_m=" + vertical,
+            "continuous_phase_dynamic_viscosity_pa_s=0.001",
+            "component_diffusivities_m2_s=methane:1.0e-8,n-heptane:2.0e-8",
+            "parameter_provenance=synthetic-transfer-zone:v1");
+      }
+    }
+    releaseRow("pr_outside_ranz_marshall_range_unsupported", false,
+        new String[] {"methane", "n-heptane"}, new double[] {0.1125, 0.8875}, 300.0, 30.0, 0.01, 0.62,
+        1.0e5, new PredictiveBubbleTransferZoneReleaseModel(0.020, 0.10, 0.50, 1.0e-3,
+            releaseValues(new String[] {"methane", "n-heptane"}, new double[] {1.0e-10, 2.0e-10}),
+            "outside-range:v1"),
+        "surface_tension_n_per_m=0.02", "transfer_zone_hydraulic_diameter_m=0.1",
+        "transfer_zone_vertical_length_m=0.5", "continuous_phase_dynamic_viscosity_pa_s=0.001",
+        "component_diffusivities_m2_s=methane:1.0e-10,n-heptane:2.0e-10",
+        "parameter_provenance=outside-range:v1");
+    releaseRow("srk_methane_heptane_0_10_vertical_0_5", true,
+        new String[] {"methane", "n-heptane"}, new double[] {0.1125, 0.8875}, 300.0, 30.0, 0.01, 0.62,
+        1.0e5, new PredictiveBubbleTransferZoneReleaseModel(0.020, 0.10, 0.50, 1.0e-3,
+            releaseValues(new String[] {"methane", "n-heptane"}, new double[] {1.0e-8, 2.0e-8}),
+            "synthetic-transfer-zone:v1"),
+        "surface_tension_n_per_m=0.02", "transfer_zone_hydraulic_diameter_m=0.1",
+        "transfer_zone_vertical_length_m=0.5", "continuous_phase_dynamic_viscosity_pa_s=0.001",
+        "component_diffusivities_m2_s=methane:1.0e-8,n-heptane:2.0e-8",
+        "parameter_provenance=synthetic-transfer-zone:v1");
+  }
+
+  static void idealGasFannoReleaseRows() {
+    releasePipeRow("pr_nitrogen_50bara_L100_f0_02", false, new String[] {"nitrogen"},
+        new double[] {1.0}, 300.0, 50.0, 0.1, 1.0, 101325.0, 100.0, 0.02,
+        new IdealGasFannoPipeReleaseModel(), "flow_path_length_m=100.0",
+        "darcy_friction_factor=0.02");
+    releasePipeRow("pr_nitrogen_50bara_L10_f0_01", false, new String[] {"nitrogen"},
+        new double[] {1.0}, 300.0, 50.0, 0.1, 1.0, 101325.0, 10.0, 0.01,
+        new IdealGasFannoPipeReleaseModel(), "flow_path_length_m=10.0",
+        "darcy_friction_factor=0.01");
+    releasePipeRow("pr_nitrogen_50bara_high_back_4_5MPa", false, new String[] {"nitrogen"},
+        new double[] {1.0}, 300.0, 50.0, 0.1, 1.0, 4.5e6, 100.0, 0.02,
+        new IdealGasFannoPipeReleaseModel(), "flow_path_length_m=100.0",
+        "darcy_friction_factor=0.02");
+    releasePipeRow("pr_nitrogen_50bara_no_flow", false, new String[] {"nitrogen"},
+        new double[] {1.0}, 300.0, 50.0, 0.1, 1.0, 5.1e6, 100.0, 0.02,
+        new IdealGasFannoPipeReleaseModel(), "flow_path_length_m=100.0",
+        "darcy_friction_factor=0.02");
+    releasePipeRow("pr_nasa_gfssp_case_1", false, new String[] {"nitrogen"}, new double[] {1.0},
+        299.8166666667, 3.447378646584, 0.1524, 1.0, 101325.0, 81.4578, 0.002,
+        new IdealGasFannoPipeReleaseModel(), "flow_path_length_m=81.4578",
+        "darcy_friction_factor=0.002");
+    releaseRow("pr_no_flow_path_unsupported", false, new String[] {"nitrogen"},
+        new double[] {1.0}, 300.0, 50.0, 0.1, 1.0, 101325.0, new IdealGasFannoPipeReleaseModel());
+    releasePipeRow("srk_nitrogen_50bara_L100_f0_02", true, new String[] {"nitrogen"},
+        new double[] {1.0}, 300.0, 50.0, 0.1, 1.0, 101325.0, 100.0, 0.02,
+        new IdealGasFannoPipeReleaseModel(), "flow_path_length_m=100.0",
+        "darcy_friction_factor=0.02");
+  }
+
+  static void realGasFannoReleaseRows() {
+    releasePipeRow("pr_nitrogen_2bara_L12_f0_015", false, new String[] {"nitrogen"},
+        new double[] {1.0}, 300.0, 2.0, 0.08, 0.9, 101325.0, 12.0, 0.015,
+        new RealGasFannoPipeReleaseModel(), "flow_path_length_m=12.0",
+        "darcy_friction_factor=0.015");
+    releasePipeRow("pr_rich_gas_120bara_L40_f0_018", false,
+        new String[] {"methane", "ethane"}, new double[] {0.95, 0.05}, 340.0, 120.0, 0.08, 0.85,
+        4.0e6, 40.0, 0.018, new RealGasFannoPipeReleaseModel(), "flow_path_length_m=40.0",
+        "darcy_friction_factor=0.018");
+    releasePipeRow("pr_rich_gas_80bara_L8_f0_012", false,
+        new String[] {"methane", "ethane"}, new double[] {0.95, 0.05}, 340.0, 80.0, 0.08, 0.9,
+        2.0e6, 8.0, 0.012, new RealGasFannoPipeReleaseModel(), "flow_path_length_m=8.0",
+        "darcy_friction_factor=0.012");
+    releasePipeRow("pr_rich_gas_80bara_L40_f0_02", false,
+        new String[] {"methane", "ethane"}, new double[] {0.95, 0.05}, 340.0, 80.0, 0.08, 0.9,
+        2.0e6, 40.0, 0.02, new RealGasFannoPipeReleaseModel(), "flow_path_length_m=40.0",
+        "darcy_friction_factor=0.02");
+    releasePipeRow("pr_rich_gas_80bara_high_back_7MPa", false,
+        new String[] {"methane", "ethane"}, new double[] {0.95, 0.05}, 340.0, 80.0, 0.08, 0.9,
+        7.0e6, 40.0, 0.02, new RealGasFannoPipeReleaseModel(), "flow_path_length_m=40.0",
+        "darcy_friction_factor=0.02");
+    releasePipeRow("pr_wet_methane_hexane_unsupported", false,
+        new String[] {"methane", "n-hexane"}, new double[] {0.55, 0.45}, 285.0, 60.0, 0.08, 0.9,
+        101325.0, 12.0, 0.015, new RealGasFannoPipeReleaseModel(), "flow_path_length_m=12.0",
+        "darcy_friction_factor=0.015");
+    releaseRow("pr_no_flow_path_unsupported", false, new String[] {"nitrogen"},
+        new double[] {1.0}, 300.0, 2.0, 0.08, 0.9, 101325.0, new RealGasFannoPipeReleaseModel());
+    releasePipeRow("srk_nitrogen_2bara_L12_f0_015", true, new String[] {"nitrogen"},
+        new double[] {1.0}, 300.0, 2.0, 0.08, 0.9, 101325.0, 12.0, 0.015,
+        new RealGasFannoPipeReleaseModel(), "flow_path_length_m=12.0",
+        "darcy_friction_factor=0.015");
+  }
+
+  static Map<String, Double> releaseValues(String[] names, double[] values) {
+    Map<String, Double> map = new java.util.LinkedHashMap<String, Double>();
+    for (int i = 0; i < names.length; i++) {
+      map.put(names[i], values[i]);
+    }
+    return map;
+  }
+
+  static void releaseRow(String label, boolean srk, String[] names, double[] amounts,
+      double temperature, double pressureBar, double diameter, double coefficient, double back,
+      ReleaseFlowModel model, String... parameters) {
+    SystemInterface fluid = hemFluid(srk, names, amounts, temperature, pressureBar);
+    ReleaseFlowRequest request = new ReleaseFlowRequest(fluid, diameter, coefficient, back);
+    releasePrint(label, srk ? "srk" : "pr", model, fluid, request, parameters);
+  }
+
+  @SuppressWarnings("checkstyle:ParameterNumber")
+  static void releasePipeRow(String label, boolean srk, String[] names, double[] amounts,
+      double temperature, double pressureBar, double diameter, double coefficient, double back,
+      double length, double friction, ReleaseFlowModel model, String... parameters) {
+    SystemInterface fluid = hemFluid(srk, names, amounts, temperature, pressureBar);
+    ReleaseFlowRequest request =
+        new ReleaseFlowRequest(fluid, diameter, coefficient, back, length, friction);
+    releasePrint(label, srk ? "srk" : "pr", model, fluid, request, parameters);
+  }
+
+  static void releasePrint(String label, String eos, ReleaseFlowModel model, SystemInterface fluid,
+      ReleaseFlowRequest request, String... parameters) {
+    ReleaseFlowResult result = model.calculate(request);
+    System.out.println(label);
+    System.out.println("eos=" + eos);
+    System.out.println("model_id=" + model.getModelId());
+    System.out.println("input_t_k=" + fluid.getTemperature());
+    System.out.println("input_p_bara=" + fluid.getPressure());
+    System.out.println("input_z=" + releaseZ(fluid));
+    System.out.println("diameter_m=" + request.getDiameterM());
+    System.out.println("discharge_coefficient=" + request.getDischargeCoefficient());
+    System.out.println("back_pressure_pa=" + request.getBackPressurePa());
+    System.out.println("flow_path_length_m=" + request.getFlowPathLengthM());
+    System.out.println("darcy_friction_factor=" + request.getDarcyFrictionFactor());
+    for (String parameter : parameters) {
+      System.out.println(parameter);
+    }
+    System.out.println("status=" + result.getStatus());
+    System.out.println("mass_flow_kg_s=" + (result.isUsable() ? result.getMassFlowRateKgS() : ""));
+    System.out.println("choked=" + result.isChoked());
+    System.out.println("throat_sound_speed_m_per_s="
+        + (result.getThroatSoundSpeedMs() == null ? "" : result.getThroatSoundSpeedMs()));
+    int d = 0;
+    for (ReleaseFlowResult.Diagnostic diagnostic : result.getDiagnostics()) {
+      System.out.println("diagnostic_" + d + "_code=" + diagnostic.getCode());
+      System.out.println("diagnostic_" + d + "_message=" + diagnostic.getMessage());
+      d++;
+    }
+    int i = 0;
+    for (Map.Entry<ReleaseFlowResult.Station, ReleaseState> entry : result.getStations().entrySet()) {
+      ReleaseState state = entry.getValue();
+      String prefix = "station_" + i + "_";
+      System.out.println(prefix + "name=" + entry.getKey().name());
+      System.out.println(prefix + "p_pa=" + state.getPressurePa());
+      System.out.println(prefix + "t_k=" + state.getTemperatureK());
+      System.out.println(prefix + "density_kg_m3=" + state.getDensityKgM3());
+      System.out.println(prefix + "h_j_per_kg=" + state.getEnthalpyJkg());
+      System.out.println(prefix + "s_j_per_kgk=" + state.getEntropyJkgK());
+      System.out.println(prefix + "velocity_m_per_s=" + state.getVelocityMs());
+      System.out.println(prefix + "mass_flux_kg_m2_s=" + state.getMassFluxKgM2s());
+      System.out.println(prefix + "gas_mass_fraction=" + state.getGasMassFraction());
+      System.out.println(prefix + "component_mole_fractions="
+          + hemFractions(state.getComponentMoleFractions()));
+      System.out.println(prefix + "component_mass_fractions="
+          + hemFractions(state.getComponentMassFractions()));
+      System.out.println(prefix + "phase_mass_fractions="
+          + hemFractions(state.getPhaseMassFractions()));
+      System.out.println(prefix + "phase_densities=" + hemFractions(state.getPhaseDensitiesKgM3()));
+      System.out.println(prefix + "phase_velocities=" + hemFractions(state.getPhaseVelocitiesMs()));
+      System.out.println(prefix + "phase_component_mass_fractions="
+          + releasePhaseFractions(state.getPhaseComponentMassFractions()));
+      i++;
+    }
+    System.out.println();
+  }
+
+  static String releaseZ(SystemInterface fluid) {
+    double[] overall = fluid.getMolarComposition();
+    StringBuilder z = new StringBuilder();
+    for (int i = 0; i < overall.length; i++) {
+      z.append(i == 0 ? "" : ",")
+          .append(fluid.getPhase(0).getComponent(i).getName()).append(":").append(overall[i]);
+    }
+    return z.toString();
+  }
+
+  static String releasePhaseFractions(Map<String, Map<String, Double>> phases) {
+    StringBuilder out = new StringBuilder();
+    for (Map.Entry<String, Map<String, Double>> phase : phases.entrySet()) {
+      if (out.length() > 0) {
+        out.append(";");
+      }
+      out.append(phase.getKey()).append("=").append(hemFractions(phase.getValue()));
     }
     return out.toString();
   }

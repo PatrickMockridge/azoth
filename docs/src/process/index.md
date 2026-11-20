@@ -27,7 +27,9 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.blocked_outlet_relief`](./blocked_outlet_relief.md) | `blocked_outlet_full_inflow` | NeqSim process/safety/overpressure/BlockedOutletRelief.java |
 | [`process.blowdown_pressure_profile`](./blowdown_pressure_profile.md) | `piecewise_step_or_linear_pressure_profile` | NeqSim process/safety/rupture/BlowdownPressureProfile.java |
 | [`process.bow_tie`](./bow_tie.md) | `closed_form_bow_tie` | NeqSim process/safety/risk/bowtie/BowTieModel.java |
+| [`process.bubble_transfer_zone_release`](./bubble_transfer_zone_release.md) | `bubble_transfer_zone_fixed_point` | NeqSim process/safety/release/PredictiveBubbleTransferZoneReleaseModel.java |
 | [`process.check_valve_leak_relief`](./check_valve_leak_relief.md) | `check_valve_leak_nozzle` | NeqSim process/safety/overpressure/CheckValveLeakRelief.java |
+| [`process.component_selective_release`](./component_selective_release.md) | `component_selective_relaxation` | NeqSim process/safety/release/ComponentSelectiveFiniteRateReleaseModel.java |
 | [`process.component_splitter`](./component_splitter.md) | `direct composition` | NeqSim process/equipment/splitter/ComponentSplitter.java |
 | [`process.compressor`](./compressor.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
 | [`process.consequence_analysis`](./consequence_analysis.md) | `outcome_frequency_composition` | NeqSim process/safety/qra/ConsequenceAnalysisEngine.java |
@@ -37,6 +39,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.depressurization`](./depressurization.md) | `explicit_euler_equilibrium_blowdown` | NeqSim process/safety/depressurization/DepressurizationSimulator.java |
 | [`process.depressurization_acceptance`](./depressurization_acceptance.md) | `trajectory_acceptance` | NeqSim process/safety/depressurization/STS0131AcceptanceCriteria.java |
 | [`process.distillation_column`](./distillation_column.md) | `sequential_substitution_sweeps` | NeqSim process/equipment/distillation/DistillationColumn.java |
+| [`process.drift_flux_release`](./drift_flux_release.md) | `drift_flux_partition` | NeqSim process/safety/release/DriftFluxHomogeneousEquilibriumReleaseModel.java |
 | [`process.dynamic_psv_sizing`](./dynamic_psv_sizing.md) | `bisection_over_psv_area` | NeqSim process/safety/depressurization/DynamicPsvSizingStudy.java |
 | [`process.ejector`](./ejector.md) | `direct composition` | NeqSim process/equipment/ejector/Ejector.java |
 | [`process.escalation_graph`](./escalation_graph.md) | `domino_failure_propagation` | NeqSim process/safety/escalation/EscalationGraphAnalyzer.java |
@@ -44,6 +47,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.expander`](./expander.md) | `direct composition` | NeqSim process/equipment/compressor/Compressor.java |
 | [`process.fault_tree`](./fault_tree.md) | `recursive_gate_evaluation` | NeqSim process/safety/risk/fta/FaultTreeAnalyzer.java |
 | [`process.filter`](./filter.md) | `direct composition` | NeqSim process/equipment/filter/Filter.java |
+| [`process.finite_rate_release`](./finite_rate_release.md) | `finite_rate_relaxation` | NeqSim process/safety/release/FiniteRateDriftFluxReleaseModel.java |
 | [`process.fire_case_relief`](./fire_case_relief.md) | `closed_form_fire_case_relief` | NeqSim process/safety/overpressure/FireCaseRelief.java |
 | [`process.fire_monitor_coverage`](./fire_monitor_coverage.md) | `closed_form_fire_monitor_coverage` | NeqSim process/safety/firewater/FireMonitorCoverage.java |
 | [`process.fire_water_coverage_assessment`](./fire_water_coverage_assessment.md) | `closed_form_fire_water_coverage_assessment` | NeqSim process/safety/firewater/FireWaterCoverageAssessment.java |
@@ -63,9 +67,12 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.heater`](./heater.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Heater.java |
 | [`process.heavy_gas_dispersion`](./heavy_gas_dispersion.md) | `britter_mcquaid_continuous_dense_gas` | NeqSim process/safety/dispersion/HeavyGasDispersion.java |
 | [`process.hem_release`](./hem_release.md) | `log_pressure_scan_golden_section` | NeqSim process/safety/release/HomogeneousEquilibriumReleaseModel.java |
+| [`process.ideal_gas_fanno_release`](./ideal_gas_fanno_release.md) | `ideal_gas_fanno_pipe` | NeqSim process/safety/release/IdealGasFannoPipeReleaseModel.java |
+| [`process.ideal_gas_release`](./ideal_gas_release.md) | `ideal_gas_isentropic_orifice` | NeqSim process/safety/release/IdealGasReleaseModel.java |
 | [`process.inherent_safety`](./inherent_safety.md) | `kletz_inherent_safety_index` | NeqSim process/safety/inherent/InherentSafetyEvaluator.java |
 | [`process.jet_fire`](./jet_fire.md) | `api521_point_source_wayne_transmissivity` | NeqSim process/safety/fire/JetFireModel.java |
 | [`process.leak_blowdown`](./leak_blowdown.md) | `explicit_euler_isentropic_blowdown` | NeqSim process/safety/release/LeakModel.java |
+| [`process.legacy_screening_release`](./legacy_screening_release.md) | `legacy_orifice_screening` | NeqSim process/safety/release/LegacyScreeningReleaseModel.java |
 | [`process.lopa`](./lopa.md) | `closed_form_lopa` | NeqSim process/safety/risk/sis/LOPAResult.java |
 | [`process.mah_bow_tie_skeleton`](./mah_bow_tie_skeleton.md) | `mah_bow_tie_catalogue` | NeqSim process/safety/hazid/MahBowTieBuilder.java |
 | [`process.manifold`](./manifold.md) | `direct composition` | NeqSim process/equipment/manifold/Manifold.java |
@@ -89,13 +96,16 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.plug_flow_reactor`](./plug_flow_reactor.md) | `direct composition` | NeqSim process/equipment/reactor/PlugFlowReactor.java |
 | [`process.pool_fire`](./pool_fire.md) | `api521_mudan_pool_fire` | NeqSim process/safety/fire/PoolFireModel.java |
 | [`process.porous_media_self_heating`](./porous_media_self_heating.md) | `frank_kamenetskii_criticality` | NeqSim process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.java |
+| [`process.prescribed_slip_release`](./prescribed_slip_release.md) | `prescribed_slip_partition` | NeqSim process/safety/release/SlipCorrectedHomogeneousEquilibriumReleaseModel.java |
 | [`process.probit`](./probit.md) | `closed_form_probit` | NeqSim process/safety/dispersion/ProbitModel.java |
 | [`process.psv_fire_sizing`](./psv_fire_sizing.md) | `closed_form_psv_fire_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
 | [`process.psv_sizing`](./psv_sizing.md) | `closed_form_psv_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
 | [`process.psv_valve`](./psv_valve.md) | `psv_latch_one_step` | NeqSim process/safety/depressurization/PsvValveModel.java |
 | [`process.pump`](./pump.md) | `direct composition` | NeqSim process/equipment/pump/Pump.java and process/equipment/pump/PumpChart.java |
 | [`process.pump_deadhead`](./pump_deadhead.md) | `centrifugal_pump_deadhead_screen` | NeqSim process/safety/pump/PumpDeadheadAnalyzer.java |
+| [`process.ranz_marshall_release`](./ranz_marshall_release.md) | `ranz_marshall_component_transfer` | NeqSim process/safety/release/RanzMarshallFiniteRateReleaseModel.java |
 | [`process.rate_based_packed_column`](./rate_based_packed_column.md) | `counter_current_fixed_point_profile` | NeqSim process/equipment/distillation/RateBasedPackedColumn.java |
+| [`process.real_gas_fanno_release`](./real_gas_fanno_release.md) | `real_gas_fanno_march` | NeqSim process/safety/release/RealGasFannoPipeReleaseModel.java |
 | [`process.relief_disposal_network`](./relief_disposal_network.md) | `closed_form_relief_disposal_network` | NeqSim process/safety/overpressure/ReliefDisposalNetwork.java |
 | [`process.risk_matrix`](./risk_matrix.md) | `closed_form_risk_matrix` | NeqSim process/safety/risk/RiskMatrix.java |
 | [`process.runaway_reaction`](./runaway_reaction.md) | `adiabatic_runaway_screen` | NeqSim process/safety/reaction/RunawayReactionAnalyzer.java |

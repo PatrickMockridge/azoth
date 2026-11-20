@@ -1,0 +1,53 @@
+model = "process.real_gas_fanno_release"
+[[cases]]
+id = "dilute_nitrogen"
+tolerance = 1.0e-3
+source = "Nitrogen at 300 K and 2 bar through a 0.08 m pipe 12 m long with `f = 0.015` and `Cd = 0.9` into 1 atm (`pr_nitrogen_2bara_L12_f0_015`): the dilute limit where the march approaches the ideal-gas answer. The port agrees to `1.9e-8`, and the case is held at `1e-3` as the EOS-march precedent. The dense and high-pressure rows are evidence in the capture and are run by the slow cross-implementation module.\n"
+[cases.inputs]
+components = ["nitrogen"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 200000.0
+diameter = 0.08
+discharge_coefficient = 0.9
+back_pressure = 101325.0
+flow_path_length = 12.0
+darcy_friction_factor = 0.015
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.277278966897692
+choked = false
+[[cases]]
+id = "two_phase_refuses"
+tolerance = 1.0e-12
+source = "Methane/n-hexane at 0.55/0.45, 285 K and 60 bar (`pr_wet_methane_hexane_unsupported`) is two-phase at the inlet, so the march refuses it as `unsupported` with `UNSUPPORTED_REAL_GAS_FANNO_REGIME`.\n"
+[cases.inputs]
+components = ["methane", "n-hexane"]
+upstream_z = [0.55, 0.45]
+upstream_t = 285.0
+upstream_p = 6000000.0
+diameter = 0.08
+discharge_coefficient = 0.9
+back_pressure = 101325.0
+flow_path_length = 12.0
+darcy_friction_factor = 0.015
+[cases.expected]
+status = "unsupported"
+choked = false
+[[cases]]
+id = "no_flow_path_is_unsupported"
+tolerance = 1.0e-12
+source = "The nitrogen state without a pipe path (`pr_no_flow_path_unsupported`).\n"
+[cases.inputs]
+components = ["nitrogen"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 200000.0
+diameter = 0.08
+discharge_coefficient = 0.9
+back_pressure = 101325.0
+flow_path_length = 0.0
+darcy_friction_factor = 0.0
+[cases.expected]
+status = "unsupported"
+choked = false

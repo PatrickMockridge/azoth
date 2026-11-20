@@ -1,0 +1,100 @@
+model = "process.finite_rate_release"
+[[cases]]
+id = "half_progress"
+tolerance = 2.0e-5
+source = "Methane/n-heptane at 0.1125/0.8875, 300 K and 30 bar through a 1 cm opening with `Cd = 0.62` into 1 bar, `sigma = 0.02`, a 0.5 s relaxation and a 0.25 s residence (`pr_methane_heptane_0_1125_tau_0.5_res_0.25`).\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+phase_transfer_relaxation_time = 0.5
+residence_time = 0.25
+parameter_provenance = "public-screening:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.8105066592284895
+choked = true
+[[cases]]
+id = "faster_relaxation"
+tolerance = 2.0e-5
+source = "The same state with a 0.1 s relaxation (`pr_methane_heptane_0_1125_tau_0.1_res_0.25`): a shorter relaxation time moves the split further toward equilibrium.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+phase_transfer_relaxation_time = 0.1
+residence_time = 0.25
+parameter_provenance = "public-screening:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.72942720901569
+choked = true
+[[cases]]
+id = "near_equilibrium"
+tolerance = 2.0e-5
+source = "The same state with a 0.01 s relaxation and a 0.5 s residence (`pr_methane_heptane_0_1125_tau_0.01_res_0.5`): the progress is essentially one, so the rate approaches the equilibrium drift-flux answer.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+phase_transfer_relaxation_time = 0.01
+residence_time = 0.5
+parameter_provenance = "public-screening:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.7175222717288527
+choked = true
+[[cases]]
+id = "methane_fraction_0_125"
+tolerance = 2.0e-5
+source = "The 0.125 methane state at the half-progress times (`pr_methane_heptane_0_125_tau_0_5_res_0_25`).\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.125, 0.875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+phase_transfer_relaxation_time = 0.5
+residence_time = 0.25
+parameter_provenance = "public-screening:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.8076826417356244
+choked = true
+[[cases]]
+id = "all_gas_upstream_is_unsupported"
+tolerance = 1.0e-12
+source = "A methane-only feed at 300 K and 20 bar (`pr_all_gas_unsupported`) has no liquid at the opening, which the relaxation refuses as `unsupported` with `FINITE_RATE_REGIME_UNSUPPORTED`.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 2000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+phase_transfer_relaxation_time = 0.5
+residence_time = 0.25
+parameter_provenance = "public-screening:v1"
+[cases.expected]
+status = "unsupported"
+choked = false

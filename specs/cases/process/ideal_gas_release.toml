@@ -1,0 +1,100 @@
+model = "process.ideal_gas_release"
+[[cases]]
+id = "methane_50bara_choked"
+tolerance = 2.0e-5
+source = "The class's adapter state (`pr_methane_50bara_choked`) from `validation/neqsim/captures/process_ideal_gas_release.tsv`: methane at 300 K and 50 bar through a 1 cm opening with `Cd = 0.75` into 1 atm. The flow is choked and the sound speed is `sqrt(gamma R T_throat/M)`.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 5000000.0
+diameter = 0.01
+discharge_coefficient = 0.75
+back_pressure = 101325.0
+[cases.expected]
+status = "valid"
+mass_flow_rate = 0.520763925419132
+choked = true
+throat_sound_speed = 430.5225291324468
+[[cases]]
+id = "methane_5bara_unchoked"
+tolerance = 2.0e-5
+source = "The same state at 5 bar into 4 bar (`pr_methane_5bara_unchoked`): the receiving ratio is above the critical ratio, so the throat is the receiving-pressure state and the sound speed is still reported.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 500000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 400000.0
+[cases.expected]
+status = "valid"
+mass_flow_rate = 0.03435765098336678
+choked = false
+throat_sound_speed = 440.4827263840064
+[[cases]]
+id = "methane_5bara_no_forward_flow"
+tolerance = 1.0e-12
+source = "The same state with the receiving pressure equal to the upstream pressure (`pr_methane_5bara_no_flow`). The class returns a valid result with zero rate, three stations and no sound speed.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 500000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 500000.0
+[cases.expected]
+status = "valid"
+mass_flow_rate = 0.0
+choked = false
+[[cases]]
+id = "methane_ethane_gas"
+tolerance = 2.0e-5
+source = "A two-component gas (`pr_methane_ethane_gas`): methane 0.9 and ethane 0.1 at 300 K and 50 bar into 1 atm. The mixture's gamma and molar mass are the flash's.\n"
+[cases.inputs]
+components = ["methane", "ethane"]
+upstream_z = [0.9, 0.1]
+upstream_t = 300.0
+upstream_p = 5000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 101325.0
+[cases.expected]
+status = "valid"
+mass_flow_rate = 0.450028912090148
+choked = true
+throat_sound_speed = 413.454026733125
+[[cases]]
+id = "methane_50bara_high_back_pressure"
+tolerance = 2.0e-5
+source = "The same feed against 40 bar (`pr_methane_50bara_high_back`): the ratio is above critical, the flow is unchoked, and the throat is the receiving-pressure state.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 5000000.0
+diameter = 0.01
+discharge_coefficient = 0.75
+back_pressure = 4000000.0
+[cases.expected]
+status = "valid"
+mass_flow_rate = 0.4213640682088363
+choked = false
+throat_sound_speed = 462.067762637076
+[[cases]]
+id = "propane_two_phase_is_unsupported"
+tolerance = 1.0e-12
+source = "Propane at 230 K and 10 bar (`pr_propane_230k_two_phase_unsupported`) flashes to two phases, which the ideal-gas adapter refuses as `unsupported` with `UNSUPPORTED_IDEAL_GAS_REGIME`.\n"
+[cases.inputs]
+components = ["propane"]
+upstream_z = [1.0]
+upstream_t = 230.0
+upstream_p = 1000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 101325.0
+[cases.expected]
+status = "unsupported"
+choked = false

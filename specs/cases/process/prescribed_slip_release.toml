@@ -1,0 +1,68 @@
+model = "process.prescribed_slip_release"
+[[cases]]
+id = "methane_propane_unity_slip"
+tolerance = 2.0e-5
+source = "Methane/propane at 0.5/0.5, 270 K and 30 bar through a 1 cm opening with `Cd = 0.62` into 1 bar, at a unit slip ratio (`pr_methane_propane_ratio_1.0`). The unit ratio recovers the homogeneous rate.\n"
+[cases.inputs]
+components = ["methane", "propane"]
+upstream_z = [0.5, 0.5]
+upstream_t = 270.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+gas_to_liquid_slip_ratio = 1.0
+[cases.expected]
+status = "valid"
+mass_flow_rate = 0.46230814881915705
+choked = true
+[[cases]]
+id = "methane_propane_slip_two"
+tolerance = 2.0e-5
+source = "The same state at a slip ratio of 2 (`pr_methane_propane_ratio_2.0`): the closure's mass flux and rate rise with the gas velocity.\n"
+[cases.inputs]
+components = ["methane", "propane"]
+upstream_z = [0.5, 0.5]
+upstream_t = 270.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+gas_to_liquid_slip_ratio = 2.0
+[cases.expected]
+status = "valid"
+mass_flow_rate = 0.5960511205350302
+choked = true
+[[cases]]
+id = "methane_propane_slip_four"
+tolerance = 2.0e-5
+source = "The same state at a slip ratio of 4 (`pr_methane_propane_ratio_4.0`): the closure's gain flattens as the gas area fills.\n"
+[cases.inputs]
+components = ["methane", "propane"]
+upstream_z = [0.5, 0.5]
+upstream_t = 270.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+gas_to_liquid_slip_ratio = 4.0
+[cases.expected]
+status = "valid"
+mass_flow_rate = 0.6075648566496228
+choked = true
+[[cases]]
+id = "single_gas_is_unsupported"
+tolerance = 1.0e-12
+source = "Methane alone at 300 K and 20 bar (`pr_single_gas_unsupported`): the opening has one phase, which the slip partition refuses as `unsupported` with `SLIP_REGIME_UNSUPPORTED`.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 2000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+gas_to_liquid_slip_ratio = 2.0
+[cases.expected]
+status = "unsupported"
+choked = false

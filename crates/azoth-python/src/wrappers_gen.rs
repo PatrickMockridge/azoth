@@ -5834,6 +5834,50 @@ pub fn bow_tie(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Predictive bubble transfer-zone orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, transfer_zone_hydraulic_diameter, transfer_zone_vertical_length, continuous_phase_dynamic_viscosity, component_diffusivities, parameter_provenance))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, transfer_zone_hydraulic_diameter, transfer_zone_vertical_length, continuous_phase_dynamic_viscosity, component_diffusivities, parameter_provenance)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn bubble_transfer_zone_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    surface_tension: f64,
+    transfer_zone_hydraulic_diameter: f64,
+    transfer_zone_vertical_length: f64,
+    continuous_phase_dynamic_viscosity: f64,
+    component_diffusivities: Vec<f64>,
+    parameter_provenance: &str,
+) -> PyResult<crate::transport_gen::PyBubbleTransferZoneReleaseResult> {
+    azoth_process::models::bubble_transfer_zone_release::bubble_transfer_zone_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        surface_tension,
+        transfer_zone_hydraulic_diameter,
+        transfer_zone_vertical_length,
+        continuous_phase_dynamic_viscosity,
+        &component_diffusivities,
+        parameter_provenance,
+    )
+    .map(|r| crate::transport_gen::PyBubbleTransferZoneReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Check valve leak relief.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -5867,6 +5911,46 @@ pub fn check_valve_leak_relief(
         scenario_name,
     )
     .map(|r| crate::transport_gen::PyCheckValveLeakReliefResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Component-selective drift-flux orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, component_relaxation_times, residence_time, parameter_provenance))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, component_relaxation_times, residence_time, parameter_provenance)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn component_selective_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    surface_tension: f64,
+    component_relaxation_times: Vec<f64>,
+    residence_time: f64,
+    parameter_provenance: &str,
+) -> PyResult<crate::transport_gen::PyComponentSelectiveReleaseResult> {
+    azoth_process::models::component_selective_release::component_selective_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        surface_tension,
+        &component_relaxation_times,
+        residence_time,
+        parameter_provenance,
+    )
+    .map(|r| crate::transport_gen::PyComponentSelectiveReleaseResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -6324,6 +6408,40 @@ pub fn distillation_column(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Vertical drift-flux orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn drift_flux_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    surface_tension: f64,
+) -> PyResult<crate::transport_gen::PyDriftFluxReleaseResult> {
+    azoth_process::models::drift_flux_release::drift_flux_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        surface_tension,
+    )
+    .map(|r| crate::transport_gen::PyDriftFluxReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Dynamic PSV sizing.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -6507,6 +6625,46 @@ pub fn fault_tree(
     azoth_process::models::fault_tree::fault_tree(&nodes_records, max_cardinality)
         .map(|r| crate::transport_gen::PyFaultTreeResult::from(&r))
         .map_err(|e| to_pyerr(py, e))
+}
+
+/// Finite-rate drift-flux orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, phase_transfer_relaxation_time, residence_time, parameter_provenance))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, phase_transfer_relaxation_time, residence_time, parameter_provenance)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn finite_rate_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    surface_tension: f64,
+    phase_transfer_relaxation_time: f64,
+    residence_time: f64,
+    parameter_provenance: &str,
+) -> PyResult<crate::transport_gen::PyFiniteRateReleaseResult> {
+    azoth_process::models::finite_rate_release::finite_rate_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        surface_tension,
+        phase_transfer_relaxation_time,
+        residence_time,
+        parameter_provenance,
+    )
+    .map(|r| crate::transport_gen::PyFiniteRateReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
 }
 
 /// Fire case relief.
@@ -7218,6 +7376,74 @@ pub fn hem_release(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Ideal-gas Fanno pipe release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, flow_path_length, darcy_friction_factor))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, flow_path_length, darcy_friction_factor)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn ideal_gas_fanno_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    flow_path_length: f64,
+    darcy_friction_factor: f64,
+) -> PyResult<crate::transport_gen::PyIdealGasFannoReleaseResult> {
+    azoth_process::models::ideal_gas_fanno_release::ideal_gas_fanno_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        flow_path_length,
+        darcy_friction_factor,
+    )
+    .map(|r| crate::transport_gen::PyIdealGasFannoReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Ideal-gas isentropic orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn ideal_gas_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+) -> PyResult<crate::transport_gen::PyIdealGasReleaseResult> {
+    azoth_process::models::ideal_gas_release::ideal_gas_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+    )
+    .map(|r| crate::transport_gen::PyIdealGasReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Inherent-safety index.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -7307,6 +7533,38 @@ pub fn leak_blowdown(
         scenario_name,
     )
     .map(|r| crate::transport_gen::PyLeakBlowdownResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Legacy orifice screening release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn legacy_screening_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+) -> PyResult<crate::transport_gen::PyLegacyScreeningReleaseResult> {
+    azoth_process::models::legacy_screening_release::legacy_screening_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+    )
+    .map(|r| crate::transport_gen::PyLegacyScreeningReleaseResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 
@@ -8058,6 +8316,40 @@ pub fn porous_media_self_heating(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Prescribed-slip orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, gas_to_liquid_slip_ratio))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, gas_to_liquid_slip_ratio)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn prescribed_slip_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    gas_to_liquid_slip_ratio: f64,
+) -> PyResult<crate::transport_gen::PyPrescribedSlipReleaseResult> {
+    azoth_process::models::prescribed_slip_release::prescribed_slip_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        gas_to_liquid_slip_ratio,
+    )
+    .map(|r| crate::transport_gen::PyPrescribedSlipReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Probit dose-response.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
@@ -8254,6 +8546,92 @@ pub fn pump_deadhead(
         max_allowable_temperature_rise.map(kelvin_intervals),
     )
     .map(|r| crate::transport_gen::PyPumpDeadheadResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Ranz-Marshall component-transfer orifice release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, residence_time, morphology, sauter_mean_diameter, continuous_phase_density, continuous_phase_dynamic_viscosity, relative_velocity, component_diffusivities, parameter_provenance))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, surface_tension, residence_time, morphology, sauter_mean_diameter, continuous_phase_density, continuous_phase_dynamic_viscosity, relative_velocity, component_diffusivities, parameter_provenance)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn ranz_marshall_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    surface_tension: f64,
+    residence_time: f64,
+    morphology: &str,
+    sauter_mean_diameter: f64,
+    continuous_phase_density: f64,
+    continuous_phase_dynamic_viscosity: f64,
+    relative_velocity: f64,
+    component_diffusivities: Vec<f64>,
+    parameter_provenance: &str,
+) -> PyResult<crate::transport_gen::PyRanzMarshallReleaseResult> {
+    azoth_process::models::ranz_marshall_release::ranz_marshall_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        surface_tension,
+        residence_time,
+        morphology,
+        sauter_mean_diameter,
+        continuous_phase_density,
+        continuous_phase_dynamic_viscosity,
+        relative_velocity,
+        &component_diffusivities,
+        parameter_provenance,
+    )
+    .map(|r| crate::transport_gen::PyRanzMarshallReleaseResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Real-gas Fanno pipe release.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, flow_path_length, darcy_friction_factor))]
+#[pyo3(
+    text_signature = "(components, upstream_z, upstream_t, upstream_p, diameter, discharge_coefficient, back_pressure, flow_path_length, darcy_friction_factor)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn real_gas_fanno_release(
+    py: Python<'_>,
+    components: Vec<String>,
+    upstream_z: Vec<f64>,
+    upstream_t: f64,
+    upstream_p: f64,
+    diameter: f64,
+    discharge_coefficient: f64,
+    back_pressure: f64,
+    flow_path_length: f64,
+    darcy_friction_factor: f64,
+) -> PyResult<crate::transport_gen::PyRealGasFannoReleaseResult> {
+    azoth_process::models::real_gas_fanno_release::real_gas_fanno_release(
+        &components,
+        &upstream_z,
+        kelvins(upstream_t),
+        pascals(upstream_p),
+        meters(diameter),
+        discharge_coefficient,
+        pascals(back_pressure),
+        flow_path_length,
+        darcy_friction_factor,
+    )
+    .map(|r| crate::transport_gen::PyRealGasFannoReleaseResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
 

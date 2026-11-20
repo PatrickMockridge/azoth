@@ -22,7 +22,7 @@ use serde::Serialize;
 
 use azoth_eos::cubic::Cubic;
 use azoth_eos::databank;
-use azoth_eos::entropy_state::{self, EntropyState, RootPolicy};
+use azoth_eos::entropy_state::{self, EntropyPhase, EntropyState, RootPolicy};
 use azoth_eos::equilibrium_sound_speed::{EquilibriumStatus, equilibrium_speed_of};
 use azoth_eos::mixture::Mixture;
 use azoth_eos::molar_enthalpy_entropy::IdealGasModel;
@@ -376,7 +376,63 @@ fn check_support(
 /// `InvalidInput` for a state or opening the class refuses at construction, a composition
 /// that is not one entry per component and sums to one, or whatever the databank refuses.
 #[allow(clippy::too_many_arguments)] // one parameter per declared input, and there are seven
-pub fn hem_release(
+/// One station row with its phase records.
+#[derive(Debug, Clone)]
+pub(crate) struct TraceStation {
+    /// Which station this row is.
+    pub station: ReleaseStation,
+    /// Absolute pressure, Pa.
+    pub pressure: f64,
+    /// Temperature, K.
+    pub temperature: f64,
+    /// Mass over EOS total volume, kg/m3.
+    pub density: f64,
+    /// Molar enthalpy, J/mol.
+    pub molar_enthalpy: f64,
+    /// Molar entropy, J/(mol K).
+    pub molar_entropy: f64,
+    /// The station's axial velocity, m/s.
+    pub velocity: f64,
+    /// The station's mass flux, before the discharge coefficient, kg/(m2 s).
+    pub mass_flux: f64,
+    /// What the flash found.
+    pub phase: ReleasePhase,
+    /// The gas phase's share of the mass.
+    pub gas_mass_fraction: f64,
+    /// The gas phase's mass share, density and composition, when one exists.
+    pub gas_phase: Option<EntropyPhase>,
+    /// The liquid phase's mass share, density and composition, when one exists.
+    pub liquid_phase: Option<EntropyPhase>,
+    /// The gas phase's velocity, when a derived model resolves slip.
+    pub gas_velocity: Option<f64>,
+    /// The liquid phase's velocity, when a derived model resolves slip.
+    pub liquid_velocity: Option<f64>,
+}
+
+/// The homogeneous-equilibrium calculation with each station's phase records.
+#[derive(Debug, Clone)]
+pub(crate) struct HemTrace {
+    /// `valid`, `valid_with_warnings`, `invalid` or `unsupported`.
+    pub status: String,
+    /// The release rate, kg/s; absent when the result is not usable.
+    pub mass_flow: Option<f64>,
+    /// Whether the accepted flow is choked.
+    pub choked: bool,
+    /// The throat's equilibrium sound speed, m/s.
+    pub sound_speed: Option<f64>,
+    /// The upstream overall mole fractions.
+    pub component_mole_fractions: Vec<f64>,
+    /// The upstream overall mass fractions.
+    pub component_mass_fractions: Vec<f64>,
+    /// The resolved stations, upstream first.
+    pub stations: Vec<TraceStation>,
+    /// The model's assumption and warning records.
+    pub diagnostics: Vec<HemReleaseDiagnostic>,
+    /// Caveats.
+    pub warnings: Vec<Warning>,
+}
+
+pub(crate) fn trace(
     components: &[String],
     upstream_z: &[f64],
     upstream_t: ThermodynamicTemperature,
@@ -384,7 +440,7 @@ pub fn hem_release(
     diameter: Length,
     discharge_coefficient: f64,
     back_pressure: Pressure,
-) -> Result<HemReleaseResult> {
+) -> Result<HemTrace> {
     let spec = &model_gen::HEM_RELEASE_SPEC;
     let mut warnings = Vec::new();
     apply_checks(
@@ -420,7 +476,7 @@ pub fn hem_release(
         .names()
         .map_or_else(|| components.to_vec(), <[String]>::to_vec);
     if let Err(failure) = check_input_support(upstream_t.value, &mixture_names, upstream_z) {
-        return Ok(failure_result(failure, warnings));
+        return Ok(trace_failure_result(failure, warnings));
     }
 
     let mut evaluations = 0_u32;
@@ -457,13 +513,18 @@ pub fn hem_release(
     ) {
         Ok(state) => state,
         Err(error) => {
-            return Ok(failure("invalid", "CALCULATION_FAILED", error.0, warnings));
+            return Ok(trace_failure(
+                "invalid",
+                "CALCULATION_FAILED",
+                error.0,
+                warnings,
+            ));
         }
     };
     if let Err(failure) = check_closures(&upstream)
         .and_then(|()| check_support(&upstream, &mixture_names, upstream_z))
     {
-        return Ok(failure_result(failure, warnings));
+        return Ok(trace_failure_result(failure, warnings));
     }
     let target = upstream.molar_entropy / molar_mass;
     let context = Context {
@@ -491,11 +552,11 @@ pub fn hem_release(
             message: "Upstream pressure is at or below receiving pressure".to_string(),
         });
         let stations = vec![
-            station_row(&upstream_sample, ReleaseStation::UpstreamStagnation),
-            station_row(&upstream_sample, ReleaseStation::ThroatCritical),
-            station_row(&upstream_sample, ReleaseStation::OrificeExit),
+            trace_station(&upstream_sample, ReleaseStation::UpstreamStagnation),
+            trace_station(&upstream_sample, ReleaseStation::ThroatCritical),
+            trace_station(&upstream_sample, ReleaseStation::OrificeExit),
         ];
-        return Ok(result(
+        return Ok(trace_out(
             "valid",
             Some(0.0),
             false,
@@ -517,7 +578,7 @@ pub fn hem_release(
         let pressure = lower * ((upper / lower).ln() * index as f64 / SAMPLES as f64).exp();
         match context.sample(pressure, &mut evaluations) {
             Ok(sample) => samples.push(sample),
-            Err(failure) => return Ok(failure_result(failure, warnings)),
+            Err(failure) => return Ok(trace_failure_result(failure, warnings)),
         }
     }
 
@@ -536,7 +597,7 @@ pub fn hem_release(
                         best = candidate;
                     }
                 }
-                Err(failure) => return Ok(failure_result(failure, warnings)),
+                Err(failure) => return Ok(trace_failure_result(failure, warnings)),
             }
         }
     }
@@ -585,7 +646,7 @@ pub fn hem_release(
                 }
             }
             Err(error) => {
-                return Ok(failure(
+                return Ok(trace_failure(
                     "invalid",
                     "CALCULATION_FAILED",
                     format!("{error}"),
@@ -596,10 +657,10 @@ pub fn hem_release(
     }
 
     let stations = vec![
-        station_row(&upstream_sample, ReleaseStation::UpstreamStagnation),
-        station_row(&best, ReleaseStation::ThroatCritical),
-        station_row(&best, ReleaseStation::OrificeExit),
-        station_row(&samples[0], ReleaseStation::AmbientExpanded),
+        trace_station(&upstream_sample, ReleaseStation::UpstreamStagnation),
+        trace_station(&best, ReleaseStation::ThroatCritical),
+        trace_station(&best, ReleaseStation::OrificeExit),
+        trace_station(&samples[0], ReleaseStation::AmbientExpanded),
     ];
     let rate =
         discharge_coefficient * std::f64::consts::PI * diameter.value.powi(2) / 4.0 * best.flux;
@@ -608,7 +669,7 @@ pub fn hem_release(
     } else {
         "valid"
     };
-    Ok(result(
+    Ok(trace_out(
         status,
         Some(rate),
         choked,
@@ -622,56 +683,59 @@ pub fn hem_release(
 }
 
 /// One station row from a sample.
-fn station_row(sample: &SampleState, station: ReleaseStation) -> HemReleaseStation {
-    HemReleaseStation {
+fn trace_station(sample: &SampleState, station: ReleaseStation) -> TraceStation {
+    TraceStation {
         station,
-        pressure: pascals(sample.state.pressure),
-        temperature: kelvins(sample.state.temperature),
-        density: kilograms_per_cubic_meter(sample.state.density),
-        molar_enthalpy: joules_per_mole(sample.state.molar_enthalpy),
-        molar_entropy: joules_per_mole_kelvin(sample.state.molar_entropy),
-        velocity: meters_per_second(sample.velocity),
-        mass_flux: kilograms_per_square_meter_second(sample.state.density * sample.velocity),
+        pressure: sample.state.pressure,
+        temperature: sample.state.temperature,
+        density: sample.state.density,
+        molar_enthalpy: sample.state.molar_enthalpy,
+        molar_entropy: sample.state.molar_entropy,
+        velocity: sample.velocity,
+        mass_flux: sample.state.density * sample.velocity,
         phase: ReleasePhase::from_phase(sample.state.phase)
             .expect("the closures refused a trivial flash"),
         gas_mass_fraction: sample.state.gas_mass_fraction,
+        gas_phase: sample.state.gas_phase.clone(),
+        liquid_phase: sample.state.liquid_phase.clone(),
+        gas_velocity: None,
+        liquid_velocity: None,
     }
 }
 
 /// The result of a successful calculation.
 #[allow(clippy::too_many_arguments)] // one argument per result field
-fn result(
+fn trace_out(
     status: &str,
     flow: Option<f64>,
     choked: bool,
     sound_speed: Option<f64>,
     z: &[f64],
     mass_fractions: Vec<f64>,
-    stations: Vec<HemReleaseStation>,
+    stations: Vec<TraceStation>,
     diagnostics: Vec<HemReleaseDiagnostic>,
     warnings: Vec<Warning>,
-) -> HemReleaseResult {
-    HemReleaseResult {
+) -> HemTrace {
+    HemTrace {
         status: status.to_string(),
-        mass_flow_rate: flow.map(kilograms_per_second),
+        mass_flow: flow,
         choked,
-        throat_sound_speed: sound_speed.map(meters_per_second),
+        sound_speed,
         component_mole_fractions: z.to_vec(),
         component_mass_fractions: mass_fractions,
         stations,
-        diagnostic_codes: diagnostics.iter().map(|row| row.code.clone()).collect(),
         diagnostics,
         warnings,
     }
 }
 
 /// The class's failure result: no rate, no stations, one diagnostic.
-fn failure(status: &str, code: &str, message: String, warnings: Vec<Warning>) -> HemReleaseResult {
-    HemReleaseResult {
+fn trace_failure(status: &str, code: &str, message: String, warnings: Vec<Warning>) -> HemTrace {
+    HemTrace {
         status: status.to_string(),
-        mass_flow_rate: None,
+        mass_flow: None,
         choked: false,
-        throat_sound_speed: None,
+        sound_speed: None,
         component_mole_fractions: Vec::new(),
         component_mass_fractions: Vec::new(),
         stations: Vec::new(),
@@ -679,25 +743,84 @@ fn failure(status: &str, code: &str, message: String, warnings: Vec<Warning>) ->
             code: code.to_string(),
             message,
         }],
-        diagnostic_codes: vec![code.to_string()],
         warnings,
     }
 }
 
 /// The class's status for one failure.
-fn failure_result(refusal: ReleaseFailure, warnings: Vec<Warning>) -> HemReleaseResult {
+fn trace_failure_result(refusal: ReleaseFailure, warnings: Vec<Warning>) -> HemTrace {
     match refusal {
         ReleaseFailure::Unsupported(message) => {
-            failure("unsupported", "UNSUPPORTED_PHYSICS", message, warnings)
+            trace_failure("unsupported", "UNSUPPORTED_PHYSICS", message, warnings)
         }
         ReleaseFailure::Invalid(message) => {
-            failure("invalid", "CALCULATION_FAILED", message, warnings)
+            trace_failure("invalid", "CALCULATION_FAILED", message, warnings)
         }
     }
 }
 
+/// The public row from the rich trace.
+fn project(trace: HemTrace) -> HemReleaseResult {
+    let diagnostic_codes = trace
+        .diagnostics
+        .iter()
+        .map(|row| row.code.clone())
+        .collect();
+    HemReleaseResult {
+        status: trace.status,
+        mass_flow_rate: trace.mass_flow.map(kilograms_per_second),
+        choked: trace.choked,
+        throat_sound_speed: trace.sound_speed.map(meters_per_second),
+        component_mole_fractions: trace.component_mole_fractions,
+        component_mass_fractions: trace.component_mass_fractions,
+        stations: trace
+            .stations
+            .into_iter()
+            .map(|row| HemReleaseStation {
+                station: row.station,
+                pressure: pascals(row.pressure),
+                temperature: kelvins(row.temperature),
+                density: kilograms_per_cubic_meter(row.density),
+                molar_enthalpy: joules_per_mole(row.molar_enthalpy),
+                molar_entropy: joules_per_mole_kelvin(row.molar_entropy),
+                velocity: meters_per_second(row.velocity),
+                mass_flux: kilograms_per_square_meter_second(row.mass_flux),
+                phase: row.phase,
+                gas_mass_fraction: row.gas_mass_fraction,
+            })
+            .collect(),
+        diagnostics: trace.diagnostics,
+        diagnostic_codes,
+        warnings: trace.warnings,
+    }
+}
+
+/// NeqSim's homogeneous-equilibrium orifice release.
+///
+/// # Errors
+/// A non-positive input, a mixture that cannot be resolved, or a state the checks refuse.
+pub fn hem_release(
+    components: &[String],
+    upstream_z: &[f64],
+    upstream_t: ThermodynamicTemperature,
+    upstream_p: Pressure,
+    diameter: Length,
+    discharge_coefficient: f64,
+    back_pressure: Pressure,
+) -> Result<HemReleaseResult> {
+    Ok(project(trace(
+        components,
+        upstream_z,
+        upstream_t,
+        upstream_p,
+        diameter,
+        discharge_coefficient,
+        back_pressure,
+    )?))
+}
+
 /// The upstream overall mass fractions.
-fn component_mass_fractions(mixture: &Mixture, z: &[f64]) -> Result<Vec<f64>> {
+pub(crate) fn component_mass_fractions(mixture: &Mixture, z: &[f64]) -> Result<Vec<f64>> {
     let mut masses = Vec::with_capacity(z.len());
     let mut total = 0.0;
     for (index, (component, fraction)) in mixture.components().iter().zip(z).enumerate() {

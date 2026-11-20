@@ -1,0 +1,80 @@
+model = "process.component_selective_release"
+[[cases]]
+id = "methane_faster_than_heptane"
+tolerance = 2.0e-5
+source = "Methane/n-heptane at 0.1125/0.8875, 300 K and 30 bar through a 1 cm opening with `Cd = 0.62` into 1 bar, `sigma = 0.02`, methane relaxing in 0.10 s and n-heptane in 1.00 s over a 0.25 s residence (`pr_methane_heptane_times_0.1_1.0`).\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+component_relaxation_times = [0.1, 1.0]
+residence_time = 0.25
+parameter_provenance = "public-component-screening:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.73295187943895
+choked = true
+[[cases]]
+id = "uniform_times_recover_the_uniform_limit"
+tolerance = 2.0e-5
+source = "The same state with both components at 0.50 s (`pr_methane_heptane_times_0.5_0.5`): it recovers the uniform finite-rate model's rate exactly.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+component_relaxation_times = [0.5, 0.5]
+residence_time = 0.25
+parameter_provenance = "uniform-limit:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.8105066592284895
+choked = true
+[[cases]]
+id = "heptane_faster_than_methane"
+tolerance = 2.0e-5
+source = "The same state with the times reversed (`pr_methane_heptane_times_1.0_0.1`): the lighter component holds more of its gas inventory and the rate rises.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+component_relaxation_times = [1.0, 0.1]
+residence_time = 0.25
+parameter_provenance = "uniform-limit:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.8351282564713358
+choked = true
+[[cases]]
+id = "incomplete_component_basis_is_unsupported"
+tolerance = 1.0e-12
+source = "A single relaxation time for a two-component fluid (`pr_incomplete_component_basis_unsupported`) does not match the component set, which the model refuses as `unsupported` with `COMPONENT_TRANSFER_REGIME_UNSUPPORTED`.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+component_relaxation_times = [0.1]
+residence_time = 0.25
+parameter_provenance = "incomplete-basis:v1"
+[cases.expected]
+status = "unsupported"
+choked = false

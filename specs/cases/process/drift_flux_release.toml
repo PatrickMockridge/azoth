@@ -1,0 +1,84 @@
+model = "process.drift_flux_release"
+[[cases]]
+id = "methane_heptane_0_1125"
+tolerance = 2.0e-5
+source = "Methane/n-heptane at 0.1125/0.8875, 300 K and 30 bar through a 1 cm opening with `Cd = 0.62` into 1 bar and `sigma = 0.02` N/m (`pr_methane_heptane_0.1125`): the PR two-phase window's lower usable state, with the solved slip ratio above one.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.7175222717288527
+choked = true
+[[cases]]
+id = "methane_heptane_0_125"
+tolerance = 2.0e-5
+source = "The same feed at a methane fraction of 0.125 (`pr_methane_heptane_0.125`): the upper usable state of the PR window.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.125, 0.875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.6146187736549176
+choked = true
+[[cases]]
+id = "surface_tension_changes_the_rate"
+tolerance = 2.0e-5
+source = "The 0.1125 state at `sigma = 0.05` N/m (`pr_methane_heptane_0_1125_sigma_0_05`): the Harmathy drift velocity rises with the tension and the rate moves with it.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.05
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.7176345511565145
+choked = true
+[[cases]]
+id = "single_phase_opening_is_unsupported"
+tolerance = 1.0e-12
+source = "Methane alone at 300 K and 20 bar (`pr_single_gas_unsupported`) has one gas phase at the opening, so the shared closure refuses it as `unsupported` with `DRIFT_FLUX_REGIME_UNSUPPORTED`.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+[cases.expected]
+status = "unsupported"
+choked = false
+[[cases]]
+id = "gas_area_bound_is_unsupported"
+tolerance = 1.0e-12
+source = "A methane fraction of 0.8 (`pr_methane_heptane_0_8_gas_area_breach_unsupported`) solves to a gas area fraction of 0.808, above the 0.80 bound, which the closure refuses as `unsupported`. The 0.1375 and 0.5 rows sit within the closure flash sensitivity and stay evidence.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.8, 0.2]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+[cases.expected]
+status = "unsupported"
+choked = false

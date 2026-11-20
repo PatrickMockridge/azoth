@@ -491,6 +491,10 @@ MODULE_TESTS: dict[str, tuple[str, ...]] = {
     "dexpi": (f"{TESTS}/test_dexpi.py",),
 }
 
+#: Ids whose cross-implementation cases are slow-sweep only (`test_cross_impl_slow`), so
+#: a `-k` naming one collects nothing from `test_cross_impl` and pytest exits 5.
+SLOW_CROSS_IMPL = frozenset({"process.real_gas_fanno_release"})
+
 #: The `specs/` trees that carry no id, and what a change in each reaches.
 SPEC_TREES: tuple[tuple[str, Claim], ...] = (
     (
@@ -1542,7 +1546,6 @@ def python_commands(
                 "nothing - and the one thing that looks like is a pass. `declared_id` reads an "
                 "`id =` line out of any spec file, including the ones whose id is not a model."
             )
-        expression = " or ".join(sorted(terms))
         model_terms = sorted(term for term in terms if selects_a_model(term))
         if model_terms:
             out.append(
@@ -1552,13 +1555,15 @@ def python_commands(
                     f'{TESTS}/models/test_model_cases.py -k "{" or ".join(model_terms)}"',
                 )
             )
-        out.append(
-            Command(
-                f"{sorted(terms)} on both kernels",
-                PYTEST,
-                f'{TESTS}/test_cross_impl.py -k "{expression}"',
+        cross_terms = sorted(term for term in terms if term not in SLOW_CROSS_IMPL)
+        if cross_terms:
+            out.append(
+                Command(
+                    f"{cross_terms} on both kernels",
+                    PYTEST,
+                    f'{TESTS}/test_cross_impl.py -k "{" or ".join(cross_terms)}"',
+                )
             )
-        )
         if named:
             out.append(
                 Command(

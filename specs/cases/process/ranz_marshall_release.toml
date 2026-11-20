@@ -1,0 +1,147 @@
+model = "process.ranz_marshall_release"
+[[cases]]
+id = "bubbles_in_range"
+tolerance = 2.0e-5
+source = "Methane/n-heptane at 0.1125/0.8875, 300 K and 30 bar through a 1 cm opening with `Cd = 0.62` into 1 bar, `sigma = 0.02`, `d32 = 1 mm`, continuous density 800 kg/m3 and viscosity 1 mPa s, a 0.01 m/s relative velocity and diffusivities `(1e-8, 2e-8)` m2/s (`pr_methane_heptane_bubbles_in_range`).\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+residence_time = 0.25
+morphology = "gas_bubbles"
+sauter_mean_diameter = 0.001
+continuous_phase_density = 800.0
+continuous_phase_dynamic_viscosity = 0.001
+relative_velocity = 0.01
+component_diffusivities = [1.0e-8, 2.0e-8]
+parameter_provenance = "public-correlation:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.851642930106992
+choked = true
+[[cases]]
+id = "stagnant_limit"
+tolerance = 2.0e-5
+source = "The same correlation at zero relative velocity (`pr_stagnant_limit`): the Sherwood numbers fall to the `Sh = 2` stagnant limit and the relaxation times lengthen.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+residence_time = 0.25
+morphology = "gas_bubbles"
+sauter_mean_diameter = 0.001
+continuous_phase_density = 800.0
+continuous_phase_dynamic_viscosity = 0.001
+relative_velocity = 0.0
+component_diffusivities = [1.0e-8, 2.0e-8]
+parameter_provenance = "public-correlation:v1"
+[cases.expected]
+status = "valid"
+mass_flow_rate = 1.872257013164362
+choked = true
+[[cases]]
+id = "liquid_droplets_are_unsupported"
+tolerance = 1.0e-12
+source = "The droplet morphology (`pr_liquid_droplets_unsupported`) has resolved coefficients but no release closure, so it is `unsupported` with `LIQUID_DROPLET_HYDRODYNAMICS_UNSUPPORTED`.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+residence_time = 0.25
+morphology = "liquid_droplets"
+sauter_mean_diameter = 0.001
+continuous_phase_density = 800.0
+continuous_phase_dynamic_viscosity = 0.001
+relative_velocity = 0.01
+component_diffusivities = [1.0e-8, 2.0e-8]
+parameter_provenance = "public-correlation:v1"
+[cases.expected]
+status = "unsupported"
+choked = false
+[[cases]]
+id = "reynolds_bound_is_unsupported"
+tolerance = 1.0e-12
+source = "A relative velocity of 0.25 m/s (`pr_reynolds_200_unsupported`) reaches a Reynolds number of 200, at the correlation's upper bound, and is `unsupported` before the morphology is read.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+residence_time = 0.25
+morphology = "gas_bubbles"
+sauter_mean_diameter = 0.001
+continuous_phase_density = 800.0
+continuous_phase_dynamic_viscosity = 0.001
+relative_velocity = 0.25
+component_diffusivities = [1.0e-8, 2.0e-8]
+parameter_provenance = "public-correlation:v1"
+[cases.expected]
+status = "unsupported"
+choked = false
+[[cases]]
+id = "schmidt_bound_is_unsupported"
+tolerance = 1.0e-12
+source = "A methane diffusivity of 5e-9 m2/s (`pr_schmidt_250_unsupported`) reaches a Schmidt number of 250, at the correlation's upper bound, and is `unsupported`.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+residence_time = 0.25
+morphology = "gas_bubbles"
+sauter_mean_diameter = 0.001
+continuous_phase_density = 800.0
+continuous_phase_dynamic_viscosity = 0.001
+relative_velocity = 0.01
+component_diffusivities = [5.0e-9, 2.0e-8]
+parameter_provenance = "public-correlation:v1"
+[cases.expected]
+status = "unsupported"
+choked = false
+[[cases]]
+id = "component_basis_is_invalid"
+tolerance = 1.0e-12
+source = "A diffusivity list missing n-heptane (`pr_incomplete_diffusivity_basis_invalid`) does not match the fluid and is `invalid` with `RANZ_MARSHALL_COMPONENT_BASIS_INVALID`.\n"
+[cases.inputs]
+components = ["methane", "n-heptane"]
+upstream_z = [0.1125, 0.8875]
+upstream_t = 300.0
+upstream_p = 3000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 100000.0
+surface_tension = 0.02
+residence_time = 0.25
+morphology = "gas_bubbles"
+sauter_mean_diameter = 0.001
+continuous_phase_density = 800.0
+continuous_phase_dynamic_viscosity = 0.001
+relative_velocity = 0.01
+component_diffusivities = [1.0e-8]
+parameter_provenance = "incomplete-diffusivity:v1"
+[cases.expected]
+status = "invalid"
+choked = false

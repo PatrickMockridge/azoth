@@ -1088,6 +1088,51 @@ class RegisterFinding:
     rule: str
 
 @final
+class BubbleTransferZoneReleaseStation:
+    """the delegate's stations, with the correlation-driven relaxed phase velocities. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
+class HemReleaseDiagnostic:
+    """the model's assumption and check records, in the order it forms them."""
+
+    code: str
+    message: str
+
+@final
+class ComponentSelectiveReleaseStation:
+    """the base stations, with the opening's relaxed phase velocities solved. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
 class ConsequenceOutcomeResult:
     """one row per input row, in caller order: the class's fixed label, the branch type, its frequency, fatality probability and fatality frequency."""
 
@@ -1109,6 +1154,25 @@ class DepressurizationPoint:
     mass_flow: Qty
 
 @final
+class DriftFluxReleaseStation:
+    """the base stations, with the opening's phase velocities solved. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
 class EscalationItemResult:
     """the largest propagation over every registered item, in the items order."""
 
@@ -1128,6 +1192,25 @@ class MinimalCutSet:
 
     members: str
     cardinality: float
+
+@final
+class FiniteRateReleaseStation:
+    """the base stations, with the opening's relaxed phase velocities solved. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
 
 @final
 class PulsationModeResult:
@@ -1250,11 +1333,42 @@ class HemReleaseStation:
     gas_mass_fraction: float
 
 @final
-class HemReleaseDiagnostic:
-    """the model's assumption and warning records, in the order it forms them."""
+class IdealGasFannoReleaseStation:
+    """the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow."""
 
-    code: str
-    message: str
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
+class IdealGasReleaseStation:
+    """the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
 
 @final
 class LeakBlowdownPoint:
@@ -1275,6 +1389,25 @@ class LeakBlowdownDiagnostic:
 
     code: str
     message: str
+
+@final
+class LegacyScreeningReleaseStation:
+    """three stations, upstream first: the stagnation state and the throat and exit aliases. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
 
 @final
 class LopaLayerContribution:
@@ -1358,6 +1491,63 @@ class PipeFireRupturePoint:
     strain_rate: Qty
     accumulated_strain: float
     rupture_strain_limit: float
+
+@final
+class PrescribedSlipReleaseStation:
+    """the base stations, with the opening's phase velocities partitioned. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
+class RanzMarshallReleaseStation:
+    """the delegate's stations, with the correlation-driven relaxed phase velocities. Empty on failure."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
+
+@final
+class RealGasFannoReleaseStation:
+    """the resolved stations, upstream first. Empty on failure, and the ambient row is absent on no forward flow."""
+
+    station: str
+    pressure: Qty
+    temperature: Qty
+    density: Qty
+    molar_enthalpy: Qty
+    molar_entropy: Qty
+    velocity: Qty
+    mass_flux: Qty
+    phase: str
+    gas_mass_fraction: float
+    gas_density: Qty | None
+    liquid_density: Qty | None
+    gas_velocity: Qty | None
+    liquid_velocity: Qty | None
 
 @final
 class ReliefDisposalRow:
@@ -3600,6 +3790,19 @@ class BowTieResult:
     warnings: list[Warning]
 
 @final
+class BubbleTransferZoneReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[BubbleTransferZoneReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
 class CheckValveLeakReliefResult:
     name: str
     relief_rate: Qty
@@ -3609,6 +3812,19 @@ class CheckValveLeakReliefResult:
     compressibility: float
     specific_heat_ratio: float
     assumptions: list[str]
+    warnings: list[Warning]
+
+@final
+class ComponentSelectiveReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[ComponentSelectiveReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
     warnings: list[Warning]
 
 @final
@@ -3832,6 +4048,19 @@ class DistillationColumnResult:
     warnings: list[Warning]
 
 @final
+class DriftFluxReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[DriftFluxReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
 class DynamicPsvSizingResult:
     steady_required_area: Qty
     dynamic_required_area: Qty
@@ -3979,6 +4208,19 @@ class FilterResult:
     collapse_pressure_utilization: float | None
     differential_pressure_design_acceptable: bool | None
     design_media_area: Qty | None
+    warnings: list[Warning]
+
+@final
+class FiniteRateReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[FiniteRateReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
     warnings: list[Warning]
 
 @final
@@ -4364,6 +4606,35 @@ class HemReleaseResult:
     warnings: list[Warning]
 
 @final
+class IdealGasFannoReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    friction_length: float | None
+    inlet_mach: float | None
+    exit_mach: float | None
+    stations: list[IdealGasFannoReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
+class IdealGasReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[IdealGasReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
 class InherentSafetyResult:
     overall_index: float
     warnings: list[Warning]
@@ -4388,6 +4659,19 @@ class LeakBlowdownResult:
     peak_mass_flow_rate: Qty | None
     time_to_empty: Qty | None
     diagnostics: list[LeakBlowdownDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
+class LegacyScreeningReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[LegacyScreeningReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
     diagnostic_codes: list[str]
     warnings: list[Warning]
 
@@ -4713,6 +4997,19 @@ class PorousMediaSelfHeatingResult:
     warnings: list[Warning]
 
 @final
+class PrescribedSlipReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[PrescribedSlipReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
 class ProbitResult:
     probit: float | None
     probability: float
@@ -4839,6 +5136,19 @@ class PumpDeadheadResult:
     warnings: list[Warning]
 
 @final
+class RanzMarshallReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    stations: list[RanzMarshallReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
+    warnings: list[Warning]
+
+@final
 class RateBasedPackedColumnResult:
     gas_out_n: Qty
     gas_out_z: list[float]
@@ -4881,6 +5191,22 @@ class RateBasedPackedColumnResult:
     segment_percent_flood: list[float]
     segment_net_molar_transfer: list[Qty]
     segment_enthalpy_balance_residual: list[Qty]
+    warnings: list[Warning]
+
+@final
+class RealGasFannoReleaseResult:
+    status: str
+    mass_flow_rate: Qty | None
+    choked: bool
+    throat_sound_speed: Qty | None
+    component_mole_fractions: list[float]
+    component_mass_fractions: list[float]
+    friction_length: float | None
+    inlet_mach: float | None
+    exit_mach: float | None
+    stations: list[RealGasFannoReleaseStation]
+    diagnostics: list[HemReleaseDiagnostic]
+    diagnostic_codes: list[str]
     warnings: list[Warning]
 
 @final
@@ -7831,6 +8157,21 @@ def bow_tie(
     consequences: list[BowTieConsequence],
     barriers: list[BowTieBarrier],
 ) -> BowTieResult: ...
+def bubble_transfer_zone_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    surface_tension: float,
+    transfer_zone_hydraulic_diameter: float,
+    transfer_zone_vertical_length: float,
+    continuous_phase_dynamic_viscosity: float,
+    component_diffusivities: list[float],
+    parameter_provenance: str,
+) -> BubbleTransferZoneReleaseResult: ...
 def check_valve_leak_relief(
     components: list[str],
     mole_fractions: list[float],
@@ -7842,6 +8183,19 @@ def check_valve_leak_relief(
     discharge_coefficient: float | None = None,
     scenario_name: str | None = None,
 ) -> CheckValveLeakReliefResult: ...
+def component_selective_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    surface_tension: float,
+    component_relaxation_times: list[float],
+    residence_time: float,
+    parameter_provenance: str,
+) -> ComponentSelectiveReleaseResult: ...
 def component_splitter(
     components: list[str],
     feed_n: float,
@@ -8027,6 +8381,16 @@ def distillation_column(
     material_grade: str | None = None,
     max_operation_pressure: float | None = None,
 ) -> DistillationColumnResult: ...
+def drift_flux_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    surface_tension: float,
+) -> DriftFluxReleaseResult: ...
 def dynamic_psv_sizing(
     components: list[str],
     initial_z: list[float],
@@ -8137,6 +8501,19 @@ def filter(
     element_collapse_pressure: float | None = None,
     element_integrity_verified: bool | None = None,
 ) -> FilterResult: ...
+def finite_rate_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    surface_tension: float,
+    phase_transfer_relaxation_time: float,
+    residence_time: float,
+    parameter_provenance: str,
+) -> FiniteRateReleaseResult: ...
 def fire_case_relief(
     has_drainage: bool,
     has_fire_fighting: bool,
@@ -8428,6 +8805,26 @@ def hem_release(
     discharge_coefficient: float,
     back_pressure: float,
 ) -> HemReleaseResult: ...
+def ideal_gas_fanno_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    flow_path_length: float,
+    darcy_friction_factor: float,
+) -> IdealGasFannoReleaseResult: ...
+def ideal_gas_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+) -> IdealGasReleaseResult: ...
 def inherent_safety(
     substitute_score: float | None = None,
     minimize_score: float | None = None,
@@ -8455,6 +8852,15 @@ def leak_blowdown(
     time_step: float | None = None,
     scenario_name: str | None = None,
 ) -> LeakBlowdownResult: ...
+def legacy_screening_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+) -> LegacyScreeningReleaseResult: ...
 def lopa(
     initiating_event_frequency_per_year: float,
     target_frequency_per_year: float,
@@ -8755,6 +9161,16 @@ def porous_media_self_heating(
     marginal_ratio: float | None = None,
     pipe_insulation_screening: bool | None = None,
 ) -> PorousMediaSelfHeatingResult: ...
+def prescribed_slip_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    gas_to_liquid_slip_ratio: float,
+) -> PrescribedSlipReleaseResult: ...
 def probit(
     a: float,
     b: float,
@@ -8852,6 +9268,24 @@ def pump_deadhead(
     minimum_flow_efficiency: float | None = None,
     max_allowable_temperature_rise: float | None = None,
 ) -> PumpDeadheadResult: ...
+def ranz_marshall_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    surface_tension: float,
+    residence_time: float,
+    morphology: str,
+    sauter_mean_diameter: float,
+    continuous_phase_density: float,
+    continuous_phase_dynamic_viscosity: float,
+    relative_velocity: float,
+    component_diffusivities: list[float],
+    parameter_provenance: str,
+) -> RanzMarshallReleaseResult: ...
 def rate_based_packed_column(
     gas_components: list[str],
     liquid_components: list[str],
@@ -8877,6 +9311,17 @@ def rate_based_packed_column(
     segment_solver: str | None = None,
     column_solver: str | None = None,
 ) -> RateBasedPackedColumnResult: ...
+def real_gas_fanno_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: float,
+    upstream_p: float,
+    diameter: float,
+    discharge_coefficient: float,
+    back_pressure: float,
+    flow_path_length: float,
+    darcy_friction_factor: float,
+) -> RealGasFannoReleaseResult: ...
 def relief_disposal_network(
     contributions: list[ReliefContribution],
 ) -> ReliefDisposalNetworkResult: ...

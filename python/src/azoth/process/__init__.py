@@ -33,7 +33,9 @@ from azoth.core.result import (
     BlockedOutletReliefResult,
     BlowdownPressureProfileResult,
     BowTieResult,
+    BubbleTransferZoneReleaseResult,
     CheckValveLeakReliefResult,
+    ComponentSelectiveReleaseResult,
     ComponentSplitterResult,
     CompressorResult,
     ConsequenceAnalysisResult,
@@ -43,6 +45,7 @@ from azoth.core.result import (
     DepressurizationAcceptanceResult,
     DepressurizationResult,
     DistillationColumnResult,
+    DriftFluxReleaseResult,
     DynamicPsvSizingResult,
     EjectorResult,
     EscalationGraphResult,
@@ -50,6 +53,7 @@ from azoth.core.result import (
     ExpanderResult,
     FaultTreeResult,
     FilterResult,
+    FiniteRateReleaseResult,
     FireCaseReliefResult,
     FireMonitorCoverageResult,
     FireWaterCoverageAssessmentResult,
@@ -69,9 +73,12 @@ from azoth.core.result import (
     HeatExchangerResult,
     HeavyGasDispersionResult,
     HemReleaseResult,
+    IdealGasFannoReleaseResult,
+    IdealGasReleaseResult,
     InherentSafetyResult,
     JetFireResult,
     LeakBlowdownResult,
+    LegacyScreeningReleaseResult,
     LopaResult,
     MahBowTieSkeletonResult,
     ManifoldResult,
@@ -95,13 +102,16 @@ from azoth.core.result import (
     PlugFlowReactorResult,
     PoolFireResult,
     PorousMediaSelfHeatingResult,
+    PrescribedSlipReleaseResult,
     ProbitResult,
     PsvFireSizingResult,
     PsvSizingResult,
     PsvValveResult,
     PumpDeadheadResult,
     PumpResult,
+    RanzMarshallReleaseResult,
     RateBasedPackedColumnResult,
+    RealGasFannoReleaseResult,
     ReliefDisposalNetworkResult,
     RiskMatrixResult,
     RunawayReactionResult,
@@ -303,6 +313,16 @@ _FIRE_CASE_RELIEF = "process.fire_case_relief"
 _FLARE = "process.flare"
 _HEATER = "process.heater"
 _HEM_RELEASE = "process.hem_release"
+_IDEAL_GAS_RELEASE = "process.ideal_gas_release"
+_LEGACY_SCREENING_RELEASE = "process.legacy_screening_release"
+_PRESCRIBED_SLIP_RELEASE = "process.prescribed_slip_release"
+_DRIFT_FLUX_RELEASE = "process.drift_flux_release"
+_FINITE_RATE_RELEASE = "process.finite_rate_release"
+_COMPONENT_SELECTIVE_RELEASE = "process.component_selective_release"
+_RANZ_MARSHALL_RELEASE = "process.ranz_marshall_release"
+_BUBBLE_TRANSFER_ZONE_RELEASE = "process.bubble_transfer_zone_release"
+_IDEAL_GAS_FANNO_RELEASE = "process.ideal_gas_fanno_release"
+_REAL_GAS_FANNO_RELEASE = "process.real_gas_fanno_release"
 _JET_FIRE = "process.jet_fire"
 _LEAK_BLOWDOWN = "process.leak_blowdown"
 _LOPA = "process.lopa"
@@ -3450,6 +3470,367 @@ def hem_release(
         diameter=diameter,
         discharge_coefficient=discharge_coefficient,
         back_pressure=back_pressure,
+    )
+
+
+def ideal_gas_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+) -> IdealGasReleaseResult:
+    """The release rate of an ideal-gas isentropic short-opening orifice.
+
+    One gas phase at a constant heat-capacity ratio. The upstream density is ``P M/(R T)``,
+    the stagnation enthalpy and entropy are the EOS flash's, and the throat is the critical
+    ratio or the receiving-pressure state. The answer is **four stations** with the rate,
+    the choked flag and the throat's ideal-gas sound speed.
+
+    A failure is the class's own result and not an exception: ``status`` is ``invalid`` or
+    ``unsupported``, the rate and stations are absent, and one diagnostic says why. **No
+    NaN crosses the boundary.**
+
+    Raises:
+        InvalidInputError: for a non-positive state or opening, a coefficient outside
+            ``(0, 1]``, or a composition that is not one entry per component and sums to one.
+
+    See :func:`azoth.process.reference.ideal_gas_release`.
+    """
+    return resolve(_IDEAL_GAS_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+    )
+
+
+def legacy_screening_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+) -> LegacyScreeningReleaseResult:
+    """The historical screening release rate through a circular opening.
+
+    The compatibility equation: a choked branch from ``P``, ``gamma``, ``T`` and ``MW``, and
+    a subcritical branch from ``2 rho (P - P_back)``. The stations alias the flashed upstream
+    state because no throat is solved, and the result is always ``valid_with_warnings`` on a
+    usable state.
+
+    Raises:
+        InvalidInputError: for a non-positive state or opening, a coefficient outside
+            ``(0, 1]``, or a composition that is not one entry per component and sums to one.
+
+    See :func:`azoth.process.reference.legacy_screening_release`.
+    """
+    return resolve(_LEGACY_SCREENING_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+    )
+
+
+def prescribed_slip_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    gas_to_liquid_slip_ratio: float,
+) -> PrescribedSlipReleaseResult:
+    """The release rate of a prescribed-slip short-opening orifice.
+
+    The homogeneous-equilibrium scan supplies the stations; the opening's phase velocities
+    are partitioned by the caller's gas-to-liquid ratio, and the rate is the partition's
+    mass flux times the effective area. A single-phase opening is ``unsupported``.
+
+    Raises:
+        InvalidInputError: for a non-positive state or opening, a slip ratio below one, a
+            coefficient outside ``(0, 1]``, or a composition that is not one entry per
+            component and sums to one.
+
+    See :func:`azoth.process.reference.prescribed_slip_release`.
+    """
+    return resolve(_PRESCRIBED_SLIP_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        gas_to_liquid_slip_ratio=gas_to_liquid_slip_ratio,
+    )
+
+
+def drift_flux_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    surface_tension: Q,
+) -> DriftFluxReleaseResult:
+    """The release rate of a vertical drift-flux short-opening orifice.
+
+    The homogeneous-equilibrium scan supplies the stations; the shared Zuber-Findlay/Harmathy
+    closure solves the opening's slip ratio and the rate is the closure's mass flux times the
+    effective area. A single-phase opening or a gas area fraction above 0.80 is
+    ``unsupported``.
+
+    See :func:`azoth.process.reference.drift_flux_release`.
+    """
+    return resolve(_DRIFT_FLUX_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        surface_tension=surface_tension,
+    )
+
+
+def finite_rate_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    surface_tension: Q,
+    phase_transfer_relaxation_time: Q,
+    residence_time: Q,
+    parameter_provenance: str,
+) -> FiniteRateReleaseResult:
+    """The release rate of a finite-rate short-opening orifice.
+
+    The opening's phase split relaxes from the upstream value toward equilibrium by
+    ``1 - exp(-residence/relaxation)``, then the shared drift-flux closure solves the station.
+    An upstream without a liquid is ``unsupported``.
+
+    See :func:`azoth.process.reference.finite_rate_release`.
+    """
+    return resolve(_FINITE_RATE_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        surface_tension=surface_tension,
+        phase_transfer_relaxation_time=phase_transfer_relaxation_time,
+        residence_time=residence_time,
+        parameter_provenance=parameter_provenance,
+    )
+
+
+def component_selective_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    surface_tension: Q,
+    component_relaxation_times: list[Q],
+    residence_time: Q,
+    parameter_provenance: str,
+) -> ComponentSelectiveReleaseResult:
+    """The release rate of a component-selective short-opening orifice.
+
+    Each component gas-held mass fraction relaxes by ``1 - exp(-residence/tau_i)``, then the
+    shared drift-flux closure solves the station. A relaxation-time list that does not match
+    the component set is ``unsupported``.
+
+    See :func:`azoth.process.reference.component_selective_release`.
+    """
+    return resolve(_COMPONENT_SELECTIVE_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        surface_tension=surface_tension,
+        component_relaxation_times=component_relaxation_times,
+        residence_time=residence_time,
+        parameter_provenance=parameter_provenance,
+    )
+
+
+def ranz_marshall_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    surface_tension: Q,
+    residence_time: Q,
+    morphology: str,
+    sauter_mean_diameter: Q,
+    continuous_phase_density: Q,
+    continuous_phase_dynamic_viscosity: Q,
+    relative_velocity: Q,
+    component_diffusivities: list[Q],
+    parameter_provenance: str,
+) -> RanzMarshallReleaseResult:
+    """The release rate of a Ranz-Marshall short-opening orifice.
+
+    The external-film correlation supplies one relaxation time per component and the
+    component-selective model solves the station. Out-of-range Reynolds or Schmidt numbers
+    and the droplet morphology are ``unsupported``; a diffusivity list that does not match
+    the fluid is ``invalid``.
+
+    See :func:`azoth.process.reference.ranz_marshall_release`.
+    """
+    return resolve(_RANZ_MARSHALL_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        surface_tension=surface_tension,
+        residence_time=residence_time,
+        morphology=morphology,
+        sauter_mean_diameter=sauter_mean_diameter,
+        continuous_phase_density=continuous_phase_density,
+        continuous_phase_dynamic_viscosity=continuous_phase_dynamic_viscosity,
+        relative_velocity=relative_velocity,
+        component_diffusivities=component_diffusivities,
+        parameter_provenance=parameter_provenance,
+    )
+
+
+def bubble_transfer_zone_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    surface_tension: Q,
+    transfer_zone_hydraulic_diameter: Q,
+    transfer_zone_vertical_length: Q,
+    continuous_phase_dynamic_viscosity: Q,
+    component_diffusivities: list[Q],
+    parameter_provenance: str,
+) -> BubbleTransferZoneReleaseResult:
+    """The release rate of a predictive bubble transfer-zone orifice.
+
+    The drift-flux base supplies the phase velocities; a fixed point predicts the bubble
+    diameter (the minimum of the Eotvos, Weber, quarter-hydraulic and opening limits), the
+    relative velocity and the residence time, and the Ranz-Marshall adapter solves each
+    iterate.
+
+    See :func:`azoth.process.reference.bubble_transfer_zone_release`.
+    """
+    return resolve(_BUBBLE_TRANSFER_ZONE_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        surface_tension=surface_tension,
+        transfer_zone_hydraulic_diameter=transfer_zone_hydraulic_diameter,
+        transfer_zone_vertical_length=transfer_zone_vertical_length,
+        continuous_phase_dynamic_viscosity=continuous_phase_dynamic_viscosity,
+        component_diffusivities=component_diffusivities,
+        parameter_provenance=parameter_provenance,
+    )
+
+
+def ideal_gas_fanno_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    flow_path_length: Q,
+    darcy_friction_factor: float,
+) -> IdealGasFannoReleaseResult:
+    """The release rate of an ideal-gas Fanno pipe.
+
+    A quasi-steady adiabatic constant-area pipe with a specified Darcy friction factor. The
+    exit Mach is one when choked, otherwise the back-pressure bisection; the Fanno function
+    and the class's ``1/M`` stagnation-pressure ratio are the class's own.
+
+    See :func:`azoth.process.reference.ideal_gas_fanno_release`.
+    """
+    return resolve(_IDEAL_GAS_FANNO_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        flow_path_length=flow_path_length,
+        darcy_friction_factor=darcy_friction_factor,
+    )
+
+
+def real_gas_fanno_release(
+    components: list[str],
+    upstream_z: list[float],
+    upstream_t: Q,
+    upstream_p: Q,
+    diameter: Q,
+    discharge_coefficient: float,
+    back_pressure: Q,
+    flow_path_length: Q,
+    darcy_friction_factor: float,
+) -> RealGasFannoReleaseResult:
+    """The release rate of a real-gas Fanno pipe.
+
+    A one-sided adiabatic constant-area pipe of a single equilibrium gas with EOS
+    properties: ten axial predictor-corrector steps, a PH flash at every energy state, the
+    entropy inlet root and nested flux bisections. A two-phase state is ``unsupported``.
+    **The pure-Python mirror is slow**; its cross-implementation cases run in the slow sweep.
+
+    See :func:`azoth.process.reference.real_gas_fanno_release`.
+    """
+    return resolve(_REAL_GAS_FANNO_RELEASE)(  # type: ignore[no-any-return]
+        components=components,
+        upstream_z=upstream_z,
+        upstream_t=upstream_t,
+        upstream_p=upstream_p,
+        diameter=diameter,
+        discharge_coefficient=discharge_coefficient,
+        back_pressure=back_pressure,
+        flow_path_length=flow_path_length,
+        darcy_friction_factor=darcy_friction_factor,
     )
 
 

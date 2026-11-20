@@ -236,7 +236,9 @@
 //!   - specs/models/process/blocked_outlet_relief.toml
 //!   - specs/models/process/blowdown_pressure_profile.toml
 //!   - specs/models/process/bow_tie.toml
+//!   - specs/models/process/bubble_transfer_zone_release.toml
 //!   - specs/models/process/check_valve_leak_relief.toml
+//!   - specs/models/process/component_selective_release.toml
 //!   - specs/models/process/component_splitter.toml
 //!   - specs/models/process/compressor.toml
 //!   - specs/models/process/consequence_analysis.toml
@@ -246,6 +248,7 @@
 //!   - specs/models/process/depressurization.toml
 //!   - specs/models/process/depressurization_acceptance.toml
 //!   - specs/models/process/distillation_column.toml
+//!   - specs/models/process/drift_flux_release.toml
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/escalation_graph.toml
@@ -253,6 +256,7 @@
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
 //!   - specs/models/process/filter.toml
+//!   - specs/models/process/finite_rate_release.toml
 //!   - specs/models/process/fire_case_relief.toml
 //!   - specs/models/process/fire_monitor_coverage.toml
 //!   - specs/models/process/fire_water_coverage_assessment.toml
@@ -272,9 +276,12 @@
 //!   - specs/models/process/heater.toml
 //!   - specs/models/process/heavy_gas_dispersion.toml
 //!   - specs/models/process/hem_release.toml
+//!   - specs/models/process/ideal_gas_fanno_release.toml
+//!   - specs/models/process/ideal_gas_release.toml
 //!   - specs/models/process/inherent_safety.toml
 //!   - specs/models/process/jet_fire.toml
 //!   - specs/models/process/leak_blowdown.toml
+//!   - specs/models/process/legacy_screening_release.toml
 //!   - specs/models/process/lopa.toml
 //!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
@@ -298,13 +305,16 @@
 //!   - specs/models/process/plug_flow_reactor.toml
 //!   - specs/models/process/pool_fire.toml
 //!   - specs/models/process/porous_media_self_heating.toml
+//!   - specs/models/process/prescribed_slip_release.toml
 //!   - specs/models/process/probit.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/psv_valve.toml
 //!   - specs/models/process/pump.toml
 //!   - specs/models/process/pump_deadhead.toml
+//!   - specs/models/process/ranz_marshall_release.toml
 //!   - specs/models/process/rate_based_packed_column.toml
+//!   - specs/models/process/real_gas_fanno_release.toml
 //!   - specs/models/process/relief_disposal_network.toml
 //!   - specs/models/process/risk_matrix.toml
 //!   - specs/models/process/runaway_reaction.toml
@@ -2943,6 +2953,57 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "pressure",
     ),
     (
+        "process.bubble_transfer_zone_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.bubble_transfer_zone_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.bubble_transfer_zone_release",
+        "upstream_p",
+        "pressure",
+    ),
+    ("process.bubble_transfer_zone_release", "diameter", "length"),
+    (
+        "process.bubble_transfer_zone_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.bubble_transfer_zone_release",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.bubble_transfer_zone_release",
+        "surface_tension",
+        "surface_tension",
+    ),
+    (
+        "process.bubble_transfer_zone_release",
+        "transfer_zone_hydraulic_diameter",
+        "length",
+    ),
+    (
+        "process.bubble_transfer_zone_release",
+        "transfer_zone_vertical_length",
+        "length",
+    ),
+    (
+        "process.bubble_transfer_zone_release",
+        "continuous_phase_dynamic_viscosity",
+        "dynamic_viscosity",
+    ),
+    (
+        "process.bubble_transfer_zone_release",
+        "component_diffusivities",
+        "diffusion_coefficient",
+    ),
+    (
         "process.check_valve_leak_relief",
         "mole_fractions",
         "dimensionless",
@@ -2976,6 +3037,47 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.check_valve_leak_relief",
         "discharge_coefficient",
         "dimensionless",
+    ),
+    (
+        "process.component_selective_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.component_selective_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.component_selective_release",
+        "upstream_p",
+        "pressure",
+    ),
+    ("process.component_selective_release", "diameter", "length"),
+    (
+        "process.component_selective_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.component_selective_release",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.component_selective_release",
+        "surface_tension",
+        "surface_tension",
+    ),
+    (
+        "process.component_selective_release",
+        "component_relaxation_times",
+        "time",
+    ),
+    (
+        "process.component_selective_release",
+        "residence_time",
+        "time",
     ),
     ("process.component_splitter", "feed_n", "molar_flow"),
     ("process.component_splitter", "feed_z", "dimensionless"),
@@ -3398,6 +3500,25 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "max_operation_pressure",
         "pressure",
     ),
+    ("process.drift_flux_release", "upstream_z", "dimensionless"),
+    (
+        "process.drift_flux_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.drift_flux_release", "upstream_p", "pressure"),
+    ("process.drift_flux_release", "diameter", "length"),
+    (
+        "process.drift_flux_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.drift_flux_release", "back_pressure", "pressure"),
+    (
+        "process.drift_flux_release",
+        "surface_tension",
+        "surface_tension",
+    ),
     ("process.dynamic_psv_sizing", "initial_z", "dimensionless"),
     (
         "process.dynamic_psv_sizing",
@@ -3537,6 +3658,31 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.filter", "joint_efficiency", "dimensionless"),
     ("process.filter", "corrosion_allowance", "length"),
     ("process.filter", "element_collapse_pressure", "pressure"),
+    ("process.finite_rate_release", "upstream_z", "dimensionless"),
+    (
+        "process.finite_rate_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.finite_rate_release", "upstream_p", "pressure"),
+    ("process.finite_rate_release", "diameter", "length"),
+    (
+        "process.finite_rate_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.finite_rate_release", "back_pressure", "pressure"),
+    (
+        "process.finite_rate_release",
+        "surface_tension",
+        "surface_tension",
+    ),
+    (
+        "process.finite_rate_release",
+        "phase_transfer_relaxation_time",
+        "time",
+    ),
+    ("process.finite_rate_release", "residence_time", "time"),
     ("process.fire_case_relief", "wetted_area", "area"),
     ("process.fire_case_relief", "vessel_diameter", "length"),
     ("process.fire_case_relief", "wetted_height", "length"),
@@ -4092,6 +4238,52 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ),
     ("process.hem_release", "back_pressure", "pressure"),
     (
+        "process.ideal_gas_fanno_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.ideal_gas_fanno_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.ideal_gas_fanno_release", "upstream_p", "pressure"),
+    ("process.ideal_gas_fanno_release", "diameter", "length"),
+    (
+        "process.ideal_gas_fanno_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.ideal_gas_fanno_release",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.ideal_gas_fanno_release",
+        "flow_path_length",
+        "length",
+    ),
+    (
+        "process.ideal_gas_fanno_release",
+        "darcy_friction_factor",
+        "dimensionless",
+    ),
+    ("process.ideal_gas_release", "upstream_z", "dimensionless"),
+    (
+        "process.ideal_gas_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.ideal_gas_release", "upstream_p", "pressure"),
+    ("process.ideal_gas_release", "diameter", "length"),
+    (
+        "process.ideal_gas_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.ideal_gas_release", "back_pressure", "pressure"),
+    (
         "process.inherent_safety",
         "substitute_score",
         "dimensionless",
@@ -4122,6 +4314,28 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ),
     ("process.leak_blowdown", "back_pressure", "pressure"),
     ("process.leak_blowdown", "time_step", "time"),
+    (
+        "process.legacy_screening_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.legacy_screening_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.legacy_screening_release", "upstream_p", "pressure"),
+    ("process.legacy_screening_release", "diameter", "length"),
+    (
+        "process.legacy_screening_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.legacy_screening_release",
+        "back_pressure",
+        "pressure",
+    ),
     (
         "process.lopa",
         "initiating_event_frequency_per_year",
@@ -4869,6 +5083,33 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "marginal_ratio",
         "dimensionless",
     ),
+    (
+        "process.prescribed_slip_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.prescribed_slip_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.prescribed_slip_release", "upstream_p", "pressure"),
+    ("process.prescribed_slip_release", "diameter", "length"),
+    (
+        "process.prescribed_slip_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.prescribed_slip_release",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.prescribed_slip_release",
+        "gas_to_liquid_slip_ratio",
+        "dimensionless",
+    ),
     ("process.probit", "a", "dimensionless"),
     ("process.probit", "b", "dimensionless"),
     ("process.probit", "n", "dimensionless"),
@@ -5015,6 +5256,55 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "max_allowable_temperature_rise",
         "thermodynamic_temperature",
     ),
+    (
+        "process.ranz_marshall_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.ranz_marshall_release", "upstream_p", "pressure"),
+    ("process.ranz_marshall_release", "diameter", "length"),
+    (
+        "process.ranz_marshall_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    ("process.ranz_marshall_release", "back_pressure", "pressure"),
+    (
+        "process.ranz_marshall_release",
+        "surface_tension",
+        "surface_tension",
+    ),
+    ("process.ranz_marshall_release", "residence_time", "time"),
+    (
+        "process.ranz_marshall_release",
+        "sauter_mean_diameter",
+        "length",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "continuous_phase_density",
+        "mass_density",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "continuous_phase_dynamic_viscosity",
+        "dynamic_viscosity",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "relative_velocity",
+        "velocity",
+    ),
+    (
+        "process.ranz_marshall_release",
+        "component_diffusivities",
+        "diffusion_coefficient",
+    ),
     ("process.rate_based_packed_column", "gas_n", "molar_flow"),
     ("process.rate_based_packed_column", "gas_z", "dimensionless"),
     ("process.rate_based_packed_column", "gas_p", "pressure"),
@@ -5063,6 +5353,38 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.rate_based_packed_column",
         "mass_transfer_correction",
+        "dimensionless",
+    ),
+    (
+        "process.real_gas_fanno_release",
+        "upstream_z",
+        "dimensionless",
+    ),
+    (
+        "process.real_gas_fanno_release",
+        "upstream_t",
+        "thermodynamic_temperature",
+    ),
+    ("process.real_gas_fanno_release", "upstream_p", "pressure"),
+    ("process.real_gas_fanno_release", "diameter", "length"),
+    (
+        "process.real_gas_fanno_release",
+        "discharge_coefficient",
+        "dimensionless",
+    ),
+    (
+        "process.real_gas_fanno_release",
+        "back_pressure",
+        "pressure",
+    ),
+    (
+        "process.real_gas_fanno_release",
+        "flow_path_length",
+        "length",
+    ),
+    (
+        "process.real_gas_fanno_release",
+        "darcy_friction_factor",
         "dimensionless",
     ),
     (

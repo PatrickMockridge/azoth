@@ -30,6 +30,22 @@ pub const BRACKET_STEPS: usize = 30;
 /// The bisection cap.
 pub const BISECTION_STEPS: usize = 100;
 
+/// One phase's share of a fixed-entropy state.
+///
+/// The density is the phase's mass over its own unshifted EOS volume `Z R T / P`, which is
+/// the volume basis the release stations use.
+#[derive(Debug, Clone, PartialEq)]
+pub struct EntropyPhase {
+    /// The phase's share of the mixture mass.
+    pub mass_fraction: f64,
+    /// The phase's mass over its own volume, kg/m3.
+    pub density: f64,
+    /// The phase's molar mass, kg/mol.
+    pub molar_mass: f64,
+    /// The phase's component mass fractions, in mixture component order.
+    pub component_mass_fractions: Vec<f64>,
+}
+
 /// One equilibrium state at the target specific entropy.
 #[derive(Debug, Clone, PartialEq)]
 pub struct EntropyState {
@@ -57,6 +73,10 @@ pub struct EntropyState {
     pub vapour_fraction: Option<f64>,
     /// The gas phase's share of the mass; zero or one when the state is one phase.
     pub gas_mass_fraction: f64,
+    /// The gas phase's mass share, density and composition, when one exists.
+    pub gas_phase: Option<EntropyPhase>,
+    /// The liquid phase's mass share, density and composition, when one exists.
+    pub liquid_phase: Option<EntropyPhase>,
 }
 
 /// How one class stops its entropy root.
@@ -342,6 +362,18 @@ fn quality_state(
         // A pure fluid's two phases share one molar mass, so the mass fraction is the
         // molar quality.
         gas_mass_fraction: quality,
+        gas_phase: Some(EntropyPhase {
+            mass_fraction: quality,
+            density: molar_mass / v_vapour,
+            molar_mass,
+            component_mass_fractions: vec![1.0],
+        }),
+        liquid_phase: Some(EntropyPhase {
+            mass_fraction: 1.0 - quality,
+            density: molar_mass / v_liquid,
+            molar_mass,
+            component_mass_fractions: vec![1.0],
+        }),
     })
 }
 
@@ -512,6 +544,26 @@ fn pure_root_state(
             0.0
         } else {
             1.0
+        },
+        gas_phase: if matches!(side, RootSide::Vapour) {
+            Some(EntropyPhase {
+                mass_fraction: 1.0,
+                density: molar_mass / volume,
+                molar_mass,
+                component_mass_fractions: phase_component_mass_fractions(mixture, z),
+            })
+        } else {
+            None
+        },
+        liquid_phase: if matches!(side, RootSide::Liquid) {
+            Some(EntropyPhase {
+                mass_fraction: 1.0,
+                density: molar_mass / volume,
+                molar_mass,
+                component_mass_fractions: phase_component_mass_fractions(mixture, z),
+            })
+        } else {
+            None
         },
     })
 }
@@ -687,6 +739,23 @@ pub fn flashed_state(
 ///
 /// # Errors
 /// `InvalidInput` for a component carrying no molar mass, or a total that is not positive.
+/// One phase composition's component mass fractions, in mixture order.
+fn phase_component_mass_fractions(mixture: &Mixture, composition: &[f64]) -> Vec<f64> {
+    let mut masses = Vec::with_capacity(composition.len());
+    let mut total = 0.0;
+    for (component, fraction) in mixture.components().iter().zip(composition) {
+        let mass = fraction * component.molar_mass.unwrap_or(0.0);
+        total += mass;
+        masses.push(mass);
+    }
+    if total > 0.0 && total.is_finite() {
+        masses.into_iter().map(|mass| mass / total).collect()
+    } else {
+        Vec::new()
+    }
+}
+
+/// The mixture's molar mass at a composition, kg/mol.
 pub fn molar_mass_of(mixture: &Mixture, composition: &[f64]) -> azoth_core::Result<f64> {
     let mut total = 0.0;
     for (index, (component, fraction)) in mixture.components().iter().zip(composition).enumerate() {
@@ -785,8 +854,10 @@ fn assemble(
             let phase_residual = (flash.x.iter().sum::<f64>() - 1.0)
                 .abs()
                 .max((flash.y.iter().sum::<f64>() - 1.0).abs());
-            let liquid_mass = (1.0 - beta) * phase_molar_mass(mixture, &flash.x)?;
-            let vapour_mass = beta * phase_molar_mass(mixture, &flash.y)?;
+            let liquid_phase_mass = phase_molar_mass(mixture, &flash.x)?;
+            let vapour_phase_mass = phase_molar_mass(mixture, &flash.y)?;
+            let liquid_mass = (1.0 - beta) * liquid_phase_mass;
+            let vapour_mass = beta * vapour_phase_mass;
             let total_mass = liquid_mass + vapour_mass;
             if total_mass <= 0.0 || !total_mass.is_finite() {
                 return Err(EntropyStateError(format!(
@@ -809,6 +880,18 @@ fn assemble(
                 phase: flash.phase,
                 vapour_fraction: flash.vapour_fraction,
                 gas_mass_fraction: vapour_mass / total_mass,
+                gas_phase: Some(EntropyPhase {
+                    mass_fraction: vapour_mass / total_mass,
+                    density: vapour_phase_mass / v_vapour,
+                    molar_mass: vapour_phase_mass,
+                    component_mass_fractions: phase_component_mass_fractions(mixture, &flash.y),
+                }),
+                liquid_phase: Some(EntropyPhase {
+                    mass_fraction: liquid_mass / total_mass,
+                    density: liquid_phase_mass / v_liquid,
+                    molar_mass: liquid_phase_mass,
+                    component_mass_fractions: phase_component_mass_fractions(mixture, &flash.x),
+                }),
             })
         }
         Phase::AllVapour | Phase::AllLiquid | Phase::Trivial => {
@@ -858,6 +941,26 @@ fn assemble(
                     1.0
                 } else {
                     0.0
+                },
+                gas_phase: if matches!(flash.phase, Phase::AllVapour) {
+                    Some(EntropyPhase {
+                        mass_fraction: 1.0,
+                        density: molar_mass / volume,
+                        molar_mass,
+                        component_mass_fractions: phase_component_mass_fractions(mixture, z),
+                    })
+                } else {
+                    None
+                },
+                liquid_phase: if matches!(flash.phase, Phase::AllVapour) {
+                    None
+                } else {
+                    Some(EntropyPhase {
+                        mass_fraction: 1.0,
+                        density: molar_mass / volume,
+                        molar_mass,
+                        component_mass_fractions: phase_component_mass_fractions(mixture, z),
+                    })
                 },
             })
         }

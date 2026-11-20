@@ -756,10 +756,34 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.bubble_transfer_zone_release",
+        name: "Predictive bubble transfer-zone orifice release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.check_valve_leak_relief",
         name: "Check valve leak relief",
         family: "overpressure",
         sub_interface: Some("overpressure"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.component_selective_release",
+        name: "Component-selective drift-flux orifice release",
+        family: "release",
+        sub_interface: None,
         purpose: "",
         native: false,
         refusal: Some(
@@ -1163,6 +1187,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.drift_flux_release",
+        name: "Vertical drift-flux orifice release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.dynamic_psv_sizing",
         name: "Dynamic PSV sizing",
         family: "depressurization",
@@ -1203,6 +1239,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         name: "Fault tree",
         family: "risk",
         sub_interface: Some("risk"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.finite_rate_release",
+        name: "Finite-rate drift-flux orifice release",
+        family: "release",
+        sub_interface: None,
         purpose: "",
         native: false,
         refusal: Some(
@@ -2988,6 +3036,30 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.ideal_gas_fanno_release",
+        name: "Ideal-gas Fanno pipe release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.ideal_gas_release",
+        name: "Ideal-gas isentropic orifice release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.inherent_safety",
         name: "Inherent-safety index",
         family: "safetyassessment",
@@ -3318,6 +3390,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
     SafetyCalculation {
         id: "process.leak_blowdown",
         name: "Vessel leak blowdown",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.legacy_screening_release",
+        name: "Legacy orifice screening release",
         family: "release",
         sub_interface: None,
         purpose: "",
@@ -5012,6 +5096,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         native: false,
         refusal: Some(
             "this calculation returns a table of rows, which this workspace does not yet draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.prescribed_slip_release",
+        name: "Prescribed-slip orifice release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
         ),
         form: None,
     },
@@ -6718,6 +6814,30 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
             expected: &[],
             tolerance: 1.0e-12,
         }),
+    },
+    SafetyCalculation {
+        id: "process.ranz_marshall_release",
+        name: "Ranz-Marshall component-transfer orifice release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.real_gas_fanno_release",
+        name: "Real-gas Fanno pipe release",
+        family: "release",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
     },
     SafetyCalculation {
         id: "process.relief_disposal_network",

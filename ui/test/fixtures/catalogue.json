@@ -22357,6 +22357,15 @@
       "sub_interface": "bowtie"
     },
     {
+      "family": "release",
+      "id": "process.bubble_transfer_zone_release",
+      "name": "Predictive bubble transfer-zone orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "overpressure",
       "id": "process.check_valve_leak_relief",
       "name": "Check valve leak relief",
@@ -22364,6 +22373,15 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": "overpressure"
+    },
+    {
+      "family": "release",
+      "id": "process.component_selective_release",
+      "name": "Component-selective drift-flux orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
     },
     {
       "family": "qra",
@@ -22777,6 +22795,15 @@
       "sub_interface": "depressurization"
     },
     {
+      "family": "release",
+      "id": "process.drift_flux_release",
+      "name": "Vertical drift-flux orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "depressurization",
       "id": "process.dynamic_psv_sizing",
       "name": "Dynamic PSV sizing",
@@ -22811,6 +22838,15 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": "risk"
+    },
+    {
+      "family": "release",
+      "id": "process.finite_rate_release",
+      "name": "Finite-rate drift-flux orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
     },
     {
       "family": "overpressure",
@@ -24724,6 +24760,24 @@
       "sub_interface": null
     },
     {
+      "family": "release",
+      "id": "process.ideal_gas_fanno_release",
+      "name": "Ideal-gas Fanno pipe release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
+      "family": "release",
+      "id": "process.ideal_gas_release",
+      "name": "Ideal-gas isentropic orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "safetyassessment",
       "form": {
         "assumptions": [
@@ -25091,6 +25145,15 @@
       "family": "release",
       "id": "process.leak_blowdown",
       "name": "Vessel leak blowdown",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
+      "family": "release",
+      "id": "process.legacy_screening_release",
+      "name": "Legacy orifice screening release",
       "native": false,
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
@@ -26901,6 +26964,15 @@
       "native": false,
       "purpose": "",
       "refusal": "this calculation returns a table of rows, which this workspace does not yet draw",
+      "sub_interface": null
+    },
+    {
+      "family": "release",
+      "id": "process.prescribed_slip_release",
+      "name": "Prescribed-slip orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": null
     },
     {
@@ -28747,6 +28819,24 @@
       "purpose": "The shut-off deadhead pressure against the protected rating, and the minimum-flow recirculation temperature rise.",
       "refusal": null,
       "sub_interface": "equipmentsafety"
+    },
+    {
+      "family": "release",
+      "id": "process.ranz_marshall_release",
+      "name": "Ranz-Marshall component-transfer orifice release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
+      "family": "release",
+      "id": "process.real_gas_fanno_release",
+      "name": "Real-gas Fanno pipe release",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
     },
     {
       "family": "overpressure",

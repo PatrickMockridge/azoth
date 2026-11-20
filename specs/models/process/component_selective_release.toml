@@ -1,0 +1,201 @@
+id = "process.component_selective_release"
+name = "Component-selective drift-flux orifice release"
+kind = "procedure"
+assumptions = [
+    "**the homogeneous-equilibrium base, then a component-selective first-order relaxation**: each component's gas-held mass fraction relaxes by `1 - exp(-residence/tau_i)` with its own relaxation time.",
+    "**the equilibrium station must resolve one gas and one liquid phase**; the upstream may be all liquid, in which case every held fraction starts at zero.",
+    "**the held fractions stay inside each component's inventory**: the sum must remain inside `(1e-10, 1 - 1e-10)`, and the reconstructed overall composition closes within `1e-12`.",
+    "**the closure is the shared Zuber-Findlay/Harmathy drift flux** on the relaxed station, with its area, kinetic-energy and gas-area bounds.",
+    "**the stagnation-energy closure is checked**: the station enthalpy plus kinetic energy equals the upstream stagnation enthalpy within `1e-6` J/kg.",
+    "**the rate is the closure's mass flux** times the effective area; the ambient station is relaxed only when it keeps two phases.",
+    "**the base's Mach and acoustic diagnostics are dropped** and the model reports no throat sound speed.",
+    "**no forward flow passes through unchanged** with `COMPONENT_TRANSFER_NOT_APPLIED`; a base failure carries `EQUILIBRIUM_BASE_<code>`.",
+    "**the fluid is PR with the classic mixing rule**, because this library databank route resolves Peng-Robinson and no other; the class own SRK tests are captured as evidence.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/release/ComponentSelectiveFiniteRateReleaseModel.java` is the port source, through its `calculate`; `TwoPhaseDriftFluxClosure` is the shared closure.",
+    "`validation/neqsim/captures/process_component_selective_release.tsv` - methane/n-heptane at 300 K and 30 bar for three component-time sets, the uniform limit and the incomplete-basis refusal.",
+]
+[source]
+standard = "NeqSim process/safety/release/ComponentSelectiveFiniteRateReleaseModel.java"
+edition = "Its `calculate`: the homogeneous base, the uniform phase-split relaxation, the component and stagnation-energy closures, the drift-flux solve and the closure's rate."
+[algorithm]
+scheme = "component_selective_relaxation"
+initialisation = "hem_isentropic_pressure_scan"
+convergence = "absolute"
+tolerance = 1.0e-10
+max_iterations = 1
+[inputs]
+[inputs.components]
+type = "components"
+description = "the fluid's substances, by name, resolved against the component databank.\n"
+[inputs.upstream_z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream stagnation composition, checked rather than renormalised.\n"
+[inputs.upstream_t]
+unit = "K"
+description = "the upstream stagnation temperature.\n"
+[inputs.upstream_p]
+unit = "Pa"
+description = "the upstream stagnation pressure, absolute.\n"
+[inputs.diameter]
+unit = "m"
+description = "the circular opening's diameter; the physical area is `pi d^2 / 4`.\n"
+[inputs.discharge_coefficient]
+unit = "dimensionless"
+description = "the effective-area factor in `(0, 1]`.\n"
+[inputs.back_pressure]
+unit = "Pa"
+description = "the receiving absolute pressure. At or above `upstream_p` the model reports no forward flow.\n"
+[inputs.surface_tension]
+unit = "N/m"
+description = "the gas/liquid interfacial tension the Harmathy drift velocity reads. Must be positive.\n"
+[inputs.component_relaxation_times]
+type = "vector"
+unit = "s"
+length = "one per component"
+description = "the first-order relaxation time of each component, in the components order. Each must be positive.\n"
+[inputs.residence_time]
+unit = "s"
+description = "the transfer time available to the opening. Must be positive.\n"
+[inputs.parameter_provenance]
+type = "string"
+description = "the source or calibration identity of the relaxation inputs; must not be empty.\n"
+[outputs]
+[outputs.status]
+type = "string"
+description = "`valid`, `invalid` or `unsupported`.\n"
+[outputs.mass_flow_rate]
+unit = "kg/s"
+optional = true
+description = "the closure's release rate, or absent when the result is not usable. A valid no-forward-flow result states `0.0`.\n"
+[outputs.choked]
+type = "boolean"
+description = "the base scan's choked flag; false on failure and on no forward flow.\n"
+[outputs.throat_sound_speed]
+unit = "m/s"
+optional = true
+description = "absent: the derived model drops the base's throat sound speed.\n"
+[outputs.component_mole_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream overall mole fractions.\n"
+[outputs.component_mass_fractions]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the upstream overall mass fractions.\n"
+[outputs.stations]
+type = "record_list"
+description = "the base stations, with the opening's relaxed phase velocities solved. Empty on failure.\n"
+[outputs.stations.fields.station]
+type = "enum"
+values = ["upstream_stagnation", "throat_critical", "orifice_exit", "ambient_expanded"]
+description = "which station this row is.\n"
+[outputs.stations.fields.pressure]
+unit = "Pa"
+description = "the station's absolute pressure.\n"
+[outputs.stations.fields.temperature]
+unit = "K"
+description = "the station's temperature.\n"
+[outputs.stations.fields.density]
+unit = "kg/m**3"
+description = "the relaxed harmonic mixture density at the opening; the base's elsewhere.\n"
+[outputs.stations.fields.molar_enthalpy]
+unit = "J/mol"
+description = "the station's molar enthalpy.\n"
+[outputs.stations.fields.molar_entropy]
+unit = "J/(mol*K)"
+description = "the station's molar entropy, which the expansion holds fixed.\n"
+[outputs.stations.fields.velocity]
+unit = "m/s"
+description = "the station's bulk velocity: the base's on the stagnation row, `mass_flux/rho` at the opening.\n"
+[outputs.stations.fields.mass_flux]
+unit = "kg/(m**2*s)"
+description = "the closure's mass flux at the opening, before the discharge coefficient.\n"
+[outputs.stations.fields.phase]
+type = "enum"
+values = ["all_vapour", "all_liquid", "two_phase"]
+description = "what the base flash found.\n"
+[outputs.stations.fields.gas_mass_fraction]
+unit = "dimensionless"
+description = "the relaxed gas phase's share of the mass. **A mass fraction, not the molar vapour fraction.**\n"
+[outputs.stations.fields.gas_density]
+unit = "kg/m**3"
+optional = true
+description = "the gas phase's own density, when the base resolved one.\n"
+[outputs.stations.fields.liquid_density]
+unit = "kg/m**3"
+optional = true
+description = "the liquid phase's own density, when the base resolved one.\n"
+[outputs.stations.fields.gas_velocity]
+unit = "m/s"
+optional = true
+description = "the solved gas velocity at the opening and the two-phase ambient; absent elsewhere.\n"
+[outputs.stations.fields.liquid_velocity]
+unit = "m/s"
+optional = true
+description = "the solved liquid velocity at the opening and the two-phase ambient; absent elsewhere.\n"
+[outputs.diagnostics]
+type = "record_list"
+description = "the model's assumptions and the base's retained records.\n"
+[outputs.diagnostics.fields.code]
+type = "string"
+description = "the stable machine code.\n"
+[outputs.diagnostics.fields.message]
+type = "string"
+description = "the engineering detail.\n"
+[outputs.diagnostic_codes]
+type = "vector_string"
+length = "one per diagnostic"
+description = "the codes alone, so a case can hold the contract without asserting prose.\n"
+[[valid_range]]
+quantity = "upstream_t"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "upstream_p"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an opening has a positive diameter"
+[[valid_range]]
+quantity = "discharge_coefficient"
+min = 0
+min_inclusive = false
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "`ReleaseFlowRequest` refuses a coefficient outside `(0, 1]`"
+[[valid_range]]
+quantity = "back_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "surface_tension"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive surface tension"
+[[valid_range]]
+quantity = "residence_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class refuses a non-positive residence time"
+[implementations]
+python = "azoth.process.component_selective_release"
+rust = "azoth_process::component_selective_release"

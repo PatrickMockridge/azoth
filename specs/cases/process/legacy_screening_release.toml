@@ -1,0 +1,97 @@
+model = "process.legacy_screening_release"
+[[cases]]
+id = "methane_50bara_choked"
+tolerance = 2.0e-5
+source = "The pinned leak-model state (`pr_methane_50bara_0_01`) from `validation/neqsim/captures/process_legacy_screening_release.tsv`: methane at 300 K and 50 bar through a 1 cm opening with `Cd = 0.62` into 1 atm. The screening equation is on its choked branch.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 5000000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 101325.0
+[cases.expected]
+status = "valid_with_warnings"
+mass_flow_rate = 0.4305101553432282
+choked = true
+[[cases]]
+id = "methane_50bara_larger_opening"
+tolerance = 2.0e-5
+source = "The same feed through a 1.3 cm opening into 1.01325 bar (`pr_methane_50bara_0_013`): the rate scales with the effective area.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 5000000.0
+diameter = 0.013
+discharge_coefficient = 0.62
+back_pressure = 101325.0
+[cases.expected]
+status = "valid_with_warnings"
+mass_flow_rate = 0.7275621625300557
+choked = true
+[[cases]]
+id = "methane_5bara_choked"
+tolerance = 2.0e-5
+source = "The same feed at 5 bar into 1 atm (`pr_methane_5bara`), still on the choked branch.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 500000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 101325.0
+[cases.expected]
+status = "valid_with_warnings"
+mass_flow_rate = 0.04138838538826983
+choked = true
+[[cases]]
+id = "methane_5bara_subcritical"
+tolerance = 2.0e-5
+source = "The same feed at 5 bar into 4 bar (`pr_methane_5bara_subcritical`): the receiving ratio is above critical, so the subcritical branch runs and the result is unchoked. The density it reads is the class ideal-gas fallback: the oracle rate equals `Cd A sqrt(2 [P M/(8.314 T)] dP)` to the last digit, not the EOS density the station carries.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 500000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 400000.0
+[cases.expected]
+status = "valid_with_warnings"
+mass_flow_rate = 0.039053388805444796
+choked = false
+[[cases]]
+id = "propane_11bara_liquid"
+tolerance = 2.0e-5
+source = "Propane at 300 K and 11 bar (`pr_propane_11bara_two_phase`) is a single liquid phase under PR; the historical equation still reports a choked rate and the station keeps the liquid's state.\n"
+[cases.inputs]
+components = ["propane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 1100000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 101325.0
+[cases.expected]
+status = "valid_with_warnings"
+mass_flow_rate = 0.16201629024257855
+choked = true
+[[cases]]
+id = "methane_5bara_no_forward_flow"
+tolerance = 1.0e-12
+source = "The same feed with the receiving pressure above the upstream pressure (`pr_methane_5bara_no_flow`): a valid zero rate, `choked` forced false and `NO_FORWARD_FLOW_OR_SCREENING_ZERO`.\n"
+[cases.inputs]
+components = ["methane"]
+upstream_z = [1.0]
+upstream_t = 300.0
+upstream_p = 500000.0
+diameter = 0.01
+discharge_coefficient = 0.62
+back_pressure = 600000.0
+[cases.expected]
+status = "valid_with_warnings"
+mass_flow_rate = 0.0
+choked = false

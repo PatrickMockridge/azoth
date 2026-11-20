@@ -65,12 +65,23 @@ def _active_cases() -> list[tuple[dict[str, Any], dict[str, Any]]]:
 CASES = _active_cases()
 
 
+#: Models whose cross-implementation case runs thousands of PH flashes in the Python
+#: mirror: the real-gas Fanno march. Their cases run in ``test_cross_impl_slow`` under
+#: the ``slow_sweep`` marker, so the nightly carries them and the lanes stay inside budget.
+SLOW_MODELS: frozenset[str] = frozenset({"process.real_gas_fanno_release"})
+
+
 def _model_cases() -> list[tuple[dict[str, Any], dict[str, Any]]]:
     """Every case of every model, taken from the model registry.
 
     The sibling of :func:`_active_cases`, for the other half of the registry.
     """
-    return [(model, case) for model in _models_gen.MODELS for case in model["cases"]]
+    return [
+        (model, case)
+        for model in _models_gen.MODELS
+        if model["id"] not in SLOW_MODELS
+        for case in model["cases"]
+    ]
 
 
 MODEL_CASES = _model_cases()
@@ -83,12 +94,7 @@ def _convergence_tolerance(
     return h.convergence_tolerance(spec_, case)
 
 
-@pytest.mark.parametrize(
-    ("model", "case"),
-    MODEL_CASES,
-    ids=lambda x: x["id"] if isinstance(x, dict) else "",
-)
-def test_python_and_rust_agree_on_models(model: dict[str, Any], case: dict[str, Any]) -> None:
+def assert_model_agrees(model: dict[str, Any], case: dict[str, Any]) -> None:
     """Run one model case through both implementations and compare.
 
     The same check :func:`test_python_and_rust_agree` makes for calculations, over the
@@ -108,6 +114,16 @@ def test_python_and_rust_agree_on_models(model: dict[str, Any], case: dict[str, 
     h.assert_results_equal(
         py, rs, tolerance, context, diagnostic_bound=_convergence_tolerance(model, case)
     )
+
+
+@pytest.mark.parametrize(
+    ("model", "case"),
+    MODEL_CASES,
+    ids=lambda x: x["id"] if isinstance(x, dict) else "",
+)
+def test_python_and_rust_agree_on_models(model: dict[str, Any], case: dict[str, Any]) -> None:
+    """Run one model case through both implementations and compare."""
+    assert_model_agrees(model, case)
 
 
 @pytest.mark.parametrize(

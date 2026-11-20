@@ -44,7 +44,9 @@ pub mod blocked_outlet_overpressure;
 pub mod blocked_outlet_relief;
 pub mod blowdown_pressure_profile;
 pub mod bow_tie;
+pub mod bubble_transfer_zone_release;
 pub mod check_valve_leak_relief;
+pub mod component_selective_release;
 pub mod component_splitter;
 pub mod compressor;
 pub mod consequence_analysis;
@@ -54,6 +56,7 @@ pub mod deluge_nozzle_layout;
 pub mod depressurization;
 pub mod depressurization_acceptance;
 pub mod distillation_column;
+pub mod drift_flux_release;
 pub mod dynamic_psv_sizing;
 pub mod ejector;
 pub mod escalation_graph;
@@ -61,6 +64,7 @@ pub mod event_tree;
 pub mod expander;
 pub mod fault_tree;
 pub mod filter;
+pub mod finite_rate_release;
 pub mod fire_case_relief;
 pub mod fire_monitor_coverage;
 pub mod fire_water_coverage_assessment;
@@ -81,9 +85,12 @@ pub mod heat_exchanger;
 pub mod heater;
 pub mod heavy_gas_dispersion;
 pub mod hem_release;
+pub mod ideal_gas_fanno_release;
+pub mod ideal_gas_release;
 pub mod inherent_safety;
 pub mod jet_fire;
 pub mod leak_blowdown;
+pub mod legacy_screening_release;
 pub mod lopa;
 pub mod mah_bow_tie_skeleton;
 pub mod manifold;
@@ -108,13 +115,17 @@ pub mod piping_fiv_liquid;
 pub mod plug_flow_reactor;
 pub mod pool_fire;
 pub mod porous_media_self_heating;
+pub mod prescribed_slip_release;
 pub mod probit;
 pub mod psv_fire_sizing;
 pub mod psv_sizing;
 pub mod psv_valve;
 pub mod pump;
 pub mod pump_deadhead;
+pub mod ranz_marshall_release;
 pub mod rate_based_packed_column;
+pub mod real_gas_fanno_release;
+pub(crate) mod release;
 pub mod relief_disposal_network;
 pub mod risk_matrix;
 pub mod runaway_reaction;
@@ -182,7 +193,13 @@ pub use blowdown_pressure_profile::{
     BlowdownPressureProfileResult, BlowdownProfilePoint, blowdown_pressure_profile,
 };
 pub use bow_tie::{BowTieBarrier, BowTieConsequence, BowTieResult, BowTieThreat, bow_tie};
+pub use bubble_transfer_zone_release::{
+    BubbleTransferZoneReleaseResult, bubble_transfer_zone_release,
+};
 pub use check_valve_leak_relief::{CheckValveLeakReliefResult, check_valve_leak_relief};
+pub use component_selective_release::{
+    ComponentSelectiveReleaseResult, component_selective_release,
+};
 pub use component_splitter::{ComponentSplitterResult, component_splitter};
 pub use compressor::{CompressorResult, compressor};
 pub use consequence_analysis::{
@@ -201,6 +218,7 @@ pub use depressurization_acceptance::{
     DepressurizationAcceptancePoint, DepressurizationAcceptanceResult, depressurization_acceptance,
 };
 pub use distillation_column::{DistillationColumnResult, distillation_column};
+pub use drift_flux_release::{DriftFluxReleaseResult, drift_flux_release};
 pub use dynamic_psv_sizing::{DynamicPsvSizingResult, dynamic_psv_sizing};
 pub use ejector::{EjectorResult, ejector};
 pub use escalation_graph::{
@@ -211,6 +229,7 @@ pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_t
 pub use expander::{ExpanderResult, expander};
 pub use fault_tree::{FaultTreeNodeSpec, FaultTreeResult, MinimalCutSet, fault_tree};
 pub use filter::{FilterResult, filter};
+pub use finite_rate_release::{FiniteRateReleaseResult, finite_rate_release};
 pub use fire_case_relief::{FireCaseReliefResult, fire_case_relief};
 pub use fire_monitor_coverage::{FireMonitorCoverageResult, fire_monitor_coverage};
 pub use fire_water_coverage_assessment::{
@@ -240,9 +259,12 @@ pub use heat_exchanger::{HeatExchangerResult, heat_exchanger};
 pub use heater::{HeaterResult, heater};
 pub use heavy_gas_dispersion::{HeavyGasDispersionResult, heavy_gas_dispersion};
 pub use hem_release::{HemReleaseResult, hem_release};
+pub use ideal_gas_fanno_release::{IdealGasFannoReleaseResult, ideal_gas_fanno_release};
+pub use ideal_gas_release::{IdealGasReleaseResult, ideal_gas_release};
 pub use inherent_safety::{InherentSafetyResult, inherent_safety};
 pub use jet_fire::{JetFireResult, jet_fire};
 pub use leak_blowdown::{LeakBlowdownResult, leak_blowdown};
+pub use legacy_screening_release::{LegacyScreeningReleaseResult, legacy_screening_release};
 pub use lopa::{
     LopaLayerContribution, LopaProtectionLayer, LopaResult, Sts0131PressureCategory, lopa,
 };
@@ -286,13 +308,16 @@ pub use piping_fiv_liquid::{PipingFivLiquidResult, piping_fiv_liquid};
 pub use plug_flow_reactor::{PlugFlowReactorResult, plug_flow_reactor};
 pub use pool_fire::{PoolFireResult, pool_fire};
 pub use porous_media_self_heating::{PorousMediaSelfHeatingResult, porous_media_self_heating};
+pub use prescribed_slip_release::{PrescribedSlipReleaseResult, prescribed_slip_release};
 pub use probit::{ProbitResult, probit};
 pub use psv_fire_sizing::{PsvFireSizingResult, psv_fire_sizing};
 pub use psv_sizing::{PsvSizingResult, psv_sizing};
 pub use psv_valve::{PsvValveResult, psv_valve};
 pub use pump::{PumpResult, pump};
 pub use pump_deadhead::{DeadheadVerdict, PumpDeadheadResult, pump_deadhead};
+pub use ranz_marshall_release::{RanzMarshallReleaseResult, ranz_marshall_release};
 pub use rate_based_packed_column::{RateBasedPackedColumnResult, rate_based_packed_column};
+pub use real_gas_fanno_release::{RealGasFannoReleaseResult, real_gas_fanno_release};
 pub use relief_disposal_network::{
     ReliefCause, ReliefContribution, ReliefDisposalNetworkResult, ReliefDisposalRow, ReliefPhase,
     relief_disposal_network,
