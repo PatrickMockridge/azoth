@@ -33,8 +33,8 @@ use crate::record_outputs_gen::{
     PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
     PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
     PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PyTr3001Finding, PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult,
-    PyZoneRatingRow,
+    PyTr3001Finding, PyTrappedInventorySegmentResult, PyVesselFillingPoint, PyVesselRuptureStep,
+    PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -28421,6 +28421,112 @@ impl From<&azoth_process::models::tr3001_compliance::Tr3001ComplianceResult>
             review_count: r.review_count,
             fail_count: r.fail_count,
             compliant: r.compliant,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.trapped_inventory`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TrappedInventoryResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTrappedInventoryResult {
+    /// the gas phase's density, or the bulk density when no gas phase exists.
+    #[pyo3(get)]
+    pub gas_density: PyQty,
+    /// the oil density, then the aqueous, then the fallback.
+    #[pyo3(get)]
+    pub liquid_density: PyQty,
+    /// the segments' internal volumes.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the gas share of the volumes.
+    #[pyo3(get)]
+    pub total_gas_volume: PyQty,
+    /// the liquid share of the volumes.
+    #[pyo3(get)]
+    pub total_liquid_volume: PyQty,
+    /// `total_gas_volume * gas_density`.
+    #[pyo3(get)]
+    pub total_gas_mass: PyQty,
+    /// `total_liquid_volume * liquid_density`.
+    #[pyo3(get)]
+    pub total_liquid_mass: PyQty,
+    /// the gas and liquid masses.
+    #[pyo3(get)]
+    pub total_mass: PyQty,
+    /// one row per input segment, in caller order.
+    #[pyo3(get)]
+    pub segments: Vec<PyTrappedInventorySegmentResult>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyTrappedInventoryResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "TrappedInventoryResult(gas_density={:?}, liquid_density={:?}, total_volume={:?}, total_gas_volume={:?}, total_liquid_volume={:?}, total_gas_mass={:?}, total_liquid_mass={:?}, total_mass={:?}, segments={:?}, {} warning(s))",
+            self.gas_density,
+            self.liquid_density,
+            self.total_volume,
+            self.total_gas_volume,
+            self.total_liquid_volume,
+            self.total_gas_mass,
+            self.total_liquid_mass,
+            self.total_mass,
+            self.segments,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::trapped_inventory::TrappedInventoryResult>
+    for PyTrappedInventoryResult
+{
+    fn from(r: &azoth_process::models::trapped_inventory::TrappedInventoryResult) -> Self {
+        Self {
+            gas_density: PyQty {
+                magnitude_si: r.gas_density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            liquid_density: PyQty {
+                magnitude_si: r.liquid_density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            total_volume: PyQty {
+                magnitude_si: r.total_volume.value,
+                unit: "m**3".to_string(),
+            },
+            total_gas_volume: PyQty {
+                magnitude_si: r.total_gas_volume.value,
+                unit: "m**3".to_string(),
+            },
+            total_liquid_volume: PyQty {
+                magnitude_si: r.total_liquid_volume.value,
+                unit: "m**3".to_string(),
+            },
+            total_gas_mass: PyQty {
+                magnitude_si: r.total_gas_mass.value,
+                unit: "kg".to_string(),
+            },
+            total_liquid_mass: PyQty {
+                magnitude_si: r.total_liquid_mass.value,
+                unit: "kg".to_string(),
+            },
+            total_mass: PyQty {
+                magnitude_si: r.total_mass.value,
+                unit: "kg".to_string(),
+            },
+            segments: r
+                .segments
+                .iter()
+                .map(PyTrappedInventorySegmentResult::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }

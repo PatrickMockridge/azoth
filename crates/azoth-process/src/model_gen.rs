@@ -119,6 +119,7 @@
 //!   - specs/models/process/throttling_valve.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
+//!   - specs/models/process/trapped_inventory.toml
 //!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vacuum_collapse.toml
@@ -90160,6 +90161,481 @@ pub static TR3001_COMPLIANCE_SPEC: ModelSpec = ModelSpec {
     cases: TR3001_COMPLIANCE_CASES,
 };
 
+static TRAPPED_INVENTORY_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "fallback_liquid_density",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a density is positive",
+        },
+    },
+];
+
+static TRAPPED_INVENTORY_CASES: &[TestCase] = &[
+    TestCase {
+        id: "two_phase",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("pressure", 5000000.0), ("temperature", 300.0)],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane", "n-butane"])],
+        strings: &[],
+        vectors: &[("z", &[0.5, 0.3, 0.2])],
+        matrices: &[],
+        expected: &[
+            ("gas_density", 62.13948916875829),
+            ("liquid_density", 449.21182603388814),
+            ("total_volume", 13.141592653589793),
+            ("total_gas_volume", 7.5132741228718345),
+            ("total_liquid_volume", 5.628318530717959),
+            ("total_gas_mass", 466.87101598010634),
+            ("total_liquid_mass", 2528.3072446841848),
+            ("total_mass", 2995.178260664291),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "segments",
+                &[
+                    &[
+                        RecordField {
+                            name: "segment_id",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("equipment"),
+                        },
+                        RecordField {
+                            name: "volume",
+                            value: FieldValue::Number(10.0),
+                        },
+                        RecordField {
+                            name: "liquid_fill_fraction",
+                            value: FieldValue::Number(0.5),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "segment_id",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("pipe"),
+                        },
+                        RecordField {
+                            name: "internal_diameter",
+                            value: FieldValue::Number(0.2),
+                        },
+                        RecordField {
+                            name: "length",
+                            value: FieldValue::Number(100.0),
+                        },
+                        RecordField {
+                            name: "liquid_fill_fraction",
+                            value: FieldValue::Number(0.2),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "segment_evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "segment_id",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("DOC-V-101"),
+                        },
+                        RecordField {
+                            name: "source_reference",
+                            value: FieldValue::Name("STID-V-101"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("documented volume"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "segment_id",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("DOC-P-101"),
+                        },
+                        RecordField {
+                            name: "source_reference",
+                            value: FieldValue::Name("STID-P-101"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("documented volume"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[(
+            "segments",
+            &[
+                &[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("V-101"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "gas_mass",
+                        value: FieldValue::Number(310.69744584379146),
+                    },
+                    RecordField {
+                        name: "liquid_mass",
+                        value: FieldValue::Number(2246.059130169441),
+                    },
+                    RecordField {
+                        name: "total_mass",
+                        value: FieldValue::Number(2556.756576013232),
+                    },
+                    RecordField {
+                        name: "gas_density",
+                        value: FieldValue::Number(62.13948916875829),
+                    },
+                    RecordField {
+                        name: "liquid_density",
+                        value: FieldValue::Number(449.21182603388814),
+                    },
+                    RecordField {
+                        name: "liquid_fill_fraction",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("P-101"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("pipe"),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(3.1415926535897936),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(2.513274122871835),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(0.6283185307179587),
+                    },
+                    RecordField {
+                        name: "gas_mass",
+                        value: FieldValue::Number(156.17357013631488),
+                    },
+                    RecordField {
+                        name: "liquid_mass",
+                        value: FieldValue::Number(282.24811451474386),
+                    },
+                    RecordField {
+                        name: "total_mass",
+                        value: FieldValue::Number(438.42168465105874),
+                    },
+                    RecordField {
+                        name: "gas_density",
+                        value: FieldValue::Number(62.13948916875829),
+                    },
+                    RecordField {
+                        name: "liquid_density",
+                        value: FieldValue::Number(449.21182603388814),
+                    },
+                    RecordField {
+                        name: "liquid_fill_fraction",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "internal_diameter",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "length",
+                        value: FieldValue::Number(100.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "gas_only_fallback",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("pressure", 5000000.0), ("temperature", 300.0)],
+        flags: &[],
+        lists: &[("components", &["methane"])],
+        strings: &[],
+        vectors: &[("z", &[1.0])],
+        matrices: &[],
+        expected: &[
+            ("gas_density", 35.25541405613884),
+            ("liquid_density", 800.0),
+            ("total_volume", 5.0),
+            ("total_gas_volume", 2.5),
+            ("total_liquid_volume", 2.5),
+            ("total_gas_mass", 88.1385351403471),
+            ("total_liquid_mass", 2000.0),
+            ("total_mass", 2088.138535140347),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "segments",
+                &[&[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("V-GAS"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "liquid_fill_fraction",
+                        value: FieldValue::Number(0.5),
+                    },
+                ]],
+            ),
+            (
+                "segment_evidence",
+                &[&[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("V-GAS"),
+                    },
+                    RecordField {
+                        name: "document_id",
+                        value: FieldValue::Name("DOC-V-GAS"),
+                    },
+                    RecordField {
+                        name: "source_reference",
+                        value: FieldValue::Name("STID-V-GAS"),
+                    },
+                    RecordField {
+                        name: "excerpt",
+                        value: FieldValue::Name("documented volume"),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "missing_evidence",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("pressure", 5000000.0), ("temperature", 300.0)],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane", "n-butane"])],
+        strings: &[],
+        vectors: &[("z", &[0.5, 0.3, 0.2])],
+        matrices: &[],
+        expected: &[
+            ("gas_density", 62.13948916875829),
+            ("liquid_density", 449.21182603388814),
+            ("total_gas_mass", 155.34872292189573),
+            ("total_liquid_mass", 1123.0295650847204),
+            ("total_mass", 1278.378288006616),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "segments",
+            &[&[
+                RecordField {
+                    name: "segment_id",
+                    value: FieldValue::Name("V-NOEV"),
+                },
+                RecordField {
+                    name: "kind",
+                    value: FieldValue::Name("equipment"),
+                },
+                RecordField {
+                    name: "volume",
+                    value: FieldValue::Number(5.0),
+                },
+                RecordField {
+                    name: "liquid_fill_fraction",
+                    value: FieldValue::Number(0.5),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "water_multiphase",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-05,
+        numbers: &[("pressure", 5000000.0), ("temperature", 300.0)],
+        flags: &[("multiphase_check", true)],
+        lists: &[("components", &["methane", "water"])],
+        strings: &[],
+        vectors: &[("z", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[
+            ("gas_density", 35.257283531476276),
+            ("liquid_density", 984.6166289023153),
+            ("total_gas_mass", 88.14320882869069),
+            ("total_liquid_mass", 2461.541572255788),
+            ("total_mass", 2549.684781084479),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "segments",
+                &[&[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("V-WET"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "liquid_fill_fraction",
+                        value: FieldValue::Number(0.5),
+                    },
+                ]],
+            ),
+            (
+                "segment_evidence",
+                &[&[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("V-WET"),
+                    },
+                    RecordField {
+                        name: "document_id",
+                        value: FieldValue::Name("DOC-V-WET"),
+                    },
+                    RecordField {
+                        name: "source_reference",
+                        value: FieldValue::Name("STID-V-WET"),
+                    },
+                    RecordField {
+                        name: "excerpt",
+                        value: FieldValue::Name("documented volume"),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+];
+
+static TRAPPED_INVENTORY_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "trapped_inventory",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.trapped_inventory`.
+pub static TRAPPED_INVENTORY_SPEC: ModelSpec = ModelSpec {
+    id: "process.trapped_inventory",
+    kind: "procedure",
+    algorithm: Some(&TRAPPED_INVENTORY_ALGORITHM),
+    checks: TRAPPED_INVENTORY_CHECKS,
+    cases: TRAPPED_INVENTORY_CASES,
+};
+
 static TUBE_RUPTURE_RELIEF_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -94730,6 +95206,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &THROTTLING_VALVE_SPEC,
     &TOXIC_LIBRARY_SPEC,
     &TR3001_COMPLIANCE_SPEC,
+    &TRAPPED_INVENTORY_SPEC,
     &TUBE_RUPTURE_RELIEF_SPEC,
     &TURBO_EXPANDER_COMPRESSOR_SPEC,
     &VACUUM_COLLAPSE_SPEC,

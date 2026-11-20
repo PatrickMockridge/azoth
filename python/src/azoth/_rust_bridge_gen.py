@@ -435,6 +435,8 @@ from azoth.core.result import (
     Tr3001ComplianceResult,
     Tr3001Finding,
     TransferBinaryInteractionParametersResult,
+    TrappedInventoryResult,
+    TrappedInventorySegmentResult,
     TrayHydraulicsResult,
     TsFlashResult,
     TubeInsertModelResult,
@@ -845,6 +847,7 @@ __all__ = [
     "tp_solid_flash",
     "tr3001_compliance",
     "transfer_binary_interaction_parameters",
+    "trapped_inventory",
     "tray_hydraulics",
     "ts_flash",
     "tu_flash",
@@ -9896,6 +9899,34 @@ def tr3001_compliance(scenarios: list[dict[str, object]], capacity_adequate: boo
         review_count=result.review_count,
         fail_count=result.fail_count,
         compliant=result.compliant,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def trapped_inventory(components: list[str], z: list[float], pressure: float, temperature: float, segments: list[dict[str, object]], eos: str | None=None, multiphase_check: bool | None=None, fallback_liquid_density: float | None=None, segment_evidence: list[dict[str, object]] | None=None) -> TrappedInventoryResult:
+    """``process.trapped_inventory``, computed in Rust."""
+    spec = _models_gen.model("process.trapped_inventory")
+    result = _core.trapped_inventory(
+        list(components),
+        list(z),
+        _si(spec, "pressure", pressure),
+        _si(spec, "temperature", temperature),
+        input_records_to_si(spec, "segments", segments),
+        eos,
+        multiphase_check,
+        None if fallback_liquid_density is None else _si(spec, "fallback_liquid_density", fallback_liquid_density),
+        None if segment_evidence is None else input_records_to_si(spec, "segment_evidence", segment_evidence),
+    )
+    return TrappedInventoryResult(
+        gas_density=from_si(result.gas_density.magnitude_si, result.gas_density.unit),
+        liquid_density=from_si(result.liquid_density.magnitude_si, result.liquid_density.unit),
+        total_volume=from_si(result.total_volume.magnitude_si, result.total_volume.unit),
+        total_gas_volume=from_si(result.total_gas_volume.magnitude_si, result.total_gas_volume.unit),
+        total_liquid_volume=from_si(result.total_liquid_volume.magnitude_si, result.total_liquid_volume.unit),
+        total_gas_mass=from_si(result.total_gas_mass.magnitude_si, result.total_gas_mass.unit),
+        total_liquid_mass=from_si(result.total_liquid_mass.magnitude_si, result.total_liquid_mass.unit),
+        total_mass=from_si(result.total_mass.magnitude_si, result.total_mass.unit),
+        segments=tuple(TrappedInventorySegmentResult(segment_id=c.segment_id, kind=c.kind, total_volume=from_si(c.total_volume.magnitude_si, c.total_volume.unit), gas_volume=from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), liquid_volume=from_si(c.liquid_volume.magnitude_si, c.liquid_volume.unit), gas_mass=from_si(c.gas_mass.magnitude_si, c.gas_mass.unit), liquid_mass=from_si(c.liquid_mass.magnitude_si, c.liquid_mass.unit), total_mass=from_si(c.total_mass.magnitude_si, c.total_mass.unit), gas_density=from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), liquid_fill_fraction=c.liquid_fill_fraction, internal_diameter=None if c.internal_diameter is None else from_si(c.internal_diameter.magnitude_si, c.internal_diameter.unit), length=None if c.length is None else from_si(c.length.magnitude_si, c.length.unit)) for c in result.segments),
         warnings=_warnings(result.warnings),
     )
 

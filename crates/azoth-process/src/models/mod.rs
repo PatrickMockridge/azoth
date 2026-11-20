@@ -163,6 +163,7 @@ pub mod toxic_library;
 pub mod tr3001_compliance;
 #[allow(dead_code)] // until the id slices consume the module
 pub(crate) mod transient_wall;
+pub mod trapped_inventory;
 pub mod tube_rupture_relief;
 pub mod turbo_expander_compressor;
 pub mod vacuum_collapse;
@@ -390,6 +391,10 @@ pub use toxic_library::{ToxicLibraryResult, toxic_library};
 pub use tr3001_compliance::{
     Tr3001Check, Tr3001ComplianceResult, Tr3001Finding, Tr3001Scenario, Tr3001Status,
     tr3001_compliance,
+};
+pub use trapped_inventory::{
+    SegmentKind, TrappedInventoryEvidence, TrappedInventoryResult, TrappedInventorySegment,
+    TrappedInventorySegmentResult, trapped_inventory,
 };
 pub use tube_rupture_relief::{TubeRuptureReliefResult, tube_rupture_relief};
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};

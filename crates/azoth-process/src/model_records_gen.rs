@@ -129,6 +129,7 @@ use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
 use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
+use crate::models::trapped_inventory::TrappedInventoryResult;
 use crate::models::tube_rupture_relief::TubeRuptureReliefResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vacuum_collapse::VacuumCollapseResult;
@@ -2943,6 +2944,26 @@ impl CalcResult for Tr3001ComplianceResult {
         "review_count",
         "fail_count",
         "compliant",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for TrappedInventoryResult {
+    const CALC_ID: &'static str = "process.trapped_inventory";
+    const FIELDS: &'static [&'static str] = &[
+        "gas_density",
+        "liquid_density",
+        "total_volume",
+        "total_gas_volume",
+        "total_liquid_volume",
+        "total_gas_mass",
+        "total_liquid_mass",
+        "total_mass",
+        "segments",
         "warnings",
     ];
 

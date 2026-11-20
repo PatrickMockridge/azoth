@@ -358,6 +358,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyThrottlingValveResult>()?;
     m.add_class::<crate::transport_gen::PyToxicLibraryResult>()?;
     m.add_class::<crate::transport_gen::PyTr3001ComplianceResult>()?;
+    m.add_class::<crate::transport_gen::PyTrappedInventoryResult>()?;
     m.add_class::<crate::transport_gen::PyTubeRuptureReliefResult>()?;
     m.add_class::<crate::transport_gen::PyTurboExpanderResult>()?;
     m.add_class::<crate::transport_gen::PyVacuumCollapseResult>()?;
@@ -459,6 +460,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PySts0131FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
     m.add_class::<crate::record_outputs_gen::PyTr3001Finding>()?;
+    m.add_class::<crate::record_outputs_gen::PyTrappedInventorySegmentResult>()?;
     m.add_class::<crate::record_outputs_gen::PyVesselFillingPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyVesselRuptureStep>()?;
     m.add_class::<crate::record_outputs_gen::PyWaterMixingResult>()?;
@@ -1275,6 +1277,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::throttling_valve, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::toxic_library, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::tr3001_compliance, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::process::trapped_inventory, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::tube_rupture_relief,
         m

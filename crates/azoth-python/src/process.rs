@@ -1022,6 +1022,66 @@ pub fn esd_response_time(
         .map_err(|error| to_pyerr(py, error))
 }
 
+/// `process.trapped_inventory` - the trapped gas and liquid inventory.
+///
+/// The flash's densities over the documented equipment and pipe volumes.
+#[pyfunction]
+#[pyo3(signature = (components, z, pressure, temperature, segments, eos = None, multiphase_check = None, fallback_liquid_density = None, segment_evidence = None))]
+#[pyo3(text_signature = "(components, z, pressure, temperature, segments, eos=None, multiphase_check=None, fallback_liquid_density=None, segment_evidence=None)")]
+#[allow(clippy::too_many_arguments)] // the spec's declared inputs
+pub fn trapped_inventory(
+    py: Python<'_>,
+    components: Vec<String>,
+    z: Vec<f64>,
+    pressure: f64,
+    temperature: f64,
+    segments: Vec<crate::records_gen::TrappedInventorySegment>,
+    eos: Option<&str>,
+    multiphase_check: Option<bool>,
+    fallback_liquid_density: Option<f64>,
+    segment_evidence: Option<Vec<crate::records_gen::TrappedInventoryEvidence>>,
+) -> PyResult<crate::transport_gen::PyTrappedInventoryResult> {
+    use azoth_process::models::trapped_inventory as inventory;
+    let segments = segments
+        .into_iter()
+        .map(|row| {
+            let kind =
+                inventory::SegmentKind::parse(&row.kind).map_err(|error| to_pyerr(py, error))?;
+            Ok(inventory::TrappedInventorySegment {
+                segment_id: row.segment_id,
+                kind,
+                volume: row.volume.map(cubic_meters),
+                liquid_fill_fraction: row.liquid_fill_fraction,
+                internal_diameter: row.internal_diameter.map(meters),
+                length: row.length.map(meters),
+            })
+        })
+        .collect::<PyResult<Vec<_>>>()?;
+    let evidence = segment_evidence.map(|rows| {
+        rows.into_iter()
+            .map(|row| inventory::TrappedInventoryEvidence {
+                segment_id: row.segment_id,
+                document_id: row.document_id,
+                source_reference: row.source_reference,
+                excerpt: row.excerpt,
+            })
+            .collect::<Vec<_>>()
+    });
+    inventory::trapped_inventory(
+        &components,
+        &z,
+        pascals(pressure),
+        kelvins(temperature),
+        &segments,
+        eos,
+        multiphase_check,
+        fallback_liquid_density.map(kilograms_per_cubic_meter),
+        evidence.as_deref(),
+    )
+    .map(|result| crate::transport_gen::PyTrappedInventoryResult::from(&result))
+    .map_err(|error| to_pyerr(py, error))
+}
+
 /// `process.absorption_column` - the tray absorber as a registered id.
 ///
 /// **The column's own profile shape with the class's own product names**, and two inlets where

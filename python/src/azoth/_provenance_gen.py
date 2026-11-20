@@ -3744,6 +3744,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 8,
         "tests_skipped": 0,
     },
+    'process.trapped_inventory': {
+        "calc_id": 'process.trapped_inventory',
+        "name": 'Trapped inventory',
+        "spec": {'path': 'specs/models/process/trapped_inventory.toml', 'sha256': '59e71b587c5ff25acc9a481178e3c8a48c107d9e2d54f8657de9b6cc27fb1ce0'},
+        "code": [{'path': 'python/src/azoth/process/reference/trapped_inventory.py', 'sha256': '0ccf4b8fc5ef94f1d0d18d41f99dac1e6d33ba04ff7101226e789561a5ab52a1'}, {'path': 'crates/azoth-process/src/models/trapped_inventory.rs', 'sha256': 'a2d544c7c4cf4554aea9087ec0c270f3ec899c1c97c154cc23a86863dc4b8300'}],
+        "source": 'NeqSim process/safety/inventory/TrappedInventoryCalculator.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 4,
+        "tests_skipped": 0,
+    },
     'process.tube_rupture_relief': {
         "calc_id": 'process.tube_rupture_relief',
         "name": 'Tube rupture relief',

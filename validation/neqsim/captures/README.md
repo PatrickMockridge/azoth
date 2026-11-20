@@ -3238,3 +3238,19 @@ The density printed beside each block is the inlet stream's bulk density, the qu
 linepack term reads; a zero-flow stream reports 0. The setters clamp volume, fraction and the
 uncertainties at zero and the window at one, and a zero reference flow prints `NaN` for the
 fraction.
+
+## The trapped inventory
+
+`process_trapped_inventory.tsv` is `TrappedInventoryCalculator.calculate` on a two-phase
+methane/ethane/n-butane state with equipment and pipe segments, a gas-only fallback, a
+missing-evidence segment, a water-bearing multiphase state and an SRK evidence row.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe trapped_inventory \
+  > captures/process_trapped_inventory.tsv
+```
+
+The densities are the flash's phases: the gas phase's, and the oil's, the aqueous's or the
+class's 800 kg/m3 fallback. The warnings are the class's strings, in segment order before the
+fallback. The SRK row is evidence: its liquid density is `1.06e-1` relative below the port's,
+so it is declared uncased.

@@ -928,6 +928,36 @@ pub struct Tr3001Scenario {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct TrappedInventoryEvidence {
+    #[pyo3(item)]
+    pub segment_id: String,
+    #[pyo3(item)]
+    pub document_id: Option<String>,
+    #[pyo3(item)]
+    pub source_reference: Option<String>,
+    #[pyo3(item)]
+    pub excerpt: Option<String>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct TrappedInventorySegment {
+    #[pyo3(item)]
+    pub segment_id: String,
+    #[pyo3(item)]
+    pub kind: String,
+    #[pyo3(item)]
+    pub volume: Option<f64>,
+    #[pyo3(item)]
+    pub liquid_fill_fraction: f64,
+    #[pyo3(item)]
+    pub internal_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub length: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct TurboIgvPenaltyPoint {
     #[pyo3(item)]
     pub igv: f64,

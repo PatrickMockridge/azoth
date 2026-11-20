@@ -3912,6 +3912,68 @@ def _s001_clause10_review(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _trapped_inventory(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.trapped_inventory`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.trapped_inventory import trapped_inventory as evaluate
+
+    def optional_q(row: Mapping[str, Any], name: str, unit: str) -> Any:
+        value = row.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    segments = [
+        {
+            "segment_id": str(row["segment_id"]),
+            "kind": str(row["kind"]),
+            "volume": optional_q(row, "volume", "m**3"),
+            "liquid_fill_fraction": quantity(
+                float(row["liquid_fill_fraction"]), "dimensionless"
+            ),
+            "internal_diameter": optional_q(row, "internal_diameter", "m"),
+            "length": optional_q(row, "length", "m"),
+        }
+        for row in inputs["segments"]
+    ]
+    evidence = [
+        {
+            "segment_id": str(row["segment_id"]),
+            "document_id": row.get("document_id"),
+            "source_reference": row.get("source_reference"),
+            "excerpt": row.get("excerpt"),
+        }
+        for row in inputs.get("segment_evidence", [])
+    ]
+    result = evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["z"]],
+        quantity(float(inputs["pressure"]), "Pa"),
+        quantity(float(inputs["temperature"]), "K"),
+        segments,
+        None if inputs.get("eos") is None else str(inputs["eos"]),
+        None if inputs.get("multiphase_check") is None else bool(inputs["multiphase_check"]),
+        optional_q(inputs, "fallback_liquid_density", "kg/m**3"),
+        evidence,
+    )
+    dumped: dict[str, float] = {
+        "gas_density_kg_per_m3": result.gas_density.to("kg/m**3").magnitude,
+        "liquid_density_kg_per_m3": result.liquid_density.to("kg/m**3").magnitude,
+        "total_volume_m3": result.total_volume.to("m**3").magnitude,
+        "total_gas_volume_m3": result.total_gas_volume.to("m**3").magnitude,
+        "total_liquid_volume_m3": result.total_liquid_volume.to("m**3").magnitude,
+        "total_gas_mass_kg": result.total_gas_mass.to("kg").magnitude,
+        "total_liquid_mass_kg": result.total_liquid_mass.to("kg").magnitude,
+        "total_mass_kg": result.total_mass.to("kg").magnitude,
+    }
+    for index, segment in enumerate(result.segments):
+        dumped[f"segment_{index}_total_volume_m3"] = segment.total_volume.to("m**3").magnitude
+        dumped[f"segment_{index}_gas_volume_m3"] = segment.gas_volume.to("m**3").magnitude
+        dumped[f"segment_{index}_liquid_volume_m3"] = segment.liquid_volume.to("m**3").magnitude
+        dumped[f"segment_{index}_gas_mass_kg"] = segment.gas_mass.to("kg").magnitude
+        dumped[f"segment_{index}_liquid_mass_kg"] = segment.liquid_mass.to("kg").magnitude
+        dumped[f"segment_{index}_total_mass_kg"] = segment.total_mass.to("kg").magnitude
+    return dumped
+
+
 def _mass_balance_leak_detection(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.mass_balance_leak_detection`'s layers, from the reference's arithmetic."""
     from azoth.core.units import quantity
@@ -4583,6 +4645,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.escalation_graph": _escalation_graph,
     "process.esd_response_time": _esd_response_time,
     "process.mass_balance_leak_detection": _mass_balance_leak_detection,
+    "process.trapped_inventory": _trapped_inventory,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.psv_valve": _psv_valve,
     "process.dynamic_psv_sizing": _dynamic_psv_sizing,
@@ -6997,6 +7060,37 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=3,
         identified_by=("#label", "leak_clamps"),
     ),
+    # The trapped inventory's five cased states.
+    LayerCase(
+        model="process.trapped_inventory",
+        case="two_phase",
+        capture="process_trapped_inventory.tsv",
+        block=0,
+        identified_by=("#label", "inv_two_phase"),
+    ),
+    LayerCase(
+        model="process.trapped_inventory",
+        case="gas_only_fallback",
+        capture="process_trapped_inventory.tsv",
+        block=1,
+        identified_by=("#label", "inv_gas_only"),
+    ),
+    LayerCase(
+        model="process.trapped_inventory",
+        case="missing_evidence",
+        capture="process_trapped_inventory.tsv",
+        block=2,
+        identified_by=("#label", "inv_no_evidence"),
+    ),
+    LayerCase(
+        model="process.trapped_inventory",
+        case="water_multiphase",
+        capture="process_trapped_inventory.tsv",
+        block=3,
+        identified_by=("#label", "inv_water_multiphase"),
+    ),
+    # The SRK evidence row is uncased: its liquid density is `1.06e-1` relative below
+    # the class's, so it is a recorded divergence rather than a case.
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -8778,6 +8872,9 @@ UNCASED_ROWS: dict[str, int] = {
     "process_esd_response_time.tsv": 1,
     # The leak sensitivity's one: the SRK evidence row.
     "process_mass_balance_leak_detection.tsv": 1,
+    # The trapped inventory's one: the SRK evidence row, whose liquid density is
+    # `1.06e-1` relative below the class's.
+    "process_trapped_inventory.tsv": 1,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

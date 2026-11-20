@@ -4988,6 +4988,130 @@ impl From<&azoth_process::models::tr3001_compliance::Tr3001Finding> for PyTr3001
     }
 }
 
+/// one row per input segment, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TrappedInventorySegmentResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTrappedInventorySegmentResult {
+    /// the segment identifier.
+    #[pyo3(get)]
+    pub segment_id: String,
+    /// the segment's kind.
+    #[pyo3(get)]
+    pub kind: String,
+    /// the segment's internal volume.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the gas share of the segment.
+    #[pyo3(get)]
+    pub gas_volume: PyQty,
+    /// the liquid share of the segment.
+    #[pyo3(get)]
+    pub liquid_volume: PyQty,
+    /// the segment's gas mass.
+    #[pyo3(get)]
+    pub gas_mass: PyQty,
+    /// the segment's liquid mass.
+    #[pyo3(get)]
+    pub liquid_mass: PyQty,
+    /// the segment's gas and liquid mass.
+    #[pyo3(get)]
+    pub total_mass: PyQty,
+    /// the density the segment's gas mass used.
+    #[pyo3(get)]
+    pub gas_density: PyQty,
+    /// the density the segment's liquid mass used.
+    #[pyo3(get)]
+    pub liquid_density: PyQty,
+    /// the echoed fill fraction.
+    #[pyo3(get)]
+    pub liquid_fill_fraction: f64,
+    /// the pipe's diameter, echoed.
+    #[pyo3(get)]
+    pub internal_diameter: Option<PyQty>,
+    /// the pipe's length, echoed.
+    #[pyo3(get)]
+    pub length: Option<PyQty>,
+}
+
+#[pymethods]
+impl PyTrappedInventorySegmentResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "TrappedInventorySegmentResult(segment_id={}, kind={}, total_volume={:?}, gas_volume={:?}, liquid_volume={:?}, gas_mass={:?}, liquid_mass={:?}, total_mass={:?}, gas_density={:?}, liquid_density={:?}, liquid_fill_fraction={}, internal_diameter={:?}, length={:?})",
+            self.segment_id,
+            self.kind,
+            self.total_volume,
+            self.gas_volume,
+            self.liquid_volume,
+            self.gas_mass,
+            self.liquid_mass,
+            self.total_mass,
+            self.gas_density,
+            self.liquid_density,
+            self.liquid_fill_fraction,
+            self.internal_diameter,
+            self.length
+        )
+    }
+}
+
+impl From<&azoth_process::models::trapped_inventory::TrappedInventorySegmentResult>
+    for PyTrappedInventorySegmentResult
+{
+    fn from(row: &azoth_process::models::trapped_inventory::TrappedInventorySegmentResult) -> Self {
+        Self {
+            segment_id: row.segment_id.clone(),
+            kind: row.kind.as_str().to_string(),
+            total_volume: PyQty {
+                magnitude_si: row.total_volume.value,
+                unit: "m**3".to_string(),
+            },
+            gas_volume: PyQty {
+                magnitude_si: row.gas_volume.value,
+                unit: "m**3".to_string(),
+            },
+            liquid_volume: PyQty {
+                magnitude_si: row.liquid_volume.value,
+                unit: "m**3".to_string(),
+            },
+            gas_mass: PyQty {
+                magnitude_si: row.gas_mass.value,
+                unit: "kg".to_string(),
+            },
+            liquid_mass: PyQty {
+                magnitude_si: row.liquid_mass.value,
+                unit: "kg".to_string(),
+            },
+            total_mass: PyQty {
+                magnitude_si: row.total_mass.value,
+                unit: "kg".to_string(),
+            },
+            gas_density: PyQty {
+                magnitude_si: row.gas_density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            liquid_density: PyQty {
+                magnitude_si: row.liquid_density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            liquid_fill_fraction: row.liquid_fill_fraction,
+            internal_diameter: row.internal_diameter.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m".to_string(),
+            }),
+            length: row.length.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m".to_string(),
+            }),
+        }
+    }
+}
+
 /// one row per step, in time order.
 #[pyclass(
     frozen,

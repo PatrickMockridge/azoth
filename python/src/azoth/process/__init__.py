@@ -137,6 +137,7 @@ from azoth.core.result import (
     ThrottlingValveResult,
     ToxicLibraryResult,
     Tr3001ComplianceResult,
+    TrappedInventoryResult,
     TubeRuptureReliefResult,
     TurboExpanderResult,
     VacuumCollapseResult,
@@ -355,6 +356,7 @@ _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
 _TOXIC_LIBRARY = "process.toxic_library"
 _TR3001_COMPLIANCE = "process.tr3001_compliance"
+_TRAPPED_INVENTORY = "process.trapped_inventory"
 _TUBE_RUPTURE_RELIEF = "process.tube_rupture_relief"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
@@ -3202,6 +3204,38 @@ def tr3001_compliance(
         required_area_in2=required_area_in2,
         acceptance_accepted=acceptance_accepted,
         accumulation_fraction=accumulation_fraction,
+    )
+
+
+def trapped_inventory(
+    components: list[str],
+    z: list[float],
+    pressure: float,
+    temperature: float,
+    segments: list[dict[str, object]],
+    eos: str | None = None,
+    multiphase_check: bool | None = None,
+    fallback_liquid_density: float | None = None,
+    segment_evidence: list[dict[str, object]] | None = None,
+) -> TrappedInventoryResult:
+    """The trapped gas and liquid inventory.
+
+    The flash's gas and liquid densities over the documented equipment and pipe volumes,
+    with the gas and liquid shares. **A segment with no evidence row warns**, and the
+    class's 800 kg/m3 fallback is used when the flash finds no liquid.
+
+    See :func:`azoth.process.reference.trapped_inventory`.
+    """
+    return resolve(_TRAPPED_INVENTORY)(  # type: ignore[no-any-return]
+        components=components,
+        z=z,
+        pressure=pressure,
+        temperature=temperature,
+        segments=segments,
+        eos=eos,
+        multiphase_check=multiphase_check,
+        fallback_liquid_density=fallback_liquid_density,
+        segment_evidence=segment_evidence,
     )
 
 

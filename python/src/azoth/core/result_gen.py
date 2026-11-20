@@ -93,6 +93,7 @@ from azoth.core.record_outputs_gen import (
     Sts0131FindingResult,
     SubFraction,
     Tr3001Finding,
+    TrappedInventorySegmentResult,
     VesselFillingPoint,
     VesselRuptureStep,
     WaterMixingResult,
@@ -11453,6 +11454,43 @@ class Tr3001ComplianceResult(_HasWarnings):
 
     #: whether no check failed.
     compliant: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TrappedInventoryResult(_HasWarnings):
+    """Result of ``process.trapped_inventory``."""
+
+    CALC_ID: ClassVar[str] = "process.trapped_inventory"
+
+    #: the gas phase's density, or the bulk density when no gas phase exists.
+    gas_density: Q
+
+    #: the oil density, then the aqueous, then the fallback.
+    liquid_density: Q
+
+    #: the segments' internal volumes.
+    total_volume: Q
+
+    #: the gas share of the volumes.
+    total_gas_volume: Q
+
+    #: the liquid share of the volumes.
+    total_liquid_volume: Q
+
+    #: `total_gas_volume * gas_density`.
+    total_gas_mass: Q
+
+    #: `total_liquid_volume * liquid_density`.
+    total_liquid_mass: Q
+
+    #: the gas and liquid masses.
+    total_mass: Q
+
+    #: one row per input segment, in caller order.
+    segments: tuple[TrappedInventorySegmentResult, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

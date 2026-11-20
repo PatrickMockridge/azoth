@@ -786,6 +786,24 @@ class Tr3001Scenario(TypedDict):
     dynamically_determined: bool
     credible: bool
 
+class TrappedInventorySegment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    segment_id: str
+    kind: str
+    volume: float | None
+    liquid_fill_fraction: float
+    internal_diameter: float | None
+    length: float | None
+
+class TrappedInventoryEvidence(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    segment_id: str
+    document_id: str | None
+    source_reference: str | None
+    excerpt: str | None
+
 class TurboUcPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1661,6 +1679,24 @@ class Tr3001Finding:
 
     check: str
     status: str
+
+@final
+class TrappedInventorySegmentResult:
+    """one row per input segment, in caller order."""
+
+    segment_id: str
+    kind: str
+    total_volume: Qty
+    gas_volume: Qty
+    liquid_volume: Qty
+    gas_mass: Qty
+    liquid_mass: Qty
+    total_mass: Qty
+    gas_density: Qty
+    liquid_density: Qty
+    liquid_fill_fraction: float
+    internal_diameter: Qty | None
+    length: Qty | None
 
 @final
 class VesselFillingPoint:
@@ -5683,6 +5719,19 @@ class Tr3001ComplianceResult:
     review_count: float
     fail_count: float
     compliant: bool
+    warnings: list[Warning]
+
+@final
+class TrappedInventoryResult:
+    gas_density: Qty
+    liquid_density: Qty
+    total_volume: Qty
+    total_gas_volume: Qty
+    total_liquid_volume: Qty
+    total_gas_mass: Qty
+    total_liquid_mass: Qty
+    total_mass: Qty
+    segments: list[TrappedInventorySegmentResult]
     warnings: list[Warning]
 
 @final
@@ -9722,6 +9771,17 @@ def tr3001_compliance(
     acceptance_accepted: bool | None = None,
     accumulation_fraction: float | None = None,
 ) -> Tr3001ComplianceResult: ...
+def trapped_inventory(
+    components: list[str],
+    z: list[float],
+    pressure: float,
+    temperature: float,
+    segments: list[TrappedInventorySegment],
+    eos: str | None = None,
+    multiphase_check: bool | None = None,
+    fallback_liquid_density: float | None = None,
+    segment_evidence: list[TrappedInventoryEvidence] | None = None,
+) -> TrappedInventoryResult: ...
 def tube_rupture_relief(
     components: list[str],
     mole_fractions: list[float],

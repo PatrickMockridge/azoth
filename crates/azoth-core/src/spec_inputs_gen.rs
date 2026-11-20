@@ -340,6 +340,7 @@
 //!   - specs/models/process/throttling_valve.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
+//!   - specs/models/process/trapped_inventory.toml
 //!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vacuum_collapse.toml
@@ -6279,6 +6280,18 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.tr3001_compliance",
         "accumulation_fraction",
         "dimensionless",
+    ),
+    ("process.trapped_inventory", "z", "dimensionless"),
+    ("process.trapped_inventory", "pressure", "pressure"),
+    (
+        "process.trapped_inventory",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.trapped_inventory",
+        "fallback_liquid_density",
+        "mass_density",
     ),
     (
         "process.tube_rupture_relief",

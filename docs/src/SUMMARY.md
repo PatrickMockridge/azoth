@@ -353,6 +353,7 @@
   - [Throttling valve](./process/throttling_valve.md)
   - [Toxic-exposure thresholds](./process/toxic_library.md)
   - [TR3001 compliance](./process/tr3001_compliance.md)
+  - [Trapped inventory](./process/trapped_inventory.md)
   - [Tube rupture relief](./process/tube_rupture_relief.md)
   - [Turbo-expander compressor](./process/turbo_expander_compressor.md)
   - [Vacuum collapse screening](./process/vacuum_collapse.md)

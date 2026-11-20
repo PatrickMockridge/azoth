@@ -200,6 +200,7 @@ import neqsim.process.safety.dispersion.HeavyGasDispersion;
 import neqsim.process.safety.dispersion.ProbitModel;
 import neqsim.process.safety.esd.EsdResponseTimeSimulator;
 import neqsim.process.safety.esd.EsdResponseTimeSimulator.EsdResponseTimeResult;
+import neqsim.process.safety.inventory.TrappedInventoryCalculator;
 import neqsim.process.safety.leakdetection.MassBalanceLeakDetector;
 import neqsim.process.safety.leakdetection.MassBalanceLeakDetector.LeakDetectionSensitivityResult;
 import neqsim.process.safety.dispersion.ToxicLibrary;
@@ -676,6 +677,9 @@ public class ProcessProbe {
         break;
       case "mass_balance_leak_detection":
         massBalanceLeakRows();
+        break;
+      case "trapped_inventory":
+        trappedInventoryRows();
         break;
       case "gas_blowby":
         gasBlowbyRows();
@@ -18063,6 +18067,95 @@ public class ProcessProbe {
     System.out.println("density_kg_per_m3=" + density);
     for (Map.Entry<String, Object> entry : result.toMap().entrySet()) {
       System.out.println(entry.getKey() + "=" + entry.getValue());
+    }
+    System.out.println();
+  }
+
+
+  static SystemInterface inventoryFluid(boolean srk, String[] names, double[] z, double temperatureK,
+      double pressureBara, boolean multiphase) {
+    SystemInterface fluid =
+        srk ? new SystemSrkEos(temperatureK, pressureBara) : new SystemPrEos(temperatureK, pressureBara);
+    for (int i = 0; i < names.length; i++) {
+      fluid.addComponent(names[i], z[i]);
+    }
+    fluid.setMixingRule(2);
+    if (multiphase) {
+      fluid.setMultiPhaseCheck(true);
+    }
+    return fluid;
+  }
+
+  static DocumentEvidence inventoryEvidence(String segmentId) {
+    return new DocumentEvidence(segmentId + "-EV", "DOC-" + segmentId, "Line list", "A", "3", 1,
+        "STID-" + segmentId, "documented volume", 0.9);
+  }
+
+  static void trappedInventoryRows() {
+    String[] names = {"methane", "ethane", "n-butane"};
+    double[] z = {0.5, 0.3, 0.2};
+    TrappedInventoryCalculator twoPhase = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(false, names, z, 300.0, 50.0, false))
+        .setOperatingConditions(50.0, 300.0)
+        .addEquipmentVolume("V-101", 10.0, 0.5, inventoryEvidence("V-101"))
+        .addPipeSegment("P-101", 0.2, 100.0, 0.2, inventoryEvidence("P-101"));
+    printInventory("inv_two_phase", twoPhase.calculate());
+
+    TrappedInventoryCalculator gasOnly = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(false, new String[] {"methane"}, new double[] {1.0}, 300.0, 50.0, false))
+        .setOperatingConditions(50.0, 300.0)
+        .addEquipmentVolume("V-GAS", 5.0, 0.5, inventoryEvidence("V-GAS"));
+    printInventory("inv_gas_only", gasOnly.calculate());
+
+    TrappedInventoryCalculator noEvidence = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(false, names, z, 300.0, 50.0, false))
+        .setOperatingConditions(50.0, 300.0)
+        .addEquipmentVolume("V-NOEV", 5.0, 0.5, null);
+    printInventory("inv_no_evidence", noEvidence.calculate());
+
+    String[] wetNames = {"methane", "water"};
+    double[] wetZ = {0.9, 0.1};
+    TrappedInventoryCalculator wet = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(false, wetNames, wetZ, 300.0, 50.0, true))
+        .setOperatingConditions(50.0, 300.0)
+        .addEquipmentVolume("V-WET", 5.0, 0.5, inventoryEvidence("V-WET"));
+    printInventory("inv_water_multiphase", wet.calculate());
+
+    TrappedInventoryCalculator srk = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(true, names, z, 300.0, 50.0, false))
+        .setOperatingConditions(50.0, 300.0)
+        .addEquipmentVolume("V-SRK", 10.0, 0.5, inventoryEvidence("V-SRK"))
+        .addPipeSegment("P-SRK", 0.2, 100.0, 0.2, inventoryEvidence("P-SRK"));
+    printInventory("inv_srk_evidence", srk.calculate());
+    System.out.println();
+  }
+
+  static void printInventory(String label, TrappedInventoryCalculator.InventoryResult result) {
+    System.out.println(label);
+    System.out.println("pressure_bara=" + result.getPressureBara());
+    System.out.println("temperature_k=" + result.getTemperatureK());
+    System.out.println("gas_density_kg_per_m3=" + result.getGasDensityKgPerM3());
+    System.out.println("liquid_density_kg_per_m3=" + result.getLiquidDensityKgPerM3());
+    System.out.println("total_volume_m3=" + result.getTotalVolumeM3());
+    System.out.println("total_gas_volume_m3=" + result.getTotalGasVolumeM3());
+    System.out.println("total_liquid_volume_m3=" + result.getTotalLiquidVolumeM3());
+    System.out.println("total_gas_mass_kg=" + result.getTotalGasMassKg());
+    System.out.println("total_liquid_mass_kg=" + result.getTotalLiquidMassKg());
+    System.out.println("total_mass_kg=" + result.getTotalMassKg());
+    System.out.println("segment_count=" + result.getSegmentResults().size());
+    for (int i = 0; i < result.getSegmentResults().size(); i++) {
+      TrappedInventoryCalculator.InventorySegmentResult segment = result.getSegmentResults().get(i);
+      System.out.println("segment_" + i + "_id=" + segment.getSegmentId());
+      System.out.println("segment_" + i + "_total_volume_m3=" + segment.getTotalVolumeM3());
+      System.out.println("segment_" + i + "_gas_volume_m3=" + segment.getGasVolumeM3());
+      System.out.println("segment_" + i + "_liquid_volume_m3=" + segment.getLiquidVolumeM3());
+      System.out.println("segment_" + i + "_gas_mass_kg=" + segment.getGasMassKg());
+      System.out.println("segment_" + i + "_liquid_mass_kg=" + segment.getLiquidMassKg());
+      System.out.println("segment_" + i + "_total_mass_kg=" + segment.getTotalMassKg());
+    }
+    System.out.println("warning_count=" + result.getWarnings().size());
+    for (int i = 0; i < result.getWarnings().size(); i++) {
+      System.out.println("warning_" + i + "=" + result.getWarnings().get(i));
     }
     System.out.println();
   }

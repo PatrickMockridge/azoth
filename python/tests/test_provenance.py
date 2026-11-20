@@ -182,8 +182,9 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # prescribed-slip release; 361: the drift-flux release; 362: the finite-rate release;
     # 363: the component-selective release; 364: the Ranz-Marshall release; 365: the
     # bubble transfer zone; 366: the ideal-gas Fanno pipe; 367: the real-gas Fanno pipe;
-    # 368: the ESD response time; 369: the mass-balance leak sensitivity.
-    assert len(registered) == 369
+    # 368: the ESD response time; 369: the mass-balance leak sensitivity;
+    # 370: the trapped inventory.
+    assert len(registered) == 370
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

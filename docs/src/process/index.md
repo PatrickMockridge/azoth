@@ -131,6 +131,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.throttling_valve`](./throttling_valve.md) | `direct composition` | NeqSim process/equipment/valve/ThrottlingValve.java |
 | [`process.toxic_library`](./toxic_library.md) | `toxic_threshold_lookup_and_ppm_conversion` | NeqSim process/safety/dispersion/ToxicLibrary.java |
 | [`process.tr3001_compliance`](./tr3001_compliance.md) | `closed_form_tr3001_compliance` | NeqSim process/safety/overpressure/TR3001ComplianceChecker.java |
+| [`process.trapped_inventory`](./trapped_inventory.md) | `trapped_inventory` | NeqSim process/safety/inventory/TrappedInventoryCalculator.java |
 | [`process.tube_rupture_relief`](./tube_rupture_relief.md) | `tube_rupture_nozzle` | NeqSim process/safety/overpressure/TubeRuptureRelief.java |
 | [`process.turbo_expander_compressor`](./turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/TurboExpanderCompressor.java |
 | [`process.vacuum_collapse`](./vacuum_collapse.md) | `constant_volume_cooling_sweep` | NeqSim process/safety/vacuum/VacuumCollapseAnalyzer.java |

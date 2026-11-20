@@ -1766,6 +1766,50 @@ class Tr3001Finding:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class TrappedInventorySegmentResult:
+    """one row per input segment, in caller order."""
+
+    #: the segment identifier.
+    segment_id: str
+
+    #: the segment's kind.
+    kind: str
+
+    #: the segment's internal volume.
+    total_volume: Q
+
+    #: the gas share of the segment.
+    gas_volume: Q
+
+    #: the liquid share of the segment.
+    liquid_volume: Q
+
+    #: the segment's gas mass.
+    gas_mass: Q
+
+    #: the segment's liquid mass.
+    liquid_mass: Q
+
+    #: the segment's gas and liquid mass.
+    total_mass: Q
+
+    #: the density the segment's gas mass used.
+    gas_density: Q
+
+    #: the density the segment's liquid mass used.
+    liquid_density: Q
+
+    #: the echoed fill fraction.
+    liquid_fill_fraction: float
+
+    #: the pipe's diameter, echoed.
+    internal_diameter: Q | None
+
+    #: the pipe's length, echoed.
+    length: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class VesselFillingPoint:
     """one row per step, in time order."""
 
