@@ -66,11 +66,15 @@ pub mod fault_tree;
 pub mod filter;
 pub mod finite_rate_release;
 pub mod fire_case_relief;
+#[allow(dead_code)] // until the id slices consume the module
+pub(crate) mod fire_exposure;
 pub mod fire_monitor_coverage;
 pub mod fire_water_coverage_assessment;
 pub mod fire_water_demand;
 pub mod flare;
 pub mod flow_induced_pulsation_screening;
+#[allow(dead_code)] // until the id slices consume the module
+pub(crate) mod fluid_state;
 pub mod fmea_worksheet;
 pub mod gas_blowby;
 pub mod gas_dispersion;
@@ -95,6 +99,8 @@ pub mod lopa;
 pub mod mah_bow_tie_skeleton;
 pub mod manifold;
 pub mod map_turbo_expander_compressor;
+#[allow(dead_code)] // the flange ratings wait for the fire-rupture id
+pub(crate) mod material_strength;
 pub mod mdmt;
 pub mod mixer;
 pub mod multi_vessel_blowdown_study;
@@ -127,6 +133,8 @@ pub mod rate_based_packed_column;
 pub mod real_gas_fanno_release;
 pub(crate) mod release;
 pub mod relief_disposal_network;
+#[allow(dead_code)] // until the id slices consume the module
+pub(crate) mod review_evidence;
 pub mod risk_matrix;
 pub mod runaway_reaction;
 pub mod s001_clause10_review;
@@ -151,6 +159,8 @@ pub mod three_phase_separator;
 pub mod throttling_valve;
 pub mod toxic_library;
 pub mod tr3001_compliance;
+#[allow(dead_code)] // until the id slices consume the module
+pub(crate) mod transient_wall;
 pub mod tube_rupture_relief;
 pub mod turbo_expander_compressor;
 pub mod vacuum_collapse;
@@ -158,6 +168,8 @@ pub mod vce;
 pub mod vessel_filling;
 pub mod vessel_rupture;
 pub(crate) mod vu_flash_route;
+#[allow(dead_code)] // until the id slices consume the module
+pub(crate) mod wax_appearance;
 
 pub use absorption_column::{AbsorptionColumnResult, absorption_column};
 pub use acoustic_induced_vibration_screening::{
