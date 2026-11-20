@@ -1,0 +1,560 @@
+id = "process.safety_system_performance"
+name = "Safety-system performance assessment"
+kind = "procedure"
+assumptions = [
+    "**the checks run per barrier in the class's order**: credit, performance standard, demand capacity, instrumentation and demand completeness, each finding in the order the class emits it.",
+    "**a barrier with no matching demand is assessed once against the register alone**; a matching demand is every demand whose barrier id equals the barrier's or whose equipment tag is one the barrier links, and a barrier with several assessments repeats the register checks.",
+    "**the class stores NaN in its metric map and the port publishes absence**: a metric that is NaN is an absent field, and a string default of empty is absent too.",
+    "**credit is `status == available` and traceable evidence**, which the row carries rolled up: the register validator reads the evidence rows, this analyzer reads the boolean.",
+    "**PFD and the performance-standard availability and response time take the demand's value first and the standard's second**; availability and response time's actual value is the demand's only; effectiveness reads the demand then the barrier and requires a demand case.",
+    "**the demand-capacity margin is `capacity - demand` and fails strictly below zero**; the demand's scenario, values and unit are carried whether or not the pair is finite.",
+    "**a fire and gas category takes FireDetector and GasDetector devices only**, matched by name, tag or location against the barrier's tags; the detector response time is a fire detector's detection delay or a gas detector's response time.",
+    "**the event SIF fails when healthy channels are below the voting logic's required trips**, warns when any channel is bypassed or faulty, and the count-mismatch warning is independent of both.",
+    "**the quantitative SIF's SIL verification is `process.sil_verification`**: not achieved or an error is a fail, and each verification warning is a warning finding.",
+    "**category inference is the class's ordered keyword list over the barrier's id, name, description, safety function and standard text**, then the first linked element's type, and the demand's category wins when it is not unknown.",
+    "**the class's messages, remediation text and dynamic metric keys are presentation**: a finding carries a stable rule, and a SIF row carries its fixed metrics.",
+]
+references = [
+    "NORSOK S-001:2020+AC:2021 and ISO 17776:2016 barrier management.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/barrier/SafetySystemPerformanceAnalyzer.java` is the port source, with the barrier, demand, SIS and measurement-device classes it reads.",
+    "`validation/neqsim/captures/process_safety_system_performance.tsv` - the upstream test's deluge, fire-and-gas, PFP and quantitative-SIF states, the category-inference state and the failure states.",
+]
+[source]
+standard = "NeqSim process/safety/barrier/SafetySystemPerformanceAnalyzer.java"
+edition = "Its `analyze`, the five check families and the category and matching helpers."
+[algorithm]
+scheme = "safety_system_performance"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.register_id]
+type = "string"
+description = "the register id the report echoes.\n"
+[inputs.register_name]
+type = "string"
+optional = true
+description = "the register name the report echoes.\n"
+[inputs.elements]
+type = "record_list"
+row_type = "PerformanceElement"
+optional = true
+description = "the safety-critical elements, in register order. **Absent is no elements.**\n"
+[inputs.elements.fields.id]
+type = "string"
+description = "the element id.\n"
+[inputs.elements.fields.element_type]
+type = "enum"
+values = ["process_equipment", "instrumented_function", "fire_protection", "structural", "utility", "other"]
+description = "the element type, read only when the keyword list is inconclusive.\n"
+[inputs.links]
+type = "record_list"
+row_type = "SafetySystemLink"
+optional = true
+description = "the element-barrier links, in register order. **Absent is no links.**\n"
+[inputs.links.fields.element_id]
+type = "string"
+description = "the element id; it must name an element row.\n"
+[inputs.links.fields.barrier_id]
+type = "string"
+description = "the barrier id; it must name a barrier row.\n"
+[inputs.barriers]
+type = "record_list"
+row_type = "PerformanceBarrier"
+optional = true
+description = "the barriers, in register order. **Absent is no barriers.**\n"
+[inputs.barriers.fields.id]
+type = "string"
+description = "the barrier id.\n"
+[inputs.barriers.fields.status]
+type = "enum"
+values = ["available", "impaired", "bypassed", "out_of_service", "unknown"]
+description = "the barrier status; **absent is the class's unknown**.\n"
+[inputs.barriers.fields.has_traceable_evidence]
+type = "boolean"
+optional = true
+description = "whether the barrier carries traceable document evidence; **absent is false**.\n"
+[inputs.barriers.fields.name]
+type = "string"
+optional = true
+description = "the barrier name.\n"
+[inputs.barriers.fields.description]
+type = "string"
+optional = true
+description = "the barrier description, read by the category keyword list.\n"
+[inputs.barriers.fields.safety_function]
+type = "string"
+optional = true
+description = "the safety function, read by the category keyword list and the quantitative-SIF match.\n"
+[inputs.barriers.fields.pfd]
+unit = "dimensionless"
+optional = true
+description = "the barrier PFD; **absent is the class's NaN**.\n"
+[inputs.barriers.fields.effectiveness]
+unit = "dimensionless"
+optional = true
+description = "the barrier effectiveness; **absent is the class's NaN**.\n"
+[inputs.barriers.fields.performance_standard_id]
+type = "string"
+optional = true
+description = "the linked standard's id; a value naming no standard row is the class's null standard.\n"
+[inputs.barrier_tags]
+type = "record_list"
+row_type = "BarrierEquipmentTag"
+optional = true
+description = "the equipment tags each barrier links, in caller order. **Absent is no tags.**\n"
+[inputs.barrier_tags.fields.barrier_id]
+type = "string"
+description = "the barrier id; it must name a barrier row.\n"
+[inputs.barrier_tags.fields.tag]
+type = "string"
+description = "the equipment tag.\n"
+[inputs.standards]
+type = "record_list"
+row_type = "SafetyPerformanceStandard"
+optional = true
+description = "the performance standards, in register order. **Absent is no standards.**\n"
+[inputs.standards.fields.id]
+type = "string"
+description = "the standard id.\n"
+[inputs.standards.fields.title]
+type = "string"
+optional = true
+description = "the standard title, read by the category keyword list.\n"
+[inputs.standards.fields.safety_function]
+type = "string"
+optional = true
+description = "the standard's safety function, read by the category keyword list.\n"
+[inputs.standards.fields.target_pfd]
+unit = "dimensionless"
+optional = true
+description = "the target PFD; **absent is the class's NaN**.\n"
+[inputs.standards.fields.required_availability]
+unit = "dimensionless"
+optional = true
+description = "the required availability; **absent is the class's NaN**.\n"
+[inputs.standards.fields.response_time_seconds]
+unit = "s"
+optional = true
+description = "the required response time; **absent is the class's NaN**.\n"
+[inputs.standard_criteria]
+type = "record_list"
+row_type = "StandardCriterion"
+optional = true
+description = "the acceptance criteria, in caller order; each is read by the category keyword list. **Absent is none.**\n"
+[inputs.standard_criteria.fields.standard_id]
+type = "string"
+description = "the standard id; it must name a standard row.\n"
+[inputs.standard_criteria.fields.criterion]
+type = "string"
+description = "the criterion text.\n"
+[inputs.demands]
+type = "record_list"
+row_type = "SafetySystemDemandRow"
+optional = true
+description = "the demand cases, in caller order. **Absent is no demand cases.**\n"
+[inputs.demands.fields.demand_id]
+type = "string"
+description = "the demand id.\n"
+[inputs.demands.fields.barrier_id]
+type = "string"
+optional = true
+description = "the barrier id this demand matches.\n"
+[inputs.demands.fields.equipment_tag]
+type = "string"
+optional = true
+description = "the equipment tag this demand matches, the other half of the class's match.\n"
+[inputs.demands.fields.scenario]
+type = "string"
+optional = true
+description = "the scenario text the assessment carries.\n"
+[inputs.demands.fields.category]
+type = "enum"
+values = ["firewater_deluge", "fire_gas_detection", "passive_fire_protection", "psd", "esd_blowdown", "relief_flare", "structural_firewall", "hipps", "unknown"]
+optional = true
+description = "the safety-system category; **absent is unknown**, which leaves the barrier's own inference.\n"
+[inputs.demands.fields.demand_value]
+unit = "dimensionless"
+optional = true
+description = "the scenario demand; **absent is the class's NaN**.\n"
+[inputs.demands.fields.capacity_value]
+unit = "dimensionless"
+optional = true
+description = "the documented capacity; **absent is the class's NaN**.\n"
+[inputs.demands.fields.demand_unit]
+type = "string"
+optional = true
+description = "the demand's unit label, carried as presentation.\n"
+[inputs.demands.fields.required_pfd]
+unit = "dimensionless"
+optional = true
+description = "the demand's required PFD; **absent is the class's NaN**.\n"
+[inputs.demands.fields.actual_pfd]
+unit = "dimensionless"
+optional = true
+description = "the demand's actual PFD; **absent is the class's NaN**.\n"
+[inputs.demands.fields.required_availability]
+unit = "dimensionless"
+optional = true
+description = "the demand's required availability; **absent is the class's NaN**.\n"
+[inputs.demands.fields.actual_availability]
+unit = "dimensionless"
+optional = true
+description = "the demand's actual availability; **absent is the class's NaN**.\n"
+[inputs.demands.fields.required_response_time_seconds]
+unit = "s"
+optional = true
+description = "the demand's required response time; **absent is the class's NaN**.\n"
+[inputs.demands.fields.actual_response_time_seconds]
+unit = "s"
+optional = true
+description = "the demand's actual response time; **absent is the class's NaN**.\n"
+[inputs.demands.fields.required_effectiveness]
+unit = "dimensionless"
+optional = true
+description = "the demand's required effectiveness; **absent is the class's NaN**.\n"
+[inputs.demands.fields.actual_effectiveness]
+unit = "dimensionless"
+optional = true
+description = "the demand's actual effectiveness; **absent is the class's NaN**.\n"
+[inputs.measurement_devices]
+type = "record_list"
+row_type = "MeasurementDeviceRow"
+optional = true
+description = "the measurement devices, in caller order. **Absent is none.**\n"
+[inputs.measurement_devices.fields.name]
+type = "string"
+description = "the device name, matched against barrier tags.\n"
+[inputs.measurement_devices.fields.kind]
+type = "enum"
+values = ["fire_detector", "gas_detector", "other"]
+description = "the class's whose `instanceof` decides relevance and the response-time source.\n"
+[inputs.measurement_devices.fields.tag]
+type = "string"
+optional = true
+description = "the device tag, the second match key.\n"
+[inputs.measurement_devices.fields.location]
+type = "string"
+optional = true
+description = "the device location, the third match key.\n"
+[inputs.measurement_devices.fields.response_time_seconds]
+unit = "s"
+optional = true
+description = "the response time; **absent is the class's constructor default**, 0 s for a fire detector and 10 s for a gas detector.\n"
+[inputs.event_sifs]
+type = "record_list"
+row_type = "EventSifRow"
+optional = true
+description = "the event and voting SIFs, in caller order. **Absent is none.**\n"
+[inputs.event_sifs.fields.name]
+type = "string"
+description = "the SIF name, the first match key.\n"
+[inputs.event_sifs.fields.voting_notation]
+type = "enum"
+values = ["1oo1", "1oo2", "2oo2", "2oo3", "2oo4", "3oo4"]
+description = "the voting logic, which fixes the required trips and total sensors.\n"
+[inputs.event_sifs.fields.overridden]
+type = "boolean"
+optional = true
+description = "whether the SIF is overridden; **absent is false**.\n"
+[inputs.sif_detectors]
+type = "record_list"
+row_type = "SifDetectorRow"
+optional = true
+description = "the event SIFs' detectors, in caller order. **Absent is none.**\n"
+[inputs.sif_detectors.fields.sif_name]
+type = "string"
+description = "the SIF name; it must name an event SIF row.\n"
+[inputs.sif_detectors.fields.name]
+type = "string"
+description = "the detector name, matched against barrier tags.\n"
+[inputs.sif_detectors.fields.bypassed]
+type = "boolean"
+optional = true
+description = "whether the detector is bypassed; **absent is false**.\n"
+[inputs.sif_detectors.fields.faulty]
+type = "boolean"
+optional = true
+description = "whether the detector is faulty; **absent is false**.\n"
+[inputs.sif_detectors.fields.tripped]
+type = "boolean"
+optional = true
+description = "whether the detector is tripped; **absent is false**.\n"
+[inputs.quantitative_sifs]
+type = "record_list"
+row_type = "QuantitativeSifRow"
+optional = true
+description = "the quantitative SIL/PFD SIFs, in caller order. **Absent is none.**\n"
+[inputs.quantitative_sifs.fields.id]
+type = "string"
+description = "the SIF id, the first match key.\n"
+[inputs.quantitative_sifs.fields.name]
+type = "string"
+optional = true
+description = "the SIF name, the identifier the report carries and a match key.\n"
+[inputs.quantitative_sifs.fields.description]
+type = "string"
+optional = true
+description = "the description, matched against the barrier's safety function.\n"
+[inputs.quantitative_sifs.fields.architecture]
+type = "string"
+description = "the architecture, read by `process.sil_verification`.\n"
+[inputs.quantitative_sifs.fields.claimed_sil]
+unit = "dimensionless"
+description = "the claimed SIL, a whole number in [1, 4].\n"
+[inputs.quantitative_sifs.fields.pfd_average]
+unit = "dimensionless"
+description = "the average PFD.\n"
+[inputs.quantitative_sifs.fields.test_interval_hours]
+unit = "dimensionless"
+optional = true
+description = "the proof-test interval in hours; **absent is the class's 0**.\n"
+[inputs.protected_equipment]
+type = "record_list"
+row_type = "ProtectedEquipmentRow"
+optional = true
+description = "the quantitative SIFs' protected equipment, in caller order. **Absent is none.**\n"
+[inputs.protected_equipment.fields.sif_id]
+type = "string"
+description = "the SIF id; it must name a quantitative SIF row.\n"
+[inputs.protected_equipment.fields.equipment]
+type = "string"
+description = "the protected equipment tag.\n"
+[outputs]
+[outputs.register_id]
+type = "string"
+description = "the register id.\n"
+[outputs.register_name]
+type = "string"
+description = "the register name, empty when absent.\n"
+[outputs.overall_verdict]
+type = "enum"
+values = ["pass", "pass_with_warnings", "fail"]
+description = "the report's verdict: any fail, else any warning, else pass.\n"
+[outputs.assessment_count]
+unit = "dimensionless"
+description = "the number of assessments.\n"
+[outputs.pass_count]
+unit = "dimensionless"
+description = "the number of passing assessments.\n"
+[outputs.warning_count]
+unit = "dimensionless"
+description = "the number of pass-with-warnings assessments.\n"
+[outputs.fail_count]
+unit = "dimensionless"
+description = "the number of failing assessments.\n"
+[outputs.assessments]
+type = "record_list"
+description = "one row per barrier and matching demand, in register order.\n"
+[outputs.assessments.fields.barrier_id]
+type = "string"
+description = "the barrier id.\n"
+[outputs.assessments.fields.barrier_name]
+type = "string"
+description = "the barrier name, empty when absent.\n"
+[outputs.assessments.fields.demand_id]
+type = "string"
+optional = true
+description = "the demand id; absent for a register-only assessment.\n"
+[outputs.assessments.fields.category]
+type = "enum"
+values = ["firewater_deluge", "fire_gas_detection", "passive_fire_protection", "psd", "esd_blowdown", "relief_flare", "structural_firewall", "hipps", "unknown"]
+description = "the inferred safety-system category.\n"
+[outputs.assessments.fields.verdict]
+type = "enum"
+values = ["pass", "pass_with_warnings", "fail"]
+description = "the assessment's verdict.\n"
+[outputs.assessments.fields.barrier_status]
+type = "enum"
+values = ["available", "impaired", "bypassed", "out_of_service", "unknown"]
+description = "the barrier status, echoed.\n"
+[outputs.assessments.fields.barrier_pfd]
+unit = "dimensionless"
+optional = true
+description = "the barrier PFD; absent for the class's NaN.\n"
+[outputs.assessments.fields.barrier_effectiveness]
+unit = "dimensionless"
+optional = true
+description = "the barrier effectiveness; absent for the class's NaN.\n"
+[outputs.assessments.fields.has_traceable_evidence]
+type = "boolean"
+description = "the barrier's evidence flag, echoed.\n"
+[outputs.assessments.fields.performance_standard_id]
+type = "string"
+optional = true
+description = "the linked standard's id; absent when no standard is linked.\n"
+[outputs.assessments.fields.target_pfd]
+unit = "dimensionless"
+optional = true
+description = "the selected target PFD; absent when both sources are NaN.\n"
+[outputs.assessments.fields.actual_pfd]
+unit = "dimensionless"
+optional = true
+description = "the selected actual PFD; absent when both sources are NaN.\n"
+[outputs.assessments.fields.required_availability]
+unit = "dimensionless"
+optional = true
+description = "the selected required availability; absent when both sources are NaN.\n"
+[outputs.assessments.fields.actual_availability]
+unit = "dimensionless"
+optional = true
+description = "the demand's actual availability; absent without a demand or a value.\n"
+[outputs.assessments.fields.required_response_time_seconds]
+unit = "s"
+optional = true
+description = "the selected required response time; absent when both sources are NaN.\n"
+[outputs.assessments.fields.actual_response_time_seconds]
+unit = "s"
+optional = true
+description = "the demand's actual response time; absent without a demand or a value.\n"
+[outputs.assessments.fields.required_effectiveness]
+unit = "dimensionless"
+optional = true
+description = "the demand's required effectiveness; absent without it.\n"
+[outputs.assessments.fields.actual_effectiveness]
+unit = "dimensionless"
+optional = true
+description = "the selected actual effectiveness; absent when both sources are NaN.\n"
+[outputs.assessments.fields.scenario]
+type = "string"
+optional = true
+description = "the demand's scenario; absent without a demand or text.\n"
+[outputs.assessments.fields.demand_value]
+unit = "dimensionless"
+optional = true
+description = "the demand's demand value; absent when NaN.\n"
+[outputs.assessments.fields.capacity_value]
+unit = "dimensionless"
+optional = true
+description = "the demand's capacity value; absent when NaN.\n"
+[outputs.assessments.fields.demand_unit]
+type = "string"
+optional = true
+description = "the demand's unit label; absent without a demand or text.\n"
+[outputs.assessments.fields.capacity_margin]
+unit = "dimensionless"
+optional = true
+description = "`capacity - demand`; absent unless both are finite.\n"
+[outputs.assessments.fields.related_instrument_count]
+unit = "dimensionless"
+description = "the number of related measurement devices.\n"
+[outputs.assessments.fields.max_instrument_response_time_seconds]
+unit = "s"
+optional = true
+description = "the largest related detector response time; absent when none is finite.\n"
+[outputs.assessments.fields.related_sif_count]
+unit = "dimensionless"
+description = "the number of related event SIFs.\n"
+[outputs.assessments.fields.related_quantitative_sif_count]
+unit = "dimensionless"
+description = "the number of related quantitative SIFs.\n"
+[outputs.assessments.fields.finding_count]
+unit = "dimensionless"
+description = "the number of findings the assessment carries.\n"
+[outputs.findings]
+type = "record_list"
+description = "every finding, assessment by assessment in the class's order.\n"
+[outputs.findings.fields.barrier_id]
+type = "string"
+description = "the barrier the finding belongs to.\n"
+[outputs.findings.fields.demand_id]
+type = "string"
+optional = true
+description = "the assessment's demand id; absent for a register-only assessment.\n"
+[outputs.findings.fields.rule]
+type = "enum"
+values = ["barrier_not_available", "barrier_untraceable", "no_performance_standard", "target_pfd_without_actual", "pfd_exceeded", "required_availability_without_actual", "availability_below_required", "required_response_time_without_actual", "response_time_exceeded", "required_effectiveness_without_actual", "effectiveness_below_required", "demand_exceeds_capacity", "no_fire_gas_detector", "detector_response_time_exceeded", "sif_overridden", "sif_detector_count_mismatch", "sif_healthy_channels_insufficient", "sif_channels_impaired", "quantitative_sil_not_achieved", "quantitative_sif_verification_warning", "fire_protection_demand_missing"]
+description = "the stable rule identifier, one per check site.\n"
+[outputs.findings.fields.severity]
+type = "enum"
+values = ["info", "warning", "fail"]
+description = "the finding's severity.\n"
+[outputs.instruments]
+type = "record_list"
+description = "the related measurement devices, assessment by assessment.\n"
+[outputs.instruments.fields.barrier_id]
+type = "string"
+description = "the barrier the device matched.\n"
+[outputs.instruments.fields.demand_id]
+type = "string"
+optional = true
+description = "the assessment's demand id; absent for a register-only assessment.\n"
+[outputs.instruments.fields.tag]
+type = "string"
+description = "the device's tag, or its name when the tag is absent.\n"
+[outputs.sifs]
+type = "record_list"
+description = "the related SIFs, assessment by assessment.\n"
+[outputs.sifs.fields.barrier_id]
+type = "string"
+description = "the barrier the SIF matched.\n"
+[outputs.sifs.fields.demand_id]
+type = "string"
+optional = true
+description = "the assessment's demand id; absent for a register-only assessment.\n"
+[outputs.sifs.fields.identifier]
+type = "string"
+description = "the SIF's name, or the quantitative SIF's first non-empty name or id.\n"
+[outputs.sifs.fields.kind]
+type = "enum"
+values = ["event", "quantitative"]
+description = "which SIF family the row is.\n"
+[outputs.sifs.fields.voting_notation]
+type = "string"
+optional = true
+description = "the event SIF's voting notation.\n"
+[outputs.sifs.fields.detector_count]
+unit = "dimensionless"
+optional = true
+description = "the event SIF's detector count.\n"
+[outputs.sifs.fields.bypassed_detector_count]
+unit = "dimensionless"
+optional = true
+description = "the event SIF's bypassed detector count.\n"
+[outputs.sifs.fields.faulty_detector_count]
+unit = "dimensionless"
+optional = true
+description = "the event SIF's faulty detector count.\n"
+[outputs.sifs.fields.tripped_detector_count]
+unit = "dimensionless"
+optional = true
+description = "the event SIF's tripped detector count.\n"
+[outputs.sifs.fields.claimed_sil]
+unit = "dimensionless"
+optional = true
+description = "the quantitative SIF's claimed SIL.\n"
+[outputs.sifs.fields.achieved_sil]
+unit = "dimensionless"
+optional = true
+description = "the verified achieved SIL.\n"
+[outputs.sifs.fields.sil_achieved]
+type = "boolean"
+optional = true
+description = "whether the achieved SIL meets the claim.\n"
+[outputs.sifs.fields.pfd_average]
+unit = "dimensionless"
+optional = true
+description = "the quantitative SIF's average PFD.\n"
+[outputs.sifs.fields.pfd_upper]
+unit = "dimensionless"
+optional = true
+description = "`1.5 PFD`.\n"
+[outputs.sifs.fields.risk_reduction_factor]
+unit = "dimensionless"
+optional = true
+description = "`1 / PFD`; absent at a zero PFD.\n"
+[outputs.sifs.fields.architecture]
+type = "string"
+optional = true
+description = "the quantitative SIF's architecture.\n"
+[outputs.sifs.fields.proof_test_interval_hours]
+unit = "dimensionless"
+optional = true
+description = "the quantitative SIF's proof-test interval.\n"
+[outputs.sifs.fields.protected_equipment_count]
+unit = "dimensionless"
+optional = true
+description = "the number of protected equipment tags the SIF names.\n"
+[implementations]
+python = "azoth.process.safety_system_performance"
+rust = "azoth_process::safety_system_performance"

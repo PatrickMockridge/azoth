@@ -1,0 +1,124 @@
+model = "process.mass_balance_leak_detection"
+[[cases]]
+id = "no_linepack"
+tolerance = 1.0e-12
+source = "A 10.0 kg/s inlet against 9.8 kg/s, a 0.01 meter fraction and no linepack, at 300 K and 50 bar. From `validation/neqsim/captures/process_mass_balance_leak_detection.tsv` (`leak_no_linepack`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+z = [0.9, 0.1]
+inlet_pressure = 5000000.0
+inlet_temperature = 300.0
+inlet_flow = 10.0
+outlet_flow = 9.8
+linepack_volume = 0.0
+flow_measurement_uncertainty_fraction = 0.01
+detection_window = 60.0
+confidence_multiplier = 3.0
+inlet_stream_name = "inlet"
+outlet_stream_name = "outlet"
+[cases.expected]
+inlet_stream_name = "inlet"
+outlet_stream_name = "outlet"
+inlet_flow = 10.0
+outlet_flow = 9.8
+measured_imbalance = 0.20000000000000462
+flow_uncertainty = 0.4200428549564914
+linepack_uncertainty = 0.0
+combined_uncertainty = 0.4200428549564914
+minimum_detectable_leak_rate = 0.620042854956496
+minimum_detectable_leak_fraction = 0.06200428549564957
+detection_window = 60.0
+confidence_multiplier = 3.0
+[[cases]]
+id = "linepack"
+tolerance = 1.0e-7
+source = "The same meters with a 100 m3 linepack, 0.1 bar and 0.5 K of measurement uncertainty, whose density is the PR flash. The port's bulk density is `6.2e-8` relative below the class's (`39.30385975046646` against `39.30386219986391`), so the case is held at `1e-7`. From (`leak_linepack`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+z = [0.9, 0.1]
+inlet_pressure = 5000000.0
+inlet_temperature = 300.0
+inlet_flow = 10.0
+outlet_flow = 9.8
+linepack_volume = 100.0
+flow_measurement_uncertainty_fraction = 0.01
+pressure_uncertainty = 10000.0
+temperature_uncertainty = 0.5
+detection_window = 60.0
+confidence_multiplier = 3.0
+[cases.expected]
+measured_imbalance = 0.20000000000000462
+flow_uncertainty = 0.4200428549564914
+linepack_uncertainty = 0.5116216283472782
+combined_uncertainty = 0.6619612455368671
+minimum_detectable_leak_rate = 0.8619612455368717
+minimum_detectable_leak_fraction = 0.08619612455368712
+density = 39.30386219986391
+[[cases]]
+id = "supplied_density"
+tolerance = 1.0e-12
+source = "The linepack state with its density supplied instead of flashed; the port's override returns the capture's own density. From (`leak_linepack`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+z = [0.9, 0.1]
+inlet_pressure = 5000000.0
+inlet_temperature = 300.0
+inlet_flow = 10.0
+outlet_flow = 9.8
+inlet_density = 39.30386219986391
+linepack_volume = 100.0
+flow_measurement_uncertainty_fraction = 0.01
+pressure_uncertainty = 10000.0
+temperature_uncertainty = 0.5
+detection_window = 60.0
+confidence_multiplier = 3.0
+[cases.expected]
+linepack_uncertainty = 0.5116216283472782
+combined_uncertainty = 0.6619612455368671
+minimum_detectable_leak_rate = 0.8619612455368717
+density = 39.30386219986391
+[[cases]]
+id = "zero_reference"
+tolerance = 1.0e-12
+source = "Both flows zero: the imbalance and every uncertainty are zero, and the fraction is absent where the class answers NaN. From (`leak_zero_reference`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+z = [0.9, 0.1]
+inlet_pressure = 5000000.0
+inlet_temperature = 300.0
+inlet_flow = 0.0
+outlet_flow = 0.0
+linepack_volume = 0.0
+[cases.expected]
+inlet_flow = 0.0
+outlet_flow = 0.0
+measured_imbalance = 0.0
+flow_uncertainty = 0.0
+linepack_uncertainty = 0.0
+combined_uncertainty = 0.0
+minimum_detectable_leak_rate = 0.0
+[[cases]]
+id = "the_setter_clamps"
+tolerance = 1.0e-12
+source = "Negative volume, fraction, uncertainties and confidence and a zero window: the class clamps each setter, so the window is 1 s and the confidence 0. From (`leak_clamps`)."
+[cases.inputs]
+components = ["methane", "ethane"]
+z = [0.9, 0.1]
+inlet_pressure = 5000000.0
+inlet_temperature = 300.0
+inlet_flow = 10.0
+outlet_flow = 9.8
+linepack_volume = -5.0
+flow_measurement_uncertainty_fraction = -0.1
+pressure_uncertainty = -100000.0
+temperature_uncertainty = -2.0
+detection_window = 0.0
+confidence_multiplier = -1.0
+[cases.expected]
+flow_uncertainty = 0.0
+linepack_uncertainty = 0.0
+combined_uncertainty = 0.0
+minimum_detectable_leak_rate = 0.20000000000000462
+minimum_detectable_leak_fraction = 0.02000000000000045
+detection_window = 1.0
+confidence_multiplier = 0.0

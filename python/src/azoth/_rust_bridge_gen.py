@@ -106,6 +106,9 @@ from azoth.core.result import (
     ElectrolyteScaleCalculatorResult,
     EmulsionType,
     EmulsionViscosityResult,
+    EnvelopePoint,
+    EnvelopeQuery,
+    EnvelopeSummary,
     EosCgPhaseResult,
     EquilibriumConstantResult,
     EquilibriumSoundSpeedResult,
@@ -114,6 +117,8 @@ from azoth.core.result import (
     ErosionRiskLevel,
     EscalationGraphResult,
     EscalationItemResult,
+    EsdContribution,
+    EsdResponseTimeResult,
     EventTreeOutcome,
     EventTreeResult,
     ExpanderResult,
@@ -227,6 +232,7 @@ from azoth.core.result import (
     ManifoldResult,
     MapTurboExpanderResult,
     MasonSaxenaConductivityResult,
+    MassBalanceLeakDetectionResult,
     Matcop5PrumrAlphaResult,
     MatcopAlphaResult,
     MatcopPrAlphaResult,
@@ -251,6 +257,10 @@ from azoth.core.result import (
     NorsokP002ComplianceResult,
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
+    OpenDrainAssessment,
+    OpenDrainResult,
+    OpenDrainReviewResult,
+    OpenDrainVerdict,
     OrificeFlowResult,
     OverallVerdict,
     OverpressureAcceptanceResult,
@@ -264,6 +274,11 @@ from azoth.core.result import (
     ParahydrogenSolidPhaseResult,
     PcsaftRahmatPhaseResult,
     PedersenPlusSplitResult,
+    PerformanceAssessment,
+    PerformanceFinding,
+    PerformanceInstrument,
+    PerformanceSif,
+    PerformanceVerdict,
     PfpDemandResult,
     PhaseTransportResult,
     PhFlashResult,
@@ -350,7 +365,9 @@ from azoth.core.result import (
     S001SecondaryPressureProtectionResult,
     SafeChartItem,
     SafeChartMissingDevice,
+    SafetyEnvelopeResult,
     SafetyInstrumentedFunctionResult,
+    SafetySystemPerformanceResult,
     SaftVrMiePhaseResult,
     SaltPrecipitationResult,
     SaturateWithWaterResult,
@@ -432,6 +449,8 @@ from azoth.core.result import (
     Tr3001ComplianceResult,
     Tr3001Finding,
     TransferBinaryInteractionParametersResult,
+    TrappedInventoryResult,
+    TrappedInventorySegmentResult,
     TrayHydraulicsResult,
     TsFlashResult,
     TubeInsertModelResult,
@@ -595,6 +614,7 @@ __all__ = [
     "equilibrium_sound_speed",
     "erosion_prediction",
     "escalation_graph",
+    "esd_response_time",
     "event_tree",
     "expander",
     "fault_tree",
@@ -679,6 +699,7 @@ __all__ = [
     "manifold",
     "map_turbo_expander_compressor",
     "mason_saxena_conductivity",
+    "mass_balance_leak_detection",
     "matcop5_prumr_alpha",
     "matcop_alpha",
     "matcop_pr_alpha",
@@ -697,6 +718,7 @@ __all__ = [
     "norsok_p002_compliance",
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
+    "open_drain_review",
     "orifice_flow",
     "overpressure_acceptance",
     "overpressure_protection_study",
@@ -776,7 +798,9 @@ __all__ = [
     "runaway_reaction",
     "s001_clause10_review",
     "s001_secondary_pressure_protection",
+    "safety_envelope",
     "safety_instrumented_function",
+    "safety_system_performance",
     "saft_vr_mie_phase",
     "salt_precipitation",
     "saturate_with_water",
@@ -840,6 +864,7 @@ __all__ = [
     "tp_solid_flash",
     "tr3001_compliance",
     "transfer_binary_interaction_parameters",
+    "trapped_inventory",
     "tray_hydraulics",
     "ts_flash",
     "tu_flash",
@@ -6729,6 +6754,28 @@ def escalation_graph(items: list[dict[str, object]], exposures: list[dict[str, o
     )
 
 
+def esd_response_time(sif_tag: str | None=None, contributions: list[dict[str, object]] | None=None, allowable_response_time: float | None=None) -> EsdResponseTimeResult:
+    """``process.esd_response_time``, computed in Rust."""
+    spec = _models_gen.model("process.esd_response_time")
+    result = _core.esd_response_time(
+        sif_tag,
+        None if contributions is None else input_records_to_si(spec, "contributions", contributions),
+        None if allowable_response_time is None else _si(spec, "allowable_response_time", allowable_response_time),
+    )
+    return EsdResponseTimeResult(
+        sif_tag=result.sif_tag,
+        detection_time=from_si(result.detection_time.magnitude_si, result.detection_time.unit),
+        logic_time=from_si(result.logic_time.magnitude_si, result.logic_time.unit),
+        final_element_time=from_si(result.final_element_time.magnitude_si, result.final_element_time.unit),
+        total_response_time=from_si(result.total_response_time.magnitude_si, result.total_response_time.unit),
+        allowable_response_time=None if result.allowable_response_time is None else from_si(result.allowable_response_time.magnitude_si, result.allowable_response_time.unit),
+        margin=None if result.margin is None else from_si(result.margin.magnitude_si, result.margin.unit),
+        within_budget=result.within_budget,
+        contributions=tuple(EsdContribution(name=c.name, stage=c.stage, time=from_si(c.time.magnitude_si, c.time.unit)) for c in result.contributions),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def event_tree(initiating_frequency_per_year: float, branches: list[dict[str, object]]) -> EventTreeResult:
     """``process.event_tree``, computed in Rust."""
     spec = _models_gen.model("process.event_tree")
@@ -7962,6 +8009,45 @@ def map_turbo_expander_compressor(expander_components: list[str], compressor_com
     )
 
 
+def mass_balance_leak_detection(components: list[str], z: list[float], inlet_pressure: float, inlet_temperature: float, inlet_flow: float, outlet_flow: float, eos: str | None=None, inlet_density: float | None=None, linepack_volume: float | None=None, flow_measurement_uncertainty_fraction: float | None=None, pressure_uncertainty: float | None=None, temperature_uncertainty: float | None=None, detection_window: float | None=None, confidence_multiplier: float | None=None, inlet_stream_name: str | None=None, outlet_stream_name: str | None=None) -> MassBalanceLeakDetectionResult:
+    """``process.mass_balance_leak_detection``, computed in Rust."""
+    spec = _models_gen.model("process.mass_balance_leak_detection")
+    result = _core.mass_balance_leak_detection(
+        list(components),
+        list(z),
+        _si(spec, "inlet_pressure", inlet_pressure),
+        _si(spec, "inlet_temperature", inlet_temperature),
+        _si(spec, "inlet_flow", inlet_flow),
+        _si(spec, "outlet_flow", outlet_flow),
+        eos,
+        None if inlet_density is None else _si(spec, "inlet_density", inlet_density),
+        None if linepack_volume is None else _si(spec, "linepack_volume", linepack_volume),
+        None if flow_measurement_uncertainty_fraction is None else flow_measurement_uncertainty_fraction,
+        None if pressure_uncertainty is None else _si(spec, "pressure_uncertainty", pressure_uncertainty),
+        None if temperature_uncertainty is None else _si(spec, "temperature_uncertainty", temperature_uncertainty),
+        None if detection_window is None else _si(spec, "detection_window", detection_window),
+        None if confidence_multiplier is None else confidence_multiplier,
+        inlet_stream_name,
+        outlet_stream_name,
+    )
+    return MassBalanceLeakDetectionResult(
+        inlet_stream_name=result.inlet_stream_name,
+        outlet_stream_name=result.outlet_stream_name,
+        inlet_flow=from_si(result.inlet_flow.magnitude_si, result.inlet_flow.unit),
+        outlet_flow=from_si(result.outlet_flow.magnitude_si, result.outlet_flow.unit),
+        measured_imbalance=from_si(result.measured_imbalance.magnitude_si, result.measured_imbalance.unit),
+        flow_uncertainty=from_si(result.flow_uncertainty.magnitude_si, result.flow_uncertainty.unit),
+        linepack_uncertainty=from_si(result.linepack_uncertainty.magnitude_si, result.linepack_uncertainty.unit),
+        combined_uncertainty=from_si(result.combined_uncertainty.magnitude_si, result.combined_uncertainty.unit),
+        minimum_detectable_leak_rate=from_si(result.minimum_detectable_leak_rate.magnitude_si, result.minimum_detectable_leak_rate.unit),
+        minimum_detectable_leak_fraction=result.minimum_detectable_leak_fraction,
+        density=None if result.density is None else from_si(result.density.magnitude_si, result.density.unit),
+        detection_window=from_si(result.detection_window.magnitude_si, result.detection_window.unit),
+        confidence_multiplier=result.confidence_multiplier,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def mdmt(material_curve: str, governing_thickness: Q, min_operating_temperature: Q, stress_ratio: float | None=None) -> MdmtResult:
     """``process.mdmt``, computed in Rust."""
     spec = _models_gen.model("process.mdmt")
@@ -8096,6 +8182,31 @@ def norsok_p002_compliance(checks: list[dict[str, object]]) -> NorsokP002Complia
         findings=tuple(P002FindingResult(name=c.name, criterion=c.criterion, compliant=c.compliant) for c in result.findings),
         compliant=result.compliant,
         non_compliant_count=result.non_compliant_count,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def open_drain_review(project_name: str | None=None, default_liquid_leak_rate: float | None=None, items: list[dict[str, object]] | None=None, evidence: list[dict[str, object]] | None=None, design_standards: list[dict[str, object]] | None=None, references: list[dict[str, object]] | None=None) -> OpenDrainReviewResult:
+    """``process.open_drain_review``, computed in Rust."""
+    spec = _models_gen.model("process.open_drain_review")
+    result = _core.open_drain_review(
+        project_name,
+        None if default_liquid_leak_rate is None else _si(spec, "default_liquid_leak_rate", default_liquid_leak_rate),
+        None if items is None else input_records_to_si(spec, "items", items),
+        None if evidence is None else input_records_to_si(spec, "evidence", evidence),
+        None if design_standards is None else input_records_to_si(spec, "design_standards", design_standards),
+        None if references is None else input_records_to_si(spec, "references", references),
+    )
+    return OpenDrainReviewResult(
+        overall_verdict=OpenDrainVerdict(result.overall_verdict),
+        item_count=result.item_count,
+        failed_item_count=result.failed_item_count,
+        warning_item_count=result.warning_item_count,
+        assessment_count=result.assessment_count,
+        fail_assessment_count=result.fail_assessment_count,
+        warning_assessment_count=result.warning_assessment_count,
+        results=tuple(OpenDrainResult(area_id=c.area_id, verdict=c.verdict, confidence=c.confidence) for c in result.results),
+        assessments=tuple(OpenDrainAssessment(area_id=c.area_id, requirement_id=c.requirement_id, clause=c.clause, status=c.status, severity=c.severity) for c in result.assessments),
         warnings=_warnings(result.warnings),
     )
 
@@ -9090,6 +9201,35 @@ def s001_secondary_pressure_protection(maximum_event_pressure: float | None=None
     )
 
 
+def safety_envelope(components: list[str], z: list[float], min_pressure: float, max_pressure: float, num_points: int, eos: str | None=None, hydrate_margin: float | None=None, wax_margin: float | None=None, co2_margin: float | None=None, mdmt_margin: float | None=None, mdmt_design_temperature: float | None=None, operating_pressure: float | None=None, operating_temperature: float | None=None, phase_trace: list[dict[str, object]] | None=None) -> SafetyEnvelopeResult:
+    """``process.safety_envelope``, computed in Rust."""
+    spec = _models_gen.model("process.safety_envelope")
+    result = _core.safety_envelope(
+        list(components),
+        list(z),
+        _si(spec, "min_pressure", min_pressure),
+        _si(spec, "max_pressure", max_pressure),
+        num_points,
+        eos,
+        None if hydrate_margin is None else _si(spec, "hydrate_margin", hydrate_margin),
+        None if wax_margin is None else _si(spec, "wax_margin", wax_margin),
+        None if co2_margin is None else _si(spec, "co2_margin", co2_margin),
+        None if mdmt_margin is None else _si(spec, "mdmt_margin", mdmt_margin),
+        None if mdmt_design_temperature is None else _si(spec, "mdmt_design_temperature", mdmt_design_temperature),
+        None if operating_pressure is None else _si(spec, "operating_pressure", operating_pressure),
+        None if operating_temperature is None else _si(spec, "operating_temperature", operating_temperature),
+        None if phase_trace is None else input_records_to_si(spec, "phase_trace", phase_trace),
+    )
+    return SafetyEnvelopeResult(
+        envelopes=tuple(EnvelopeSummary(envelope=c.envelope, name=c.name, point_count=c.point_count, reference_water_content=c.reference_water_content, reference_wax_content=c.reference_wax_content) for c in result.envelopes),
+        points=tuple(EnvelopePoint(envelope=c.envelope, index=c.index, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=None if c.temperature is None else from_si(c.temperature.magnitude_si, c.temperature.unit), margin=from_si(c.margin.magnitude_si, c.margin.unit), safe_temperature=None if c.safe_temperature is None else from_si(c.safe_temperature.magnitude_si, c.safe_temperature.unit)) for c in result.points),
+        queries=tuple(EnvelopeQuery(envelope=c.envelope, temperature=None if c.temperature is None else from_si(c.temperature.magnitude_si, c.temperature.unit), safe_temperature=None if c.safe_temperature is None else from_si(c.safe_temperature.magnitude_si, c.safe_temperature.unit), margin=None if c.margin is None else from_si(c.margin.magnitude_si, c.margin.unit), safe=c.safe) for c in result.queries),
+        all_safe=result.all_safe,
+        most_limiting_envelope=result.most_limiting_envelope,
+        warnings=_warnings(result.warnings),
+    )
+
+
 def safety_instrumented_function(pfd_average: float, claimed_sil: float, unmitigated_frequency_per_year: float, target_frequency_per_year: float, test_interval_hours: float, lambda_du_per_hour: float | None=None, spurious_trip_rate_per_year: float | None=None, mttr_hours: float | None=None, base_availability: float | None=None) -> SafetyInstrumentedFunctionResult:
     """``process.safety_instrumented_function``, computed in Rust."""
     result = _core.safety_instrumented_function(
@@ -9115,6 +9255,41 @@ def safety_instrumented_function(pfd_average: float, claimed_sil: float, unmitig
         pfd_1oo2=result.pfd_1oo2,
         pfd_2oo3=result.pfd_2oo3,
         availability_with_spurious_trips=result.availability_with_spurious_trips,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def safety_system_performance(register_id: str, register_name: str | None=None, elements: list[dict[str, object]] | None=None, links: list[dict[str, object]] | None=None, barriers: list[dict[str, object]] | None=None, barrier_tags: list[dict[str, object]] | None=None, standards: list[dict[str, object]] | None=None, standard_criteria: list[dict[str, object]] | None=None, demands: list[dict[str, object]] | None=None, measurement_devices: list[dict[str, object]] | None=None, event_sifs: list[dict[str, object]] | None=None, sif_detectors: list[dict[str, object]] | None=None, quantitative_sifs: list[dict[str, object]] | None=None, protected_equipment: list[dict[str, object]] | None=None) -> SafetySystemPerformanceResult:
+    """``process.safety_system_performance``, computed in Rust."""
+    spec = _models_gen.model("process.safety_system_performance")
+    result = _core.safety_system_performance(
+        register_id,
+        register_name,
+        None if elements is None else input_records_to_si(spec, "elements", elements),
+        None if links is None else input_records_to_si(spec, "links", links),
+        None if barriers is None else input_records_to_si(spec, "barriers", barriers),
+        None if barrier_tags is None else input_records_to_si(spec, "barrier_tags", barrier_tags),
+        None if standards is None else input_records_to_si(spec, "standards", standards),
+        None if standard_criteria is None else input_records_to_si(spec, "standard_criteria", standard_criteria),
+        None if demands is None else input_records_to_si(spec, "demands", demands),
+        None if measurement_devices is None else input_records_to_si(spec, "measurement_devices", measurement_devices),
+        None if event_sifs is None else input_records_to_si(spec, "event_sifs", event_sifs),
+        None if sif_detectors is None else input_records_to_si(spec, "sif_detectors", sif_detectors),
+        None if quantitative_sifs is None else input_records_to_si(spec, "quantitative_sifs", quantitative_sifs),
+        None if protected_equipment is None else input_records_to_si(spec, "protected_equipment", protected_equipment),
+    )
+    return SafetySystemPerformanceResult(
+        register_id=result.register_id,
+        register_name=result.register_name,
+        overall_verdict=PerformanceVerdict(result.overall_verdict),
+        assessment_count=result.assessment_count,
+        pass_count=result.pass_count,
+        warning_count=result.warning_count,
+        fail_count=result.fail_count,
+        assessments=tuple(PerformanceAssessment(barrier_id=c.barrier_id, barrier_name=c.barrier_name, demand_id=c.demand_id, category=c.category, verdict=c.verdict, barrier_status=c.barrier_status, barrier_pfd=c.barrier_pfd, barrier_effectiveness=c.barrier_effectiveness, has_traceable_evidence=c.has_traceable_evidence, performance_standard_id=c.performance_standard_id, target_pfd=c.target_pfd, actual_pfd=c.actual_pfd, required_availability=c.required_availability, actual_availability=c.actual_availability, required_response_time_seconds=None if c.required_response_time_seconds is None else from_si(c.required_response_time_seconds.magnitude_si, c.required_response_time_seconds.unit), actual_response_time_seconds=None if c.actual_response_time_seconds is None else from_si(c.actual_response_time_seconds.magnitude_si, c.actual_response_time_seconds.unit), required_effectiveness=c.required_effectiveness, actual_effectiveness=c.actual_effectiveness, scenario=c.scenario, demand_value=c.demand_value, capacity_value=c.capacity_value, demand_unit=c.demand_unit, capacity_margin=c.capacity_margin, related_instrument_count=c.related_instrument_count, max_instrument_response_time_seconds=None if c.max_instrument_response_time_seconds is None else from_si(c.max_instrument_response_time_seconds.magnitude_si, c.max_instrument_response_time_seconds.unit), related_sif_count=c.related_sif_count, related_quantitative_sif_count=c.related_quantitative_sif_count, finding_count=c.finding_count) for c in result.assessments),
+        findings=tuple(PerformanceFinding(barrier_id=c.barrier_id, demand_id=c.demand_id, rule=c.rule, severity=c.severity) for c in result.findings),
+        instruments=tuple(PerformanceInstrument(barrier_id=c.barrier_id, demand_id=c.demand_id, tag=c.tag) for c in result.instruments),
+        sifs=tuple(PerformanceSif(barrier_id=c.barrier_id, demand_id=c.demand_id, identifier=c.identifier, kind=c.kind, voting_notation=c.voting_notation, detector_count=c.detector_count, bypassed_detector_count=c.bypassed_detector_count, faulty_detector_count=c.faulty_detector_count, tripped_detector_count=c.tripped_detector_count, claimed_sil=c.claimed_sil, achieved_sil=c.achieved_sil, sil_achieved=c.sil_achieved, pfd_average=c.pfd_average, pfd_upper=c.pfd_upper, risk_reduction_factor=c.risk_reduction_factor, architecture=c.architecture, proof_test_interval_hours=c.proof_test_interval_hours, protected_equipment_count=c.protected_equipment_count) for c in result.sifs),
         warnings=_warnings(result.warnings),
     )
 
@@ -9830,6 +10005,34 @@ def tr3001_compliance(scenarios: list[dict[str, object]], capacity_adequate: boo
         review_count=result.review_count,
         fail_count=result.fail_count,
         compliant=result.compliant,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def trapped_inventory(components: list[str], z: list[float], pressure: float, temperature: float, segments: list[dict[str, object]], eos: str | None=None, multiphase_check: bool | None=None, fallback_liquid_density: float | None=None, segment_evidence: list[dict[str, object]] | None=None) -> TrappedInventoryResult:
+    """``process.trapped_inventory``, computed in Rust."""
+    spec = _models_gen.model("process.trapped_inventory")
+    result = _core.trapped_inventory(
+        list(components),
+        list(z),
+        _si(spec, "pressure", pressure),
+        _si(spec, "temperature", temperature),
+        input_records_to_si(spec, "segments", segments),
+        eos,
+        multiphase_check,
+        None if fallback_liquid_density is None else _si(spec, "fallback_liquid_density", fallback_liquid_density),
+        None if segment_evidence is None else input_records_to_si(spec, "segment_evidence", segment_evidence),
+    )
+    return TrappedInventoryResult(
+        gas_density=from_si(result.gas_density.magnitude_si, result.gas_density.unit),
+        liquid_density=from_si(result.liquid_density.magnitude_si, result.liquid_density.unit),
+        total_volume=from_si(result.total_volume.magnitude_si, result.total_volume.unit),
+        total_gas_volume=from_si(result.total_gas_volume.magnitude_si, result.total_gas_volume.unit),
+        total_liquid_volume=from_si(result.total_liquid_volume.magnitude_si, result.total_liquid_volume.unit),
+        total_gas_mass=from_si(result.total_gas_mass.magnitude_si, result.total_gas_mass.unit),
+        total_liquid_mass=from_si(result.total_liquid_mass.magnitude_si, result.total_liquid_mass.unit),
+        total_mass=from_si(result.total_mass.magnitude_si, result.total_mass.unit),
+        segments=tuple(TrappedInventorySegmentResult(segment_id=c.segment_id, kind=c.kind, total_volume=from_si(c.total_volume.magnitude_si, c.total_volume.unit), gas_volume=from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), liquid_volume=from_si(c.liquid_volume.magnitude_si, c.liquid_volume.unit), gas_mass=from_si(c.gas_mass.magnitude_si, c.gas_mass.unit), liquid_mass=from_si(c.liquid_mass.magnitude_si, c.liquid_mass.unit), total_mass=from_si(c.total_mass.magnitude_si, c.total_mass.unit), gas_density=from_si(c.gas_density.magnitude_si, c.gas_density.unit), liquid_density=from_si(c.liquid_density.magnitude_si, c.liquid_density.unit), liquid_fill_fraction=c.liquid_fill_fraction, internal_diameter=None if c.internal_diameter is None else from_si(c.internal_diameter.magnitude_si, c.internal_diameter.unit), length=None if c.length is None else from_si(c.length.magnitude_si, c.length.unit)) for c in result.segments),
         warnings=_warnings(result.warnings),
     )
 

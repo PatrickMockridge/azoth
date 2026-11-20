@@ -60,17 +60,22 @@ pub mod drift_flux_release;
 pub mod dynamic_psv_sizing;
 pub mod ejector;
 pub mod escalation_graph;
+pub mod esd_response_time;
 pub mod event_tree;
 pub mod expander;
 pub mod fault_tree;
 pub mod filter;
 pub mod finite_rate_release;
 pub mod fire_case_relief;
+#[allow(dead_code)] // until the id slices consume the module
+pub(crate) mod fire_exposure;
 pub mod fire_monitor_coverage;
 pub mod fire_water_coverage_assessment;
 pub mod fire_water_demand;
 pub mod flare;
 pub mod flow_induced_pulsation_screening;
+#[allow(dead_code)] // until the id slices consume the module
+pub(crate) mod fluid_state;
 pub mod fmea_worksheet;
 pub mod gas_blowby;
 pub mod gas_dispersion;
@@ -95,12 +100,16 @@ pub mod lopa;
 pub mod mah_bow_tie_skeleton;
 pub mod manifold;
 pub mod map_turbo_expander_compressor;
+pub mod mass_balance_leak_detection;
+#[allow(dead_code)] // the flange ratings wait for the fire-rupture id
+pub(crate) mod material_strength;
 pub mod mdmt;
 pub mod mixer;
 pub mod multi_vessel_blowdown_study;
 pub mod nog070_sil_determination;
 pub mod non_equilibrium_blowdown;
 pub mod norsok_p002_compliance;
+pub mod open_drain_review;
 pub mod overpressure;
 pub mod overpressure_acceptance;
 pub mod overpressure_protection_study;
@@ -127,12 +136,16 @@ pub mod rate_based_packed_column;
 pub mod real_gas_fanno_release;
 pub(crate) mod release;
 pub mod relief_disposal_network;
+#[allow(dead_code)] // until the id slices consume the module
+pub(crate) mod review_evidence;
 pub mod risk_matrix;
 pub mod runaway_reaction;
 pub mod s001_clause10_review;
 pub mod s001_secondary_pressure_protection;
+pub mod safety_envelope;
 pub mod safety_instrumented_function;
 pub mod safety_review;
+pub mod safety_system_performance;
 pub mod self_heating_induction;
 pub mod selfheating;
 pub mod semenov_self_heating;
@@ -151,6 +164,10 @@ pub mod three_phase_separator;
 pub mod throttling_valve;
 pub mod toxic_library;
 pub mod tr3001_compliance;
+#[allow(dead_code)] // until the id slices consume the module
+pub(crate) mod transient_wall;
+pub mod trapped_inventory;
+pub mod trapped_liquid_fire_rupture;
 pub mod tube_rupture_relief;
 pub mod turbo_expander_compressor;
 pub mod vacuum_collapse;
@@ -158,6 +175,8 @@ pub mod vce;
 pub mod vessel_filling;
 pub mod vessel_rupture;
 pub(crate) mod vu_flash_route;
+#[allow(dead_code)] // until the id slices consume the module
+pub(crate) mod wax_appearance;
 
 pub use absorption_column::{AbsorptionColumnResult, absorption_column};
 pub use acoustic_induced_vibration_screening::{
@@ -225,6 +244,7 @@ pub use escalation_graph::{
     EscalationExposure, EscalationGraphResult, EscalationItem, EscalationItemResult,
     escalation_graph,
 };
+pub use esd_response_time::{EsdContribution, EsdResponseTimeResult, EsdStage, esd_response_time};
 pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_tree};
 pub use expander::{ExpanderResult, expander};
 pub use fault_tree::{FaultTreeNodeSpec, FaultTreeResult, MinimalCutSet, fault_tree};
@@ -273,6 +293,9 @@ pub use mah_bow_tie_skeleton::{
 };
 pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};
+pub use mass_balance_leak_detection::{
+    MassBalanceLeakDetectionResult, mass_balance_leak_detection,
+};
 pub use mdmt::{MdmtResult, mdmt};
 pub use mixer::{MixerResult, mixer};
 pub use multi_vessel_blowdown_study::{
@@ -286,6 +309,11 @@ pub use non_equilibrium_blowdown::{
 pub use norsok_p002_compliance::{
     NorsokP002ComplianceResult, P002CheckRow, P002Criterion, P002FindingResult,
     norsok_p002_compliance,
+};
+pub use open_drain_review::{
+    OpenDrainAssessment, OpenDrainEvidence, OpenDrainItem, OpenDrainReference, OpenDrainResult,
+    OpenDrainReviewResult, OpenDrainSeverity, OpenDrainStandard, OpenDrainStatus, OpenDrainVerdict,
+    open_drain_review,
 };
 pub use overpressure_acceptance::{OverpressureAcceptanceResult, overpressure_acceptance};
 pub use overpressure_protection_study::{
@@ -334,10 +362,23 @@ pub use s001_clause10_review::{
 pub use s001_secondary_pressure_protection::{
     S001SecondaryPressureProtectionResult, s001_secondary_pressure_protection,
 };
+pub use safety_envelope::{
+    EnvelopeKind, EnvelopePoint, EnvelopeQuery, EnvelopeSummary, EnvelopeTracePoint,
+    SafetyEnvelopeResult, safety_envelope,
+};
 pub use safety_instrumented_function::{
     SafetyInstrumentedFunctionResult, safety_instrumented_function,
 };
 pub use safety_review::{Api14cCategory, Api14cDevice};
+pub use safety_system_performance::{
+    BarrierEquipmentTag, DeviceKind, ElementKind, EventSifRow, MeasurementDeviceRow,
+    PerformanceAssessment, PerformanceBarrier, PerformanceBarrierStatus, PerformanceCategory,
+    PerformanceElement, PerformanceFinding, PerformanceFindingSeverity, PerformanceInstrument,
+    PerformanceRule, PerformanceSif, PerformanceSifKind, PerformanceVerdict, ProtectedEquipmentRow,
+    QuantitativeSifRow, SafetyPerformanceStandard, SafetySystemDemandRow, SafetySystemLink,
+    SafetySystemPerformanceResult, SifDetectorRow, StandardCriterion, VotingNotation,
+    safety_system_performance,
+};
 pub use self_heating_induction::{
     SelfHeatingInductionResult, SelfHeatingTimePoint, self_heating_induction,
 };
@@ -372,6 +413,14 @@ pub use toxic_library::{ToxicLibraryResult, toxic_library};
 pub use tr3001_compliance::{
     Tr3001Check, Tr3001ComplianceResult, Tr3001Finding, Tr3001Scenario, Tr3001Status,
     tr3001_compliance,
+};
+pub use trapped_inventory::{
+    SegmentKind, TrappedInventoryEvidence, TrappedInventoryResult, TrappedInventorySegment,
+    TrappedInventorySegmentResult, trapped_inventory,
+};
+pub use trapped_liquid_fire_rupture::{
+    FailureMode, FireKind, RupturePoint, TrappedLiquidFireRuptureResult,
+    trapped_liquid_fire_rupture,
 };
 pub use tube_rupture_relief::{TubeRuptureReliefResult, tube_rupture_relief};
 pub use turbo_expander_compressor::{TurboExpanderResult, turbo_expander_compressor};

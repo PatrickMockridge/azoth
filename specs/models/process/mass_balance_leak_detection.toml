@@ -1,0 +1,153 @@
+id = "process.mass_balance_leak_detection"
+name = "Mass-balance leak sensitivity"
+kind = "procedure"
+assumptions = [
+    "**the measured imbalance is inlet minus outlet**, and the reference flow is the larger of their absolute values.",
+    "**the flow uncertainty is `confidence sqrt((inlet f)^2 + (outlet f)^2)`**, with `f` the relative meter fraction.",
+    "**the linepack uncertainty is `confidence rho V sqrt((dP/P)^2 + (dT/T)^2) / window`**, with the inlet's bulk density.",
+    "**the minimum detectable rate is `|imbalance| + combined`**, and the fraction is absent when the reference flow is zero.",
+    "**the class clamps volume, fraction and the uncertainties at zero and the window at one**; the port carries the clamps.",
+    "**a linepack density failure is a warning and a zero linepack uncertainty**, as the class's own catch returns.",
+    "**a supplied `inlet_density` supersedes the flash**; the class reads the inlet stream's bulk density, and the port's flash is `6.2e-8` relative below it on the captured state.",
+    "**the stream names are echoed when stated**, and the class's `toMap`/`toJson` adapters are presentation.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/leakdetection/MassBalanceLeakDetector.java` is the port source.",
+    "`validation/neqsim/captures/process_mass_balance_leak_detection.tsv` - no linepack, a linepack state with a density, a mismatched density, a zero reference flow and the setter clamps.",
+]
+[source]
+standard = "NeqSim process/safety/leakdetection/MassBalanceLeakDetector.java"
+edition = "Its `calculateSensitivity` and `calculateLinepackUncertaintyKgPerS`, with the setters' clamps."
+[algorithm]
+scheme = "mass_balance_leak_sensitivity"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.components]
+type = "components"
+description = "the inlet fluid's substances, by name, resolved against the component databank.\n"
+[inputs.z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the inlet fluid's overall mole fractions, checked rather than renormalised.\n"
+[inputs.inlet_pressure]
+unit = "Pa"
+description = "the inlet stream's absolute pressure.\n"
+[inputs.inlet_temperature]
+unit = "K"
+description = "the inlet stream's temperature.\n"
+[inputs.inlet_flow]
+unit = "kg/s"
+description = "the measured inlet mass flow.\n"
+[inputs.outlet_flow]
+unit = "kg/s"
+description = "the measured outlet mass flow.\n"
+[inputs.eos]
+type = "enum"
+values = ["pr", "srk"]
+optional = true
+description = "the cubic the inlet fluid runs. **Absent is `pr`.**\n"
+[inputs.inlet_density]
+unit = "kg/m**3"
+optional = true
+description = "the inlet fluid's bulk density. **Absent is a TP flash at the inlet state.**\n"
+[inputs.linepack_volume]
+unit = "m**3"
+optional = true
+description = "the linepack volume in the uncertainty. **Absent is zero**, and a negative value is clamped to zero.\n"
+[inputs.flow_measurement_uncertainty_fraction]
+unit = "dimensionless"
+optional = true
+description = "the relative meter uncertainty, at least zero. **Absent is `0.01`.**\n"
+[inputs.pressure_uncertainty]
+unit = "Pa"
+optional = true
+description = "the inlet pressure measurement uncertainty, at least zero. **Absent is zero.**\n"
+[inputs.temperature_uncertainty]
+unit = "K"
+interval = true
+optional = true
+description = "the inlet temperature measurement uncertainty, at least zero. **Absent is zero.**\n"
+[inputs.detection_window]
+unit = "s"
+optional = true
+description = "the persistence or averaging window. **Absent is `60`, and a value below one is clamped to one.**\n"
+[inputs.confidence_multiplier]
+unit = "dimensionless"
+optional = true
+description = "the statistical confidence multiplier, at least zero. **Absent is `3`.**\n"
+[inputs.inlet_stream_name]
+type = "string"
+optional = true
+description = "the inlet stream's name, echoed.\n"
+[inputs.outlet_stream_name]
+type = "string"
+optional = true
+description = "the outlet stream's name, echoed.\n"
+[outputs]
+[outputs.inlet_stream_name]
+type = "string"
+optional = true
+description = "the echoed inlet stream name.\n"
+[outputs.outlet_stream_name]
+type = "string"
+optional = true
+description = "the echoed outlet stream name.\n"
+[outputs.inlet_flow]
+unit = "kg/s"
+description = "the measured inlet mass flow.\n"
+[outputs.outlet_flow]
+unit = "kg/s"
+description = "the measured outlet mass flow.\n"
+[outputs.measured_imbalance]
+unit = "kg/s"
+description = "`inlet_flow - outlet_flow`.\n"
+[outputs.flow_uncertainty]
+unit = "kg/s"
+description = "the two meters' combined uncertainty at the confidence multiplier.\n"
+[outputs.linepack_uncertainty]
+unit = "kg/s"
+description = "the linepack's pressure and temperature uncertainty as an equivalent leak rate.\n"
+[outputs.combined_uncertainty]
+unit = "kg/s"
+description = "`sqrt(flow_uncertainty^2 + linepack_uncertainty^2)`.\n"
+[outputs.minimum_detectable_leak_rate]
+unit = "kg/s"
+description = "`|measured_imbalance| + combined_uncertainty`.\n"
+[outputs.minimum_detectable_leak_fraction]
+unit = "dimensionless"
+optional = true
+description = "the rate over the larger absolute flow; absent when that flow is zero.\n"
+[outputs.density]
+unit = "kg/m**3"
+optional = true
+description = "the bulk density the linepack term used; absent when no linepack is stated.\n"
+[outputs.detection_window]
+unit = "s"
+description = "the clamped averaging window.\n"
+[outputs.confidence_multiplier]
+unit = "dimensionless"
+description = "the clamped confidence multiplier.\n"
+[[valid_range]]
+quantity = "inlet_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "inlet_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "inlet_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a density is positive"
+[implementations]
+python = "azoth.process.mass_balance_leak_detection"
+rust = "azoth_process::mass_balance_leak_detection"

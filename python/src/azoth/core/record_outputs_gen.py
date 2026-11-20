@@ -346,6 +346,69 @@ class DriftFluxReleaseStation:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class EnvelopePoint:
+    """every arm's points, arm by arm in the class's order."""
+
+    #: the arm the point belongs to.
+    envelope: str
+
+    #: the point's index within its arm.
+    index: float
+
+    #: the point's pressure.
+    pressure: Q
+
+    #: the point's limit temperature; absent when the arm's flash failed.
+    temperature: Q | None
+
+    #: the point's margin.
+    margin: Q
+
+    #: the limit less the margin, absent with the temperature.
+    safe_temperature: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EnvelopeQuery:
+    """one row per arm when an operating point is stated, in the class's order."""
+
+    #: the arm.
+    envelope: str
+
+    #: the interpolated limit at the operating pressure; absent outside the arm.
+    temperature: Q | None
+
+    #: the limit less the interpolated margin.
+    safe_temperature: Q | None
+
+    #: `operating_temperature - limit`; absent outside the arm.
+    margin: Q | None
+
+    #: the class's strict `operating_temperature > safe_temperature`; the phase envelope is always safe.
+    safe: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EnvelopeSummary:
+    """one summary row per arm, in the class's order."""
+
+    #: the arm.
+    envelope: str
+
+    #: the class's envelope name.
+    name: str
+
+    #: the points the arm carries.
+    point_count: float
+
+    #: the feed's water mole fraction, 0 when absent.
+    reference_water_content: float
+
+    #: the class's reference wax content, which it never sets and which is 0.
+    reference_wax_content: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class EquilibriumSoundSpeedSample:
     """the accepted stencil's states, centre first."""
 
@@ -374,6 +437,20 @@ class EscalationItemResult:
 
     #: the failed item's identifier.
     item_id: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EsdContribution:
+    """the contributions echoed in caller order."""
+
+    #: the contribution's name.
+    name: str
+
+    #: the contribution's stage.
+    stage: str
+
+    #: the contribution's time.
+    time: Q
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -1164,6 +1241,40 @@ class NonEquilibriumBlowdownPoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class OpenDrainAssessment:
+    """every assessment, item by item."""
+
+    #: the item the assessment belongs to.
+    area_id: str
+
+    #: the stable requirement identifier, e.g. `OD-S001-9.4.1-CAPACITY`.
+    requirement_id: str
+
+    #: the clause, e.g. `9.4.1`, or the class's literal `Operational evidence` label.
+    clause: str
+
+    #: the assessment's status.
+    status: str
+
+    #: the class's severity band; a pass, info or not-applicable row is low.
+    severity: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class OpenDrainResult:
+    """one row per item, in caller order."""
+
+    #: the item's area id.
+    area_id: str
+
+    #: the item's verdict.
+    verdict: str
+
+    #: the item's evidence confidence.
+    confidence: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class P002FindingResult:
     """one row per check, in the caller's order."""
 
@@ -1175,6 +1286,185 @@ class P002FindingResult:
 
     #: whether the value is at or below the limit, or the caller's flag for a recorded check.
     compliant: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PerformanceAssessment:
+    """one row per barrier and matching demand, in register order."""
+
+    #: the barrier id.
+    barrier_id: str
+
+    #: the barrier name, empty when absent.
+    barrier_name: str
+
+    #: the demand id; absent for a register-only assessment.
+    demand_id: str | None
+
+    #: the inferred safety-system category.
+    category: str
+
+    #: the assessment's verdict.
+    verdict: str
+
+    #: the barrier status, echoed.
+    barrier_status: str
+
+    #: the barrier PFD; absent for the class's NaN.
+    barrier_pfd: float | None
+
+    #: the barrier effectiveness; absent for the class's NaN.
+    barrier_effectiveness: float | None
+
+    #: the barrier's evidence flag, echoed.
+    has_traceable_evidence: bool
+
+    #: the linked standard's id; absent when no standard is linked.
+    performance_standard_id: str | None
+
+    #: the selected target PFD; absent when both sources are NaN.
+    target_pfd: float | None
+
+    #: the selected actual PFD; absent when both sources are NaN.
+    actual_pfd: float | None
+
+    #: the selected required availability; absent when both sources are NaN.
+    required_availability: float | None
+
+    #: the demand's actual availability; absent without a demand or a value.
+    actual_availability: float | None
+
+    #: the selected required response time; absent when both sources are NaN.
+    required_response_time_seconds: Q | None
+
+    #: the demand's actual response time; absent without a demand or a value.
+    actual_response_time_seconds: Q | None
+
+    #: the demand's required effectiveness; absent without it.
+    required_effectiveness: float | None
+
+    #: the selected actual effectiveness; absent when both sources are NaN.
+    actual_effectiveness: float | None
+
+    #: the demand's scenario; absent without a demand or text.
+    scenario: str | None
+
+    #: the demand's demand value; absent when NaN.
+    demand_value: float | None
+
+    #: the demand's capacity value; absent when NaN.
+    capacity_value: float | None
+
+    #: the demand's unit label; absent without a demand or text.
+    demand_unit: str | None
+
+    #: `capacity - demand`; absent unless both are finite.
+    capacity_margin: float | None
+
+    #: the number of related measurement devices.
+    related_instrument_count: float
+
+    #: the largest related detector response time; absent when none is finite.
+    max_instrument_response_time_seconds: Q | None
+
+    #: the number of related event SIFs.
+    related_sif_count: float
+
+    #: the number of related quantitative SIFs.
+    related_quantitative_sif_count: float
+
+    #: the number of findings the assessment carries.
+    finding_count: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PerformanceFinding:
+    """every finding, assessment by assessment in the class's order."""
+
+    #: the barrier the finding belongs to.
+    barrier_id: str
+
+    #: the assessment's demand id; absent for a register-only assessment.
+    demand_id: str | None
+
+    #: the stable rule identifier, one per check site.
+    rule: str
+
+    #: the finding's severity.
+    severity: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PerformanceInstrument:
+    """the related measurement devices, assessment by assessment."""
+
+    #: the barrier the device matched.
+    barrier_id: str
+
+    #: the assessment's demand id; absent for a register-only assessment.
+    demand_id: str | None
+
+    #: the device's tag, or its name when the tag is absent.
+    tag: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PerformanceSif:
+    """the related SIFs, assessment by assessment."""
+
+    #: the barrier the SIF matched.
+    barrier_id: str
+
+    #: the assessment's demand id; absent for a register-only assessment.
+    demand_id: str | None
+
+    #: the SIF's name, or the quantitative SIF's first non-empty name or id.
+    identifier: str
+
+    #: which SIF family the row is.
+    kind: str
+
+    #: the event SIF's voting notation.
+    voting_notation: str | None
+
+    #: the event SIF's detector count.
+    detector_count: float | None
+
+    #: the event SIF's bypassed detector count.
+    bypassed_detector_count: float | None
+
+    #: the event SIF's faulty detector count.
+    faulty_detector_count: float | None
+
+    #: the event SIF's tripped detector count.
+    tripped_detector_count: float | None
+
+    #: the quantitative SIF's claimed SIL.
+    claimed_sil: float | None
+
+    #: the verified achieved SIL.
+    achieved_sil: float | None
+
+    #: whether the achieved SIL meets the claim.
+    sil_achieved: bool | None
+
+    #: the quantitative SIF's average PFD.
+    pfd_average: float | None
+
+    #: `1.5 PFD`.
+    pfd_upper: float | None
+
+    #: `1 / PFD`; absent at a zero PFD.
+    risk_reduction_factor: float | None
+
+    #: the quantitative SIF's architecture.
+    architecture: str | None
+
+    #: the quantitative SIF's proof-test interval.
+    proof_test_interval_hours: float | None
+
+    #: the number of protected equipment tags the SIF names.
+    protected_equipment_count: float | None
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -1547,6 +1837,35 @@ class RiskAssessmentRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class RupturePoint:
+    """the recorded time series, one row per step, the failure step included."""
+
+    #: the step's time.
+    time: Q
+
+    #: the step's absolute pressure.
+    pressure: Q
+
+    #: the step's liquid temperature.
+    liquid_temperature: Q
+
+    #: the inner wall surface's temperature.
+    inner_wall_temperature: Q
+
+    #: the outer wall surface's temperature.
+    outer_wall_temperature: Q
+
+    #: the thin-wall von Mises stress.
+    von_mises_stress: Q
+
+    #: the temperature-retained allowable stress.
+    allowable_stress: Q
+
+    #: the temperature-reduced flange rating.
+    flange_rating: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SafeChartItem:
     """one row per classified equipment, in caller order."""
 
@@ -1749,6 +2068,50 @@ class Tr3001Finding:
 
     #: the check's status; the checker emits pass, fail and needs-review, never info.
     status: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TrappedInventorySegmentResult:
+    """one row per input segment, in caller order."""
+
+    #: the segment identifier.
+    segment_id: str
+
+    #: the segment's kind.
+    kind: str
+
+    #: the segment's internal volume.
+    total_volume: Q
+
+    #: the gas share of the segment.
+    gas_volume: Q
+
+    #: the liquid share of the segment.
+    liquid_volume: Q
+
+    #: the segment's gas mass.
+    gas_mass: Q
+
+    #: the segment's liquid mass.
+    liquid_mass: Q
+
+    #: the segment's gas and liquid mass.
+    total_mass: Q
+
+    #: the density the segment's gas mass used.
+    gas_density: Q
+
+    #: the density the segment's liquid mass used.
+    liquid_density: Q
+
+    #: the echoed fill fraction.
+    liquid_fill_fraction: float
+
+    #: the pipe's diameter, echoed.
+    internal_diameter: Q | None
+
+    #: the pipe's length, echoed.
+    length: Q | None
 
 
 @dataclass(frozen=True, slots=True, eq=False)

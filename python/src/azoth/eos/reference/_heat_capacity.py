@@ -18,10 +18,6 @@ from azoth.eos.reference._mixture_state import phase_state_at
 from azoth.eos.reference.molar_enthalpy_entropy import molar_enthalpy_entropy
 from azoth.eos.reference.pr_molar_volume import MOLAR_GAS_CONSTANT
 
-#: Peng-Robinson's two geometry deltas, the mixture the model is stated on.
-DELTA1 = 1.0 + math.sqrt(2.0)
-DELTA2 = 1.0 - math.sqrt(2.0)
-
 
 class PhaseCapacity(NamedTuple):
     """One phase's capacities and the pressure derivative they rest on."""
@@ -65,13 +61,15 @@ def phase_capacity(
     constant = MOLAR_GAS_CONSTANT
     state = phase_state_at(reduced, kij, composition, root)
     v = root * constant * t / p
+    delta1 = mixture.cubic.delta1
+    delta2 = mixture.cubic.delta2
 
     # `A` is dimensionless (`aP/(RT)^2`), so the dimensional `a` and `b` are these.
     a = state.a_mix * (constant * t) * (constant * t) / p
     b = state.b_mix * constant * t / p
     d_a_d_t = a * state.psi_bar / t
-    f = (v + DELTA1 * b) * (v + DELTA2 * b)
-    d_f = 2.0 * v + (DELTA1 + DELTA2) * b
+    f = (v + delta1 * b) * (v + delta2 * b)
+    d_f = 2.0 * v + (delta1 + delta2) * b
     d_p_d_v = -constant * t / ((v - b) * (v - b)) + a * d_f / (f * f)
     d_p_d_t = constant / (v - b) - d_a_d_t / f
     if not d_p_d_v < 0.0 or not math.isfinite(d_p_d_v) or not math.isfinite(d_p_d_t):

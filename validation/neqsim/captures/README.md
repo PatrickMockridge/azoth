@@ -3208,3 +3208,100 @@ pressure correction; the dynamic area is the bisection result that keeps the pea
 the allowable accumulation. The dynamic march is an ideal-gas lumped vessel seeded from one
 flash: `p_start = Pset x initial_pressure_fraction`, so the fluid's own stated pressure enters
 only through the flash and Z. The two states give oversizing ratios of 2.50 and 3.19.
+
+## The ESD response time
+
+`process_esd_response_time.tsv` is `EsdResponseTimeSimulator` on the class's two tests, a
+no-budget state, a zero-time detection against an equal budget and the empty-list refusal.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe esd_response_time \
+  > captures/process_esd_response_time.tsv
+```
+
+The stage totals are plain sums, `within_budget` is inclusive, and a missing budget prints
+`NaN` for the allowance and the margin. `addValve` is one final-element contribution of the
+solenoid delay plus the stroke.
+
+## The mass-balance leak sensitivity
+
+`process_mass_balance_leak_detection.tsv` is `MassBalanceLeakDetector.calculateSensitivity` on
+a methane/ethane inlet and outlet, with no linepack, a 100 m3 linepack at 0.1 bar and 0.5 K,
+both flows zero, the negative setter clamps, and an SRK evidence row.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe mass_balance_leak_detection \
+  > captures/process_mass_balance_leak_detection.tsv
+```
+
+The density printed beside each block is the inlet stream's bulk density, the quantity the
+linepack term reads; a zero-flow stream reports 0. The setters clamp volume, fraction and the
+uncertainties at zero and the window at one, and a zero reference flow prints `NaN` for the
+fraction.
+
+## The trapped inventory
+
+`process_trapped_inventory.tsv` is `TrappedInventoryCalculator.calculate` on a two-phase
+methane/ethane/n-butane state with equipment and pipe segments, a gas-only fallback, a
+missing-evidence segment, a water-bearing multiphase state and an SRK evidence row.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe trapped_inventory \
+  > captures/process_trapped_inventory.tsv
+```
+
+The densities are the flash's phases: the gas phase's, and the oil's, the aqueous's or the
+class's 800 kg/m3 fallback. The warnings are the class's strings, in segment order before the
+fallback. The SRK row is evidence: its liquid density is `1.06e-1` relative below the port's,
+so it is declared uncased.
+
+## The safety envelope
+
+`process_safety_envelope.tsv` is `SafetyEnvelopeCalculator` on a methane/water fluid, the
+wax feed and a methane/ethane binary, each with the five arms and an operating point.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe safety_envelope \
+  > captures/process_safety_envelope.tsv
+```
+
+The hydrate fluid needs `setHydrateCheck(true)` and the wax feed needs its solid wax phase and
+multiphase wax check; without them the arms write `NaN`. The class's phase curve is the last
+arm: it is a failed all-zero curve on the hydrate fluid and a low-pressure branch on the other
+two, so the port takes the curve as a supplied trace and its own generated branch is not
+carried. The MDMT gamma is the port's EOS capacity ratio and runs up to `2.3e-1` below the
+class's at the top of the hydrate range; the case says so.
+
+## The trapped-liquid fire rupture
+
+`process_trapped_liquid_fire_rupture.tsv` is `TrappedLiquidFireRuptureStudy.run` on a 50 bar
+two-phase inventory and a 10 bar one, with the no-failure, flange, pipe, relief, passive-
+protection and vapor-pocket states; the preamble prints the two inventories' masses.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe trapped_liquid_fire_rupture \
+  > captures/process_trapped_liquid_fire_rupture.tsv
+```
+
+The wall is the class's explicit finite difference and the march records the point before the
+events, so the failure step is the last row. The vapor-pocket state's event is at `0` s, where
+the flashed inventory already carries gas; the pressure rise is `K beta dT` and the relief caps
+it only when `reliefLimitsPressure` is true.
+
+## The safety-system performance assessment
+
+`process_safety_system_performance.tsv` is `SafetySystemPerformanceAnalyzer.analyze` on the
+upstream test's deluge, fire-and-gas, PFP and quantitative-SIF registers, the
+category-inference state, and the rule-coverage, instrumentation and element-fallback states.
+Each assessment prints its metrics (a NaN skipped), its findings in the class's order with
+message and severity, its instrument tags and its SIF names.
+
+```bash
+../../tools/gated.sh javac -proc:none -cp neqsim-118d9af.jar ProcessProbe.java
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe safety_system_performance \
+  > captures/process_safety_system_performance.tsv
+```
+
+The class's `setPfd` also sets the effectiveness to `1 - PFD`, so the fire-and-gas barrier's
+`0.99972` is the setter's arithmetic rather than a stored value. The finding messages are
+presentation; the port carries one stable rule per check site in the same order.

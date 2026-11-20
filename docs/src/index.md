@@ -357,6 +357,7 @@ Five sections, and the difference between them is the point:
 - [`process.dynamic_psv_sizing`](./process/dynamic_psv_sizing.md) — Dynamic PSV sizing
 - [`process.ejector`](./process/ejector.md) — Ejector
 - [`process.escalation_graph`](./process/escalation_graph.md) — Escalation graph analysis
+- [`process.esd_response_time`](./process/esd_response_time.md) — ESD response time
 - [`process.event_tree`](./process/event_tree.md) — Event tree
 - [`process.expander`](./process/expander.md) — Expander
 - [`process.fault_tree`](./process/fault_tree.md) — Fault tree
@@ -391,12 +392,14 @@ Five sections, and the difference between them is the point:
 - [`process.mah_bow_tie_skeleton`](./process/mah_bow_tie_skeleton.md) — MAH bow-tie skeleton
 - [`process.manifold`](./process/manifold.md) — Manifold
 - [`process.map_turbo_expander_compressor`](./process/map_turbo_expander_compressor.md) — Map turbo-expander compressor
+- [`process.mass_balance_leak_detection`](./process/mass_balance_leak_detection.md) — Mass-balance leak sensitivity
 - [`process.mdmt`](./process/mdmt.md) — Minimum design metal temperature
 - [`process.mixer`](./process/mixer.md) — Mixer
 - [`process.multi_vessel_blowdown_study`](./process/multi_vessel_blowdown_study.md) — Multi-vessel blowdown study
 - [`process.nog070_sil_determination`](./process/nog070_sil_determination.md) — NOG 070 SIL determination
 - [`process.non_equilibrium_blowdown`](./process/non_equilibrium_blowdown.md) — Non-equilibrium blowdown
 - [`process.norsok_p002_compliance`](./process/norsok_p002_compliance.md) — NORSOK P-002 point-check compliance
+- [`process.open_drain_review`](./process/open_drain_review.md) — NORSOK S-001 open-drain review
 - [`process.overpressure_acceptance`](./process/overpressure_acceptance.md) — Overpressure acceptance
 - [`process.overpressure_protection_study`](./process/overpressure_protection_study.md) — Overpressure protection study
 - [`process.packed_column`](./process/packed_column.md) — Packed column
@@ -425,7 +428,9 @@ Five sections, and the difference between them is the point:
 - [`process.runaway_reaction`](./process/runaway_reaction.md) — Runaway reaction screening
 - [`process.s001_clause10_review`](./process/s001_clause10_review.md) — NORSOK S-001 Clause 10 review
 - [`process.s001_secondary_pressure_protection`](./process/s001_secondary_pressure_protection.md) — NORSOK S-001 secondary pressure protection
+- [`process.safety_envelope`](./process/safety_envelope.md) — Safety envelope
 - [`process.safety_instrumented_function`](./process/safety_instrumented_function.md) — Safety instrumented function
+- [`process.safety_system_performance`](./process/safety_system_performance.md) — Safety-system performance assessment
 - [`process.self_heating_induction`](./process/self_heating_induction.md) — Self-heating induction time
 - [`process.semenov_self_heating`](./process/semenov_self_heating.md) — Semenov self-heating
 - [`process.separator`](./process/separator.md) — Separator
@@ -443,6 +448,8 @@ Five sections, and the difference between them is the point:
 - [`process.throttling_valve`](./process/throttling_valve.md) — Throttling valve
 - [`process.toxic_library`](./process/toxic_library.md) — Toxic-exposure thresholds
 - [`process.tr3001_compliance`](./process/tr3001_compliance.md) — TR3001 compliance
+- [`process.trapped_inventory`](./process/trapped_inventory.md) — Trapped inventory
+- [`process.trapped_liquid_fire_rupture`](./process/trapped_liquid_fire_rupture.md) — Trapped-liquid fire rupture
 - [`process.tube_rupture_relief`](./process/tube_rupture_relief.md) — Tube rupture relief
 - [`process.turbo_expander_compressor`](./process/turbo_expander_compressor.md) — Turbo-expander compressor
 - [`process.vacuum_collapse`](./process/vacuum_collapse.md) — Vacuum collapse screening

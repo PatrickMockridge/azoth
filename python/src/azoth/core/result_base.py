@@ -141,6 +141,51 @@ class RuptureStatus(StrEnum):
     RUPTURE = "rupture"
 
 
+class FailureMode(StrEnum):
+    """The trapped-liquid study's limiting failure mode."""
+
+    NONE = "none"
+    RELIEF_SET_PRESSURE = "relief_set_pressure"
+    VAPOR_POCKET = "vapor_pocket"
+    PIPE_RUPTURE = "pipe_rupture"
+    FLANGE_FAILURE = "flange_failure"
+
+
+class OpenDrainStatus(StrEnum):
+    """An open-drain assessment's status."""
+
+    PASS = "pass"
+    WARNING = "warning"
+    FAIL = "fail"
+    INFO = "info"
+    NOT_APPLICABLE = "not_applicable"
+
+
+class OpenDrainSeverity(StrEnum):
+    """An open-drain assessment's severity band."""
+
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
+class OpenDrainVerdict(StrEnum):
+    """An open-drain item's or report's verdict."""
+
+    PASS = "pass"
+    PASS_WITH_WARNINGS = "pass_with_warnings"
+    FAIL = "fail"
+
+
+class PerformanceVerdict(StrEnum):
+    """A barrier assessment's or report's verdict."""
+
+    PASS = "pass"
+    PASS_WITH_WARNINGS = "pass_with_warnings"
+    FAIL = "fail"
+
+
 class FluidBasis(StrEnum):
     """The release branch the density switch selected."""
 

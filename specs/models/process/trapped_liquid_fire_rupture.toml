@@ -1,0 +1,326 @@
+id = "process.trapped_liquid_fire_rupture"
+name = "Trapped-liquid fire rupture"
+kind = "procedure"
+assumptions = [
+    "**the time march is the class's**: a point is recorded, the four events checked, and the step breaks on the pipe or flange failure.",
+    "**the wall is the class's explicit finite difference**, with the CFL sub-step split and the unweighted node mean.",
+    "**the incident flux is read at the pre-advance outer-wall temperature**, and the liquid absorbs the incident heat less what the wall took.",
+    "**the pressure rise is `K beta dT` from the inventory's initial state**, capped at the relief set pressure only when the relief limits it.",
+    "**the effective liquid mass is the greater of the liquid and total masses**, so a gas-only inventory still has a capacity.",
+    "**the vapor pocket is a TP flash with more than `1e-10` gas mole fraction**; the port's feed is one mole.",
+    "**the limiting mode is the earliest pipe or flange failure, else relief set, else vapor pocket**, and the minimum failure time is the earlier of pipe and flange.",
+    "**the material is API 5L grade `B` unless a grade or an ambient tensile strength is stated**, and a flange class outside the six is an infinite rating.",
+    "**the class's standards and recommendations are carried as its strings**, and its release-source hand-off is session surface.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/rupture/TrappedLiquidFireRuptureStudy.java` and its result are the port source, with `process/util/fire/TransientWallHeatTransfer.java`, `FireExposureScenario.java` and `MaterialStrengthCurve.java`.",
+    "`validation/neqsim/captures/process_trapped_liquid_fire_rupture.tsv` - a no-failure state, the flange and pipe failures, the relief set, the passive-protection factor and the vapor-pocket state.",
+]
+[source]
+standard = "NeqSim process/safety/rupture/TrappedLiquidFireRuptureStudy.java"
+edition = "Its `run`, the event recorders and the builder's validation, with the wall and fire helper classes."
+[algorithm]
+scheme = "trapped_liquid_fire_rupture"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.components]
+type = "components"
+description = "the fluid's substances, by name, resolved against the component databank.\n"
+[inputs.z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the fluid's overall mole fractions, checked rather than renormalised.\n"
+[inputs.eos]
+type = "enum"
+values = ["pr", "srk"]
+optional = true
+description = "the cubic the vapor-pocket flash runs. **Absent is `pr`.**\n"
+[inputs.multiphase_check]
+type = "boolean"
+optional = true
+description = "whether the vapor-pocket flash runs the multiphase solve. **Absent is false.**\n"
+[inputs.inventory_pressure]
+unit = "Pa"
+description = "the trapped inventory's initial absolute pressure.\n"
+[inputs.inventory_temperature]
+unit = "K"
+description = "the trapped inventory's initial temperature.\n"
+[inputs.inventory_liquid_mass]
+unit = "kg"
+description = "the inventory's liquid mass.\n"
+[inputs.inventory_total_mass]
+unit = "kg"
+description = "the inventory's total mass.\n"
+[inputs.inventory_total_volume]
+unit = "m**3"
+description = "the inventory's total volume.\n"
+[inputs.segment_id]
+type = "string"
+optional = true
+description = "the segment identifier. **Absent is `trapped-segment`.**\n"
+[inputs.fire_type]
+type = "enum"
+values = ["api_521_pool_fire", "fixed_heat_flux", "radiative_fire"]
+optional = true
+description = "the fire exposure's type. **Absent is `api_521_pool_fire`** at factor one.\n"
+[inputs.environmental_factor]
+unit = "dimensionless"
+optional = true
+description = "the API 521 environmental factor. **Absent is one.**\n"
+[inputs.fire_heat_flux]
+unit = "W/m**2"
+optional = true
+description = "the fixed flux, required for `fixed_heat_flux`.\n"
+[inputs.fire_emissivity]
+unit = "dimensionless"
+optional = true
+description = "the radiative fire's emissivity.\n"
+[inputs.fire_view_factor]
+unit = "dimensionless"
+optional = true
+description = "the radiative fire's view factor.\n"
+[inputs.flame_temperature]
+unit = "K"
+optional = true
+description = "the radiative fire's flame temperature.\n"
+[inputs.ambient_temperature]
+unit = "K"
+optional = true
+description = "the fire's ambient temperature. **Absent is `298.15`.**\n"
+[inputs.passive_protection_factor]
+unit = "dimensionless"
+optional = true
+description = "the heat-flux multiplier after passive protection. **Absent is one.**\n"
+[inputs.fire_exposed_area]
+unit = "m**2"
+optional = true
+description = "the API 521 pool fire's wetted area. **Absent is `pi D_outer L`.**\n"
+[inputs.api5l_grade]
+type = "string"
+optional = true
+description = "the API 5L grade. **Absent is `B`.**\n"
+[inputs.ambient_tensile_strength]
+unit = "MPa"
+optional = true
+description = "an explicit ambient tensile strength, superseding the grade.\n"
+[inputs.pipe_internal_diameter]
+unit = "m"
+description = "the pipe's internal diameter; the outer is the internal plus twice the wall.\n"
+[inputs.wall_thickness]
+unit = "m"
+description = "the pipe wall's thickness.\n"
+[inputs.exposed_length]
+unit = "m"
+description = "the fire-exposed pipe length.\n"
+[inputs.flange_class]
+type = "enum"
+values = ["0", "150", "300", "600", "900", "1500", "2500"]
+optional = true
+description = "the ASME B16.5 pressure class. **Absent is `0`**, which is an infinite rating.\n"
+[inputs.relief_set_pressure]
+unit = "Pa"
+optional = true
+description = "the relief set pressure, when a relief is stated.\n"
+[inputs.relief_limits_pressure]
+type = "boolean"
+optional = true
+description = "whether the relief caps the pressure. **Absent is false.**\n"
+[inputs.max_time]
+unit = "s"
+optional = true
+description = "the simulated horizon. **Absent is `1800`.**\n"
+[inputs.time_step]
+unit = "s"
+optional = true
+description = "the recorded step. **Absent is `2`.**\n"
+[inputs.wall_density]
+unit = "kg/m**3"
+optional = true
+description = "the wall's density. **Absent is `7850`.**\n"
+[inputs.wall_heat_capacity]
+unit = "J/(kg*K)"
+optional = true
+description = "the wall's heat capacity. **Absent is `500`.**\n"
+[inputs.wall_conductivity]
+unit = "W/(m*K)"
+optional = true
+description = "the wall's conductivity. **Absent is `45`.**\n"
+[inputs.liquid_heat_capacity]
+unit = "J/(kg*K)"
+optional = true
+description = "the liquid's heat capacity. **Absent is `2200`.**\n"
+[inputs.liquid_expansion]
+unit = "1/K"
+optional = true
+description = "the liquid's thermal expansion coefficient. **Absent is `7e-4`.**\n"
+[inputs.liquid_bulk_modulus]
+unit = "Pa"
+optional = true
+description = "the liquid's bulk modulus. **Absent is `1.2e9`.**\n"
+[inputs.inner_htc]
+unit = "W/(m**2*K)"
+optional = true
+description = "the inner film coefficient. **Absent is `500`.**\n"
+[inputs.outer_htc]
+unit = "W/(m**2*K)"
+optional = true
+description = "the outer film coefficient. **Absent is `35`.**\n"
+[inputs.tensile_strength_factor]
+unit = "dimensionless"
+optional = true
+description = "the accepted fraction of the retained tensile strength. **Absent is `0.75`.**\n"
+[inputs.wall_nodes]
+unit = "dimensionless"
+optional = true
+description = "the wall's spatial nodes, at least three. **Absent is `15`.**\n"
+[inputs.vapor_pocket_detection]
+type = "boolean"
+optional = true
+description = "whether the vapor-pocket test runs. **Absent is true.**\n"
+[outputs]
+[outputs.segment_id]
+type = "string"
+description = "the echoed segment identifier.\n"
+[outputs.trajectory]
+type = "record_list"
+description = "the recorded time series, one row per step, the failure step included.\n"
+[outputs.trajectory.fields.time]
+unit = "s"
+description = "the step's time.\n"
+[outputs.trajectory.fields.pressure]
+unit = "Pa"
+description = "the step's absolute pressure.\n"
+[outputs.trajectory.fields.liquid_temperature]
+unit = "K"
+description = "the step's liquid temperature.\n"
+[outputs.trajectory.fields.inner_wall_temperature]
+unit = "K"
+description = "the inner wall surface's temperature.\n"
+[outputs.trajectory.fields.outer_wall_temperature]
+unit = "K"
+description = "the outer wall surface's temperature.\n"
+[outputs.trajectory.fields.von_mises_stress]
+unit = "Pa"
+description = "the thin-wall von Mises stress.\n"
+[outputs.trajectory.fields.allowable_stress]
+unit = "Pa"
+description = "the temperature-retained allowable stress.\n"
+[outputs.trajectory.fields.flange_rating]
+unit = "Pa"
+description = "the temperature-reduced flange rating.\n"
+[outputs.limiting_failure_mode]
+type = "enum"
+values = ["none", "relief_set_pressure", "vapor_pocket", "pipe_rupture", "flange_failure"]
+description = "the class's limiting mode.\n"
+[outputs.rupture_predicted]
+type = "boolean"
+description = "whether the limiting mode is a pipe or flange failure.\n"
+[outputs.time_to_relief_set]
+unit = "s"
+optional = true
+description = "the first time the relief set pressure is reached.\n"
+[outputs.time_to_vapor_pocket]
+unit = "s"
+optional = true
+description = "the first time the vapor pocket appears.\n"
+[outputs.time_to_pipe_rupture]
+unit = "s"
+optional = true
+description = "the first time the pipe stress reaches its allowable.\n"
+[outputs.time_to_flange_failure]
+unit = "s"
+optional = true
+description = "the first time the pressure reaches the flange rating.\n"
+[outputs.minimum_failure_time]
+unit = "s"
+optional = true
+description = "the earlier of the pipe and flange failure times.\n"
+[outputs.final_pressure]
+unit = "Pa"
+description = "the last recorded pressure.\n"
+[outputs.final_liquid_temperature]
+unit = "K"
+description = "the last recorded liquid temperature.\n"
+[outputs.final_outer_wall_temperature]
+unit = "K"
+description = "the last recorded outer wall temperature.\n"
+[outputs.standards_applied]
+type = "vector_string"
+description = "the class's applied standard references.\n"
+[outputs.recommendations]
+type = "vector_string"
+description = "the class's recommendations.\n"
+[[valid_range]]
+quantity = "inventory_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "inventory_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "inventory_total_mass"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the study requires a positive mass"
+[[valid_range]]
+quantity = "inventory_total_volume"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the study requires a positive volume"
+[[valid_range]]
+quantity = "pipe_internal_diameter"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a pipe has a positive diameter"
+[[valid_range]]
+quantity = "wall_thickness"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a wall has a positive thickness"
+[[valid_range]]
+quantity = "exposed_length"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an exposed length is positive"
+[[valid_range]]
+quantity = "max_time"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a horizon is positive"
+[[valid_range]]
+quantity = "time_step"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a step is positive"
+[[valid_range]]
+quantity = "tensile_strength_factor"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "the class requires a positive factor"
+[[valid_range]]
+quantity = "passive_protection_factor"
+min = 0
+min_inclusive = true
+max = 1
+max_inclusive = true
+severity = "error"
+rationale = "the class refuses a multiplier outside [0, 1]"
+[implementations]
+python = "azoth.process.trapped_liquid_fire_rupture"
+rust = "azoth_process::trapped_liquid_fire_rupture"

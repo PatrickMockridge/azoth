@@ -189,6 +189,14 @@ import neqsim.process.safety.barrier.DocumentEvidence;
 import neqsim.process.safety.barrier.PerformanceStandard;
 import neqsim.process.safety.barrier.SafetyBarrier;
 import neqsim.process.safety.barrier.SafetyCriticalElement;
+import neqsim.process.safety.barrier.SafetySystemCategory;
+import neqsim.process.safety.barrier.SafetySystemDemand;
+import neqsim.process.safety.barrier.SafetySystemPerformanceAnalyzer;
+import neqsim.process.safety.barrier.SafetySystemPerformanceReport;
+import neqsim.process.measurementdevice.FireDetector;
+import neqsim.process.measurementdevice.GasDetector;
+import neqsim.process.logic.sis.Detector;
+import neqsim.process.logic.sis.VotingLogic;
 import neqsim.process.safety.blowby.GasBlowbyAnalyzer;
 import neqsim.process.safety.blowby.GasBlowbyResult;
 import neqsim.process.safety.dispersion.GasDispersionAnalyzer;
@@ -198,6 +206,21 @@ import neqsim.process.safety.dispersion.HazardousAreaCalculator;
 import neqsim.process.safety.dispersion.HazardousAreaCalculator.ReleaseGrade;
 import neqsim.process.safety.dispersion.HeavyGasDispersion;
 import neqsim.process.safety.dispersion.ProbitModel;
+import neqsim.process.safety.esd.EsdResponseTimeSimulator;
+import neqsim.process.safety.esd.EsdResponseTimeSimulator.EsdResponseTimeResult;
+import neqsim.process.safety.envelope.SafetyEnvelope;
+import neqsim.process.safety.envelope.SafetyEnvelopeCalculator;
+import neqsim.process.safety.inventory.TrappedInventoryCalculator;
+import neqsim.process.safety.opendrain.OpenDrainReviewEngine;
+import neqsim.process.safety.opendrain.OpenDrainReviewInput;
+import neqsim.process.safety.opendrain.OpenDrainReviewItem;
+import neqsim.process.safety.opendrain.OpenDrainReviewReport;
+import neqsim.process.safety.opendrain.OpenDrainReviewResult;
+import neqsim.process.safety.rupture.FireExposureScenario;
+import neqsim.process.safety.rupture.TrappedLiquidFireRuptureStudy;
+import neqsim.process.safety.rupture.TrappedLiquidFireRuptureResult;
+import neqsim.process.safety.leakdetection.MassBalanceLeakDetector;
+import neqsim.process.safety.leakdetection.MassBalanceLeakDetector.LeakDetectionSensitivityResult;
 import neqsim.process.safety.dispersion.ToxicLibrary;
 import neqsim.process.safety.fire.Api537FlareFlameModel;
 import neqsim.process.safety.fire.BLEVECalculator;
@@ -666,6 +689,27 @@ public class ProcessProbe {
         break;
       case "s001_clause10_review":
         s001Clause10ReviewRows();
+        break;
+      case "esd_response_time":
+        esdResponseTimeRows();
+        break;
+      case "mass_balance_leak_detection":
+        massBalanceLeakRows();
+        break;
+      case "trapped_inventory":
+        trappedInventoryRows();
+        break;
+      case "safety_envelope":
+        safetyEnvelopeRows();
+        break;
+      case "trapped_liquid_fire_rupture":
+        trappedLiquidRows();
+        break;
+      case "open_drain_review":
+        openDrainRows();
+        break;
+      case "safety_system_performance":
+        safetySystemPerformanceRows();
         break;
       case "gas_blowby":
         gasBlowbyRows();
@@ -17952,6 +17996,700 @@ public class ProcessProbe {
             .put("reliefLoadKgPerS", 10.0).put("psvCapacityKgPerS", 14.0)));
 
     printReviewCoercion();
+  }
+
+  static void esdResponseTimeRows() {
+    printEsd("esd_within_budget",
+        new EsdResponseTimeSimulator().setSifTag("ESD-1234")
+            .addDetection("PT-1001 high-pressure", 1.0)
+            .addLogic("Logic solver scan + 2oo3 vote", 0.5)
+            .addValve("ESDV-2001", 0.5, 8.0).setAllowableResponseTimeS(15.0).evaluate());
+    printEsd("esd_exceeds_budget",
+        new EsdResponseTimeSimulator().setSifTag("ESD-9999")
+            .addDetection("LT-3001 high-level", 2.0).addLogic("Logic solver", 0.5)
+            .addValve("ESDV-3002 (large bore)", 1.0, 20.0).setAllowableResponseTimeS(15.0)
+            .evaluate());
+    printEsd("esd_no_budget",
+        new EsdResponseTimeSimulator().setSifTag("ESD-NOBUDGET").addDetection("TT-1", 1.0)
+            .evaluate());
+    printEsd("esd_zero_time",
+        new EsdResponseTimeSimulator().setSifTag("ESD-ZERO").addDetection("DT-1", 0.0)
+            .addLogic("logic", 2.0).setAllowableResponseTimeS(2.0).evaluate());
+    try {
+      new EsdResponseTimeSimulator().evaluate();
+      System.out.println("esd_empty=NO_THROW");
+    } catch (RuntimeException failure) {
+      System.out.println("esd_empty=" + failure.getClass().getSimpleName());
+    }
+    System.out.println();
+  }
+
+  static void printEsd(String label, EsdResponseTimeResult result) {
+    System.out.println(label);
+    System.out.println("sif_tag=" + result.getSifTag());
+    System.out.println("detection_time_s=" + result.getDetectionTimeS());
+    System.out.println("logic_time_s=" + result.getLogicTimeS());
+    System.out.println("final_element_time_s=" + result.getFinalElementTimeS());
+    System.out.println("total_response_time_s=" + result.getTotalResponseTimeS());
+    System.out.println("allowable_response_time_s=" + result.getAllowableResponseTimeS());
+    System.out.println("margin_s=" + result.getMarginS());
+    System.out.println("within_budget=" + result.isWithinBudget());
+    System.out.println("contribution_count=" + result.getContributions().size());
+    for (int i = 0; i < result.getContributions().size(); i++) {
+      EsdResponseTimeSimulator.Contribution contribution = result.getContributions().get(i);
+      System.out.println("contribution_" + i + "_name=" + contribution.getName());
+      System.out.println("contribution_" + i + "_stage=" + contribution.getStage());
+      System.out.println("contribution_" + i + "_time_s=" + contribution.getTimeS());
+    }
+    System.out.println();
+  }
+
+  static Stream leakStream(String name, boolean srk, String[] names, double[] z, double temperatureK,
+      double pressureBara, double kgPerSecond) {
+    SystemInterface fluid =
+        srk ? new SystemSrkEos(temperatureK, pressureBara) : new SystemPrEos(temperatureK, pressureBara);
+    for (int i = 0; i < names.length; i++) {
+      fluid.addComponent(names[i], z[i]);
+    }
+    fluid.setMixingRule(2);
+    Stream stream = new Stream(name, fluid);
+    stream.setFlowRate(kgPerSecond, "kg/sec");
+    stream.run();
+    return stream;
+  }
+
+  static void massBalanceLeakRows() {
+    String[] names = {"methane", "ethane"};
+    double[] z = {0.9, 0.1};
+    Stream inlet = leakStream("inlet", false, names, z, 300.0, 50.0, 10.0);
+    Stream outlet = leakStream("outlet", false, names, z, 300.0, 50.0, 9.8);
+    printLeak("leak_no_linepack",
+        new MassBalanceLeakDetector(inlet, outlet).calculateSensitivity(), densityOf(inlet));
+    printLeak("leak_linepack", new MassBalanceLeakDetector(inlet, outlet)
+        .setLinepackVolumeM3(100.0).setPressureUncertaintyBara(0.1)
+        .setTemperatureUncertaintyK(0.5).setFlowMeasurementUncertaintyFraction(0.01)
+        .setDetectionWindowS(60.0).setConfidenceMultiplier(3.0).calculateSensitivity(),
+        densityOf(inlet));
+    Stream zeroInlet = leakStream("zero-inlet", false, names, z, 300.0, 50.0, 0.0);
+    Stream zeroOutlet = leakStream("zero-outlet", false, names, z, 300.0, 50.0, 0.0);
+    printLeak("leak_zero_reference",
+        new MassBalanceLeakDetector(zeroInlet, zeroOutlet).calculateSensitivity(),
+        densityOf(zeroInlet));
+    printLeak("leak_clamps", new MassBalanceLeakDetector(inlet, outlet)
+        .setLinepackVolumeM3(-5.0).setFlowMeasurementUncertaintyFraction(-0.1)
+        .setPressureUncertaintyBara(-1.0).setTemperatureUncertaintyK(-2.0)
+        .setDetectionWindowS(0.0).setConfidenceMultiplier(-1.0).calculateSensitivity(),
+        densityOf(inlet));
+    Stream srkInlet = leakStream("srk-inlet", true, names, z, 300.0, 50.0, 10.0);
+    Stream srkOutlet = leakStream("srk-outlet", true, names, z, 300.0, 50.0, 9.8);
+    printLeak("leak_srk_evidence", new MassBalanceLeakDetector(srkInlet, srkOutlet)
+        .setLinepackVolumeM3(100.0).setPressureUncertaintyBara(0.1)
+        .setTemperatureUncertaintyK(0.5).calculateSensitivity(), densityOf(srkInlet));
+    System.out.println();
+  }
+
+  static double densityOf(Stream stream) {
+    return stream.getThermoSystem().getDensity("kg/m3");
+  }
+
+  static void printLeak(String label, LeakDetectionSensitivityResult result, double density) {
+    System.out.println(label);
+    System.out.println("density_kg_per_m3=" + density);
+    for (Map.Entry<String, Object> entry : result.toMap().entrySet()) {
+      System.out.println(entry.getKey() + "=" + entry.getValue());
+    }
+    System.out.println();
+  }
+
+
+  static SystemInterface inventoryFluid(boolean srk, String[] names, double[] z, double temperatureK,
+      double pressureBara, boolean multiphase) {
+    SystemInterface fluid =
+        srk ? new SystemSrkEos(temperatureK, pressureBara) : new SystemPrEos(temperatureK, pressureBara);
+    for (int i = 0; i < names.length; i++) {
+      fluid.addComponent(names[i], z[i]);
+    }
+    fluid.setMixingRule(2);
+    if (multiphase) {
+      fluid.setMultiPhaseCheck(true);
+    }
+    return fluid;
+  }
+
+  static DocumentEvidence inventoryEvidence(String segmentId) {
+    return new DocumentEvidence(segmentId + "-EV", "DOC-" + segmentId, "Line list", "A", "3", 1,
+        "STID-" + segmentId, "documented volume", 0.9);
+  }
+
+  static void trappedInventoryRows() {
+    String[] names = {"methane", "ethane", "n-butane"};
+    double[] z = {0.5, 0.3, 0.2};
+    TrappedInventoryCalculator twoPhase = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(false, names, z, 300.0, 50.0, false))
+        .setOperatingConditions(50.0, 300.0)
+        .addEquipmentVolume("V-101", 10.0, 0.5, inventoryEvidence("V-101"))
+        .addPipeSegment("P-101", 0.2, 100.0, 0.2, inventoryEvidence("P-101"));
+    printInventory("inv_two_phase", twoPhase.calculate());
+
+    TrappedInventoryCalculator gasOnly = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(false, new String[] {"methane"}, new double[] {1.0}, 300.0, 50.0, false))
+        .setOperatingConditions(50.0, 300.0)
+        .addEquipmentVolume("V-GAS", 5.0, 0.5, inventoryEvidence("V-GAS"));
+    printInventory("inv_gas_only", gasOnly.calculate());
+
+    TrappedInventoryCalculator noEvidence = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(false, names, z, 300.0, 50.0, false))
+        .setOperatingConditions(50.0, 300.0)
+        .addEquipmentVolume("V-NOEV", 5.0, 0.5, null);
+    printInventory("inv_no_evidence", noEvidence.calculate());
+
+    String[] wetNames = {"methane", "water"};
+    double[] wetZ = {0.9, 0.1};
+    TrappedInventoryCalculator wet = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(false, wetNames, wetZ, 300.0, 50.0, true))
+        .setOperatingConditions(50.0, 300.0)
+        .addEquipmentVolume("V-WET", 5.0, 0.5, inventoryEvidence("V-WET"));
+    printInventory("inv_water_multiphase", wet.calculate());
+
+    TrappedInventoryCalculator srk = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(true, names, z, 300.0, 50.0, false))
+        .setOperatingConditions(50.0, 300.0)
+        .addEquipmentVolume("V-SRK", 10.0, 0.5, inventoryEvidence("V-SRK"))
+        .addPipeSegment("P-SRK", 0.2, 100.0, 0.2, inventoryEvidence("P-SRK"));
+    printInventory("inv_srk_evidence", srk.calculate());
+    System.out.println();
+  }
+
+  static void printInventory(String label, TrappedInventoryCalculator.InventoryResult result) {
+    System.out.println(label);
+    System.out.println("pressure_bara=" + result.getPressureBara());
+    System.out.println("temperature_k=" + result.getTemperatureK());
+    System.out.println("gas_density_kg_per_m3=" + result.getGasDensityKgPerM3());
+    System.out.println("liquid_density_kg_per_m3=" + result.getLiquidDensityKgPerM3());
+    System.out.println("total_volume_m3=" + result.getTotalVolumeM3());
+    System.out.println("total_gas_volume_m3=" + result.getTotalGasVolumeM3());
+    System.out.println("total_liquid_volume_m3=" + result.getTotalLiquidVolumeM3());
+    System.out.println("total_gas_mass_kg=" + result.getTotalGasMassKg());
+    System.out.println("total_liquid_mass_kg=" + result.getTotalLiquidMassKg());
+    System.out.println("total_mass_kg=" + result.getTotalMassKg());
+    System.out.println("segment_count=" + result.getSegmentResults().size());
+    for (int i = 0; i < result.getSegmentResults().size(); i++) {
+      TrappedInventoryCalculator.InventorySegmentResult segment = result.getSegmentResults().get(i);
+      System.out.println("segment_" + i + "_id=" + segment.getSegmentId());
+      System.out.println("segment_" + i + "_total_volume_m3=" + segment.getTotalVolumeM3());
+      System.out.println("segment_" + i + "_gas_volume_m3=" + segment.getGasVolumeM3());
+      System.out.println("segment_" + i + "_liquid_volume_m3=" + segment.getLiquidVolumeM3());
+      System.out.println("segment_" + i + "_gas_mass_kg=" + segment.getGasMassKg());
+      System.out.println("segment_" + i + "_liquid_mass_kg=" + segment.getLiquidMassKg());
+      System.out.println("segment_" + i + "_total_mass_kg=" + segment.getTotalMassKg());
+    }
+    System.out.println("warning_count=" + result.getWarnings().size());
+    for (int i = 0; i < result.getWarnings().size(); i++) {
+      System.out.println("warning_" + i + "=" + result.getWarnings().get(i));
+    }
+    System.out.println();
+  }
+
+
+  static SystemInterface envelopeFluid(boolean wax) {
+    SystemInterface fluid = new SystemSrkEos(300.0, 50.0);
+    if (wax) {
+      fluid.addComponent("methane", 0.4);
+      fluid.addComponent("n-heptane", 0.1);
+      fluid.addComponent("nc14", 0.1);
+      fluid.addComponent("nc20", 0.2);
+      fluid.addComponent("nc24", 0.2);
+      fluid.addSolidComplexPhase("wax");
+      fluid.setMultiphaseWaxCheck(true);
+      fluid.setMultiPhaseCheck(true);
+    } else {
+      fluid.addComponent("methane", 0.9);
+      fluid.addComponent("water", 0.1);
+      fluid.setHydrateCheck(true);
+      fluid.setMultiPhaseCheck(true);
+    }
+    fluid.setMixingRule(2);
+    fluid.init(0);
+    fluid.init(1);
+    return fluid;
+  }
+
+  static SystemInterface phaseFluid() {
+    SystemInterface fluid = new SystemSrkEos(300.0, 50.0);
+    fluid.addComponent("methane", 0.7);
+    fluid.addComponent("ethane", 0.3);
+    fluid.setMixingRule(2);
+    fluid.init(0);
+    fluid.init(1);
+    return fluid;
+  }
+
+  static void safetyEnvelopeRows() {
+    printEnvelope("se_hydrate", new SafetyEnvelopeCalculator(envelopeFluid(false)), 1.0, 150.0,
+        5, 300.0, 50.0, 280.0, true, true);
+    printEnvelope("se_wax", new SafetyEnvelopeCalculator(envelopeFluid(true)), 1.0, 20.0,
+        5, 300.0, 5.0, 270.0, true, true);
+    printEnvelope("se_phase", new SafetyEnvelopeCalculator(phaseFluid()), 1.0, 50.0,
+        5, 300.0, 20.0, 250.0, true, true);
+    System.out.println();
+  }
+
+  static void printEnvelope(String label, SafetyEnvelopeCalculator calculator, double minBara,
+      double maxBara, int points, double designTemperatureK, double operatingPressureBara,
+      double operatingTemperatureK, boolean hydrate, boolean wax) {
+    System.out.println(label);
+    List<SafetyEnvelope> envelopes = new ArrayList<SafetyEnvelope>();
+    if (hydrate) {
+      envelopes.add(calculator.calculateHydrateEnvelope(minBara, maxBara, points));
+    }
+    if (wax) {
+      envelopes.add(calculator.calculateWaxEnvelope(minBara, maxBara, points));
+    }
+    envelopes.add(calculator.calculateCO2FreezingEnvelope(minBara, maxBara, points));
+    envelopes.add(calculator.calculateMDMTEnvelope(minBara, maxBara, designTemperatureK, points));
+    envelopes.add(calculator.calculatePhaseEnvelope(points));
+    for (int i = 0; i < envelopes.size(); i++) {
+      SafetyEnvelope envelope = envelopes.get(i);
+      System.out.println("envelope_" + i + "_name=" + envelope.getName());
+      System.out.println("envelope_" + i + "_type=" + envelope.getType());
+      System.out.println("envelope_" + i + "_points=" + envelope.getNumberOfPoints());
+      System.out.println(
+          "envelope_" + i + "_reference_water=" + envelope.getReferenceWaterContent());
+      System.out.println(
+          "envelope_" + i + "_reference_wax=" + envelope.getReferenceWaxContent());
+      for (int j = 0; j < envelope.getNumberOfPoints(); j++) {
+        System.out.println("envelope_" + i + "_p" + j + "_pressure_bara="
+            + envelope.getPressure()[j]);
+        System.out.println("envelope_" + i + "_p" + j + "_temperature_k="
+            + envelope.getTemperature()[j]);
+        System.out.println("envelope_" + i + "_p" + j + "_margin_k=" + envelope.getMargin()[j]);
+      }
+      System.out.println("envelope_" + i + "_limit_at_operating_k="
+          + envelope.getTemperatureAtPressure(operatingPressureBara));
+      System.out.println("envelope_" + i + "_safe_temperature_at_operating_k="
+          + envelope.getSafeTemperatureAtPressure(operatingPressureBara));
+      System.out.println("envelope_" + i + "_safe="
+          + envelope.isOperatingPointSafe(operatingPressureBara, operatingTemperatureK));
+      System.out.println("envelope_" + i + "_margin_at_operating_k="
+          + envelope.calculateMarginToLimit(operatingPressureBara, operatingTemperatureK));
+    }
+    SafetyEnvelope[] array = envelopes.toArray(new SafetyEnvelope[0]);
+    System.out.println("all_safe="
+        + SafetyEnvelopeCalculator.isOperatingPointSafe(array, operatingPressureBara,
+            operatingTemperatureK));
+    SafetyEnvelope most = SafetyEnvelopeCalculator.getMostLimitingEnvelope(array,
+        operatingPressureBara, operatingTemperatureK);
+    System.out.println("most_limiting=" + (most == null ? "none" : most.getName()));
+    System.out.println();
+  }
+
+
+  static TrappedInventoryCalculator.InventoryResult ruptureInventory(double pressureBara) {
+    String[] names = {"methane", "ethane", "n-butane"};
+    double[] z = {0.5, 0.3, 0.2};
+    TrappedInventoryCalculator calculator = new TrappedInventoryCalculator()
+        .setFluid(inventoryFluid(false, names, z, 300.0, pressureBara, false))
+        .setOperatingConditions(pressureBara, 300.0)
+        .addEquipmentVolume("SEG-1", 10.0, 0.5, inventoryEvidence("SEG-1"));
+    return calculator.calculate();
+  }
+
+  static SystemInterface ruptureFluid() {
+    String[] names = {"methane", "ethane", "n-butane"};
+    double[] z = {0.5, 0.3, 0.2};
+    return inventoryFluid(false, names, z, 300.0, 50.0, false);
+  }
+
+  static TrappedLiquidFireRuptureStudy buildRupture(double pressureBara, int flangeClass,
+      double flux, double maxTime, boolean relief, boolean vapor) {
+    double area = Math.PI * 0.12 * 10.0;
+    TrappedLiquidFireRuptureStudy.Builder builder = TrappedLiquidFireRuptureStudy.builder()
+        .segmentId("SEG-1").inventory(ruptureInventory(pressureBara)).fluid(ruptureFluid())
+        .pipeGeometry(0.1, 0.01, 10.0).flangeClass(flangeClass)
+        .fireScenario(FireExposureScenario.fixedHeatFlux(area, flux)).timeControls(maxTime, 2.0)
+        .vaporPocketDetectionEnabled(vapor);
+    if (relief) {
+      builder.reliefSetPressure(60.0, "bara", true);
+    }
+    return builder.build();
+  }
+
+  static void trappedLiquidRows() {
+    System.out.println("inventory_preamble");
+    for (double pressure : new double[] {10.0, 50.0}) {
+      TrappedInventoryCalculator.InventoryResult inventory = ruptureInventory(pressure);
+      System.out.println("inventory_" + (int) pressure + "_liquid_mass_kg="
+          + inventory.getTotalLiquidMassKg());
+      System.out.println("inventory_" + (int) pressure + "_total_mass_kg="
+          + inventory.getTotalMassKg());
+      System.out.println("inventory_" + (int) pressure + "_volume_m3="
+          + inventory.getTotalVolumeM3());
+    }
+    System.out.println();
+    printRupture("tlf_no_failure", buildRupture(50.0, 0, 10000.0, 20.0, false, false).run());
+    printRupture("tlf_flange", buildRupture(10.0, 150, 500000.0, 600.0, false, true).run());
+    printRupture("tlf_pipe", buildRupture(50.0, 0, 500000.0, 600.0, false, true).run());
+    printRupture("tlf_relief", buildRupture(50.0, 0, 500000.0, 600.0, true, true).run());
+    // The passive factor is a copy of the scenario, applied before the run.
+    double area = Math.PI * 0.12 * 10.0;
+    TrappedLiquidFireRuptureStudy pfpStudy = TrappedLiquidFireRuptureStudy.builder()
+        .segmentId("SEG-1").inventory(ruptureInventory(50.0)).fluid(ruptureFluid())
+        .pipeGeometry(0.1, 0.01, 10.0).flangeClass(0)
+        .fireScenario(FireExposureScenario.fixedHeatFlux(area, 500000.0).withPassiveProtectionFactor(0.3))
+        .timeControls(600.0, 2.0).build();
+    printRupture("tlf_pfp", pfpStudy.run());
+    printRupture("tlf_vapor", buildRupture(50.0, 0, 500000.0, 600.0, false, true).run());
+    System.out.println();
+  }
+
+  @SuppressWarnings("unchecked")
+  static void printRupture(String label, TrappedLiquidFireRuptureResult result) {
+    System.out.println(label);
+    System.out.println("segment_id=" + result.getSegmentId());
+    System.out.println("limiting_failure_mode=" + result.getLimitingFailureMode());
+    System.out.println("rupture_predicted=" + result.isRupturePredicted());
+    System.out.println("time_to_relief_set_s=" + result.getTimeToReliefSetSeconds());
+    System.out.println("time_to_vapor_pocket_s=" + result.getTimeToVaporPocketSeconds());
+    System.out.println("time_to_pipe_rupture_s=" + result.getTimeToPipeRuptureSeconds());
+    System.out.println("time_to_flange_failure_s=" + result.getTimeToFlangeFailureSeconds());
+    System.out.println("minimum_failure_time_s=" + result.getMinimumFailureTimeSeconds());
+    System.out.println("final_pressure_bara=" + result.getFinalPressureBara());
+    System.out.println("final_liquid_temperature_k=" + result.getFinalLiquidTemperatureK());
+    System.out.println("final_outer_wall_temperature_k=" + result.getFinalOuterWallTemperatureK());
+    System.out.println("warning_count=" + result.getWarnings().size());
+    for (int i = 0; i < result.getWarnings().size(); i++) {
+      System.out.println("warning_" + i + "=" + result.getWarnings().get(i));
+    }
+    System.out.println("recommendation_count=" + result.getRecommendations().size());
+    Map<String, Object> map = result.toMap();
+    Map<String, Object> series = (Map<String, Object>) map.get("timeSeries");
+    System.out.println("point_count=" + result.getTimeSeconds().size());
+    for (Map.Entry<String, Object> entry : series.entrySet()) {
+      List<Double> values = (List<Double>) entry.getValue();
+      for (int i = 0; i < values.size(); i++) {
+        System.out.println("series_" + entry.getKey() + "_" + i + "=" + values.get(i));
+      }
+    }
+    System.out.println();
+  }
+
+
+  static OpenDrainReviewItem drainItem(String areaId, String areaType) {
+    return new OpenDrainReviewItem().setAreaId(areaId).setAreaType(areaType);
+  }
+
+  static OpenDrainReviewInput drainInput(OpenDrainReviewItem... items) {
+    OpenDrainReviewInput input = new OpenDrainReviewInput().setProjectName("open-drain review");
+    for (OpenDrainReviewItem item : items) {
+      input.addItem(item);
+    }
+    return input;
+  }
+
+  static void openDrainRows() {
+    OpenDrainReviewItem compliant = drainItem("AREA-1", "process")
+        .put("designStandards", new ArrayList<String>(List.of("NORSOK P-002", "ISO 13702")))
+        .put("sourceHasFlammableOrHazardousLiquid", true)
+        .put("hasOpenDrainMeasures", true)
+        .put("fireWaterCapacityKgPerS", 10.0)
+        .put("liquidLeakRateKgPerS", 2.0)
+        .put("drainageCapacityKgPerS", 15.0)
+        .put("backflowPrevented", true)
+        .put("closedOpenDrainInteractionPrevented", true)
+        .put("hazardousNonHazardousPhysicallySeparated", true)
+        .put("hazardousNonHazardousCombined", false)
+        .put("sealDesignedForMaxBackpressure", true)
+        .put("ventTerminatedSafe", true)
+        .put("openDrainDependsOnUtility", false);
+    compliant.addSourceReference("STID-AREA-1");
+    printDrain("drain_compliant", drainInput(compliant));
+
+    OpenDrainReviewItem capacity = drainItem("AREA-2", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", true)
+        .put("hasOpenDrainMeasures", true)
+        .put("fireWaterCapacityKgPerS", 10.0)
+        .put("liquidLeakRateKgPerS", 2.0)
+        .put("drainageCapacityKgPerS", 5.0);
+    printDrain("drain_capacity_fail", drainInput(capacity));
+
+    OpenDrainReviewItem haz = drainItem("AREA-3", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", true)
+        .put("hazardousNonHazardousCombined", true)
+        .put("hazardousNonHazardousPhysicallySeparated", false);
+    printDrain("drain_haz_combined", drainInput(haz));
+
+    OpenDrainReviewItem missing = drainItem("AREA-4", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", true);
+    printDrain("drain_missing", drainInput(missing));
+
+    OpenDrainReviewItem utility = drainItem("AREA-5", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", true)
+        .put("openDrainDependsOnUtility", true);
+    printDrain("drain_utility", drainInput(utility));
+
+    OpenDrainReviewItem operational = drainItem("AREA-6", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", true)
+        .put("observedBackflowEvents", "1")
+        .put("sumpHighLevelEvents", "2");
+    printDrain("drain_operational", drainInput(operational));
+
+    printDrain("drain_empty", drainInput());
+
+    OpenDrainReviewItem coercion = drainItem("AREA-7", "process")
+        .put("sourceHasFlammableOrHazardousLiquid", "yes")
+        .put("hasOpenDrainMeasures", "1")
+        .put("designStandards", "NORSOK P-002 and ISO 13702")
+        .put("fireWaterCapacityKgPerS", "10.5")
+        .put("drainageCapacityKgPerS", "20");
+    printDrain("drain_coercion", drainInput(coercion));
+    System.out.println();
+  }
+
+  @SuppressWarnings("unchecked")
+  static void printDrain(String label, OpenDrainReviewInput input) {
+    OpenDrainReviewReport report = new OpenDrainReviewEngine().evaluate(input);
+    System.out.println(label);
+    System.out.println("overall_verdict=" + report.getOverallVerdict());
+    System.out.println("result_count=" + report.getResults().size());
+    for (int i = 0; i < report.getResults().size(); i++) {
+      OpenDrainReviewResult result = report.getResults().get(i);
+      System.out.println("result_" + i + "_area_id=" + result.getItem().getAreaId());
+      System.out.println("result_" + i + "_verdict=" + result.getVerdict());
+      System.out.println("result_" + i + "_confidence=" + result.getConfidence());
+      System.out.println("result_" + i + "_assessment_count=" + result.getAssessments().size());
+      for (int j = 0; j < result.getAssessments().size(); j++) {
+        Map<String, Object> map = result.getAssessments().get(j).toMap();
+        System.out.println("assessment_" + i + "_" + j + "_requirement_id="
+            + map.get("requirementId"));
+        System.out.println("assessment_" + i + "_" + j + "_clause=" + map.get("clause"));
+        System.out.println("assessment_" + i + "_" + j + "_status=" + map.get("status"));
+        System.out.println("assessment_" + i + "_" + j + "_severity=" + map.get("severity"));
+      }
+    }
+    System.out.println();
+  }
+
+  static DocumentEvidence performanceEvidence(String id) {
+    return new DocumentEvidence(id, "STID-001", "Safety systems STID", "A", "4.2", 12,
+        "references/stid.pdf", "Barrier requirement extracted from STID and C&E documents.", 0.95);
+  }
+
+  static SafetyBarrier performanceBarrier(String id, String name, String function,
+      SafetySystemCategory category) {
+    PerformanceStandard standard = new PerformanceStandard("PS-" + id).setTitle(name + " standard")
+        .setSafetyFunction(function).setDemandMode(PerformanceStandard.DemandMode.LOW_DEMAND)
+        .setTargetPfd(category == SafetySystemCategory.PASSIVE_FIRE_PROTECTION ? Double.NaN : 1.0e-3)
+        .setRequiredAvailability(0.99).setResponseTimeSeconds(60.0)
+        .addAcceptanceCriterion("Barrier shall meet documented functional requirements.")
+        .addEvidence(performanceEvidence("E-" + id));
+    return new SafetyBarrier(id).setName(name).setDescription(function)
+        .setType(SafetyBarrier.BarrierType.MITIGATION).setStatus(SafetyBarrier.BarrierStatus.AVAILABLE)
+        .setSafetyFunction(function).setOwner("Technical safety").addEquipmentTag("V-101")
+        .addHazardId("LOC-V-101").setPerformanceStandard(standard)
+        .addEvidence(performanceEvidence("BE-" + id));
+  }
+
+  static void safetySystemPerformanceRows() {
+    BarrierRegister delugeRegister = new BarrierRegister("BR-FIRE-001").setName("Fire protection");
+    SafetyBarrier deluge = performanceBarrier("B-DELUGE-001", "Deluge system",
+        "Mitigate jet fire exposure using deluge in module M01", SafetySystemCategory.FIREWATER_DELUGE)
+        .setPfd(2.8e-4).setEffectiveness(0.95);
+    delugeRegister.addBarrier(deluge)
+        .addSafetyCriticalElement(new SafetyCriticalElement("SCE-FW-001").setTag("FW-001")
+            .setName("Deluge zone M01").setType(SafetyCriticalElement.ElementType.FIRE_PROTECTION)
+            .addBarrier(deluge));
+    SafetySystemDemand delugeDemand = new SafetySystemDemand("D-DELUGE-001")
+        .setBarrierId("B-DELUGE-001").setCategory(SafetySystemCategory.FIREWATER_DELUGE)
+        .setScenario("Jet fire on V-101").setDemandValue(10.0).setCapacityValue(15.0)
+        .setDemandUnit("L/min/m2").setRequiredResponseTimeSeconds(45.0)
+        .setActualResponseTimeSeconds(30.0).setRequiredAvailability(0.99)
+        .setActualAvailability(0.995).setRequiredEffectiveness(0.90)
+        .setActualEffectiveness(0.95);
+    printPerformance("ssp_deluge_pass",
+        new SafetySystemPerformanceAnalyzer(delugeRegister).addDemandCase(delugeDemand));
+
+    BarrierRegister fgsRegister = new BarrierRegister("BR-FG-001").setName("Fire and gas");
+    SafetyBarrier detection = performanceBarrier("B-FGS-001", "Fire and gas detection",
+        "Detect gas or fire and activate deluge", SafetySystemCategory.FIRE_GAS_DETECTION)
+        .setPfd(2.8e-4);
+    detection.addEquipmentTag("FD-101").addEquipmentTag("GD-101");
+    fgsRegister.addBarrier(detection)
+        .addSafetyCriticalElement(new SafetyCriticalElement("SCE-FGS-001").setTag("FGS-001")
+            .setName("Fire and gas detection")
+            .setType(SafetyCriticalElement.ElementType.INSTRUMENTED_FUNCTION).addBarrier(detection));
+    FireDetector fireDetector = new FireDetector("FD-101", "Module M01");
+    fireDetector.setDetectionDelay(2.0);
+    GasDetector gasDetector = new GasDetector("GD-101", GasDetector.GasType.COMBUSTIBLE, "Module M01");
+    gasDetector.setResponseTime(8.0);
+    neqsim.process.logic.sis.SafetyInstrumentedFunction fgsSif = new neqsim.process.logic.sis.SafetyInstrumentedFunction("B-FGS-001 Deluge SIF",
+        VotingLogic.TWO_OUT_OF_THREE);
+    fgsSif.addDetector(new Detector("FD-101", Detector.DetectorType.FIRE, Detector.AlarmLevel.HIGH,
+        1.0, "binary"));
+    fgsSif.addDetector(new Detector("GD-101", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL"));
+    fgsSif.addDetector(new Detector("GD-102", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL"));
+    SafetySystemDemand fgsDemand = new SafetySystemDemand("D-FGS-001").setBarrierId("B-FGS-001")
+        .setCategory(SafetySystemCategory.FIRE_GAS_DETECTION).setRequiredResponseTimeSeconds(20.0)
+        .setActualResponseTimeSeconds(10.0).setRequiredAvailability(0.99)
+        .setActualAvailability(0.996);
+    printPerformance("ssp_fire_gas", new SafetySystemPerformanceAnalyzer(fgsRegister)
+        .addMeasurementDevice(fireDetector).addMeasurementDevice(gasDetector)
+        .addSafetyInstrumentedFunction(fgsSif).addDemandCase(fgsDemand));
+
+    BarrierRegister pfpRegister = new BarrierRegister("BR-PFP-001").setName("PFP review");
+    SafetyBarrier pfp = performanceBarrier("B-PFP-001", "Passive fire protection",
+        "PFP coating on V-101 support steel", SafetySystemCategory.PASSIVE_FIRE_PROTECTION)
+        .setEffectiveness(0.80);
+    pfpRegister.addBarrier(pfp)
+        .addSafetyCriticalElement(new SafetyCriticalElement("SCE-PFP-001").setTag("PFP-V-101")
+            .setName("PFP on V-101").setType(SafetyCriticalElement.ElementType.STRUCTURAL)
+            .addBarrier(pfp));
+    SafetySystemDemand pfpDemand = new SafetySystemDemand("D-PFP-001").setBarrierId("B-PFP-001")
+        .setCategory(SafetySystemCategory.PASSIVE_FIRE_PROTECTION)
+        .setScenario("Jet fire thermal radiation at support steel").setDemandValue(45.0)
+        .setCapacityValue(37.5).setDemandUnit("kW/m2").setRequiredEffectiveness(0.90)
+        .setActualEffectiveness(0.80);
+    printPerformance("ssp_pfp_capacity_fail",
+        new SafetySystemPerformanceAnalyzer(pfpRegister).addDemandCase(pfpDemand));
+
+    BarrierRegister quantitativeRegister = new BarrierRegister("BR-QSIF-001")
+        .setName("Quantitative SIF");
+    SafetyBarrier sifBarrier = performanceBarrier("B-SIF-101", "SIF shutdown",
+        "SIF shutdown protects V-101", SafetySystemCategory.ESD_BLOWDOWN).setPfd(8.0e-4);
+    quantitativeRegister.addBarrier(sifBarrier);
+    neqsim.process.safety.risk.sis.SafetyInstrumentedFunction quantitativeSif =
+        neqsim.process.safety.risk.sis.SafetyInstrumentedFunction.builder().id("B-SIF-101")
+            .name("B-SIF-101 quantitative SIL").description("SIF shutdown protects V-101").sil(3)
+            .pfd(8.0e-4).architecture("1oo2").testIntervalHours(8760.0).addProtectedEquipment("V-101")
+            .build();
+    printPerformance("ssp_quantitative_sif", new SafetySystemPerformanceAnalyzer(quantitativeRegister)
+        .addQuantitativeSafetyInstrumentedFunction(quantitativeSif));
+
+    BarrierRegister psdRegister = new BarrierRegister("BR-PSD-001").setName("PSD review");
+    SafetyBarrier psd = performanceBarrier("B-PSD-101", "PSD valve",
+        "Process shutdown closes shutdown valve SDV-101", SafetySystemCategory.UNKNOWN)
+        .setPfd(8.0e-4);
+    psdRegister.addBarrier(psd);
+    printPerformance("ssp_psd_category", new SafetySystemPerformanceAnalyzer(psdRegister));
+
+    BarrierRegister rulesRegister = new BarrierRegister("BR-RULES-001").setName("Rule coverage");
+    SafetyBarrier rules = new SafetyBarrier("B-RULES-101").setName("Rules barrier")
+        .setDescription("Isolation duty").setSafetyFunction("Isolation duty")
+        .setStatus(SafetyBarrier.BarrierStatus.OUT_OF_SERVICE).addEquipmentTag("GD-201");
+    rulesRegister.addBarrier(rules)
+        .addSafetyCriticalElement(new SafetyCriticalElement("SCE-RULES-001").setTag("SCE-R")
+            .setName("Rules SCE").setType(SafetyCriticalElement.ElementType.INSTRUMENTED_FUNCTION)
+            .addBarrier(rules));
+    SafetySystemDemand rulesDemand = new SafetySystemDemand("D-RULES-101")
+        .setBarrierId("B-RULES-101").setRequiredPfd(1.0e-3).setActualPfd(1.0e-2)
+        .setRequiredAvailability(0.99).setActualAvailability(0.95)
+        .setRequiredResponseTimeSeconds(10.0).setActualResponseTimeSeconds(20.0)
+        .setRequiredEffectiveness(0.9).setActualEffectiveness(0.5).setScenario("Loss of containment")
+        .setDemandValue(10.0).setCapacityValue(5.0).setDemandUnit("kg/s");
+    SafetySystemDemand rulesDetectorDemand = new SafetySystemDemand("D-RULES-102")
+        .setBarrierId("B-RULES-101").setRequiredResponseTimeSeconds(5.0);
+    GasDetector rulesGas = new GasDetector("GD-201", GasDetector.GasType.COMBUSTIBLE, "Module M02");
+    rulesGas.setResponseTime(30.0);
+    neqsim.process.logic.sis.SafetyInstrumentedFunction rulesSif = new neqsim.process.logic.sis.SafetyInstrumentedFunction("B-RULES-101 SIF",
+        VotingLogic.TWO_OUT_OF_THREE);
+    Detector bypassed = new Detector("GD-201", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL");
+    bypassed.setBypass(true);
+    Detector faulty = new Detector("GD-202", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL");
+    faulty.setFaulty(true);
+    Detector healthy = new Detector("GD-203", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL");
+    rulesSif.addDetector(bypassed);
+    rulesSif.addDetector(faulty);
+    rulesSif.addDetector(healthy);
+    rulesSif.setOverride(true);
+    printPerformance("ssp_rule_failures", new SafetySystemPerformanceAnalyzer(rulesRegister)
+        .addMeasurementDevice(rulesGas).addSafetyInstrumentedFunction(rulesSif)
+        .addDemandCase(rulesDemand).addDemandCase(rulesDetectorDemand));
+
+    BarrierRegister instrumentRegister = new BarrierRegister("BR-INST-001").setName("Instrumentation");
+    SafetyBarrier instrumentBarrier = performanceBarrier("B-INST-001", "Gas detection",
+        "Detect gas and alarm", SafetySystemCategory.FIRE_GAS_DETECTION).setPfd(2.8e-4);
+    instrumentBarrier.addEquipmentTag("GD-301");
+    instrumentRegister.addBarrier(instrumentBarrier);
+    neqsim.process.logic.sis.SafetyInstrumentedFunction instrumentSif = new neqsim.process.logic.sis.SafetyInstrumentedFunction("B-INST-001 SIF",
+        VotingLogic.TWO_OUT_OF_THREE);
+    Detector instrumentBypassed = new Detector("GD-301", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL");
+    instrumentBypassed.setBypass(true);
+    Detector instrumentHealthy = new Detector("GD-302", Detector.DetectorType.GAS,
+        Detector.AlarmLevel.HIGH_HIGH, 60.0, "%LEL");
+    instrumentSif.addDetector(instrumentBypassed);
+    instrumentSif.addDetector(instrumentHealthy);
+    printPerformance("ssp_instrumentation_warnings",
+        new SafetySystemPerformanceAnalyzer(instrumentRegister)
+            .addSafetyInstrumentedFunction(instrumentSif));
+
+    BarrierRegister inferredRegister = new BarrierRegister("BR-INF-001").setName("Inferred category");
+    SafetyBarrier inferred = new SafetyBarrier("B-INF-001").setName("Bland barrier")
+        .setDescription("Isolation duty").setSafetyFunction("Isolation duty")
+        .setStatus(SafetyBarrier.BarrierStatus.AVAILABLE).addEquipmentTag("V-301")
+        .addEvidence(performanceEvidence("BE-INF-001"));
+    inferred.setPerformanceStandard(new PerformanceStandard("PS-INF-001").setTitle("Bland standard")
+        .setSafetyFunction("Isolation duty").setTargetPfd(1.0e-3).setRequiredAvailability(0.99)
+        .setResponseTimeSeconds(60.0).addAcceptanceCriterion("meet requirements"));
+    inferredRegister.addBarrier(inferred)
+        .addSafetyCriticalElement(new SafetyCriticalElement("SCE-INF-001").setTag("SCE-I")
+            .setName("Fire equipment").setType(SafetyCriticalElement.ElementType.FIRE_PROTECTION)
+            .addBarrier(inferred));
+    printPerformance("ssp_element_inference", new SafetySystemPerformanceAnalyzer(inferredRegister));
+    System.out.println();
+  }
+
+  @SuppressWarnings("unchecked")
+  static void printPerformance(String label, SafetySystemPerformanceAnalyzer analyzer) {
+    SafetySystemPerformanceReport report = analyzer.analyze();
+    System.out.println(label);
+    System.out.println("register_id=" + report.getRegisterId());
+    System.out.println("register_name=" + report.getName());
+    System.out.println("overall_verdict=" + report.getOverallVerdict());
+    System.out.println("assessment_count=" + report.getAssessments().size());
+    System.out.println("pass_count="
+        + report.countAssessments(SafetySystemPerformanceReport.Verdict.PASS));
+    System.out.println("warning_count="
+        + report.countAssessments(SafetySystemPerformanceReport.Verdict.PASS_WITH_WARNINGS));
+    System.out.println("fail_count="
+        + report.countAssessments(SafetySystemPerformanceReport.Verdict.FAIL));
+    for (int i = 0; i < report.getAssessments().size(); i++) {
+      Map<String, Object> map = report.getAssessments().get(i).toMap();
+      String prefix = "assessment_" + i + "_";
+      System.out.println(prefix + "barrier_id=" + map.get("barrierId"));
+      System.out.println(prefix + "barrier_name=" + map.get("barrierName"));
+      System.out.println(prefix + "demand_id=" + map.get("demandId"));
+      System.out.println(prefix + "category=" + map.get("category"));
+      System.out.println(prefix + "verdict=" + map.get("verdict"));
+      Map<String, Object> metrics = (Map<String, Object>) map.get("metrics");
+      for (Map.Entry<String, Object> entry : metrics.entrySet()) {
+        Object value = entry.getValue();
+        if (value instanceof Number && Double.isNaN(((Number) value).doubleValue())) {
+          continue;
+        }
+        System.out.println(
+            prefix + "metric_" + entry.getKey() + "=" + String.valueOf(value).replace("\n", " "));
+      }
+      List<String> tags = (List<String>) map.get("instrumentTags");
+      for (int j = 0; j < tags.size(); j++) {
+        System.out.println(prefix + "instrument_" + j + "=" + tags.get(j));
+      }
+      List<String> sifs = (List<String>) map.get("safetyInstrumentedFunctions");
+      for (int j = 0; j < sifs.size(); j++) {
+        System.out.println(prefix + "sif_" + j + "=" + sifs.get(j));
+      }
+      List<Map<String, Object>> findings = (List<Map<String, Object>>) map.get("findings");
+      System.out.println(prefix + "finding_count=" + findings.size());
+      for (int j = 0; j < findings.size(); j++) {
+        System.out.println(prefix + "finding_" + j + "_severity=" + findings.get(j).get("severity"));
+        System.out.println(prefix + "finding_" + j + "_message=" + findings.get(j).get("message"));
+      }
+    }
+    System.out.println();
   }
 
   // ---- The safety screens ---------------------------------------------------

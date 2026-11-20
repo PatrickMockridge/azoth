@@ -1,0 +1,97 @@
+id = "process.esd_response_time"
+name = "ESD response time"
+kind = "procedure"
+assumptions = [
+    "**the three stage totals are the contributions' sums** in the class's `detection`, `logic` and `final_element` stages, and the total is their sum.",
+    "**an absent allowable response time is no budget**: the result is within budget and its margin is absent, matching the class's NaN allowance.",
+    "**`within_budget` is `total <= allowable`**, so an exactly-spent budget passes.",
+    "**a contribution's time is at least zero**; a negative time is refused at the boundary.",
+    "**an empty contribution list is the class's `IllegalStateException`**, typed at the boundary.",
+    "**`addValve` is one final-element contribution** of the solenoid delay plus the stroke; the model takes the flattened row.",
+    "**the contributions are echoed in caller order**, and the class's `summary` prose is presentation.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/esd/EsdResponseTimeSimulator.java` is the port source.",
+    "`validation/neqsim/captures/process_esd_response_time.tsv` - the class's two tests, a no-budget state, a zero-time contribution and the empty-list refusal.",
+]
+[source]
+standard = "NeqSim process/safety/esd/EsdResponseTimeSimulator.java"
+edition = "Its `evaluate`, the three stage totals, the total, the budget test and the result."
+[algorithm]
+scheme = "esd_response_time"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.sif_tag]
+type = "string"
+optional = true
+description = "the SIF identifier the result echoes. **Absent is `ESD-SIF`.**\n"
+[inputs.contributions]
+type = "record_list"
+row_type = "EsdContributionInput"
+optional = true
+description = "the timed contributions, in caller order. **Absent is an empty list, which the class refuses.**\n"
+[inputs.contributions.fields.name]
+type = "string"
+description = "the contribution's name.\n"
+[inputs.contributions.fields.stage]
+type = "enum"
+values = ["detection", "logic", "final_element"]
+description = "the stage the contribution belongs to.\n"
+[inputs.contributions.fields.time]
+unit = "s"
+description = "the contribution's time, at least zero.\n"
+[inputs.allowable_response_time]
+unit = "s"
+optional = true
+description = "the end-to-end budget. **Absent is the class's NaN: within budget, with no margin.**\n"
+[outputs]
+[outputs.sif_tag]
+type = "string"
+description = "the echoed SIF identifier.\n"
+[outputs.detection_time]
+unit = "s"
+description = "the sum of the detection contributions.\n"
+[outputs.logic_time]
+unit = "s"
+description = "the sum of the logic contributions.\n"
+[outputs.final_element_time]
+unit = "s"
+description = "the sum of the final-element contributions.\n"
+[outputs.total_response_time]
+unit = "s"
+description = "the three stage totals' sum.\n"
+[outputs.allowable_response_time]
+unit = "s"
+optional = true
+description = "the budget, absent when none is stated.\n"
+[outputs.margin]
+unit = "s"
+optional = true
+description = "`allowable - total`, absent when no budget is stated.\n"
+[outputs.within_budget]
+type = "boolean"
+description = "`total <= allowable`, and true when no budget is stated.\n"
+[outputs.contributions]
+type = "record_list"
+description = "the contributions echoed in caller order.\n"
+[outputs.contributions.fields.name]
+type = "string"
+description = "the contribution's name.\n"
+[outputs.contributions.fields.stage]
+type = "enum"
+values = ["detection", "logic", "final_element"]
+description = "the contribution's stage.\n"
+[outputs.contributions.fields.time]
+unit = "s"
+description = "the contribution's time.\n"
+[[valid_range]]
+quantity = "allowable_response_time"
+min = 0
+min_inclusive = true
+severity = "error"
+rationale = "a negative budget is not a budget"
+[implementations]
+python = "azoth.process.esd_response_time"
+rust = "azoth_process::esd_response_time"

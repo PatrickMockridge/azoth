@@ -49,6 +49,7 @@ from azoth.core.result import (
     DynamicPsvSizingResult,
     EjectorResult,
     EscalationGraphResult,
+    EsdResponseTimeResult,
     EventTreeResult,
     ExpanderResult,
     FaultTreeResult,
@@ -83,12 +84,14 @@ from azoth.core.result import (
     MahBowTieSkeletonResult,
     ManifoldResult,
     MapTurboExpanderResult,
+    MassBalanceLeakDetectionResult,
     MdmtResult,
     MixerResult,
     MultiVesselBlowdownStudyResult,
     Nog070SilDeterminationResult,
     NonEquilibriumBlowdownResult,
     NorsokP002ComplianceResult,
+    OpenDrainReviewResult,
     OverpressureAcceptanceResult,
     OverpressureProtectionStudyResult,
     PackedColumnResult,
@@ -117,7 +120,9 @@ from azoth.core.result import (
     RunawayReactionResult,
     S001Clause10ReviewResult,
     S001SecondaryPressureProtectionResult,
+    SafetyEnvelopeResult,
     SafetyInstrumentedFunctionResult,
+    SafetySystemPerformanceResult,
     SelfHeatingInductionResult,
     SemenovSelfHeatingResult,
     SeparatorCapacityAssessmentResult,
@@ -135,6 +140,8 @@ from azoth.core.result import (
     ThrottlingValveResult,
     ToxicLibraryResult,
     Tr3001ComplianceResult,
+    TrappedInventoryResult,
+    TrappedLiquidFireRuptureResult,
     TubeRuptureReliefResult,
     TurboExpanderResult,
     VacuumCollapseResult,
@@ -276,6 +283,7 @@ _RELIEF_DISPOSAL_NETWORK = "process.relief_disposal_network"
 _RISK_MATRIX = "process.risk_matrix"
 _RUNAWAY_REACTION = "process.runaway_reaction"
 _SAFETY_INSTRUMENTED_FUNCTION = "process.safety_instrumented_function"
+_SAFETY_ENVELOPE = "process.safety_envelope"
 _PIPE = "process.pipe"
 _GAS_SCRUBBER = "process.gas_scrubber"
 _HEAT_EXCHANGER = "process.heat_exchanger"
@@ -300,10 +308,12 @@ _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
 _ALARP_AUDIT = "process.alarp_audit"
 _ESCALATION_GRAPH = "process.escalation_graph"
+_ESD_RESPONSE_TIME = "process.esd_response_time"
 _INHERENT_SAFETY = "process.inherent_safety"
 _NORSOK_P002_COMPLIANCE = "process.norsok_p002_compliance"
 _STS0131_GATE = "process.sts0131_gate"
 _MDMT = "process.mdmt"
+_MASS_BALANCE_LEAK_DETECTION = "process.mass_balance_leak_detection"
 _PIPING_FIV_GAS = "process.piping_fiv_gas"
 _PIPING_FIV_LIQUID = "process.piping_fiv_liquid"
 _VACUUM_COLLAPSE = "process.vacuum_collapse"
@@ -351,6 +361,10 @@ _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
 _TOXIC_LIBRARY = "process.toxic_library"
 _TR3001_COMPLIANCE = "process.tr3001_compliance"
+_TRAPPED_INVENTORY = "process.trapped_inventory"
+_TRAPPED_LIQUID_FIRE_RUPTURE = "process.trapped_liquid_fire_rupture"
+_OPEN_DRAIN_REVIEW = "process.open_drain_review"
+_SAFETY_SYSTEM_PERFORMANCE = "process.safety_system_performance"
 _TUBE_RUPTURE_RELIEF = "process.tube_rupture_relief"
 _GIBBS_REACTOR = "process.gibbs_reactor"
 _PLUG_FLOW_REACTOR = "process.plug_flow_reactor"
@@ -1841,6 +1855,52 @@ def expander(
     )
 
 
+def mass_balance_leak_detection(
+    components: list[str],
+    z: list[float],
+    inlet_pressure: float,
+    inlet_temperature: float,
+    inlet_flow: float,
+    outlet_flow: float,
+    eos: str | None = None,
+    inlet_density: float | None = None,
+    linepack_volume: float | None = None,
+    flow_measurement_uncertainty_fraction: float | None = None,
+    pressure_uncertainty: float | None = None,
+    temperature_uncertainty: float | None = None,
+    detection_window: float | None = None,
+    confidence_multiplier: float | None = None,
+    inlet_stream_name: str | None = None,
+    outlet_stream_name: str | None = None,
+) -> MassBalanceLeakDetectionResult:
+    """The mass-balance leak sensitivity.
+
+    The measured imbalance, the two meters' uncertainty, the linepack's pressure and
+    temperature uncertainty, and the minimum detectable rate. **The setters' clamps are
+    carried**: volume, fraction and the uncertainties floor at zero and the window at one.
+
+    See :func:`azoth.process.reference.mass_balance_leak_detection`.
+    """
+    return resolve(_MASS_BALANCE_LEAK_DETECTION)(  # type: ignore[no-any-return]
+        components=components,
+        z=z,
+        inlet_pressure=inlet_pressure,
+        inlet_temperature=inlet_temperature,
+        inlet_flow=inlet_flow,
+        outlet_flow=outlet_flow,
+        eos=eos,
+        inlet_density=inlet_density,
+        linepack_volume=linepack_volume,
+        flow_measurement_uncertainty_fraction=flow_measurement_uncertainty_fraction,
+        pressure_uncertainty=pressure_uncertainty,
+        temperature_uncertainty=temperature_uncertainty,
+        detection_window=detection_window,
+        confidence_multiplier=confidence_multiplier,
+        inlet_stream_name=inlet_stream_name,
+        outlet_stream_name=outlet_stream_name,
+    )
+
+
 def mdmt(
     material_curve: str,
     governing_thickness: Q,
@@ -2827,6 +2887,25 @@ def ejector(
     )
 
 
+def esd_response_time(
+    sif_tag: str | None = None,
+    contributions: list[dict[str, object]] | None = None,
+    allowable_response_time: float | None = None,
+) -> EsdResponseTimeResult:
+    """The ESD response-time budget.
+
+    The three stage sums, their total and the inclusive budget test. **An absent budget is
+    within budget and has no margin**, and the contributions are echoed in caller order.
+
+    See :func:`azoth.process.reference.esd_response_time`.
+    """
+    return resolve(_ESD_RESPONSE_TIME)(  # type: ignore[no-any-return]
+        sif_tag=sif_tag,
+        contributions=contributions,
+        allowable_response_time=allowable_response_time,
+    )
+
+
 def event_tree(
     initiating_frequency_per_year: float,
     branches: list[dict[str, object]],
@@ -2932,6 +3011,48 @@ def s001_secondary_pressure_protection(
         relief_leakage_assessed=relief_leakage_assessed,
         relief_leakage_to_safe_location=relief_leakage_to_safe_location,
         proof_test_interval_months=proof_test_interval_months,
+    )
+
+
+def safety_envelope(
+    components: list[str],
+    z: list[float],
+    min_pressure: float,
+    max_pressure: float,
+    num_points: int,
+    eos: str | None = None,
+    hydrate_margin: float | None = None,
+    wax_margin: float | None = None,
+    co2_margin: float | None = None,
+    mdmt_margin: float | None = None,
+    mdmt_design_temperature: float | None = None,
+    operating_pressure: float | None = None,
+    operating_temperature: float | None = None,
+    phase_trace: list[dict[str, object]] | None = None,
+) -> SafetyEnvelopeResult:
+    """The operational safety envelope.
+
+    The hydrate, wax, CO2-freezing and MDMT curves, and the phase curve when its points
+    are supplied. **A failed point is absent with a warning**, and the queries follow the
+    class's first-bracket interpolation and strict safe test.
+
+    See :func:`azoth.process.reference.safety_envelope`.
+    """
+    return resolve(_SAFETY_ENVELOPE)(  # type: ignore[no-any-return]
+        components=components,
+        z=z,
+        min_pressure=min_pressure,
+        max_pressure=max_pressure,
+        num_points=num_points,
+        eos=eos,
+        hydrate_margin=hydrate_margin,
+        wax_margin=wax_margin,
+        co2_margin=co2_margin,
+        mdmt_margin=mdmt_margin,
+        mdmt_design_temperature=mdmt_design_temperature,
+        operating_pressure=operating_pressure,
+        operating_temperature=operating_temperature,
+        phase_trace=phase_trace,
     )
 
 
@@ -3133,6 +3254,202 @@ def tr3001_compliance(
         required_area_in2=required_area_in2,
         acceptance_accepted=acceptance_accepted,
         accumulation_fraction=accumulation_fraction,
+    )
+
+
+def trapped_inventory(
+    components: list[str],
+    z: list[float],
+    pressure: float,
+    temperature: float,
+    segments: list[dict[str, object]],
+    eos: str | None = None,
+    multiphase_check: bool | None = None,
+    fallback_liquid_density: float | None = None,
+    segment_evidence: list[dict[str, object]] | None = None,
+) -> TrappedInventoryResult:
+    """The trapped gas and liquid inventory.
+
+    The flash's gas and liquid densities over the documented equipment and pipe volumes,
+    with the gas and liquid shares. **A segment with no evidence row warns**, and the
+    class's 800 kg/m3 fallback is used when the flash finds no liquid.
+
+    See :func:`azoth.process.reference.trapped_inventory`.
+    """
+    return resolve(_TRAPPED_INVENTORY)(  # type: ignore[no-any-return]
+        components=components,
+        z=z,
+        pressure=pressure,
+        temperature=temperature,
+        segments=segments,
+        eos=eos,
+        multiphase_check=multiphase_check,
+        fallback_liquid_density=fallback_liquid_density,
+        segment_evidence=segment_evidence,
+    )
+
+
+def trapped_liquid_fire_rupture(
+    components: list[str],
+    z: list[float],
+    inventory_pressure: float,
+    inventory_temperature: float,
+    inventory_liquid_mass: float,
+    inventory_total_mass: float,
+    inventory_total_volume: float,
+    pipe_internal_diameter: float,
+    wall_thickness: float,
+    exposed_length: float,
+    eos: str | None = None,
+    multiphase_check: bool | None = None,
+    segment_id: str | None = None,
+    fire_type: str | None = None,
+    environmental_factor: float | None = None,
+    fire_heat_flux: float | None = None,
+    fire_emissivity: float | None = None,
+    fire_view_factor: float | None = None,
+    flame_temperature: float | None = None,
+    ambient_temperature: float | None = None,
+    passive_protection_factor: float | None = None,
+    fire_exposed_area: float | None = None,
+    api5l_grade: str | None = None,
+    ambient_tensile_strength: float | None = None,
+    flange_class: str | None = None,
+    relief_set_pressure: float | None = None,
+    relief_limits_pressure: bool | None = None,
+    max_time: float | None = None,
+    time_step: float | None = None,
+    wall_density: float | None = None,
+    wall_heat_capacity: float | None = None,
+    wall_conductivity: float | None = None,
+    liquid_heat_capacity: float | None = None,
+    liquid_expansion: float | None = None,
+    liquid_bulk_modulus: float | None = None,
+    inner_htc: float | None = None,
+    outer_htc: float | None = None,
+    tensile_strength_factor: float | None = None,
+    wall_nodes: int | None = None,
+    vapor_pocket_detection: bool | None = None,
+) -> TrappedLiquidFireRuptureResult:
+    """The trapped-liquid fire rupture study.
+
+    The explicit wall march, the fire exposure, the material and flange derating and the
+    four events. **The limiting mode is the earliest pipe or flange failure**, else the
+    relief set, else the vapor pocket.
+
+    See :func:`azoth.process.reference.trapped_liquid_fire_rupture`.
+    """
+    return resolve(_TRAPPED_LIQUID_FIRE_RUPTURE)(  # type: ignore[no-any-return]
+        components=components,
+        z=z,
+        inventory_pressure=inventory_pressure,
+        inventory_temperature=inventory_temperature,
+        inventory_liquid_mass=inventory_liquid_mass,
+        inventory_total_mass=inventory_total_mass,
+        inventory_total_volume=inventory_total_volume,
+        pipe_internal_diameter=pipe_internal_diameter,
+        wall_thickness=wall_thickness,
+        exposed_length=exposed_length,
+        eos=eos,
+        multiphase_check=multiphase_check,
+        segment_id=segment_id,
+        fire_type=fire_type,
+        environmental_factor=environmental_factor,
+        fire_heat_flux=fire_heat_flux,
+        fire_emissivity=fire_emissivity,
+        fire_view_factor=fire_view_factor,
+        flame_temperature=flame_temperature,
+        ambient_temperature=ambient_temperature,
+        passive_protection_factor=passive_protection_factor,
+        fire_exposed_area=fire_exposed_area,
+        api5l_grade=api5l_grade,
+        ambient_tensile_strength=ambient_tensile_strength,
+        flange_class=flange_class,
+        relief_set_pressure=relief_set_pressure,
+        relief_limits_pressure=relief_limits_pressure,
+        max_time=max_time,
+        time_step=time_step,
+        wall_density=wall_density,
+        wall_heat_capacity=wall_heat_capacity,
+        wall_conductivity=wall_conductivity,
+        liquid_heat_capacity=liquid_heat_capacity,
+        liquid_expansion=liquid_expansion,
+        liquid_bulk_modulus=liquid_bulk_modulus,
+        inner_htc=inner_htc,
+        outer_htc=outer_htc,
+        tensile_strength_factor=tensile_strength_factor,
+        wall_nodes=wall_nodes,
+        vapor_pocket_detection=vapor_pocket_detection,
+    )
+
+
+def open_drain_review(
+    project_name: str | None = None,
+    default_liquid_leak_rate: float | None = None,
+    items: list[dict[str, object]] | None = None,
+    evidence: list[dict[str, object]] | None = None,
+    design_standards: list[dict[str, object]] | None = None,
+    references: list[dict[str, object]] | None = None,
+) -> OpenDrainReviewResult:
+    """The NORSOK S-001 Clause 9 open-drain review.
+
+    Nineteen assessments per item in the class's order, with a tri-state boolean
+    requirement, the capacity test against fire water plus the process leak, the
+    evidence confidence and the verdict cascade. **A duplicate area id, a duplicate
+    (area id, key) or a row naming no item is refused.**
+
+    See :func:`azoth.process.reference.open_drain_review`.
+    """
+    return resolve(_OPEN_DRAIN_REVIEW)(  # type: ignore[no-any-return]
+        project_name=project_name,
+        default_liquid_leak_rate=default_liquid_leak_rate,
+        items=items,
+        evidence=evidence,
+        design_standards=design_standards,
+        references=references,
+    )
+
+
+def safety_system_performance(
+    register_id: str,
+    register_name: str | None = None,
+    elements: list[dict[str, object]] | None = None,
+    links: list[dict[str, object]] | None = None,
+    barriers: list[dict[str, object]] | None = None,
+    barrier_tags: list[dict[str, object]] | None = None,
+    standards: list[dict[str, object]] | None = None,
+    standard_criteria: list[dict[str, object]] | None = None,
+    demands: list[dict[str, object]] | None = None,
+    measurement_devices: list[dict[str, object]] | None = None,
+    event_sifs: list[dict[str, object]] | None = None,
+    sif_detectors: list[dict[str, object]] | None = None,
+    quantitative_sifs: list[dict[str, object]] | None = None,
+    protected_equipment: list[dict[str, object]] | None = None,
+) -> SafetySystemPerformanceResult:
+    """The safety-system performance assessment over a barrier register.
+
+    The class's five check families per barrier and matching demand, the category
+    inference, the related instruments and SIFs, and a stable rule on every finding.
+    **A row naming an element, barrier, standard, SIF or equipment tag that is not in
+    the register is refused.**
+
+    See :func:`azoth.process.reference.safety_system_performance`.
+    """
+    return resolve(_SAFETY_SYSTEM_PERFORMANCE)(  # type: ignore[no-any-return]
+        register_id=register_id,
+        register_name=register_name,
+        elements=elements,
+        links=links,
+        barriers=barriers,
+        barrier_tags=barrier_tags,
+        standards=standards,
+        standard_criteria=standard_criteria,
+        demands=demands,
+        measurement_devices=measurement_devices,
+        event_sifs=event_sifs,
+        sif_detectors=sif_detectors,
+        quantitative_sifs=quantitative_sifs,
+        protected_equipment=protected_equipment,
     )
 
 

@@ -31,6 +31,7 @@
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/escalation_graph.toml
+//!   - specs/models/process/esd_response_time.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
@@ -65,12 +66,14 @@
 //!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
+//!   - specs/models/process/mass_balance_leak_detection.toml
 //!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/multi_vessel_blowdown_study.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/non_equilibrium_blowdown.toml
 //!   - specs/models/process/norsok_p002_compliance.toml
+//!   - specs/models/process/open_drain_review.toml
 //!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/overpressure_protection_study.toml
 //!   - specs/models/process/packed_column.toml
@@ -99,7 +102,9 @@
 //!   - specs/models/process/runaway_reaction.toml
 //!   - specs/models/process/s001_clause10_review.toml
 //!   - specs/models/process/s001_secondary_pressure_protection.toml
+//!   - specs/models/process/safety_envelope.toml
 //!   - specs/models/process/safety_instrumented_function.toml
+//!   - specs/models/process/safety_system_performance.toml
 //!   - specs/models/process/self_heating_induction.toml
 //!   - specs/models/process/semenov_self_heating.toml
 //!   - specs/models/process/separator.toml
@@ -117,6 +122,8 @@
 //!   - specs/models/process/throttling_valve.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
+//!   - specs/models/process/trapped_inventory.toml
+//!   - specs/models/process/trapped_liquid_fire_rupture.toml
 //!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vacuum_collapse.toml

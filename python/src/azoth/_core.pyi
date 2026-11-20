@@ -12,7 +12,7 @@ see `azoth._rust_bridge`.
 
 from typing import TypedDict, final
 
-from azoth.core.result_base import PlusModel
+from azoth.core.result_base import BeggsBrillRegime, BlowbyVerdict, CooldownVerdict, CorrosionSeverity, DeadheadVerdict, EmulsionType, ErosionRiskLevel, FailureMode, FeSMorphology, FivLikelihood, FlowRegime, FluidBasis, GoverningCriterion, HenryStatus, HydrateRiskLevel, HydrateStructure, MultiflashSeedPath, OpenDrainVerdict, OverallVerdict, PerformanceVerdict, Phase, PlusModel, ReliefPhase, RootStructure, RunawayVerdict, RuptureStatus, SelfHeatingGeometry, SelfHeatingVerdict, SettleOutVerdict, StabilityVerdict, SupplyVerdict, TpMultiflashSeed, VacuumVerdict
 
 # --- transport types ------------------------------------------------------
 # The values that cross the boundary and are not results. Hand-written here
@@ -560,6 +560,13 @@ class EscalationExposure(TypedDict):
     target: str
     load: float
 
+class EsdContributionInput(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    stage: str
+    time: float
+
 class EventTreeBranch(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -659,6 +666,32 @@ class P002CheckRow(TypedDict):
     carry_over_limit: float | None
     recorded_ok: bool | None
 
+class OpenDrainItem(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    area_id: str
+    area_type: str | None
+    drain_system_type: str | None
+
+class OpenDrainEvidence(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    area_id: str
+    key: str
+    value: str | None
+
+class OpenDrainStandard(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    area_id: str
+    standard: str
+
+class OpenDrainReference(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    area_id: str
+    reference: str
+
 class OverpressureScenario(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -742,6 +775,121 @@ class ReviewReference(TypedDict):
     function_id: str
     reference: str
 
+class EnvelopeTracePoint(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    pressure: float
+    temperature: float
+
+class PerformanceElement(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    element_type: str
+
+class SafetySystemLink(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    element_id: str
+    barrier_id: str
+
+class PerformanceBarrier(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    status: str
+    has_traceable_evidence: bool | None
+    name: str | None
+    description: str | None
+    safety_function: str | None
+    pfd: float | None
+    effectiveness: float | None
+    performance_standard_id: str | None
+
+class BarrierEquipmentTag(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    barrier_id: str
+    tag: str
+
+class SafetyPerformanceStandard(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    title: str | None
+    safety_function: str | None
+    target_pfd: float | None
+    required_availability: float | None
+    response_time_seconds: float | None
+
+class StandardCriterion(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    standard_id: str
+    criterion: str
+
+class SafetySystemDemandRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    demand_id: str
+    barrier_id: str | None
+    equipment_tag: str | None
+    scenario: str | None
+    category: str | None
+    demand_value: float | None
+    capacity_value: float | None
+    demand_unit: str | None
+    required_pfd: float | None
+    actual_pfd: float | None
+    required_availability: float | None
+    actual_availability: float | None
+    required_response_time_seconds: float | None
+    actual_response_time_seconds: float | None
+    required_effectiveness: float | None
+    actual_effectiveness: float | None
+
+class MeasurementDeviceRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    kind: str
+    tag: str | None
+    location: str | None
+    response_time_seconds: float | None
+
+class EventSifRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    voting_notation: str
+    overridden: bool | None
+
+class SifDetectorRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    sif_name: str
+    name: str
+    bypassed: bool | None
+    faulty: bool | None
+    tripped: bool | None
+
+class QuantitativeSifRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    id: str
+    name: str | None
+    description: str | None
+    architecture: str
+    claimed_sil: float
+    pfd_average: float
+    test_interval_hours: float | None
+
+class ProtectedEquipmentRow(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    sif_id: str
+    equipment: str
+
 class EfficiencyPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -778,6 +926,24 @@ class Tr3001Scenario(TypedDict):
     relief_rate: float
     dynamically_determined: bool
     credible: bool
+
+class TrappedInventorySegment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    segment_id: str
+    kind: str
+    volume: float | None
+    liquid_fill_fraction: float
+    internal_diameter: float | None
+    length: float | None
+
+class TrappedInventoryEvidence(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    segment_id: str
+    document_id: str | None
+    source_reference: str | None
+    excerpt: str | None
 
 class TurboUcPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -1179,6 +1345,14 @@ class EscalationItemResult:
     item_id: str
 
 @final
+class EsdContribution:
+    """the contributions echoed in caller order."""
+
+    name: str
+    stage: str
+    time: Qty
+
+@final
 class EventTreeOutcome:
     """one row per leaf, in the class's bit order: `2^n` rows, or one when there are no branches."""
 
@@ -1479,6 +1653,24 @@ class P002FindingResult:
     compliant: bool
 
 @final
+class OpenDrainResult:
+    """one row per item, in caller order."""
+
+    area_id: str
+    verdict: str
+    confidence: float
+
+@final
+class OpenDrainAssessment:
+    """every assessment, item by item."""
+
+    area_id: str
+    requirement_id: str
+    clause: str
+    status: str
+    severity: str
+
+@final
 class PipeFireRupturePoint:
     """one row per marching step, in time order, ending at the rupture step when one is found."""
 
@@ -1606,6 +1798,110 @@ class ReviewCoverage:
     status: str
 
 @final
+class EnvelopeSummary:
+    """one summary row per arm, in the class's order."""
+
+    envelope: str
+    name: str
+    point_count: float
+    reference_water_content: float
+    reference_wax_content: float
+
+@final
+class EnvelopePoint:
+    """every arm's points, arm by arm in the class's order."""
+
+    envelope: str
+    index: float
+    pressure: Qty
+    temperature: Qty | None
+    margin: Qty
+    safe_temperature: Qty | None
+
+@final
+class EnvelopeQuery:
+    """one row per arm when an operating point is stated, in the class's order."""
+
+    envelope: str
+    temperature: Qty | None
+    safe_temperature: Qty | None
+    margin: Qty | None
+    safe: bool
+
+@final
+class PerformanceAssessment:
+    """one row per barrier and matching demand, in register order."""
+
+    barrier_id: str
+    barrier_name: str
+    demand_id: str | None
+    category: str
+    verdict: str
+    barrier_status: str
+    barrier_pfd: float | None
+    barrier_effectiveness: float | None
+    has_traceable_evidence: bool
+    performance_standard_id: str | None
+    target_pfd: float | None
+    actual_pfd: float | None
+    required_availability: float | None
+    actual_availability: float | None
+    required_response_time_seconds: Qty | None
+    actual_response_time_seconds: Qty | None
+    required_effectiveness: float | None
+    actual_effectiveness: float | None
+    scenario: str | None
+    demand_value: float | None
+    capacity_value: float | None
+    demand_unit: str | None
+    capacity_margin: float | None
+    related_instrument_count: float
+    max_instrument_response_time_seconds: Qty | None
+    related_sif_count: float
+    related_quantitative_sif_count: float
+    finding_count: float
+
+@final
+class PerformanceFinding:
+    """every finding, assessment by assessment in the class's order."""
+
+    barrier_id: str
+    demand_id: str | None
+    rule: str
+    severity: str
+
+@final
+class PerformanceInstrument:
+    """the related measurement devices, assessment by assessment."""
+
+    barrier_id: str
+    demand_id: str | None
+    tag: str
+
+@final
+class PerformanceSif:
+    """the related SIFs, assessment by assessment."""
+
+    barrier_id: str
+    demand_id: str | None
+    identifier: str
+    kind: str
+    voting_notation: str | None
+    detector_count: float | None
+    bypassed_detector_count: float | None
+    faulty_detector_count: float | None
+    tripped_detector_count: float | None
+    claimed_sil: float | None
+    achieved_sil: float | None
+    sil_achieved: bool | None
+    pfd_average: float | None
+    pfd_upper: float | None
+    risk_reduction_factor: float | None
+    architecture: str | None
+    proof_test_interval_hours: float | None
+    protected_equipment_count: float | None
+
+@final
 class SelfHeatingTimePoint:
     """the retained temperature samples, in the class's order."""
 
@@ -1646,6 +1942,37 @@ class Tr3001Finding:
 
     check: str
     status: str
+
+@final
+class TrappedInventorySegmentResult:
+    """one row per input segment, in caller order."""
+
+    segment_id: str
+    kind: str
+    total_volume: Qty
+    gas_volume: Qty
+    liquid_volume: Qty
+    gas_mass: Qty
+    liquid_mass: Qty
+    total_mass: Qty
+    gas_density: Qty
+    liquid_density: Qty
+    liquid_fill_fraction: float
+    internal_diameter: Qty | None
+    length: Qty | None
+
+@final
+class RupturePoint:
+    """the recorded time series, one row per step, the failure step included."""
+
+    time: Qty
+    pressure: Qty
+    liquid_temperature: Qty
+    inner_wall_temperature: Qty
+    outer_wall_temperature: Qty
+    von_mises_stress: Qty
+    allowable_stress: Qty
+    flange_rating: Qty
 
 @final
 class VesselFillingPoint:
@@ -4111,6 +4438,19 @@ class EscalationGraphResult:
     warnings: list[Warning]
 
 @final
+class EsdResponseTimeResult:
+    sif_tag: str
+    detection_time: Qty
+    logic_time: Qty
+    final_element_time: Qty
+    total_response_time: Qty
+    allowable_response_time: Qty | None
+    margin: Qty | None
+    within_budget: bool
+    contributions: list[EsdContribution]
+    warnings: list[Warning]
+
+@final
 class EventTreeResult:
     outcomes: list[EventTreeOutcome]
     warnings: list[Warning]
@@ -4727,6 +5067,23 @@ class MapTurboExpanderResult:
     warnings: list[Warning]
 
 @final
+class MassBalanceLeakDetectionResult:
+    inlet_stream_name: str | None
+    outlet_stream_name: str | None
+    inlet_flow: Qty
+    outlet_flow: Qty
+    measured_imbalance: Qty
+    flow_uncertainty: Qty
+    linepack_uncertainty: Qty
+    combined_uncertainty: Qty
+    minimum_detectable_leak_rate: Qty
+    minimum_detectable_leak_fraction: float | None
+    density: Qty | None
+    detection_window: Qty
+    confidence_multiplier: float
+    warnings: list[Warning]
+
+@final
 class MdmtResult:
     mdmt: Qty
     acceptable: bool
@@ -4780,6 +5137,19 @@ class NorsokP002ComplianceResult:
     findings: list[P002FindingResult]
     compliant: bool
     non_compliant_count: float
+    warnings: list[Warning]
+
+@final
+class OpenDrainReviewResult:
+    overall_verdict: OpenDrainVerdict
+    item_count: float
+    failed_item_count: float
+    warning_item_count: float
+    assessment_count: float
+    fail_assessment_count: float
+    warning_assessment_count: float
+    results: list[OpenDrainResult]
+    assessments: list[OpenDrainAssessment]
     warnings: list[Warning]
 
 @final
@@ -5266,6 +5636,15 @@ class S001SecondaryPressureProtectionResult:
     warnings: list[Warning]
 
 @final
+class SafetyEnvelopeResult:
+    envelopes: list[EnvelopeSummary]
+    points: list[EnvelopePoint]
+    queries: list[EnvelopeQuery]
+    all_safe: bool | None
+    most_limiting_envelope: str | None
+    warnings: list[Warning]
+
+@final
 class SafetyInstrumentedFunctionResult:
     risk_reduction_factor: float | None
     mitigated_frequency_per_year: float
@@ -5278,6 +5657,21 @@ class SafetyInstrumentedFunctionResult:
     pfd_1oo2: float | None
     pfd_2oo3: float | None
     availability_with_spurious_trips: float | None
+    warnings: list[Warning]
+
+@final
+class SafetySystemPerformanceResult:
+    register_id: str
+    register_name: str
+    overall_verdict: PerformanceVerdict
+    assessment_count: float
+    pass_count: float
+    warning_count: float
+    fail_count: float
+    assessments: list[PerformanceAssessment]
+    findings: list[PerformanceFinding]
+    instruments: list[PerformanceInstrument]
+    sifs: list[PerformanceSif]
     warnings: list[Warning]
 
 @final
@@ -5638,6 +6032,37 @@ class Tr3001ComplianceResult:
     review_count: float
     fail_count: float
     compliant: bool
+    warnings: list[Warning]
+
+@final
+class TrappedInventoryResult:
+    gas_density: Qty
+    liquid_density: Qty
+    total_volume: Qty
+    total_gas_volume: Qty
+    total_liquid_volume: Qty
+    total_gas_mass: Qty
+    total_liquid_mass: Qty
+    total_mass: Qty
+    segments: list[TrappedInventorySegmentResult]
+    warnings: list[Warning]
+
+@final
+class TrappedLiquidFireRuptureResult:
+    segment_id: str
+    trajectory: list[RupturePoint]
+    limiting_failure_mode: FailureMode
+    rupture_predicted: bool
+    time_to_relief_set: Qty | None
+    time_to_vapor_pocket: Qty | None
+    time_to_pipe_rupture: Qty | None
+    time_to_flange_failure: Qty | None
+    minimum_failure_time: Qty | None
+    final_pressure: Qty
+    final_liquid_temperature: Qty
+    final_outer_wall_temperature: Qty
+    standards_applied: list[str]
+    recommendations: list[str]
     warnings: list[Warning]
 
 @final
@@ -8430,6 +8855,11 @@ def escalation_graph(
     exposures: list[EscalationExposure],
     initiator: str,
 ) -> EscalationGraphResult: ...
+def esd_response_time(
+    sif_tag: str | None = None,
+    contributions: list[EsdContributionInput] | None = None,
+    allowable_response_time: float | None = None,
+) -> EsdResponseTimeResult: ...
 def event_tree(
     initiating_frequency_per_year: float,
     branches: list[EventTreeBranch],
@@ -8905,6 +9335,24 @@ def map_turbo_expander_compressor(
     chart_conditions: list[float] | None = None,
     impeller_diameter: float | None = None,
 ) -> MapTurboExpanderResult: ...
+def mass_balance_leak_detection(
+    components: list[str],
+    z: list[float],
+    inlet_pressure: float,
+    inlet_temperature: float,
+    inlet_flow: float,
+    outlet_flow: float,
+    eos: str | None = None,
+    inlet_density: float | None = None,
+    linepack_volume: float | None = None,
+    flow_measurement_uncertainty_fraction: float | None = None,
+    pressure_uncertainty: float | None = None,
+    temperature_uncertainty: float | None = None,
+    detection_window: float | None = None,
+    confidence_multiplier: float | None = None,
+    inlet_stream_name: str | None = None,
+    outlet_stream_name: str | None = None,
+) -> MassBalanceLeakDetectionResult: ...
 def mdmt(
     material_curve: str,
     governing_thickness: float,
@@ -8962,6 +9410,14 @@ def non_equilibrium_blowdown(
     stop_pressure: float | None = None,
 ) -> NonEquilibriumBlowdownResult: ...
 def norsok_p002_compliance(checks: list[P002CheckRow]) -> NorsokP002ComplianceResult: ...
+def open_drain_review(
+    project_name: str | None = None,
+    default_liquid_leak_rate: float | None = None,
+    items: list[OpenDrainItem] | None = None,
+    evidence: list[OpenDrainEvidence] | None = None,
+    design_standards: list[OpenDrainStandard] | None = None,
+    references: list[OpenDrainReference] | None = None,
+) -> OpenDrainReviewResult: ...
 def overpressure_acceptance(
     peak_pressure: float,
     mawp: float,
@@ -9357,6 +9813,22 @@ def s001_secondary_pressure_protection(
     relief_leakage_to_safe_location: bool | None = None,
     proof_test_interval_months: float | None = None,
 ) -> S001SecondaryPressureProtectionResult: ...
+def safety_envelope(
+    components: list[str],
+    z: list[float],
+    min_pressure: float,
+    max_pressure: float,
+    num_points: float,
+    eos: str | None = None,
+    hydrate_margin: float | None = None,
+    wax_margin: float | None = None,
+    co2_margin: float | None = None,
+    mdmt_margin: float | None = None,
+    mdmt_design_temperature: float | None = None,
+    operating_pressure: float | None = None,
+    operating_temperature: float | None = None,
+    phase_trace: list[EnvelopeTracePoint] | None = None,
+) -> SafetyEnvelopeResult: ...
 def safety_instrumented_function(
     pfd_average: float,
     claimed_sil: float,
@@ -9368,6 +9840,22 @@ def safety_instrumented_function(
     mttr_hours: float | None = None,
     base_availability: float | None = None,
 ) -> SafetyInstrumentedFunctionResult: ...
+def safety_system_performance(
+    register_id: str,
+    register_name: str | None = None,
+    elements: list[PerformanceElement] | None = None,
+    links: list[SafetySystemLink] | None = None,
+    barriers: list[PerformanceBarrier] | None = None,
+    barrier_tags: list[BarrierEquipmentTag] | None = None,
+    standards: list[SafetyPerformanceStandard] | None = None,
+    standard_criteria: list[StandardCriterion] | None = None,
+    demands: list[SafetySystemDemandRow] | None = None,
+    measurement_devices: list[MeasurementDeviceRow] | None = None,
+    event_sifs: list[EventSifRow] | None = None,
+    sif_detectors: list[SifDetectorRow] | None = None,
+    quantitative_sifs: list[QuantitativeSifRow] | None = None,
+    protected_equipment: list[ProtectedEquipmentRow] | None = None,
+) -> SafetySystemPerformanceResult: ...
 def self_heating_induction(
     geometry: str,
     characteristic_dimension: float,
@@ -9654,6 +10142,59 @@ def tr3001_compliance(
     acceptance_accepted: bool | None = None,
     accumulation_fraction: float | None = None,
 ) -> Tr3001ComplianceResult: ...
+def trapped_inventory(
+    components: list[str],
+    z: list[float],
+    pressure: float,
+    temperature: float,
+    segments: list[TrappedInventorySegment],
+    eos: str | None = None,
+    multiphase_check: bool | None = None,
+    fallback_liquid_density: float | None = None,
+    segment_evidence: list[TrappedInventoryEvidence] | None = None,
+) -> TrappedInventoryResult: ...
+def trapped_liquid_fire_rupture(
+    components: list[str],
+    z: list[float],
+    inventory_pressure: float,
+    inventory_temperature: float,
+    inventory_liquid_mass: float,
+    inventory_total_mass: float,
+    inventory_total_volume: float,
+    pipe_internal_diameter: float,
+    wall_thickness: float,
+    exposed_length: float,
+    eos: str | None = None,
+    multiphase_check: bool | None = None,
+    segment_id: str | None = None,
+    fire_type: str | None = None,
+    environmental_factor: float | None = None,
+    fire_heat_flux: float | None = None,
+    fire_emissivity: float | None = None,
+    fire_view_factor: float | None = None,
+    flame_temperature: float | None = None,
+    ambient_temperature: float | None = None,
+    passive_protection_factor: float | None = None,
+    fire_exposed_area: float | None = None,
+    api5l_grade: str | None = None,
+    ambient_tensile_strength: float | None = None,
+    flange_class: str | None = None,
+    relief_set_pressure: float | None = None,
+    relief_limits_pressure: bool | None = None,
+    max_time: float | None = None,
+    time_step: float | None = None,
+    wall_density: float | None = None,
+    wall_heat_capacity: float | None = None,
+    wall_conductivity: float | None = None,
+    liquid_heat_capacity: float | None = None,
+    liquid_expansion: float | None = None,
+    liquid_bulk_modulus: float | None = None,
+    inner_htc: float | None = None,
+    outer_htc: float | None = None,
+    tensile_strength_factor: float | None = None,
+    wall_nodes: float | None = None,
+    vapor_pocket_detection: bool | None = None,
+) -> TrappedLiquidFireRuptureResult: ...
 def tube_rupture_relief(
     components: list[str],
     mole_fractions: list[float],

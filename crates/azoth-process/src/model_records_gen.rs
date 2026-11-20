@@ -41,6 +41,7 @@ use crate::models::drift_flux_release::DriftFluxReleaseResult;
 use crate::models::dynamic_psv_sizing::DynamicPsvSizingResult;
 use crate::models::ejector::EjectorResult;
 use crate::models::escalation_graph::EscalationGraphResult;
+use crate::models::esd_response_time::EsdResponseTimeResult;
 use crate::models::event_tree::EventTreeResult;
 use crate::models::expander::ExpanderResult;
 use crate::models::fault_tree::FaultTreeResult;
@@ -75,12 +76,14 @@ use crate::models::lopa::LopaResult;
 use crate::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult;
 use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
+use crate::models::mass_balance_leak_detection::MassBalanceLeakDetectionResult;
 use crate::models::mdmt::MdmtResult;
 use crate::models::mixer::MixerResult;
 use crate::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult;
 use crate::models::nog070_sil_determination::Nog070SilDeterminationResult;
 use crate::models::non_equilibrium_blowdown::NonEquilibriumBlowdownResult;
 use crate::models::norsok_p002_compliance::NorsokP002ComplianceResult;
+use crate::models::open_drain_review::OpenDrainReviewResult;
 use crate::models::overpressure_acceptance::OverpressureAcceptanceResult;
 use crate::models::overpressure_protection_study::OverpressureProtectionStudyResult;
 use crate::models::packed_column::PackedColumnResult;
@@ -109,7 +112,9 @@ use crate::models::risk_matrix::RiskMatrixResult;
 use crate::models::runaway_reaction::RunawayReactionResult;
 use crate::models::s001_clause10_review::S001Clause10ReviewResult;
 use crate::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult;
+use crate::models::safety_envelope::SafetyEnvelopeResult;
 use crate::models::safety_instrumented_function::SafetyInstrumentedFunctionResult;
+use crate::models::safety_system_performance::SafetySystemPerformanceResult;
 use crate::models::self_heating_induction::SelfHeatingInductionResult;
 use crate::models::semenov_self_heating::SemenovSelfHeatingResult;
 use crate::models::separator::SeparatorResult;
@@ -127,6 +132,8 @@ use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
 use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
+use crate::models::trapped_inventory::TrappedInventoryResult;
+use crate::models::trapped_liquid_fire_rupture::TrappedLiquidFireRuptureResult;
 use crate::models::tube_rupture_relief::TubeRuptureReliefResult;
 use crate::models::turbo_expander_compressor::TurboExpanderResult;
 use crate::models::vacuum_collapse::VacuumCollapseResult;
@@ -813,6 +820,26 @@ impl CalcResult for EscalationGraphResult {
         "any_escalation",
         "worst_case_items",
         "worst_case_count",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for EsdResponseTimeResult {
+    const CALC_ID: &'static str = "process.esd_response_time";
+    const FIELDS: &'static [&'static str] = &[
+        "sif_tag",
+        "detection_time",
+        "logic_time",
+        "final_element_time",
+        "total_response_time",
+        "allowable_response_time",
+        "margin",
+        "within_budget",
+        "contributions",
         "warnings",
     ];
 
@@ -1661,6 +1688,30 @@ impl CalcResult for MapTurboExpanderResult {
     }
 }
 
+impl CalcResult for MassBalanceLeakDetectionResult {
+    const CALC_ID: &'static str = "process.mass_balance_leak_detection";
+    const FIELDS: &'static [&'static str] = &[
+        "inlet_stream_name",
+        "outlet_stream_name",
+        "inlet_flow",
+        "outlet_flow",
+        "measured_imbalance",
+        "flow_uncertainty",
+        "linepack_uncertainty",
+        "combined_uncertainty",
+        "minimum_detectable_leak_rate",
+        "minimum_detectable_leak_fraction",
+        "density",
+        "detection_window",
+        "confidence_multiplier",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for MdmtResult {
     const CALC_ID: &'static str = "process.mdmt";
     const FIELDS: &'static [&'static str] = &["mdmt", "acceptable", "warnings"];
@@ -1745,6 +1796,26 @@ impl CalcResult for NorsokP002ComplianceResult {
     const CALC_ID: &'static str = "process.norsok_p002_compliance";
     const FIELDS: &'static [&'static str] =
         &["findings", "compliant", "non_compliant_count", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for OpenDrainReviewResult {
+    const CALC_ID: &'static str = "process.open_drain_review";
+    const FIELDS: &'static [&'static str] = &[
+        "overall_verdict",
+        "item_count",
+        "failed_item_count",
+        "warning_item_count",
+        "assessment_count",
+        "fail_assessment_count",
+        "warning_assessment_count",
+        "results",
+        "assessments",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings
@@ -2417,6 +2488,22 @@ impl CalcResult for S001SecondaryPressureProtectionResult {
     }
 }
 
+impl CalcResult for SafetyEnvelopeResult {
+    const CALC_ID: &'static str = "process.safety_envelope";
+    const FIELDS: &'static [&'static str] = &[
+        "envelopes",
+        "points",
+        "queries",
+        "all_safe",
+        "most_limiting_envelope",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for SafetyInstrumentedFunctionResult {
     const CALC_ID: &'static str = "process.safety_instrumented_function";
     const FIELDS: &'static [&'static str] = &[
@@ -2431,6 +2518,28 @@ impl CalcResult for SafetyInstrumentedFunctionResult {
         "pfd_1oo2",
         "pfd_2oo3",
         "availability_with_spurious_trips",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SafetySystemPerformanceResult {
+    const CALC_ID: &'static str = "process.safety_system_performance";
+    const FIELDS: &'static [&'static str] = &[
+        "register_id",
+        "register_name",
+        "overall_verdict",
+        "assessment_count",
+        "pass_count",
+        "warning_count",
+        "fail_count",
+        "assessments",
+        "findings",
+        "instruments",
+        "sifs",
         "warnings",
     ];
 
@@ -2897,6 +3006,51 @@ impl CalcResult for Tr3001ComplianceResult {
         "review_count",
         "fail_count",
         "compliant",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for TrappedInventoryResult {
+    const CALC_ID: &'static str = "process.trapped_inventory";
+    const FIELDS: &'static [&'static str] = &[
+        "gas_density",
+        "liquid_density",
+        "total_volume",
+        "total_gas_volume",
+        "total_liquid_volume",
+        "total_gas_mass",
+        "total_liquid_mass",
+        "total_mass",
+        "segments",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for TrappedLiquidFireRuptureResult {
+    const CALC_ID: &'static str = "process.trapped_liquid_fire_rupture";
+    const FIELDS: &'static [&'static str] = &[
+        "segment_id",
+        "trajectory",
+        "limiting_failure_mode",
+        "rupture_predicted",
+        "time_to_relief_set",
+        "time_to_vapor_pocket",
+        "time_to_pipe_rupture",
+        "time_to_flange_failure",
+        "minimum_failure_time",
+        "final_pressure",
+        "final_liquid_temperature",
+        "final_outer_wall_temperature",
+        "standards_applied",
+        "recommendations",
         "warnings",
     ];
 

@@ -31,6 +31,7 @@
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/escalation_graph.toml
+//!   - specs/models/process/esd_response_time.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
@@ -65,12 +66,14 @@
 //!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
+//!   - specs/models/process/mass_balance_leak_detection.toml
 //!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/multi_vessel_blowdown_study.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/non_equilibrium_blowdown.toml
 //!   - specs/models/process/norsok_p002_compliance.toml
+//!   - specs/models/process/open_drain_review.toml
 //!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/overpressure_protection_study.toml
 //!   - specs/models/process/packed_column.toml
@@ -99,7 +102,9 @@
 //!   - specs/models/process/runaway_reaction.toml
 //!   - specs/models/process/s001_clause10_review.toml
 //!   - specs/models/process/s001_secondary_pressure_protection.toml
+//!   - specs/models/process/safety_envelope.toml
 //!   - specs/models/process/safety_instrumented_function.toml
+//!   - specs/models/process/safety_system_performance.toml
 //!   - specs/models/process/self_heating_induction.toml
 //!   - specs/models/process/semenov_self_heating.toml
 //!   - specs/models/process/separator.toml
@@ -117,6 +122,8 @@
 //!   - specs/models/process/throttling_valve.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
+//!   - specs/models/process/trapped_inventory.toml
+//!   - specs/models/process/trapped_liquid_fire_rupture.toml
 //!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vacuum_collapse.toml
@@ -32225,6 +32232,326 @@ pub static ESCALATION_GRAPH_SPEC: ModelSpec = ModelSpec {
     cases: ESCALATION_GRAPH_CASES,
 };
 
+static ESD_RESPONSE_TIME_CHECKS: &[SpecCheck] = &[SpecCheck {
+    on_input: true,
+    check: RangeCheck {
+        quantity: "allowable_response_time",
+        min: Some(0.0),
+        min_inclusive: true,
+        max: None,
+        max_inclusive: true,
+        equals: None,
+        band: Band::Outside,
+        severity: Severity::Error,
+        code: WarningCode::OutOfValidRange,
+        rationale: "a negative budget is not a budget",
+    },
+}];
+
+static ESD_RESPONSE_TIME_CASES: &[TestCase] = &[
+    TestCase {
+        id: "within_budget",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("allowable_response_time", 15.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_tag", "ESD-1234")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("detection_time", 1.0),
+            ("logic_time", 0.5),
+            ("final_element_time", 8.5),
+            ("total_response_time", 10.0),
+            ("allowable_response_time", 15.0),
+            ("margin", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("sif_tag", "ESD-1234")],
+        records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("PT-1001 high-pressure"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("detection"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Logic solver scan + 2oo3 vote"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("logic"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ESDV-2001"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("final_element"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(8.5),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("PT-1001 high-pressure"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("detection"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Logic solver scan + 2oo3 vote"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("logic"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ESDV-2001"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("final_element"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(8.5),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "exceeds_budget",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("allowable_response_time", 15.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_tag", "ESD-9999")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("total_response_time", 23.5),
+            ("allowable_response_time", 15.0),
+            ("margin", -8.5),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("LT-3001 high-level"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("detection"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Logic solver"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("logic"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ESDV-3002 (large bore)"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("final_element"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(21.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "no_budget",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_tag", "ESD-NOBUDGET")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("total_response_time", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "contributions",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("TT-1"),
+                },
+                RecordField {
+                    name: "stage",
+                    value: FieldValue::Name("detection"),
+                },
+                RecordField {
+                    name: "time",
+                    value: FieldValue::Number(1.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "zero_time_and_equal_budget",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("allowable_response_time", 2.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("sif_tag", "ESD-ZERO")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("detection_time", 0.0),
+            ("logic_time", 2.0),
+            ("final_element_time", 0.0),
+            ("total_response_time", 2.0),
+            ("allowable_response_time", 2.0),
+            ("margin", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "contributions",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("DT-1"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("detection"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("logic"),
+                    },
+                    RecordField {
+                        name: "stage",
+                        value: FieldValue::Name("logic"),
+                    },
+                    RecordField {
+                        name: "time",
+                        value: FieldValue::Number(2.0),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+];
+
+static ESD_RESPONSE_TIME_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "esd_response_time",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.esd_response_time`.
+pub static ESD_RESPONSE_TIME_SPEC: ModelSpec = ModelSpec {
+    id: "process.esd_response_time",
+    kind: "procedure",
+    algorithm: Some(&ESD_RESPONSE_TIME_ALGORITHM),
+    checks: ESD_RESPONSE_TIME_CHECKS,
+    cases: ESD_RESPONSE_TIME_CASES,
+};
+
 static EVENT_TREE_CHECKS: &[SpecCheck] = &[SpecCheck {
     on_input: true,
     check: RangeCheck {
@@ -58890,6 +59217,268 @@ pub static MAP_TURBO_EXPANDER_COMPRESSOR_SPEC: ModelSpec = ModelSpec {
     cases: MAP_TURBO_EXPANDER_COMPRESSOR_CASES,
 };
 
+static MASS_BALANCE_LEAK_DETECTION_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "inlet_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "inlet_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "inlet_density",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a density is positive",
+        },
+    },
+];
+
+static MASS_BALANCE_LEAK_DETECTION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "no_linepack",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("inlet_pressure", 5000000.0),
+            ("inlet_temperature", 300.0),
+            ("inlet_flow", 10.0),
+            ("outlet_flow", 9.8),
+            ("linepack_volume", 0.0),
+            ("flow_measurement_uncertainty_fraction", 0.01),
+            ("detection_window", 60.0),
+            ("confidence_multiplier", 3.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane"])],
+        strings: &[
+            ("inlet_stream_name", "inlet"),
+            ("outlet_stream_name", "outlet"),
+        ],
+        vectors: &[("z", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[
+            ("inlet_flow", 10.0),
+            ("outlet_flow", 9.8),
+            ("measured_imbalance", 0.20000000000000462),
+            ("flow_uncertainty", 0.4200428549564914),
+            ("linepack_uncertainty", 0.0),
+            ("combined_uncertainty", 0.4200428549564914),
+            ("minimum_detectable_leak_rate", 0.620042854956496),
+            ("minimum_detectable_leak_fraction", 0.06200428549564957),
+            ("detection_window", 60.0),
+            ("confidence_multiplier", 3.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("inlet_stream_name", "inlet"),
+            ("outlet_stream_name", "outlet"),
+        ],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "linepack",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-07,
+        numbers: &[
+            ("inlet_pressure", 5000000.0),
+            ("inlet_temperature", 300.0),
+            ("inlet_flow", 10.0),
+            ("outlet_flow", 9.8),
+            ("linepack_volume", 100.0),
+            ("flow_measurement_uncertainty_fraction", 0.01),
+            ("pressure_uncertainty", 10000.0),
+            ("temperature_uncertainty", 0.5),
+            ("detection_window", 60.0),
+            ("confidence_multiplier", 3.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane"])],
+        strings: &[],
+        vectors: &[("z", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[
+            ("measured_imbalance", 0.20000000000000462),
+            ("flow_uncertainty", 0.4200428549564914),
+            ("linepack_uncertainty", 0.5116216283472782),
+            ("combined_uncertainty", 0.6619612455368671),
+            ("minimum_detectable_leak_rate", 0.8619612455368717),
+            ("minimum_detectable_leak_fraction", 0.08619612455368712),
+            ("density", 39.30386219986391),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "supplied_density",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("inlet_pressure", 5000000.0),
+            ("inlet_temperature", 300.0),
+            ("inlet_flow", 10.0),
+            ("outlet_flow", 9.8),
+            ("inlet_density", 39.30386219986391),
+            ("linepack_volume", 100.0),
+            ("flow_measurement_uncertainty_fraction", 0.01),
+            ("pressure_uncertainty", 10000.0),
+            ("temperature_uncertainty", 0.5),
+            ("detection_window", 60.0),
+            ("confidence_multiplier", 3.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane"])],
+        strings: &[],
+        vectors: &[("z", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[
+            ("linepack_uncertainty", 0.5116216283472782),
+            ("combined_uncertainty", 0.6619612455368671),
+            ("minimum_detectable_leak_rate", 0.8619612455368717),
+            ("density", 39.30386219986391),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "zero_reference",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("inlet_pressure", 5000000.0),
+            ("inlet_temperature", 300.0),
+            ("inlet_flow", 0.0),
+            ("outlet_flow", 0.0),
+            ("linepack_volume", 0.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane"])],
+        strings: &[],
+        vectors: &[("z", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[
+            ("inlet_flow", 0.0),
+            ("outlet_flow", 0.0),
+            ("measured_imbalance", 0.0),
+            ("flow_uncertainty", 0.0),
+            ("linepack_uncertainty", 0.0),
+            ("combined_uncertainty", 0.0),
+            ("minimum_detectable_leak_rate", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "the_setter_clamps",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[
+            ("inlet_pressure", 5000000.0),
+            ("inlet_temperature", 300.0),
+            ("inlet_flow", 10.0),
+            ("outlet_flow", 9.8),
+            ("linepack_volume", -5.0),
+            ("flow_measurement_uncertainty_fraction", -0.1),
+            ("pressure_uncertainty", -100000.0),
+            ("temperature_uncertainty", -2.0),
+            ("detection_window", 0.0),
+            ("confidence_multiplier", -1.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane"])],
+        strings: &[],
+        vectors: &[("z", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[
+            ("flow_uncertainty", 0.0),
+            ("linepack_uncertainty", 0.0),
+            ("combined_uncertainty", 0.0),
+            ("minimum_detectable_leak_rate", 0.20000000000000462),
+            ("minimum_detectable_leak_fraction", 0.02000000000000045),
+            ("detection_window", 1.0),
+            ("confidence_multiplier", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static MASS_BALANCE_LEAK_DETECTION_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "mass_balance_leak_sensitivity",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.mass_balance_leak_detection`.
+pub static MASS_BALANCE_LEAK_DETECTION_SPEC: ModelSpec = ModelSpec {
+    id: "process.mass_balance_leak_detection",
+    kind: "procedure",
+    algorithm: Some(&MASS_BALANCE_LEAK_DETECTION_ALGORITHM),
+    checks: MASS_BALANCE_LEAK_DETECTION_CHECKS,
+    cases: MASS_BALANCE_LEAK_DETECTION_CASES,
+};
+
 static MDMT_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -60523,6 +61112,2862 @@ pub static NORSOK_P002_COMPLIANCE_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&NORSOK_P002_COMPLIANCE_ALGORITHM),
     checks: NORSOK_P002_COMPLIANCE_CHECKS,
     cases: NORSOK_P002_COMPLIANCE_CASES,
+};
+
+static OPEN_DRAIN_REVIEW_CHECKS: &[SpecCheck] = &[];
+
+static OPEN_DRAIN_REVIEW_CASES: &[TestCase] = &[
+    TestCase {
+        id: "compliant",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("item_count", 1.0),
+            ("failed_item_count", 0.0),
+            ("warning_item_count", 0.0),
+            ("assessment_count", 19.0),
+            ("fail_assessment_count", 0.0),
+            ("warning_assessment_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("overall_verdict", "pass")],
+        records: &[
+            (
+                "items",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-1"),
+                    },
+                    RecordField {
+                        name: "area_type",
+                        value: FieldValue::Name("process"),
+                    },
+                ]],
+            ),
+            (
+                "evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("sourceHasFlammableOrHazardousLiquid"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hasOpenDrainMeasures"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("fireWaterCapacityKgPerS"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("10.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("liquidLeakRateKgPerS"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("2.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("drainageCapacityKgPerS"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("15.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("backflowPrevented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("closedOpenDrainInteractionPrevented"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hazardousNonHazardousPhysicallySeparated"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hazardousNonHazardousCombined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("sealDesignedForMaxBackpressure"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("ventTerminatedSafe"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("openDrainDependsOnUtility"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "design_standards",
+                &[
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "standard",
+                            value: FieldValue::Name("NORSOK P-002"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "standard",
+                            value: FieldValue::Name("ISO 13702"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "references",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-1"),
+                    },
+                    RecordField {
+                        name: "reference",
+                        value: FieldValue::Name("STID-AREA-1"),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[
+            (
+                "results",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-1"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(0.85),
+                    },
+                ]],
+            ),
+            (
+                "assessments",
+                &[
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-STANDARDS"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-COLLECTION"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-CAPACITY"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-BACKFLOW"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-BUNDING"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-FLOATER"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-INERTING"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-CLOSED-OPEN"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-HAZ-NONHAZ"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-COMMON-SUMP"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-SEAL-BACKPRESSURE"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-VENT"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-FIRE-SEALS"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-HELIDECK"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-DRILLING-PROD"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-TOTE"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.3-FIRE-DIVISION"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.3"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-UTILITY"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-1"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-OPS-TAGREADER"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("Operational evidence"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("info"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "capacity_fail",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("item_count", 1.0),
+            ("failed_item_count", 1.0),
+            ("warning_item_count", 0.0),
+            ("assessment_count", 19.0),
+            ("fail_assessment_count", 1.0),
+            ("warning_assessment_count", 6.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("overall_verdict", "fail")],
+        records: &[
+            (
+                "items",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-2"),
+                    },
+                    RecordField {
+                        name: "area_type",
+                        value: FieldValue::Name("process"),
+                    },
+                ]],
+            ),
+            (
+                "evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("sourceHasFlammableOrHazardousLiquid"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hasOpenDrainMeasures"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("fireWaterCapacityKgPerS"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("10.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("liquidLeakRateKgPerS"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("2.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("drainageCapacityKgPerS"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("5.0"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "results",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-2"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("fail"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(0.55),
+                    },
+                ]],
+            ),
+            (
+                "assessments",
+                &[
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-STANDARDS"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("medium"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-COLLECTION"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-CAPACITY"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("critical"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-BACKFLOW"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-BUNDING"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-FLOATER"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-INERTING"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-CLOSED-OPEN"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-HAZ-NONHAZ"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-COMMON-SUMP"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-SEAL-BACKPRESSURE"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-VENT"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-FIRE-SEALS"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-HELIDECK"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-DRILLING-PROD"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-TOTE"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.3-FIRE-DIVISION"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.3"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-UTILITY"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("info"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-2"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-OPS-TAGREADER"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("Operational evidence"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("info"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "haz_combined",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("item_count", 1.0),
+            ("failed_item_count", 1.0),
+            ("warning_item_count", 0.0),
+            ("assessment_count", 19.0),
+            ("fail_assessment_count", 1.0),
+            ("warning_assessment_count", 7.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("overall_verdict", "fail")],
+        records: &[
+            (
+                "items",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-3"),
+                    },
+                    RecordField {
+                        name: "area_type",
+                        value: FieldValue::Name("process"),
+                    },
+                ]],
+            ),
+            (
+                "evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("sourceHasFlammableOrHazardousLiquid"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hazardousNonHazardousCombined"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("true"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hazardousNonHazardousPhysicallySeparated"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("false"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "results",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-3"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("fail"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(0.2),
+                    },
+                ]],
+            ),
+            (
+                "assessments",
+                &[
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-STANDARDS"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("medium"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-COLLECTION"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-CAPACITY"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-BACKFLOW"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-BUNDING"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-FLOATER"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-INERTING"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-CLOSED-OPEN"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-HAZ-NONHAZ"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("critical"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-COMMON-SUMP"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-SEAL-BACKPRESSURE"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-VENT"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-FIRE-SEALS"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-HELIDECK"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-DRILLING-PROD"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-TOTE"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.3-FIRE-DIVISION"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.3"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-UTILITY"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("info"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-3"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-OPS-TAGREADER"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("Operational evidence"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("info"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "missing",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("item_count", 1.0),
+            ("failed_item_count", 0.0),
+            ("warning_item_count", 1.0),
+            ("assessment_count", 19.0),
+            ("fail_assessment_count", 0.0),
+            ("warning_assessment_count", 8.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("overall_verdict", "pass_with_warnings")],
+        records: &[
+            (
+                "items",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-4"),
+                    },
+                    RecordField {
+                        name: "area_type",
+                        value: FieldValue::Name("process"),
+                    },
+                ]],
+            ),
+            (
+                "evidence",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-4"),
+                    },
+                    RecordField {
+                        name: "key",
+                        value: FieldValue::Name("sourceHasFlammableOrHazardousLiquid"),
+                    },
+                    RecordField {
+                        name: "value",
+                        value: FieldValue::Name("true"),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[
+            (
+                "results",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-4"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass_with_warnings"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(0.2),
+                    },
+                ]],
+            ),
+            (
+                "assessments",
+                &[
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-STANDARDS"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("medium"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-COLLECTION"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-CAPACITY"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-BACKFLOW"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-BUNDING"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-FLOATER"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-INERTING"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-CLOSED-OPEN"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-HAZ-NONHAZ"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-COMMON-SUMP"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-SEAL-BACKPRESSURE"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-VENT"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-FIRE-SEALS"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-HELIDECK"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-DRILLING-PROD"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-TOTE"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.3-FIRE-DIVISION"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.3"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-UTILITY"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("info"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-4"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-OPS-TAGREADER"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("Operational evidence"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("info"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "coercion",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("item_count", 1.0),
+            ("failed_item_count", 0.0),
+            ("warning_item_count", 1.0),
+            ("assessment_count", 19.0),
+            ("fail_assessment_count", 0.0),
+            ("warning_assessment_count", 5.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("overall_verdict", "pass_with_warnings")],
+        records: &[
+            (
+                "items",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-7"),
+                    },
+                    RecordField {
+                        name: "area_type",
+                        value: FieldValue::Name("process"),
+                    },
+                ]],
+            ),
+            (
+                "evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("sourceHasFlammableOrHazardousLiquid"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("yes"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("hasOpenDrainMeasures"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("1"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("designStandards"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("NORSOK P-002 and ISO 13702"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("fireWaterCapacityKgPerS"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("10.5"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "key",
+                            value: FieldValue::Name("drainageCapacityKgPerS"),
+                        },
+                        RecordField {
+                            name: "value",
+                            value: FieldValue::Name("20"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "results",
+                &[&[
+                    RecordField {
+                        name: "area_id",
+                        value: FieldValue::Name("AREA-7"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass_with_warnings"),
+                    },
+                    RecordField {
+                        name: "confidence",
+                        value: FieldValue::Number(0.65),
+                    },
+                ]],
+            ),
+            (
+                "assessments",
+                &[
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-STANDARDS"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-COLLECTION"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-CAPACITY"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("pass"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-BACKFLOW"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-BUNDING"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-FLOATER"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-INERTING"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-CLOSED-OPEN"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-HAZ-NONHAZ"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-COMMON-SUMP"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-SEAL-BACKPRESSURE"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-VENT"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("high"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-FIRE-SEALS"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-HELIDECK"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-DRILLING-PROD"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.2-TOTE"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.2"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.3-FIRE-DIVISION"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.3"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("not_applicable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-S001-9.4.1-UTILITY"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("9.4.1"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("info"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "area_id",
+                            value: FieldValue::Name("AREA-7"),
+                        },
+                        RecordField {
+                            name: "requirement_id",
+                            value: FieldValue::Name("OD-OPS-TAGREADER"),
+                        },
+                        RecordField {
+                            name: "clause",
+                            value: FieldValue::Name("Operational evidence"),
+                        },
+                        RecordField {
+                            name: "status",
+                            value: FieldValue::Name("info"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("low"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+];
+
+static OPEN_DRAIN_REVIEW_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "norsok_s001_open_drain_review",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.open_drain_review`.
+pub static OPEN_DRAIN_REVIEW_SPEC: ModelSpec = ModelSpec {
+    id: "process.open_drain_review",
+    kind: "procedure",
+    algorithm: Some(&OPEN_DRAIN_REVIEW_ALGORITHM),
+    checks: OPEN_DRAIN_REVIEW_CHECKS,
+    cases: OPEN_DRAIN_REVIEW_CASES,
 };
 
 static OVERPRESSURE_ACCEPTANCE_CHECKS: &[SpecCheck] = &[
@@ -80429,6 +83874,738 @@ pub static S001_SECONDARY_PRESSURE_PROTECTION_SPEC: ModelSpec = ModelSpec {
     cases: S001_SECONDARY_PRESSURE_PROTECTION_CASES,
 };
 
+static SAFETY_ENVELOPE_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "min_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "max_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "num_points",
+            min: Some(2.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class divides by num_points - 1",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "mdmt_design_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "operating_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "operating_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature",
+        },
+    },
+];
+
+static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "hydrate",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.3,
+        numbers: &[
+            ("min_pressure", 100000.0),
+            ("max_pressure", 15000000.0),
+            ("num_points", 5.0),
+            ("operating_pressure", 5000000.0),
+            ("operating_temperature", 280.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "water"])],
+        strings: &[("eos", "srk")],
+        vectors: &[("z", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("most_limiting_envelope", "Hydrate Formation")],
+        records: &[],
+        expected_records: &[
+            (
+                "envelopes",
+                &[
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("hydrate"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Hydrate Formation"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.09999999999999998),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("wax"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Wax Appearance"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("CO2 Freezing"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("MDMT"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "queries",
+                &[
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("hydrate"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(279.2637590766215),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(274.2637590766215),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(0.7362409233784888),
+                        },
+                    ],
+                    &[RecordField {
+                        name: "envelope",
+                        value: FieldValue::Name("wax"),
+                    }],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(216.72928),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(213.72928),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(63.27071999999998),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(100.65856713118744),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(90.65856713118744),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(179.34143286881255),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "wax",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.2,
+        numbers: &[
+            ("min_pressure", 100000.0),
+            ("max_pressure", 2000000.0),
+            ("num_points", 5.0),
+            ("operating_pressure", 500000.0),
+            ("operating_temperature", 270.0),
+        ],
+        flags: &[],
+        lists: &[(
+            "components",
+            &["methane", "n-heptane", "nc14", "nc20", "nc24"],
+        )],
+        strings: &[("eos", "srk")],
+        vectors: &[("z", &[0.4, 0.1, 0.1, 0.2, 0.2])],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("most_limiting_envelope", "MDMT")],
+        records: &[],
+        expected_records: &[
+            (
+                "envelopes",
+                &[
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("hydrate"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Hydrate Formation"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("wax"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Wax Appearance"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("CO2 Freezing"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("MDMT"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "queries",
+                &[
+                    &[RecordField {
+                        name: "envelope",
+                        value: FieldValue::Name("hydrate"),
+                    }],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("wax"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(270.4277881823088),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(265.4277881823088),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(-0.42778818230880233),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(211.36615023369686),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(208.36615023369686),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(58.63384976630314),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(299.9999931606415),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(289.9999931606415),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(-29.99999316064151),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "phase_trace",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.2,
+        numbers: &[
+            ("min_pressure", 100000.0),
+            ("max_pressure", 5000000.0),
+            ("num_points", 5.0),
+            ("operating_pressure", 2000000.0),
+            ("operating_temperature", 250.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane"])],
+        strings: &[("eos", "srk")],
+        vectors: &[("z", &[0.7, 0.3])],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("most_limiting_envelope", "CO2 Freezing")],
+        records: &[(
+            "phase_trace",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(110517.09180756476),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(166.71388189460214),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(122140.27581601699),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(168.18265461320092),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(134985.88075760033),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(169.67969457404368),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(149182.46976412702),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(171.2057230517833),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(166529.11949458864),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(172.91871031834745),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[
+            (
+                "envelopes",
+                &[
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("hydrate"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Hydrate Formation"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("wax"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Wax Appearance"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("CO2 Freezing"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("MDMT"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("phase_envelope"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Phase Envelope"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "queries",
+                &[
+                    &[RecordField {
+                        name: "envelope",
+                        value: FieldValue::Name("hydrate"),
+                    }],
+                    &[RecordField {
+                        name: "envelope",
+                        value: FieldValue::Name("wax"),
+                    }],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(216.60928),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(213.60928),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(33.39071999999999),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(151.08776935056537),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(141.08776935056537),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(98.91223064943463),
+                        },
+                    ],
+                    &[RecordField {
+                        name: "envelope",
+                        value: FieldValue::Name("phase_envelope"),
+                    }],
+                ],
+            ),
+        ],
+    },
+];
+
+static SAFETY_ENVELOPE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "safety_envelope",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.safety_envelope`.
+pub static SAFETY_ENVELOPE_SPEC: ModelSpec = ModelSpec {
+    id: "process.safety_envelope",
+    kind: "procedure",
+    algorithm: Some(&SAFETY_ENVELOPE_ALGORITHM),
+    checks: SAFETY_ENVELOPE_CHECKS,
+    cases: SAFETY_ENVELOPE_CASES,
+};
+
 static SAFETY_INSTRUMENTED_FUNCTION_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -80788,6 +84965,3040 @@ pub static SAFETY_INSTRUMENTED_FUNCTION_SPEC: ModelSpec = ModelSpec {
     algorithm: Some(&SAFETY_INSTRUMENTED_FUNCTION_ALGORITHM),
     checks: SAFETY_INSTRUMENTED_FUNCTION_CHECKS,
     cases: SAFETY_INSTRUMENTED_FUNCTION_CASES,
+};
+
+static SAFETY_SYSTEM_PERFORMANCE_CHECKS: &[SpecCheck] = &[];
+
+static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "deluge_pass",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-FIRE-001"),
+            ("register_name", "Fire protection"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 1.0),
+            ("warning_count", 0.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-FIRE-001"),
+            ("register_name", "Fire protection"),
+            ("overall_verdict", "pass"),
+        ],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-FW-001"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("fire_protection"),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-FW-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-DELUGE-001"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Deluge system"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name(
+                            "Mitigate jet fire exposure using deluge in module M01",
+                        ),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name(
+                            "Mitigate jet fire exposure using deluge in module M01",
+                        ),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.00028),
+                    },
+                    RecordField {
+                        name: "effectiveness",
+                        value: FieldValue::Number(0.95),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-DELUGE-001"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("Deluge system standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name(
+                            "Mitigate jet fire exposure using deluge in module M01",
+                        ),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+            (
+                "demands",
+                &[&[
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-DELUGE-001"),
+                    },
+                    RecordField {
+                        name: "scenario",
+                        value: FieldValue::Name("Jet fire on V-101"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("firewater_deluge"),
+                    },
+                    RecordField {
+                        name: "demand_value",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "capacity_value",
+                        value: FieldValue::Number(15.0),
+                    },
+                    RecordField {
+                        name: "demand_unit",
+                        value: FieldValue::Name("L/min/m2"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "actual_response_time_seconds",
+                        value: FieldValue::Number(30.0),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "actual_availability",
+                        value: FieldValue::Number(0.995),
+                    },
+                    RecordField {
+                        name: "required_effectiveness",
+                        value: FieldValue::Number(0.9),
+                    },
+                    RecordField {
+                        name: "actual_effectiveness",
+                        value: FieldValue::Number(0.95),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[(
+            "assessments",
+            &[&[
+                RecordField {
+                    name: "barrier_id",
+                    value: FieldValue::Name("B-DELUGE-001"),
+                },
+                RecordField {
+                    name: "barrier_name",
+                    value: FieldValue::Name("Deluge system"),
+                },
+                RecordField {
+                    name: "category",
+                    value: FieldValue::Name("firewater_deluge"),
+                },
+                RecordField {
+                    name: "verdict",
+                    value: FieldValue::Name("pass"),
+                },
+                RecordField {
+                    name: "barrier_status",
+                    value: FieldValue::Name("available"),
+                },
+                RecordField {
+                    name: "demand_id",
+                    value: FieldValue::Name("D-DELUGE-001"),
+                },
+                RecordField {
+                    name: "barrier_pfd",
+                    value: FieldValue::Name("0.00028"),
+                },
+                RecordField {
+                    name: "barrier_effectiveness",
+                    value: FieldValue::Name("0.95"),
+                },
+                RecordField {
+                    name: "performance_standard_id",
+                    value: FieldValue::Name("PS-B-DELUGE-001"),
+                },
+                RecordField {
+                    name: "target_pfd",
+                    value: FieldValue::Name("0.001"),
+                },
+                RecordField {
+                    name: "actual_pfd",
+                    value: FieldValue::Name("0.00028"),
+                },
+                RecordField {
+                    name: "required_availability",
+                    value: FieldValue::Name("0.99"),
+                },
+                RecordField {
+                    name: "actual_availability",
+                    value: FieldValue::Name("0.995"),
+                },
+                RecordField {
+                    name: "required_response_time_seconds",
+                    value: FieldValue::Name("45.0"),
+                },
+                RecordField {
+                    name: "actual_response_time_seconds",
+                    value: FieldValue::Name("30.0"),
+                },
+                RecordField {
+                    name: "required_effectiveness",
+                    value: FieldValue::Name("0.9"),
+                },
+                RecordField {
+                    name: "actual_effectiveness",
+                    value: FieldValue::Name("0.95"),
+                },
+                RecordField {
+                    name: "scenario",
+                    value: FieldValue::Name("Jet fire on V-101"),
+                },
+                RecordField {
+                    name: "demand_value",
+                    value: FieldValue::Name("10.0"),
+                },
+                RecordField {
+                    name: "capacity_value",
+                    value: FieldValue::Name("15.0"),
+                },
+                RecordField {
+                    name: "demand_unit",
+                    value: FieldValue::Name("L/min/m2"),
+                },
+                RecordField {
+                    name: "capacity_margin",
+                    value: FieldValue::Name("5.0"),
+                },
+                RecordField {
+                    name: "related_instrument_count",
+                    value: FieldValue::Name("0.0"),
+                },
+                RecordField {
+                    name: "related_sif_count",
+                    value: FieldValue::Name("0.0"),
+                },
+                RecordField {
+                    name: "related_quantitative_sif_count",
+                    value: FieldValue::Name("0.0"),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "fire_gas",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-FG-001"),
+            ("register_name", "Fire and gas"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 1.0),
+            ("warning_count", 0.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-FG-001"),
+            ("register_name", "Fire and gas"),
+            ("overall_verdict", "pass"),
+        ],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-FGS-001"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("instrumented_function"),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-FGS-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-FGS-001"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Fire and gas detection"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Detect gas or fire and activate deluge"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Detect gas or fire and activate deluge"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.00028),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-FGS-001"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-FGS-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("V-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-FGS-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("FD-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-FGS-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("GD-101"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("Fire and gas detection standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Detect gas or fire and activate deluge"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+            (
+                "demands",
+                &[&[
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-FGS-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("fire_gas_detection"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Number(20.0),
+                    },
+                    RecordField {
+                        name: "actual_response_time_seconds",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "actual_availability",
+                        value: FieldValue::Number(0.996),
+                    },
+                ]],
+            ),
+            (
+                "measurement_devices",
+                &[
+                    &[
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("FD-101"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("fire_detector"),
+                        },
+                        RecordField {
+                            name: "location",
+                            value: FieldValue::Name("Module M01"),
+                        },
+                        RecordField {
+                            name: "response_time_seconds",
+                            value: FieldValue::Number(2.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-101"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("gas_detector"),
+                        },
+                        RecordField {
+                            name: "location",
+                            value: FieldValue::Name("Module M01"),
+                        },
+                        RecordField {
+                            name: "response_time_seconds",
+                            value: FieldValue::Number(8.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "event_sifs",
+                &[&[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B-FGS-001 Deluge SIF"),
+                    },
+                    RecordField {
+                        name: "voting_notation",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                ]],
+            ),
+            (
+                "sif_detectors",
+                &[
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-FGS-001 Deluge SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("FD-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-FGS-001 Deluge SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-FGS-001 Deluge SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-102"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("Fire and gas detection"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("fire_gas_detection"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-FGS-001"),
+                    },
+                    RecordField {
+                        name: "barrier_pfd",
+                        value: FieldValue::Name("0.00028"),
+                    },
+                    RecordField {
+                        name: "barrier_effectiveness",
+                        value: FieldValue::Name("0.99972"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Name("0.001"),
+                    },
+                    RecordField {
+                        name: "actual_pfd",
+                        value: FieldValue::Name("0.00028"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "actual_availability",
+                        value: FieldValue::Name("0.996"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("20.0"),
+                    },
+                    RecordField {
+                        name: "actual_response_time_seconds",
+                        value: FieldValue::Name("10.0"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("2.0"),
+                    },
+                    RecordField {
+                        name: "max_instrument_response_time_seconds",
+                        value: FieldValue::Name("8.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("1.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                ]],
+            ),
+            (
+                "instruments",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-FGS-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("FD-101"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-FGS-001"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-FGS-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("GD-101"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-FGS-001"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "sifs",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-FGS-001"),
+                    },
+                    RecordField {
+                        name: "identifier",
+                        value: FieldValue::Name("B-FGS-001 Deluge SIF"),
+                    },
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-FGS-001"),
+                    },
+                    RecordField {
+                        name: "voting_notation",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                    RecordField {
+                        name: "detector_count",
+                        value: FieldValue::Name("3.0"),
+                    },
+                    RecordField {
+                        name: "bypassed_detector_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "faulty_detector_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "tripped_detector_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("event"),
+                    },
+                ]],
+            ),
+        ],
+    },
+    TestCase {
+        id: "pfp_capacity_fail",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-PFP-001"),
+            ("register_name", "PFP review"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 0.0),
+            ("warning_count", 0.0),
+            ("fail_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-PFP-001"),
+            ("register_name", "PFP review"),
+            ("overall_verdict", "fail"),
+        ],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-PFP-001"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("structural"),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-PFP-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PFP-001"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Passive fire protection"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("PFP coating on V-101 support steel"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("PFP coating on V-101 support steel"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "effectiveness",
+                        value: FieldValue::Number(0.8),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-PFP-001"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("Passive fire protection standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("PFP coating on V-101 support steel"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+            (
+                "demands",
+                &[&[
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-PFP-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "scenario",
+                        value: FieldValue::Name("Jet fire thermal radiation at support steel"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("passive_fire_protection"),
+                    },
+                    RecordField {
+                        name: "demand_value",
+                        value: FieldValue::Number(45.0),
+                    },
+                    RecordField {
+                        name: "capacity_value",
+                        value: FieldValue::Number(37.5),
+                    },
+                    RecordField {
+                        name: "demand_unit",
+                        value: FieldValue::Name("kW/m2"),
+                    },
+                    RecordField {
+                        name: "required_effectiveness",
+                        value: FieldValue::Number(0.9),
+                    },
+                    RecordField {
+                        name: "actual_effectiveness",
+                        value: FieldValue::Number(0.8),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("Passive fire protection"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("passive_fire_protection"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("fail"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "demand_id",
+                        value: FieldValue::Name("D-PFP-001"),
+                    },
+                    RecordField {
+                        name: "barrier_effectiveness",
+                        value: FieldValue::Name("0.8"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-PFP-001"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("60.0"),
+                    },
+                    RecordField {
+                        name: "required_effectiveness",
+                        value: FieldValue::Name("0.9"),
+                    },
+                    RecordField {
+                        name: "actual_effectiveness",
+                        value: FieldValue::Name("0.8"),
+                    },
+                    RecordField {
+                        name: "scenario",
+                        value: FieldValue::Name("Jet fire thermal radiation at support steel"),
+                    },
+                    RecordField {
+                        name: "demand_value",
+                        value: FieldValue::Name("45.0"),
+                    },
+                    RecordField {
+                        name: "capacity_value",
+                        value: FieldValue::Name("37.5"),
+                    },
+                    RecordField {
+                        name: "demand_unit",
+                        value: FieldValue::Name("kW/m2"),
+                    },
+                    RecordField {
+                        name: "capacity_margin",
+                        value: FieldValue::Name("-7.5"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                ]],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PFP-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_availability_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-PFP-001"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PFP-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_response_time_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-PFP-001"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PFP-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("effectiveness_below_required"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-PFP-001"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PFP-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("demand_exceeds_capacity"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-PFP-001"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "quantitative_sif",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-QSIF-001"),
+            ("register_name", "Quantitative SIF"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 0.0),
+            ("warning_count", 1.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-QSIF-001"),
+            ("register_name", "Quantitative SIF"),
+            ("overall_verdict", "pass_with_warnings"),
+        ],
+        records: &[
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("SIF shutdown"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("SIF shutdown protects V-101"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("SIF shutdown protects V-101"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.0008),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-SIF-101"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("SIF shutdown standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("SIF shutdown protects V-101"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+            (
+                "quantitative_sifs",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B-SIF-101 quantitative SIL"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("SIF shutdown protects V-101"),
+                    },
+                    RecordField {
+                        name: "architecture",
+                        value: FieldValue::Name("1oo2"),
+                    },
+                    RecordField {
+                        name: "claimed_sil",
+                        value: FieldValue::Number(3.0),
+                    },
+                    RecordField {
+                        name: "pfd_average",
+                        value: FieldValue::Number(0.0008),
+                    },
+                    RecordField {
+                        name: "test_interval_hours",
+                        value: FieldValue::Number(8760.0),
+                    },
+                ]],
+            ),
+            (
+                "protected_equipment",
+                &[&[
+                    RecordField {
+                        name: "sif_id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "equipment",
+                        value: FieldValue::Name("V-101"),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("SIF shutdown"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("unknown"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass_with_warnings"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "barrier_pfd",
+                        value: FieldValue::Name("0.0008"),
+                    },
+                    RecordField {
+                        name: "barrier_effectiveness",
+                        value: FieldValue::Name("0.9992"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Name("0.001"),
+                    },
+                    RecordField {
+                        name: "actual_pfd",
+                        value: FieldValue::Name("0.0008"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("60.0"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("1.0"),
+                    },
+                ]],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-SIF-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_availability_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-SIF-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_response_time_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-SIF-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("quantitative_sif_verification_warning"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "sifs",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-SIF-101"),
+                    },
+                    RecordField {
+                        name: "identifier",
+                        value: FieldValue::Name("B-SIF-101 quantitative SIL"),
+                    },
+                    RecordField {
+                        name: "claimed_sil",
+                        value: FieldValue::Name("3.0"),
+                    },
+                    RecordField {
+                        name: "achieved_sil",
+                        value: FieldValue::Name("3.0"),
+                    },
+                    RecordField {
+                        name: "pfd_average",
+                        value: FieldValue::Name("0.0008"),
+                    },
+                    RecordField {
+                        name: "pfd_upper",
+                        value: FieldValue::Name("0.0012000000000000001"),
+                    },
+                    RecordField {
+                        name: "risk_reduction_factor",
+                        value: FieldValue::Name("1250.0"),
+                    },
+                    RecordField {
+                        name: "architecture",
+                        value: FieldValue::Name("1oo2"),
+                    },
+                    RecordField {
+                        name: "proof_test_interval_hours",
+                        value: FieldValue::Name("8760.0"),
+                    },
+                    RecordField {
+                        name: "protected_equipment_count",
+                        value: FieldValue::Name("1.0"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("quantitative"),
+                    },
+                ]],
+            ),
+        ],
+    },
+    TestCase {
+        id: "psd_category",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-PSD-001"),
+            ("register_name", "PSD review"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 0.0),
+            ("warning_count", 1.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-PSD-001"),
+            ("register_name", "PSD review"),
+            ("overall_verdict", "pass_with_warnings"),
+        ],
+        records: &[
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("PSD valve"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Process shutdown closes shutdown valve SDV-101"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Process shutdown closes shutdown valve SDV-101"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.0008),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-PSD-101"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-101"),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("PSD valve standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Process shutdown closes shutdown valve SDV-101"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("PSD valve"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("psd"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass_with_warnings"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "barrier_pfd",
+                        value: FieldValue::Name("0.0008"),
+                    },
+                    RecordField {
+                        name: "barrier_effectiveness",
+                        value: FieldValue::Name("0.9992"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-PSD-101"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Name("0.001"),
+                    },
+                    RecordField {
+                        name: "actual_pfd",
+                        value: FieldValue::Name("0.0008"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("60.0"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                ]],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PSD-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_availability_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-PSD-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_response_time_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "rule_failures",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-RULES-001"),
+            ("register_name", "Rule coverage"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 2.0),
+            ("pass_count", 0.0),
+            ("warning_count", 0.0),
+            ("fail_count", 2.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-RULES-001"),
+            ("register_name", "Rule coverage"),
+            ("overall_verdict", "fail"),
+        ],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-RULES-001"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("instrumented_function"),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-RULES-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-RULES-101"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-RULES-101"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Rules barrier"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Isolation duty"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Isolation duty"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("out_of_service"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(false),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-RULES-101"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("GD-201"),
+                    },
+                ]],
+            ),
+            (
+                "demands",
+                &[
+                    &[
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "scenario",
+                            value: FieldValue::Name("Loss of containment"),
+                        },
+                        RecordField {
+                            name: "required_pfd",
+                            value: FieldValue::Number(0.001),
+                        },
+                        RecordField {
+                            name: "actual_pfd",
+                            value: FieldValue::Number(0.01),
+                        },
+                        RecordField {
+                            name: "required_availability",
+                            value: FieldValue::Number(0.99),
+                        },
+                        RecordField {
+                            name: "actual_availability",
+                            value: FieldValue::Number(0.95),
+                        },
+                        RecordField {
+                            name: "required_response_time_seconds",
+                            value: FieldValue::Number(10.0),
+                        },
+                        RecordField {
+                            name: "actual_response_time_seconds",
+                            value: FieldValue::Number(20.0),
+                        },
+                        RecordField {
+                            name: "required_effectiveness",
+                            value: FieldValue::Number(0.9),
+                        },
+                        RecordField {
+                            name: "actual_effectiveness",
+                            value: FieldValue::Number(0.5),
+                        },
+                        RecordField {
+                            name: "demand_value",
+                            value: FieldValue::Number(10.0),
+                        },
+                        RecordField {
+                            name: "capacity_value",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "demand_unit",
+                            value: FieldValue::Name("kg/s"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "required_response_time_seconds",
+                            value: FieldValue::Number(5.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "measurement_devices",
+                &[&[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("GD-201"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("gas_detector"),
+                    },
+                    RecordField {
+                        name: "location",
+                        value: FieldValue::Name("Module M02"),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(30.0),
+                    },
+                ]],
+            ),
+            (
+                "event_sifs",
+                &[&[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B-RULES-101 SIF"),
+                    },
+                    RecordField {
+                        name: "voting_notation",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                    RecordField {
+                        name: "overridden",
+                        value: FieldValue::Flag(true),
+                    },
+                ]],
+            ),
+            (
+                "sif_detectors",
+                &[
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-RULES-101 SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-201"),
+                        },
+                        RecordField {
+                            name: "bypassed",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-RULES-101 SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-202"),
+                        },
+                        RecordField {
+                            name: "faulty",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-RULES-101 SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-203"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "barrier_name",
+                            value: FieldValue::Name("Rules barrier"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("esd_blowdown"),
+                        },
+                        RecordField {
+                            name: "verdict",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "barrier_status",
+                            value: FieldValue::Name("out_of_service"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                        RecordField {
+                            name: "scenario",
+                            value: FieldValue::Name("Loss of containment"),
+                        },
+                        RecordField {
+                            name: "demand_value",
+                            value: FieldValue::Name("10.0"),
+                        },
+                        RecordField {
+                            name: "capacity_value",
+                            value: FieldValue::Name("5.0"),
+                        },
+                        RecordField {
+                            name: "demand_unit",
+                            value: FieldValue::Name("kg/s"),
+                        },
+                        RecordField {
+                            name: "capacity_margin",
+                            value: FieldValue::Name("-5.0"),
+                        },
+                        RecordField {
+                            name: "related_instrument_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "max_instrument_response_time_seconds",
+                            value: FieldValue::Name("30.0"),
+                        },
+                        RecordField {
+                            name: "related_sif_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "related_quantitative_sif_count",
+                            value: FieldValue::Name("0.0"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "barrier_name",
+                            value: FieldValue::Name("Rules barrier"),
+                        },
+                        RecordField {
+                            name: "category",
+                            value: FieldValue::Name("esd_blowdown"),
+                        },
+                        RecordField {
+                            name: "verdict",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "barrier_status",
+                            value: FieldValue::Name("out_of_service"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                        RecordField {
+                            name: "related_instrument_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "max_instrument_response_time_seconds",
+                            value: FieldValue::Name("30.0"),
+                        },
+                        RecordField {
+                            name: "related_sif_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "related_quantitative_sif_count",
+                            value: FieldValue::Name("0.0"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("barrier_not_available"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("barrier_untraceable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("no_performance_standard"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("demand_exceeds_capacity"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_overridden"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_healthy_channels_insufficient"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("barrier_not_available"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("barrier_untraceable"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("no_performance_standard"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("detector_response_time_exceeded"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_overridden"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_healthy_channels_insufficient"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "instruments",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("GD-201"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("GD-201"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "sifs",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "identifier",
+                            value: FieldValue::Name("B-RULES-101 SIF"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-101"),
+                        },
+                        RecordField {
+                            name: "voting_notation",
+                            value: FieldValue::Name("2oo3"),
+                        },
+                        RecordField {
+                            name: "detector_count",
+                            value: FieldValue::Name("3.0"),
+                        },
+                        RecordField {
+                            name: "bypassed_detector_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "faulty_detector_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "tripped_detector_count",
+                            value: FieldValue::Name("0.0"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("event"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-RULES-101"),
+                        },
+                        RecordField {
+                            name: "identifier",
+                            value: FieldValue::Name("B-RULES-101 SIF"),
+                        },
+                        RecordField {
+                            name: "demand_id",
+                            value: FieldValue::Name("D-RULES-102"),
+                        },
+                        RecordField {
+                            name: "voting_notation",
+                            value: FieldValue::Name("2oo3"),
+                        },
+                        RecordField {
+                            name: "detector_count",
+                            value: FieldValue::Name("3.0"),
+                        },
+                        RecordField {
+                            name: "bypassed_detector_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "faulty_detector_count",
+                            value: FieldValue::Name("1.0"),
+                        },
+                        RecordField {
+                            name: "tripped_detector_count",
+                            value: FieldValue::Name("0.0"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("event"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "instrumentation_warnings",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-INST-001"),
+            ("register_name", "Instrumentation"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 0.0),
+            ("warning_count", 0.0),
+            ("fail_count", 1.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-INST-001"),
+            ("register_name", "Instrumentation"),
+            ("overall_verdict", "fail"),
+        ],
+        records: &[
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-INST-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Gas detection"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Detect gas and alarm"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Detect gas and alarm"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "pfd",
+                        value: FieldValue::Number(0.00028),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-INST-001"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("V-101"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "tag",
+                            value: FieldValue::Name("GD-301"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-B-INST-001"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("Gas detection standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Detect gas and alarm"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-B-INST-001"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name(
+                            "Barrier shall meet documented functional requirements.",
+                        ),
+                    },
+                ]],
+            ),
+            (
+                "event_sifs",
+                &[&[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("B-INST-001 SIF"),
+                    },
+                    RecordField {
+                        name: "voting_notation",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                ]],
+            ),
+            (
+                "sif_detectors",
+                &[
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-INST-001 SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-301"),
+                        },
+                        RecordField {
+                            name: "bypassed",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "sif_name",
+                            value: FieldValue::Name("B-INST-001 SIF"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("GD-302"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-INST-001"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("Gas detection"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("fire_gas_detection"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("fail"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "barrier_pfd",
+                        value: FieldValue::Name("0.00028"),
+                    },
+                    RecordField {
+                        name: "barrier_effectiveness",
+                        value: FieldValue::Name("0.99972"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-B-INST-001"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Name("0.001"),
+                    },
+                    RecordField {
+                        name: "actual_pfd",
+                        value: FieldValue::Name("0.00028"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("60.0"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("1.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                ]],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_availability_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_response_time_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("no_fire_gas_detector"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_detector_count_mismatch"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INST-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("sif_healthy_channels_insufficient"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("fail"),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "sifs",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-INST-001"),
+                    },
+                    RecordField {
+                        name: "identifier",
+                        value: FieldValue::Name("B-INST-001 SIF"),
+                    },
+                    RecordField {
+                        name: "voting_notation",
+                        value: FieldValue::Name("2oo3"),
+                    },
+                    RecordField {
+                        name: "detector_count",
+                        value: FieldValue::Name("2.0"),
+                    },
+                    RecordField {
+                        name: "bypassed_detector_count",
+                        value: FieldValue::Name("1.0"),
+                    },
+                    RecordField {
+                        name: "faulty_detector_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "tripped_detector_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("event"),
+                    },
+                ]],
+            ),
+        ],
+    },
+    TestCase {
+        id: "element_inference",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[
+            ("register_id", "BR-INF-001"),
+            ("register_name", "Inferred category"),
+        ],
+        vectors: &[],
+        matrices: &[],
+        expected: &[
+            ("assessment_count", 1.0),
+            ("pass_count", 0.0),
+            ("warning_count", 1.0),
+            ("fail_count", 0.0),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("register_id", "BR-INF-001"),
+            ("register_name", "Inferred category"),
+            ("overall_verdict", "pass_with_warnings"),
+        ],
+        records: &[
+            (
+                "elements",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("SCE-INF-001"),
+                    },
+                    RecordField {
+                        name: "element_type",
+                        value: FieldValue::Name("fire_protection"),
+                    },
+                ]],
+            ),
+            (
+                "links",
+                &[&[
+                    RecordField {
+                        name: "element_id",
+                        value: FieldValue::Name("SCE-INF-001"),
+                    },
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-INF-001"),
+                    },
+                ]],
+            ),
+            (
+                "barriers",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("B-INF-001"),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Bland barrier"),
+                    },
+                    RecordField {
+                        name: "description",
+                        value: FieldValue::Name("Isolation duty"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Isolation duty"),
+                    },
+                    RecordField {
+                        name: "status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-INF-001"),
+                    },
+                ]],
+            ),
+            (
+                "barrier_tags",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-INF-001"),
+                    },
+                    RecordField {
+                        name: "tag",
+                        value: FieldValue::Name("V-301"),
+                    },
+                ]],
+            ),
+            (
+                "standards",
+                &[&[
+                    RecordField {
+                        name: "id",
+                        value: FieldValue::Name("PS-INF-001"),
+                    },
+                    RecordField {
+                        name: "title",
+                        value: FieldValue::Name("Bland standard"),
+                    },
+                    RecordField {
+                        name: "safety_function",
+                        value: FieldValue::Name("Isolation duty"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Number(0.001),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Number(0.99),
+                    },
+                    RecordField {
+                        name: "response_time_seconds",
+                        value: FieldValue::Number(60.0),
+                    },
+                ]],
+            ),
+            (
+                "standard_criteria",
+                &[&[
+                    RecordField {
+                        name: "standard_id",
+                        value: FieldValue::Name("PS-INF-001"),
+                    },
+                    RecordField {
+                        name: "criterion",
+                        value: FieldValue::Name("meet requirements"),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[
+            (
+                "assessments",
+                &[&[
+                    RecordField {
+                        name: "barrier_id",
+                        value: FieldValue::Name("B-INF-001"),
+                    },
+                    RecordField {
+                        name: "barrier_name",
+                        value: FieldValue::Name("Bland barrier"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("firewater_deluge"),
+                    },
+                    RecordField {
+                        name: "verdict",
+                        value: FieldValue::Name("pass_with_warnings"),
+                    },
+                    RecordField {
+                        name: "barrier_status",
+                        value: FieldValue::Name("available"),
+                    },
+                    RecordField {
+                        name: "performance_standard_id",
+                        value: FieldValue::Name("PS-INF-001"),
+                    },
+                    RecordField {
+                        name: "target_pfd",
+                        value: FieldValue::Name("0.001"),
+                    },
+                    RecordField {
+                        name: "required_availability",
+                        value: FieldValue::Name("0.99"),
+                    },
+                    RecordField {
+                        name: "required_response_time_seconds",
+                        value: FieldValue::Name("60.0"),
+                    },
+                    RecordField {
+                        name: "related_instrument_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "related_quantitative_sif_count",
+                        value: FieldValue::Name("0.0"),
+                    },
+                ]],
+            ),
+            (
+                "findings",
+                &[
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INF-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("target_pfd_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INF-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_availability_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INF-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("required_response_time_without_actual"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "barrier_id",
+                            value: FieldValue::Name("B-INF-001"),
+                        },
+                        RecordField {
+                            name: "rule",
+                            value: FieldValue::Name("fire_protection_demand_missing"),
+                        },
+                        RecordField {
+                            name: "severity",
+                            value: FieldValue::Name("warning"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+];
+
+static SAFETY_SYSTEM_PERFORMANCE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "safety_system_performance",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.safety_system_performance`.
+pub static SAFETY_SYSTEM_PERFORMANCE_SPEC: ModelSpec = ModelSpec {
+    id: "process.safety_system_performance",
+    kind: "procedure",
+    algorithm: Some(&SAFETY_SYSTEM_PERFORMANCE_ALGORITHM),
+    checks: SAFETY_SYSTEM_PERFORMANCE_CHECKS,
+    cases: SAFETY_SYSTEM_PERFORMANCE_CASES,
 };
 
 static SELF_HEATING_INDUCTION_CHECKS: &[SpecCheck] = &[
@@ -89576,6 +96787,862 @@ pub static TR3001_COMPLIANCE_SPEC: ModelSpec = ModelSpec {
     cases: TR3001_COMPLIANCE_CASES,
 };
 
+static TRAPPED_INVENTORY_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "fallback_liquid_density",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a density is positive",
+        },
+    },
+];
+
+static TRAPPED_INVENTORY_CASES: &[TestCase] = &[
+    TestCase {
+        id: "two_phase",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("pressure", 5000000.0), ("temperature", 300.0)],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane", "n-butane"])],
+        strings: &[],
+        vectors: &[("z", &[0.5, 0.3, 0.2])],
+        matrices: &[],
+        expected: &[
+            ("gas_density", 62.13948916875829),
+            ("liquid_density", 449.21182603388814),
+            ("total_volume", 13.141592653589793),
+            ("total_gas_volume", 7.5132741228718345),
+            ("total_liquid_volume", 5.628318530717959),
+            ("total_gas_mass", 466.87101598010634),
+            ("total_liquid_mass", 2528.3072446841848),
+            ("total_mass", 2995.178260664291),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "segments",
+                &[
+                    &[
+                        RecordField {
+                            name: "segment_id",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("equipment"),
+                        },
+                        RecordField {
+                            name: "volume",
+                            value: FieldValue::Number(10.0),
+                        },
+                        RecordField {
+                            name: "liquid_fill_fraction",
+                            value: FieldValue::Number(0.5),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "segment_id",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "kind",
+                            value: FieldValue::Name("pipe"),
+                        },
+                        RecordField {
+                            name: "internal_diameter",
+                            value: FieldValue::Number(0.2),
+                        },
+                        RecordField {
+                            name: "length",
+                            value: FieldValue::Number(100.0),
+                        },
+                        RecordField {
+                            name: "liquid_fill_fraction",
+                            value: FieldValue::Number(0.2),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "segment_evidence",
+                &[
+                    &[
+                        RecordField {
+                            name: "segment_id",
+                            value: FieldValue::Name("V-101"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("DOC-V-101"),
+                        },
+                        RecordField {
+                            name: "source_reference",
+                            value: FieldValue::Name("STID-V-101"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("documented volume"),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "segment_id",
+                            value: FieldValue::Name("P-101"),
+                        },
+                        RecordField {
+                            name: "document_id",
+                            value: FieldValue::Name("DOC-P-101"),
+                        },
+                        RecordField {
+                            name: "source_reference",
+                            value: FieldValue::Name("STID-P-101"),
+                        },
+                        RecordField {
+                            name: "excerpt",
+                            value: FieldValue::Name("documented volume"),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[(
+            "segments",
+            &[
+                &[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("V-101"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(10.0),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "gas_mass",
+                        value: FieldValue::Number(310.69744584379146),
+                    },
+                    RecordField {
+                        name: "liquid_mass",
+                        value: FieldValue::Number(2246.059130169441),
+                    },
+                    RecordField {
+                        name: "total_mass",
+                        value: FieldValue::Number(2556.756576013232),
+                    },
+                    RecordField {
+                        name: "gas_density",
+                        value: FieldValue::Number(62.13948916875829),
+                    },
+                    RecordField {
+                        name: "liquid_density",
+                        value: FieldValue::Number(449.21182603388814),
+                    },
+                    RecordField {
+                        name: "liquid_fill_fraction",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("P-101"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("pipe"),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(3.1415926535897936),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(2.513274122871835),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(0.6283185307179587),
+                    },
+                    RecordField {
+                        name: "gas_mass",
+                        value: FieldValue::Number(156.17357013631488),
+                    },
+                    RecordField {
+                        name: "liquid_mass",
+                        value: FieldValue::Number(282.24811451474386),
+                    },
+                    RecordField {
+                        name: "total_mass",
+                        value: FieldValue::Number(438.42168465105874),
+                    },
+                    RecordField {
+                        name: "gas_density",
+                        value: FieldValue::Number(62.13948916875829),
+                    },
+                    RecordField {
+                        name: "liquid_density",
+                        value: FieldValue::Number(449.21182603388814),
+                    },
+                    RecordField {
+                        name: "liquid_fill_fraction",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "internal_diameter",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "length",
+                        value: FieldValue::Number(100.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "gas_only_fallback",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("pressure", 5000000.0), ("temperature", 300.0)],
+        flags: &[],
+        lists: &[("components", &["methane"])],
+        strings: &[],
+        vectors: &[("z", &[1.0])],
+        matrices: &[],
+        expected: &[
+            ("gas_density", 35.25541405613884),
+            ("liquid_density", 800.0),
+            ("total_volume", 5.0),
+            ("total_gas_volume", 2.5),
+            ("total_liquid_volume", 2.5),
+            ("total_gas_mass", 88.1385351403471),
+            ("total_liquid_mass", 2000.0),
+            ("total_mass", 2088.138535140347),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "segments",
+                &[&[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("V-GAS"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "liquid_fill_fraction",
+                        value: FieldValue::Number(0.5),
+                    },
+                ]],
+            ),
+            (
+                "segment_evidence",
+                &[&[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("V-GAS"),
+                    },
+                    RecordField {
+                        name: "document_id",
+                        value: FieldValue::Name("DOC-V-GAS"),
+                    },
+                    RecordField {
+                        name: "source_reference",
+                        value: FieldValue::Name("STID-V-GAS"),
+                    },
+                    RecordField {
+                        name: "excerpt",
+                        value: FieldValue::Name("documented volume"),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "missing_evidence",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("pressure", 5000000.0), ("temperature", 300.0)],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane", "n-butane"])],
+        strings: &[],
+        vectors: &[("z", &[0.5, 0.3, 0.2])],
+        matrices: &[],
+        expected: &[
+            ("gas_density", 62.13948916875829),
+            ("liquid_density", 449.21182603388814),
+            ("total_gas_mass", 155.34872292189573),
+            ("total_liquid_mass", 1123.0295650847204),
+            ("total_mass", 1278.378288006616),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "segments",
+            &[&[
+                RecordField {
+                    name: "segment_id",
+                    value: FieldValue::Name("V-NOEV"),
+                },
+                RecordField {
+                    name: "kind",
+                    value: FieldValue::Name("equipment"),
+                },
+                RecordField {
+                    name: "volume",
+                    value: FieldValue::Number(5.0),
+                },
+                RecordField {
+                    name: "liquid_fill_fraction",
+                    value: FieldValue::Number(0.5),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "water_multiphase",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-05,
+        numbers: &[("pressure", 5000000.0), ("temperature", 300.0)],
+        flags: &[("multiphase_check", true)],
+        lists: &[("components", &["methane", "water"])],
+        strings: &[],
+        vectors: &[("z", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[
+            ("gas_density", 35.257283531476276),
+            ("liquid_density", 984.6166289023153),
+            ("total_gas_mass", 88.14320882869069),
+            ("total_liquid_mass", 2461.541572255788),
+            ("total_mass", 2549.684781084479),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "segments",
+                &[&[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("V-WET"),
+                    },
+                    RecordField {
+                        name: "kind",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "volume",
+                        value: FieldValue::Number(5.0),
+                    },
+                    RecordField {
+                        name: "liquid_fill_fraction",
+                        value: FieldValue::Number(0.5),
+                    },
+                ]],
+            ),
+            (
+                "segment_evidence",
+                &[&[
+                    RecordField {
+                        name: "segment_id",
+                        value: FieldValue::Name("V-WET"),
+                    },
+                    RecordField {
+                        name: "document_id",
+                        value: FieldValue::Name("DOC-V-WET"),
+                    },
+                    RecordField {
+                        name: "source_reference",
+                        value: FieldValue::Name("STID-V-WET"),
+                    },
+                    RecordField {
+                        name: "excerpt",
+                        value: FieldValue::Name("documented volume"),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+];
+
+static TRAPPED_INVENTORY_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "trapped_inventory",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.trapped_inventory`.
+pub static TRAPPED_INVENTORY_SPEC: ModelSpec = ModelSpec {
+    id: "process.trapped_inventory",
+    kind: "procedure",
+    algorithm: Some(&TRAPPED_INVENTORY_ALGORITHM),
+    checks: TRAPPED_INVENTORY_CHECKS,
+    cases: TRAPPED_INVENTORY_CASES,
+};
+
+static TRAPPED_LIQUID_FIRE_RUPTURE_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "inventory_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "inventory_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "inventory_total_mass",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the study requires a positive mass",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "inventory_total_volume",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the study requires a positive volume",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "pipe_internal_diameter",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a pipe has a positive diameter",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "wall_thickness",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a wall has a positive thickness",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "exposed_length",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an exposed length is positive",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "max_time",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a horizon is positive",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "time_step",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "a step is positive",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "tensile_strength_factor",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class requires a positive factor",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "passive_protection_factor",
+            min: Some(0.0),
+            min_inclusive: true,
+            max: Some(1.0),
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class refuses a multiplier outside [0, 1]",
+        },
+    },
+];
+
+static TRAPPED_LIQUID_FIRE_RUPTURE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "no_failure",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("inventory_pressure", 5000000.0),
+            ("inventory_temperature", 300.0),
+            ("inventory_liquid_mass", 2246.059130169441),
+            ("inventory_total_mass", 2556.756576013232),
+            ("inventory_total_volume", 10.0),
+            ("pipe_internal_diameter", 0.1),
+            ("wall_thickness", 0.01),
+            ("exposed_length", 10.0),
+            ("fire_heat_flux", 10000.0),
+            ("max_time", 20.0),
+            ("time_step", 2.0),
+        ],
+        flags: &[("vapor_pocket_detection", false)],
+        lists: &[("components", &["methane", "ethane", "n-butane"])],
+        strings: &[("fire_type", "fixed_heat_flux")],
+        vectors: &[("z", &[0.5, 0.3, 0.2])],
+        matrices: &[],
+        expected: &[
+            ("final_pressure", 5012760.306260937),
+            ("final_liquid_temperature", 300.01519084078683),
+            ("final_outer_wall_temperature", 305.30679875134905),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[
+            ("segment_id", "trapped-segment"),
+            ("limiting_failure_mode", "none"),
+        ],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "flange_failure",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("inventory_pressure", 1000000.0),
+            ("inventory_temperature", 300.0),
+            ("inventory_liquid_mass", 4000.0),
+            ("inventory_total_mass", 4061.735103001965),
+            ("inventory_total_volume", 10.0),
+            ("pipe_internal_diameter", 0.1),
+            ("wall_thickness", 0.01),
+            ("exposed_length", 10.0),
+            ("fire_heat_flux", 500000.0),
+            ("max_time", 600.0),
+            ("time_step", 2.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane", "n-butane"])],
+        strings: &[("fire_type", "fixed_heat_flux"), ("flange_class", "150")],
+        vectors: &[("z", &[0.5, 0.3, 0.2])],
+        matrices: &[],
+        expected: &[
+            ("time_to_flange_failure", 22.0),
+            ("minimum_failure_time", 22.0),
+            ("final_pressure", 1465832.210042704),
+            ("final_liquid_temperature", 300.55456215481274),
+            ("final_outer_wall_temperature", 586.9348854255791),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("limiting_failure_mode", "flange_failure")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pipe_rupture",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("inventory_pressure", 5000000.0),
+            ("inventory_temperature", 300.0),
+            ("inventory_liquid_mass", 2246.059130169441),
+            ("inventory_total_mass", 2556.756576013232),
+            ("inventory_total_volume", 10.0),
+            ("pipe_internal_diameter", 0.1),
+            ("wall_thickness", 0.01),
+            ("exposed_length", 10.0),
+            ("fire_heat_flux", 500000.0),
+            ("max_time", 600.0),
+            ("time_step", 2.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane", "n-butane"])],
+        strings: &[("fire_type", "fixed_heat_flux")],
+        vectors: &[("z", &[0.5, 0.3, 0.2])],
+        matrices: &[],
+        expected: &[
+            ("time_to_pipe_rupture", 62.0),
+            ("minimum_failure_time", 62.0),
+            ("final_pressure", 10333528.154974353),
+            ("final_liquid_temperature", 306.3494382797314),
+            ("final_outer_wall_temperature", 893.3867869221738),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("limiting_failure_mode", "pipe_rupture")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "relief_set",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("inventory_pressure", 5000000.0),
+            ("inventory_temperature", 300.0),
+            ("inventory_liquid_mass", 2246.059130169441),
+            ("inventory_total_mass", 2556.756576013232),
+            ("inventory_total_volume", 10.0),
+            ("pipe_internal_diameter", 0.1),
+            ("wall_thickness", 0.01),
+            ("exposed_length", 10.0),
+            ("fire_heat_flux", 500000.0),
+            ("relief_set_pressure", 6000000.0),
+            ("max_time", 600.0),
+            ("time_step", 2.0),
+        ],
+        flags: &[("relief_limits_pressure", true)],
+        lists: &[("components", &["methane", "ethane", "n-butane"])],
+        strings: &[("fire_type", "fixed_heat_flux")],
+        vectors: &[("z", &[0.5, 0.3, 0.2])],
+        matrices: &[],
+        expected: &[
+            ("time_to_relief_set", 26.0),
+            ("time_to_pipe_rupture", 74.0),
+            ("minimum_failure_time", 74.0),
+            ("final_pressure", 6000000.0),
+            ("final_liquid_temperature", 308.6854551230138),
+            ("final_outer_wall_temperature", 958.4451062177354),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("limiting_failure_mode", "pipe_rupture")],
+        records: &[],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pfp_factor",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-09,
+        numbers: &[
+            ("inventory_pressure", 5000000.0),
+            ("inventory_temperature", 300.0),
+            ("inventory_liquid_mass", 2246.059130169441),
+            ("inventory_total_mass", 2556.756576013232),
+            ("inventory_total_volume", 10.0),
+            ("pipe_internal_diameter", 0.1),
+            ("wall_thickness", 0.01),
+            ("exposed_length", 10.0),
+            ("fire_heat_flux", 500000.0),
+            ("passive_protection_factor", 0.3),
+            ("max_time", 600.0),
+            ("time_step", 2.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane", "n-butane"])],
+        strings: &[("fire_type", "fixed_heat_flux")],
+        vectors: &[("z", &[0.5, 0.3, 0.2])],
+        matrices: &[],
+        expected: &[
+            ("time_to_pipe_rupture", 520.0),
+            ("minimum_failure_time", 520.0),
+            ("final_pressure", 41687831.03717779),
+            ("final_liquid_temperature", 343.67598932997356),
+            ("final_outer_wall_temperature", 642.2964759288351),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[("limiting_failure_mode", "pipe_rupture")],
+        records: &[],
+        expected_records: &[],
+    },
+];
+
+static TRAPPED_LIQUID_FIRE_RUPTURE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "trapped_liquid_fire_rupture",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.trapped_liquid_fire_rupture`.
+pub static TRAPPED_LIQUID_FIRE_RUPTURE_SPEC: ModelSpec = ModelSpec {
+    id: "process.trapped_liquid_fire_rupture",
+    kind: "procedure",
+    algorithm: Some(&TRAPPED_LIQUID_FIRE_RUPTURE_ALGORITHM),
+    checks: TRAPPED_LIQUID_FIRE_RUPTURE_CHECKS,
+    cases: TRAPPED_LIQUID_FIRE_RUPTURE_CASES,
+};
+
 static TUBE_RUPTURE_RELIEF_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -94058,6 +102125,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &DYNAMIC_PSV_SIZING_SPEC,
     &EJECTOR_SPEC,
     &ESCALATION_GRAPH_SPEC,
+    &ESD_RESPONSE_TIME_SPEC,
     &EVENT_TREE_SPEC,
     &EXPANDER_SPEC,
     &FAULT_TREE_SPEC,
@@ -94092,12 +102160,14 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &MAH_BOW_TIE_SKELETON_SPEC,
     &MANIFOLD_SPEC,
     &MAP_TURBO_EXPANDER_COMPRESSOR_SPEC,
+    &MASS_BALANCE_LEAK_DETECTION_SPEC,
     &MDMT_SPEC,
     &MIXER_SPEC,
     &MULTI_VESSEL_BLOWDOWN_STUDY_SPEC,
     &NOG070_SIL_DETERMINATION_SPEC,
     &NON_EQUILIBRIUM_BLOWDOWN_SPEC,
     &NORSOK_P002_COMPLIANCE_SPEC,
+    &OPEN_DRAIN_REVIEW_SPEC,
     &OVERPRESSURE_ACCEPTANCE_SPEC,
     &OVERPRESSURE_PROTECTION_STUDY_SPEC,
     &PACKED_COLUMN_SPEC,
@@ -94126,7 +102196,9 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &RUNAWAY_REACTION_SPEC,
     &S001_CLAUSE10_REVIEW_SPEC,
     &S001_SECONDARY_PRESSURE_PROTECTION_SPEC,
+    &SAFETY_ENVELOPE_SPEC,
     &SAFETY_INSTRUMENTED_FUNCTION_SPEC,
+    &SAFETY_SYSTEM_PERFORMANCE_SPEC,
     &SELF_HEATING_INDUCTION_SPEC,
     &SEMENOV_SELF_HEATING_SPEC,
     &SEPARATOR_SPEC,
@@ -94144,6 +102216,8 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &THROTTLING_VALVE_SPEC,
     &TOXIC_LIBRARY_SPEC,
     &TR3001_COMPLIANCE_SPEC,
+    &TRAPPED_INVENTORY_SPEC,
+    &TRAPPED_LIQUID_FIRE_RUPTURE_SPEC,
     &TUBE_RUPTURE_RELIEF_SPEC,
     &TURBO_EXPANDER_COMPRESSOR_SPEC,
     &VACUUM_COLLAPSE_SPEC,

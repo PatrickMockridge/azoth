@@ -252,6 +252,7 @@
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
 //!   - specs/models/process/escalation_graph.toml
+//!   - specs/models/process/esd_response_time.toml
 //!   - specs/models/process/event_tree.toml
 //!   - specs/models/process/expander.toml
 //!   - specs/models/process/fault_tree.toml
@@ -286,12 +287,14 @@
 //!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
+//!   - specs/models/process/mass_balance_leak_detection.toml
 //!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/multi_vessel_blowdown_study.toml
 //!   - specs/models/process/nog070_sil_determination.toml
 //!   - specs/models/process/non_equilibrium_blowdown.toml
 //!   - specs/models/process/norsok_p002_compliance.toml
+//!   - specs/models/process/open_drain_review.toml
 //!   - specs/models/process/overpressure_acceptance.toml
 //!   - specs/models/process/overpressure_protection_study.toml
 //!   - specs/models/process/packed_column.toml
@@ -320,7 +323,9 @@
 //!   - specs/models/process/runaway_reaction.toml
 //!   - specs/models/process/s001_clause10_review.toml
 //!   - specs/models/process/s001_secondary_pressure_protection.toml
+//!   - specs/models/process/safety_envelope.toml
 //!   - specs/models/process/safety_instrumented_function.toml
+//!   - specs/models/process/safety_system_performance.toml
 //!   - specs/models/process/self_heating_induction.toml
 //!   - specs/models/process/semenov_self_heating.toml
 //!   - specs/models/process/separator.toml
@@ -338,6 +343,8 @@
 //!   - specs/models/process/throttling_valve.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
+//!   - specs/models/process/trapped_inventory.toml
+//!   - specs/models/process/trapped_liquid_fire_rupture.toml
 //!   - specs/models/process/tube_rupture_relief.toml
 //!   - specs/models/process/turbo_expander_compressor.toml
 //!   - specs/models/process/vacuum_collapse.toml
@@ -3575,6 +3582,11 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.ejector", "mixing_efficiency", "dimensionless"),
     ("process.ejector", "diffuser_efficiency", "dimensionless"),
     (
+        "process.esd_response_time",
+        "allowable_response_time",
+        "time",
+    ),
+    (
         "process.event_tree",
         "initiating_frequency_per_year",
         "dimensionless",
@@ -4450,6 +4462,62 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "impeller_diameter",
         "length",
     ),
+    ("process.mass_balance_leak_detection", "z", "dimensionless"),
+    (
+        "process.mass_balance_leak_detection",
+        "inlet_pressure",
+        "pressure",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "inlet_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "inlet_flow",
+        "mass_rate",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "outlet_flow",
+        "mass_rate",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "inlet_density",
+        "mass_density",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "linepack_volume",
+        "volume",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "flow_measurement_uncertainty_fraction",
+        "dimensionless",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "pressure_uncertainty",
+        "pressure",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "temperature_uncertainty",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "detection_window",
+        "time",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "confidence_multiplier",
+        "dimensionless",
+    ),
     ("process.mdmt", "governing_thickness", "length"),
     (
         "process.mdmt",
@@ -4606,6 +4674,11 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.non_equilibrium_blowdown",
         "stop_pressure",
         "pressure",
+    ),
+    (
+        "process.open_drain_review",
+        "default_liquid_leak_rate",
+        "mass_rate",
     ),
     (
         "process.overpressure_acceptance",
@@ -5468,6 +5541,41 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "proof_test_interval_months",
         "dimensionless",
     ),
+    ("process.safety_envelope", "z", "dimensionless"),
+    ("process.safety_envelope", "min_pressure", "pressure"),
+    ("process.safety_envelope", "max_pressure", "pressure"),
+    ("process.safety_envelope", "num_points", "dimensionless"),
+    (
+        "process.safety_envelope",
+        "hydrate_margin",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.safety_envelope",
+        "wax_margin",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.safety_envelope",
+        "co2_margin",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.safety_envelope",
+        "mdmt_margin",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.safety_envelope",
+        "mdmt_design_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.safety_envelope", "operating_pressure", "pressure"),
+    (
+        "process.safety_envelope",
+        "operating_temperature",
+        "thermodynamic_temperature",
+    ),
     (
         "process.safety_instrumented_function",
         "pfd_average",
@@ -6215,6 +6323,161 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "process.tr3001_compliance",
         "accumulation_fraction",
+        "dimensionless",
+    ),
+    ("process.trapped_inventory", "z", "dimensionless"),
+    ("process.trapped_inventory", "pressure", "pressure"),
+    (
+        "process.trapped_inventory",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.trapped_inventory",
+        "fallback_liquid_density",
+        "mass_density",
+    ),
+    ("process.trapped_liquid_fire_rupture", "z", "dimensionless"),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inventory_pressure",
+        "pressure",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inventory_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inventory_liquid_mass",
+        "mass",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inventory_total_mass",
+        "mass",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inventory_total_volume",
+        "volume",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "environmental_factor",
+        "dimensionless",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "fire_heat_flux",
+        "heat_flux_density",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "fire_emissivity",
+        "dimensionless",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "fire_view_factor",
+        "dimensionless",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "flame_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "ambient_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "passive_protection_factor",
+        "dimensionless",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "fire_exposed_area",
+        "area",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "ambient_tensile_strength",
+        "pressure",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "pipe_internal_diameter",
+        "length",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "wall_thickness",
+        "length",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "exposed_length",
+        "length",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "relief_set_pressure",
+        "pressure",
+    ),
+    ("process.trapped_liquid_fire_rupture", "max_time", "time"),
+    ("process.trapped_liquid_fire_rupture", "time_step", "time"),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "wall_density",
+        "mass_density",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "wall_heat_capacity",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "wall_conductivity",
+        "thermal_conductivity",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "liquid_heat_capacity",
+        "specific_heat_capacity",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "liquid_expansion",
+        "per_temperature",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "liquid_bulk_modulus",
+        "pressure",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "inner_htc",
+        "heat_transfer",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "outer_htc",
+        "heat_transfer",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "tensile_strength_factor",
+        "dimensionless",
+    ),
+    (
+        "process.trapped_liquid_fire_rupture",
+        "wall_nodes",
         "dimensionless",
     ),
     (

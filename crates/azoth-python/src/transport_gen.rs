@@ -17,24 +17,26 @@ use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent, PyChemicalWarningRow,
     PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult, PyDepositionSegmentRow,
-    PyDepressurizationPoint, PyDriftFluxReleaseStation, PyEquilibriumSoundSpeedSample,
-    PyEscalationItemResult, PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment,
-    PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
-    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
-    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasFannoReleaseStation,
-    PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
-    PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier,
-    PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
-    PyNonEquilibriumBlowdownPoint, PyP002FindingResult, PyPipeFireRupturePoint,
+    PyDepressurizationPoint, PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery,
+    PyEnvelopeSummary, PyEquilibriumSoundSpeedSample, PyEscalationItemResult, PyEsdContribution,
+    PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry,
+    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
+    PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
+    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
+    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
+    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
+    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment,
+    PyOpenDrainResult, PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding,
+    PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint,
     PyPrescribedSlipReleaseStation, PyPulsationModeResult, PyRanzMarshallReleaseStation,
     PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PyTr3001Finding, PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult,
-    PyZoneRatingRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
+    PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
+    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult,
+    PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyTr3001Finding, PyTrappedInventorySegmentResult, PyVesselFillingPoint, PyVesselRuptureStep,
+    PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -17248,6 +17250,106 @@ impl From<&azoth_process::models::escalation_graph::EscalationGraphResult>
         }
     }
 }
+/// Result of `process.esd_response_time`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EsdResponseTimeResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEsdResponseTimeResult {
+    /// the echoed SIF identifier.
+    #[pyo3(get)]
+    pub sif_tag: String,
+    /// the sum of the detection contributions.
+    #[pyo3(get)]
+    pub detection_time: PyQty,
+    /// the sum of the logic contributions.
+    #[pyo3(get)]
+    pub logic_time: PyQty,
+    /// the sum of the final-element contributions.
+    #[pyo3(get)]
+    pub final_element_time: PyQty,
+    /// the three stage totals' sum.
+    #[pyo3(get)]
+    pub total_response_time: PyQty,
+    /// the budget, absent when none is stated.
+    #[pyo3(get)]
+    pub allowable_response_time: Option<PyQty>,
+    /// `allowable - total`, absent when no budget is stated.
+    #[pyo3(get)]
+    pub margin: Option<PyQty>,
+    /// `total <= allowable`, and true when no budget is stated.
+    #[pyo3(get)]
+    pub within_budget: bool,
+    /// the contributions echoed in caller order.
+    #[pyo3(get)]
+    pub contributions: Vec<PyEsdContribution>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyEsdResponseTimeResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "EsdResponseTimeResult(sif_tag={:?}, detection_time={:?}, logic_time={:?}, final_element_time={:?}, total_response_time={:?}, allowable_response_time={:?}, margin={:?}, within_budget={:?}, contributions={:?}, {} warning(s))",
+            self.sif_tag,
+            self.detection_time,
+            self.logic_time,
+            self.final_element_time,
+            self.total_response_time,
+            self.allowable_response_time,
+            self.margin,
+            self.within_budget,
+            self.contributions,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::esd_response_time::EsdResponseTimeResult>
+    for PyEsdResponseTimeResult
+{
+    fn from(r: &azoth_process::models::esd_response_time::EsdResponseTimeResult) -> Self {
+        Self {
+            sif_tag: r.sif_tag.clone(),
+            detection_time: PyQty {
+                magnitude_si: r.detection_time.value,
+                unit: "s".to_string(),
+            },
+            logic_time: PyQty {
+                magnitude_si: r.logic_time.value,
+                unit: "s".to_string(),
+            },
+            final_element_time: PyQty {
+                magnitude_si: r.final_element_time.value,
+                unit: "s".to_string(),
+            },
+            total_response_time: PyQty {
+                magnitude_si: r.total_response_time.value,
+                unit: "s".to_string(),
+            },
+            allowable_response_time: r.allowable_response_time.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            margin: r.margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            within_budget: r.within_budget,
+            contributions: r
+                .contributions
+                .iter()
+                .map(PyEsdContribution::from)
+                .collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.event_tree`, transported.
 #[pyclass(
     frozen,
@@ -21581,6 +21683,133 @@ impl From<&azoth_process::models::map_turbo_expander_compressor::MapTurboExpande
         }
     }
 }
+/// Result of `process.mass_balance_leak_detection`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MassBalanceLeakDetectionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMassBalanceLeakDetectionResult {
+    /// the echoed inlet stream name.
+    #[pyo3(get)]
+    pub inlet_stream_name: Option<String>,
+    /// the echoed outlet stream name.
+    #[pyo3(get)]
+    pub outlet_stream_name: Option<String>,
+    /// the measured inlet mass flow.
+    #[pyo3(get)]
+    pub inlet_flow: PyQty,
+    /// the measured outlet mass flow.
+    #[pyo3(get)]
+    pub outlet_flow: PyQty,
+    /// `inlet_flow - outlet_flow`.
+    #[pyo3(get)]
+    pub measured_imbalance: PyQty,
+    /// the two meters' combined uncertainty at the confidence multiplier.
+    #[pyo3(get)]
+    pub flow_uncertainty: PyQty,
+    /// the linepack's pressure and temperature uncertainty as an equivalent leak rate.
+    #[pyo3(get)]
+    pub linepack_uncertainty: PyQty,
+    /// `sqrt(flow_uncertainty^2 + linepack_uncertainty^2)`.
+    #[pyo3(get)]
+    pub combined_uncertainty: PyQty,
+    /// `|measured_imbalance| + combined_uncertainty`.
+    #[pyo3(get)]
+    pub minimum_detectable_leak_rate: PyQty,
+    /// the rate over the larger absolute flow; absent when that flow is zero.
+    #[pyo3(get)]
+    pub minimum_detectable_leak_fraction: Option<f64>,
+    /// the bulk density the linepack term used; absent when no linepack is stated.
+    #[pyo3(get)]
+    pub density: Option<PyQty>,
+    /// the clamped averaging window.
+    #[pyo3(get)]
+    pub detection_window: PyQty,
+    /// the clamped confidence multiplier.
+    #[pyo3(get)]
+    pub confidence_multiplier: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyMassBalanceLeakDetectionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "MassBalanceLeakDetectionResult(inlet_stream_name={:?}, outlet_stream_name={:?}, inlet_flow={:?}, outlet_flow={:?}, measured_imbalance={:?}, flow_uncertainty={:?}, linepack_uncertainty={:?}, combined_uncertainty={:?}, minimum_detectable_leak_rate={:?}, minimum_detectable_leak_fraction={:?}, density={:?}, detection_window={:?}, confidence_multiplier={:?}, {} warning(s))",
+            self.inlet_stream_name,
+            self.outlet_stream_name,
+            self.inlet_flow,
+            self.outlet_flow,
+            self.measured_imbalance,
+            self.flow_uncertainty,
+            self.linepack_uncertainty,
+            self.combined_uncertainty,
+            self.minimum_detectable_leak_rate,
+            self.minimum_detectable_leak_fraction,
+            self.density,
+            self.detection_window,
+            self.confidence_multiplier,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::mass_balance_leak_detection::MassBalanceLeakDetectionResult>
+    for PyMassBalanceLeakDetectionResult
+{
+    fn from(
+        r: &azoth_process::models::mass_balance_leak_detection::MassBalanceLeakDetectionResult,
+    ) -> Self {
+        Self {
+            inlet_stream_name: r.inlet_stream_name.clone(),
+            outlet_stream_name: r.outlet_stream_name.clone(),
+            inlet_flow: PyQty {
+                magnitude_si: r.inlet_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            outlet_flow: PyQty {
+                magnitude_si: r.outlet_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            measured_imbalance: PyQty {
+                magnitude_si: r.measured_imbalance.value,
+                unit: "kg/s".to_string(),
+            },
+            flow_uncertainty: PyQty {
+                magnitude_si: r.flow_uncertainty.value,
+                unit: "kg/s".to_string(),
+            },
+            linepack_uncertainty: PyQty {
+                magnitude_si: r.linepack_uncertainty.value,
+                unit: "kg/s".to_string(),
+            },
+            combined_uncertainty: PyQty {
+                magnitude_si: r.combined_uncertainty.value,
+                unit: "kg/s".to_string(),
+            },
+            minimum_detectable_leak_rate: PyQty {
+                magnitude_si: r.minimum_detectable_leak_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            minimum_detectable_leak_fraction: r.minimum_detectable_leak_fraction,
+            density: r.density.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/m**3".to_string(),
+            }),
+            detection_window: PyQty {
+                magnitude_si: r.detection_window.value,
+                unit: "s".to_string(),
+            },
+            confidence_multiplier: r.confidence_multiplier,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.mdmt`, transported.
 #[pyclass(
     frozen,
@@ -21988,6 +22217,88 @@ impl From<&azoth_process::models::norsok_p002_compliance::NorsokP002ComplianceRe
             findings: r.findings.iter().map(PyP002FindingResult::from).collect(),
             compliant: r.compliant,
             non_compliant_count: r.non_compliant_count,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.open_drain_review`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OpenDrainReviewResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOpenDrainReviewResult {
+    /// the report's verdict: any fail, else any pass-with-warnings, else pass.
+    #[pyo3(get)]
+    pub overall_verdict: String,
+    /// the number of reviewed items.
+    #[pyo3(get)]
+    pub item_count: f64,
+    /// the number of items whose verdict is fail.
+    #[pyo3(get)]
+    pub failed_item_count: f64,
+    /// the number of items whose verdict is pass-with-warnings.
+    #[pyo3(get)]
+    pub warning_item_count: f64,
+    /// the total number of assessments.
+    #[pyo3(get)]
+    pub assessment_count: f64,
+    /// the number of failing assessments.
+    #[pyo3(get)]
+    pub fail_assessment_count: f64,
+    /// the number of warning assessments.
+    #[pyo3(get)]
+    pub warning_assessment_count: f64,
+    /// one row per item, in caller order.
+    #[pyo3(get)]
+    pub results: Vec<PyOpenDrainResult>,
+    /// every assessment, item by item.
+    #[pyo3(get)]
+    pub assessments: Vec<PyOpenDrainAssessment>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyOpenDrainReviewResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "OpenDrainReviewResult(overall_verdict={:?}, item_count={:?}, failed_item_count={:?}, warning_item_count={:?}, assessment_count={:?}, fail_assessment_count={:?}, warning_assessment_count={:?}, results={:?}, assessments={:?}, {} warning(s))",
+            self.overall_verdict,
+            self.item_count,
+            self.failed_item_count,
+            self.warning_item_count,
+            self.assessment_count,
+            self.fail_assessment_count,
+            self.warning_assessment_count,
+            self.results,
+            self.assessments,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::open_drain_review::OpenDrainReviewResult>
+    for PyOpenDrainReviewResult
+{
+    fn from(r: &azoth_process::models::open_drain_review::OpenDrainReviewResult) -> Self {
+        Self {
+            overall_verdict: r.overall_verdict.as_str().to_string(),
+            item_count: r.item_count,
+            failed_item_count: r.failed_item_count,
+            warning_item_count: r.warning_item_count,
+            assessment_count: r.assessment_count,
+            fail_assessment_count: r.fail_assessment_count,
+            warning_assessment_count: r.warning_assessment_count,
+            results: r.results.iter().map(PyOpenDrainResult::from).collect(),
+            assessments: r
+                .assessments
+                .iter()
+                .map(PyOpenDrainAssessment::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }
@@ -25505,6 +25816,64 @@ impl From<&azoth_process::models::s001_secondary_pressure_protection::S001Second
         }
     }
 }
+/// Result of `process.safety_envelope`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SafetyEnvelopeResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySafetyEnvelopeResult {
+    /// one summary row per arm, in the class's order.
+    #[pyo3(get)]
+    pub envelopes: Vec<PyEnvelopeSummary>,
+    /// every arm's points, arm by arm in the class's order.
+    #[pyo3(get)]
+    pub points: Vec<PyEnvelopePoint>,
+    /// one row per arm when an operating point is stated, in the class's order.
+    #[pyo3(get)]
+    pub queries: Vec<PyEnvelopeQuery>,
+    /// whether every query is safe; absent without an operating point.
+    #[pyo3(get)]
+    pub all_safe: Option<bool>,
+    /// the arm with the smallest finite margin, absent when every margin is absent.
+    #[pyo3(get)]
+    pub most_limiting_envelope: Option<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySafetyEnvelopeResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SafetyEnvelopeResult(envelopes={:?}, points={:?}, queries={:?}, all_safe={:?}, most_limiting_envelope={:?}, {} warning(s))",
+            self.envelopes,
+            self.points,
+            self.queries,
+            self.all_safe,
+            self.most_limiting_envelope,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_envelope::SafetyEnvelopeResult>
+    for PySafetyEnvelopeResult
+{
+    fn from(r: &azoth_process::models::safety_envelope::SafetyEnvelopeResult) -> Self {
+        Self {
+            envelopes: r.envelopes.iter().map(PyEnvelopeSummary::from).collect(),
+            points: r.points.iter().map(PyEnvelopePoint::from).collect(),
+            queries: r.queries.iter().map(PyEnvelopeQuery::from).collect(),
+            all_safe: r.all_safe,
+            most_limiting_envelope: r.most_limiting_envelope.clone(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.safety_instrumented_function`, transported.
 #[pyclass(
     frozen,
@@ -25591,6 +25960,104 @@ impl From<&azoth_process::models::safety_instrumented_function::SafetyInstrument
             pfd_1oo2: r.pfd_1oo2,
             pfd_2oo3: r.pfd_2oo3,
             availability_with_spurious_trips: r.availability_with_spurious_trips,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.safety_system_performance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SafetySystemPerformanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySafetySystemPerformanceResult {
+    /// the register id.
+    #[pyo3(get)]
+    pub register_id: String,
+    /// the register name, empty when absent.
+    #[pyo3(get)]
+    pub register_name: String,
+    /// the report's verdict: any fail, else any warning, else pass.
+    #[pyo3(get)]
+    pub overall_verdict: String,
+    /// the number of assessments.
+    #[pyo3(get)]
+    pub assessment_count: f64,
+    /// the number of passing assessments.
+    #[pyo3(get)]
+    pub pass_count: f64,
+    /// the number of pass-with-warnings assessments.
+    #[pyo3(get)]
+    pub warning_count: f64,
+    /// the number of failing assessments.
+    #[pyo3(get)]
+    pub fail_count: f64,
+    /// one row per barrier and matching demand, in register order.
+    #[pyo3(get)]
+    pub assessments: Vec<PyPerformanceAssessment>,
+    /// every finding, assessment by assessment in the class's order.
+    #[pyo3(get)]
+    pub findings: Vec<PyPerformanceFinding>,
+    /// the related measurement devices, assessment by assessment.
+    #[pyo3(get)]
+    pub instruments: Vec<PyPerformanceInstrument>,
+    /// the related SIFs, assessment by assessment.
+    #[pyo3(get)]
+    pub sifs: Vec<PyPerformanceSif>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySafetySystemPerformanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SafetySystemPerformanceResult(register_id={:?}, register_name={:?}, overall_verdict={:?}, assessment_count={:?}, pass_count={:?}, warning_count={:?}, fail_count={:?}, assessments={:?}, findings={:?}, instruments={:?}, sifs={:?}, {} warning(s))",
+            self.register_id,
+            self.register_name,
+            self.overall_verdict,
+            self.assessment_count,
+            self.pass_count,
+            self.warning_count,
+            self.fail_count,
+            self.assessments,
+            self.findings,
+            self.instruments,
+            self.sifs,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_system_performance::SafetySystemPerformanceResult>
+    for PySafetySystemPerformanceResult
+{
+    fn from(
+        r: &azoth_process::models::safety_system_performance::SafetySystemPerformanceResult,
+    ) -> Self {
+        Self {
+            register_id: r.register_id.clone(),
+            register_name: r.register_name.clone(),
+            overall_verdict: r.overall_verdict.as_str().to_string(),
+            assessment_count: r.assessment_count,
+            pass_count: r.pass_count,
+            warning_count: r.warning_count,
+            fail_count: r.fail_count,
+            assessments: r
+                .assessments
+                .iter()
+                .map(PyPerformanceAssessment::from)
+                .collect(),
+            findings: r.findings.iter().map(PyPerformanceFinding::from).collect(),
+            instruments: r
+                .instruments
+                .iter()
+                .map(PyPerformanceInstrument::from)
+                .collect(),
+            sifs: r.sifs.iter().map(PyPerformanceSif::from).collect(),
             warnings: transport(&r.warnings),
         }
     }
@@ -28194,6 +28661,241 @@ impl From<&azoth_process::models::tr3001_compliance::Tr3001ComplianceResult>
             review_count: r.review_count,
             fail_count: r.fail_count,
             compliant: r.compliant,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.trapped_inventory`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TrappedInventoryResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTrappedInventoryResult {
+    /// the gas phase's density, or the bulk density when no gas phase exists.
+    #[pyo3(get)]
+    pub gas_density: PyQty,
+    /// the oil density, then the aqueous, then the fallback.
+    #[pyo3(get)]
+    pub liquid_density: PyQty,
+    /// the segments' internal volumes.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the gas share of the volumes.
+    #[pyo3(get)]
+    pub total_gas_volume: PyQty,
+    /// the liquid share of the volumes.
+    #[pyo3(get)]
+    pub total_liquid_volume: PyQty,
+    /// `total_gas_volume * gas_density`.
+    #[pyo3(get)]
+    pub total_gas_mass: PyQty,
+    /// `total_liquid_volume * liquid_density`.
+    #[pyo3(get)]
+    pub total_liquid_mass: PyQty,
+    /// the gas and liquid masses.
+    #[pyo3(get)]
+    pub total_mass: PyQty,
+    /// one row per input segment, in caller order.
+    #[pyo3(get)]
+    pub segments: Vec<PyTrappedInventorySegmentResult>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyTrappedInventoryResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "TrappedInventoryResult(gas_density={:?}, liquid_density={:?}, total_volume={:?}, total_gas_volume={:?}, total_liquid_volume={:?}, total_gas_mass={:?}, total_liquid_mass={:?}, total_mass={:?}, segments={:?}, {} warning(s))",
+            self.gas_density,
+            self.liquid_density,
+            self.total_volume,
+            self.total_gas_volume,
+            self.total_liquid_volume,
+            self.total_gas_mass,
+            self.total_liquid_mass,
+            self.total_mass,
+            self.segments,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::trapped_inventory::TrappedInventoryResult>
+    for PyTrappedInventoryResult
+{
+    fn from(r: &azoth_process::models::trapped_inventory::TrappedInventoryResult) -> Self {
+        Self {
+            gas_density: PyQty {
+                magnitude_si: r.gas_density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            liquid_density: PyQty {
+                magnitude_si: r.liquid_density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            total_volume: PyQty {
+                magnitude_si: r.total_volume.value,
+                unit: "m**3".to_string(),
+            },
+            total_gas_volume: PyQty {
+                magnitude_si: r.total_gas_volume.value,
+                unit: "m**3".to_string(),
+            },
+            total_liquid_volume: PyQty {
+                magnitude_si: r.total_liquid_volume.value,
+                unit: "m**3".to_string(),
+            },
+            total_gas_mass: PyQty {
+                magnitude_si: r.total_gas_mass.value,
+                unit: "kg".to_string(),
+            },
+            total_liquid_mass: PyQty {
+                magnitude_si: r.total_liquid_mass.value,
+                unit: "kg".to_string(),
+            },
+            total_mass: PyQty {
+                magnitude_si: r.total_mass.value,
+                unit: "kg".to_string(),
+            },
+            segments: r
+                .segments
+                .iter()
+                .map(PyTrappedInventorySegmentResult::from)
+                .collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.trapped_liquid_fire_rupture`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TrappedLiquidFireRuptureResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTrappedLiquidFireRuptureResult {
+    /// the echoed segment identifier.
+    #[pyo3(get)]
+    pub segment_id: String,
+    /// the recorded time series, one row per step, the failure step included.
+    #[pyo3(get)]
+    pub trajectory: Vec<PyRupturePoint>,
+    /// the class's limiting mode.
+    #[pyo3(get)]
+    pub limiting_failure_mode: String,
+    /// whether the limiting mode is a pipe or flange failure.
+    #[pyo3(get)]
+    pub rupture_predicted: bool,
+    /// the first time the relief set pressure is reached.
+    #[pyo3(get)]
+    pub time_to_relief_set: Option<PyQty>,
+    /// the first time the vapor pocket appears.
+    #[pyo3(get)]
+    pub time_to_vapor_pocket: Option<PyQty>,
+    /// the first time the pipe stress reaches its allowable.
+    #[pyo3(get)]
+    pub time_to_pipe_rupture: Option<PyQty>,
+    /// the first time the pressure reaches the flange rating.
+    #[pyo3(get)]
+    pub time_to_flange_failure: Option<PyQty>,
+    /// the earlier of the pipe and flange failure times.
+    #[pyo3(get)]
+    pub minimum_failure_time: Option<PyQty>,
+    /// the last recorded pressure.
+    #[pyo3(get)]
+    pub final_pressure: PyQty,
+    /// the last recorded liquid temperature.
+    #[pyo3(get)]
+    pub final_liquid_temperature: PyQty,
+    /// the last recorded outer wall temperature.
+    #[pyo3(get)]
+    pub final_outer_wall_temperature: PyQty,
+    /// the class's applied standard references.
+    #[pyo3(get)]
+    pub standards_applied: Vec<String>,
+    /// the class's recommendations.
+    #[pyo3(get)]
+    pub recommendations: Vec<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyTrappedLiquidFireRuptureResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "TrappedLiquidFireRuptureResult(segment_id={:?}, trajectory={:?}, limiting_failure_mode={:?}, rupture_predicted={:?}, time_to_relief_set={:?}, time_to_vapor_pocket={:?}, time_to_pipe_rupture={:?}, time_to_flange_failure={:?}, minimum_failure_time={:?}, final_pressure={:?}, final_liquid_temperature={:?}, final_outer_wall_temperature={:?}, standards_applied={:?}, recommendations={:?}, {} warning(s))",
+            self.segment_id,
+            self.trajectory,
+            self.limiting_failure_mode,
+            self.rupture_predicted,
+            self.time_to_relief_set,
+            self.time_to_vapor_pocket,
+            self.time_to_pipe_rupture,
+            self.time_to_flange_failure,
+            self.minimum_failure_time,
+            self.final_pressure,
+            self.final_liquid_temperature,
+            self.final_outer_wall_temperature,
+            self.standards_applied,
+            self.recommendations,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::trapped_liquid_fire_rupture::TrappedLiquidFireRuptureResult>
+    for PyTrappedLiquidFireRuptureResult
+{
+    fn from(
+        r: &azoth_process::models::trapped_liquid_fire_rupture::TrappedLiquidFireRuptureResult,
+    ) -> Self {
+        Self {
+            segment_id: r.segment_id.clone(),
+            trajectory: r.trajectory.iter().map(PyRupturePoint::from).collect(),
+            limiting_failure_mode: r.limiting_failure_mode.as_str().to_string(),
+            rupture_predicted: r.rupture_predicted,
+            time_to_relief_set: r.time_to_relief_set.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            time_to_vapor_pocket: r.time_to_vapor_pocket.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            time_to_pipe_rupture: r.time_to_pipe_rupture.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            time_to_flange_failure: r.time_to_flange_failure.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            minimum_failure_time: r.minimum_failure_time.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "s".to_string(),
+            }),
+            final_pressure: PyQty {
+                magnitude_si: r.final_pressure.value,
+                unit: "Pa".to_string(),
+            },
+            final_liquid_temperature: PyQty {
+                magnitude_si: r.final_liquid_temperature.value,
+                unit: "K".to_string(),
+            },
+            final_outer_wall_temperature: PyQty {
+                magnitude_si: r.final_outer_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            standards_applied: r.standards_applied.clone(),
+            recommendations: r.recommendations.clone(),
             warnings: transport(&r.warnings),
         }
     }

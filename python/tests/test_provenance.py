@@ -181,8 +181,11 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # blowdown; 358: the ideal-gas release; 359: the legacy screening release; 360: the
     # prescribed-slip release; 361: the drift-flux release; 362: the finite-rate release;
     # 363: the component-selective release; 364: the Ranz-Marshall release; 365: the
-    # bubble transfer zone; 366: the ideal-gas Fanno pipe; 367: the real-gas Fanno pipe.
-    assert len(registered) == 367
+    # bubble transfer zone; 366: the ideal-gas Fanno pipe; 367: the real-gas Fanno pipe;
+    # 368: the ESD response time; 369: the mass-balance leak sensitivity;
+    # 370: the trapped inventory; 371: the safety envelope; 372: the trapped-liquid
+    # fire rupture; 373: the open-drain review; 374: the safety-system performance.
+    assert len(registered) == 374
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

@@ -1,0 +1,95 @@
+model = "process.trapped_inventory"
+[[cases]]
+id = "two_phase"
+tolerance = 1.0e-6
+source = "Methane/ethane/n-butane at 0.5/0.3/0.2, 300 K and 50 bar, with a 10 m3 equipment volume at half fill and a 0.2 m, 100 m pipe at 0.2 fill. From `validation/neqsim/captures/process_trapped_inventory.tsv` (`inv_two_phase`)."
+[cases.inputs]
+components = ["methane", "ethane", "n-butane"]
+z = [0.5, 0.3, 0.2]
+pressure = 5000000.0
+temperature = 300.0
+segments = [
+  { segment_id = "V-101", kind = "equipment", volume = 10.0, liquid_fill_fraction = 0.5 },
+  { segment_id = "P-101", kind = "pipe", internal_diameter = 0.2, length = 100.0, liquid_fill_fraction = 0.2 },
+]
+segment_evidence = [
+  { segment_id = "V-101", document_id = "DOC-V-101", source_reference = "STID-V-101", excerpt = "documented volume" },
+  { segment_id = "P-101", document_id = "DOC-P-101", source_reference = "STID-P-101", excerpt = "documented volume" },
+]
+[cases.expected]
+gas_density = 62.13948916875829
+liquid_density = 449.21182603388814
+total_volume = 13.141592653589793
+total_gas_volume = 7.5132741228718345
+total_liquid_volume = 5.628318530717959
+total_gas_mass = 466.87101598010634
+total_liquid_mass = 2528.3072446841848
+total_mass = 2995.178260664291
+segments = [
+  { segment_id = "V-101", kind = "equipment", total_volume = 10.0, gas_volume = 5.0, liquid_volume = 5.0, gas_mass = 310.69744584379146, liquid_mass = 2246.059130169441, total_mass = 2556.756576013232, gas_density = 62.13948916875829, liquid_density = 449.21182603388814, liquid_fill_fraction = 0.5 },
+  { segment_id = "P-101", kind = "pipe", total_volume = 3.1415926535897936, gas_volume = 2.513274122871835, liquid_volume = 0.6283185307179587, gas_mass = 156.17357013631488, liquid_mass = 282.24811451474386, total_mass = 438.42168465105874, gas_density = 62.13948916875829, liquid_density = 449.21182603388814, liquid_fill_fraction = 0.2, internal_diameter = 0.2, length = 100.0 },
+]
+[[cases]]
+id = "gas_only_fallback"
+tolerance = 1.0e-6
+source = "Pure methane at 300 K and 50 bar, one phase gas, so the class's 800 kg/m3 fallback is the liquid density and the fallback warning fires. From (`inv_gas_only`)."
+[cases.inputs]
+components = ["methane"]
+z = [1.0]
+pressure = 5000000.0
+temperature = 300.0
+segments = [
+  { segment_id = "V-GAS", kind = "equipment", volume = 5.0, liquid_fill_fraction = 0.5 },
+]
+segment_evidence = [
+  { segment_id = "V-GAS", document_id = "DOC-V-GAS", source_reference = "STID-V-GAS", excerpt = "documented volume" },
+]
+[cases.expected]
+gas_density = 35.25541405613884
+liquid_density = 800.0
+total_volume = 5.0
+total_gas_volume = 2.5
+total_liquid_volume = 2.5
+total_gas_mass = 88.1385351403471
+total_liquid_mass = 2000.0
+total_mass = 2088.138535140347
+[[cases]]
+id = "missing_evidence"
+tolerance = 1.0e-6
+source = "The two-phase fluid with one equipment segment and no evidence row: the class's missing-evidence warning fires. From (`inv_no_evidence`)."
+[cases.inputs]
+components = ["methane", "ethane", "n-butane"]
+z = [0.5, 0.3, 0.2]
+pressure = 5000000.0
+temperature = 300.0
+segments = [
+  { segment_id = "V-NOEV", kind = "equipment", volume = 5.0, liquid_fill_fraction = 0.5 },
+]
+[cases.expected]
+gas_density = 62.13948916875829
+liquid_density = 449.21182603388814
+total_gas_mass = 155.34872292189573
+total_liquid_mass = 1123.0295650847204
+total_mass = 1278.378288006616
+[[cases]]
+id = "water_multiphase"
+tolerance = 1.0e-5
+source = "Methane/water at 0.9/0.1, 300 K and 50 bar with the multiphase check: the liquid is the aqueous phase. From (`inv_water_multiphase`)."
+[cases.inputs]
+components = ["methane", "water"]
+z = [0.9, 0.1]
+pressure = 5000000.0
+temperature = 300.0
+multiphase_check = true
+segments = [
+  { segment_id = "V-WET", kind = "equipment", volume = 5.0, liquid_fill_fraction = 0.5 },
+]
+segment_evidence = [
+  { segment_id = "V-WET", document_id = "DOC-V-WET", source_reference = "STID-V-WET", excerpt = "documented volume" },
+]
+[cases.expected]
+gas_density = 35.257283531476276
+liquid_density = 984.6166289023153
+total_gas_mass = 88.14320882869069
+total_liquid_mass = 2461.541572255788
+total_mass = 2549.684781084479

@@ -960,6 +960,184 @@ impl From<&azoth_process::models::drift_flux_release::DriftFluxReleaseStation>
     }
 }
 
+/// every arm's points, arm by arm in the class's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EnvelopePoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEnvelopePoint {
+    /// the arm the point belongs to.
+    #[pyo3(get)]
+    pub envelope: String,
+    /// the point's index within its arm.
+    #[pyo3(get)]
+    pub index: usize,
+    /// the point's pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the point's limit temperature; absent when the arm's flash failed.
+    #[pyo3(get)]
+    pub temperature: Option<PyQty>,
+    /// the point's margin.
+    #[pyo3(get)]
+    pub margin: PyQty,
+    /// the limit less the margin, absent with the temperature.
+    #[pyo3(get)]
+    pub safe_temperature: Option<PyQty>,
+}
+
+#[pymethods]
+impl PyEnvelopePoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "EnvelopePoint(envelope={}, index={:?}, pressure={:?}, temperature={:?}, margin={:?}, safe_temperature={:?})",
+            self.envelope,
+            self.index,
+            self.pressure,
+            self.temperature,
+            self.margin,
+            self.safe_temperature
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_envelope::EnvelopePoint> for PyEnvelopePoint {
+    fn from(row: &azoth_process::models::safety_envelope::EnvelopePoint) -> Self {
+        Self {
+            envelope: row.envelope.as_str().to_string(),
+            index: row.index,
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            temperature: row.temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            margin: PyQty {
+                magnitude_si: row.margin,
+                unit: "K".to_string(),
+            },
+            safe_temperature: row.safe_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+        }
+    }
+}
+
+/// one row per arm when an operating point is stated, in the class's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EnvelopeQuery"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEnvelopeQuery {
+    /// the arm.
+    #[pyo3(get)]
+    pub envelope: String,
+    /// the interpolated limit at the operating pressure; absent outside the arm.
+    #[pyo3(get)]
+    pub temperature: Option<PyQty>,
+    /// the limit less the interpolated margin.
+    #[pyo3(get)]
+    pub safe_temperature: Option<PyQty>,
+    /// `operating_temperature - limit`; absent outside the arm.
+    #[pyo3(get)]
+    pub margin: Option<PyQty>,
+    /// the class's strict `operating_temperature > safe_temperature`; the phase envelope is always safe.
+    #[pyo3(get)]
+    pub safe: bool,
+}
+
+#[pymethods]
+impl PyEnvelopeQuery {
+    fn __repr__(&self) -> String {
+        format!(
+            "EnvelopeQuery(envelope={}, temperature={:?}, safe_temperature={:?}, margin={:?}, safe={:?})",
+            self.envelope, self.temperature, self.safe_temperature, self.margin, self.safe
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_envelope::EnvelopeQuery> for PyEnvelopeQuery {
+    fn from(row: &azoth_process::models::safety_envelope::EnvelopeQuery) -> Self {
+        Self {
+            envelope: row.envelope.as_str().to_string(),
+            temperature: row.temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            safe_temperature: row.safe_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            margin: row.margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            safe: row.safe,
+        }
+    }
+}
+
+/// one summary row per arm, in the class's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EnvelopeSummary"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEnvelopeSummary {
+    /// the arm.
+    #[pyo3(get)]
+    pub envelope: String,
+    /// the class's envelope name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the points the arm carries.
+    #[pyo3(get)]
+    pub point_count: usize,
+    /// the feed's water mole fraction, 0 when absent.
+    #[pyo3(get)]
+    pub reference_water_content: f64,
+    /// the class's reference wax content, which it never sets and which is 0.
+    #[pyo3(get)]
+    pub reference_wax_content: f64,
+}
+
+#[pymethods]
+impl PyEnvelopeSummary {
+    fn __repr__(&self) -> String {
+        format!(
+            "EnvelopeSummary(envelope={}, name={}, point_count={:?}, reference_water_content={}, reference_wax_content={})",
+            self.envelope,
+            self.name,
+            self.point_count,
+            self.reference_water_content,
+            self.reference_wax_content
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_envelope::EnvelopeSummary> for PyEnvelopeSummary {
+    fn from(row: &azoth_process::models::safety_envelope::EnvelopeSummary) -> Self {
+        Self {
+            envelope: row.envelope.as_str().to_string(),
+            name: row.name.clone(),
+            point_count: row.point_count,
+            reference_water_content: row.reference_water_content,
+            reference_wax_content: row.reference_wax_content,
+        }
+    }
+}
+
 /// the accepted stencil's states, centre first.
 #[pyclass(
     frozen,
@@ -1056,6 +1234,49 @@ impl From<&azoth_process::models::escalation_graph::EscalationItemResult>
     fn from(row: &azoth_process::models::escalation_graph::EscalationItemResult) -> Self {
         Self {
             item_id: row.item_id.clone(),
+        }
+    }
+}
+
+/// the contributions echoed in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EsdContribution"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEsdContribution {
+    /// the contribution's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the contribution's stage.
+    #[pyo3(get)]
+    pub stage: String,
+    /// the contribution's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+}
+
+#[pymethods]
+impl PyEsdContribution {
+    fn __repr__(&self) -> String {
+        format!(
+            "EsdContribution(name={}, stage={}, time={:?})",
+            self.name, self.stage, self.time
+        )
+    }
+}
+
+impl From<&azoth_process::models::esd_response_time::EsdContribution> for PyEsdContribution {
+    fn from(row: &azoth_process::models::esd_response_time::EsdContribution) -> Self {
+        Self {
+            name: row.name.clone(),
+            stage: row.stage.as_str().to_string(),
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
         }
     }
 }
@@ -3275,6 +3496,96 @@ impl From<&azoth_process::models::non_equilibrium_blowdown::NonEquilibriumBlowdo
     }
 }
 
+/// every assessment, item by item.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OpenDrainAssessment"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOpenDrainAssessment {
+    /// the item the assessment belongs to.
+    #[pyo3(get)]
+    pub area_id: String,
+    /// the stable requirement identifier, e.g. `OD-S001-9.4.1-CAPACITY`.
+    #[pyo3(get)]
+    pub requirement_id: String,
+    /// the clause, e.g. `9.4.1`, or the class's literal `Operational evidence` label.
+    #[pyo3(get)]
+    pub clause: String,
+    /// the assessment's status.
+    #[pyo3(get)]
+    pub status: String,
+    /// the class's severity band; a pass, info or not-applicable row is low.
+    #[pyo3(get)]
+    pub severity: String,
+}
+
+#[pymethods]
+impl PyOpenDrainAssessment {
+    fn __repr__(&self) -> String {
+        format!(
+            "OpenDrainAssessment(area_id={}, requirement_id={}, clause={}, status={}, severity={})",
+            self.area_id, self.requirement_id, self.clause, self.status, self.severity
+        )
+    }
+}
+
+impl From<&azoth_process::models::open_drain_review::OpenDrainAssessment>
+    for PyOpenDrainAssessment
+{
+    fn from(row: &azoth_process::models::open_drain_review::OpenDrainAssessment) -> Self {
+        Self {
+            area_id: row.area_id.clone(),
+            requirement_id: row.requirement_id.clone(),
+            clause: row.clause.clone(),
+            status: row.status.as_str().to_string(),
+            severity: row.severity.as_str().to_string(),
+        }
+    }
+}
+
+/// one row per item, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OpenDrainResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOpenDrainResult {
+    /// the item's area id.
+    #[pyo3(get)]
+    pub area_id: String,
+    /// the item's verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// the item's evidence confidence.
+    #[pyo3(get)]
+    pub confidence: f64,
+}
+
+#[pymethods]
+impl PyOpenDrainResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "OpenDrainResult(area_id={}, verdict={}, confidence={})",
+            self.area_id, self.verdict, self.confidence
+        )
+    }
+}
+
+impl From<&azoth_process::models::open_drain_review::OpenDrainResult> for PyOpenDrainResult {
+    fn from(row: &azoth_process::models::open_drain_review::OpenDrainResult) -> Self {
+        Self {
+            area_id: row.area_id.clone(),
+            verdict: row.verdict.as_str().to_string(),
+            confidence: row.confidence,
+        }
+    }
+}
+
 /// one row per check, in the caller's order.
 #[pyclass(
     frozen,
@@ -3313,6 +3624,391 @@ impl From<&azoth_process::models::norsok_p002_compliance::P002FindingResult>
             name: row.name.clone(),
             criterion: row.criterion.as_str().to_string(),
             compliant: row.compliant,
+        }
+    }
+}
+
+/// one row per barrier and matching demand, in register order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PerformanceAssessment"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPerformanceAssessment {
+    /// the barrier id.
+    #[pyo3(get)]
+    pub barrier_id: String,
+    /// the barrier name, empty when absent.
+    #[pyo3(get)]
+    pub barrier_name: String,
+    /// the demand id; absent for a register-only assessment.
+    #[pyo3(get)]
+    pub demand_id: Option<String>,
+    /// the inferred safety-system category.
+    #[pyo3(get)]
+    pub category: String,
+    /// the assessment's verdict.
+    #[pyo3(get)]
+    pub verdict: String,
+    /// the barrier status, echoed.
+    #[pyo3(get)]
+    pub barrier_status: String,
+    /// the barrier PFD; absent for the class's NaN.
+    #[pyo3(get)]
+    pub barrier_pfd: Option<f64>,
+    /// the barrier effectiveness; absent for the class's NaN.
+    #[pyo3(get)]
+    pub barrier_effectiveness: Option<f64>,
+    /// the barrier's evidence flag, echoed.
+    #[pyo3(get)]
+    pub has_traceable_evidence: bool,
+    /// the linked standard's id; absent when no standard is linked.
+    #[pyo3(get)]
+    pub performance_standard_id: Option<String>,
+    /// the selected target PFD; absent when both sources are NaN.
+    #[pyo3(get)]
+    pub target_pfd: Option<f64>,
+    /// the selected actual PFD; absent when both sources are NaN.
+    #[pyo3(get)]
+    pub actual_pfd: Option<f64>,
+    /// the selected required availability; absent when both sources are NaN.
+    #[pyo3(get)]
+    pub required_availability: Option<f64>,
+    /// the demand's actual availability; absent without a demand or a value.
+    #[pyo3(get)]
+    pub actual_availability: Option<f64>,
+    /// the selected required response time; absent when both sources are NaN.
+    #[pyo3(get)]
+    pub required_response_time_seconds: Option<PyQty>,
+    /// the demand's actual response time; absent without a demand or a value.
+    #[pyo3(get)]
+    pub actual_response_time_seconds: Option<PyQty>,
+    /// the demand's required effectiveness; absent without it.
+    #[pyo3(get)]
+    pub required_effectiveness: Option<f64>,
+    /// the selected actual effectiveness; absent when both sources are NaN.
+    #[pyo3(get)]
+    pub actual_effectiveness: Option<f64>,
+    /// the demand's scenario; absent without a demand or text.
+    #[pyo3(get)]
+    pub scenario: Option<String>,
+    /// the demand's demand value; absent when NaN.
+    #[pyo3(get)]
+    pub demand_value: Option<f64>,
+    /// the demand's capacity value; absent when NaN.
+    #[pyo3(get)]
+    pub capacity_value: Option<f64>,
+    /// the demand's unit label; absent without a demand or text.
+    #[pyo3(get)]
+    pub demand_unit: Option<String>,
+    /// `capacity - demand`; absent unless both are finite.
+    #[pyo3(get)]
+    pub capacity_margin: Option<f64>,
+    /// the number of related measurement devices.
+    #[pyo3(get)]
+    pub related_instrument_count: f64,
+    /// the largest related detector response time; absent when none is finite.
+    #[pyo3(get)]
+    pub max_instrument_response_time_seconds: Option<PyQty>,
+    /// the number of related event SIFs.
+    #[pyo3(get)]
+    pub related_sif_count: f64,
+    /// the number of related quantitative SIFs.
+    #[pyo3(get)]
+    pub related_quantitative_sif_count: f64,
+    /// the number of findings the assessment carries.
+    #[pyo3(get)]
+    pub finding_count: f64,
+}
+
+#[pymethods]
+impl PyPerformanceAssessment {
+    fn __repr__(&self) -> String {
+        format!(
+            "PerformanceAssessment(barrier_id={}, barrier_name={}, demand_id={:?}, category={}, verdict={}, barrier_status={}, barrier_pfd={:?}, barrier_effectiveness={:?}, has_traceable_evidence={:?}, performance_standard_id={:?}, target_pfd={:?}, actual_pfd={:?}, required_availability={:?}, actual_availability={:?}, required_response_time_seconds={:?}, actual_response_time_seconds={:?}, required_effectiveness={:?}, actual_effectiveness={:?}, scenario={:?}, demand_value={:?}, capacity_value={:?}, demand_unit={:?}, capacity_margin={:?}, related_instrument_count={}, max_instrument_response_time_seconds={:?}, related_sif_count={}, related_quantitative_sif_count={}, finding_count={})",
+            self.barrier_id,
+            self.barrier_name,
+            self.demand_id,
+            self.category,
+            self.verdict,
+            self.barrier_status,
+            self.barrier_pfd,
+            self.barrier_effectiveness,
+            self.has_traceable_evidence,
+            self.performance_standard_id,
+            self.target_pfd,
+            self.actual_pfd,
+            self.required_availability,
+            self.actual_availability,
+            self.required_response_time_seconds,
+            self.actual_response_time_seconds,
+            self.required_effectiveness,
+            self.actual_effectiveness,
+            self.scenario,
+            self.demand_value,
+            self.capacity_value,
+            self.demand_unit,
+            self.capacity_margin,
+            self.related_instrument_count,
+            self.max_instrument_response_time_seconds,
+            self.related_sif_count,
+            self.related_quantitative_sif_count,
+            self.finding_count
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_system_performance::PerformanceAssessment>
+    for PyPerformanceAssessment
+{
+    fn from(row: &azoth_process::models::safety_system_performance::PerformanceAssessment) -> Self {
+        Self {
+            barrier_id: row.barrier_id.clone(),
+            barrier_name: row.barrier_name.clone(),
+            demand_id: row.demand_id.clone(),
+            category: row.category.as_str().to_string(),
+            verdict: row.verdict.as_str().to_string(),
+            barrier_status: row.barrier_status.as_str().to_string(),
+            barrier_pfd: row.barrier_pfd,
+            barrier_effectiveness: row.barrier_effectiveness,
+            has_traceable_evidence: row.has_traceable_evidence,
+            performance_standard_id: row.performance_standard_id.clone(),
+            target_pfd: row.target_pfd,
+            actual_pfd: row.actual_pfd,
+            required_availability: row.required_availability,
+            actual_availability: row.actual_availability,
+            required_response_time_seconds: row.required_response_time_seconds.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "s".to_string(),
+            }),
+            actual_response_time_seconds: row.actual_response_time_seconds.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "s".to_string(),
+            }),
+            required_effectiveness: row.required_effectiveness,
+            actual_effectiveness: row.actual_effectiveness,
+            scenario: row.scenario.clone(),
+            demand_value: row.demand_value,
+            capacity_value: row.capacity_value,
+            demand_unit: row.demand_unit.clone(),
+            capacity_margin: row.capacity_margin,
+            related_instrument_count: row.related_instrument_count,
+            max_instrument_response_time_seconds: row.max_instrument_response_time_seconds.map(
+                |v| PyQty {
+                    magnitude_si: v,
+                    unit: "s".to_string(),
+                },
+            ),
+            related_sif_count: row.related_sif_count,
+            related_quantitative_sif_count: row.related_quantitative_sif_count,
+            finding_count: row.finding_count,
+        }
+    }
+}
+
+/// every finding, assessment by assessment in the class's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PerformanceFinding"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPerformanceFinding {
+    /// the barrier the finding belongs to.
+    #[pyo3(get)]
+    pub barrier_id: String,
+    /// the assessment's demand id; absent for a register-only assessment.
+    #[pyo3(get)]
+    pub demand_id: Option<String>,
+    /// the stable rule identifier, one per check site.
+    #[pyo3(get)]
+    pub rule: String,
+    /// the finding's severity.
+    #[pyo3(get)]
+    pub severity: String,
+}
+
+#[pymethods]
+impl PyPerformanceFinding {
+    fn __repr__(&self) -> String {
+        format!(
+            "PerformanceFinding(barrier_id={}, demand_id={:?}, rule={}, severity={})",
+            self.barrier_id, self.demand_id, self.rule, self.severity
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_system_performance::PerformanceFinding>
+    for PyPerformanceFinding
+{
+    fn from(row: &azoth_process::models::safety_system_performance::PerformanceFinding) -> Self {
+        Self {
+            barrier_id: row.barrier_id.clone(),
+            demand_id: row.demand_id.clone(),
+            rule: row.rule.as_str().to_string(),
+            severity: row.severity.as_str().to_string(),
+        }
+    }
+}
+
+/// the related measurement devices, assessment by assessment.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PerformanceInstrument"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPerformanceInstrument {
+    /// the barrier the device matched.
+    #[pyo3(get)]
+    pub barrier_id: String,
+    /// the assessment's demand id; absent for a register-only assessment.
+    #[pyo3(get)]
+    pub demand_id: Option<String>,
+    /// the device's tag, or its name when the tag is absent.
+    #[pyo3(get)]
+    pub tag: String,
+}
+
+#[pymethods]
+impl PyPerformanceInstrument {
+    fn __repr__(&self) -> String {
+        format!(
+            "PerformanceInstrument(barrier_id={}, demand_id={:?}, tag={})",
+            self.barrier_id, self.demand_id, self.tag
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_system_performance::PerformanceInstrument>
+    for PyPerformanceInstrument
+{
+    fn from(row: &azoth_process::models::safety_system_performance::PerformanceInstrument) -> Self {
+        Self {
+            barrier_id: row.barrier_id.clone(),
+            demand_id: row.demand_id.clone(),
+            tag: row.tag.clone(),
+        }
+    }
+}
+
+/// the related SIFs, assessment by assessment.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PerformanceSif"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPerformanceSif {
+    /// the barrier the SIF matched.
+    #[pyo3(get)]
+    pub barrier_id: String,
+    /// the assessment's demand id; absent for a register-only assessment.
+    #[pyo3(get)]
+    pub demand_id: Option<String>,
+    /// the SIF's name, or the quantitative SIF's first non-empty name or id.
+    #[pyo3(get)]
+    pub identifier: String,
+    /// which SIF family the row is.
+    #[pyo3(get)]
+    pub kind: String,
+    /// the event SIF's voting notation.
+    #[pyo3(get)]
+    pub voting_notation: Option<String>,
+    /// the event SIF's detector count.
+    #[pyo3(get)]
+    pub detector_count: Option<f64>,
+    /// the event SIF's bypassed detector count.
+    #[pyo3(get)]
+    pub bypassed_detector_count: Option<f64>,
+    /// the event SIF's faulty detector count.
+    #[pyo3(get)]
+    pub faulty_detector_count: Option<f64>,
+    /// the event SIF's tripped detector count.
+    #[pyo3(get)]
+    pub tripped_detector_count: Option<f64>,
+    /// the quantitative SIF's claimed SIL.
+    #[pyo3(get)]
+    pub claimed_sil: Option<f64>,
+    /// the verified achieved SIL.
+    #[pyo3(get)]
+    pub achieved_sil: Option<f64>,
+    /// whether the achieved SIL meets the claim.
+    #[pyo3(get)]
+    pub sil_achieved: Option<bool>,
+    /// the quantitative SIF's average PFD.
+    #[pyo3(get)]
+    pub pfd_average: Option<f64>,
+    /// `1.5 PFD`.
+    #[pyo3(get)]
+    pub pfd_upper: Option<f64>,
+    /// `1 / PFD`; absent at a zero PFD.
+    #[pyo3(get)]
+    pub risk_reduction_factor: Option<f64>,
+    /// the quantitative SIF's architecture.
+    #[pyo3(get)]
+    pub architecture: Option<String>,
+    /// the quantitative SIF's proof-test interval.
+    #[pyo3(get)]
+    pub proof_test_interval_hours: Option<f64>,
+    /// the number of protected equipment tags the SIF names.
+    #[pyo3(get)]
+    pub protected_equipment_count: Option<f64>,
+}
+
+#[pymethods]
+impl PyPerformanceSif {
+    fn __repr__(&self) -> String {
+        format!(
+            "PerformanceSif(barrier_id={}, demand_id={:?}, identifier={}, kind={}, voting_notation={:?}, detector_count={:?}, bypassed_detector_count={:?}, faulty_detector_count={:?}, tripped_detector_count={:?}, claimed_sil={:?}, achieved_sil={:?}, sil_achieved={:?}, pfd_average={:?}, pfd_upper={:?}, risk_reduction_factor={:?}, architecture={:?}, proof_test_interval_hours={:?}, protected_equipment_count={:?})",
+            self.barrier_id,
+            self.demand_id,
+            self.identifier,
+            self.kind,
+            self.voting_notation,
+            self.detector_count,
+            self.bypassed_detector_count,
+            self.faulty_detector_count,
+            self.tripped_detector_count,
+            self.claimed_sil,
+            self.achieved_sil,
+            self.sil_achieved,
+            self.pfd_average,
+            self.pfd_upper,
+            self.risk_reduction_factor,
+            self.architecture,
+            self.proof_test_interval_hours,
+            self.protected_equipment_count
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_system_performance::PerformanceSif> for PyPerformanceSif {
+    fn from(row: &azoth_process::models::safety_system_performance::PerformanceSif) -> Self {
+        Self {
+            barrier_id: row.barrier_id.clone(),
+            demand_id: row.demand_id.clone(),
+            identifier: row.identifier.clone(),
+            kind: row.kind.as_str().to_string(),
+            voting_notation: row.voting_notation.clone(),
+            detector_count: row.detector_count,
+            bypassed_detector_count: row.bypassed_detector_count,
+            faulty_detector_count: row.faulty_detector_count,
+            tripped_detector_count: row.tripped_detector_count,
+            claimed_sil: row.claimed_sil,
+            achieved_sil: row.achieved_sil,
+            sil_achieved: row.sil_achieved,
+            pfd_average: row.pfd_average,
+            pfd_upper: row.pfd_upper,
+            risk_reduction_factor: row.risk_reduction_factor,
+            architecture: row.architecture.clone(),
+            proof_test_interval_hours: row.proof_test_interval_hours,
+            protected_equipment_count: row.protected_equipment_count,
         }
     }
 }
@@ -4322,6 +5018,97 @@ impl From<&azoth_process::models::risk_matrix::RiskAssessmentRow> for PyRiskAsse
     }
 }
 
+/// the recorded time series, one row per step, the failure step included.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "RupturePoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyRupturePoint {
+    /// the step's time.
+    #[pyo3(get)]
+    pub time: PyQty,
+    /// the step's absolute pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the step's liquid temperature.
+    #[pyo3(get)]
+    pub liquid_temperature: PyQty,
+    /// the inner wall surface's temperature.
+    #[pyo3(get)]
+    pub inner_wall_temperature: PyQty,
+    /// the outer wall surface's temperature.
+    #[pyo3(get)]
+    pub outer_wall_temperature: PyQty,
+    /// the thin-wall von Mises stress.
+    #[pyo3(get)]
+    pub von_mises_stress: PyQty,
+    /// the temperature-retained allowable stress.
+    #[pyo3(get)]
+    pub allowable_stress: PyQty,
+    /// the temperature-reduced flange rating.
+    #[pyo3(get)]
+    pub flange_rating: PyQty,
+}
+
+#[pymethods]
+impl PyRupturePoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "RupturePoint(time={:?}, pressure={:?}, liquid_temperature={:?}, inner_wall_temperature={:?}, outer_wall_temperature={:?}, von_mises_stress={:?}, allowable_stress={:?}, flange_rating={:?})",
+            self.time,
+            self.pressure,
+            self.liquid_temperature,
+            self.inner_wall_temperature,
+            self.outer_wall_temperature,
+            self.von_mises_stress,
+            self.allowable_stress,
+            self.flange_rating
+        )
+    }
+}
+
+impl From<&azoth_process::models::trapped_liquid_fire_rupture::RupturePoint> for PyRupturePoint {
+    fn from(row: &azoth_process::models::trapped_liquid_fire_rupture::RupturePoint) -> Self {
+        Self {
+            time: PyQty {
+                magnitude_si: row.time.value,
+                unit: "s".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            liquid_temperature: PyQty {
+                magnitude_si: row.liquid_temperature.value,
+                unit: "K".to_string(),
+            },
+            inner_wall_temperature: PyQty {
+                magnitude_si: row.inner_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            outer_wall_temperature: PyQty {
+                magnitude_si: row.outer_wall_temperature.value,
+                unit: "K".to_string(),
+            },
+            von_mises_stress: PyQty {
+                magnitude_si: row.von_mises_stress.value,
+                unit: "Pa".to_string(),
+            },
+            allowable_stress: PyQty {
+                magnitude_si: row.allowable_stress.value,
+                unit: "Pa".to_string(),
+            },
+            flange_rating: PyQty {
+                magnitude_si: row.flange_rating.value,
+                unit: "Pa".to_string(),
+            },
+        }
+    }
+}
+
 /// one row per classified equipment, in caller order.
 #[pyclass(
     frozen,
@@ -4941,6 +5728,130 @@ impl From<&azoth_process::models::tr3001_compliance::Tr3001Finding> for PyTr3001
         Self {
             check: row.check.as_str().to_string(),
             status: row.status.as_str().to_string(),
+        }
+    }
+}
+
+/// one row per input segment, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TrappedInventorySegmentResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTrappedInventorySegmentResult {
+    /// the segment identifier.
+    #[pyo3(get)]
+    pub segment_id: String,
+    /// the segment's kind.
+    #[pyo3(get)]
+    pub kind: String,
+    /// the segment's internal volume.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the gas share of the segment.
+    #[pyo3(get)]
+    pub gas_volume: PyQty,
+    /// the liquid share of the segment.
+    #[pyo3(get)]
+    pub liquid_volume: PyQty,
+    /// the segment's gas mass.
+    #[pyo3(get)]
+    pub gas_mass: PyQty,
+    /// the segment's liquid mass.
+    #[pyo3(get)]
+    pub liquid_mass: PyQty,
+    /// the segment's gas and liquid mass.
+    #[pyo3(get)]
+    pub total_mass: PyQty,
+    /// the density the segment's gas mass used.
+    #[pyo3(get)]
+    pub gas_density: PyQty,
+    /// the density the segment's liquid mass used.
+    #[pyo3(get)]
+    pub liquid_density: PyQty,
+    /// the echoed fill fraction.
+    #[pyo3(get)]
+    pub liquid_fill_fraction: f64,
+    /// the pipe's diameter, echoed.
+    #[pyo3(get)]
+    pub internal_diameter: Option<PyQty>,
+    /// the pipe's length, echoed.
+    #[pyo3(get)]
+    pub length: Option<PyQty>,
+}
+
+#[pymethods]
+impl PyTrappedInventorySegmentResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "TrappedInventorySegmentResult(segment_id={}, kind={}, total_volume={:?}, gas_volume={:?}, liquid_volume={:?}, gas_mass={:?}, liquid_mass={:?}, total_mass={:?}, gas_density={:?}, liquid_density={:?}, liquid_fill_fraction={}, internal_diameter={:?}, length={:?})",
+            self.segment_id,
+            self.kind,
+            self.total_volume,
+            self.gas_volume,
+            self.liquid_volume,
+            self.gas_mass,
+            self.liquid_mass,
+            self.total_mass,
+            self.gas_density,
+            self.liquid_density,
+            self.liquid_fill_fraction,
+            self.internal_diameter,
+            self.length
+        )
+    }
+}
+
+impl From<&azoth_process::models::trapped_inventory::TrappedInventorySegmentResult>
+    for PyTrappedInventorySegmentResult
+{
+    fn from(row: &azoth_process::models::trapped_inventory::TrappedInventorySegmentResult) -> Self {
+        Self {
+            segment_id: row.segment_id.clone(),
+            kind: row.kind.as_str().to_string(),
+            total_volume: PyQty {
+                magnitude_si: row.total_volume.value,
+                unit: "m**3".to_string(),
+            },
+            gas_volume: PyQty {
+                magnitude_si: row.gas_volume.value,
+                unit: "m**3".to_string(),
+            },
+            liquid_volume: PyQty {
+                magnitude_si: row.liquid_volume.value,
+                unit: "m**3".to_string(),
+            },
+            gas_mass: PyQty {
+                magnitude_si: row.gas_mass.value,
+                unit: "kg".to_string(),
+            },
+            liquid_mass: PyQty {
+                magnitude_si: row.liquid_mass.value,
+                unit: "kg".to_string(),
+            },
+            total_mass: PyQty {
+                magnitude_si: row.total_mass.value,
+                unit: "kg".to_string(),
+            },
+            gas_density: PyQty {
+                magnitude_si: row.gas_density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            liquid_density: PyQty {
+                magnitude_si: row.liquid_density.value,
+                unit: "kg/m**3".to_string(),
+            },
+            liquid_fill_fraction: row.liquid_fill_fraction,
+            internal_diameter: row.internal_diameter.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m".to_string(),
+            }),
+            length: row.length.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "m".to_string(),
+            }),
         }
     }
 }

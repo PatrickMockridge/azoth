@@ -3912,6 +3912,563 @@ def _s001_clause10_review(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _trapped_liquid_fire_rupture(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.trapped_liquid_fire_rupture`'s layers, from the reference's arithmetic."""
+    import math
+
+    from azoth.core.units import quantity
+    from azoth.process.reference.trapped_liquid_fire_rupture import (
+        trapped_liquid_fire_rupture as evaluate,
+    )
+
+    def optional_q(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    def optional_float(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    result = evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["z"]],
+        quantity(float(inputs["inventory_pressure"]), "Pa"),
+        quantity(float(inputs["inventory_temperature"]), "K"),
+        quantity(float(inputs["inventory_liquid_mass"]), "kg"),
+        quantity(float(inputs["inventory_total_mass"]), "kg"),
+        quantity(float(inputs["inventory_total_volume"]), "m**3"),
+        quantity(float(inputs["pipe_internal_diameter"]), "m"),
+        quantity(float(inputs["wall_thickness"]), "m"),
+        quantity(float(inputs["exposed_length"]), "m"),
+        None if inputs.get("eos") is None else str(inputs["eos"]),
+        None if inputs.get("multiphase_check") is None else bool(inputs["multiphase_check"]),
+        None if inputs.get("segment_id") is None else str(inputs["segment_id"]),
+        None if inputs.get("fire_type") is None else str(inputs["fire_type"]),
+        optional_float("environmental_factor"),
+        optional_float("fire_heat_flux"),
+        optional_float("fire_emissivity"),
+        optional_float("fire_view_factor"),
+        optional_q("flame_temperature", "K"),
+        optional_q("ambient_temperature", "K"),
+        optional_float("passive_protection_factor"),
+        optional_float("fire_exposed_area"),
+        None if inputs.get("api5l_grade") is None else str(inputs["api5l_grade"]),
+        optional_q("ambient_tensile_strength", "MPa"),
+        None if inputs.get("flange_class") is None else str(inputs["flange_class"]),
+        optional_q("relief_set_pressure", "Pa"),
+        None
+        if inputs.get("relief_limits_pressure") is None
+        else bool(inputs["relief_limits_pressure"]),
+        optional_q("max_time", "s"),
+        optional_q("time_step", "s"),
+        optional_q("wall_density", "kg/m**3"),
+        optional_float("wall_heat_capacity"),
+        optional_float("wall_conductivity"),
+        optional_float("liquid_heat_capacity"),
+        optional_float("liquid_expansion"),
+        optional_q("liquid_bulk_modulus", "Pa"),
+        optional_float("inner_htc"),
+        optional_float("outer_htc"),
+        optional_float("tensile_strength_factor"),
+        None if inputs.get("wall_nodes") is None else int(inputs["wall_nodes"]),
+        None
+        if inputs.get("vapor_pocket_detection") is None
+        else bool(inputs["vapor_pocket_detection"]),
+    )
+    dumped: dict[str, float] = {
+        "point_count": float(len(result.trajectory)),
+        "final_pressure_bara": result.final_pressure.to("bar").magnitude,
+        "final_liquid_temperature_k": result.final_liquid_temperature.to("K").magnitude,
+        "final_outer_wall_temperature_k": result.final_outer_wall_temperature.to("K").magnitude,
+    }
+    for name, value in (
+        ("time_to_relief_set_s", result.time_to_relief_set),
+        ("time_to_vapor_pocket_s", result.time_to_vapor_pocket),
+        ("time_to_pipe_rupture_s", result.time_to_pipe_rupture),
+        ("time_to_flange_failure_s", result.time_to_flange_failure),
+        ("minimum_failure_time_s", result.minimum_failure_time),
+    ):
+        if value is not None:
+            dumped[name] = value.to("s").magnitude
+    for index, row in enumerate(result.trajectory):
+        dumped[f"series_timeSeconds_{index}"] = row.time.to("s").magnitude
+        dumped[f"series_pressureBara_{index}"] = row.pressure.to("bar").magnitude
+        dumped[f"series_liquidTemperatureK_{index}"] = row.liquid_temperature.to("K").magnitude
+        dumped[f"series_innerWallTemperatureK_{index}"] = row.inner_wall_temperature.to(
+            "K"
+        ).magnitude
+        dumped[f"series_outerWallTemperatureK_{index}"] = row.outer_wall_temperature.to(
+            "K"
+        ).magnitude
+        dumped[f"series_vonMisesStressMPa_{index}"] = row.von_mises_stress.to("MPa").magnitude
+        dumped[f"series_allowableStressMPa_{index}"] = row.allowable_stress.to("MPa").magnitude
+        rating = row.flange_rating.to("bar").magnitude
+        if math.isfinite(rating):
+            dumped[f"series_flangeRatingBara_{index}"] = rating
+    return dumped
+
+
+def _safety_envelope(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.safety_envelope`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.safety_envelope import safety_envelope as evaluate
+
+    def optional_q(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    def optional_float(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    trace = [
+        {
+            "pressure": quantity(float(row["pressure"]), "Pa"),
+            "temperature": quantity(float(row["temperature"]), "K"),
+        }
+        for row in inputs.get("phase_trace", [])
+    ]
+    result = evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["z"]],
+        quantity(float(inputs["min_pressure"]), "Pa"),
+        quantity(float(inputs["max_pressure"]), "Pa"),
+        int(inputs["num_points"]),
+        None if inputs.get("eos") is None else str(inputs["eos"]),
+        optional_float("hydrate_margin"),
+        optional_float("wax_margin"),
+        optional_float("co2_margin"),
+        optional_float("mdmt_margin"),
+        optional_q("mdmt_design_temperature", "K"),
+        optional_q("operating_pressure", "Pa"),
+        optional_q("operating_temperature", "K"),
+        trace or None,
+    )
+    dumped: dict[str, float] = {}
+    for index, summary in enumerate(result.envelopes):
+        dumped[f"envelope_{index}_points"] = summary.point_count
+        dumped[f"envelope_{index}_reference_water"] = summary.reference_water_content
+        dumped[f"envelope_{index}_reference_wax"] = summary.reference_wax_content
+    kinds = ("hydrate", "wax", "co2_freezing", "mdmt", "phase_envelope")
+    for row in result.points:
+        index = int(row.index)
+        arm = kinds.index(row.envelope)
+        dumped[f"envelope_{arm}_p{index}_pressure_bara"] = row.pressure.to("bar").magnitude
+        if row.temperature is not None:
+            dumped[f"envelope_{arm}_p{index}_temperature_k"] = row.temperature.to("K").magnitude
+        dumped[f"envelope_{arm}_p{index}_margin_k"] = row.margin.to("K").magnitude
+    for query in result.queries:
+        arm = kinds.index(query.envelope)
+        if query.temperature is not None:
+            dumped[f"envelope_{arm}_limit_at_operating_k"] = query.temperature.to("K").magnitude
+        if query.safe_temperature is not None:
+            dumped[f"envelope_{arm}_safe_temperature_at_operating_k"] = query.safe_temperature.to(
+                "K"
+            ).magnitude
+        if row.margin is not None:
+            dumped[f"envelope_{arm}_margin_at_operating_k"] = row.margin.to("K").magnitude
+    return dumped
+
+
+def _trapped_inventory(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.trapped_inventory`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.trapped_inventory import trapped_inventory as evaluate
+
+    def optional_q(row: Mapping[str, Any], name: str, unit: str) -> Any:
+        value = row.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    segments = [
+        {
+            "segment_id": str(row["segment_id"]),
+            "kind": str(row["kind"]),
+            "volume": optional_q(row, "volume", "m**3"),
+            "liquid_fill_fraction": quantity(float(row["liquid_fill_fraction"]), "dimensionless"),
+            "internal_diameter": optional_q(row, "internal_diameter", "m"),
+            "length": optional_q(row, "length", "m"),
+        }
+        for row in inputs["segments"]
+    ]
+    evidence = [
+        {
+            "segment_id": str(row["segment_id"]),
+            "document_id": row.get("document_id"),
+            "source_reference": row.get("source_reference"),
+            "excerpt": row.get("excerpt"),
+        }
+        for row in inputs.get("segment_evidence", [])
+    ]
+    result = evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["z"]],
+        quantity(float(inputs["pressure"]), "Pa"),
+        quantity(float(inputs["temperature"]), "K"),
+        segments,
+        None if inputs.get("eos") is None else str(inputs["eos"]),
+        None if inputs.get("multiphase_check") is None else bool(inputs["multiphase_check"]),
+        optional_q(inputs, "fallback_liquid_density", "kg/m**3"),
+        evidence,
+    )
+    dumped: dict[str, float] = {
+        "gas_density_kg_per_m3": result.gas_density.to("kg/m**3").magnitude,
+        "liquid_density_kg_per_m3": result.liquid_density.to("kg/m**3").magnitude,
+        "total_volume_m3": result.total_volume.to("m**3").magnitude,
+        "total_gas_volume_m3": result.total_gas_volume.to("m**3").magnitude,
+        "total_liquid_volume_m3": result.total_liquid_volume.to("m**3").magnitude,
+        "total_gas_mass_kg": result.total_gas_mass.to("kg").magnitude,
+        "total_liquid_mass_kg": result.total_liquid_mass.to("kg").magnitude,
+        "total_mass_kg": result.total_mass.to("kg").magnitude,
+    }
+    for index, segment in enumerate(result.segments):
+        dumped[f"segment_{index}_total_volume_m3"] = segment.total_volume.to("m**3").magnitude
+        dumped[f"segment_{index}_gas_volume_m3"] = segment.gas_volume.to("m**3").magnitude
+        dumped[f"segment_{index}_liquid_volume_m3"] = segment.liquid_volume.to("m**3").magnitude
+        dumped[f"segment_{index}_gas_mass_kg"] = segment.gas_mass.to("kg").magnitude
+        dumped[f"segment_{index}_liquid_mass_kg"] = segment.liquid_mass.to("kg").magnitude
+        dumped[f"segment_{index}_total_mass_kg"] = segment.total_mass.to("kg").magnitude
+    return dumped
+
+
+def _open_drain_review(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.open_drain_review`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.open_drain_review import open_drain_review as evaluate
+
+    def optional_text(value: Any) -> str | None:
+        return None if value is None else str(value)
+
+    items = [
+        {
+            "area_id": str(row["area_id"]),
+            "area_type": optional_text(row.get("area_type")),
+            "drain_system_type": optional_text(row.get("drain_system_type")),
+        }
+        for row in inputs.get("items", [])
+    ]
+    evidence = [
+        {
+            "area_id": str(row["area_id"]),
+            "key": str(row["key"]),
+            "value": optional_text(row.get("value")),
+        }
+        for row in inputs.get("evidence", [])
+    ]
+    standards = [
+        {"area_id": str(row["area_id"]), "standard": str(row["standard"])}
+        for row in inputs.get("design_standards", [])
+    ]
+    references = [
+        {"area_id": str(row["area_id"]), "reference": str(row["reference"])}
+        for row in inputs.get("references", [])
+    ]
+    leak = inputs.get("default_liquid_leak_rate")
+    result = evaluate(
+        None if inputs.get("project_name") is None else str(inputs["project_name"]),
+        None if leak is None else quantity(float(leak), "kg/s"),
+        items,
+        evidence,
+        standards,
+        references,
+    )
+    dumped: dict[str, float] = {
+        "result_count": float(len(result.results)),
+        "item_count": result.item_count,
+        "failed_item_count": result.failed_item_count,
+        "warning_item_count": result.warning_item_count,
+        "assessment_count": result.assessment_count,
+        "fail_assessment_count": result.fail_assessment_count,
+        "warning_assessment_count": result.warning_assessment_count,
+    }
+    for index, row in enumerate(result.results):
+        dumped[f"result_{index}_confidence"] = row.confidence
+        dumped[f"result_{index}_assessment_count"] = float(
+            sum(1 for a in result.assessments if a.area_id == row.area_id)
+        )
+    return dumped
+
+
+def _safety_system_performance(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.safety_system_performance`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.safety_system_performance import (
+        safety_system_performance as evaluate,
+    )
+
+    def optional_q(row: Mapping[str, Any], name: str, unit: str) -> Any:
+        value = row.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    def optional_text(value: Any) -> str | None:
+        return None if value is None else str(value)
+
+    elements = [
+        {"id": str(row["id"]), "element_type": str(row["element_type"])}
+        for row in inputs.get("elements", [])
+    ]
+    links = [
+        {"element_id": str(row["element_id"]), "barrier_id": str(row["barrier_id"])}
+        for row in inputs.get("links", [])
+    ]
+    barriers = [
+        {
+            "id": str(row["id"]),
+            "status": str(row.get("status") or "unknown"),
+            "has_traceable_evidence": bool(row.get("has_traceable_evidence") or False),
+            "name": optional_text(row.get("name")),
+            "description": optional_text(row.get("description")),
+            "safety_function": optional_text(row.get("safety_function")),
+            "pfd": row.get("pfd"),
+            "effectiveness": row.get("effectiveness"),
+            "performance_standard_id": optional_text(row.get("performance_standard_id")),
+        }
+        for row in inputs.get("barriers", [])
+    ]
+    tags = [
+        {"barrier_id": str(row["barrier_id"]), "tag": str(row["tag"])}
+        for row in inputs.get("barrier_tags", [])
+    ]
+    standards = [
+        {
+            "id": str(row["id"]),
+            "title": optional_text(row.get("title")),
+            "safety_function": optional_text(row.get("safety_function")),
+            "target_pfd": row.get("target_pfd"),
+            "required_availability": row.get("required_availability"),
+            "response_time_seconds": optional_q(row, "response_time_seconds", "s"),
+        }
+        for row in inputs.get("standards", [])
+    ]
+    criteria = [
+        {"standard_id": str(row["standard_id"]), "criterion": str(row["criterion"])}
+        for row in inputs.get("standard_criteria", [])
+    ]
+    demands = [
+        {
+            "demand_id": str(row["demand_id"]),
+            "barrier_id": optional_text(row.get("barrier_id")),
+            "equipment_tag": optional_text(row.get("equipment_tag")),
+            "scenario": optional_text(row.get("scenario")),
+            "category": str(row.get("category") or "unknown"),
+            "demand_value": row.get("demand_value"),
+            "capacity_value": row.get("capacity_value"),
+            "demand_unit": optional_text(row.get("demand_unit")),
+            "required_pfd": row.get("required_pfd"),
+            "actual_pfd": row.get("actual_pfd"),
+            "required_availability": row.get("required_availability"),
+            "actual_availability": row.get("actual_availability"),
+            "required_response_time_seconds": optional_q(
+                row, "required_response_time_seconds", "s"
+            ),
+            "actual_response_time_seconds": optional_q(row, "actual_response_time_seconds", "s"),
+            "required_effectiveness": row.get("required_effectiveness"),
+            "actual_effectiveness": row.get("actual_effectiveness"),
+        }
+        for row in inputs.get("demands", [])
+    ]
+    devices = [
+        {
+            "name": str(row["name"]),
+            "kind": str(row["kind"]),
+            "tag": optional_text(row.get("tag")),
+            "location": optional_text(row.get("location")),
+            "response_time_seconds": optional_q(row, "response_time_seconds", "s"),
+        }
+        for row in inputs.get("measurement_devices", [])
+    ]
+    event_sifs = [
+        {
+            "name": str(row["name"]),
+            "voting_notation": str(row["voting_notation"]),
+            "overridden": bool(row.get("overridden") or False),
+        }
+        for row in inputs.get("event_sifs", [])
+    ]
+    detectors = [
+        {
+            "sif_name": str(row["sif_name"]),
+            "name": str(row["name"]),
+            "bypassed": bool(row.get("bypassed") or False),
+            "faulty": bool(row.get("faulty") or False),
+            "tripped": bool(row.get("tripped") or False),
+        }
+        for row in inputs.get("sif_detectors", [])
+    ]
+    quantitative = [
+        {
+            "id": str(row["id"]),
+            "name": optional_text(row.get("name")),
+            "description": optional_text(row.get("description")),
+            "architecture": str(row["architecture"]),
+            "claimed_sil": row["claimed_sil"],
+            "pfd_average": row["pfd_average"],
+            "test_interval_hours": row.get("test_interval_hours"),
+        }
+        for row in inputs.get("quantitative_sifs", [])
+    ]
+    protected = [
+        {"sif_id": str(row["sif_id"]), "equipment": str(row["equipment"])}
+        for row in inputs.get("protected_equipment", [])
+    ]
+    result = evaluate(
+        str(inputs["register_id"]),
+        None if inputs.get("register_name") is None else str(inputs["register_name"]),
+        elements,
+        links,
+        barriers,
+        tags,
+        standards,
+        criteria,
+        demands,
+        devices,
+        event_sifs,
+        detectors,
+        quantitative,
+        protected,
+    )
+    dumped: dict[str, float] = {
+        "assessment_count": result.assessment_count,
+        "pass_count": result.pass_count,
+        "warning_count": result.warning_count,
+        "fail_count": result.fail_count,
+    }
+    metric_names = (
+        ("metric_barrierPfd", "barrier_pfd", None),
+        ("metric_barrierEffectiveness", "barrier_effectiveness", None),
+        ("metric_targetPfd", "target_pfd", None),
+        ("metric_actualPfd", "actual_pfd", None),
+        ("metric_requiredAvailability", "required_availability", None),
+        ("metric_actualAvailability", "actual_availability", None),
+        (
+            "metric_requiredResponseTimeSeconds",
+            "required_response_time_seconds",
+            "s",
+        ),
+        ("metric_actualResponseTimeSeconds", "actual_response_time_seconds", "s"),
+        ("metric_requiredEffectiveness", "required_effectiveness", None),
+        ("metric_actualEffectiveness", "actual_effectiveness", None),
+        ("metric_demandValue", "demand_value", None),
+        ("metric_capacityValue", "capacity_value", None),
+        ("metric_capacityMargin", "capacity_margin", None),
+        ("metric_relatedInstrumentCount", "related_instrument_count", None),
+        (
+            "metric_maxInstrumentResponseTimeSeconds",
+            "max_instrument_response_time_seconds",
+            "s",
+        ),
+        ("metric_relatedSafetyInstrumentedFunctionCount", "related_sif_count", None),
+        (
+            "metric_relatedQuantitativeSafetyInstrumentedFunctionCount",
+            "related_quantitative_sif_count",
+            None,
+        ),
+    )
+    for index, assessment in enumerate(result.assessments):
+        prefix = f"assessment_{index}_"
+        for dump_name, attribute, unit in metric_names:
+            value = getattr(assessment, attribute)
+            if value is None:
+                continue
+            dumped[prefix + dump_name] = value.to(unit).magnitude if unit is not None else value
+        dumped[prefix + "finding_count"] = assessment.finding_count
+    return dumped
+
+
+def _mass_balance_leak_detection(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.mass_balance_leak_detection`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.mass_balance_leak_detection import (
+        mass_balance_leak_detection as evaluate,
+    )
+
+    def optional_q(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    def optional_float(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    def optional_text(name: str) -> str | None:
+        value = inputs.get(name)
+        return None if value is None else str(value)
+
+    result = evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["z"]],
+        quantity(float(inputs["inlet_pressure"]), "Pa"),
+        quantity(float(inputs["inlet_temperature"]), "K"),
+        quantity(float(inputs["inlet_flow"]), "kg/s"),
+        quantity(float(inputs["outlet_flow"]), "kg/s"),
+        optional_text("eos"),
+        optional_q("inlet_density", "kg/m**3"),
+        optional_q("linepack_volume", "m**3"),
+        optional_float("flow_measurement_uncertainty_fraction"),
+        optional_q("pressure_uncertainty", "Pa"),
+        optional_float("temperature_uncertainty"),
+        optional_q("detection_window", "s"),
+        optional_float("confidence_multiplier"),
+        optional_text("inlet_stream_name"),
+        optional_text("outlet_stream_name"),
+    )
+    dumped: dict[str, float] = {
+        "inletFlowKgPerS": result.inlet_flow.to("kg/s").magnitude,
+        "outletFlowKgPerS": result.outlet_flow.to("kg/s").magnitude,
+        "measuredImbalanceKgPerS": result.measured_imbalance.to("kg/s").magnitude,
+        "flowUncertaintyKgPerS": result.flow_uncertainty.to("kg/s").magnitude,
+        "linepackUncertaintyKgPerS": result.linepack_uncertainty.to("kg/s").magnitude,
+        "combinedUncertaintyKgPerS": result.combined_uncertainty.to("kg/s").magnitude,
+        "minimumDetectableLeakRateKgPerS": result.minimum_detectable_leak_rate.to("kg/s").magnitude,
+        "detectionWindowS": result.detection_window.to("s").magnitude,
+        "confidenceMultiplier": result.confidence_multiplier,
+    }
+    if result.minimum_detectable_leak_fraction is not None:
+        dumped["minimumDetectableLeakFraction"] = result.minimum_detectable_leak_fraction
+    if result.density is not None:
+        dumped["density_kg_per_m3"] = result.density.to("kg/m**3").magnitude
+    return dumped
+
+
+def _esd_response_time(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.esd_response_time`'s layers, from the reference's own arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.esd_response_time import (
+        esd_response_time as evaluate,
+    )
+
+    rows = inputs.get("contributions")
+    contribution_rows = (
+        None
+        if rows is None
+        else [
+            {
+                "name": str(row["name"]),
+                "stage": str(row["stage"]),
+                "time": quantity(float(row["time"]), "s"),
+            }
+            for row in rows
+        ]
+    )
+    result = evaluate(
+        None if inputs.get("sif_tag") is None else str(inputs["sif_tag"]),
+        contribution_rows,
+        None
+        if inputs.get("allowable_response_time") is None
+        else quantity(float(inputs["allowable_response_time"]), "s"),
+    )
+    dumped: dict[str, float] = {
+        "detection_time_s": result.detection_time.to("s").magnitude,
+        "logic_time_s": result.logic_time.to("s").magnitude,
+        "final_element_time_s": result.final_element_time.to("s").magnitude,
+        "total_response_time_s": result.total_response_time.to("s").magnitude,
+    }
+    if result.allowable_response_time is not None:
+        dumped["allowable_response_time_s"] = result.allowable_response_time.to("s").magnitude
+    if result.margin is not None:
+        dumped["margin_s"] = result.margin.to("s").magnitude
+    return dumped
+
+
 def _check_valve_leak_relief(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.check_valve_leak_relief`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -4486,6 +5043,13 @@ DUMPERS: dict[str, Dumper] = {
     "process.acoustic_induced_vibration_screening": _acoustic_induced_vibration_screening,
     "process.alarp_audit": _alarp_audit,
     "process.escalation_graph": _escalation_graph,
+    "process.esd_response_time": _esd_response_time,
+    "process.mass_balance_leak_detection": _mass_balance_leak_detection,
+    "process.safety_envelope": _safety_envelope,
+    "process.trapped_liquid_fire_rupture": _trapped_liquid_fire_rupture,
+    "process.trapped_inventory": _trapped_inventory,
+    "process.open_drain_review": _open_drain_review,
+    "process.safety_system_performance": _safety_system_performance,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.psv_valve": _psv_valve,
     "process.dynamic_psv_sizing": _dynamic_psv_sizing,
@@ -6842,6 +7406,247 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=1,
         identified_by=("#label", "cl10_secondary_fail"),
     ),
+    # The ESD budget's four cased states; the empty-list refusal is uncased.
+    LayerCase(
+        model="process.esd_response_time",
+        case="within_budget",
+        capture="process_esd_response_time.tsv",
+        block=0,
+        identified_by=("#label", "esd_within_budget"),
+    ),
+    LayerCase(
+        model="process.esd_response_time",
+        case="exceeds_budget",
+        capture="process_esd_response_time.tsv",
+        block=1,
+        identified_by=("#label", "esd_exceeds_budget"),
+    ),
+    LayerCase(
+        model="process.esd_response_time",
+        case="no_budget",
+        capture="process_esd_response_time.tsv",
+        block=2,
+        identified_by=("#label", "esd_no_budget"),
+    ),
+    LayerCase(
+        model="process.esd_response_time",
+        case="zero_time_and_equal_budget",
+        capture="process_esd_response_time.tsv",
+        block=3,
+        identified_by=("#label", "esd_zero_time"),
+    ),
+    # The leak sensitivity's four cased states; the SRK evidence row is uncased.
+    LayerCase(
+        model="process.mass_balance_leak_detection",
+        case="no_linepack",
+        capture="process_mass_balance_leak_detection.tsv",
+        block=0,
+        identified_by=("#label", "leak_no_linepack"),
+    ),
+    LayerCase(
+        model="process.mass_balance_leak_detection",
+        case="linepack",
+        capture="process_mass_balance_leak_detection.tsv",
+        block=1,
+        identified_by=("#label", "leak_linepack"),
+    ),
+    LayerCase(
+        model="process.mass_balance_leak_detection",
+        case="zero_reference",
+        capture="process_mass_balance_leak_detection.tsv",
+        block=2,
+        identified_by=("#label", "leak_zero_reference"),
+    ),
+    LayerCase(
+        model="process.mass_balance_leak_detection",
+        case="the_setter_clamps",
+        capture="process_mass_balance_leak_detection.tsv",
+        block=3,
+        identified_by=("#label", "leak_clamps"),
+    ),
+    # The trapped inventory's five cased states.
+    LayerCase(
+        model="process.trapped_inventory",
+        case="two_phase",
+        capture="process_trapped_inventory.tsv",
+        block=0,
+        identified_by=("#label", "inv_two_phase"),
+    ),
+    LayerCase(
+        model="process.trapped_inventory",
+        case="gas_only_fallback",
+        capture="process_trapped_inventory.tsv",
+        block=1,
+        identified_by=("#label", "inv_gas_only"),
+    ),
+    LayerCase(
+        model="process.trapped_inventory",
+        case="missing_evidence",
+        capture="process_trapped_inventory.tsv",
+        block=2,
+        identified_by=("#label", "inv_no_evidence"),
+    ),
+    LayerCase(
+        model="process.trapped_inventory",
+        case="water_multiphase",
+        capture="process_trapped_inventory.tsv",
+        block=3,
+        identified_by=("#label", "inv_water_multiphase"),
+    ),
+    # The SRK evidence row is uncased: its liquid density is `1.06e-1` relative below
+    # the class's, so it is a recorded divergence rather than a case.
+    # The open-drain review's five cased states; its utility, operational and empty
+    # states are declared uncased.
+    LayerCase(
+        model="process.open_drain_review",
+        case="compliant",
+        capture="process_open_drain_review.tsv",
+        block=0,
+        identified_by=("#label", "drain_compliant"),
+    ),
+    LayerCase(
+        model="process.open_drain_review",
+        case="capacity_fail",
+        capture="process_open_drain_review.tsv",
+        block=1,
+        identified_by=("#label", "drain_capacity_fail"),
+    ),
+    LayerCase(
+        model="process.open_drain_review",
+        case="haz_combined",
+        capture="process_open_drain_review.tsv",
+        block=2,
+        identified_by=("#label", "drain_haz_combined"),
+    ),
+    LayerCase(
+        model="process.open_drain_review",
+        case="missing",
+        capture="process_open_drain_review.tsv",
+        block=3,
+        identified_by=("#label", "drain_missing"),
+    ),
+    LayerCase(
+        model="process.open_drain_review",
+        case="coercion",
+        capture="process_open_drain_review.tsv",
+        block=7,
+        identified_by=("#label", "drain_coercion"),
+    ),
+    # The barrier analyzer's eight states.
+    LayerCase(
+        model="process.safety_system_performance",
+        case="deluge_pass",
+        capture="process_safety_system_performance.tsv",
+        block=0,
+        identified_by=("#label", "ssp_deluge_pass"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="fire_gas",
+        capture="process_safety_system_performance.tsv",
+        block=1,
+        identified_by=("#label", "ssp_fire_gas"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="pfp_capacity_fail",
+        capture="process_safety_system_performance.tsv",
+        block=2,
+        identified_by=("#label", "ssp_pfp_capacity_fail"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="quantitative_sif",
+        capture="process_safety_system_performance.tsv",
+        block=3,
+        identified_by=("#label", "ssp_quantitative_sif"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="psd_category",
+        capture="process_safety_system_performance.tsv",
+        block=4,
+        identified_by=("#label", "ssp_psd_category"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="rule_failures",
+        capture="process_safety_system_performance.tsv",
+        block=5,
+        identified_by=("#label", "ssp_rule_failures"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="instrumentation_warnings",
+        capture="process_safety_system_performance.tsv",
+        block=6,
+        identified_by=("#label", "ssp_instrumentation_warnings"),
+    ),
+    LayerCase(
+        model="process.safety_system_performance",
+        case="element_inference",
+        capture="process_safety_system_performance.tsv",
+        block=7,
+        identified_by=("#label", "ssp_element_inference"),
+    ),
+    # The safety envelope's three cased states.
+    LayerCase(
+        model="process.safety_envelope",
+        case="hydrate",
+        capture="process_safety_envelope.tsv",
+        block=0,
+        identified_by=("#label", "se_hydrate"),
+    ),
+    LayerCase(
+        model="process.safety_envelope",
+        case="wax",
+        capture="process_safety_envelope.tsv",
+        block=1,
+        identified_by=("#label", "se_wax"),
+    ),
+    LayerCase(
+        model="process.safety_envelope",
+        case="phase_trace",
+        capture="process_safety_envelope.tsv",
+        block=2,
+        identified_by=("#label", "se_phase"),
+    ),
+    # The trapped-liquid study's five cased states; the vapor-pocket state is uncased.
+    LayerCase(
+        model="process.trapped_liquid_fire_rupture",
+        case="no_failure",
+        capture="process_trapped_liquid_fire_rupture.tsv",
+        block=1,
+        identified_by=("#label", "tlf_no_failure"),
+    ),
+    LayerCase(
+        model="process.trapped_liquid_fire_rupture",
+        case="flange_failure",
+        capture="process_trapped_liquid_fire_rupture.tsv",
+        block=2,
+        identified_by=("#label", "tlf_flange"),
+    ),
+    LayerCase(
+        model="process.trapped_liquid_fire_rupture",
+        case="pipe_rupture",
+        capture="process_trapped_liquid_fire_rupture.tsv",
+        block=3,
+        identified_by=("#label", "tlf_pipe"),
+    ),
+    LayerCase(
+        model="process.trapped_liquid_fire_rupture",
+        case="relief_set",
+        capture="process_trapped_liquid_fire_rupture.tsv",
+        block=4,
+        identified_by=("#label", "tlf_relief"),
+    ),
+    LayerCase(
+        model="process.trapped_liquid_fire_rupture",
+        case="pfp_factor",
+        capture="process_trapped_liquid_fire_rupture.tsv",
+        block=5,
+        identified_by=("#label", "tlf_pfp"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -8619,6 +9424,19 @@ UNCASED_ROWS: dict[str, int] = {
     # utility states, the gated and alias items, the duplicate id, the first-alias parse and
     # the coercion.
     "process_s001_clause10_review.tsv": 11,
+    # The ESD budget's one: the empty-list refusal has no result.
+    "process_esd_response_time.tsv": 1,
+    # The leak sensitivity's one: the SRK evidence row.
+    "process_mass_balance_leak_detection.tsv": 1,
+    # The trapped inventory's one: the SRK evidence row, whose liquid density is
+    # `1.06e-1` relative below the class's.
+    "process_trapped_inventory.tsv": 1,
+    # The trapped-liquid study's two: the inventory preamble and the vapor-pocket state.
+    "process_trapped_liquid_fire_rupture.tsv": 2,
+    # The open-drain review's three: the utility failure, the operational-evidence
+    # failure and the empty review are held by the Rust test rather than the layer diff,
+    # whose capture keys for those states are strings.
+    "process_open_drain_review.tsv": 3,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

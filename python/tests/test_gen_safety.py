@@ -44,7 +44,7 @@ def test_the_catalogue_is_every_safety_model_and_nothing_else() -> None:
     specs = [spec for _, spec in module.documents()]
     ids = [spec["id"] for spec in specs]
     assert len(ids) == len(set(ids))
-    assert len(ids) == 89
+    assert len(ids) == 96
     families = [module.family_of(spec) for spec in specs]
     assert families.count("depressurization") == 8
     assert families.count("dispersion") == 6
@@ -52,14 +52,19 @@ def test_the_catalogue_is_every_safety_model_and_nothing_else() -> None:
     assert families.count("fire") == 6
     assert families.count("firewater") == 5
     assert families.count("overpressure") == 12
-    assert families.count("rupture") == 4
+    assert families.count("rupture") == 5
     assert families.count("release") == 12
     assert families.count("risk") == 8
     assert families.count("qra") == 1
     assert families.count("selfheating") == 4
     assert families.count("hazid") == 4
     assert families.count("api14c") == 1
-    assert families.count("barrier") == 1
+    assert families.count("barrier") == 2
+    assert families.count("inventory") == 1
+    assert families.count("envelope") == 1
+    assert families.count("leakdetection") == 1
+    assert families.count("esd") == 1
+    assert families.count("opendrain") == 1
     assert families.count("processsafetysystem") == 2
     assert families.count("compliance") == 2
     assert families.count("safetyassessment") == 3
@@ -140,8 +145,8 @@ def test_the_native_scenarios_are_the_scalar_safety_models() -> None:
 def test_every_non_native_entry_has_a_refusal_and_no_form() -> None:
     module: Any = tool()
     entries = module.render()
-    assert entries.count("native: false") == 57
-    assert entries.count("refusal: Some(") == 57
+    assert entries.count("native: false") == 64
+    assert entries.count("refusal: Some(") == 64
     for _, spec in module.documents():
         if module.native_of(spec):
             assert module.refusal_of(spec) is None, spec["id"]

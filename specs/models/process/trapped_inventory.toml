@@ -1,0 +1,189 @@
+id = "process.trapped_inventory"
+name = "Trapped inventory"
+kind = "procedure"
+assumptions = [
+    "**the flash is a TP flash at the operating state**; the gas density is the gas phase's, else the bulk; the liquid is oil, then aqueous, else the fallback.",
+    "**a segment's volume is its stated volume for equipment**, and `pi d^2 L / 4` for a pipe; the wrong pair is refused.",
+    "**the fill fraction is in `[0, 1]`**, and the gas and liquid volumes are its two shares.",
+    "**a segment with no evidence row warns**, as the class tests emptiness rather than traceability.",
+    "**the fallback density warns when it is used on a nonzero liquid volume**, with the class's exact equality.",
+    "**a multiphase flash labels gas by the largest Z and a liquid aqueous above half water**; the phase order is not promised.",
+    "**the class's `createDepressurizationFluid` is a session hand-off**, not part of this result, and the SRK arm's gas and liquid densities are `1.84e-2` and `1.06e-1` relative below the class's.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/inventory/TrappedInventoryCalculator.java` is the port source.",
+    "`validation/neqsim/captures/process_trapped_inventory.tsv` - a two-phase methane/ethane/butane state with equipment and pipe segments, a gas-only fallback, a missing-evidence segment, a water-bearing multiphase state and the SRK evidence.",
+]
+[source]
+standard = "NeqSim process/safety/inventory/TrappedInventoryCalculator.java"
+edition = "Its `calculate`, `prepareFluidState`, `getGasDensity` and `getLiquidDensity`."
+[algorithm]
+scheme = "trapped_inventory"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.components]
+type = "components"
+description = "the representative fluid's substances, by name, resolved against the component databank.\n"
+[inputs.z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the representative fluid's overall mole fractions, checked rather than renormalised.\n"
+[inputs.pressure]
+unit = "Pa"
+description = "the operating absolute pressure.\n"
+[inputs.temperature]
+unit = "K"
+description = "the operating temperature.\n"
+[inputs.segments]
+type = "record_list"
+row_type = "TrappedInventorySegment"
+description = "the documented isolated volumes, in caller order. **The list must not be empty.**\n"
+[inputs.segments.fields.segment_id]
+type = "string"
+description = "the segment identifier.\n"
+[inputs.segments.fields.kind]
+type = "enum"
+values = ["equipment", "pipe"]
+description = "`equipment` takes `volume`; `pipe` takes `internal_diameter` and `length`.\n"
+[inputs.segments.fields.volume]
+unit = "m**3"
+optional = true
+description = "the equipment's internal volume.\n"
+[inputs.segments.fields.liquid_fill_fraction]
+unit = "dimensionless"
+description = "the liquid share of the volume, in `[0, 1]`.\n"
+[inputs.segments.fields.internal_diameter]
+unit = "m"
+optional = true
+description = "the pipe's internal diameter.\n"
+[inputs.segments.fields.length]
+unit = "m"
+optional = true
+description = "the pipe's length.\n"
+[inputs.eos]
+type = "enum"
+values = ["pr", "srk"]
+optional = true
+description = "the cubic the representative fluid runs. **Absent is `pr`.**\n"
+[inputs.multiphase_check]
+type = "boolean"
+optional = true
+description = "whether the flash runs the multiphase solve. **Absent is false**, the class's default TP flash.\n"
+[inputs.fallback_liquid_density]
+unit = "kg/m**3"
+optional = true
+description = "the density used when the flash finds no liquid. **Absent is the class's `800`.**\n"
+[inputs.segment_evidence]
+type = "record_list"
+row_type = "TrappedInventoryEvidence"
+optional = true
+description = "the document evidence, in caller order. **Absent is no evidence**, and every segment then warns. A row naming no segment is refused.\n"
+[inputs.segment_evidence.fields.segment_id]
+type = "string"
+description = "the segment the evidence belongs to.\n"
+[inputs.segment_evidence.fields.document_id]
+type = "string"
+optional = true
+description = "the document identifier.\n"
+[inputs.segment_evidence.fields.source_reference]
+type = "string"
+optional = true
+description = "the source reference.\n"
+[inputs.segment_evidence.fields.excerpt]
+type = "string"
+optional = true
+description = "the excerpt the volume rests on.\n"
+[outputs]
+[outputs.gas_density]
+unit = "kg/m**3"
+description = "the gas phase's density, or the bulk density when no gas phase exists.\n"
+[outputs.liquid_density]
+unit = "kg/m**3"
+description = "the oil density, then the aqueous, then the fallback.\n"
+[outputs.total_volume]
+unit = "m**3"
+description = "the segments' internal volumes.\n"
+[outputs.total_gas_volume]
+unit = "m**3"
+description = "the gas share of the volumes.\n"
+[outputs.total_liquid_volume]
+unit = "m**3"
+description = "the liquid share of the volumes.\n"
+[outputs.total_gas_mass]
+unit = "kg"
+description = "`total_gas_volume * gas_density`.\n"
+[outputs.total_liquid_mass]
+unit = "kg"
+description = "`total_liquid_volume * liquid_density`.\n"
+[outputs.total_mass]
+unit = "kg"
+description = "the gas and liquid masses.\n"
+[outputs.segments]
+type = "record_list"
+description = "one row per input segment, in caller order.\n"
+[outputs.segments.fields.segment_id]
+type = "string"
+description = "the segment identifier.\n"
+[outputs.segments.fields.kind]
+type = "enum"
+values = ["equipment", "pipe"]
+description = "the segment's kind.\n"
+[outputs.segments.fields.total_volume]
+unit = "m**3"
+description = "the segment's internal volume.\n"
+[outputs.segments.fields.gas_volume]
+unit = "m**3"
+description = "the gas share of the segment.\n"
+[outputs.segments.fields.liquid_volume]
+unit = "m**3"
+description = "the liquid share of the segment.\n"
+[outputs.segments.fields.gas_mass]
+unit = "kg"
+description = "the segment's gas mass.\n"
+[outputs.segments.fields.liquid_mass]
+unit = "kg"
+description = "the segment's liquid mass.\n"
+[outputs.segments.fields.total_mass]
+unit = "kg"
+description = "the segment's gas and liquid mass.\n"
+[outputs.segments.fields.gas_density]
+unit = "kg/m**3"
+description = "the density the segment's gas mass used.\n"
+[outputs.segments.fields.liquid_density]
+unit = "kg/m**3"
+description = "the density the segment's liquid mass used.\n"
+[outputs.segments.fields.liquid_fill_fraction]
+unit = "dimensionless"
+description = "the echoed fill fraction.\n"
+[outputs.segments.fields.internal_diameter]
+unit = "m"
+optional = true
+description = "the pipe's diameter, echoed.\n"
+[outputs.segments.fields.length]
+unit = "m"
+optional = true
+description = "the pipe's length, echoed.\n"
+[[valid_range]]
+quantity = "pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "fallback_liquid_density"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "a density is positive"
+[implementations]
+python = "azoth.process.trapped_inventory"
+rust = "azoth_process::trapped_inventory"

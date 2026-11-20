@@ -105,7 +105,13 @@ BINDING = REPO_ROOT / "crates" / "azoth-python" / "src"
 #: `process.api14c_safe_chart`, `process.barrier_register_validation` and
 #: `process.s001_clause10_review`. The S-001 secondary-pressure screen is derived - its
 #: inputs are scalars - so the count moves by three.
-KNOWN_HAND_WRITTEN = 71
+#: 71 -> 72 when `process.esd_response_time` brought an optional record list whose stage is an
+#: enum, which the generator leaves to a hand wrapper for the same reason as the safety reviews.
+#: 72 -> 73 for `process.trapped_inventory`, whose segment and evidence record lists carry units.
+#: 73 -> 74 for `process.safety_envelope`, whose optional phase trace is a record list.
+#: 74 -> 75 for `process.open_drain_review`, whose four record lists are extracted by hand.
+#: 75 -> 76 for `process.safety_system_performance`, whose fourteen record lists are.
+KNOWN_HAND_WRITTEN = 76
 
 
 def _tools_module(name: str) -> ModuleType:

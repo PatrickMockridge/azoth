@@ -34,8 +34,12 @@ from azoth.core.record_outputs_gen import (
     DepositionSegmentRow,
     DepressurizationPoint,
     DriftFluxReleaseStation,
+    EnvelopePoint,
+    EnvelopeQuery,
+    EnvelopeSummary,
     EquilibriumSoundSpeedSample,
     EscalationItemResult,
+    EsdContribution,
     EventTreeOutcome,
     FiniteRateReleaseStation,
     FlowlineScaleSegment,
@@ -65,7 +69,13 @@ from azoth.core.record_outputs_gen import (
     MultiVesselProfileRow,
     NaceIssueRow,
     NonEquilibriumBlowdownPoint,
+    OpenDrainAssessment,
+    OpenDrainResult,
     P002FindingResult,
+    PerformanceAssessment,
+    PerformanceFinding,
+    PerformanceInstrument,
+    PerformanceSif,
     PipeFireRupturePoint,
     PrescribedSlipReleaseStation,
     PulsationModeResult,
@@ -78,6 +88,7 @@ from azoth.core.record_outputs_gen import (
     ReviewCoverage,
     ReviewVerdict,
     RiskAssessmentRow,
+    RupturePoint,
     SafeChartItem,
     SafeChartMissingDevice,
     ScaleControlRiskRow,
@@ -92,6 +103,7 @@ from azoth.core.record_outputs_gen import (
     Sts0131FindingResult,
     SubFraction,
     Tr3001Finding,
+    TrappedInventorySegmentResult,
     VesselFillingPoint,
     VesselRuptureStep,
     WaterMixingResult,
@@ -105,6 +117,7 @@ from azoth.core.result_base import (
     DeadheadVerdict,
     EmulsionType,
     ErosionRiskLevel,
+    FailureMode,
     FeSMorphology,
     FivLikelihood,
     FlowRegime,
@@ -114,7 +127,9 @@ from azoth.core.result_base import (
     HydrateRiskLevel,
     HydrateStructure,
     MultiflashSeedPath,
+    OpenDrainVerdict,
     OverallVerdict,
+    PerformanceVerdict,
     Phase,
     PlusModel,
     ReliefPhase,
@@ -6954,6 +6969,43 @@ class EscalationGraphResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class EsdResponseTimeResult(_HasWarnings):
+    """Result of ``process.esd_response_time``."""
+
+    CALC_ID: ClassVar[str] = "process.esd_response_time"
+
+    #: the echoed SIF identifier.
+    sif_tag: str
+
+    #: the sum of the detection contributions.
+    detection_time: Q
+
+    #: the sum of the logic contributions.
+    logic_time: Q
+
+    #: the sum of the final-element contributions.
+    final_element_time: Q
+
+    #: the three stage totals' sum.
+    total_response_time: Q
+
+    #: the budget, absent when none is stated.
+    allowable_response_time: Q | None
+
+    #: `allowable - total`, absent when no budget is stated.
+    margin: Q | None
+
+    #: `total <= allowable`, and true when no budget is stated.
+    within_budget: bool
+
+    #: the contributions echoed in caller order.
+    contributions: tuple[EsdContribution, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class EventTreeResult(_HasWarnings):
     """Result of ``process.event_tree``."""
 
@@ -8734,6 +8786,55 @@ class MapTurboExpanderResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MassBalanceLeakDetectionResult(_HasWarnings):
+    """Result of ``process.mass_balance_leak_detection``."""
+
+    CALC_ID: ClassVar[str] = "process.mass_balance_leak_detection"
+
+    #: the echoed inlet stream name.
+    inlet_stream_name: str | None
+
+    #: the echoed outlet stream name.
+    outlet_stream_name: str | None
+
+    #: the measured inlet mass flow.
+    inlet_flow: Q
+
+    #: the measured outlet mass flow.
+    outlet_flow: Q
+
+    #: `inlet_flow - outlet_flow`.
+    measured_imbalance: Q
+
+    #: the two meters' combined uncertainty at the confidence multiplier.
+    flow_uncertainty: Q
+
+    #: the linepack's pressure and temperature uncertainty as an equivalent leak rate.
+    linepack_uncertainty: Q
+
+    #: `sqrt(flow_uncertainty^2 + linepack_uncertainty^2)`.
+    combined_uncertainty: Q
+
+    #: `|measured_imbalance| + combined_uncertainty`.
+    minimum_detectable_leak_rate: Q
+
+    #: the rate over the larger absolute flow; absent when that flow is zero.
+    minimum_detectable_leak_fraction: float | None
+
+    #: the bulk density the linepack term used; absent when no linepack is stated.
+    density: Q | None
+
+    #: the clamped averaging window.
+    detection_window: Q
+
+    #: the clamped confidence multiplier.
+    confidence_multiplier: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class MdmtResult(_HasWarnings):
     """Result of ``process.mdmt``."""
 
@@ -8884,6 +8985,43 @@ class NorsokP002ComplianceResult(_HasWarnings):
 
     #: the number of non-compliant findings.
     non_compliant_count: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class OpenDrainReviewResult(_HasWarnings):
+    """Result of ``process.open_drain_review``."""
+
+    CALC_ID: ClassVar[str] = "process.open_drain_review"
+
+    #: the report's verdict: any fail, else any pass-with-warnings, else pass.
+    overall_verdict: OpenDrainVerdict
+
+    #: the number of reviewed items.
+    item_count: float
+
+    #: the number of items whose verdict is fail.
+    failed_item_count: float
+
+    #: the number of items whose verdict is pass-with-warnings.
+    warning_item_count: float
+
+    #: the total number of assessments.
+    assessment_count: float
+
+    #: the number of failing assessments.
+    fail_assessment_count: float
+
+    #: the number of warning assessments.
+    warning_assessment_count: float
+
+    #: one row per item, in caller order.
+    results: tuple[OpenDrainResult, ...]
+
+    #: every assessment, item by item.
+    assessments: tuple[OpenDrainAssessment, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -10283,6 +10421,31 @@ class S001SecondaryPressureProtectionResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SafetyEnvelopeResult(_HasWarnings):
+    """Result of ``process.safety_envelope``."""
+
+    CALC_ID: ClassVar[str] = "process.safety_envelope"
+
+    #: one summary row per arm, in the class's order.
+    envelopes: tuple[EnvelopeSummary, ...]
+
+    #: every arm's points, arm by arm in the class's order.
+    points: tuple[EnvelopePoint, ...]
+
+    #: one row per arm when an operating point is stated, in the class's order.
+    queries: tuple[EnvelopeQuery, ...]
+
+    #: whether every query is safe; absent without an operating point.
+    all_safe: bool | None
+
+    #: the arm with the smallest finite margin, absent when every margin is absent.
+    most_limiting_envelope: str | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SafetyInstrumentedFunctionResult(_HasWarnings):
     """Result of ``process.safety_instrumented_function``."""
 
@@ -10320,6 +10483,49 @@ class SafetyInstrumentedFunctionResult(_HasWarnings):
 
     #: `base (1 - rate mttr / 8760)`; absent when the base availability or the MTTR is absent.
     availability_with_spurious_trips: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SafetySystemPerformanceResult(_HasWarnings):
+    """Result of ``process.safety_system_performance``."""
+
+    CALC_ID: ClassVar[str] = "process.safety_system_performance"
+
+    #: the register id.
+    register_id: str
+
+    #: the register name, empty when absent.
+    register_name: str
+
+    #: the report's verdict: any fail, else any warning, else pass.
+    overall_verdict: PerformanceVerdict
+
+    #: the number of assessments.
+    assessment_count: float
+
+    #: the number of passing assessments.
+    pass_count: float
+
+    #: the number of pass-with-warnings assessments.
+    warning_count: float
+
+    #: the number of failing assessments.
+    fail_count: float
+
+    #: one row per barrier and matching demand, in register order.
+    assessments: tuple[PerformanceAssessment, ...]
+
+    #: every finding, assessment by assessment in the class's order.
+    findings: tuple[PerformanceFinding, ...]
+
+    #: the related measurement devices, assessment by assessment.
+    instruments: tuple[PerformanceInstrument, ...]
+
+    #: the related SIFs, assessment by assessment.
+    sifs: tuple[PerformanceSif, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]
@@ -11366,6 +11572,95 @@ class Tr3001ComplianceResult(_HasWarnings):
 
     #: whether no check failed.
     compliant: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TrappedInventoryResult(_HasWarnings):
+    """Result of ``process.trapped_inventory``."""
+
+    CALC_ID: ClassVar[str] = "process.trapped_inventory"
+
+    #: the gas phase's density, or the bulk density when no gas phase exists.
+    gas_density: Q
+
+    #: the oil density, then the aqueous, then the fallback.
+    liquid_density: Q
+
+    #: the segments' internal volumes.
+    total_volume: Q
+
+    #: the gas share of the volumes.
+    total_gas_volume: Q
+
+    #: the liquid share of the volumes.
+    total_liquid_volume: Q
+
+    #: `total_gas_volume * gas_density`.
+    total_gas_mass: Q
+
+    #: `total_liquid_volume * liquid_density`.
+    total_liquid_mass: Q
+
+    #: the gas and liquid masses.
+    total_mass: Q
+
+    #: one row per input segment, in caller order.
+    segments: tuple[TrappedInventorySegmentResult, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TrappedLiquidFireRuptureResult(_HasWarnings):
+    """Result of ``process.trapped_liquid_fire_rupture``."""
+
+    CALC_ID: ClassVar[str] = "process.trapped_liquid_fire_rupture"
+
+    #: the echoed segment identifier.
+    segment_id: str
+
+    #: the recorded time series, one row per step, the failure step included.
+    trajectory: tuple[RupturePoint, ...]
+
+    #: the class's limiting mode.
+    limiting_failure_mode: FailureMode
+
+    #: whether the limiting mode is a pipe or flange failure.
+    rupture_predicted: bool
+
+    #: the first time the relief set pressure is reached.
+    time_to_relief_set: Q | None
+
+    #: the first time the vapor pocket appears.
+    time_to_vapor_pocket: Q | None
+
+    #: the first time the pipe stress reaches its allowable.
+    time_to_pipe_rupture: Q | None
+
+    #: the first time the pressure reaches the flange rating.
+    time_to_flange_failure: Q | None
+
+    #: the earlier of the pipe and flange failure times.
+    minimum_failure_time: Q | None
+
+    #: the last recorded pressure.
+    final_pressure: Q
+
+    #: the last recorded liquid temperature.
+    final_liquid_temperature: Q
+
+    #: the last recorded outer wall temperature.
+    final_outer_wall_temperature: Q
+
+    #: the class's applied standard references.
+    standards_applied: tuple[str, ...]
+
+    #: the class's recommendations.
+    recommendations: tuple[str, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

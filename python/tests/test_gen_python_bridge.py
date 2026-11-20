@@ -37,7 +37,9 @@ BRIDGE = REPO_ROOT / "python" / "src" / "azoth" / "_rust_bridge.py"
 #:   quantities already, so they cross as `Tc.to("K").magnitude` rather than through the spec's
 #:   unit. The generator's whole conversion rule is "read the declaration", and there is none.
 #: Lowering this is still the point; raising it needs a reason in the diff.
-KNOWN_HAND_WRITTEN = 2
+# 2 -> 3 for `process.trapped_liquid_fire_rupture`, whose optional flange class is a
+# name-to-count conversion the generator cannot place in its expression.
+KNOWN_HAND_WRITTEN = 3
 
 
 def _tools_module(name: str) -> ModuleType:

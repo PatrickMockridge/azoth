@@ -1,0 +1,147 @@
+id = "process.open_drain_review"
+name = "NORSOK S-001 open-drain review"
+kind = "procedure"
+assumptions = [
+    "**the nineteen assessments run per item in the class's order**, from standards through operational evidence, with a gated row not applicable.",
+    "**a boolean requirement is tri-state**: absent is `warning`/`high`, false is `fail`/`critical` and true is `pass`/`low`.",
+    "**the capacity check fails on `capacity + 1e-12 < max(0, fire water) + max(0, leak rate)`**, and the missing capacity is a `warning`/`high`.",
+    "**the hazardous/non-hazardous row fails when combined is true and separated is not**, warns when both are absent and passes otherwise.",
+    "**confidence starts at `0.20` and adds the class's five increments** for references, capacity, drain measures, standards and operational evidence, capped at `1.0`.",
+    "**an item's verdict is `fail` if any assessment failed, else `pass_with_warnings` if any warned, else `pass`**; info and not-applicable rows are ignored, and the report's verdict is the same cascade.",
+    "**the alias set resolves at its first present key**, with Java's `Double.parseDouble` and six boolean tokens; an unparseable value yields the default.",
+    "**the messages, recommendations and detail maps are presentation**: the rows carry the requirement id, clause, status and severity.",
+    "**the drilling check uses the area type's text**, as the class does, and a duplicate (`area_id`, `key`) or a row naming no item is refused.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/opendrain/OpenDrainReviewEngine.java` is the port source.",
+    "`validation/neqsim/captures/process_open_drain_review.tsv` - the complete example, a capacity failure, the hazardous/non-hazardous and operational-evidence states, the gated items, the empty input and the coercion block.",
+]
+[source]
+standard = "NeqSim process/safety/opendrain/OpenDrainReviewEngine.java"
+edition = "Its `evaluate`, the nineteen `check*` methods, `calculateConfidence` and the verdict cascade."
+[algorithm]
+scheme = "norsok_s001_open_drain_review"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.project_name]
+type = "string"
+optional = true
+description = "the project name the report echoes.\n"
+[inputs.default_liquid_leak_rate]
+unit = "kg/s"
+optional = true
+description = "the default worst credible process fire leak rate. **Absent is `5`.**\n"
+[inputs.items]
+type = "record_list"
+row_type = "OpenDrainItem"
+optional = true
+description = "the review items, in caller order. **Absent is an empty review.**\n"
+[inputs.items.fields.area_id]
+type = "string"
+description = "the area identifier. A duplicate id is refused.\n"
+[inputs.items.fields.area_type]
+type = "string"
+optional = true
+description = "the free-form area type, which gates the helideck and drilling checks by lower-case substring.\n"
+[inputs.items.fields.drain_system_type]
+type = "string"
+optional = true
+description = "the free-form drain system type, the other half of the drainage-scope text.\n"
+[inputs.evidence]
+type = "record_list"
+row_type = "OpenDrainEvidence"
+optional = true
+description = "the item evidence as key-value rows, in caller order. **Absent is no evidence.** A duplicate (`area_id`, `key`) is refused.\n"
+[inputs.evidence.fields.area_id]
+type = "string"
+description = "the area the evidence belongs to; it must name an item.\n"
+[inputs.evidence.fields.key]
+type = "string"
+description = "the evidence key, exact case, one of the aliases the checks read.\n"
+[inputs.evidence.fields.value]
+type = "string"
+optional = true
+description = "the value, coerced by key: Java's `Double.parseDouble` for a numeric key and the six boolean tokens for a boolean key. **Absent is a present but unparseable value**; a parse failure yields the default at that key.\n"
+[inputs.design_standards]
+type = "record_list"
+row_type = "OpenDrainStandard"
+optional = true
+description = "the design standards as list values, in caller order. **Absent means the evidence's scalar aliases are read instead.**\n"
+[inputs.design_standards.fields.area_id]
+type = "string"
+description = "the area the standard belongs to; it must name an item.\n"
+[inputs.design_standards.fields.standard]
+type = "string"
+description = "the standard text.\n"
+[inputs.references]
+type = "record_list"
+row_type = "OpenDrainReference"
+optional = true
+description = "the technical-document references, in caller order. **Absent is none**, which drops the references confidence increment.\n"
+[inputs.references.fields.area_id]
+type = "string"
+description = "the area the reference belongs to; it must name an item.\n"
+[inputs.references.fields.reference]
+type = "string"
+description = "the reference text.\n"
+[outputs]
+[outputs.overall_verdict]
+type = "enum"
+values = ["pass", "pass_with_warnings", "fail"]
+description = "the report's verdict: any fail, else any pass-with-warnings, else pass.\n"
+[outputs.item_count]
+unit = "dimensionless"
+description = "the number of reviewed items.\n"
+[outputs.failed_item_count]
+unit = "dimensionless"
+description = "the number of items whose verdict is fail.\n"
+[outputs.warning_item_count]
+unit = "dimensionless"
+description = "the number of items whose verdict is pass-with-warnings.\n"
+[outputs.assessment_count]
+unit = "dimensionless"
+description = "the total number of assessments.\n"
+[outputs.fail_assessment_count]
+unit = "dimensionless"
+description = "the number of failing assessments.\n"
+[outputs.warning_assessment_count]
+unit = "dimensionless"
+description = "the number of warning assessments.\n"
+[outputs.results]
+type = "record_list"
+description = "one row per item, in caller order.\n"
+[outputs.results.fields.area_id]
+type = "string"
+description = "the item's area id.\n"
+[outputs.results.fields.verdict]
+type = "enum"
+values = ["pass", "pass_with_warnings", "fail"]
+description = "the item's verdict.\n"
+[outputs.results.fields.confidence]
+unit = "dimensionless"
+description = "the item's evidence confidence.\n"
+[outputs.assessments]
+type = "record_list"
+description = "every assessment, item by item.\n"
+[outputs.assessments.fields.area_id]
+type = "string"
+description = "the item the assessment belongs to.\n"
+[outputs.assessments.fields.requirement_id]
+type = "string"
+description = "the stable requirement identifier, e.g. `OD-S001-9.4.1-CAPACITY`.\n"
+[outputs.assessments.fields.clause]
+type = "string"
+description = "the clause, e.g. `9.4.1`, or the class's literal `Operational evidence` label.\n"
+[outputs.assessments.fields.status]
+type = "enum"
+values = ["pass", "warning", "fail", "info", "not_applicable"]
+description = "the assessment's status.\n"
+[outputs.assessments.fields.severity]
+type = "enum"
+values = ["low", "medium", "high", "critical"]
+description = "the class's severity band; a pass, info or not-applicable row is low.\n"
+[implementations]
+python = "azoth.process.open_drain_review"
+rust = "azoth_process::open_drain_review"

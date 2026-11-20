@@ -15,8 +15,8 @@ and the whole safety surface grouped by family. Thirty-one scenario models acros
 families — fire, dispersion, equipment safety, firewater, overpressure, process safety systems,
 risk, safety assessment, vibration and depressurization — and the bow-tie run inside this
 interface. The rest — the models that take a fluid or a table of rows, and the rupture,
-release and QRA families — are listed with links to their manual pages; they are not runnable
-here yet. The four thermo-bound relief loads and the overpressure protection study are in that
+release, QRA, inventory, envelope, leak-detection, ESD and open-drain families — are listed
+with links to their manual pages; they are not runnable here yet. The four thermo-bound relief loads and the overpressure protection study are in that
 list: they take a fluid or a scenario table, and the library reaches them.
 
 ## Bow-ties
@@ -105,7 +105,8 @@ with the refusal its shape earns rather than given a field it cannot express.
 `process.gas_dispersion` and the twelve release models take a composition;
 `process.fire_water_demand`, `process.relief_disposal_network`, `process.tr3001_compliance`,
 `process.consequence_analysis`, `process.risk_matrix`, `process.fault_tree`, `process.lopa` and
-`process.event_tree` take and/or return record lists; `process.sil_verification` returns one;
+`process.event_tree`, `process.open_drain_review` and `process.safety_system_performance`
+take and/or return record lists; `process.sil_verification` returns one;
 `process.api537_flare_flame_model` takes a flux table; the four self-heating ids publish the
 class's warning strings as a vector output, and the basket test takes a record list. The four
 rupture models take records too, and their manual pages state the inputs, the range and the

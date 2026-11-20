@@ -942,10 +942,18 @@ a claim nothing holds.
   `mdmt/`, `leakdetection/`, `cfd/`, `envelope/`, `scenario/` and `dto/`, plus the risk
   subpackages (232 `.java` files excluding `package-info.java`). The bullets above port their
   own classes - the risk core, the twelve release models, the five overpressure calculators,
-  the six dispersion ids, the four rupture ids, the four self-heating ids, the four hazid
+  the six dispersion ids, the five rupture ids, the four self-heating ids, the four hazid
   worksheet ids, the four safety-review worksheet ids, the six safety screens, the nine
-  safety worksheets and vibration screens and the eight depressurization ids; the types
-  no bullet names remain unported, each with its class.
+  safety worksheets and vibration screens and the eight depressurization ids. The safety-tree
+  remainder is seven studies: **`process.trapped_inventory`** (`TrappedInventoryCalculator`),
+  **`process.safety_envelope`** (`SafetyEnvelopeCalculator`), **`process.trapped_liquid_fire_rupture`**
+  (`TrappedLiquidFireRuptureStudy`), **`process.mass_balance_leak_detection`**
+  (`MassBalanceLeakDetector`), **`process.esd_response_time`** (`EsdResponseTimeSimulator`),
+  **`process.safety_system_performance`** (`SafetySystemPerformanceAnalyzer`) and
+  **`process.open_drain_review`** (`OpenDrainReviewEngine`). What remains is session surface:
+  the JSON adapters and exporters, the report prose, the live-`ProcessSystem` walks and the
+  study hand-offs (`createDepressurizationFluid`, `createRuptureSourceTerm`,
+  `toPassiveFireProtectionDemand`).
 - **The self-heating family** - four ids. **`process.semenov_self_heating` is
   `SemenovSelfHeatingAnalyzer.analyze`**: `psi` against `1/e`, the critical-temperature
   bisection on [150, 2000] K, the margin and the three-value verdict.

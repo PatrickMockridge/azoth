@@ -990,6 +990,430 @@ pub fn s001_clause10_review(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// `process.esd_response_time` - the ESD response-time budget.
+///
+/// The three stage sums, the inclusive budget test and the echoed contributions.
+#[pyfunction]
+#[pyo3(signature = (sif_tag = None, contributions = None, allowable_response_time = None))]
+#[pyo3(text_signature = "(sif_tag=None, contributions=None, allowable_response_time=None)")]
+pub fn esd_response_time(
+    py: Python<'_>,
+    sif_tag: Option<&str>,
+    contributions: Option<Vec<crate::records_gen::EsdContributionInput>>,
+    allowable_response_time: Option<f64>,
+) -> PyResult<crate::transport_gen::PyEsdResponseTimeResult> {
+    use azoth_process::models::esd_response_time as esd;
+    let rows = match contributions {
+        Some(rows) => rows
+            .into_iter()
+            .map(|row| {
+                let stage =
+                    esd::EsdStage::parse(&row.stage).map_err(|error| to_pyerr(py, error))?;
+                Ok(esd::EsdContribution {
+                    name: row.name,
+                    stage,
+                    time: seconds(row.time),
+                })
+            })
+            .collect::<PyResult<Vec<_>>>()?,
+        None => Vec::new(),
+    };
+    esd::esd_response_time(sif_tag, &rows, allowable_response_time.map(seconds))
+        .map(|result| crate::transport_gen::PyEsdResponseTimeResult::from(&result))
+        .map_err(|error| to_pyerr(py, error))
+}
+
+/// `process.trapped_inventory` - the trapped gas and liquid inventory.
+///
+/// The flash's densities over the documented equipment and pipe volumes.
+#[pyfunction]
+#[pyo3(signature = (components, z, pressure, temperature, segments, eos = None, multiphase_check = None, fallback_liquid_density = None, segment_evidence = None))]
+#[pyo3(
+    text_signature = "(components, z, pressure, temperature, segments, eos=None, multiphase_check=None, fallback_liquid_density=None, segment_evidence=None)"
+)]
+#[allow(clippy::too_many_arguments)] // the spec's declared inputs
+pub fn trapped_inventory(
+    py: Python<'_>,
+    components: Vec<String>,
+    z: Vec<f64>,
+    pressure: f64,
+    temperature: f64,
+    segments: Vec<crate::records_gen::TrappedInventorySegment>,
+    eos: Option<&str>,
+    multiphase_check: Option<bool>,
+    fallback_liquid_density: Option<f64>,
+    segment_evidence: Option<Vec<crate::records_gen::TrappedInventoryEvidence>>,
+) -> PyResult<crate::transport_gen::PyTrappedInventoryResult> {
+    use azoth_process::models::trapped_inventory as inventory;
+    let segments = segments
+        .into_iter()
+        .map(|row| {
+            let kind =
+                inventory::SegmentKind::parse(&row.kind).map_err(|error| to_pyerr(py, error))?;
+            Ok(inventory::TrappedInventorySegment {
+                segment_id: row.segment_id,
+                kind,
+                volume: row.volume.map(cubic_meters),
+                liquid_fill_fraction: row.liquid_fill_fraction,
+                internal_diameter: row.internal_diameter.map(meters),
+                length: row.length.map(meters),
+            })
+        })
+        .collect::<PyResult<Vec<_>>>()?;
+    let evidence = segment_evidence.map(|rows| {
+        rows.into_iter()
+            .map(|row| inventory::TrappedInventoryEvidence {
+                segment_id: row.segment_id,
+                document_id: row.document_id,
+                source_reference: row.source_reference,
+                excerpt: row.excerpt,
+            })
+            .collect::<Vec<_>>()
+    });
+    inventory::trapped_inventory(
+        &components,
+        &z,
+        pascals(pressure),
+        kelvins(temperature),
+        &segments,
+        eos,
+        multiphase_check,
+        fallback_liquid_density.map(kilograms_per_cubic_meter),
+        evidence.as_deref(),
+    )
+    .map(|result| crate::transport_gen::PyTrappedInventoryResult::from(&result))
+    .map_err(|error| to_pyerr(py, error))
+}
+
+/// `process.open_drain_review` - the NORSOK S-001 open-drain review.
+///
+/// Nineteen assessments per item, the evidence confidence and the verdict cascade.
+#[pyfunction]
+#[pyo3(signature = (project_name = None, default_liquid_leak_rate = None, items = None, evidence = None, design_standards = None, references = None))]
+#[pyo3(
+    text_signature = "(project_name=None, default_liquid_leak_rate=None, items=None, evidence=None, design_standards=None, references=None)"
+)]
+pub fn open_drain_review(
+    py: Python<'_>,
+    project_name: Option<&str>,
+    default_liquid_leak_rate: Option<f64>,
+    items: Option<Vec<crate::records_gen::OpenDrainItem>>,
+    evidence: Option<Vec<crate::records_gen::OpenDrainEvidence>>,
+    design_standards: Option<Vec<crate::records_gen::OpenDrainStandard>>,
+    references: Option<Vec<crate::records_gen::OpenDrainReference>>,
+) -> PyResult<crate::transport_gen::PyOpenDrainReviewResult> {
+    use azoth_process::models::open_drain_review as review;
+    let items = items.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::OpenDrainItem {
+                area_id: row.area_id,
+                area_type: row.area_type,
+                drain_system_type: row.drain_system_type,
+            })
+            .collect::<Vec<_>>()
+    });
+    let evidence = evidence.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::OpenDrainEvidence {
+                area_id: row.area_id,
+                key: row.key,
+                value: row.value,
+            })
+            .collect::<Vec<_>>()
+    });
+    let standards = design_standards.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::OpenDrainStandard {
+                area_id: row.area_id,
+                standard: row.standard,
+            })
+            .collect::<Vec<_>>()
+    });
+    let references = references.map(|rows| {
+        rows.into_iter()
+            .map(|row| review::OpenDrainReference {
+                area_id: row.area_id,
+                reference: row.reference,
+            })
+            .collect::<Vec<_>>()
+    });
+    review::open_drain_review(
+        project_name,
+        default_liquid_leak_rate,
+        items.as_deref(),
+        evidence.as_deref(),
+        standards.as_deref(),
+        references.as_deref(),
+    )
+    .map(|result| crate::transport_gen::PyOpenDrainReviewResult::from(&result))
+    .map_err(|error| to_pyerr(py, error))
+}
+
+/// `process.safety_system_performance` - the safety-system performance assessment.
+///
+/// The five check families per barrier and matching demand, the category inference and
+/// the related instruments and SIFs.
+#[pyfunction]
+#[pyo3(signature = (register_id, register_name = None, elements = None, links = None, barriers = None, barrier_tags = None, standards = None, standard_criteria = None, demands = None, measurement_devices = None, event_sifs = None, sif_detectors = None, quantitative_sifs = None, protected_equipment = None))]
+#[pyo3(
+    text_signature = "(register_id, register_name=None, elements=None, links=None, barriers=None, barrier_tags=None, standards=None, standard_criteria=None, demands=None, measurement_devices=None, event_sifs=None, sif_detectors=None, quantitative_sifs=None, protected_equipment=None)"
+)]
+#[allow(clippy::too_many_arguments)] // the spec's declared inputs
+pub fn safety_system_performance(
+    py: Python<'_>,
+    register_id: &str,
+    register_name: Option<&str>,
+    elements: Option<Vec<crate::records_gen::PerformanceElement>>,
+    links: Option<Vec<crate::records_gen::SafetySystemLink>>,
+    barriers: Option<Vec<crate::records_gen::PerformanceBarrier>>,
+    barrier_tags: Option<Vec<crate::records_gen::BarrierEquipmentTag>>,
+    standards: Option<Vec<crate::records_gen::SafetyPerformanceStandard>>,
+    standard_criteria: Option<Vec<crate::records_gen::StandardCriterion>>,
+    demands: Option<Vec<crate::records_gen::SafetySystemDemandRow>>,
+    measurement_devices: Option<Vec<crate::records_gen::MeasurementDeviceRow>>,
+    event_sifs: Option<Vec<crate::records_gen::EventSifRow>>,
+    sif_detectors: Option<Vec<crate::records_gen::SifDetectorRow>>,
+    quantitative_sifs: Option<Vec<crate::records_gen::QuantitativeSifRow>>,
+    protected_equipment: Option<Vec<crate::records_gen::ProtectedEquipmentRow>>,
+) -> PyResult<crate::transport_gen::PySafetySystemPerformanceResult> {
+    use azoth_process::models::safety_system_performance as performance;
+    let elements = elements
+        .map(|rows| {
+            rows.into_iter()
+                .map(|row| {
+                    Ok(performance::PerformanceElement {
+                        id: row.id,
+                        element_type: performance::ElementKind::parse(&row.element_type)
+                            .map_err(|error| to_pyerr(py, error))?,
+                    })
+                })
+                .collect::<PyResult<Vec<_>>>()
+        })
+        .transpose()?;
+    let links = links.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::SafetySystemLink {
+                element_id: row.element_id,
+                barrier_id: row.barrier_id,
+            })
+            .collect::<Vec<_>>()
+    });
+    let barriers = barriers
+        .map(|rows| {
+            rows.into_iter()
+                .map(|row| {
+                    Ok(performance::PerformanceBarrier {
+                        id: row.id,
+                        status: performance::PerformanceBarrierStatus::parse(&row.status)
+                            .map_err(|error| to_pyerr(py, error))?,
+                        has_traceable_evidence: row.has_traceable_evidence.unwrap_or(false),
+                        name: row.name,
+                        description: row.description,
+                        safety_function: row.safety_function,
+                        pfd: row.pfd,
+                        effectiveness: row.effectiveness,
+                        performance_standard_id: row.performance_standard_id,
+                    })
+                })
+                .collect::<PyResult<Vec<_>>>()
+        })
+        .transpose()?;
+    let tags = barrier_tags.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::BarrierEquipmentTag {
+                barrier_id: row.barrier_id,
+                tag: row.tag,
+            })
+            .collect::<Vec<_>>()
+    });
+    let standards = standards.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::SafetyPerformanceStandard {
+                id: row.id,
+                title: row.title,
+                safety_function: row.safety_function,
+                target_pfd: row.target_pfd,
+                required_availability: row.required_availability,
+                response_time_seconds: row.response_time_seconds,
+            })
+            .collect::<Vec<_>>()
+    });
+    let criteria = standard_criteria.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::StandardCriterion {
+                standard_id: row.standard_id,
+                criterion: row.criterion,
+            })
+            .collect::<Vec<_>>()
+    });
+    let demands = demands
+        .map(|rows| {
+            rows.into_iter()
+                .map(|row| {
+                    let category = match row.category.as_deref() {
+                        None => performance::PerformanceCategory::Unknown,
+                        Some(text) => performance::PerformanceCategory::parse(text)
+                            .map_err(|error| to_pyerr(py, error))?,
+                    };
+                    Ok(performance::SafetySystemDemandRow {
+                        demand_id: row.demand_id,
+                        barrier_id: row.barrier_id,
+                        equipment_tag: row.equipment_tag,
+                        scenario: row.scenario,
+                        category,
+                        demand_value: row.demand_value,
+                        capacity_value: row.capacity_value,
+                        demand_unit: row.demand_unit,
+                        required_pfd: row.required_pfd,
+                        actual_pfd: row.actual_pfd,
+                        required_availability: row.required_availability,
+                        actual_availability: row.actual_availability,
+                        required_response_time_seconds: row.required_response_time_seconds,
+                        actual_response_time_seconds: row.actual_response_time_seconds,
+                        required_effectiveness: row.required_effectiveness,
+                        actual_effectiveness: row.actual_effectiveness,
+                    })
+                })
+                .collect::<PyResult<Vec<_>>>()
+        })
+        .transpose()?;
+    let devices = measurement_devices
+        .map(|rows| {
+            rows.into_iter()
+                .map(|row| {
+                    Ok(performance::MeasurementDeviceRow {
+                        name: row.name,
+                        kind: performance::DeviceKind::parse(&row.kind)
+                            .map_err(|error| to_pyerr(py, error))?,
+                        tag: row.tag,
+                        location: row.location,
+                        response_time_seconds: row.response_time_seconds,
+                    })
+                })
+                .collect::<PyResult<Vec<_>>>()
+        })
+        .transpose()?;
+    let event_sifs = event_sifs
+        .map(|rows| {
+            rows.into_iter()
+                .map(|row| {
+                    Ok(performance::EventSifRow {
+                        name: row.name,
+                        voting_notation: performance::VotingNotation::parse(&row.voting_notation)
+                            .map_err(|error| to_pyerr(py, error))?,
+                        overridden: row.overridden.unwrap_or(false),
+                    })
+                })
+                .collect::<PyResult<Vec<_>>>()
+        })
+        .transpose()?;
+    let detectors = sif_detectors.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::SifDetectorRow {
+                sif_name: row.sif_name,
+                name: row.name,
+                bypassed: row.bypassed.unwrap_or(false),
+                faulty: row.faulty.unwrap_or(false),
+                tripped: row.tripped.unwrap_or(false),
+            })
+            .collect::<Vec<_>>()
+    });
+    let quantitative = quantitative_sifs.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::QuantitativeSifRow {
+                id: row.id,
+                name: row.name,
+                description: row.description,
+                architecture: row.architecture,
+                claimed_sil: row.claimed_sil,
+                pfd_average: row.pfd_average,
+                test_interval_hours: row.test_interval_hours,
+            })
+            .collect::<Vec<_>>()
+    });
+    let protected = protected_equipment.map(|rows| {
+        rows.into_iter()
+            .map(|row| performance::ProtectedEquipmentRow {
+                sif_id: row.sif_id,
+                equipment: row.equipment,
+            })
+            .collect::<Vec<_>>()
+    });
+    performance::safety_system_performance(
+        register_id,
+        register_name,
+        elements.as_deref(),
+        links.as_deref(),
+        barriers.as_deref(),
+        tags.as_deref(),
+        standards.as_deref(),
+        criteria.as_deref(),
+        demands.as_deref(),
+        devices.as_deref(),
+        event_sifs.as_deref(),
+        detectors.as_deref(),
+        quantitative.as_deref(),
+        protected.as_deref(),
+    )
+    .map(|result| crate::transport_gen::PySafetySystemPerformanceResult::from(&result))
+    .map_err(|error| to_pyerr(py, error))
+}
+
+/// `process.safety_envelope` - the operational safety envelope.
+///
+/// The five curves and the operating-point queries.
+#[pyfunction]
+#[pyo3(signature = (components, z, min_pressure, max_pressure, num_points, eos = None, hydrate_margin = None, wax_margin = None, co2_margin = None, mdmt_margin = None, mdmt_design_temperature = None, operating_pressure = None, operating_temperature = None, phase_trace = None))]
+#[pyo3(
+    text_signature = "(components, z, min_pressure, max_pressure, num_points, eos=None, hydrate_margin=None, wax_margin=None, co2_margin=None, mdmt_margin=None, mdmt_design_temperature=None, operating_pressure=None, operating_temperature=None, phase_trace=None)"
+)]
+#[allow(clippy::too_many_arguments)] // the spec's declared inputs
+pub fn safety_envelope(
+    py: Python<'_>,
+    components: Vec<String>,
+    z: Vec<f64>,
+    min_pressure: f64,
+    max_pressure: f64,
+    num_points: f64,
+    eos: Option<&str>,
+    hydrate_margin: Option<f64>,
+    wax_margin: Option<f64>,
+    co2_margin: Option<f64>,
+    mdmt_margin: Option<f64>,
+    mdmt_design_temperature: Option<f64>,
+    operating_pressure: Option<f64>,
+    operating_temperature: Option<f64>,
+    phase_trace: Option<Vec<crate::records_gen::EnvelopeTracePoint>>,
+) -> PyResult<crate::transport_gen::PySafetyEnvelopeResult> {
+    use azoth_process::models::safety_envelope as envelope;
+    let trace = phase_trace.map(|rows| {
+        rows.into_iter()
+            .map(|row| envelope::EnvelopeTracePoint {
+                pressure: pascals(row.pressure),
+                temperature: kelvins(row.temperature),
+            })
+            .collect::<Vec<_>>()
+    });
+    envelope::safety_envelope(
+        &components,
+        &z,
+        pascals(min_pressure),
+        pascals(max_pressure),
+        num_points as usize,
+        eos,
+        hydrate_margin,
+        wax_margin,
+        co2_margin,
+        mdmt_margin,
+        mdmt_design_temperature.map(kelvins),
+        operating_pressure.map(pascals),
+        operating_temperature.map(kelvins),
+        trace.as_deref(),
+    )
+    .map(|result| crate::transport_gen::PySafetyEnvelopeResult::from(&result))
+    .map_err(|error| to_pyerr(py, error))
+}
+
 /// `process.absorption_column` - the tray absorber as a registered id.
 ///
 /// **The column's own profile shape with the class's own product names**, and two inlets where
