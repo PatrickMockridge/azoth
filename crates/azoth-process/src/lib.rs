@@ -13,6 +13,7 @@ pub mod channel;
 pub mod check;
 pub mod column;
 pub mod compressor_chart;
+pub mod costing;
 pub mod executor;
 pub mod expander_chart;
 pub mod flowsheet;
