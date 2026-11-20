@@ -8772,6 +8772,55 @@ class MapTurboExpanderResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MassBalanceLeakDetectionResult(_HasWarnings):
+    """Result of ``process.mass_balance_leak_detection``."""
+
+    CALC_ID: ClassVar[str] = "process.mass_balance_leak_detection"
+
+    #: the echoed inlet stream name.
+    inlet_stream_name: str | None
+
+    #: the echoed outlet stream name.
+    outlet_stream_name: str | None
+
+    #: the measured inlet mass flow.
+    inlet_flow: Q
+
+    #: the measured outlet mass flow.
+    outlet_flow: Q
+
+    #: `inlet_flow - outlet_flow`.
+    measured_imbalance: Q
+
+    #: the two meters' combined uncertainty at the confidence multiplier.
+    flow_uncertainty: Q
+
+    #: the linepack's pressure and temperature uncertainty as an equivalent leak rate.
+    linepack_uncertainty: Q
+
+    #: `sqrt(flow_uncertainty^2 + linepack_uncertainty^2)`.
+    combined_uncertainty: Q
+
+    #: `|measured_imbalance| + combined_uncertainty`.
+    minimum_detectable_leak_rate: Q
+
+    #: the rate over the larger absolute flow; absent when that flow is zero.
+    minimum_detectable_leak_fraction: float | None
+
+    #: the bulk density the linepack term used; absent when no linepack is stated.
+    density: Q | None
+
+    #: the clamped averaging window.
+    detection_window: Q
+
+    #: the clamped confidence multiplier.
+    confidence_multiplier: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class MdmtResult(_HasWarnings):
     """Result of ``process.mdmt``."""
 

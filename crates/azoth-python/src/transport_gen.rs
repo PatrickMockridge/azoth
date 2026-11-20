@@ -21681,6 +21681,133 @@ impl From<&azoth_process::models::map_turbo_expander_compressor::MapTurboExpande
         }
     }
 }
+/// Result of `process.mass_balance_leak_detection`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MassBalanceLeakDetectionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMassBalanceLeakDetectionResult {
+    /// the echoed inlet stream name.
+    #[pyo3(get)]
+    pub inlet_stream_name: Option<String>,
+    /// the echoed outlet stream name.
+    #[pyo3(get)]
+    pub outlet_stream_name: Option<String>,
+    /// the measured inlet mass flow.
+    #[pyo3(get)]
+    pub inlet_flow: PyQty,
+    /// the measured outlet mass flow.
+    #[pyo3(get)]
+    pub outlet_flow: PyQty,
+    /// `inlet_flow - outlet_flow`.
+    #[pyo3(get)]
+    pub measured_imbalance: PyQty,
+    /// the two meters' combined uncertainty at the confidence multiplier.
+    #[pyo3(get)]
+    pub flow_uncertainty: PyQty,
+    /// the linepack's pressure and temperature uncertainty as an equivalent leak rate.
+    #[pyo3(get)]
+    pub linepack_uncertainty: PyQty,
+    /// `sqrt(flow_uncertainty^2 + linepack_uncertainty^2)`.
+    #[pyo3(get)]
+    pub combined_uncertainty: PyQty,
+    /// `|measured_imbalance| + combined_uncertainty`.
+    #[pyo3(get)]
+    pub minimum_detectable_leak_rate: PyQty,
+    /// the rate over the larger absolute flow; absent when that flow is zero.
+    #[pyo3(get)]
+    pub minimum_detectable_leak_fraction: Option<f64>,
+    /// the bulk density the linepack term used; absent when no linepack is stated.
+    #[pyo3(get)]
+    pub density: Option<PyQty>,
+    /// the clamped averaging window.
+    #[pyo3(get)]
+    pub detection_window: PyQty,
+    /// the clamped confidence multiplier.
+    #[pyo3(get)]
+    pub confidence_multiplier: f64,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyMassBalanceLeakDetectionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "MassBalanceLeakDetectionResult(inlet_stream_name={:?}, outlet_stream_name={:?}, inlet_flow={:?}, outlet_flow={:?}, measured_imbalance={:?}, flow_uncertainty={:?}, linepack_uncertainty={:?}, combined_uncertainty={:?}, minimum_detectable_leak_rate={:?}, minimum_detectable_leak_fraction={:?}, density={:?}, detection_window={:?}, confidence_multiplier={:?}, {} warning(s))",
+            self.inlet_stream_name,
+            self.outlet_stream_name,
+            self.inlet_flow,
+            self.outlet_flow,
+            self.measured_imbalance,
+            self.flow_uncertainty,
+            self.linepack_uncertainty,
+            self.combined_uncertainty,
+            self.minimum_detectable_leak_rate,
+            self.minimum_detectable_leak_fraction,
+            self.density,
+            self.detection_window,
+            self.confidence_multiplier,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::mass_balance_leak_detection::MassBalanceLeakDetectionResult>
+    for PyMassBalanceLeakDetectionResult
+{
+    fn from(
+        r: &azoth_process::models::mass_balance_leak_detection::MassBalanceLeakDetectionResult,
+    ) -> Self {
+        Self {
+            inlet_stream_name: r.inlet_stream_name.clone(),
+            outlet_stream_name: r.outlet_stream_name.clone(),
+            inlet_flow: PyQty {
+                magnitude_si: r.inlet_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            outlet_flow: PyQty {
+                magnitude_si: r.outlet_flow.value,
+                unit: "kg/s".to_string(),
+            },
+            measured_imbalance: PyQty {
+                magnitude_si: r.measured_imbalance.value,
+                unit: "kg/s".to_string(),
+            },
+            flow_uncertainty: PyQty {
+                magnitude_si: r.flow_uncertainty.value,
+                unit: "kg/s".to_string(),
+            },
+            linepack_uncertainty: PyQty {
+                magnitude_si: r.linepack_uncertainty.value,
+                unit: "kg/s".to_string(),
+            },
+            combined_uncertainty: PyQty {
+                magnitude_si: r.combined_uncertainty.value,
+                unit: "kg/s".to_string(),
+            },
+            minimum_detectable_leak_rate: PyQty {
+                magnitude_si: r.minimum_detectable_leak_rate.value,
+                unit: "kg/s".to_string(),
+            },
+            minimum_detectable_leak_fraction: r.minimum_detectable_leak_fraction,
+            density: r.density.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "kg/m**3".to_string(),
+            }),
+            detection_window: PyQty {
+                magnitude_si: r.detection_window.value,
+                unit: "s".to_string(),
+            },
+            confidence_multiplier: r.confidence_multiplier,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `process.mdmt`, transported.
 #[pyclass(
     frozen,

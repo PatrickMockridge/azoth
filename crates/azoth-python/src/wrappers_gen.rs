@@ -7651,6 +7651,56 @@ pub fn manifold(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Mass-balance leak sensitivity.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, z, inlet_pressure, inlet_temperature, inlet_flow, outlet_flow, eos, inlet_density, linepack_volume, flow_measurement_uncertainty_fraction, pressure_uncertainty, temperature_uncertainty, detection_window, confidence_multiplier, inlet_stream_name, outlet_stream_name))]
+#[pyo3(
+    text_signature = "(components, z, inlet_pressure, inlet_temperature, inlet_flow, outlet_flow, eos, inlet_density, linepack_volume, flow_measurement_uncertainty_fraction, pressure_uncertainty, temperature_uncertainty, detection_window, confidence_multiplier, inlet_stream_name, outlet_stream_name)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn mass_balance_leak_detection(
+    py: Python<'_>,
+    components: Vec<String>,
+    z: Vec<f64>,
+    inlet_pressure: f64,
+    inlet_temperature: f64,
+    inlet_flow: f64,
+    outlet_flow: f64,
+    eos: Option<&str>,
+    inlet_density: Option<f64>,
+    linepack_volume: Option<f64>,
+    flow_measurement_uncertainty_fraction: Option<f64>,
+    pressure_uncertainty: Option<f64>,
+    temperature_uncertainty: Option<f64>,
+    detection_window: Option<f64>,
+    confidence_multiplier: Option<f64>,
+    inlet_stream_name: Option<&str>,
+    outlet_stream_name: Option<&str>,
+) -> PyResult<crate::transport_gen::PyMassBalanceLeakDetectionResult> {
+    azoth_process::models::mass_balance_leak_detection::mass_balance_leak_detection(
+        &components,
+        &z,
+        pascals(inlet_pressure),
+        kelvins(inlet_temperature),
+        kilograms_per_second(inlet_flow),
+        kilograms_per_second(outlet_flow),
+        eos,
+        inlet_density.map(kilograms_per_cubic_meter),
+        linepack_volume.map(cubic_meters),
+        flow_measurement_uncertainty_fraction,
+        pressure_uncertainty.map(pascals),
+        temperature_uncertainty,
+        detection_window.map(seconds),
+        confidence_multiplier,
+        inlet_stream_name,
+        outlet_stream_name,
+    )
+    .map(|r| crate::transport_gen::PyMassBalanceLeakDetectionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Minimum design metal temperature.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

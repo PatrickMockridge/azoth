@@ -84,6 +84,7 @@ from azoth.core.result import (
     MahBowTieSkeletonResult,
     ManifoldResult,
     MapTurboExpanderResult,
+    MassBalanceLeakDetectionResult,
     MdmtResult,
     MixerResult,
     MultiVesselBlowdownStudyResult,
@@ -306,6 +307,7 @@ _INHERENT_SAFETY = "process.inherent_safety"
 _NORSOK_P002_COMPLIANCE = "process.norsok_p002_compliance"
 _STS0131_GATE = "process.sts0131_gate"
 _MDMT = "process.mdmt"
+_MASS_BALANCE_LEAK_DETECTION = "process.mass_balance_leak_detection"
 _PIPING_FIV_GAS = "process.piping_fiv_gas"
 _PIPING_FIV_LIQUID = "process.piping_fiv_liquid"
 _VACUUM_COLLAPSE = "process.vacuum_collapse"
@@ -1840,6 +1842,52 @@ def expander(
         shaft_power=shaft_power,
         outlet_temperature=outlet_temperature,
         mechanical_design=mechanical_design,
+    )
+
+
+def mass_balance_leak_detection(
+    components: list[str],
+    z: list[float],
+    inlet_pressure: float,
+    inlet_temperature: float,
+    inlet_flow: float,
+    outlet_flow: float,
+    eos: str | None = None,
+    inlet_density: float | None = None,
+    linepack_volume: float | None = None,
+    flow_measurement_uncertainty_fraction: float | None = None,
+    pressure_uncertainty: float | None = None,
+    temperature_uncertainty: float | None = None,
+    detection_window: float | None = None,
+    confidence_multiplier: float | None = None,
+    inlet_stream_name: str | None = None,
+    outlet_stream_name: str | None = None,
+) -> MassBalanceLeakDetectionResult:
+    """The mass-balance leak sensitivity.
+
+    The measured imbalance, the two meters' uncertainty, the linepack's pressure and
+    temperature uncertainty, and the minimum detectable rate. **The setters' clamps are
+    carried**: volume, fraction and the uncertainties floor at zero and the window at one.
+
+    See :func:`azoth.process.reference.mass_balance_leak_detection`.
+    """
+    return resolve(_MASS_BALANCE_LEAK_DETECTION)(  # type: ignore[no-any-return]
+        components=components,
+        z=z,
+        inlet_pressure=inlet_pressure,
+        inlet_temperature=inlet_temperature,
+        inlet_flow=inlet_flow,
+        outlet_flow=outlet_flow,
+        eos=eos,
+        inlet_density=inlet_density,
+        linepack_volume=linepack_volume,
+        flow_measurement_uncertainty_fraction=flow_measurement_uncertainty_fraction,
+        pressure_uncertainty=pressure_uncertainty,
+        temperature_uncertainty=temperature_uncertainty,
+        detection_window=detection_window,
+        confidence_multiplier=confidence_multiplier,
+        inlet_stream_name=inlet_stream_name,
+        outlet_stream_name=outlet_stream_name,
     )
 
 

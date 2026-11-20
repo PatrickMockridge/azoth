@@ -78,6 +78,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.mah_bow_tie_skeleton`](./mah_bow_tie_skeleton.md) | `mah_bow_tie_catalogue` | NeqSim process/safety/hazid/MahBowTieBuilder.java |
 | [`process.manifold`](./manifold.md) | `direct composition` | NeqSim process/equipment/manifold/Manifold.java |
 | [`process.map_turbo_expander_compressor`](./map_turbo_expander_compressor.md) | `direct composition` | NeqSim process/equipment/expander/MapTurboExpanderCompressor.java |
+| [`process.mass_balance_leak_detection`](./mass_balance_leak_detection.md) | `mass_balance_leak_sensitivity` | NeqSim process/safety/leakdetection/MassBalanceLeakDetector.java |
 | [`process.mdmt`](./mdmt.md) | `ucs66_analytic_mdmt` | NeqSim process/safety/mdmt/MDMTCalculator.java |
 | [`process.mixer`](./mixer.md) | `direct composition` | NeqSim process/equipment/mixer/Mixer.java |
 | [`process.multi_vessel_blowdown_study`](./multi_vessel_blowdown_study.md) | `profile_superposition` | NeqSim process/safety/depressurization/MultiVesselBlowdownStudy.java |

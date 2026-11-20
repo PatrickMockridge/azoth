@@ -287,6 +287,7 @@
 //!   - specs/models/process/mah_bow_tie_skeleton.toml
 //!   - specs/models/process/manifold.toml
 //!   - specs/models/process/map_turbo_expander_compressor.toml
+//!   - specs/models/process/mass_balance_leak_detection.toml
 //!   - specs/models/process/mdmt.toml
 //!   - specs/models/process/mixer.toml
 //!   - specs/models/process/multi_vessel_blowdown_study.toml
@@ -4455,6 +4456,62 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.map_turbo_expander_compressor",
         "impeller_diameter",
         "length",
+    ),
+    ("process.mass_balance_leak_detection", "z", "dimensionless"),
+    (
+        "process.mass_balance_leak_detection",
+        "inlet_pressure",
+        "pressure",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "inlet_temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "inlet_flow",
+        "mass_rate",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "outlet_flow",
+        "mass_rate",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "inlet_density",
+        "mass_density",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "linepack_volume",
+        "volume",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "flow_measurement_uncertainty_fraction",
+        "dimensionless",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "pressure_uncertainty",
+        "pressure",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "temperature_uncertainty",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "detection_window",
+        "time",
+    ),
+    (
+        "process.mass_balance_leak_detection",
+        "confidence_multiplier",
+        "dimensionless",
     ),
     ("process.mdmt", "governing_thickness", "length"),
     (

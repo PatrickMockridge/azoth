@@ -229,6 +229,7 @@ from azoth.core.result import (
     ManifoldResult,
     MapTurboExpanderResult,
     MasonSaxenaConductivityResult,
+    MassBalanceLeakDetectionResult,
     Matcop5PrumrAlphaResult,
     MatcopAlphaResult,
     MatcopPrAlphaResult,
@@ -682,6 +683,7 @@ __all__ = [
     "manifold",
     "map_turbo_expander_compressor",
     "mason_saxena_conductivity",
+    "mass_balance_leak_detection",
     "matcop5_prumr_alpha",
     "matcop_alpha",
     "matcop_pr_alpha",
@@ -6737,7 +6739,7 @@ def esd_response_time(sif_tag: str | None=None, contributions: list[dict[str, ob
     spec = _models_gen.model("process.esd_response_time")
     result = _core.esd_response_time(
         sif_tag,
-        input_records_to_si(spec, "contributions", contributions),
+        None if contributions is None else input_records_to_si(spec, "contributions", contributions),
         None if allowable_response_time is None else _si(spec, "allowable_response_time", allowable_response_time),
     )
     return EsdResponseTimeResult(
@@ -7983,6 +7985,45 @@ def map_turbo_expander_compressor(expander_components: list[str], compressor_com
         power_balance_residual=from_si(result.power_balance_residual.magnitude_si, result.power_balance_residual.unit),
         speed_limited=result.speed_limited,
         operating_status=result.operating_status,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def mass_balance_leak_detection(components: list[str], z: list[float], inlet_pressure: float, inlet_temperature: float, inlet_flow: float, outlet_flow: float, eos: str | None=None, inlet_density: float | None=None, linepack_volume: float | None=None, flow_measurement_uncertainty_fraction: float | None=None, pressure_uncertainty: float | None=None, temperature_uncertainty: float | None=None, detection_window: float | None=None, confidence_multiplier: float | None=None, inlet_stream_name: str | None=None, outlet_stream_name: str | None=None) -> MassBalanceLeakDetectionResult:
+    """``process.mass_balance_leak_detection``, computed in Rust."""
+    spec = _models_gen.model("process.mass_balance_leak_detection")
+    result = _core.mass_balance_leak_detection(
+        list(components),
+        list(z),
+        _si(spec, "inlet_pressure", inlet_pressure),
+        _si(spec, "inlet_temperature", inlet_temperature),
+        _si(spec, "inlet_flow", inlet_flow),
+        _si(spec, "outlet_flow", outlet_flow),
+        eos,
+        None if inlet_density is None else _si(spec, "inlet_density", inlet_density),
+        None if linepack_volume is None else _si(spec, "linepack_volume", linepack_volume),
+        None if flow_measurement_uncertainty_fraction is None else flow_measurement_uncertainty_fraction,
+        None if pressure_uncertainty is None else _si(spec, "pressure_uncertainty", pressure_uncertainty),
+        None if temperature_uncertainty is None else _si(spec, "temperature_uncertainty", temperature_uncertainty),
+        None if detection_window is None else _si(spec, "detection_window", detection_window),
+        None if confidence_multiplier is None else confidence_multiplier,
+        inlet_stream_name,
+        outlet_stream_name,
+    )
+    return MassBalanceLeakDetectionResult(
+        inlet_stream_name=result.inlet_stream_name,
+        outlet_stream_name=result.outlet_stream_name,
+        inlet_flow=from_si(result.inlet_flow.magnitude_si, result.inlet_flow.unit),
+        outlet_flow=from_si(result.outlet_flow.magnitude_si, result.outlet_flow.unit),
+        measured_imbalance=from_si(result.measured_imbalance.magnitude_si, result.measured_imbalance.unit),
+        flow_uncertainty=from_si(result.flow_uncertainty.magnitude_si, result.flow_uncertainty.unit),
+        linepack_uncertainty=from_si(result.linepack_uncertainty.magnitude_si, result.linepack_uncertainty.unit),
+        combined_uncertainty=from_si(result.combined_uncertainty.magnitude_si, result.combined_uncertainty.unit),
+        minimum_detectable_leak_rate=from_si(result.minimum_detectable_leak_rate.magnitude_si, result.minimum_detectable_leak_rate.unit),
+        minimum_detectable_leak_fraction=result.minimum_detectable_leak_fraction,
+        density=None if result.density is None else from_si(result.density.magnitude_si, result.density.unit),
+        detection_window=from_si(result.detection_window.magnitude_si, result.detection_window.unit),
+        confidence_multiplier=result.confidence_multiplier,
         warnings=_warnings(result.warnings),
     )
 

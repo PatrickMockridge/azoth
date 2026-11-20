@@ -100,6 +100,7 @@ pub mod lopa;
 pub mod mah_bow_tie_skeleton;
 pub mod manifold;
 pub mod map_turbo_expander_compressor;
+pub mod mass_balance_leak_detection;
 #[allow(dead_code)] // the flange ratings wait for the fire-rupture id
 pub(crate) mod material_strength;
 pub mod mdmt;
@@ -238,9 +239,7 @@ pub use escalation_graph::{
     EscalationExposure, EscalationGraphResult, EscalationItem, EscalationItemResult,
     escalation_graph,
 };
-pub use esd_response_time::{
-    EsdContribution, EsdResponseTimeResult, EsdStage, esd_response_time,
-};
+pub use esd_response_time::{EsdContribution, EsdResponseTimeResult, EsdStage, esd_response_time};
 pub use event_tree::{EventTreeBranch, EventTreeOutcome, EventTreeResult, event_tree};
 pub use expander::{ExpanderResult, expander};
 pub use fault_tree::{FaultTreeNodeSpec, FaultTreeResult, MinimalCutSet, fault_tree};
@@ -289,6 +288,9 @@ pub use mah_bow_tie_skeleton::{
 };
 pub use manifold::{ManifoldResult, manifold};
 pub use map_turbo_expander_compressor::{MapTurboExpanderResult, map_turbo_expander_compressor};
+pub use mass_balance_leak_detection::{
+    MassBalanceLeakDetectionResult, mass_balance_leak_detection,
+};
 pub use mdmt::{MdmtResult, mdmt};
 pub use mixer::{MixerResult, mixer};
 pub use multi_vessel_blowdown_study::{

@@ -3912,6 +3912,61 @@ def _s001_clause10_review(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _mass_balance_leak_detection(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.mass_balance_leak_detection`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.mass_balance_leak_detection import (
+        mass_balance_leak_detection as evaluate,
+    )
+
+    def optional_q(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    def optional_float(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    def optional_text(name: str) -> str | None:
+        value = inputs.get(name)
+        return None if value is None else str(value)
+
+    result = evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["z"]],
+        quantity(float(inputs["inlet_pressure"]), "Pa"),
+        quantity(float(inputs["inlet_temperature"]), "K"),
+        quantity(float(inputs["inlet_flow"]), "kg/s"),
+        quantity(float(inputs["outlet_flow"]), "kg/s"),
+        optional_text("eos"),
+        optional_q("inlet_density", "kg/m**3"),
+        optional_q("linepack_volume", "m**3"),
+        optional_float("flow_measurement_uncertainty_fraction"),
+        optional_q("pressure_uncertainty", "Pa"),
+        optional_float("temperature_uncertainty"),
+        optional_q("detection_window", "s"),
+        optional_float("confidence_multiplier"),
+        optional_text("inlet_stream_name"),
+        optional_text("outlet_stream_name"),
+    )
+    dumped: dict[str, float] = {
+        "inletFlowKgPerS": result.inlet_flow.to("kg/s").magnitude,
+        "outletFlowKgPerS": result.outlet_flow.to("kg/s").magnitude,
+        "measuredImbalanceKgPerS": result.measured_imbalance.to("kg/s").magnitude,
+        "flowUncertaintyKgPerS": result.flow_uncertainty.to("kg/s").magnitude,
+        "linepackUncertaintyKgPerS": result.linepack_uncertainty.to("kg/s").magnitude,
+        "combinedUncertaintyKgPerS": result.combined_uncertainty.to("kg/s").magnitude,
+        "minimumDetectableLeakRateKgPerS": result.minimum_detectable_leak_rate.to("kg/s").magnitude,
+        "detectionWindowS": result.detection_window.to("s").magnitude,
+        "confidenceMultiplier": result.confidence_multiplier,
+    }
+    if result.minimum_detectable_leak_fraction is not None:
+        dumped["minimumDetectableLeakFraction"] = result.minimum_detectable_leak_fraction
+    if result.density is not None:
+        dumped["density_kg_per_m3"] = result.density.to("kg/m**3").magnitude
+    return dumped
+
+
 def _esd_response_time(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.esd_response_time`'s layers, from the reference's own arithmetic."""
     from azoth.core.units import quantity
@@ -4527,6 +4582,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.alarp_audit": _alarp_audit,
     "process.escalation_graph": _escalation_graph,
     "process.esd_response_time": _esd_response_time,
+    "process.mass_balance_leak_detection": _mass_balance_leak_detection,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.psv_valve": _psv_valve,
     "process.dynamic_psv_sizing": _dynamic_psv_sizing,
@@ -6912,6 +6968,35 @@ LAYER_CASES: tuple[LayerCase, ...] = (
         block=3,
         identified_by=("#label", "esd_zero_time"),
     ),
+    # The leak sensitivity's four cased states; the SRK evidence row is uncased.
+    LayerCase(
+        model="process.mass_balance_leak_detection",
+        case="no_linepack",
+        capture="process_mass_balance_leak_detection.tsv",
+        block=0,
+        identified_by=("#label", "leak_no_linepack"),
+    ),
+    LayerCase(
+        model="process.mass_balance_leak_detection",
+        case="linepack",
+        capture="process_mass_balance_leak_detection.tsv",
+        block=1,
+        identified_by=("#label", "leak_linepack"),
+    ),
+    LayerCase(
+        model="process.mass_balance_leak_detection",
+        case="zero_reference",
+        capture="process_mass_balance_leak_detection.tsv",
+        block=2,
+        identified_by=("#label", "leak_zero_reference"),
+    ),
+    LayerCase(
+        model="process.mass_balance_leak_detection",
+        case="the_setter_clamps",
+        capture="process_mass_balance_leak_detection.tsv",
+        block=3,
+        identified_by=("#label", "leak_clamps"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",
@@ -8691,6 +8776,8 @@ UNCASED_ROWS: dict[str, int] = {
     "process_s001_clause10_review.tsv": 11,
     # The ESD budget's one: the empty-list refusal has no result.
     "process_esd_response_time.tsv": 1,
+    # The leak sensitivity's one: the SRK evidence row.
+    "process_mass_balance_leak_detection.tsv": 1,
     # The dense gas's six: the constructor's four guards and the ratio's two.
     "process_heavy_gas_dispersion.tsv": 6,
     # The hazardous area's nine: the constructor's six guards and the setters' three.

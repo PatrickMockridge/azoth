@@ -4755,6 +4755,23 @@ class MapTurboExpanderResult:
     warnings: list[Warning]
 
 @final
+class MassBalanceLeakDetectionResult:
+    inlet_stream_name: str | None
+    outlet_stream_name: str | None
+    inlet_flow: Qty
+    outlet_flow: Qty
+    measured_imbalance: Qty
+    flow_uncertainty: Qty
+    linepack_uncertainty: Qty
+    combined_uncertainty: Qty
+    minimum_detectable_leak_rate: Qty
+    minimum_detectable_leak_fraction: float | None
+    density: Qty | None
+    detection_window: Qty
+    confidence_multiplier: float
+    warnings: list[Warning]
+
+@final
 class MdmtResult:
     mdmt: Qty
     acceptable: bool
@@ -8938,6 +8955,24 @@ def map_turbo_expander_compressor(
     chart_conditions: list[float] | None = None,
     impeller_diameter: float | None = None,
 ) -> MapTurboExpanderResult: ...
+def mass_balance_leak_detection(
+    components: list[str],
+    z: list[float],
+    inlet_pressure: float,
+    inlet_temperature: float,
+    inlet_flow: float,
+    outlet_flow: float,
+    eos: str | None = None,
+    inlet_density: float | None = None,
+    linepack_volume: float | None = None,
+    flow_measurement_uncertainty_fraction: float | None = None,
+    pressure_uncertainty: float | None = None,
+    temperature_uncertainty: float | None = None,
+    detection_window: float | None = None,
+    confidence_multiplier: float | None = None,
+    inlet_stream_name: str | None = None,
+    outlet_stream_name: str | None = None,
+) -> MassBalanceLeakDetectionResult: ...
 def mdmt(
     material_curve: str,
     governing_thickness: float,

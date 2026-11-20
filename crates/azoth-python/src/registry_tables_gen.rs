@@ -306,6 +306,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.mah_bow_tie_skeleton" => azoth_process::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult::FIELDS.to_vec(),
         "process.manifold" => azoth_process::models::manifold::ManifoldResult::FIELDS.to_vec(),
         "process.map_turbo_expander_compressor" => azoth_process::models::map_turbo_expander_compressor::MapTurboExpanderResult::FIELDS.to_vec(),
+        "process.mass_balance_leak_detection" => azoth_process::models::mass_balance_leak_detection::MassBalanceLeakDetectionResult::FIELDS.to_vec(),
         "process.mdmt" => azoth_process::models::mdmt::MdmtResult::FIELDS.to_vec(),
         "process.mixer" => azoth_process::models::mixer::MixerResult::FIELDS.to_vec(),
         "process.multi_vessel_blowdown_study" => azoth_process::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult::FIELDS.to_vec(),

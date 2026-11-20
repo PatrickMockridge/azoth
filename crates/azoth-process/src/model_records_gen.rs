@@ -76,6 +76,7 @@ use crate::models::lopa::LopaResult;
 use crate::models::mah_bow_tie_skeleton::MahBowTieSkeletonResult;
 use crate::models::manifold::ManifoldResult;
 use crate::models::map_turbo_expander_compressor::MapTurboExpanderResult;
+use crate::models::mass_balance_leak_detection::MassBalanceLeakDetectionResult;
 use crate::models::mdmt::MdmtResult;
 use crate::models::mixer::MixerResult;
 use crate::models::multi_vessel_blowdown_study::MultiVesselBlowdownStudyResult;
@@ -1674,6 +1675,30 @@ impl CalcResult for MapTurboExpanderResult {
         "power_balance_residual",
         "speed_limited",
         "operating_status",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for MassBalanceLeakDetectionResult {
+    const CALC_ID: &'static str = "process.mass_balance_leak_detection";
+    const FIELDS: &'static [&'static str] = &[
+        "inlet_stream_name",
+        "outlet_stream_name",
+        "inlet_flow",
+        "outlet_flow",
+        "measured_imbalance",
+        "flow_uncertainty",
+        "linepack_uncertainty",
+        "combined_uncertainty",
+        "minimum_detectable_leak_rate",
+        "minimum_detectable_leak_fraction",
+        "density",
+        "detection_window",
+        "confidence_multiplier",
         "warnings",
     ];
 

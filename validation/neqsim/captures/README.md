@@ -3222,3 +3222,19 @@ no-budget state, a zero-time detection against an equal budget and the empty-lis
 The stage totals are plain sums, `within_budget` is inclusive, and a missing budget prints
 `NaN` for the allowance and the margin. `addValve` is one final-element contribution of the
 solenoid delay plus the stroke.
+
+## The mass-balance leak sensitivity
+
+`process_mass_balance_leak_detection.tsv` is `MassBalanceLeakDetector.calculateSensitivity` on
+a methane/ethane inlet and outlet, with no linepack, a 100 m3 linepack at 0.1 bar and 0.5 K,
+both flows zero, the negative setter clamps, and an SRK evidence row.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe mass_balance_leak_detection \
+  > captures/process_mass_balance_leak_detection.tsv
+```
+
+The density printed beside each block is the inlet stream's bulk density, the quantity the
+linepack term reads; a zero-flow stream reports 0. The setters clamp volume, fraction and the
+uncertainties at zero and the window at one, and a zero reference flow prints `NaN` for the
+fraction.

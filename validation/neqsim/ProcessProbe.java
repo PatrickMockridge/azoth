@@ -200,6 +200,8 @@ import neqsim.process.safety.dispersion.HeavyGasDispersion;
 import neqsim.process.safety.dispersion.ProbitModel;
 import neqsim.process.safety.esd.EsdResponseTimeSimulator;
 import neqsim.process.safety.esd.EsdResponseTimeSimulator.EsdResponseTimeResult;
+import neqsim.process.safety.leakdetection.MassBalanceLeakDetector;
+import neqsim.process.safety.leakdetection.MassBalanceLeakDetector.LeakDetectionSensitivityResult;
 import neqsim.process.safety.dispersion.ToxicLibrary;
 import neqsim.process.safety.fire.Api537FlareFlameModel;
 import neqsim.process.safety.fire.BLEVECalculator;
@@ -671,6 +673,9 @@ public class ProcessProbe {
         break;
       case "esd_response_time":
         esdResponseTimeRows();
+        break;
+      case "mass_balance_leak_detection":
+        massBalanceLeakRows();
         break;
       case "gas_blowby":
         gasBlowbyRows();
@@ -18001,6 +18006,63 @@ public class ProcessProbe {
       System.out.println("contribution_" + i + "_name=" + contribution.getName());
       System.out.println("contribution_" + i + "_stage=" + contribution.getStage());
       System.out.println("contribution_" + i + "_time_s=" + contribution.getTimeS());
+    }
+    System.out.println();
+  }
+
+  static Stream leakStream(String name, boolean srk, String[] names, double[] z, double temperatureK,
+      double pressureBara, double kgPerSecond) {
+    SystemInterface fluid =
+        srk ? new SystemSrkEos(temperatureK, pressureBara) : new SystemPrEos(temperatureK, pressureBara);
+    for (int i = 0; i < names.length; i++) {
+      fluid.addComponent(names[i], z[i]);
+    }
+    fluid.setMixingRule(2);
+    Stream stream = new Stream(name, fluid);
+    stream.setFlowRate(kgPerSecond, "kg/sec");
+    stream.run();
+    return stream;
+  }
+
+  static void massBalanceLeakRows() {
+    String[] names = {"methane", "ethane"};
+    double[] z = {0.9, 0.1};
+    Stream inlet = leakStream("inlet", false, names, z, 300.0, 50.0, 10.0);
+    Stream outlet = leakStream("outlet", false, names, z, 300.0, 50.0, 9.8);
+    printLeak("leak_no_linepack",
+        new MassBalanceLeakDetector(inlet, outlet).calculateSensitivity(), densityOf(inlet));
+    printLeak("leak_linepack", new MassBalanceLeakDetector(inlet, outlet)
+        .setLinepackVolumeM3(100.0).setPressureUncertaintyBara(0.1)
+        .setTemperatureUncertaintyK(0.5).setFlowMeasurementUncertaintyFraction(0.01)
+        .setDetectionWindowS(60.0).setConfidenceMultiplier(3.0).calculateSensitivity(),
+        densityOf(inlet));
+    Stream zeroInlet = leakStream("zero-inlet", false, names, z, 300.0, 50.0, 0.0);
+    Stream zeroOutlet = leakStream("zero-outlet", false, names, z, 300.0, 50.0, 0.0);
+    printLeak("leak_zero_reference",
+        new MassBalanceLeakDetector(zeroInlet, zeroOutlet).calculateSensitivity(),
+        densityOf(zeroInlet));
+    printLeak("leak_clamps", new MassBalanceLeakDetector(inlet, outlet)
+        .setLinepackVolumeM3(-5.0).setFlowMeasurementUncertaintyFraction(-0.1)
+        .setPressureUncertaintyBara(-1.0).setTemperatureUncertaintyK(-2.0)
+        .setDetectionWindowS(0.0).setConfidenceMultiplier(-1.0).calculateSensitivity(),
+        densityOf(inlet));
+    Stream srkInlet = leakStream("srk-inlet", true, names, z, 300.0, 50.0, 10.0);
+    Stream srkOutlet = leakStream("srk-outlet", true, names, z, 300.0, 50.0, 9.8);
+    printLeak("leak_srk_evidence", new MassBalanceLeakDetector(srkInlet, srkOutlet)
+        .setLinepackVolumeM3(100.0).setPressureUncertaintyBara(0.1)
+        .setTemperatureUncertaintyK(0.5).calculateSensitivity(), densityOf(srkInlet));
+    System.out.println();
+  }
+
+  static double densityOf(Stream stream) {
+    return stream.getThermoSystem().getDensity("kg/m3");
+  }
+
+  static void printLeak(String label, LeakDetectionSensitivityResult result, double density) {
+    System.out.println(label);
+    System.out.println("density_kg_per_m3=" + density);
+    for (Map.Entry<String, Object> entry : result.toMap().entrySet()) {
+      System.out.println(entry.getKey() + "=" + entry.getValue());
     }
     System.out.println();
   }

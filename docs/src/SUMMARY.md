@@ -300,6 +300,7 @@
   - [MAH bow-tie skeleton](./process/mah_bow_tie_skeleton.md)
   - [Manifold](./process/manifold.md)
   - [Map turbo-expander compressor](./process/map_turbo_expander_compressor.md)
+  - [Mass-balance leak sensitivity](./process/mass_balance_leak_detection.md)
   - [Minimum design metal temperature](./process/mdmt.md)
   - [Mixer](./process/mixer.md)
   - [Multi-vessel blowdown study](./process/multi_vessel_blowdown_study.md)

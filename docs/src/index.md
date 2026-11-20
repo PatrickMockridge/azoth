@@ -392,6 +392,7 @@ Five sections, and the difference between them is the point:
 - [`process.mah_bow_tie_skeleton`](./process/mah_bow_tie_skeleton.md) — MAH bow-tie skeleton
 - [`process.manifold`](./process/manifold.md) — Manifold
 - [`process.map_turbo_expander_compressor`](./process/map_turbo_expander_compressor.md) — Map turbo-expander compressor
+- [`process.mass_balance_leak_detection`](./process/mass_balance_leak_detection.md) — Mass-balance leak sensitivity
 - [`process.mdmt`](./process/mdmt.md) — Minimum design metal temperature
 - [`process.mixer`](./process/mixer.md) — Mixer
 - [`process.multi_vessel_blowdown_study`](./process/multi_vessel_blowdown_study.md) — Multi-vessel blowdown study

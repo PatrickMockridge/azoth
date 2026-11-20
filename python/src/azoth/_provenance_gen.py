@@ -3161,6 +3161,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 3,
         "tests_skipped": 0,
     },
+    'process.mass_balance_leak_detection': {
+        "calc_id": 'process.mass_balance_leak_detection',
+        "name": 'Mass-balance leak sensitivity',
+        "spec": {'path': 'specs/models/process/mass_balance_leak_detection.toml', 'sha256': '85e44170a39aa75967d09f5a820903ba1db6e63634c29affbff9f2d10fa4d9b3'},
+        "code": [{'path': 'python/src/azoth/process/reference/mass_balance_leak_detection.py', 'sha256': '8582579691e559f02a4503214a55539fae9aa4d515114621fde6c0fb1719810c'}, {'path': 'crates/azoth-process/src/models/mass_balance_leak_detection.rs', 'sha256': 'a997332b2c6075b81c6c9b6d6bb9a73cf9d0d27ecb1664538f041c69ab5f2956'}],
+        "source": 'NeqSim process/safety/leakdetection/MassBalanceLeakDetector.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 5,
+        "tests_skipped": 0,
+    },
     'process.mdmt': {
         "calc_id": 'process.mdmt',
         "name": 'Minimum design metal temperature',

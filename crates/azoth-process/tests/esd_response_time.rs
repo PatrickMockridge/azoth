@@ -2,9 +2,7 @@
 //! `validation/neqsim/captures/process_esd_response_time.tsv`.
 
 use azoth_core::units::seconds;
-use azoth_process::models::esd_response_time::{
-    EsdContribution, EsdStage, esd_response_time,
-};
+use azoth_process::models::esd_response_time::{EsdContribution, EsdStage, esd_response_time};
 
 fn row(name: &str, stage: EsdStage, time_s: f64) -> EsdContribution {
     EsdContribution {
@@ -25,11 +23,7 @@ fn close(actual: f64, expected: f64, what: &str) {
 fn the_class_within_budget_state() {
     let rows = [
         row("PT-1001 high-pressure", EsdStage::Detection, 1.0),
-        row(
-            "Logic solver scan + 2oo3 vote",
-            EsdStage::Logic,
-            0.5,
-        ),
+        row("Logic solver scan + 2oo3 vote", EsdStage::Logic, 0.5),
         row("ESDV-2001", EsdStage::FinalElement, 8.5),
     ];
     let result = esd_response_time(Some("ESD-1234"), &rows, Some(seconds(15.0)))
@@ -47,7 +41,11 @@ fn the_class_within_budget_state() {
         15.0,
         "allowable",
     );
-    close(result.margin.expect("the margin is stated").value, 5.0, "margin");
+    close(
+        result.margin.expect("the margin is stated").value,
+        5.0,
+        "margin",
+    );
     assert!(result.within_budget);
     assert_eq!(result.contributions.len(), 3);
     assert_eq!(result.contributions[2].stage, EsdStage::FinalElement);
@@ -64,15 +62,18 @@ fn the_class_exceeds_budget_state() {
     let result = esd_response_time(Some("ESD-9999"), &rows, Some(seconds(15.0)))
         .expect("the state evaluates");
     close(result.total_response_time.value, 23.5, "total");
-    close(result.margin.expect("the margin is stated").value, -8.5, "margin");
+    close(
+        result.margin.expect("the margin is stated").value,
+        -8.5,
+        "margin",
+    );
     assert!(!result.within_budget);
 }
 
 #[test]
 fn no_budget_is_within_and_has_no_margin() {
     let rows = [row("TT-1", EsdStage::Detection, 1.0)];
-    let result = esd_response_time(Some("ESD-NOBUDGET"), &rows, None)
-        .expect("the state evaluates");
+    let result = esd_response_time(Some("ESD-NOBUDGET"), &rows, None).expect("the state evaluates");
     close(result.total_response_time.value, 1.0, "total");
     assert!(result.allowable_response_time.is_none());
     assert!(result.margin.is_none());
@@ -89,7 +90,11 @@ fn an_equal_budget_passes_and_a_zero_contribution_is_kept() {
     let result = esd_response_time(Some("ESD-ZERO"), &rows, Some(seconds(2.0)))
         .expect("the state evaluates");
     close(result.total_response_time.value, 2.0, "total");
-    close(result.margin.expect("the margin is stated").value, 0.0, "margin");
+    close(
+        result.margin.expect("the margin is stated").value,
+        0.0,
+        "margin",
+    );
     assert!(result.within_budget);
     close(result.contributions[0].time.value, 0.0, "zero contribution");
 }
