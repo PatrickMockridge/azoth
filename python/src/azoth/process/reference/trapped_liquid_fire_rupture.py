@@ -12,7 +12,7 @@ from typing import Any
 
 from azoth.core.errors import InvalidInputError
 from azoth.core.range import apply_checks, checks_for
-from azoth.core.result import RupturePoint, TrappedLiquidFireRuptureResult
+from azoth.core.result import FailureMode, RupturePoint, TrappedLiquidFireRuptureResult
 from azoth.core.units import Q, from_si, input_to_si
 from azoth.core.warnings import Warning, WarningCode
 from azoth.eos import components as _components
@@ -328,7 +328,7 @@ def trapped_liquid_fire_rupture(
     return TrappedLiquidFireRuptureResult(
         segment_id="trapped-segment" if segment_id is None else segment_id,
         trajectory=tuple(trajectory),
-        limiting_failure_mode=mode,
+        limiting_failure_mode=FailureMode(mode),
         rupture_predicted=mode in ("pipe_rupture", "flange_failure"),
         time_to_relief_set=None if time_to_relief is None else from_si(time_to_relief, "s"),
         time_to_vapor_pocket=None if time_to_vapor is None else from_si(time_to_vapor, "s"),

@@ -125,14 +125,14 @@ def incident_heat_flux(scenario: FireExposure, outer_surface_temperature: float)
 
 def heat_input(scenario: FireExposure, outer_surface_temperature: float) -> float:
     """The total incident heat input, W."""
-    return incident_heat_flux(scenario, outer_surface_temperature) * scenario.exposed_area
+    return incident_heat_flux(scenario, outer_surface_temperature) * float(scenario.exposed_area)
 
 
 def api521_pool_fire_heat_load(wetted_area: float, environmental_factor: float) -> float:
     """The class's API 521 pool-fire heat load, W."""
     _validate_positive(wetted_area, "wetted_area")
     _validate_positive(environmental_factor, "environmental_factor")
-    return 6.19e6 * environmental_factor * wetted_area**0.82
+    return float(6.19e6 * environmental_factor * wetted_area**0.82)
 
 
 def generalized_stefan_boltzmann_heat_flux(

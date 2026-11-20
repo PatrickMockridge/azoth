@@ -670,6 +670,18 @@ def ordered_parameters(inputs: Mapping[str, dict[str, Any]]) -> list[tuple[str, 
     ]
 
 
+def result_base_enums(entries: list[dict[str, Any]]) -> list[str]:
+    """Every enum the result dataclasses annotate, which `azoth.core.result_base` declares."""
+    import inspect
+
+    names: set[str] = set()
+    for entry in entries:
+        for hint in get_type_hints(result_type(entry["id"])).values():
+            if inspect.isclass(hint) and hint.__module__ == "azoth.core.result_base":
+                names.add(hint.__name__)
+    return sorted(names)
+
+
 def render_result_class(calc_id: str) -> str:
     """One `@final class <Name>Result:` block."""
     resolved = result_type(calc_id)
@@ -976,6 +988,7 @@ def render_vocabulary() -> str:
 
 def render() -> str:
     entries = sorted([*CALCS, *MODELS], key=lambda e: e["id"])
+    enums = result_base_enums(entries)
     classes = "\n\n".join(render_result_class(entry["id"]) for entry in entries)
     signatures = "\n".join(render_signature(entry) for entry in entries)
     introspection = "\n".join(
@@ -987,11 +1000,10 @@ def render() -> str:
         f'"""{DOCSTRING}"""\n\n'
         "from typing import TypedDict, final\n\n"
         # **A result field can name an enum the stub does not define.** The transport
-        # carries `selected_model` as a string, and the stub renders the *dataclass's*
-        # annotation - which is `PlusModel`, declared in `azoth.core.result_base` beside
-        # the phase and the stability verdict. Without the import the name is unresolved
-        # and `mypy` refuses the whole file rather than the one field.
-        "from azoth.core.result_base import PlusModel\n\n"
+        # carries an enum as a string, and the stub renders the *dataclass's* annotation -
+        # which is the enum class declared in `azoth.core.result_base`. Without the import
+        # the name is unresolved and `mypy` refuses the whole file rather than the field.
+        f"from azoth.core.result_base import {', '.join(enums)}\n\n"
         "# --- transport types ------------------------------------------------------\n"
         "# The values that cross the boundary and are not results. Hand-written here\n"
         "# because a `cdylib` has nothing to introspect; held to the Rust structs by\n"

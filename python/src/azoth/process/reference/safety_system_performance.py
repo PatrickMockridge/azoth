@@ -45,18 +45,18 @@ def _spec() -> dict[str, Any]:
 def safety_system_performance(
     register_id: str,
     register_name: str | None = None,
-    elements: list[dict[str, object]] | None = None,
-    links: list[dict[str, object]] | None = None,
-    barriers: list[dict[str, object]] | None = None,
-    barrier_tags: list[dict[str, object]] | None = None,
-    standards: list[dict[str, object]] | None = None,
-    standard_criteria: list[dict[str, object]] | None = None,
-    demands: list[dict[str, object]] | None = None,
-    measurement_devices: list[dict[str, object]] | None = None,
-    event_sifs: list[dict[str, object]] | None = None,
-    sif_detectors: list[dict[str, object]] | None = None,
-    quantitative_sifs: list[dict[str, object]] | None = None,
-    protected_equipment: list[dict[str, object]] | None = None,
+    elements: list[dict[str, Any]] | None = None,
+    links: list[dict[str, Any]] | None = None,
+    barriers: list[dict[str, Any]] | None = None,
+    barrier_tags: list[dict[str, Any]] | None = None,
+    standards: list[dict[str, Any]] | None = None,
+    standard_criteria: list[dict[str, Any]] | None = None,
+    demands: list[dict[str, Any]] | None = None,
+    measurement_devices: list[dict[str, Any]] | None = None,
+    event_sifs: list[dict[str, Any]] | None = None,
+    sif_detectors: list[dict[str, Any]] | None = None,
+    quantitative_sifs: list[dict[str, Any]] | None = None,
+    protected_equipment: list[dict[str, Any]] | None = None,
 ) -> SafetySystemPerformanceResult:
     """The safety-system performance assessment.
 
@@ -86,18 +86,28 @@ def safety_system_performance(
     """
     spec = _spec()
     warnings: list[Warning] = []
-    element_rows = input_records_to_si(spec, "elements", elements or [])
-    link_rows = input_records_to_si(spec, "links", links or [])
-    barrier_rows = input_records_to_si(spec, "barriers", barriers or [])
-    tag_rows = input_records_to_si(spec, "barrier_tags", barrier_tags or [])
-    standard_rows = input_records_to_si(spec, "standards", standards or [])
-    criteria_rows = input_records_to_si(spec, "standard_criteria", standard_criteria or [])
-    demand_rows = input_records_to_si(spec, "demands", demands or [])
-    device_rows = input_records_to_si(spec, "measurement_devices", measurement_devices or [])
-    event_rows = input_records_to_si(spec, "event_sifs", event_sifs or [])
-    detector_rows = input_records_to_si(spec, "sif_detectors", sif_detectors or [])
-    quantitative_rows = input_records_to_si(spec, "quantitative_sifs", quantitative_sifs or [])
-    protected_rows = input_records_to_si(spec, "protected_equipment", protected_equipment or [])
+    element_rows: list[dict[str, Any]] = input_records_to_si(spec, "elements", elements or [])
+    link_rows: list[dict[str, Any]] = input_records_to_si(spec, "links", links or [])
+    barrier_rows: list[dict[str, Any]] = input_records_to_si(spec, "barriers", barriers or [])
+    tag_rows: list[dict[str, Any]] = input_records_to_si(spec, "barrier_tags", barrier_tags or [])
+    standard_rows: list[dict[str, Any]] = input_records_to_si(spec, "standards", standards or [])
+    criteria_rows: list[dict[str, Any]] = input_records_to_si(
+        spec, "standard_criteria", standard_criteria or []
+    )
+    demand_rows: list[dict[str, Any]] = input_records_to_si(spec, "demands", demands or [])
+    device_rows: list[dict[str, Any]] = input_records_to_si(
+        spec, "measurement_devices", measurement_devices or []
+    )
+    event_rows: list[dict[str, Any]] = input_records_to_si(spec, "event_sifs", event_sifs or [])
+    detector_rows: list[dict[str, Any]] = input_records_to_si(
+        spec, "sif_detectors", sif_detectors or []
+    )
+    quantitative_rows: list[dict[str, Any]] = input_records_to_si(
+        spec, "quantitative_sifs", quantitative_sifs or []
+    )
+    protected_rows: list[dict[str, Any]] = input_records_to_si(
+        spec, "protected_equipment", protected_equipment or []
+    )
 
     barriers_by_id: dict[str, dict[str, Any]] = {}
     for row in barrier_rows:
@@ -180,15 +190,14 @@ def safety_system_performance(
             "name": _text(row.get("name")),
             "description": _text(row.get("description")),
             "architecture": str(row["architecture"]),
-            "claimed_sil": float(row["claimed_sil"]),
-            "pfd_average": float(row["pfd_average"]),
+            "claimed_sil": _required_number(row["claimed_sil"], "quantitative_sifs"),
+            "pfd_average": _required_number(row["pfd_average"], "quantitative_sifs"),
             "test_interval_hours": _finite(row.get("test_interval_hours")),
         }
         for row in quantitative_rows
     ]
     protected: list[dict[str, str]] = [
-        {"sif_id": str(row["sif_id"]), "equipment": str(row["equipment"])}
-        for row in protected_rows
+        {"sif_id": str(row["sif_id"]), "equipment": str(row["equipment"])} for row in protected_rows
     ]
     for row in protected:
         if not any(sif["id"] == row["sif_id"] for sif in quantitative):
@@ -251,20 +260,12 @@ def safety_system_performance(
     instruments: list[PerformanceInstrument] = []
     sifs: list[PerformanceSif] = []
     for barrier in barriers_by_id.values():
-        matching = [
-            demand
-            for demand in demands_index
-            if _matches_demand(demand, barrier, tags)
-        ]
+        matching = [demand for demand in demands_index if _matches_demand(demand, barrier, tags)]
         if not matching:
-            assessments.append(
-                _assess(barrier, None, register, findings, instruments, sifs)
-            )
+            assessments.append(_assess(barrier, None, register, findings, instruments, sifs))
         else:
             for demand in matching:
-                assessments.append(
-                    _assess(barrier, demand, register, findings, instruments, sifs)
-                )
+                assessments.append(_assess(barrier, demand, register, findings, instruments, sifs))
 
     overall = PerformanceVerdict.PASS
     pass_count = 0.0
@@ -301,10 +302,16 @@ def _text(value: object) -> str | None:
 
 
 def _finite(value: object) -> float | None:
-    if value is None:
+    if not isinstance(value, (int, float)):
         return None
     number = float(value)
     return number if number == number else None
+
+
+def _required_number(value: object, field: str) -> float:
+    if not isinstance(value, (int, float)):
+        raise InvalidInputError(field, "a required numeric value is not a number")
+    return float(value)
 
 
 def _normalise(text: str | None) -> str:
@@ -335,9 +342,7 @@ def _push(
     severity: str,
 ) -> None:
     findings.append(
-        PerformanceFinding(
-            barrier_id=barrier_id, demand_id=demand_id, rule=rule, severity=severity
-        )
+        PerformanceFinding(barrier_id=barrier_id, demand_id=demand_id, rule=rule, severity=severity)
     )
 
 
@@ -359,9 +364,9 @@ def _barrier_tags(register: dict[str, Any], barrier_id: str) -> list[str]:
 
 def _effective_effectiveness(barrier: dict[str, Any]) -> float | None:
     if barrier["effectiveness"] is not None:
-        return barrier["effectiveness"]
+        return float(barrier["effectiveness"])
     if barrier["pfd"] is not None:
-        return 1.0 - barrier["pfd"]
+        return float(1.0 - barrier["pfd"])
     return None
 
 
@@ -373,7 +378,7 @@ def _determine_category(
     register: dict[str, Any], barrier: dict[str, Any], demand: dict[str, Any] | None
 ) -> str:
     if demand is not None and demand["category"] != "unknown":
-        return demand["category"]
+        return str(demand["category"])
     standard_id = barrier["performance_standard_id"]
     standard = register["standards"].get(standard_id) if standard_id else None
     parts = [
@@ -386,14 +391,10 @@ def _determine_category(
         parts.append(standard["title"])
         parts.append(standard["safety_function"])
         parts.extend(
-            row["criterion"]
-            for row in register["criteria"]
-            if row["standard_id"] == standard["id"]
+            row["criterion"] for row in register["criteria"] if row["standard_id"] == standard["id"]
         )
     text = " ".join(part for part in parts if part).lower()
-    if _contains_any(
-        text, ("deluge", "firewater", "fire water", "sprinkler", "water spray")
-    ):
+    if _contains_any(text, ("deluge", "firewater", "fire water", "sprinkler", "water spray")):
         return "firewater_deluge"
     if _contains_any(
         text, ("fire detector", "gas detector", "f&g", "fgs", "fire and gas", "detection")
@@ -491,9 +492,7 @@ def _assess(
         )
         if required is not None:
             required_response = required
-            actual_response = (
-                None if demand is None else demand["actual_response_time_seconds"]
-            )
+            actual_response = None if demand is None else demand["actual_response_time_seconds"]
             if actual_response is None:
                 _push(
                     local,
@@ -554,22 +553,16 @@ def _assess(
             tags_out.append(identifier)
         if device["kind"] == "fire_detector":
             response = (
-                0.0
-                if device["response_time_seconds"] is None
-                else device["response_time_seconds"]
+                0.0 if device["response_time_seconds"] is None else device["response_time_seconds"]
             )
         elif device["kind"] == "gas_detector":
             response = (
-                10.0
-                if device["response_time_seconds"] is None
-                else device["response_time_seconds"]
+                10.0 if device["response_time_seconds"] is None else device["response_time_seconds"]
             )
         else:
             response = None
         if response is not None:
-            max_response = (
-                response if max_response is None else max(max_response, response)
-            )
+            max_response = response if max_response is None else max(max_response, response)
     if category == "fire_gas_detection" and not related:
         _push(local, barrier_id, demand_id, "no_fire_gas_detector", "warning")
     if demand is not None and demand["actual_response_time_seconds"] is None:
@@ -594,9 +587,7 @@ def _assess(
         )
     ]
     for sif in event_related:
-        detectors = [
-            row for row in register["detectors"] if row["sif_name"] == sif["name"]
-        ]
+        detectors = [row for row in register["detectors"] if row["sif_name"] == sif["name"]]
         count = float(len(detectors))
         bypassed = float(sum(1 for row in detectors if row["bypassed"]))
         faulty = float(sum(1 for row in detectors if row["faulty"]))
@@ -631,9 +622,7 @@ def _assess(
             _push(local, barrier_id, demand_id, "sif_detector_count_mismatch", "warning")
         healthy = count - bypassed - faulty
         if healthy < required_trips:
-            _push(
-                local, barrier_id, demand_id, "sif_healthy_channels_insufficient", "fail"
-            )
+            _push(local, barrier_id, demand_id, "sif_healthy_channels_insufficient", "fail")
         elif bypassed > 0.0 or faulty > 0.0:
             _push(local, barrier_id, demand_id, "sif_channels_impaired", "warning")
 
@@ -653,9 +642,7 @@ def _assess(
     ]
     for sif in quantitative_related:
         identifier = sif["name"].strip() if sif["name"] else sif["id"].strip() or "quantitativeSIF"
-        interval = (
-            0.0 if sif["test_interval_hours"] is None else sif["test_interval_hours"]
-        )
+        interval = 0.0 if sif["test_interval_hours"] is None else sif["test_interval_hours"]
         verification = sil_verification(
             sif["pfd_average"], sif["claimed_sil"], sif["architecture"], interval
         )
@@ -688,9 +675,7 @@ def _assess(
                 )
             )
         if not verification.sil_achieved or verification.error_count > 0.0:
-            _push(
-                local, barrier_id, demand_id, "quantitative_sil_not_achieved", "fail"
-            )
+            _push(local, barrier_id, demand_id, "quantitative_sil_not_achieved", "fail")
         for issue in verification.issues:
             if issue.severity == "warning":
                 _push(

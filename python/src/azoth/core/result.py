@@ -29,6 +29,7 @@ from azoth.core.result_base import CorrosionSeverity as CorrosionSeverity
 from azoth.core.result_base import DeadheadVerdict as DeadheadVerdict
 from azoth.core.result_base import EmulsionType as EmulsionType
 from azoth.core.result_base import ErosionRiskLevel as ErosionRiskLevel
+from azoth.core.result_base import FailureMode as FailureMode
 from azoth.core.result_base import FeSMorphology as FeSMorphology
 from azoth.core.result_base import FivLikelihood as FivLikelihood
 from azoth.core.result_base import FlowRegime as FlowRegime
@@ -38,8 +39,12 @@ from azoth.core.result_base import HenryStatus as HenryStatus
 from azoth.core.result_base import HydrateRiskLevel as HydrateRiskLevel
 from azoth.core.result_base import HydrateStructure as HydrateStructure
 from azoth.core.result_base import MultiflashSeedPath as MultiflashSeedPath
+from azoth.core.result_base import OpenDrainSeverity as OpenDrainSeverity
+from azoth.core.result_base import OpenDrainStatus as OpenDrainStatus
+from azoth.core.result_base import OpenDrainVerdict as OpenDrainVerdict
 from azoth.core.result_base import OverallVerdict as OverallVerdict
 from azoth.core.result_base import P002Criterion as P002Criterion
+from azoth.core.result_base import PerformanceVerdict as PerformanceVerdict
 from azoth.core.result_base import Phase as Phase
 from azoth.core.result_base import PlusModel as PlusModel
 from azoth.core.result_base import ReliefPhase as ReliefPhase

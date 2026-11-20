@@ -8,6 +8,7 @@ source is ``SafetyEnvelopeCalculator``'s five ``calculate*Envelope`` methods, wi
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from typing import Any
 
 from azoth.core.errors import InvalidInputError
@@ -66,7 +67,10 @@ def _si(value: Any, unit: str) -> float | None:
 
 
 def _arm(
-    kind: str, pressure_bar: list[float], temperature: list[float | None], margin: list[float]
+    kind: str,
+    pressure_bar: list[float],
+    temperature: Sequence[float | None],
+    margin: list[float],
 ) -> dict[str, Any]:
     return {
         "envelope": kind,
@@ -78,8 +82,8 @@ def _arm(
 
 def _co2_temperature(pressure_bar: float) -> float:
     if pressure_bar < _CO2_TRIPLE_BAR:
-        return _CO2_TRIPLE_K * (pressure_bar / _CO2_TRIPLE_BAR) ** 0.1
-    return _CO2_TRIPLE_K + 0.004 * (pressure_bar - _CO2_TRIPLE_BAR)
+        return float(_CO2_TRIPLE_K * (pressure_bar / _CO2_TRIPLE_BAR) ** 0.1)
+    return float(_CO2_TRIPLE_K + 0.004 * (pressure_bar - _CO2_TRIPLE_BAR))
 
 
 def _temperature_at(arm: dict[str, Any], pressure_bar: float) -> float | None:
@@ -94,9 +98,9 @@ def _temperature_at(arm: dict[str, Any], pressure_bar: float) -> float | None:
             return None
         delta = right - left
         if abs(delta) < 1.0e-10:
-            return left_temperature
+            return float(left_temperature)
         fraction = (pressure_bar - left) / delta
-        return left_temperature + fraction * (right_temperature - left_temperature)
+        return float(left_temperature + fraction * (right_temperature - left_temperature))
     return None
 
 
@@ -109,9 +113,9 @@ def _margin_at(arm: dict[str, Any], pressure_bar: float) -> float:
             continue
         delta = right - left
         if abs(delta) < 1.0e-10:
-            return margins[index]
+            return float(margins[index])
         fraction = (pressure_bar - left) / delta
-        return margins[index] + fraction * (margins[index + 1] - margins[index])
+        return float(margins[index] + fraction * (margins[index + 1] - margins[index]))
     return math.nan
 
 
@@ -129,7 +133,7 @@ def safety_envelope(
     mdmt_design_temperature: Q | None = None,
     operating_pressure: Q | None = None,
     operating_temperature: Q | None = None,
-    phase_trace: list[dict[str, object]] | None = None,
+    phase_trace: list[dict[str, Any]] | None = None,
 ) -> SafetyEnvelopeResult:
     """The operational safety envelope.
 
@@ -333,9 +337,7 @@ def safety_envelope(
             safe_temperature = (
                 None if temperature is None else temperature - _margin_at(arm, operating_bar)
             )
-            if arm["envelope"] == "phase_envelope":
-                safe = True
-            elif safe_temperature is None:
+            if arm["envelope"] == "phase_envelope" or safe_temperature is None:
                 safe = True
             else:
                 safe = operating_t > safe_temperature
@@ -351,9 +353,8 @@ def safety_envelope(
                     safe=safe,
                 )
             )
-            if margin is not None and math.isfinite(margin):
-                if best is None or margin < best[1]:
-                    best = (arm["envelope"], margin)
+            if margin is not None and math.isfinite(margin) and (best is None or margin < best[1]):
+                best = (arm["envelope"], margin)
         all_safe = all(query.safe for query in queries)
         most_limiting = None if best is None else _NAMES[best[0]]
 

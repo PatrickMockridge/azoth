@@ -12,7 +12,7 @@ see `azoth._rust_bridge`.
 
 from typing import TypedDict, final
 
-from azoth.core.result_base import PlusModel
+from azoth.core.result_base import BeggsBrillRegime, BlowbyVerdict, CooldownVerdict, CorrosionSeverity, DeadheadVerdict, EmulsionType, ErosionRiskLevel, FailureMode, FeSMorphology, FivLikelihood, FlowRegime, FluidBasis, GoverningCriterion, HenryStatus, HydrateRiskLevel, HydrateStructure, MultiflashSeedPath, OpenDrainVerdict, OverallVerdict, PerformanceVerdict, Phase, PlusModel, ReliefPhase, RootStructure, RunawayVerdict, RuptureStatus, SelfHeatingGeometry, SelfHeatingVerdict, SettleOutVerdict, StabilityVerdict, SupplyVerdict, TpMultiflashSeed, VacuumVerdict
 
 # --- transport types ------------------------------------------------------
 # The values that cross the boundary and are not results. Hand-written here

@@ -21,7 +21,7 @@ guarantee was being verified by nothing.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from typing import Any
+from typing import Any, cast
 
 from azoth import _core, _models_gen
 
@@ -367,7 +367,10 @@ def trapped_liquid_fire_rupture(
     def si(name: str, value: Any) -> float | None:
         return None if value is None else _si(spec, name, value)
 
-    result = _core.trapped_liquid_fire_rupture(
+    # The stub's declared order is the spec's; this binding's is the hand-written one the
+    # `flange_class` conversion forced, which `test_gen_stub` declares as a known drift.
+    call = cast(Any, _core.trapped_liquid_fire_rupture)
+    result = call(
         list(components),
         list(z),
         eos,

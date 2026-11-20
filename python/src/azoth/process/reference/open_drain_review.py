@@ -36,12 +36,12 @@ def _spec() -> dict[str, Any]:
 
 
 def open_drain_review(
-    project_name: str | None = None,
+    _project_name: str | None = None,
     default_liquid_leak_rate: Q | float | None = None,
-    items: list[dict[str, object]] | None = None,
-    evidence: list[dict[str, object]] | None = None,
-    design_standards: list[dict[str, object]] | None = None,
-    references: list[dict[str, object]] | None = None,
+    items: list[dict[str, Any]] | None = None,
+    evidence: list[dict[str, Any]] | None = None,
+    design_standards: list[dict[str, Any]] | None = None,
+    references: list[dict[str, Any]] | None = None,
 ) -> OpenDrainReviewResult:
     """The NORSOK S-001 Clause 9 open-drain review.
 
@@ -78,7 +78,8 @@ def open_drain_review(
 
     reviewed: list[dict[str, Any]] = []
     seen: set[str] = set()
-    for row in input_records_to_si(spec, "items", items or []):
+    item_rows: list[dict[str, Any]] = input_records_to_si(spec, "items", items or [])
+    for row in item_rows:
         area_id = str(row["area_id"])
         if area_id in seen:
             raise InvalidInputError("items.area_id", f"`{area_id}` appears more than once")
@@ -94,7 +95,8 @@ def open_drain_review(
         )
 
     index = {item["area_id"]: item for item in reviewed}
-    for row in input_records_to_si(spec, "evidence", evidence or []):
+    evidence_rows: list[dict[str, Any]] = input_records_to_si(spec, "evidence", evidence or [])
+    for row in evidence_rows:
         area_id = str(row["area_id"])
         item = index.get(area_id)
         if item is None:
@@ -105,19 +107,21 @@ def open_drain_review(
                 "evidence.key", f"`{key}` appears more than once for `{area_id}`"
             )
         item["evidence"][key] = _optional_text(row.get("value"))
-    for row in input_records_to_si(spec, "design_standards", design_standards or []):
+    standard_rows: list[dict[str, Any]] = input_records_to_si(
+        spec, "design_standards", design_standards or []
+    )
+    for row in standard_rows:
         item = index.get(str(row["area_id"]))
         if item is None:
             raise InvalidInputError(
                 "design_standards.area_id", f"`{row['area_id']}` names no item row"
             )
         item["evidence"].setdefault("designStandards", []).append(str(row["standard"]))
-    for row in input_records_to_si(spec, "references", references or []):
+    reference_rows: list[dict[str, Any]] = input_records_to_si(spec, "references", references or [])
+    for row in reference_rows:
         item = index.get(str(row["area_id"]))
         if item is None:
-            raise InvalidInputError(
-                "references.area_id", f"`{row['area_id']}` names no item row"
-            )
+            raise InvalidInputError("references.area_id", f"`{row['area_id']}` names no item row")
         item["references"].append(str(row["reference"]))
 
     results: list[OpenDrainResult] = []
@@ -242,17 +246,13 @@ def _evaluate(item: dict[str, Any], default_leak: float) -> list[OpenDrainAssess
         False,
         ("hasFlammableLiquidTanks", "tankArea", "flammableLiquidVesselsPresent"),
     ):
-        _required_bool(
-            rows, item, "OD-S001-9.4.1-BUNDING", "9.4.1", "bundingAndDrainageAdequate"
-        )
+        _required_bool(rows, item, "OD-S001-9.4.1-BUNDING", "9.4.1", "bundingAndDrainageAdequate")
     else:
         _push(rows, item, "OD-S001-9.4.1-BUNDING", "9.4.1", "not_applicable", "low")
 
     # 6. Floater.
     if ev.get_bool_default(evidence, False, ("isFloater", "floatingFacility", "floater")):
-        _required_bool(
-            rows, item, "OD-S001-9.4.1-FLOATER", "9.4.1", "preventsCrossAreaSpreading"
-        )
+        _required_bool(rows, item, "OD-S001-9.4.1-FLOATER", "9.4.1", "preventsCrossAreaSpreading")
     else:
         _push(rows, item, "OD-S001-9.4.1-FLOATER", "9.4.1", "not_applicable", "low")
 
@@ -296,9 +296,7 @@ def _evaluate(item: dict[str, Any], default_leak: float) -> list[OpenDrainAssess
         _push(rows, item, "OD-S001-9.4.2-HAZ-NONHAZ", "9.4.2", "pass", "low")
 
     # 10. Common sump.
-    if ev.get_bool_default(
-        evidence, False, ("commonCaissonOrSump", "sharedCaisson", "sharedSump")
-    ):
+    if ev.get_bool_default(evidence, False, ("commonCaissonOrSump", "sharedCaisson", "sharedSump")):
         _required_bool(
             rows,
             item,
@@ -355,12 +353,8 @@ def _evaluate(item: dict[str, Any], default_leak: float) -> list[OpenDrainAssess
         _push(rows, item, "OD-S001-9.4.2-DRILLING-PROD", "9.4.2", "not_applicable", "low")
 
     # 16. Temporary storage.
-    if ev.get_bool_default(
-        evidence, False, ("temporaryFlammableLiquidStorage", "toteTankStorage")
-    ):
-        _required_bool(
-            rows, item, "OD-S001-9.4.2-TOTE", "9.4.2", "adequateCollectionDrainForTote"
-        )
+    if ev.get_bool_default(evidence, False, ("temporaryFlammableLiquidStorage", "toteTankStorage")):
+        _required_bool(rows, item, "OD-S001-9.4.2-TOTE", "9.4.2", "adequateCollectionDrainForTote")
     else:
         _push(rows, item, "OD-S001-9.4.2-TOTE", "9.4.2", "not_applicable", "low")
 
@@ -411,9 +405,10 @@ def _evaluate(item: dict[str, Any], default_leak: float) -> list[OpenDrainAssess
         high_level = ev.get_double(evidence, 0.0, ("sumpHighLevelEvents",))
         observed = ev.get_double(evidence, math.nan, ("observedBackpressureBara",))
         maximum = ev.get_double(evidence, math.nan, ("maximumAllowedBackpressureBara",))
-        if backflow > 0.0:
-            _push(rows, item, "OD-OPS-TAGREADER", "Operational evidence", "fail", "high")
-        elif not math.isnan(observed) and not math.isnan(maximum) and observed > maximum:
+        over_backpressure = (
+            not math.isnan(observed) and not math.isnan(maximum) and observed > maximum
+        )
+        if backflow > 0.0 or over_backpressure:
             _push(rows, item, "OD-OPS-TAGREADER", "Operational evidence", "fail", "high")
         elif high_level > 0.0:
             _push(rows, item, "OD-OPS-TAGREADER", "Operational evidence", "warning", "medium")
@@ -470,9 +465,7 @@ def _confidence(item: dict[str, Any]) -> float:
         ("hasOpenDrainMeasures", "backflowPrevented", "closedOpenDrainInteractionPrevented"),
     ):
         score += 0.20
-    if ev.has_any(
-        item["evidence"], ("designStandards", "standards", "drainageSystemStandards")
-    ):
+    if ev.has_any(item["evidence"], ("designStandards", "standards", "drainageSystemStandards")):
         score += 0.10
     if ev.has_any(
         item["evidence"],

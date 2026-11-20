@@ -4057,12 +4057,12 @@ def _safety_envelope(inputs: Mapping[str, Any]) -> dict[str, float]:
         if row.temperature is not None:
             dumped[f"envelope_{arm}_p{index}_temperature_k"] = row.temperature.to("K").magnitude
         dumped[f"envelope_{arm}_p{index}_margin_k"] = row.margin.to("K").magnitude
-    for row in result.queries:
-        arm = kinds.index(row.envelope)
-        if row.temperature is not None:
-            dumped[f"envelope_{arm}_limit_at_operating_k"] = row.temperature.to("K").magnitude
-        if row.safe_temperature is not None:
-            dumped[f"envelope_{arm}_safe_temperature_at_operating_k"] = row.safe_temperature.to(
+    for query in result.queries:
+        arm = kinds.index(query.envelope)
+        if query.temperature is not None:
+            dumped[f"envelope_{arm}_limit_at_operating_k"] = query.temperature.to("K").magnitude
+        if query.safe_temperature is not None:
+            dumped[f"envelope_{arm}_safe_temperature_at_operating_k"] = query.safe_temperature.to(
                 "K"
             ).magnitude
         if row.margin is not None:
@@ -4260,9 +4260,7 @@ def _safety_system_performance(inputs: Mapping[str, Any]) -> dict[str, float]:
             "required_response_time_seconds": optional_q(
                 row, "required_response_time_seconds", "s"
             ),
-            "actual_response_time_seconds": optional_q(
-                row, "actual_response_time_seconds", "s"
-            ),
+            "actual_response_time_seconds": optional_q(row, "actual_response_time_seconds", "s"),
             "required_effectiveness": row.get("required_effectiveness"),
             "actual_effectiveness": row.get("actual_effectiveness"),
         }
@@ -4371,9 +4369,7 @@ def _safety_system_performance(inputs: Mapping[str, Any]) -> dict[str, float]:
             value = getattr(assessment, attribute)
             if value is None:
                 continue
-            dumped[prefix + dump_name] = (
-                value.to(unit).magnitude if unit is not None else value
-            )
+            dumped[prefix + dump_name] = value.to(unit).magnitude if unit is not None else value
         dumped[prefix + "finding_count"] = assessment.finding_count
     return dumped
 

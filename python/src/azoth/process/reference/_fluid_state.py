@@ -126,7 +126,8 @@ def _assemble(
 
 
 def _water_index(mixture: Any) -> int | None:
-    return mixture.index_of("water")
+    index: int | None = mixture.index_of("water")
+    return None if index is None else int(index)
 
 
 def _is_aqueous(composition: list[float], water: int | None) -> bool:

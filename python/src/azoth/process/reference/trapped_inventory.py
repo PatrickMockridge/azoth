@@ -76,9 +76,7 @@ def trapped_inventory(
         warnings,
     )
     if not segments:
-        raise InvalidInputError(
-            "segments", "the class refuses an inventory with no segment"
-        )
+        raise InvalidInputError("segments", "the class refuses an inventory with no segment")
     fallback = 800.0 if fallback_value is None else fallback_value
     if not fallback > 0.0 or not math.isfinite(fallback):
         raise InvalidInputError("fallback_liquid_density", "a density is positive")
@@ -96,14 +94,10 @@ def trapped_inventory(
     for row in segments:
         segment_id = str(row.get("segment_id", ""))
         if not segment_id.strip():
-            raise InvalidInputError(
-                "segments.segment_id", "a segment identifier must not be empty"
-            )
+            raise InvalidInputError("segments.segment_id", "a segment identifier must not be empty")
         kind = str(row.get("kind", ""))
         if kind not in _KINDS:
-            raise InvalidInputError(
-                "segments.kind", f"`{kind}` is not `equipment` or `pipe`"
-            )
+            raise InvalidInputError("segments.kind", f"`{kind}` is not `equipment` or `pipe`")
         fill = _si(row.get("liquid_fill_fraction"), "dimensionless")
         if fill is None or not 0.0 <= fill <= 1.0 or not math.isfinite(fill):
             raise InvalidInputError(
@@ -126,9 +120,7 @@ def trapped_inventory(
             volumes.append(volume)
         else:
             if row.get("volume") is not None:
-                raise InvalidInputError(
-                    "segments", "a pipe states its geometry, not a volume"
-                )
+                raise InvalidInputError("segments", "a pipe states its geometry, not a volume")
             diameter = _si(row.get("internal_diameter"), "m")
             length = _si(row.get("length"), "m")
             if diameter is None or length is None:
@@ -141,9 +133,7 @@ def trapped_inventory(
                 or not length > 0.0
                 or not math.isfinite(length)
             ):
-                raise InvalidInputError(
-                    "segments", "a pipe's diameter and length are positive"
-                )
+                raise InvalidInputError("segments", "a pipe's diameter and length are positive")
             volumes.append(math.pi * diameter * diameter * length / 4.0)
 
     mixture, ideal_gas = _components.mixture_of(

@@ -30,7 +30,7 @@ def _spec() -> dict[str, Any]:
 
 def esd_response_time(
     sif_tag: str | None = None,
-    contributions: list[dict[str, object]] | None = None,
+    contributions: list[dict[str, Any]] | None = None,
     allowable_response_time: Q | None = None,
 ) -> EsdResponseTimeResult:
     """The ESD response-time budget.
@@ -61,7 +61,7 @@ def esd_response_time(
         warnings,
     )
 
-    rows = input_records_to_si(spec, "contributions", contributions or [])
+    rows: list[dict[str, Any]] = input_records_to_si(spec, "contributions", contributions or [])
     if not rows:
         raise InvalidInputError("contributions", "the class refuses an empty contribution list")
 
