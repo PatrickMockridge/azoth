@@ -108,7 +108,8 @@ BINDING = REPO_ROOT / "crates" / "azoth-python" / "src"
 #: 71 -> 72 when `process.esd_response_time` brought an optional record list whose stage is an
 #: enum, which the generator leaves to a hand wrapper for the same reason as the safety reviews.
 #: 72 -> 73 for `process.trapped_inventory`, whose segment and evidence record lists carry units.
-KNOWN_HAND_WRITTEN = 73
+#: 73 -> 74 for `process.safety_envelope`, whose optional phase trace is a record list.
+KNOWN_HAND_WRITTEN = 74
 
 
 def _tools_module(name: str) -> ModuleType:

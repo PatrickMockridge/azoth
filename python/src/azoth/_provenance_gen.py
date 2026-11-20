@@ -3546,6 +3546,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 7,
         "tests_skipped": 0,
     },
+    'process.safety_envelope': {
+        "calc_id": 'process.safety_envelope',
+        "name": 'Safety envelope',
+        "spec": {'path': 'specs/models/process/safety_envelope.toml', 'sha256': 'b5057c9fe5b33985493106684be8d7a9a7917652a810ae443e239ec1ec157af9'},
+        "code": [{'path': 'python/src/azoth/process/reference/safety_envelope.py', 'sha256': '51e77b41c0612c13404e718e212bcf64836c5f08b48e5fe3b62e800b8930bcfa'}, {'path': 'crates/azoth-process/src/models/safety_envelope.rs', 'sha256': 'ecb9560d71096e9ffc7c0a4857308b60e1055b347d7e95b2ad43bfe56ae5ac0a'}],
+        "source": 'NeqSim process/safety/envelope/SafetyEnvelopeCalculator.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 3,
+        "tests_skipped": 0,
+    },
     'process.safety_instrumented_function': {
         "calc_id": 'process.safety_instrumented_function',
         "name": 'Safety instrumented function',

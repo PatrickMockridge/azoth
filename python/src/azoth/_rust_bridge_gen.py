@@ -106,6 +106,9 @@ from azoth.core.result import (
     ElectrolyteScaleCalculatorResult,
     EmulsionType,
     EmulsionViscosityResult,
+    EnvelopePoint,
+    EnvelopeQuery,
+    EnvelopeSummary,
     EosCgPhaseResult,
     EquilibriumConstantResult,
     EquilibriumSoundSpeedResult,
@@ -353,6 +356,7 @@ from azoth.core.result import (
     S001SecondaryPressureProtectionResult,
     SafeChartItem,
     SafeChartMissingDevice,
+    SafetyEnvelopeResult,
     SafetyInstrumentedFunctionResult,
     SaftVrMiePhaseResult,
     SaltPrecipitationResult,
@@ -783,6 +787,7 @@ __all__ = [
     "runaway_reaction",
     "s001_clause10_review",
     "s001_secondary_pressure_protection",
+    "safety_envelope",
     "safety_instrumented_function",
     "saft_vr_mie_phase",
     "salt_precipitation",
@@ -9155,6 +9160,35 @@ def s001_secondary_pressure_protection(maximum_event_pressure: float | None=None
         proof_test_configured=result.proof_test_configured,
         proof_test_criterion_met=result.proof_test_criterion_met,
         acceptable=result.acceptable,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def safety_envelope(components: list[str], z: list[float], min_pressure: float, max_pressure: float, num_points: int, eos: str | None=None, hydrate_margin: float | None=None, wax_margin: float | None=None, co2_margin: float | None=None, mdmt_margin: float | None=None, mdmt_design_temperature: float | None=None, operating_pressure: float | None=None, operating_temperature: float | None=None, phase_trace: list[dict[str, object]] | None=None) -> SafetyEnvelopeResult:
+    """``process.safety_envelope``, computed in Rust."""
+    spec = _models_gen.model("process.safety_envelope")
+    result = _core.safety_envelope(
+        list(components),
+        list(z),
+        _si(spec, "min_pressure", min_pressure),
+        _si(spec, "max_pressure", max_pressure),
+        num_points,
+        eos,
+        None if hydrate_margin is None else _si(spec, "hydrate_margin", hydrate_margin),
+        None if wax_margin is None else _si(spec, "wax_margin", wax_margin),
+        None if co2_margin is None else _si(spec, "co2_margin", co2_margin),
+        None if mdmt_margin is None else _si(spec, "mdmt_margin", mdmt_margin),
+        None if mdmt_design_temperature is None else _si(spec, "mdmt_design_temperature", mdmt_design_temperature),
+        None if operating_pressure is None else _si(spec, "operating_pressure", operating_pressure),
+        None if operating_temperature is None else _si(spec, "operating_temperature", operating_temperature),
+        None if phase_trace is None else input_records_to_si(spec, "phase_trace", phase_trace),
+    )
+    return SafetyEnvelopeResult(
+        envelopes=tuple(EnvelopeSummary(envelope=c.envelope, name=c.name, point_count=c.point_count, reference_water_content=c.reference_water_content, reference_wax_content=c.reference_wax_content) for c in result.envelopes),
+        points=tuple(EnvelopePoint(envelope=c.envelope, index=c.index, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=None if c.temperature is None else from_si(c.temperature.magnitude_si, c.temperature.unit), margin=from_si(c.margin.magnitude_si, c.margin.unit), safe_temperature=None if c.safe_temperature is None else from_si(c.safe_temperature.magnitude_si, c.safe_temperature.unit)) for c in result.points),
+        queries=tuple(EnvelopeQuery(envelope=c.envelope, temperature=None if c.temperature is None else from_si(c.temperature.magnitude_si, c.temperature.unit), safe_temperature=None if c.safe_temperature is None else from_si(c.safe_temperature.magnitude_si, c.safe_temperature.unit), margin=None if c.margin is None else from_si(c.margin.magnitude_si, c.margin.unit), safe=c.safe) for c in result.queries),
+        all_safe=result.all_safe,
+        most_limiting_envelope=result.most_limiting_envelope,
         warnings=_warnings(result.warnings),
     )
 

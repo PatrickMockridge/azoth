@@ -3254,3 +3254,20 @@ The densities are the flash's phases: the gas phase's, and the oil's, the aqueou
 class's 800 kg/m3 fallback. The warnings are the class's strings, in segment order before the
 fallback. The SRK row is evidence: its liquid density is `1.06e-1` relative below the port's,
 so it is declared uncased.
+
+## The safety envelope
+
+`process_safety_envelope.tsv` is `SafetyEnvelopeCalculator` on a methane/water fluid, the
+wax feed and a methane/ethane binary, each with the five arms and an operating point.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe safety_envelope \
+  > captures/process_safety_envelope.tsv
+```
+
+The hydrate fluid needs `setHydrateCheck(true)` and the wax feed needs its solid wax phase and
+multiphase wax check; without them the arms write `NaN`. The class's phase curve is the last
+arm: it is a failed all-zero curve on the hydrate fluid and a low-pressure branch on the other
+two, so the port takes the curve as a supplied trace and its own generated branch is not
+carried. The MDMT gamma is the port's EOS capacity ratio and runs up to `2.3e-1` below the
+class's at the top of the hydrate range; the case says so.

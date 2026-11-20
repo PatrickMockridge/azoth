@@ -17,23 +17,24 @@ use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
     PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent, PyChemicalWarningRow,
     PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult, PyDepositionSegmentRow,
-    PyDepressurizationPoint, PyDriftFluxReleaseStation, PyEquilibriumSoundSpeedSample,
-    PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome, PyFiniteRateReleaseStation,
-    PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow, PyHazopTemplateDeviation,
-    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
-    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasFannoReleaseStation,
-    PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
-    PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier,
-    PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
-    PyNonEquilibriumBlowdownPoint, PyP002FindingResult, PyPipeFireRupturePoint,
-    PyPrescribedSlipReleaseStation, PyPulsationModeResult, PyRanzMarshallReleaseStation,
-    PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PyTr3001Finding, PyTrappedInventorySegmentResult, PyVesselFillingPoint, PyVesselRuptureStep,
+    PyDepressurizationPoint, PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery,
+    PyEnvelopeSummary, PyEquilibriumSoundSpeedSample, PyEscalationItemResult, PyEsdContribution,
+    PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry,
+    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
+    PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
+    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
+    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
+    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
+    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyP002FindingResult,
+    PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation, PyPulsationModeResult,
+    PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation, PyRegisterFinding,
+    PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage,
+    PyReviewVerdict, PyRiskAssessmentRow, PySafeChartItem, PySafeChartMissingDevice,
+    PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow, PyScenarioIndexRow,
+    PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue, PySterileRadius,
+    PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction, PyTr3001Finding,
+    PyTrappedInventorySegmentResult, PyVesselFillingPoint, PyVesselRuptureStep,
     PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
@@ -25728,6 +25729,64 @@ impl From<&azoth_process::models::s001_secondary_pressure_protection::S001Second
             proof_test_configured: r.proof_test_configured,
             proof_test_criterion_met: r.proof_test_criterion_met,
             acceptable: r.acceptable,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.safety_envelope`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SafetyEnvelopeResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySafetyEnvelopeResult {
+    /// one summary row per arm, in the class's order.
+    #[pyo3(get)]
+    pub envelopes: Vec<PyEnvelopeSummary>,
+    /// every arm's points, arm by arm in the class's order.
+    #[pyo3(get)]
+    pub points: Vec<PyEnvelopePoint>,
+    /// one row per arm when an operating point is stated, in the class's order.
+    #[pyo3(get)]
+    pub queries: Vec<PyEnvelopeQuery>,
+    /// whether every query is safe; absent without an operating point.
+    #[pyo3(get)]
+    pub all_safe: Option<bool>,
+    /// the arm with the smallest finite margin, absent when every margin is absent.
+    #[pyo3(get)]
+    pub most_limiting_envelope: Option<String>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySafetyEnvelopeResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SafetyEnvelopeResult(envelopes={:?}, points={:?}, queries={:?}, all_safe={:?}, most_limiting_envelope={:?}, {} warning(s))",
+            self.envelopes,
+            self.points,
+            self.queries,
+            self.all_safe,
+            self.most_limiting_envelope,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_envelope::SafetyEnvelopeResult>
+    for PySafetyEnvelopeResult
+{
+    fn from(r: &azoth_process::models::safety_envelope::SafetyEnvelopeResult) -> Self {
+        Self {
+            envelopes: r.envelopes.iter().map(PyEnvelopeSummary::from).collect(),
+            points: r.points.iter().map(PyEnvelopePoint::from).collect(),
+            queries: r.queries.iter().map(PyEnvelopeQuery::from).collect(),
+            all_safe: r.all_safe,
+            most_limiting_envelope: r.most_limiting_envelope.clone(),
             warnings: transport(&r.warnings),
         }
     }

@@ -141,6 +141,7 @@ pub mod risk_matrix;
 pub mod runaway_reaction;
 pub mod s001_clause10_review;
 pub mod s001_secondary_pressure_protection;
+pub mod safety_envelope;
 pub mod safety_instrumented_function;
 pub mod safety_review;
 pub mod self_heating_induction;
@@ -352,6 +353,10 @@ pub use s001_clause10_review::{
 };
 pub use s001_secondary_pressure_protection::{
     S001SecondaryPressureProtectionResult, s001_secondary_pressure_protection,
+};
+pub use safety_envelope::{
+    EnvelopeKind, EnvelopePoint, EnvelopeQuery, EnvelopeSummary, EnvelopeTracePoint,
+    SafetyEnvelopeResult, safety_envelope,
 };
 pub use safety_instrumented_function::{
     SafetyInstrumentedFunctionResult, safety_instrumented_function,

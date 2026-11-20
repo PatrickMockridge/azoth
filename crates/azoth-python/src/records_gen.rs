@@ -273,6 +273,15 @@ pub struct ElementBarrierLink {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct EnvelopeTracePoint {
+    #[pyo3(item)]
+    pub pressure: f64,
+    #[pyo3(item)]
+    pub temperature: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct EscalationExposure {
     #[pyo3(item)]
     pub source: String,

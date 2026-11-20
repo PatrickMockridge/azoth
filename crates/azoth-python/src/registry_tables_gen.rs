@@ -341,6 +341,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.runaway_reaction" => azoth_process::models::runaway_reaction::RunawayReactionResult::FIELDS.to_vec(),
         "process.s001_clause10_review" => azoth_process::models::s001_clause10_review::S001Clause10ReviewResult::FIELDS.to_vec(),
         "process.s001_secondary_pressure_protection" => azoth_process::models::s001_secondary_pressure_protection::S001SecondaryPressureProtectionResult::FIELDS.to_vec(),
+        "process.safety_envelope" => azoth_process::models::safety_envelope::SafetyEnvelopeResult::FIELDS.to_vec(),
         "process.safety_instrumented_function" => azoth_process::models::safety_instrumented_function::SafetyInstrumentedFunctionResult::FIELDS.to_vec(),
         "process.self_heating_induction" => azoth_process::models::self_heating_induction::SelfHeatingInductionResult::FIELDS.to_vec(),
         "process.semenov_self_heating" => azoth_process::models::semenov_self_heating::SemenovSelfHeatingResult::FIELDS.to_vec(),

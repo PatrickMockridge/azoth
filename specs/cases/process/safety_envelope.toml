@@ -1,0 +1,91 @@
+model = "process.safety_envelope"
+[[cases]]
+id = "hydrate"
+tolerance = 3.0e-1
+source = "Methane/water at 0.9/0.1, 1-150 bar, five points, an operating point at 50 bar and 280 K; the hydrate, wax (absent, no wax former), CO2 and MDMT arms. From `validation/neqsim/captures/process_safety_envelope.tsv` (`se_hydrate`). The MDMT gamma is held at `3e-1` (measured up to `2.3e-1` at the top of this range); the Rust test holds the other arms at `1e-6`."
+[cases.inputs]
+components = ["methane", "water"]
+z = [0.9, 0.1]
+min_pressure = 100000.0
+max_pressure = 15000000.0
+num_points = 5
+eos = "srk"
+operating_pressure = 5000000.0
+operating_temperature = 280.0
+[cases.expected]
+envelopes = [
+  { envelope = "hydrate", name = "Hydrate Formation", point_count = 5.0, reference_water_content = 0.09999999999999998, reference_wax_content = 0.0 },
+  { envelope = "wax", name = "Wax Appearance", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+  { envelope = "co2_freezing", name = "CO2 Freezing", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+  { envelope = "mdmt", name = "MDMT", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+]
+queries = [
+  { envelope = "hydrate", temperature = 279.2637590766215, safe_temperature = 274.2637590766215, margin = 0.7362409233784888 },
+  { envelope = "wax" },
+  { envelope = "co2_freezing", temperature = 216.72928, safe_temperature = 213.72928, margin = 63.27071999999998 },
+  { envelope = "mdmt", temperature = 100.65856713118744, safe_temperature = 90.65856713118744, margin = 179.34143286881255 },
+]
+most_limiting_envelope = "Hydrate Formation"
+[[cases]]
+id = "wax"
+tolerance = 2.0e-1
+source = "The wax feed at 1-20 bar, five points, an operating point at 5 bar and 270 K; the wax, CO2 and MDMT arms and the hydrate arm absent for want of water. From (`se_wax`). The MDMT gamma is held at `2e-1`; the Rust test holds the other arms at `1e-6`."
+[cases.inputs]
+components = ["methane", "n-heptane", "nc14", "nc20", "nc24"]
+z = [0.4, 0.1, 0.1, 0.2, 0.2]
+min_pressure = 100000.0
+max_pressure = 2000000.0
+num_points = 5
+eos = "srk"
+operating_pressure = 500000.0
+operating_temperature = 270.0
+[cases.expected]
+envelopes = [
+  { envelope = "hydrate", name = "Hydrate Formation", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+  { envelope = "wax", name = "Wax Appearance", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+  { envelope = "co2_freezing", name = "CO2 Freezing", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+  { envelope = "mdmt", name = "MDMT", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+]
+queries = [
+  { envelope = "hydrate" },
+  { envelope = "wax", temperature = 270.4277881823088, safe_temperature = 265.4277881823088, margin = -0.42778818230880233 },
+  { envelope = "co2_freezing", temperature = 211.36615023369686, safe_temperature = 208.36615023369686, margin = 58.63384976630314 },
+  { envelope = "mdmt", temperature = 299.9999931606415, safe_temperature = 289.9999931606415, margin = -29.99999316064151 },
+]
+most_limiting_envelope = "MDMT"
+[[cases]]
+id = "phase_trace"
+tolerance = 2.0e-1
+source = "Methane/ethane at 0.7/0.3 with the phase curve supplied from the class's `se_phase` capture, an operating point at 20 bar and 250 K outside its 1.1-1.7 bar range. From (`se_phase`). The MDMT gamma is held at `2e-1`; the Rust test holds the other arms at `1e-6`."
+[cases.inputs]
+components = ["methane", "ethane"]
+z = [0.7, 0.3]
+min_pressure = 100000.0
+max_pressure = 5000000.0
+num_points = 5
+eos = "srk"
+operating_pressure = 2000000.0
+operating_temperature = 250.0
+phase_trace = [
+  { pressure = 110517.09180756477, temperature = 166.71388189460214 },
+  { pressure = 122140.27581601699, temperature = 168.18265461320092 },
+  { pressure = 134985.88075760032, temperature = 169.67969457404368 },
+  { pressure = 149182.46976412703, temperature = 171.2057230517833 },
+  { pressure = 166529.11949458864, temperature = 172.91871031834745 },
+]
+[cases.expected]
+envelopes = [
+  { envelope = "hydrate", name = "Hydrate Formation", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+  { envelope = "wax", name = "Wax Appearance", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+  { envelope = "co2_freezing", name = "CO2 Freezing", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+  { envelope = "mdmt", name = "MDMT", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+  { envelope = "phase_envelope", name = "Phase Envelope", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
+]
+queries = [
+  { envelope = "hydrate" },
+  { envelope = "wax" },
+  { envelope = "co2_freezing", temperature = 216.60928, safe_temperature = 213.60928, margin = 33.39071999999999 },
+  { envelope = "mdmt", temperature = 151.08776935056537, safe_temperature = 141.08776935056537, margin = 98.91223064943463 },
+  { envelope = "phase_envelope" },
+]
+most_limiting_envelope = "CO2 Freezing"

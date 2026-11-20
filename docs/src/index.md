@@ -427,6 +427,7 @@ Five sections, and the difference between them is the point:
 - [`process.runaway_reaction`](./process/runaway_reaction.md) — Runaway reaction screening
 - [`process.s001_clause10_review`](./process/s001_clause10_review.md) — NORSOK S-001 Clause 10 review
 - [`process.s001_secondary_pressure_protection`](./process/s001_secondary_pressure_protection.md) — NORSOK S-001 secondary pressure protection
+- [`process.safety_envelope`](./process/safety_envelope.md) — Safety envelope
 - [`process.safety_instrumented_function`](./process/safety_instrumented_function.md) — Safety instrumented function
 - [`process.self_heating_induction`](./process/self_heating_induction.md) — Self-heating induction time
 - [`process.semenov_self_heating`](./process/semenov_self_heating.md) — Semenov self-heating

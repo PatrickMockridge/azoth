@@ -34,6 +34,9 @@ from azoth.core.record_outputs_gen import (
     DepositionSegmentRow,
     DepressurizationPoint,
     DriftFluxReleaseStation,
+    EnvelopePoint,
+    EnvelopeQuery,
+    EnvelopeSummary,
     EquilibriumSoundSpeedSample,
     EscalationItemResult,
     EsdContribution,
@@ -10365,6 +10368,31 @@ class S001SecondaryPressureProtectionResult(_HasWarnings):
 
     #: whether every criterion is met.
     acceptable: bool
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SafetyEnvelopeResult(_HasWarnings):
+    """Result of ``process.safety_envelope``."""
+
+    CALC_ID: ClassVar[str] = "process.safety_envelope"
+
+    #: one summary row per arm, in the class's order.
+    envelopes: tuple[EnvelopeSummary, ...]
+
+    #: every arm's points, arm by arm in the class's order.
+    points: tuple[EnvelopePoint, ...]
+
+    #: one row per arm when an operating point is stated, in the class's order.
+    queries: tuple[EnvelopeQuery, ...]
+
+    #: whether every query is safe; absent without an operating point.
+    all_safe: bool | None
+
+    #: the arm with the smallest finite margin, absent when every margin is absent.
+    most_limiting_envelope: str | None
 
     #: Caveats.
     warnings: tuple[Warning, ...]

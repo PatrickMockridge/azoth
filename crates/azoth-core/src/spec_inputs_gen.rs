@@ -322,6 +322,7 @@
 //!   - specs/models/process/runaway_reaction.toml
 //!   - specs/models/process/s001_clause10_review.toml
 //!   - specs/models/process/s001_secondary_pressure_protection.toml
+//!   - specs/models/process/safety_envelope.toml
 //!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/self_heating_induction.toml
 //!   - specs/models/process/semenov_self_heating.toml
@@ -5531,6 +5532,41 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "process.s001_secondary_pressure_protection",
         "proof_test_interval_months",
         "dimensionless",
+    ),
+    ("process.safety_envelope", "z", "dimensionless"),
+    ("process.safety_envelope", "min_pressure", "pressure"),
+    ("process.safety_envelope", "max_pressure", "pressure"),
+    ("process.safety_envelope", "num_points", "dimensionless"),
+    (
+        "process.safety_envelope",
+        "hydrate_margin",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.safety_envelope",
+        "wax_margin",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.safety_envelope",
+        "co2_margin",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.safety_envelope",
+        "mdmt_margin",
+        "thermodynamic_temperature",
+    ),
+    (
+        "process.safety_envelope",
+        "mdmt_design_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("process.safety_envelope", "operating_pressure", "pressure"),
+    (
+        "process.safety_envelope",
+        "operating_temperature",
+        "thermodynamic_temperature",
     ),
     (
         "process.safety_instrumented_function",

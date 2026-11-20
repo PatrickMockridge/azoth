@@ -101,6 +101,7 @@
 //!   - specs/models/process/runaway_reaction.toml
 //!   - specs/models/process/s001_clause10_review.toml
 //!   - specs/models/process/s001_secondary_pressure_protection.toml
+//!   - specs/models/process/safety_envelope.toml
 //!   - specs/models/process/safety_instrumented_function.toml
 //!   - specs/models/process/self_heating_induction.toml
 //!   - specs/models/process/semenov_self_heating.toml
@@ -81014,6 +81015,738 @@ pub static S001_SECONDARY_PRESSURE_PROTECTION_SPEC: ModelSpec = ModelSpec {
     cases: S001_SECONDARY_PRESSURE_PROTECTION_CASES,
 };
 
+static SAFETY_ENVELOPE_CHECKS: &[SpecCheck] = &[
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "min_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "max_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "num_points",
+            min: Some(2.0),
+            min_inclusive: true,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "the class divides by num_points - 1",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "mdmt_design_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "operating_pressure",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute pressure",
+        },
+    },
+    SpecCheck {
+        on_input: true,
+        check: RangeCheck {
+            quantity: "operating_temperature",
+            min: Some(0.0),
+            min_inclusive: false,
+            max: None,
+            max_inclusive: true,
+            equals: None,
+            band: Band::Outside,
+            severity: Severity::Error,
+            code: WarningCode::OutOfValidRange,
+            rationale: "an absolute temperature",
+        },
+    },
+];
+
+static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
+    TestCase {
+        id: "hydrate",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.3,
+        numbers: &[
+            ("min_pressure", 100000.0),
+            ("max_pressure", 15000000.0),
+            ("num_points", 5.0),
+            ("operating_pressure", 5000000.0),
+            ("operating_temperature", 280.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "water"])],
+        strings: &[("eos", "srk")],
+        vectors: &[("z", &[0.9, 0.1])],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("most_limiting_envelope", "Hydrate Formation")],
+        records: &[],
+        expected_records: &[
+            (
+                "envelopes",
+                &[
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("hydrate"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Hydrate Formation"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.09999999999999998),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("wax"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Wax Appearance"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("CO2 Freezing"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("MDMT"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "queries",
+                &[
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("hydrate"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(279.2637590766215),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(274.2637590766215),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(0.7362409233784888),
+                        },
+                    ],
+                    &[RecordField {
+                        name: "envelope",
+                        value: FieldValue::Name("wax"),
+                    }],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(216.72928),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(213.72928),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(63.27071999999998),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(100.65856713118744),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(90.65856713118744),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(179.34143286881255),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "wax",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.2,
+        numbers: &[
+            ("min_pressure", 100000.0),
+            ("max_pressure", 2000000.0),
+            ("num_points", 5.0),
+            ("operating_pressure", 500000.0),
+            ("operating_temperature", 270.0),
+        ],
+        flags: &[],
+        lists: &[(
+            "components",
+            &["methane", "n-heptane", "nc14", "nc20", "nc24"],
+        )],
+        strings: &[("eos", "srk")],
+        vectors: &[("z", &[0.4, 0.1, 0.1, 0.2, 0.2])],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("most_limiting_envelope", "MDMT")],
+        records: &[],
+        expected_records: &[
+            (
+                "envelopes",
+                &[
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("hydrate"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Hydrate Formation"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("wax"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Wax Appearance"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("CO2 Freezing"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("MDMT"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "queries",
+                &[
+                    &[RecordField {
+                        name: "envelope",
+                        value: FieldValue::Name("hydrate"),
+                    }],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("wax"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(270.4277881823088),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(265.4277881823088),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(-0.42778818230880233),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(211.36615023369686),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(208.36615023369686),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(58.63384976630314),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(299.9999931606415),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(289.9999931606415),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(-29.99999316064151),
+                        },
+                    ],
+                ],
+            ),
+        ],
+    },
+    TestCase {
+        id: "phase_trace",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.2,
+        numbers: &[
+            ("min_pressure", 100000.0),
+            ("max_pressure", 5000000.0),
+            ("num_points", 5.0),
+            ("operating_pressure", 2000000.0),
+            ("operating_temperature", 250.0),
+        ],
+        flags: &[],
+        lists: &[("components", &["methane", "ethane"])],
+        strings: &[("eos", "srk")],
+        vectors: &[("z", &[0.7, 0.3])],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("most_limiting_envelope", "CO2 Freezing")],
+        records: &[(
+            "phase_trace",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(110517.09180756476),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(166.71388189460214),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(122140.27581601699),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(168.18265461320092),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(134985.88075760033),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(169.67969457404368),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(149182.46976412702),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(171.2057230517833),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(166529.11949458864),
+                    },
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(172.91871031834745),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[
+            (
+                "envelopes",
+                &[
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("hydrate"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Hydrate Formation"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("wax"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Wax Appearance"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("CO2 Freezing"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("MDMT"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("phase_envelope"),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("Phase Envelope"),
+                        },
+                        RecordField {
+                            name: "point_count",
+                            value: FieldValue::Number(5.0),
+                        },
+                        RecordField {
+                            name: "reference_water_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "reference_wax_content",
+                            value: FieldValue::Number(0.0),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "queries",
+                &[
+                    &[RecordField {
+                        name: "envelope",
+                        value: FieldValue::Name("hydrate"),
+                    }],
+                    &[RecordField {
+                        name: "envelope",
+                        value: FieldValue::Name("wax"),
+                    }],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("co2_freezing"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(216.60928),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(213.60928),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(33.39071999999999),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("mdmt"),
+                        },
+                        RecordField {
+                            name: "temperature",
+                            value: FieldValue::Number(151.08776935056537),
+                        },
+                        RecordField {
+                            name: "safe_temperature",
+                            value: FieldValue::Number(141.08776935056537),
+                        },
+                        RecordField {
+                            name: "margin",
+                            value: FieldValue::Number(98.91223064943463),
+                        },
+                    ],
+                    &[RecordField {
+                        name: "envelope",
+                        value: FieldValue::Name("phase_envelope"),
+                    }],
+                ],
+            ),
+        ],
+    },
+];
+
+static SAFETY_ENVELOPE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "safety_envelope",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: None,
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.safety_envelope`.
+pub static SAFETY_ENVELOPE_SPEC: ModelSpec = ModelSpec {
+    id: "process.safety_envelope",
+    kind: "procedure",
+    algorithm: Some(&SAFETY_ENVELOPE_ALGORITHM),
+    checks: SAFETY_ENVELOPE_CHECKS,
+    cases: SAFETY_ENVELOPE_CASES,
+};
+
 static SAFETY_INSTRUMENTED_FUNCTION_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -95188,6 +95921,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &RUNAWAY_REACTION_SPEC,
     &S001_CLAUSE10_REVIEW_SPEC,
     &S001_SECONDARY_PRESSURE_PROTECTION_SPEC,
+    &SAFETY_ENVELOPE_SPEC,
     &SAFETY_INSTRUMENTED_FUNCTION_SPEC,
     &SELF_HEATING_INDUCTION_SPEC,
     &SEMENOV_SELF_HEATING_SPEC,

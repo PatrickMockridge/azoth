@@ -1082,6 +1082,59 @@ pub fn trapped_inventory(
     .map_err(|error| to_pyerr(py, error))
 }
 
+/// `process.safety_envelope` - the operational safety envelope.
+///
+/// The five curves and the operating-point queries.
+#[pyfunction]
+#[pyo3(signature = (components, z, min_pressure, max_pressure, num_points, eos = None, hydrate_margin = None, wax_margin = None, co2_margin = None, mdmt_margin = None, mdmt_design_temperature = None, operating_pressure = None, operating_temperature = None, phase_trace = None))]
+#[pyo3(text_signature = "(components, z, min_pressure, max_pressure, num_points, eos=None, hydrate_margin=None, wax_margin=None, co2_margin=None, mdmt_margin=None, mdmt_design_temperature=None, operating_pressure=None, operating_temperature=None, phase_trace=None)")]
+#[allow(clippy::too_many_arguments)] // the spec's declared inputs
+pub fn safety_envelope(
+    py: Python<'_>,
+    components: Vec<String>,
+    z: Vec<f64>,
+    min_pressure: f64,
+    max_pressure: f64,
+    num_points: f64,
+    eos: Option<&str>,
+    hydrate_margin: Option<f64>,
+    wax_margin: Option<f64>,
+    co2_margin: Option<f64>,
+    mdmt_margin: Option<f64>,
+    mdmt_design_temperature: Option<f64>,
+    operating_pressure: Option<f64>,
+    operating_temperature: Option<f64>,
+    phase_trace: Option<Vec<crate::records_gen::EnvelopeTracePoint>>,
+) -> PyResult<crate::transport_gen::PySafetyEnvelopeResult> {
+    use azoth_process::models::safety_envelope as envelope;
+    let trace = phase_trace.map(|rows| {
+        rows.into_iter()
+            .map(|row| envelope::EnvelopeTracePoint {
+                pressure: pascals(row.pressure),
+                temperature: kelvins(row.temperature),
+            })
+            .collect::<Vec<_>>()
+    });
+    envelope::safety_envelope(
+        &components,
+        &z,
+        pascals(min_pressure),
+        pascals(max_pressure),
+        num_points as usize,
+        eos,
+        hydrate_margin,
+        wax_margin,
+        co2_margin,
+        mdmt_margin,
+        mdmt_design_temperature.map(kelvins),
+        operating_pressure.map(pascals),
+        operating_temperature.map(kelvins),
+        trace.as_deref(),
+    )
+    .map(|result| crate::transport_gen::PySafetyEnvelopeResult::from(&result))
+    .map_err(|error| to_pyerr(py, error))
+}
+
 /// `process.absorption_column` - the tray absorber as a registered id.
 ///
 /// **The column's own profile shape with the class's own product names**, and two inlets where

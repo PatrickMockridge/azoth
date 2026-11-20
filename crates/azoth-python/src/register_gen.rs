@@ -340,6 +340,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyRunawayReactionResult>()?;
     m.add_class::<crate::transport_gen::PyS001Clause10ReviewResult>()?;
     m.add_class::<crate::transport_gen::PyS001SecondaryPressureProtectionResult>()?;
+    m.add_class::<crate::transport_gen::PySafetyEnvelopeResult>()?;
     m.add_class::<crate::transport_gen::PySafetyInstrumentedFunctionResult>()?;
     m.add_class::<crate::transport_gen::PySelfHeatingInductionResult>()?;
     m.add_class::<crate::transport_gen::PySemenovSelfHeatingResult>()?;
@@ -401,6 +402,9 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepressurizationPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyDriftFluxReleaseStation>()?;
+    m.add_class::<crate::record_outputs_gen::PyEnvelopePoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyEnvelopeQuery>()?;
+    m.add_class::<crate::record_outputs_gen::PyEnvelopeSummary>()?;
     m.add_class::<crate::record_outputs_gen::PyEquilibriumSoundSpeedSample>()?;
     m.add_class::<crate::record_outputs_gen::PyEscalationItemResult>()?;
     m.add_class::<crate::record_outputs_gen::PyEsdContribution>()?;
@@ -1238,6 +1242,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::s001_secondary_pressure_protection,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::process::safety_envelope, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::safety_instrumented_function,
         m

@@ -1,0 +1,205 @@
+id = "process.safety_envelope"
+name = "Safety envelope"
+kind = "procedure"
+assumptions = [
+    "**the five arms run in the class's order**: hydrate, wax, CO2 freezing, MDMT at the design temperature (300 K) and the phase envelope.",
+    "**the margins default to the class's** `5` K hydrate, `5` K wax, `3` K CO2 and `10` K MDMT.",
+    "**hydrate seeds at 280 K and wax at 320 K**, the class's initial guesses, and each point is an independent flash.",
+    "**CO2 is the class's closed form**: triple point 5.18 bar and 216.55 K, `216.55 (P/5.18)^0.1` below and `216.55 + 0.004 (P - 5.18)` above.",
+    "**MDMT is the isentropic `T (1.01325/P)^((gamma-1)/gamma)`**, with gamma 1.3 on a failed read and `designT - 50` on a failed flash.",
+    "**the phase arm is the supplied `phase_trace`; absent is no phase arm**, because the class's continuation is a different algorithm and its curve is evidence.",
+    "**a failed point is absent with a warning, not NaN**; the queries are the class's first-bracket interpolation, interpolated margin and raw margin-to-limit.",
+    "**the phase envelope is always safe by construction**, and a point outside a curve is safe with no margin.",
+    "**the MDMT arm is up to `2.3e-1` relative below the class's on the captured range**; the isentropic form is the same and the EOS capacity ratio is the divergence.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/safety/envelope/SafetyEnvelopeCalculator.java` and `SafetyEnvelope.java` are the port source.",
+    "`validation/neqsim/captures/process_safety_envelope.tsv` - the hydrate fluid, the wax fluid, the CO2 and MDMT points, the class's phase curve and the operating-point queries.",
+]
+[source]
+standard = "NeqSim process/safety/envelope/SafetyEnvelopeCalculator.java"
+edition = "Its five `calculate*Envelope` methods, and `SafetyEnvelope`'s interpolation, safe test and margin."
+[algorithm]
+scheme = "safety_envelope"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.components]
+type = "components"
+description = "the fluid's substances, by name, resolved against the component databank.\n"
+[inputs.z]
+type = "vector"
+unit = "dimensionless"
+length = "one per component"
+description = "the fluid's overall mole fractions, checked rather than renormalised.\n"
+[inputs.min_pressure]
+unit = "Pa"
+description = "the first pressure of each arm.\n"
+[inputs.max_pressure]
+unit = "Pa"
+description = "the last pressure of each arm.\n"
+[inputs.num_points]
+unit = "dimensionless"
+description = "the points per arm, at least two.\n"
+[inputs.eos]
+type = "enum"
+values = ["pr", "srk"]
+optional = true
+description = "the cubic the fluid runs. **Absent is `srk`**, where the hydrate and wax kernels are captured.\n"
+[inputs.hydrate_margin]
+unit = "K"
+interval = true
+optional = true
+description = "the hydrate curve's margin. **Absent is `5`.**\n"
+[inputs.wax_margin]
+unit = "K"
+interval = true
+optional = true
+description = "the wax curve's margin. **Absent is `5`.**\n"
+[inputs.co2_margin]
+unit = "K"
+interval = true
+optional = true
+description = "the CO2 curve's margin. **Absent is `3`.**\n"
+[inputs.mdmt_margin]
+unit = "K"
+interval = true
+optional = true
+description = "the MDMT curve's margin. **Absent is `10`.**\n"
+[inputs.mdmt_design_temperature]
+unit = "K"
+optional = true
+description = "the MDMT arm's design temperature. **Absent is `300`.**\n"
+[inputs.operating_pressure]
+unit = "Pa"
+optional = true
+description = "the operating pressure for the queries; both it and the temperature or neither.\n"
+[inputs.operating_temperature]
+unit = "K"
+optional = true
+description = "the operating temperature for the queries.\n"
+[inputs.phase_trace]
+type = "record_list"
+row_type = "EnvelopeTracePoint"
+optional = true
+description = "the phase curve's points, in caller order. **Absent is no phase arm.**\n"
+[inputs.phase_trace.fields.pressure]
+unit = "Pa"
+description = "the point's pressure.\n"
+[inputs.phase_trace.fields.temperature]
+unit = "K"
+description = "the point's temperature.\n"
+[outputs]
+[outputs.envelopes]
+type = "record_list"
+description = "one summary row per arm, in the class's order.\n"
+[outputs.envelopes.fields.envelope]
+type = "enum"
+values = ["hydrate", "wax", "co2_freezing", "mdmt", "phase_envelope"]
+description = "the arm.\n"
+[outputs.envelopes.fields.name]
+type = "string"
+description = "the class's envelope name.\n"
+[outputs.envelopes.fields.point_count]
+unit = "dimensionless"
+description = "the points the arm carries.\n"
+[outputs.envelopes.fields.reference_water_content]
+unit = "dimensionless"
+description = "the feed's water mole fraction, 0 when absent.\n"
+[outputs.envelopes.fields.reference_wax_content]
+unit = "dimensionless"
+description = "the class's reference wax content, which it never sets and which is 0.\n"
+[outputs.points]
+type = "record_list"
+description = "every arm's points, arm by arm in the class's order.\n"
+[outputs.points.fields.envelope]
+type = "enum"
+values = ["hydrate", "wax", "co2_freezing", "mdmt", "phase_envelope"]
+description = "the arm the point belongs to.\n"
+[outputs.points.fields.index]
+unit = "dimensionless"
+description = "the point's index within its arm.\n"
+[outputs.points.fields.pressure]
+unit = "Pa"
+description = "the point's pressure.\n"
+[outputs.points.fields.temperature]
+unit = "K"
+optional = true
+description = "the point's limit temperature; absent when the arm's flash failed.\n"
+[outputs.points.fields.margin]
+unit = "K"
+description = "the point's margin.\n"
+[outputs.points.fields.safe_temperature]
+unit = "K"
+optional = true
+description = "the limit less the margin, absent with the temperature.\n"
+[outputs.queries]
+type = "record_list"
+description = "one row per arm when an operating point is stated, in the class's order.\n"
+[outputs.queries.fields.envelope]
+type = "enum"
+values = ["hydrate", "wax", "co2_freezing", "mdmt", "phase_envelope"]
+description = "the arm.\n"
+[outputs.queries.fields.temperature]
+unit = "K"
+optional = true
+description = "the interpolated limit at the operating pressure; absent outside the arm.\n"
+[outputs.queries.fields.safe_temperature]
+unit = "K"
+optional = true
+description = "the limit less the interpolated margin.\n"
+[outputs.queries.fields.margin]
+unit = "K"
+optional = true
+description = "`operating_temperature - limit`; absent outside the arm.\n"
+[outputs.queries.fields.safe]
+type = "boolean"
+description = "the class's strict `operating_temperature > safe_temperature`; the phase envelope is always safe.\n"
+[outputs.all_safe]
+type = "boolean"
+optional = true
+description = "whether every query is safe; absent without an operating point.\n"
+[outputs.most_limiting_envelope]
+type = "string"
+optional = true
+description = "the arm with the smallest finite margin, absent when every margin is absent.\n"
+[[valid_range]]
+quantity = "min_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "max_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "num_points"
+min = 2
+min_inclusive = true
+severity = "error"
+rationale = "the class divides by num_points - 1"
+[[valid_range]]
+quantity = "mdmt_design_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[[valid_range]]
+quantity = "operating_pressure"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute pressure"
+[[valid_range]]
+quantity = "operating_temperature"
+min = 0
+min_inclusive = false
+severity = "error"
+rationale = "an absolute temperature"
+[implementations]
+python = "azoth.process.safety_envelope"
+rust = "azoth_process::safety_envelope"

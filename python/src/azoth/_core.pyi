@@ -749,6 +749,12 @@ class ReviewReference(TypedDict):
     function_id: str
     reference: str
 
+class EnvelopeTracePoint(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    pressure: float
+    temperature: float
+
 class EfficiencyPoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1637,6 +1643,37 @@ class ReviewCoverage:
 
     function_type: str
     status: str
+
+@final
+class EnvelopeSummary:
+    """one summary row per arm, in the class's order."""
+
+    envelope: str
+    name: str
+    point_count: float
+    reference_water_content: float
+    reference_wax_content: float
+
+@final
+class EnvelopePoint:
+    """every arm's points, arm by arm in the class's order."""
+
+    envelope: str
+    index: float
+    pressure: Qty
+    temperature: Qty | None
+    margin: Qty
+    safe_temperature: Qty | None
+
+@final
+class EnvelopeQuery:
+    """one row per arm when an operating point is stated, in the class's order."""
+
+    envelope: str
+    temperature: Qty | None
+    safe_temperature: Qty | None
+    margin: Qty | None
+    safe: bool
 
 @final
 class SelfHeatingTimePoint:
@@ -5344,6 +5381,15 @@ class S001SecondaryPressureProtectionResult:
     proof_test_configured: bool
     proof_test_criterion_met: bool
     acceptable: bool
+    warnings: list[Warning]
+
+@final
+class SafetyEnvelopeResult:
+    envelopes: list[EnvelopeSummary]
+    points: list[EnvelopePoint]
+    queries: list[EnvelopeQuery]
+    all_safe: bool | None
+    most_limiting_envelope: str | None
     warnings: list[Warning]
 
 @final
@@ -9474,6 +9520,22 @@ def s001_secondary_pressure_protection(
     relief_leakage_to_safe_location: bool | None = None,
     proof_test_interval_months: float | None = None,
 ) -> S001SecondaryPressureProtectionResult: ...
+def safety_envelope(
+    components: list[str],
+    z: list[float],
+    min_pressure: float,
+    max_pressure: float,
+    num_points: float,
+    eos: str | None = None,
+    hydrate_margin: float | None = None,
+    wax_margin: float | None = None,
+    co2_margin: float | None = None,
+    mdmt_margin: float | None = None,
+    mdmt_design_temperature: float | None = None,
+    operating_pressure: float | None = None,
+    operating_temperature: float | None = None,
+    phase_trace: list[EnvelopeTracePoint] | None = None,
+) -> SafetyEnvelopeResult: ...
 def safety_instrumented_function(
     pfd_average: float,
     claimed_sil: float,

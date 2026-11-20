@@ -3912,6 +3912,68 @@ def _s001_clause10_review(inputs: Mapping[str, Any]) -> dict[str, float]:
     return layers
 
 
+def _safety_envelope(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`process.safety_envelope`'s layers, from the reference's arithmetic."""
+    from azoth.core.units import quantity
+    from azoth.process.reference.safety_envelope import safety_envelope as evaluate
+
+    def optional_q(name: str, unit: str) -> Any:
+        value = inputs.get(name)
+        return None if value is None else quantity(float(value), unit)
+
+    def optional_float(name: str) -> float | None:
+        value = inputs.get(name)
+        return None if value is None else float(value)
+
+    trace = [
+        {
+            "pressure": quantity(float(row["pressure"]), "Pa"),
+            "temperature": quantity(float(row["temperature"]), "K"),
+        }
+        for row in inputs.get("phase_trace", [])
+    ]
+    result = evaluate(
+        [str(name) for name in inputs["components"]],
+        [float(value) for value in inputs["z"]],
+        quantity(float(inputs["min_pressure"]), "Pa"),
+        quantity(float(inputs["max_pressure"]), "Pa"),
+        int(inputs["num_points"]),
+        None if inputs.get("eos") is None else str(inputs["eos"]),
+        optional_float("hydrate_margin"),
+        optional_float("wax_margin"),
+        optional_float("co2_margin"),
+        optional_float("mdmt_margin"),
+        optional_q("mdmt_design_temperature", "K"),
+        optional_q("operating_pressure", "Pa"),
+        optional_q("operating_temperature", "K"),
+        trace or None,
+    )
+    dumped: dict[str, float] = {}
+    for index, summary in enumerate(result.envelopes):
+        dumped[f"envelope_{index}_points"] = summary.point_count
+        dumped[f"envelope_{index}_reference_water"] = summary.reference_water_content
+        dumped[f"envelope_{index}_reference_wax"] = summary.reference_wax_content
+    kinds = ("hydrate", "wax", "co2_freezing", "mdmt", "phase_envelope")
+    for row in result.points:
+        index = int(row.index)
+        arm = kinds.index(row.envelope)
+        dumped[f"envelope_{arm}_p{index}_pressure_bara"] = row.pressure.to("bar").magnitude
+        if row.temperature is not None:
+            dumped[f"envelope_{arm}_p{index}_temperature_k"] = row.temperature.to("K").magnitude
+        dumped[f"envelope_{arm}_p{index}_margin_k"] = row.margin.to("K").magnitude
+    for row in result.queries:
+        arm = kinds.index(row.envelope)
+        if row.temperature is not None:
+            dumped[f"envelope_{arm}_limit_at_operating_k"] = row.temperature.to("K").magnitude
+        if row.safe_temperature is not None:
+            dumped[f"envelope_{arm}_safe_temperature_at_operating_k"] = (
+                row.safe_temperature.to("K").magnitude
+            )
+        if row.margin is not None:
+            dumped[f"envelope_{arm}_margin_at_operating_k"] = row.margin.to("K").magnitude
+    return dumped
+
+
 def _trapped_inventory(inputs: Mapping[str, Any]) -> dict[str, float]:
     """`process.trapped_inventory`'s layers, from the reference's arithmetic."""
     from azoth.core.units import quantity
@@ -4645,6 +4707,7 @@ DUMPERS: dict[str, Dumper] = {
     "process.escalation_graph": _escalation_graph,
     "process.esd_response_time": _esd_response_time,
     "process.mass_balance_leak_detection": _mass_balance_leak_detection,
+    "process.safety_envelope": _safety_envelope,
     "process.trapped_inventory": _trapped_inventory,
     "process.flow_induced_pulsation_screening": _flow_induced_pulsation_screening,
     "process.psv_valve": _psv_valve,
@@ -7091,6 +7154,28 @@ LAYER_CASES: tuple[LayerCase, ...] = (
     ),
     # The SRK evidence row is uncased: its liquid density is `1.06e-1` relative below
     # the class's, so it is a recorded divergence rather than a case.
+    # The safety envelope's three cased states.
+    LayerCase(
+        model="process.safety_envelope",
+        case="hydrate",
+        capture="process_safety_envelope.tsv",
+        block=0,
+        identified_by=("#label", "se_hydrate"),
+    ),
+    LayerCase(
+        model="process.safety_envelope",
+        case="wax",
+        capture="process_safety_envelope.tsv",
+        block=1,
+        identified_by=("#label", "se_wax"),
+    ),
+    LayerCase(
+        model="process.safety_envelope",
+        case="phase_trace",
+        capture="process_safety_envelope.tsv",
+        block=2,
+        identified_by=("#label", "se_phase"),
+    ),
     # The control-valve loads: one state block and one no-fluid block are uncased.
     LayerCase(
         model="process.control_valve_failure_relief",

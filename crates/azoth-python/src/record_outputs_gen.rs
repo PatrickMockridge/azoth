@@ -960,6 +960,184 @@ impl From<&azoth_process::models::drift_flux_release::DriftFluxReleaseStation>
     }
 }
 
+/// every arm's points, arm by arm in the class's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EnvelopePoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEnvelopePoint {
+    /// the arm the point belongs to.
+    #[pyo3(get)]
+    pub envelope: String,
+    /// the point's index within its arm.
+    #[pyo3(get)]
+    pub index: usize,
+    /// the point's pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the point's limit temperature; absent when the arm's flash failed.
+    #[pyo3(get)]
+    pub temperature: Option<PyQty>,
+    /// the point's margin.
+    #[pyo3(get)]
+    pub margin: PyQty,
+    /// the limit less the margin, absent with the temperature.
+    #[pyo3(get)]
+    pub safe_temperature: Option<PyQty>,
+}
+
+#[pymethods]
+impl PyEnvelopePoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "EnvelopePoint(envelope={}, index={:?}, pressure={:?}, temperature={:?}, margin={:?}, safe_temperature={:?})",
+            self.envelope,
+            self.index,
+            self.pressure,
+            self.temperature,
+            self.margin,
+            self.safe_temperature
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_envelope::EnvelopePoint> for PyEnvelopePoint {
+    fn from(row: &azoth_process::models::safety_envelope::EnvelopePoint) -> Self {
+        Self {
+            envelope: row.envelope.as_str().to_string(),
+            index: row.index,
+            pressure: PyQty {
+                magnitude_si: row.pressure.value,
+                unit: "Pa".to_string(),
+            },
+            temperature: row.temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            margin: PyQty {
+                magnitude_si: row.margin,
+                unit: "K".to_string(),
+            },
+            safe_temperature: row.safe_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+        }
+    }
+}
+
+/// one row per arm when an operating point is stated, in the class's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EnvelopeQuery"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEnvelopeQuery {
+    /// the arm.
+    #[pyo3(get)]
+    pub envelope: String,
+    /// the interpolated limit at the operating pressure; absent outside the arm.
+    #[pyo3(get)]
+    pub temperature: Option<PyQty>,
+    /// the limit less the interpolated margin.
+    #[pyo3(get)]
+    pub safe_temperature: Option<PyQty>,
+    /// `operating_temperature - limit`; absent outside the arm.
+    #[pyo3(get)]
+    pub margin: Option<PyQty>,
+    /// the class's strict `operating_temperature > safe_temperature`; the phase envelope is always safe.
+    #[pyo3(get)]
+    pub safe: bool,
+}
+
+#[pymethods]
+impl PyEnvelopeQuery {
+    fn __repr__(&self) -> String {
+        format!(
+            "EnvelopeQuery(envelope={}, temperature={:?}, safe_temperature={:?}, margin={:?}, safe={:?})",
+            self.envelope, self.temperature, self.safe_temperature, self.margin, self.safe
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_envelope::EnvelopeQuery> for PyEnvelopeQuery {
+    fn from(row: &azoth_process::models::safety_envelope::EnvelopeQuery) -> Self {
+        Self {
+            envelope: row.envelope.as_str().to_string(),
+            temperature: row.temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            safe_temperature: row.safe_temperature.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            margin: row.margin.map(|v| PyQty {
+                magnitude_si: v.value,
+                unit: "K".to_string(),
+            }),
+            safe: row.safe,
+        }
+    }
+}
+
+/// one summary row per arm, in the class's order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EnvelopeSummary"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEnvelopeSummary {
+    /// the arm.
+    #[pyo3(get)]
+    pub envelope: String,
+    /// the class's envelope name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the points the arm carries.
+    #[pyo3(get)]
+    pub point_count: usize,
+    /// the feed's water mole fraction, 0 when absent.
+    #[pyo3(get)]
+    pub reference_water_content: f64,
+    /// the class's reference wax content, which it never sets and which is 0.
+    #[pyo3(get)]
+    pub reference_wax_content: f64,
+}
+
+#[pymethods]
+impl PyEnvelopeSummary {
+    fn __repr__(&self) -> String {
+        format!(
+            "EnvelopeSummary(envelope={}, name={}, point_count={:?}, reference_water_content={}, reference_wax_content={})",
+            self.envelope,
+            self.name,
+            self.point_count,
+            self.reference_water_content,
+            self.reference_wax_content
+        )
+    }
+}
+
+impl From<&azoth_process::models::safety_envelope::EnvelopeSummary> for PyEnvelopeSummary {
+    fn from(row: &azoth_process::models::safety_envelope::EnvelopeSummary) -> Self {
+        Self {
+            envelope: row.envelope.as_str().to_string(),
+            name: row.name.clone(),
+            point_count: row.point_count,
+            reference_water_content: row.reference_water_content,
+            reference_wax_content: row.reference_wax_content,
+        }
+    }
+}
+
 /// the accepted stencil's states, centre first.
 #[pyclass(
     frozen,

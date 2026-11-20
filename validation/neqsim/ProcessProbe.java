@@ -200,6 +200,8 @@ import neqsim.process.safety.dispersion.HeavyGasDispersion;
 import neqsim.process.safety.dispersion.ProbitModel;
 import neqsim.process.safety.esd.EsdResponseTimeSimulator;
 import neqsim.process.safety.esd.EsdResponseTimeSimulator.EsdResponseTimeResult;
+import neqsim.process.safety.envelope.SafetyEnvelope;
+import neqsim.process.safety.envelope.SafetyEnvelopeCalculator;
 import neqsim.process.safety.inventory.TrappedInventoryCalculator;
 import neqsim.process.safety.leakdetection.MassBalanceLeakDetector;
 import neqsim.process.safety.leakdetection.MassBalanceLeakDetector.LeakDetectionSensitivityResult;
@@ -680,6 +682,9 @@ public class ProcessProbe {
         break;
       case "trapped_inventory":
         trappedInventoryRows();
+        break;
+      case "safety_envelope":
+        safetyEnvelopeRows();
         break;
       case "gas_blowby":
         gasBlowbyRows();
@@ -18157,6 +18162,99 @@ public class ProcessProbe {
     for (int i = 0; i < result.getWarnings().size(); i++) {
       System.out.println("warning_" + i + "=" + result.getWarnings().get(i));
     }
+    System.out.println();
+  }
+
+
+  static SystemInterface envelopeFluid(boolean wax) {
+    SystemInterface fluid = new SystemSrkEos(300.0, 50.0);
+    if (wax) {
+      fluid.addComponent("methane", 0.4);
+      fluid.addComponent("n-heptane", 0.1);
+      fluid.addComponent("nc14", 0.1);
+      fluid.addComponent("nc20", 0.2);
+      fluid.addComponent("nc24", 0.2);
+      fluid.addSolidComplexPhase("wax");
+      fluid.setMultiphaseWaxCheck(true);
+      fluid.setMultiPhaseCheck(true);
+    } else {
+      fluid.addComponent("methane", 0.9);
+      fluid.addComponent("water", 0.1);
+      fluid.setHydrateCheck(true);
+      fluid.setMultiPhaseCheck(true);
+    }
+    fluid.setMixingRule(2);
+    fluid.init(0);
+    fluid.init(1);
+    return fluid;
+  }
+
+  static SystemInterface phaseFluid() {
+    SystemInterface fluid = new SystemSrkEos(300.0, 50.0);
+    fluid.addComponent("methane", 0.7);
+    fluid.addComponent("ethane", 0.3);
+    fluid.setMixingRule(2);
+    fluid.init(0);
+    fluid.init(1);
+    return fluid;
+  }
+
+  static void safetyEnvelopeRows() {
+    printEnvelope("se_hydrate", new SafetyEnvelopeCalculator(envelopeFluid(false)), 1.0, 150.0,
+        5, 300.0, 50.0, 280.0, true, true);
+    printEnvelope("se_wax", new SafetyEnvelopeCalculator(envelopeFluid(true)), 1.0, 20.0,
+        5, 300.0, 5.0, 270.0, true, true);
+    printEnvelope("se_phase", new SafetyEnvelopeCalculator(phaseFluid()), 1.0, 50.0,
+        5, 300.0, 20.0, 250.0, true, true);
+    System.out.println();
+  }
+
+  static void printEnvelope(String label, SafetyEnvelopeCalculator calculator, double minBara,
+      double maxBara, int points, double designTemperatureK, double operatingPressureBara,
+      double operatingTemperatureK, boolean hydrate, boolean wax) {
+    System.out.println(label);
+    List<SafetyEnvelope> envelopes = new ArrayList<SafetyEnvelope>();
+    if (hydrate) {
+      envelopes.add(calculator.calculateHydrateEnvelope(minBara, maxBara, points));
+    }
+    if (wax) {
+      envelopes.add(calculator.calculateWaxEnvelope(minBara, maxBara, points));
+    }
+    envelopes.add(calculator.calculateCO2FreezingEnvelope(minBara, maxBara, points));
+    envelopes.add(calculator.calculateMDMTEnvelope(minBara, maxBara, designTemperatureK, points));
+    envelopes.add(calculator.calculatePhaseEnvelope(points));
+    for (int i = 0; i < envelopes.size(); i++) {
+      SafetyEnvelope envelope = envelopes.get(i);
+      System.out.println("envelope_" + i + "_name=" + envelope.getName());
+      System.out.println("envelope_" + i + "_type=" + envelope.getType());
+      System.out.println("envelope_" + i + "_points=" + envelope.getNumberOfPoints());
+      System.out.println(
+          "envelope_" + i + "_reference_water=" + envelope.getReferenceWaterContent());
+      System.out.println(
+          "envelope_" + i + "_reference_wax=" + envelope.getReferenceWaxContent());
+      for (int j = 0; j < envelope.getNumberOfPoints(); j++) {
+        System.out.println("envelope_" + i + "_p" + j + "_pressure_bara="
+            + envelope.getPressure()[j]);
+        System.out.println("envelope_" + i + "_p" + j + "_temperature_k="
+            + envelope.getTemperature()[j]);
+        System.out.println("envelope_" + i + "_p" + j + "_margin_k=" + envelope.getMargin()[j]);
+      }
+      System.out.println("envelope_" + i + "_limit_at_operating_k="
+          + envelope.getTemperatureAtPressure(operatingPressureBara));
+      System.out.println("envelope_" + i + "_safe_temperature_at_operating_k="
+          + envelope.getSafeTemperatureAtPressure(operatingPressureBara));
+      System.out.println("envelope_" + i + "_safe="
+          + envelope.isOperatingPointSafe(operatingPressureBara, operatingTemperatureK));
+      System.out.println("envelope_" + i + "_margin_at_operating_k="
+          + envelope.calculateMarginToLimit(operatingPressureBara, operatingTemperatureK));
+    }
+    SafetyEnvelope[] array = envelopes.toArray(new SafetyEnvelope[0]);
+    System.out.println("all_safe="
+        + SafetyEnvelopeCalculator.isOperatingPointSafe(array, operatingPressureBara,
+            operatingTemperatureK));
+    SafetyEnvelope most = SafetyEnvelopeCalculator.getMostLimitingEnvelope(array,
+        operatingPressureBara, operatingTemperatureK);
+    System.out.println("most_limiting=" + (most == null ? "none" : most.getName()));
     System.out.println();
   }
 

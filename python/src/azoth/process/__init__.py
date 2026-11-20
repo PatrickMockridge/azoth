@@ -119,6 +119,7 @@ from azoth.core.result import (
     RunawayReactionResult,
     S001Clause10ReviewResult,
     S001SecondaryPressureProtectionResult,
+    SafetyEnvelopeResult,
     SafetyInstrumentedFunctionResult,
     SelfHeatingInductionResult,
     SemenovSelfHeatingResult,
@@ -279,6 +280,7 @@ _RELIEF_DISPOSAL_NETWORK = "process.relief_disposal_network"
 _RISK_MATRIX = "process.risk_matrix"
 _RUNAWAY_REACTION = "process.runaway_reaction"
 _SAFETY_INSTRUMENTED_FUNCTION = "process.safety_instrumented_function"
+_SAFETY_ENVELOPE = "process.safety_envelope"
 _PIPE = "process.pipe"
 _GAS_SCRUBBER = "process.gas_scrubber"
 _HEAT_EXCHANGER = "process.heat_exchanger"
@@ -3003,6 +3005,48 @@ def s001_secondary_pressure_protection(
         relief_leakage_assessed=relief_leakage_assessed,
         relief_leakage_to_safe_location=relief_leakage_to_safe_location,
         proof_test_interval_months=proof_test_interval_months,
+    )
+
+
+def safety_envelope(
+    components: list[str],
+    z: list[float],
+    min_pressure: float,
+    max_pressure: float,
+    num_points: int,
+    eos: str | None = None,
+    hydrate_margin: float | None = None,
+    wax_margin: float | None = None,
+    co2_margin: float | None = None,
+    mdmt_margin: float | None = None,
+    mdmt_design_temperature: float | None = None,
+    operating_pressure: float | None = None,
+    operating_temperature: float | None = None,
+    phase_trace: list[dict[str, object]] | None = None,
+) -> SafetyEnvelopeResult:
+    """The operational safety envelope.
+
+    The hydrate, wax, CO2-freezing and MDMT curves, and the phase curve when its points
+    are supplied. **A failed point is absent with a warning**, and the queries follow the
+    class's first-bracket interpolation and strict safe test.
+
+    See :func:`azoth.process.reference.safety_envelope`.
+    """
+    return resolve(_SAFETY_ENVELOPE)(  # type: ignore[no-any-return]
+        components=components,
+        z=z,
+        min_pressure=min_pressure,
+        max_pressure=max_pressure,
+        num_points=num_points,
+        eos=eos,
+        hydrate_margin=hydrate_margin,
+        wax_margin=wax_margin,
+        co2_margin=co2_margin,
+        mdmt_margin=mdmt_margin,
+        mdmt_design_temperature=mdmt_design_temperature,
+        operating_pressure=operating_pressure,
+        operating_temperature=operating_temperature,
+        phase_trace=phase_trace,
     )
 
 

@@ -346,6 +346,69 @@ class DriftFluxReleaseStation:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class EnvelopePoint:
+    """every arm's points, arm by arm in the class's order."""
+
+    #: the arm the point belongs to.
+    envelope: str
+
+    #: the point's index within its arm.
+    index: float
+
+    #: the point's pressure.
+    pressure: Q
+
+    #: the point's limit temperature; absent when the arm's flash failed.
+    temperature: Q | None
+
+    #: the point's margin.
+    margin: Q
+
+    #: the limit less the margin, absent with the temperature.
+    safe_temperature: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EnvelopeQuery:
+    """one row per arm when an operating point is stated, in the class's order."""
+
+    #: the arm.
+    envelope: str
+
+    #: the interpolated limit at the operating pressure; absent outside the arm.
+    temperature: Q | None
+
+    #: the limit less the interpolated margin.
+    safe_temperature: Q | None
+
+    #: `operating_temperature - limit`; absent outside the arm.
+    margin: Q | None
+
+    #: the class's strict `operating_temperature > safe_temperature`; the phase envelope is always safe.
+    safe: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EnvelopeSummary:
+    """one summary row per arm, in the class's order."""
+
+    #: the arm.
+    envelope: str
+
+    #: the class's envelope name.
+    name: str
+
+    #: the points the arm carries.
+    point_count: float
+
+    #: the feed's water mole fraction, 0 when absent.
+    reference_water_content: float
+
+    #: the class's reference wax content, which it never sets and which is 0.
+    reference_wax_content: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class EquilibriumSoundSpeedSample:
     """the accepted stencil's states, centre first."""
 
