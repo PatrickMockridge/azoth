@@ -22822,6 +22822,15 @@
       "sub_interface": "safetyassessment"
     },
     {
+      "family": "esd",
+      "id": "process.esd_response_time",
+      "name": "ESD response time",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "risk",
       "id": "process.event_tree",
       "name": "Event tree",
@@ -25178,6 +25187,15 @@
       "sub_interface": null
     },
     {
+      "family": "leakdetection",
+      "id": "process.mass_balance_leak_detection",
+      "name": "Mass-balance leak sensitivity",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a fluid as input, which a scenario does not yet provide",
+      "sub_interface": null
+    },
+    {
       "family": "equipmentsafety",
       "form": {
         "assumptions": [
@@ -25500,6 +25518,15 @@
       "family": "compliance",
       "id": "process.norsok_p002_compliance",
       "name": "NORSOK P-002 point-check compliance",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
+      "family": "opendrain",
+      "id": "process.open_drain_review",
+      "name": "NORSOK S-001 open-drain review",
       "native": false,
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
@@ -29448,6 +29475,15 @@
       "sub_interface": "processsafetysystem"
     },
     {
+      "family": "envelope",
+      "id": "process.safety_envelope",
+      "name": "Safety envelope",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "risk",
       "form": {
         "assumptions": [
@@ -29801,6 +29837,15 @@
       "sub_interface": "risk"
     },
     {
+      "family": "barrier",
+      "id": "process.safety_system_performance",
+      "name": "Safety-system performance assessment",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
       "family": "selfheating",
       "id": "process.self_heating_induction",
       "name": "Self-heating induction time",
@@ -30059,6 +30104,24 @@
       "purpose": "",
       "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
       "sub_interface": "overpressure"
+    },
+    {
+      "family": "inventory",
+      "id": "process.trapped_inventory",
+      "name": "Trapped inventory",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
+    },
+    {
+      "family": "rupture",
+      "id": "process.trapped_liquid_fire_rupture",
+      "name": "Trapped-liquid fire rupture",
+      "native": false,
+      "purpose": "",
+      "refusal": "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+      "sub_interface": null
     },
     {
       "family": "overpressure",

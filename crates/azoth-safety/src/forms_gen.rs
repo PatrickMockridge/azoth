@@ -1223,6 +1223,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.esd_response_time",
+        name: "ESD response time",
+        family: "esd",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.event_tree",
         name: "Event tree",
         family: "risk",
@@ -3436,6 +3448,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         form: None,
     },
     SafetyCalculation {
+        id: "process.mass_balance_leak_detection",
+        name: "Mass-balance leak sensitivity",
+        family: "leakdetection",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a fluid as input, which a scenario does not yet provide",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.mdmt",
         name: "Minimum design metal temperature",
         family: "equipmentsafety",
@@ -3737,6 +3761,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         id: "process.norsok_p002_compliance",
         name: "NORSOK P-002 point-check compliance",
         family: "compliance",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.open_drain_review",
+        name: "NORSOK S-001 open-drain review",
+        family: "opendrain",
         sub_interface: None,
         purpose: "",
         native: false,
@@ -7419,6 +7455,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.safety_envelope",
+        name: "Safety envelope",
+        family: "envelope",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.safety_instrumented_function",
         name: "Safety instrumented function",
         family: "risk",
@@ -7747,6 +7795,18 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         }),
     },
     SafetyCalculation {
+        id: "process.safety_system_performance",
+        name: "Safety-system performance assessment",
+        family: "barrier",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
         id: "process.self_heating_induction",
         name: "Self-heating induction time",
         family: "selfheating",
@@ -8002,6 +8062,30 @@ pub static CALCULATIONS: &[SafetyCalculation] = &[
         name: "TR3001 compliance",
         family: "overpressure",
         sub_interface: Some("overpressure"),
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.trapped_inventory",
+        name: "Trapped inventory",
+        family: "inventory",
+        sub_interface: None,
+        purpose: "",
+        native: false,
+        refusal: Some(
+            "this calculation takes a table of rows as input and returns one as output, which a scenario does not yet provide or draw",
+        ),
+        form: None,
+    },
+    SafetyCalculation {
+        id: "process.trapped_liquid_fire_rupture",
+        name: "Trapped-liquid fire rupture",
+        family: "rupture",
+        sub_interface: None,
         purpose: "",
         native: false,
         refusal: Some(
