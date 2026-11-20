@@ -82,13 +82,6 @@ def component_selective_release(
     diameter_m = input_to_si(spec, "diameter", diameter)
     back = input_to_si(spec, "back_pressure", back_pressure)
     sigma = input_to_si(spec, "surface_tension", surface_tension)
-    if len(component_relaxation_times) != len(components):
-        return _failure(
-            "unsupported",
-            "COMPONENT_TRANSFER_REGIME_UNSUPPORTED",
-            "Relaxation-time components must exactly match the fluid components",
-            warnings,
-        )
     times = [
         input_to_si(spec, "component_relaxation_times", value)
         for value in component_relaxation_times
@@ -112,6 +105,13 @@ def component_selective_release(
         }.get,
         warnings,
     )
+    if len(component_relaxation_times) != len(components):
+        return _failure(
+            "unsupported",
+            "COMPONENT_TRANSFER_REGIME_UNSUPPORTED",
+            "Relaxation-time components must exactly match the fluid components",
+            warnings,
+        )
     if not math.isfinite(sigma) or sigma <= 0.0:
         raise InvalidInputError(
             "surface_tension",
