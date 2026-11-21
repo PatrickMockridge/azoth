@@ -10064,6 +10064,32 @@ pub fn gas_correlations(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Water and brine correlation table.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (queries))]
+#[pyo3(text_signature = "(queries)")]
+pub fn water_correlations(
+    py: Python<'_>,
+    queries: Vec<crate::records_gen::WaterQuery>,
+) -> PyResult<crate::transport_gen::PyWaterCorrelationsResult> {
+    let queries_records: Vec<azoth_pvt::water_correlations::WaterQuery> = queries
+        .into_iter()
+        .map(|row| azoth_pvt::water_correlations::WaterQuery {
+            calculation: row.calculation,
+            temperature: row.temperature.map(kelvins),
+            pressure: row.pressure.map(pascals),
+            salinity_ppm: row.salinity_ppm,
+            salinity_wt_fraction: row.salinity_wt_fraction,
+            salinity_molality: row.salinity_molality,
+        })
+        .collect();
+    azoth_pvt::water_correlations::water_correlations(&queries_records)
+        .map(|r| crate::transport_gen::PyWaterCorrelationsResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Reactive chemical equilibrium by the Smith-Missen method.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

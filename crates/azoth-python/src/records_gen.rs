@@ -1702,6 +1702,23 @@ pub struct WaterAnalysis {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct WaterQuery {
+    #[pyo3(item)]
+    pub calculation: String,
+    #[pyo3(item)]
+    pub temperature: Option<f64>,
+    #[pyo3(item)]
+    pub pressure: Option<f64>,
+    #[pyo3(item)]
+    pub salinity_ppm: Option<f64>,
+    #[pyo3(item)]
+    pub salinity_wt_fraction: Option<f64>,
+    #[pyo3(item)]
+    pub salinity_molality: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct ZoneDefinitionRow {
     #[pyo3(item)]
     pub zone_name: String,

@@ -1,0 +1,33 @@
+model = "pvt.water_correlations"
+[[cases]]
+id = "capture_states"
+tolerance = 1.0e-9
+source = "The water-property class's own test state - 366.48 K, 206.84 bara, 30000 ppm, 0.03 weight fraction - and the McCain Rsw state at 373.15 K and 100 bara, from `validation/neqsim/captures/pvt_water.tsv` (`water_correlations`)."
+[cases.inputs]
+queries = [
+  { calculation = "water_fvf_mccain", temperature = 366.48, pressure = 20684000.0 },
+  { calculation = "water_fvf_osif", temperature = 366.48, pressure = 20684000.0, salinity_ppm = 30000.0 },
+  { calculation = "dead_water_viscosity_mccain", temperature = 366.48, salinity_ppm = 30000.0 },
+  { calculation = "water_viscosity_mccain", temperature = 366.48, pressure = 20684000.0, salinity_ppm = 30000.0 },
+  { calculation = "water_compressibility_mccain", temperature = 366.48, pressure = 20684000.0, salinity_ppm = 30000.0 },
+  { calculation = "brine_density_batzle_wang", temperature = 366.48, pressure = 20684000.0, salinity_wt_fraction = 0.03 },
+  { calculation = "water_density", temperature = 366.48, pressure = 20684000.0 },
+  { calculation = "solution_gas_water_ratio_culberson", temperature = 366.48, pressure = 20684000.0, salinity_ppm = 30000.0 },
+  { calculation = "water_gas_surface_tension", temperature = 366.48, pressure = 20684000.0 },
+  { calculation = "rsw_mccain", temperature = 373.15, pressure = 10000000.0, salinity_molality = 0.0 },
+  { calculation = "rsw_mccain", temperature = 373.15, pressure = 10000000.0, salinity_molality = 0.6206267976011888 },
+]
+[cases.expected]
+queries = [
+  { calculation = "water_fvf_mccain", fvf = 1.0339360723713957 },
+  { calculation = "water_fvf_osif", fvf = 0.9991415308911262 },
+  { calculation = "dead_water_viscosity_mccain", viscosity = 0.0003354601229917465 },
+  { calculation = "water_viscosity_mccain", viscosity = 0.00038518832767548723 },
+  { calculation = "water_compressibility_mccain", compressibility = 4.0555083882631894e-10 },
+  { calculation = "brine_density_batzle_wang", density = 994.5440241141248 },
+  { calculation = "water_density", density = 973.9070128483688 },
+  { calculation = "solution_gas_water_ratio_culberson", rsw = 2.671882062636093 },
+  { calculation = "water_gas_surface_tension", surface_tension = 0.0404929164508038 },
+  { calculation = "rsw_mccain", rsw = 1.5791188803621292 },
+  { calculation = "rsw_mccain", rsw = 1.5757157300172224 },
+]

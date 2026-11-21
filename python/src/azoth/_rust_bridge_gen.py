@@ -515,11 +515,13 @@ from azoth.core.result import (
     VuFlashResult,
     VuFlashSingleCompResult,
     WaterCompatibilityResult,
+    WaterCorrelationsResult,
     WaterDewPointLineResult,
     WaterDewPointMultiphaseResult,
     WaterDewPointTemperatureResult,
     WaterMixingResult,
     WaterPhaseResult,
+    WaterResultRow,
     WaxSolidFugacityResult,
     WhitsonGammaSplitResult,
     WilkeChangDiffusivityResult,
@@ -932,6 +934,7 @@ __all__ = [
     "vu_flash",
     "vu_flash_single_comp",
     "water_compatibility",
+    "water_correlations",
     "water_dew_point_line",
     "water_dew_point_multiphase",
     "water_dew_point_temperature",
@@ -10458,6 +10461,18 @@ def gas_correlations(queries: Sequence[Mapping[str, Any]]) -> GasCorrelationsRes
     )
     return GasCorrelationsResult(
         queries=tuple(GasResultRow(calculation=c.calculation, temperature=None if c.temperature is None else from_si(c.temperature.magnitude_si, c.temperature.unit), pressure=None if c.pressure is None else from_si(c.pressure.magnitude_si, c.pressure.unit), factor=c.factor, density=None if c.density is None else from_si(c.density.magnitude_si, c.density.unit), gas_fvf=c.gas_fvf, pseudo_pressure=c.pseudo_pressure, h2s_fraction=c.h2s_fraction) for c in result.queries),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def water_correlations(queries: Sequence[Mapping[str, Any]]) -> WaterCorrelationsResult:
+    """``pvt.water_correlations``, computed in Rust."""
+    spec = _models_gen.model("pvt.water_correlations")
+    result = _core.water_correlations(
+        input_records_to_si(spec, "queries", queries),
+    )
+    return WaterCorrelationsResult(
+        queries=tuple(WaterResultRow(calculation=c.calculation, fvf=c.fvf, viscosity=None if c.viscosity is None else from_si(c.viscosity.magnitude_si, c.viscosity.unit), compressibility=c.compressibility, density=None if c.density is None else from_si(c.density.magnitude_si, c.density.unit), rsw=c.rsw, surface_tension=None if c.surface_tension is None else from_si(c.surface_tension.magnitude_si, c.surface_tension.unit)) for c in result.queries),
         warnings=_warnings(result.warnings),
     )
 

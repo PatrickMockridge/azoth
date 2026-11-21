@@ -15,3 +15,4 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 |---|---|---|
 | [`pvt.black_oil_correlations`](./black_oil_correlations.md) | `black_oil_correlation_dispatch` | NeqSim pvtsimulation/util/BlackOilCorrelations.java and SaturationPressureCorrelation.java |
 | [`pvt.gas_correlations`](./gas_correlations.md) | `gas_correlation_dispatch` | NeqSim pvtsimulation/util/ZFactorCorrelations.java, GasPseudoCriticalProperties.java, GasPseudoPressure.java and reservoirproperties/CompositionEstimation.java |
+| [`pvt.water_correlations`](./water_correlations.md) | `water_correlation_dispatch` | NeqSim pvtsimulation/util/WaterPropertyCorrelations.java and SolutionGasWaterRatio.java |

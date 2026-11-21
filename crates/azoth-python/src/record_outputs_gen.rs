@@ -7328,6 +7328,77 @@ impl From<&azoth_eos::results::WaterMixingResult> for PyWaterMixingResult {
     }
 }
 
+/// one row per input row, in caller order; only the fields the calculation answers are present.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "WaterResultRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyWaterResultRow {
+    /// the call this row answered.
+    #[pyo3(get)]
+    pub calculation: String,
+    /// the water formation volume factor.
+    #[pyo3(get)]
+    pub fvf: Option<f64>,
+    /// the water or brine viscosity.
+    #[pyo3(get)]
+    pub viscosity: Option<PyQty>,
+    /// the water compressibility in 1/Pa.
+    #[pyo3(get)]
+    pub compressibility: Option<f64>,
+    /// the water or brine density.
+    #[pyo3(get)]
+    pub density: Option<PyQty>,
+    /// the solution gas-water ratio in Sm3/Sm3.
+    #[pyo3(get)]
+    pub rsw: Option<f64>,
+    /// the water-gas surface tension.
+    #[pyo3(get)]
+    pub surface_tension: Option<PyQty>,
+}
+
+#[pymethods]
+impl PyWaterResultRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "WaterResultRow(calculation={}, fvf={:?}, viscosity={:?}, compressibility={:?}, density={:?}, rsw={:?}, surface_tension={:?})",
+            self.calculation,
+            self.fvf,
+            self.viscosity,
+            self.compressibility,
+            self.density,
+            self.rsw,
+            self.surface_tension
+        )
+    }
+}
+
+impl From<&azoth_pvt::water_correlations::WaterResultRow> for PyWaterResultRow {
+    fn from(row: &azoth_pvt::water_correlations::WaterResultRow) -> Self {
+        Self {
+            calculation: row.calculation.clone(),
+            fvf: row.fvf,
+            viscosity: row.viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            compressibility: row.compressibility,
+            density: row.density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            rsw: row.rsw,
+            surface_tension: row.surface_tension.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "N/m".to_string(),
+            }),
+        }
+    }
+}
+
 /// one row per zone, in the input order.
 #[pyclass(
     frozen,

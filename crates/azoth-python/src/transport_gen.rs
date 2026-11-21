@@ -41,7 +41,8 @@ use crate::record_outputs_gen::{
     PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow,
     PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
     PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
-    PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult, PyWaterResultRow,
+    PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -30376,6 +30377,42 @@ impl From<&azoth_pvt::gas_correlations::GasCorrelationsResult> for PyGasCorrelat
     fn from(r: &azoth_pvt::gas_correlations::GasCorrelationsResult) -> Self {
         Self {
             queries: r.queries.iter().map(PyGasResultRow::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.water_correlations`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "WaterCorrelationsResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyWaterCorrelationsResult {
+    /// one row per input row, in caller order; only the fields the calculation answers are present.
+    #[pyo3(get)]
+    pub queries: Vec<PyWaterResultRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyWaterCorrelationsResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "WaterCorrelationsResult(queries={:?}, {} warning(s))",
+            self.queries,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::water_correlations::WaterCorrelationsResult> for PyWaterCorrelationsResult {
+    fn from(r: &azoth_pvt::water_correlations::WaterCorrelationsResult) -> Self {
+        Self {
+            queries: r.queries.iter().map(PyWaterResultRow::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

@@ -375,6 +375,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyVesselRuptureResult>()?;
     m.add_class::<crate::transport_gen::PyBlackOilCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyGasCorrelationsResult>()?;
+    m.add_class::<crate::transport_gen::PyWaterCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
     m.add_class::<crate::transport_gen::PyEquilibriumConstantResult>()?;
     m.add_class::<crate::transport_gen::PyKineticRateLawResult>()?;
@@ -506,6 +507,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyVesselFillingPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyVesselRuptureStep>()?;
     m.add_class::<crate::record_outputs_gen::PyWaterMixingResult>()?;
+    m.add_class::<crate::record_outputs_gen::PyWaterResultRow>()?;
     m.add_class::<crate::record_outputs_gen::PyZoneRatingRow>()?;
 
     // The calculations and models themselves.
@@ -1357,6 +1359,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_correlations, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::water_correlations,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::chemical_equilibrium,
         m

@@ -468,6 +468,7 @@ Five sections, and the difference between them is the point:
 
 - [`pvt.black_oil_correlations`](./pvt/black_oil_correlations.md) — Black-oil correlation table
 - [`pvt.gas_correlations`](./pvt/gas_correlations.md) — Gas correlation table
+- [`pvt.water_correlations`](./pvt/water_correlations.md) — Water and brine correlation table
 
 **Reactions** - [`reactions/index.md`](./reactions/index.md):
 

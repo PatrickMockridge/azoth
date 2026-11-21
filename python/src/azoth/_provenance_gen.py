@@ -3931,6 +3931,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 1,
         "tests_skipped": 0,
     },
+    'pvt.water_correlations': {
+        "calc_id": 'pvt.water_correlations',
+        "name": 'Water and brine correlation table',
+        "spec": {'path': 'specs/models/pvt/water_correlations.toml', 'sha256': 'e84357318ad0a86d58a059eb2cefac36994ead15b95537920dc60d093c856ba4'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/water_correlations.py', 'sha256': 'f9c91c112a83123cc1a2a456f2cb339c89cc0e885b63d9f97cd015b725661b76'}, {'path': 'crates/azoth-pvt/src/water_correlations.rs', 'sha256': '0b7a69c00c20cff71da46e6c75111c2c8bcc08f92b8273ff2f35e516cddad48f'}],
+        "source": 'NeqSim pvtsimulation/util/WaterPropertyCorrelations.java and SolutionGasWaterRatio.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 1,
+        "tests_skipped": 0,
+    },
     'reactions.chemical_equilibrium': {
         "calc_id": 'reactions.chemical_equilibrium',
         "name": 'Reactive chemical equilibrium by the Smith-Missen method',

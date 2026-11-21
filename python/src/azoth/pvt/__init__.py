@@ -20,13 +20,18 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from azoth._dispatch import resolve
-from azoth.core.result import BlackOilCorrelationsResult, GasCorrelationsResult
+from azoth.core.result import (
+    BlackOilCorrelationsResult,
+    GasCorrelationsResult,
+    WaterCorrelationsResult,
+)
 from azoth.pvt import layers as layers
 
 _BLACK_OIL_CORRELATIONS = "pvt.black_oil_correlations"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
+_WATER_CORRELATIONS = "pvt.water_correlations"
 
-__all__ = ["black_oil_correlations", "gas_correlations", "layers"]
+__all__ = ["black_oil_correlations", "gas_correlations", "layers", "water_correlations"]
 
 
 def black_oil_correlations(
@@ -77,5 +82,30 @@ def gas_correlations(
     See :func:`azoth.pvt.reference.gas_correlations.gas_correlations`.
     """
     return resolve(_GAS_CORRELATIONS)(  # type: ignore[no-any-return]
+        queries=queries,
+    )
+
+
+def water_correlations(
+    queries: Sequence[Mapping[str, Any]],
+) -> WaterCorrelationsResult:
+    """The water and brine correlation table over the stated calls.
+
+    ``queries`` states the call and only the inputs it reads. The salinity convention is the
+    calculation's own: ppm (mg/L) for the water properties, a weight fraction for the
+    Batzle-Wang density, and mol/kg water for the McCain Rsw. Viscosity answers Pa*s from
+    the class's cP, compressibility 1/Pa from its 1/bara, and surface tension N/m from its
+    mN/m.
+
+    Returns:
+        One row per input row, with only the fields the calculation answers.
+
+    Raises:
+        InvalidInputError: for a missing field, a non-positive temperature or pressure, a
+            negative salinity, a weight fraction outside [0, 0.3], or a non-finite answer.
+
+    See :func:`azoth.pvt.reference.water_correlations.water_correlations`.
+    """
+    return resolve(_WATER_CORRELATIONS)(  # type: ignore[no-any-return]
         queries=queries,
     )

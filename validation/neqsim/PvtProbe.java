@@ -3,12 +3,16 @@
 // publishes it.
 
 import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
+import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
 import neqsim.pvtsimulation.util.BlackOilCorrelations;
 import neqsim.pvtsimulation.util.BlackOilUnits;
 import neqsim.pvtsimulation.util.GasPseudoCriticalProperties;
 import neqsim.pvtsimulation.util.GasPseudoPressure;
 import neqsim.pvtsimulation.util.SaturationPressureCorrelation;
+import neqsim.pvtsimulation.util.WaterPropertyCorrelations;
 import neqsim.pvtsimulation.util.ZFactorCorrelations;
+import neqsim.thermo.system.SystemInterface;
+import neqsim.thermo.system.SystemSrkEos;
 
 public final class PvtProbe {
 
@@ -158,6 +162,45 @@ public final class PvtProbe {
     line("h2s_concentration_from_co2", composition.estimateH2Sconcentration(0.05));
   }
 
+  private static void water() {
+    double t = 366.48;
+    double p = 206.84;
+    double ppm = 30000.0;
+
+    System.out.println("water_correlations");
+    line("water_fvf_mccain", WaterPropertyCorrelations.waterFVFMcCain(t, p));
+    line("water_fvf_osif", WaterPropertyCorrelations.waterFVFOsif(t, p, ppm));
+    line("dead_water_viscosity_mccain",
+        WaterPropertyCorrelations.deadWaterViscosityMcCain(t, ppm) * 1.0e-3);
+    line("water_viscosity_mccain",
+        WaterPropertyCorrelations.waterViscosityMcCain(t, p, ppm) * 1.0e-3);
+    line("water_compressibility_mccain",
+        WaterPropertyCorrelations.waterCompressibilityMcCain(t, p, ppm) * 1.0e-5);
+    line("brine_density_batzle_wang", WaterPropertyCorrelations.brineDensityBatzleWang(t, p, 0.03));
+    line("water_density", WaterPropertyCorrelations.waterDensity(t, p));
+    line("solution_gas_water_ratio_culberson",
+        WaterPropertyCorrelations.solutionGasWaterRatioCulberson(t, p, ppm));
+    line("water_gas_surface_tension", WaterPropertyCorrelations.waterGasSurfaceTension(t, p) * 1.0e-3);
+
+    SystemInterface gas = new SystemSrkEos(373.15, 200.0);
+    gas.addComponent("methane", 0.85);
+    gas.addComponent("ethane", 0.08);
+    gas.addComponent("propane", 0.04);
+    gas.addComponent("CO2", 0.03);
+    gas.setMixingRule("classic");
+    SolutionGasWaterRatio rsw = new SolutionGasWaterRatio(gas);
+    rsw.setCalculationMethod(SolutionGasWaterRatio.CalculationMethod.MCCAIN);
+    rsw.setTemperaturesAndPressures(new double[] {373.15}, new double[] {100.0});
+    rsw.setSalinity(0.0);
+    rsw.runCalc();
+    line("rsw_mccain_pure", rsw.getRsw(0));
+    rsw.setSalinity(3.5, "wt%");
+    line("rsw_mccain_3_5_wt_molality", rsw.getSalinity());
+    rsw.setTemperaturesAndPressures(new double[] {373.15}, new double[] {100.0});
+    rsw.runCalc();
+    line("rsw_mccain_3_5_wt", rsw.getRsw(0));
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -166,6 +209,9 @@ public final class PvtProbe {
         break;
       case "gas":
         gas();
+        break;
+      case "water":
+        water();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

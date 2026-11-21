@@ -129,6 +129,7 @@ from azoth.core.record_outputs_gen import (
     VesselFillingPoint,
     VesselRuptureStep,
     WaterMixingResult,
+    WaterResultRow,
     ZoneRatingRow,
 )
 from azoth.core.result_base import (
@@ -12268,6 +12269,19 @@ class GasCorrelationsResult(_HasWarnings):
 
     #: one row per input row, in caller order; only the fields the calculation answers are present.
     queries: tuple[GasResultRow, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class WaterCorrelationsResult(_HasWarnings):
+    """Result of ``pvt.water_correlations``."""
+
+    CALC_ID: ClassVar[str] = "pvt.water_correlations"
+
+    #: one row per input row, in caller order; only the fields the calculation answers are present.
+    queries: tuple[WaterResultRow, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

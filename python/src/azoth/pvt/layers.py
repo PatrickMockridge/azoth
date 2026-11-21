@@ -38,6 +38,9 @@ NO_INTERIOR: dict[str, str] = {
     "pvt.gas_correlations": (
         "each row is one correlation's answer; no state lies between inputs and value"
     ),
+    "pvt.water_correlations": (
+        "each row is one correlation's answer; no state lies between inputs and value"
+    ),
 }
 
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the

@@ -2666,6 +2666,32 @@ class WaterMixingResult:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class WaterResultRow:
+    """one row per input row, in caller order; only the fields the calculation answers are present."""
+
+    #: the call this row answered.
+    calculation: str
+
+    #: the water formation volume factor.
+    fvf: float | None
+
+    #: the water or brine viscosity.
+    viscosity: Q | None
+
+    #: the water compressibility in 1/Pa.
+    compressibility: float | None
+
+    #: the water or brine density.
+    density: Q | None
+
+    #: the solution gas-water ratio in Sm3/Sm3.
+    rsw: float | None
+
+    #: the water-gas surface tension.
+    surface_tension: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class ZoneRatingRow:
     """one row per zone, in the input order."""
 
