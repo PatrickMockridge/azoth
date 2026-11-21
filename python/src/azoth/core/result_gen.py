@@ -113,6 +113,14 @@ from azoth.core.record_outputs_gen import (
     StreamScaleMineralRow,
     Sts0131FindingResult,
     SubFraction,
+    TopsidesBreakdownLine,
+    TopsidesCapitalLine,
+    TopsidesFlag,
+    TopsidesMtoRow,
+    TopsidesProjectLine,
+    TopsidesProjectSummaryLine,
+    TopsidesSummaryLine,
+    TopsidesWeightLine,
     Tr3001Finding,
     TrappedInventorySegmentResult,
     TypeCostLine,
@@ -11642,6 +11650,40 @@ class ThrottlingValveResult(_HasWarnings):
 
     #: `calculateMolarFlow()`: the mole flow the adjusted `Kv` and the drop give - the inverse of the sizing, and the class's own consistency check.
     calculated_molar_flow: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesFacilityCostResult(_HasWarnings):
+    """Result of ``process.topsides_facility_cost``."""
+
+    CALC_ID: ClassVar[str] = "process.topsides_facility_cost"
+
+    #: the ten capital-cost lines.
+    capital_costs: tuple[TopsidesCapitalLine, ...]
+
+    #: the two summary lines.
+    capital_cost_summary: tuple[TopsidesSummaryLine, ...]
+
+    #: the module breakdown lines, keyed `module.<camelCase>`.
+    capital_cost_breakdown: tuple[TopsidesBreakdownLine, ...]
+
+    #: the four project cost lines.
+    project_costs: tuple[TopsidesProjectLine, ...]
+
+    #: the total topsides capex.
+    project_cost_summary: tuple[TopsidesProjectSummaryLine, ...]
+
+    #: the four weight lines.
+    weight_basis: tuple[TopsidesWeightLine, ...]
+
+    #: the equipment and allowance MTO rows.
+    material_take_off: tuple[TopsidesMtoRow, ...]
+
+    #: the class's quality flags.
+    quality_flags: tuple[TopsidesFlag, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

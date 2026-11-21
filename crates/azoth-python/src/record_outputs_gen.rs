@@ -6414,6 +6414,338 @@ impl From<&azoth_characterization::results::SubFraction> for PySubFraction {
     }
 }
 
+/// the module breakdown lines, keyed `module.<camelCase>`.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TopsidesBreakdownLine"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTopsidesBreakdownLine {
+    /// the module key.
+    #[pyo3(get)]
+    pub name: String,
+    /// the module's located cost.
+    #[pyo3(get)]
+    pub cost: f64,
+}
+
+#[pymethods]
+impl PyTopsidesBreakdownLine {
+    fn __repr__(&self) -> String {
+        format!(
+            "TopsidesBreakdownLine(name={}, cost={})",
+            self.name, self.cost
+        )
+    }
+}
+
+impl From<&azoth_process::models::topsides_facility_cost::TopsidesBreakdownLine>
+    for PyTopsidesBreakdownLine
+{
+    fn from(row: &azoth_process::models::topsides_facility_cost::TopsidesBreakdownLine) -> Self {
+        Self {
+            name: row.name.clone(),
+            cost: row.cost,
+        }
+    }
+}
+
+/// the ten capital-cost lines.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TopsidesCapitalLine"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTopsidesCapitalLine {
+    /// the line's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the line's cost.
+    #[pyo3(get)]
+    pub cost: f64,
+}
+
+#[pymethods]
+impl PyTopsidesCapitalLine {
+    fn __repr__(&self) -> String {
+        format!(
+            "TopsidesCapitalLine(name={}, cost={})",
+            self.name, self.cost
+        )
+    }
+}
+
+impl From<&azoth_process::models::topsides_facility_cost::TopsidesCapitalLine>
+    for PyTopsidesCapitalLine
+{
+    fn from(row: &azoth_process::models::topsides_facility_cost::TopsidesCapitalLine) -> Self {
+        Self {
+            name: row.name.clone(),
+            cost: row.cost,
+        }
+    }
+}
+
+/// the class's quality flags.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TopsidesFlag"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTopsidesFlag {
+    /// the flag's message.
+    #[pyo3(get)]
+    pub message: String,
+}
+
+#[pymethods]
+impl PyTopsidesFlag {
+    fn __repr__(&self) -> String {
+        format!("TopsidesFlag(message={})", self.message)
+    }
+}
+
+impl From<&azoth_process::models::topsides_facility_cost::TopsidesFlag> for PyTopsidesFlag {
+    fn from(row: &azoth_process::models::topsides_facility_cost::TopsidesFlag) -> Self {
+        Self {
+            message: row.message.clone(),
+        }
+    }
+}
+
+/// the equipment and allowance MTO rows.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TopsidesMtoRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTopsidesMtoRow {
+    /// the line's item.
+    #[pyo3(get)]
+    pub item: String,
+    /// the line's category.
+    #[pyo3(get)]
+    pub category: String,
+    /// the line's quantity.
+    #[pyo3(get)]
+    pub quantity: f64,
+    /// the quantity's unit.
+    #[pyo3(get)]
+    pub unit: String,
+    /// the line's weight, zero where absent.
+    #[pyo3(get)]
+    pub weight_kg: PyQty,
+    /// whether the line carries a weight.
+    #[pyo3(get)]
+    pub has_weight: bool,
+    /// the line's cost.
+    #[pyo3(get)]
+    pub cost_usd: f64,
+    /// the line's source.
+    #[pyo3(get)]
+    pub source: String,
+}
+
+#[pymethods]
+impl PyTopsidesMtoRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "TopsidesMtoRow(item={}, category={}, quantity={}, unit={}, weight_kg={:?}, has_weight={:?}, cost_usd={}, source={})",
+            self.item,
+            self.category,
+            self.quantity,
+            self.unit,
+            self.weight_kg,
+            self.has_weight,
+            self.cost_usd,
+            self.source
+        )
+    }
+}
+
+impl From<&azoth_process::models::topsides_facility_cost::TopsidesMtoRow> for PyTopsidesMtoRow {
+    fn from(row: &azoth_process::models::topsides_facility_cost::TopsidesMtoRow) -> Self {
+        Self {
+            item: row.item.clone(),
+            category: row.category.clone(),
+            quantity: row.quantity,
+            unit: row.unit.clone(),
+            weight_kg: PyQty {
+                magnitude_si: row.weight_kg,
+                unit: "kg".to_string(),
+            },
+            has_weight: row.has_weight,
+            cost_usd: row.cost_usd,
+            source: row.source.clone(),
+        }
+    }
+}
+
+/// the four project cost lines.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TopsidesProjectLine"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTopsidesProjectLine {
+    /// the line's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the line's cost.
+    #[pyo3(get)]
+    pub cost: f64,
+}
+
+#[pymethods]
+impl PyTopsidesProjectLine {
+    fn __repr__(&self) -> String {
+        format!(
+            "TopsidesProjectLine(name={}, cost={})",
+            self.name, self.cost
+        )
+    }
+}
+
+impl From<&azoth_process::models::topsides_facility_cost::TopsidesProjectLine>
+    for PyTopsidesProjectLine
+{
+    fn from(row: &azoth_process::models::topsides_facility_cost::TopsidesProjectLine) -> Self {
+        Self {
+            name: row.name.clone(),
+            cost: row.cost,
+        }
+    }
+}
+
+/// the total topsides capex.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TopsidesProjectSummaryLine"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTopsidesProjectSummaryLine {
+    /// the line's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the line's cost.
+    #[pyo3(get)]
+    pub cost: f64,
+}
+
+#[pymethods]
+impl PyTopsidesProjectSummaryLine {
+    fn __repr__(&self) -> String {
+        format!(
+            "TopsidesProjectSummaryLine(name={}, cost={})",
+            self.name, self.cost
+        )
+    }
+}
+
+impl From<&azoth_process::models::topsides_facility_cost::TopsidesProjectSummaryLine>
+    for PyTopsidesProjectSummaryLine
+{
+    fn from(
+        row: &azoth_process::models::topsides_facility_cost::TopsidesProjectSummaryLine,
+    ) -> Self {
+        Self {
+            name: row.name.clone(),
+            cost: row.cost,
+        }
+    }
+}
+
+/// the two summary lines.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TopsidesSummaryLine"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTopsidesSummaryLine {
+    /// the summary line's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the summary line's cost.
+    #[pyo3(get)]
+    pub cost: f64,
+}
+
+#[pymethods]
+impl PyTopsidesSummaryLine {
+    fn __repr__(&self) -> String {
+        format!(
+            "TopsidesSummaryLine(name={}, cost={})",
+            self.name, self.cost
+        )
+    }
+}
+
+impl From<&azoth_process::models::topsides_facility_cost::TopsidesSummaryLine>
+    for PyTopsidesSummaryLine
+{
+    fn from(row: &azoth_process::models::topsides_facility_cost::TopsidesSummaryLine) -> Self {
+        Self {
+            name: row.name.clone(),
+            cost: row.cost,
+        }
+    }
+}
+
+/// the four weight lines.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TopsidesWeightLine"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTopsidesWeightLine {
+    /// the line's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the line's weight.
+    #[pyo3(get)]
+    pub weight_kg: PyQty,
+}
+
+#[pymethods]
+impl PyTopsidesWeightLine {
+    fn __repr__(&self) -> String {
+        format!(
+            "TopsidesWeightLine(name={}, weight_kg={:?})",
+            self.name, self.weight_kg
+        )
+    }
+}
+
+impl From<&azoth_process::models::topsides_facility_cost::TopsidesWeightLine>
+    for PyTopsidesWeightLine
+{
+    fn from(row: &azoth_process::models::topsides_facility_cost::TopsidesWeightLine) -> Self {
+        Self {
+            name: row.name.clone(),
+            weight_kg: PyQty {
+                magnitude_si: row.weight_kg,
+                unit: "kg".to_string(),
+            },
+        }
+    }
+}
+
 /// one row per check the class raised, in its order.
 #[pyclass(
     frozen,

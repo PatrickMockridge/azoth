@@ -362,6 +362,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyTankResult>()?;
     m.add_class::<crate::transport_gen::PyThreePhaseSeparatorResult>()?;
     m.add_class::<crate::transport_gen::PyThrottlingValveResult>()?;
+    m.add_class::<crate::transport_gen::PyTopsidesFacilityCostResult>()?;
     m.add_class::<crate::transport_gen::PyToxicLibraryResult>()?;
     m.add_class::<crate::transport_gen::PyTr3001ComplianceResult>()?;
     m.add_class::<crate::transport_gen::PyTrappedInventoryResult>()?;
@@ -487,6 +488,14 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
     m.add_class::<crate::record_outputs_gen::PySts0131FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesBreakdownLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesCapitalLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesFlag>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesMtoRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesProjectLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesProjectSummaryLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesSummaryLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesWeightLine>()?;
     m.add_class::<crate::record_outputs_gen::PyTr3001Finding>()?;
     m.add_class::<crate::record_outputs_gen::PyTrappedInventorySegmentResult>()?;
     m.add_class::<crate::record_outputs_gen::PyTypeCostLine>()?;
@@ -1319,6 +1328,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::throttling_valve, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::process::topsides_facility_cost, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::toxic_library, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::tr3001_compliance, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::trapped_inventory, m)?)?;

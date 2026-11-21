@@ -1,0 +1,189 @@
+id = "process.topsides_facility_cost"
+name = "Topsides facility cost"
+kind = "procedure"
+assumptions = [
+    "**the estimator takes the process rows, not a process object**: each row is a unit's name, process type, total module cost and weight, the summary `process.process_cost_estimate` publishes.",
+    "**the module classification is the class's ordered containment chain** over the process type: compressors and expanders, pumps, heat exchangers, valves and piping, columns and vessels and tanks, and everything else.",
+    "**a well or reservoir row is excluded from the topsides scope** with the class's quality flag, and its located cost is reported as the excluded scope.",
+    "**the facility type's five factors and the project context's congestion factor are the class's tables**; installation and hook-up both scale by the congestion factor.",
+    "**the MTO's allowance weights are absent rather than NaN**: the class writes `NaN` for the electrical and HVAC allowance lines, and the port publishes `has_weight` false.",
+    "**the estimate class only changes the quality flag**: above Class 3 the class adds its not-detailed warning, and nothing else reads it.",
+    "**costs are USD magnitudes declared dimensionless** because the vocabulary has no currency unit.",
+    "**`toJson`, `toMap` and the report text are session surface**, not inputs or outputs of this id.",
+]
+references = [
+    "Turton, R., Shaeiwitz, J. A., Bhattacharyya, D. & Whiting, W. B. (2018). Analysis, Synthesis and Design of Chemical Processes, 5th Ed. Pearson.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/costestimation/topsides/TopsidesFacilityCostEstimator.java` is the port source.",
+    "`validation/neqsim/captures/process_cost_topsides.tsv` - the class's own fixed-platform North Sea estimate over its four-unit gas train, with the module breakdown, bulk allowances, project stack and MTO.",
+]
+[source]
+standard = "NeqSim process/costestimation/topsides/TopsidesFacilityCostEstimator.java"
+edition = "Its `estimate` over the process rows, `classifyModule`, `isExcludedFromTopsides`, `addScopeQualityFlags` and the facility-type and project-context factor sets."
+[algorithm]
+scheme = "topsides_facility_stack"
+initialisation = "first_unit_in_caller_order"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.equipment]
+type = "record_list"
+row_type = "TopsidesEquipment"
+description = "one process unit per row, in caller order.\n"
+[inputs.equipment.fields.name]
+type = "string"
+description = "the unit's name.\n"
+[inputs.equipment.fields.equipment_type]
+type = "string"
+description = "the process type the roll-up classified, e.g. `Vessels`.\n"
+[inputs.equipment.fields.total_module_cost]
+unit = "dimensionless"
+description = "the unit's total module cost, unlocated USD.\n"
+[inputs.equipment.fields.weight]
+unit = "kg"
+description = "the unit's dry weight.\n"
+[inputs.facility_type]
+type = "enum"
+values = ["fixed_platform", "fpso", "semi_submersible", "onshore", "brownfield_tie_in"]
+optional = true
+description = "the facility type, whose five factors are the class's table; absent is fixed_platform.\n"
+[inputs.project_context]
+type = "enum"
+values = ["greenfield", "brownfield_modification", "host_tie_in"]
+optional = true
+description = "the project context, whose congestion factor is 1.00, 1.35 or 1.50; absent is greenfield.\n"
+[inputs.location_factor]
+unit = "dimensionless"
+optional = true
+description = "the location factor applied to the module and bulk costs; absent is 1.0.\n"
+[inputs.piping_bulk_factor]
+unit = "dimensionless"
+optional = true
+description = "the piping bulk factor; absent is 0.25.\n"
+[inputs.electrical_instrumentation_factor]
+unit = "dimensionless"
+optional = true
+description = "the electrical and instrumentation factor; absent is 0.16.\n"
+[inputs.insulation_paint_fireproofing_factor]
+unit = "dimensionless"
+optional = true
+description = "the insulation, paint and fireproofing factor; absent is 0.06.\n"
+[inputs.hvac_telecom_safety_factor]
+unit = "dimensionless"
+optional = true
+description = "the HVAC, telecom and safety factor; absent is 0.08.\n"
+[inputs.engineering_procurement_factor]
+unit = "dimensionless"
+optional = true
+description = "the engineering and procurement factor; absent is 0.14.\n"
+[inputs.construction_management_factor]
+unit = "dimensionless"
+optional = true
+description = "the construction management factor; absent is 0.06.\n"
+[inputs.project_contingency_factor]
+unit = "dimensionless"
+optional = true
+description = "the project contingency factor; absent is 0.15.\n"
+[inputs.owner_cost_factor]
+unit = "dimensionless"
+optional = true
+description = "the owner cost factor; absent is 0.10.\n"
+[inputs.include_utilities_and_offsites]
+type = "boolean"
+optional = true
+description = "whether the utilities and offsites allowance is included; **absent is true**, the class's default.\n"
+[inputs.estimate_class]
+unit = "dimensionless"
+optional = true
+description = "the AACE estimate class, 1 to 5; above Class 3 the class adds its not-detailed warning. Absent is 4.\n"
+[outputs]
+[outputs.capital_costs]
+type = "record_list"
+description = "the ten capital-cost lines.\n"
+[outputs.capital_costs.fields.name]
+type = "string"
+description = "the line's name.\n"
+[outputs.capital_costs.fields.cost]
+unit = "dimensionless"
+description = "the line's cost.\n"
+[outputs.capital_cost_summary]
+type = "record_list"
+description = "the two summary lines.\n"
+[outputs.capital_cost_summary.fields.name]
+type = "string"
+description = "the summary line's name.\n"
+[outputs.capital_cost_summary.fields.cost]
+unit = "dimensionless"
+description = "the summary line's cost.\n"
+[outputs.capital_cost_breakdown]
+type = "record_list"
+description = "the module breakdown lines, keyed `module.<camelCase>`.\n"
+[outputs.capital_cost_breakdown.fields.name]
+type = "string"
+description = "the module key.\n"
+[outputs.capital_cost_breakdown.fields.cost]
+unit = "dimensionless"
+description = "the module's located cost.\n"
+[outputs.project_costs]
+type = "record_list"
+description = "the four project cost lines.\n"
+[outputs.project_costs.fields.name]
+type = "string"
+description = "the line's name.\n"
+[outputs.project_costs.fields.cost]
+unit = "dimensionless"
+description = "the line's cost.\n"
+[outputs.project_cost_summary]
+type = "record_list"
+description = "the total topsides capex.\n"
+[outputs.project_cost_summary.fields.name]
+type = "string"
+description = "the line's name.\n"
+[outputs.project_cost_summary.fields.cost]
+unit = "dimensionless"
+description = "the line's cost.\n"
+[outputs.weight_basis]
+type = "record_list"
+description = "the four weight lines.\n"
+[outputs.weight_basis.fields.name]
+type = "string"
+description = "the line's name.\n"
+[outputs.weight_basis.fields.weight_kg]
+unit = "kg"
+description = "the line's weight.\n"
+[outputs.material_take_off]
+type = "record_list"
+description = "the equipment and allowance MTO rows.\n"
+[outputs.material_take_off.fields.item]
+type = "string"
+description = "the line's item.\n"
+[outputs.material_take_off.fields.category]
+type = "string"
+description = "the line's category.\n"
+[outputs.material_take_off.fields.quantity]
+unit = "dimensionless"
+description = "the line's quantity.\n"
+[outputs.material_take_off.fields.unit]
+type = "string"
+description = "the quantity's unit.\n"
+[outputs.material_take_off.fields.weight_kg]
+unit = "kg"
+description = "the line's weight, zero where absent.\n"
+[outputs.material_take_off.fields.has_weight]
+type = "boolean"
+description = "whether the line carries a weight.\n"
+[outputs.material_take_off.fields.cost_usd]
+unit = "dimensionless"
+description = "the line's cost.\n"
+[outputs.material_take_off.fields.source]
+type = "string"
+description = "the line's source.\n"
+[outputs.quality_flags]
+type = "record_list"
+description = "the class's quality flags.\n"
+[outputs.quality_flags.fields.message]
+type = "string"
+description = "the flag's message.\n"
+[implementations]
+python = "azoth.process.topsides_facility_cost"
+rust = "azoth_process::topsides_facility_cost"

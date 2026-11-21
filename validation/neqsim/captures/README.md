@@ -3357,3 +3357,20 @@ nine operating-cost lines and the economics.
 The operating-cost walk reads `getDuty()` as kW although the cooler returns watts, so the
 cooling-water line is the class's own thousand-fold duty; the case states the duty the walk
 reads. The system weight and the weight-based capex are printed last.
+
+### `process_cost_topsides.tsv`
+
+`TopsidesFacilityCostEstimator` on the class's own four-unit gas train: a fixed-platform
+North Sea estimate at a 1.35 location on a Class 3 basis, with a greenfield context. The
+capture prints the process rows the estimator folds, then the ten capital lines, the two
+summary lines, the module breakdown, the four project lines, the total topsides capex, the
+weight basis, the nine MTO rows and the quality flags.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe topsides_cost \
+  > captures/process_cost_topsides.tsv
+```
+
+The electrical and HVAC allowance MTO weights are `NaN` in the class; the port publishes
+`has_weight` false with a zero weight. The facility-type and context flags are the class's
+own strings, and a Class 4 or coarser basis adds its not-detailed flag after them.

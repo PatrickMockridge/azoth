@@ -449,6 +449,7 @@ Five sections, and the difference between them is the point:
 - [`process.tank`](./process/tank.md) — Tank
 - [`process.three_phase_separator`](./process/three_phase_separator.md) — Three-phase separator
 - [`process.throttling_valve`](./process/throttling_valve.md) — Throttling valve
+- [`process.topsides_facility_cost`](./process/topsides_facility_cost.md) — Topsides facility cost
 - [`process.toxic_library`](./process/toxic_library.md) — Toxic-exposure thresholds
 - [`process.tr3001_compliance`](./process/tr3001_compliance.md) — TR3001 compliance
 - [`process.trapped_inventory`](./process/trapped_inventory.md) — Trapped inventory

@@ -3788,6 +3788,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 9,
         "tests_skipped": 0,
     },
+    'process.topsides_facility_cost': {
+        "calc_id": 'process.topsides_facility_cost',
+        "name": 'Topsides facility cost',
+        "spec": {'path': 'specs/models/process/topsides_facility_cost.toml', 'sha256': 'c63e79530c10b4a4f7dee801a6c8bbd1d1a0483cb3545c4bec7752a3b4f9ff2c'},
+        "code": [{'path': 'python/src/azoth/process/reference/topsides_facility_cost.py', 'sha256': '1aaf755ba9ae127ce68c62d21e5905296367a7ecaa0e8563c0c814b9c187161f'}, {'path': 'crates/azoth-process/src/models/topsides_facility_cost.rs', 'sha256': '0ea7bdba1e70b02b4928f41ff522b47fed2c00aca2e26fb2e0a7ffa945bc83ea'}],
+        "source": 'NeqSim process/costestimation/topsides/TopsidesFacilityCostEstimator.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 1,
+        "tests_skipped": 0,
+    },
     'process.toxic_library': {
         "calc_id": 'process.toxic_library',
         "name": 'Toxic-exposure thresholds',

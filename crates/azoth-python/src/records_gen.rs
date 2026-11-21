@@ -1513,6 +1513,19 @@ pub struct Sts0131CheckRow {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct TopsidesEquipment {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub equipment_type: String,
+    #[pyo3(item)]
+    pub total_module_cost: f64,
+    #[pyo3(item)]
+    pub weight: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct Tr3001Scenario {
     #[pyo3(item)]
     pub cause: String,

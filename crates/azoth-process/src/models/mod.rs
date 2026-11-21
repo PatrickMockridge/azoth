@@ -165,6 +165,7 @@ pub mod sts0131_gate;
 pub mod tank;
 pub mod three_phase_separator;
 pub mod throttling_valve;
+pub mod topsides_facility_cost;
 pub mod toxic_library;
 pub mod tr3001_compliance;
 #[allow(dead_code)] // until the id slices consume the module
@@ -424,6 +425,11 @@ pub use sts0131_gate::{
 pub use tank::{TankResult, tank};
 pub use three_phase_separator::{ThreePhaseSeparatorResult, three_phase_separator};
 pub use throttling_valve::{ThrottlingValveResult, throttling_valve};
+pub use topsides_facility_cost::{
+    TopsidesBreakdownLine, TopsidesCapitalLine, TopsidesEquipment, TopsidesFacilityCostResult,
+    TopsidesFlag, TopsidesMtoRow, TopsidesProjectLine, TopsidesProjectSummaryLine,
+    TopsidesSummaryLine, TopsidesWeightLine, topsides_facility_cost,
+};
 pub use toxic_library::{ToxicLibraryResult, toxic_library};
 pub use tr3001_compliance::{
     Tr3001Check, Tr3001ComplianceResult, Tr3001Finding, Tr3001Scenario, Tr3001Status,

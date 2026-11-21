@@ -133,6 +133,7 @@ use crate::models::sts0131_gate::Sts0131GateResult;
 use crate::models::tank::TankResult;
 use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
+use crate::models::topsides_facility_cost::TopsidesFacilityCostResult;
 use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
 use crate::models::trapped_inventory::TrappedInventoryResult;
@@ -3032,6 +3033,25 @@ impl CalcResult for ThrottlingValveResult {
         "choked",
         "gas_valve",
         "calculated_molar_flow",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for TopsidesFacilityCostResult {
+    const CALC_ID: &'static str = "process.topsides_facility_cost";
+    const FIELDS: &'static [&'static str] = &[
+        "capital_costs",
+        "capital_cost_summary",
+        "capital_cost_breakdown",
+        "project_costs",
+        "project_cost_summary",
+        "weight_basis",
+        "material_take_off",
+        "quality_flags",
         "warnings",
     ];
 

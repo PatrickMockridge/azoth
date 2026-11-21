@@ -1107,6 +1107,14 @@ class Sts0131CheckRow(TypedDict):
     sil_compliant: bool | None
     custom_ok: bool | None
 
+class TopsidesEquipment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    equipment_type: str
+    total_module_cost: float
+    weight: float
+
 class Tr3001Scenario(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -2265,6 +2273,67 @@ class Sts0131FindingResult:
     severity: str
     name: str | None
     margin: float | None
+
+@final
+class TopsidesCapitalLine:
+    """the ten capital-cost lines."""
+
+    name: str
+    cost: float
+
+@final
+class TopsidesSummaryLine:
+    """the two summary lines."""
+
+    name: str
+    cost: float
+
+@final
+class TopsidesBreakdownLine:
+    """the module breakdown lines, keyed `module.<camelCase>`."""
+
+    name: str
+    cost: float
+
+@final
+class TopsidesProjectLine:
+    """the four project cost lines."""
+
+    name: str
+    cost: float
+
+@final
+class TopsidesProjectSummaryLine:
+    """the total topsides capex."""
+
+    name: str
+    cost: float
+
+@final
+class TopsidesWeightLine:
+    """the four weight lines."""
+
+    name: str
+    weight_kg: Qty
+
+@final
+class TopsidesMtoRow:
+    """the equipment and allowance MTO rows."""
+
+    item: str
+    category: str
+    quantity: float
+    unit: str
+    weight_kg: Qty
+    has_weight: bool
+    cost_usd: float
+    source: str
+
+@final
+class TopsidesFlag:
+    """the class's quality flags."""
+
+    message: str
 
 @final
 class Tr3001Finding:
@@ -6382,6 +6451,18 @@ class ThrottlingValveResult:
     choked: bool
     gas_valve: bool
     calculated_molar_flow: Qty
+    warnings: list[Warning]
+
+@final
+class TopsidesFacilityCostResult:
+    capital_costs: list[TopsidesCapitalLine]
+    capital_cost_summary: list[TopsidesSummaryLine]
+    capital_cost_breakdown: list[TopsidesBreakdownLine]
+    project_costs: list[TopsidesProjectLine]
+    project_cost_summary: list[TopsidesProjectSummaryLine]
+    weight_basis: list[TopsidesWeightLine]
+    material_take_off: list[TopsidesMtoRow]
+    quality_flags: list[TopsidesFlag]
     warnings: list[Warning]
 
 @final
@@ -10516,6 +10597,22 @@ def throttling_valve(
     is_isothermal: bool | None = None,
     sizing_standard: str | None = None,
 ) -> ThrottlingValveResult: ...
+def topsides_facility_cost(
+    equipment: list[TopsidesEquipment],
+    facility_type: str | None = None,
+    project_context: str | None = None,
+    location_factor: float | None = None,
+    piping_bulk_factor: float | None = None,
+    electrical_instrumentation_factor: float | None = None,
+    insulation_paint_fireproofing_factor: float | None = None,
+    hvac_telecom_safety_factor: float | None = None,
+    engineering_procurement_factor: float | None = None,
+    construction_management_factor: float | None = None,
+    project_contingency_factor: float | None = None,
+    owner_cost_factor: float | None = None,
+    include_utilities_and_offsites: bool | None = None,
+    estimate_class: float | None = None,
+) -> TopsidesFacilityCostResult: ...
 def toxic_library(
     chemical: str | None = None,
     concentration_ppm: float | None = None,

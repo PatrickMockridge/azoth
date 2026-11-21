@@ -135,6 +135,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.tank`](./tank.md) | `direct composition` | NeqSim process/equipment/tank/Tank.java |
 | [`process.three_phase_separator`](./three_phase_separator.md) | `direct composition` | NeqSim process/equipment/separator/ThreePhaseSeparator.java |
 | [`process.throttling_valve`](./throttling_valve.md) | `direct composition` | NeqSim process/equipment/valve/ThrottlingValve.java |
+| [`process.topsides_facility_cost`](./topsides_facility_cost.md) | `topsides_facility_stack` | NeqSim process/costestimation/topsides/TopsidesFacilityCostEstimator.java |
 | [`process.toxic_library`](./toxic_library.md) | `toxic_threshold_lookup_and_ppm_conversion` | NeqSim process/safety/dispersion/ToxicLibrary.java |
 | [`process.tr3001_compliance`](./tr3001_compliance.md) | `closed_form_tr3001_compliance` | NeqSim process/safety/overpressure/TR3001ComplianceChecker.java |
 | [`process.trapped_inventory`](./trapped_inventory.md) | `trapped_inventory` | NeqSim process/safety/inventory/TrappedInventoryCalculator.java |

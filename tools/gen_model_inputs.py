@@ -543,6 +543,9 @@ NON_UNIT_MODELS = {
     "process.process_cost_estimate": (
         "a process cost roll-up over per-unit summary rows, not a unit"
     ),
+    "process.topsides_facility_cost": (
+        "a topsides facility stack over process summary rows, not a unit"
+    ),
 }
 
 

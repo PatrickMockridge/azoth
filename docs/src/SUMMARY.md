@@ -357,6 +357,7 @@
   - [Tank](./process/tank.md)
   - [Three-phase separator](./process/three_phase_separator.md)
   - [Throttling valve](./process/throttling_valve.md)
+  - [Topsides facility cost](./process/topsides_facility_cost.md)
   - [Toxic-exposure thresholds](./process/toxic_library.md)
   - [TR3001 compliance](./process/tr3001_compliance.md)
   - [Trapped inventory](./process/trapped_inventory.md)

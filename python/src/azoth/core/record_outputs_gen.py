@@ -2355,6 +2355,109 @@ class SubFraction:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class TopsidesBreakdownLine:
+    """the module breakdown lines, keyed `module.<camelCase>`."""
+
+    #: the module key.
+    name: str
+
+    #: the module's located cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesCapitalLine:
+    """the ten capital-cost lines."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesFlag:
+    """the class's quality flags."""
+
+    #: the flag's message.
+    message: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesMtoRow:
+    """the equipment and allowance MTO rows."""
+
+    #: the line's item.
+    item: str
+
+    #: the line's category.
+    category: str
+
+    #: the line's quantity.
+    quantity: float
+
+    #: the quantity's unit.
+    unit: str
+
+    #: the line's weight, zero where absent.
+    weight_kg: Q
+
+    #: whether the line carries a weight.
+    has_weight: bool
+
+    #: the line's cost.
+    cost_usd: float
+
+    #: the line's source.
+    source: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesProjectLine:
+    """the four project cost lines."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesProjectSummaryLine:
+    """the total topsides capex."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesSummaryLine:
+    """the two summary lines."""
+
+    #: the summary line's name.
+    name: str
+
+    #: the summary line's cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesWeightLine:
+    """the four weight lines."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's weight.
+    weight_kg: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class Tr3001Finding:
     """one row per check the class raised, in its order."""
 

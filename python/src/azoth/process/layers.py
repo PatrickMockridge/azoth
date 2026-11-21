@@ -5113,6 +5113,11 @@ DUMPERS: dict[str, Dumper] = {
 #: **This is not "the model is too simple to check".** Each entry names the arithmetic and
 #: what would have to exist for there to be a layer.
 NO_INTERIOR: dict[str, str] = {
+    "process.topsides_facility_cost": (
+        "the facility stack is a set of factor products over the stated rows, so every number "
+        "the kernel forms is on a capital line, a project line or an MTO row. The capture's "
+        "block is the case's evidence"
+    ),
     "process.process_cost_estimate": (
         "the roll-up's totals are sums of the stated rows and its splits are fixed percentages "
         "of them, so every number the kernel forms is on an output row or a named cost line. "
@@ -9401,6 +9406,8 @@ UNCASED_ROWS: dict[str, int] = {
     # The roll-up's six states: the summary, the type and discipline splits, the project
     # stack, the OPEX lines and the economics. The id is a `NO_INTERIOR` model.
     "process_cost_process.tsv": 6,
+    # The topsides estimator's one fixed-platform state. The id is a `NO_INTERIOR` model.
+    "process_cost_topsides.tsv": 1,
     # The dispersion capture's five: four SRK rows, the class's own tests' cubic kept as
     # evidence beside the PR oracle, and the zero-rate refusal the port raises rather than
     # reproduces.

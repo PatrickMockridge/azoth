@@ -123,6 +123,7 @@
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml
+//!   - specs/models/process/topsides_facility_cost.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/trapped_inventory.toml
@@ -101528,6 +101529,776 @@ pub static THROTTLING_VALVE_SPEC: ModelSpec = ModelSpec {
     cases: THROTTLING_VALVE_CASES,
 };
 
+static TOPSIDES_FACILITY_COST_CHECKS: &[SpecCheck] = &[];
+
+static TOPSIDES_FACILITY_COST_CASES: &[TestCase] = &[TestCase {
+    id: "fixed_platform",
+    kind: "case",
+    property: None,
+    status: "active",
+    skip_reason: None,
+    tolerance: 1e-12,
+    numbers: &[
+        ("location_factor", 1.35),
+        ("piping_bulk_factor", 0.25),
+        ("electrical_instrumentation_factor", 0.16),
+        ("insulation_paint_fireproofing_factor", 0.06),
+        ("hvac_telecom_safety_factor", 0.08),
+        ("engineering_procurement_factor", 0.14),
+        ("construction_management_factor", 0.06),
+        ("project_contingency_factor", 0.15),
+        ("owner_cost_factor", 0.1),
+        ("estimate_class", 3.0),
+    ],
+    flags: &[("include_utilities_and_offsites", true)],
+    lists: &[],
+    strings: &[
+        ("facility_type", "fixed_platform"),
+        ("project_context", "greenfield"),
+    ],
+    vectors: &[],
+    matrices: &[],
+    expected: &[],
+    expected_vectors: &[],
+    expected_strings: &[],
+    records: &[(
+        "equipment",
+        &[
+            &[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Feed"),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("Streams"),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "weight",
+                    value: FieldValue::Number(0.0),
+                },
+            ],
+            &[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Inlet Separator"),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("Vessels"),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(14905.679819876523),
+                },
+                RecordField {
+                    name: "weight",
+                    value: FieldValue::Number(1312.8218157927067),
+                },
+            ],
+            &[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Export Compressor"),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("Compressors"),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(1997444.3385886613),
+                },
+                RecordField {
+                    name: "weight",
+                    value: FieldValue::Number(695625.7181328537),
+                },
+            ],
+            &[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Aftercooler"),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("Heat Exchangers"),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(9387.9),
+                },
+                RecordField {
+                    name: "weight",
+                    value: FieldValue::Number(228.0),
+                },
+            ],
+            &[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("Export Control Valve"),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("Valves"),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(272641.47134845454),
+                },
+                RecordField {
+                    name: "weight",
+                    value: FieldValue::Number(274.7412026459561),
+                },
+            ],
+        ],
+    )],
+    expected_records: &[
+        (
+            "capital_costs",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("processEquipmentModules"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(3097412.17617194),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("structuralSteel"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(8473911.565988204),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("pipingBulk"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(774353.044042985),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("electricalAndInstrumentation"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(495585.94818751037),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("insulationPaintFireproofing"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(185844.73057031637),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("hvacTelecomAndSafetySystems"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(247792.97409375518),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("utilitiesAndOffsites"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(557534.1917109492),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("moduleFabricationAndIntegration"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(557534.1917109492),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("offshoreInstallation"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(2877993.7644953215),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("hookUpAndCommissioning"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(1726796.2586971927),
+                    },
+                ],
+            ],
+        ),
+        (
+            "capital_cost_summary",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("directFieldCost"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(18994758.84566912),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("excludedNonTopsidesScope"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        ),
+        (
+            "capital_cost_breakdown",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("module.miscellaneousProcessPackages"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("module.separationAndTreatmentModules"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(20122.667756833307),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("module.compressionAndRotatingEquipment"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(2696549.857094693),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("module.heatTransferAndCooling"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(12673.665),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("module.pipingAndFlowControl"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(368065.98632041365),
+                    },
+                ],
+            ],
+        ),
+        (
+            "project_costs",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("engineeringProcurementProjectManagement"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(2659266.238393677),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("constructionManagement"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(1139685.5307401472),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("projectContingency"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(2849213.826850368),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("ownerCost"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(1899475.8845669122),
+                    },
+                ],
+            ],
+        ),
+        (
+            "project_cost_summary",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("totalTopsidesCapex"),
+                },
+                RecordField {
+                    name: "cost",
+                    value: FieldValue::Number(27542400.32622022),
+                },
+            ]],
+        ),
+        (
+            "weight_basis",
+            &[
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("equipmentDryWeight"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(697441.2811512924),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("structuralSteelWeight"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(627697.1530361632),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("pipingBulkWeight"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(244104.44840295232),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("totalEstimatedDryWeight"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(1569242.882590408),
+                    },
+                ],
+            ],
+        ),
+        (
+            "material_take_off",
+            &[
+                &[
+                    RecordField {
+                        name: "item",
+                        value: FieldValue::Name("Feed"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "quantity",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "unit",
+                        value: FieldValue::Name("kg"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "has_weight",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "cost_usd",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("process-cost-estimate"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item",
+                        value: FieldValue::Name("Inlet Separator"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "quantity",
+                        value: FieldValue::Number(1312.8218157927067),
+                    },
+                    RecordField {
+                        name: "unit",
+                        value: FieldValue::Name("kg"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(1312.8218157927067),
+                    },
+                    RecordField {
+                        name: "has_weight",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "cost_usd",
+                        value: FieldValue::Number(20122.667756833307),
+                    },
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("process-cost-estimate"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item",
+                        value: FieldValue::Name("Export Compressor"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "quantity",
+                        value: FieldValue::Number(695625.7181328537),
+                    },
+                    RecordField {
+                        name: "unit",
+                        value: FieldValue::Name("kg"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(695625.7181328537),
+                    },
+                    RecordField {
+                        name: "has_weight",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "cost_usd",
+                        value: FieldValue::Number(2696549.857094693),
+                    },
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("process-cost-estimate"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item",
+                        value: FieldValue::Name("Aftercooler"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "quantity",
+                        value: FieldValue::Number(228.0),
+                    },
+                    RecordField {
+                        name: "unit",
+                        value: FieldValue::Name("kg"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(228.0),
+                    },
+                    RecordField {
+                        name: "has_weight",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "cost_usd",
+                        value: FieldValue::Number(12673.665),
+                    },
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("process-cost-estimate"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item",
+                        value: FieldValue::Name("Export Control Valve"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("equipment"),
+                    },
+                    RecordField {
+                        name: "quantity",
+                        value: FieldValue::Number(274.7412026459561),
+                    },
+                    RecordField {
+                        name: "unit",
+                        value: FieldValue::Name("kg"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(274.7412026459561),
+                    },
+                    RecordField {
+                        name: "has_weight",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "cost_usd",
+                        value: FieldValue::Number(368065.98632041365),
+                    },
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("process-cost-estimate"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item",
+                        value: FieldValue::Name("Structural steel allowance"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("structural"),
+                    },
+                    RecordField {
+                        name: "quantity",
+                        value: FieldValue::Number(627697.1530361632),
+                    },
+                    RecordField {
+                        name: "unit",
+                        value: FieldValue::Name("kg"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(627697.1530361632),
+                    },
+                    RecordField {
+                        name: "has_weight",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "cost_usd",
+                        value: FieldValue::Number(8473911.565988204),
+                    },
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("topsides-allowance"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item",
+                        value: FieldValue::Name("Piping bulk allowance"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("piping"),
+                    },
+                    RecordField {
+                        name: "quantity",
+                        value: FieldValue::Number(244104.44840295232),
+                    },
+                    RecordField {
+                        name: "unit",
+                        value: FieldValue::Name("kg"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(244104.44840295232),
+                    },
+                    RecordField {
+                        name: "has_weight",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "cost_usd",
+                        value: FieldValue::Number(774353.044042985),
+                    },
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("topsides-allowance"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item",
+                        value: FieldValue::Name("Electrical and instrumentation allowance"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("electrical"),
+                    },
+                    RecordField {
+                        name: "quantity",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "unit",
+                        value: FieldValue::Name("allowance"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "has_weight",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "cost_usd",
+                        value: FieldValue::Number(495585.94818751037),
+                    },
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("topsides-allowance"),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "item",
+                        value: FieldValue::Name("HVAC, telecom, fire and gas allowance"),
+                    },
+                    RecordField {
+                        name: "category",
+                        value: FieldValue::Name("safety-systems"),
+                    },
+                    RecordField {
+                        name: "quantity",
+                        value: FieldValue::Number(1.0),
+                    },
+                    RecordField {
+                        name: "unit",
+                        value: FieldValue::Name("allowance"),
+                    },
+                    RecordField {
+                        name: "weight_kg",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "has_weight",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "cost_usd",
+                        value: FieldValue::Number(247792.97409375518),
+                    },
+                    RecordField {
+                        name: "source",
+                        value: FieldValue::Name("topsides-allowance"),
+                    },
+                ],
+            ],
+        ),
+        (
+            "quality_flags",
+            &[
+                &[RecordField {
+                    name: "message",
+                    value: FieldValue::Name("Facility type factor set: Fixed platform"),
+                }],
+                &[RecordField {
+                    name: "message",
+                    value: FieldValue::Name("Project context factor set: Greenfield"),
+                }],
+                &[RecordField {
+                    name: "message",
+                    value: FieldValue::Name(
+                        "Utilities and offsites are factor allowances unless explicit utility modules are included.",
+                    ),
+                }],
+            ],
+        ),
+    ],
+}];
+
+static TOPSIDES_FACILITY_COST_ALGORITHM: ModelAlgorithm = ModelAlgorithm {
+    scheme: "topsides_facility_stack",
+    convergence: "absolute",
+    tolerance: 1e-12,
+    max_iterations: 1,
+    bracket: None,
+    initialisation: Some("first_unit_in_caller_order"),
+    initial_temperature: None,
+    inner: None,
+    fallback: None,
+};
+
+/// Registry entry for `process.topsides_facility_cost`.
+pub static TOPSIDES_FACILITY_COST_SPEC: ModelSpec = ModelSpec {
+    id: "process.topsides_facility_cost",
+    kind: "procedure",
+    algorithm: Some(&TOPSIDES_FACILITY_COST_ALGORITHM),
+    checks: TOPSIDES_FACILITY_COST_CHECKS,
+    cases: TOPSIDES_FACILITY_COST_CASES,
+};
+
 static TOXIC_LIBRARY_CHECKS: &[SpecCheck] = &[
     SpecCheck {
         on_input: true,
@@ -108258,6 +109029,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &TANK_SPEC,
     &THREE_PHASE_SEPARATOR_SPEC,
     &THROTTLING_VALVE_SPEC,
+    &TOPSIDES_FACILITY_COST_SPEC,
     &TOXIC_LIBRARY_SPEC,
     &TR3001_COMPLIANCE_SPEC,
     &TRAPPED_INVENTORY_SPEC,

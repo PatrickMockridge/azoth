@@ -344,6 +344,7 @@
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml
+//!   - specs/models/process/topsides_facility_cost.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/trapped_inventory.toml
@@ -6372,6 +6373,56 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "dimensionless",
     ),
     ("process.throttling_valve", "xt", "dimensionless"),
+    (
+        "process.topsides_facility_cost",
+        "location_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "piping_bulk_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "electrical_instrumentation_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "insulation_paint_fireproofing_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "hvac_telecom_safety_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "engineering_procurement_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "construction_management_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "project_contingency_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "owner_cost_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "estimate_class",
+        "dimensionless",
+    ),
     (
         "process.toxic_library",
         "concentration_ppm",

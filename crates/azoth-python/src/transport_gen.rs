@@ -38,8 +38,10 @@ use crate::record_outputs_gen::{
     PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
     PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
     PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine, PyVesselFillingPoint,
-    PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow,
+    PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
+    PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
+    PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -28825,6 +28827,107 @@ impl From<&azoth_process::models::throttling_valve::ThrottlingValveResult>
                 magnitude_si: r.calculated_molar_flow,
                 unit: "mol/s".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.topsides_facility_cost`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TopsidesFacilityCostResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTopsidesFacilityCostResult {
+    /// the ten capital-cost lines.
+    #[pyo3(get)]
+    pub capital_costs: Vec<PyTopsidesCapitalLine>,
+    /// the two summary lines.
+    #[pyo3(get)]
+    pub capital_cost_summary: Vec<PyTopsidesSummaryLine>,
+    /// the module breakdown lines, keyed `module.<camelCase>`.
+    #[pyo3(get)]
+    pub capital_cost_breakdown: Vec<PyTopsidesBreakdownLine>,
+    /// the four project cost lines.
+    #[pyo3(get)]
+    pub project_costs: Vec<PyTopsidesProjectLine>,
+    /// the total topsides capex.
+    #[pyo3(get)]
+    pub project_cost_summary: Vec<PyTopsidesProjectSummaryLine>,
+    /// the four weight lines.
+    #[pyo3(get)]
+    pub weight_basis: Vec<PyTopsidesWeightLine>,
+    /// the equipment and allowance MTO rows.
+    #[pyo3(get)]
+    pub material_take_off: Vec<PyTopsidesMtoRow>,
+    /// the class's quality flags.
+    #[pyo3(get)]
+    pub quality_flags: Vec<PyTopsidesFlag>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyTopsidesFacilityCostResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "TopsidesFacilityCostResult(capital_costs={:?}, capital_cost_summary={:?}, capital_cost_breakdown={:?}, project_costs={:?}, project_cost_summary={:?}, weight_basis={:?}, material_take_off={:?}, quality_flags={:?}, {} warning(s))",
+            self.capital_costs,
+            self.capital_cost_summary,
+            self.capital_cost_breakdown,
+            self.project_costs,
+            self.project_cost_summary,
+            self.weight_basis,
+            self.material_take_off,
+            self.quality_flags,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::topsides_facility_cost::TopsidesFacilityCostResult>
+    for PyTopsidesFacilityCostResult
+{
+    fn from(r: &azoth_process::models::topsides_facility_cost::TopsidesFacilityCostResult) -> Self {
+        Self {
+            capital_costs: r
+                .capital_costs
+                .iter()
+                .map(PyTopsidesCapitalLine::from)
+                .collect(),
+            capital_cost_summary: r
+                .capital_cost_summary
+                .iter()
+                .map(PyTopsidesSummaryLine::from)
+                .collect(),
+            capital_cost_breakdown: r
+                .capital_cost_breakdown
+                .iter()
+                .map(PyTopsidesBreakdownLine::from)
+                .collect(),
+            project_costs: r
+                .project_costs
+                .iter()
+                .map(PyTopsidesProjectLine::from)
+                .collect(),
+            project_cost_summary: r
+                .project_cost_summary
+                .iter()
+                .map(PyTopsidesProjectSummaryLine::from)
+                .collect(),
+            weight_basis: r
+                .weight_basis
+                .iter()
+                .map(PyTopsidesWeightLine::from)
+                .collect(),
+            material_take_off: r
+                .material_take_off
+                .iter()
+                .map(PyTopsidesMtoRow::from)
+                .collect(),
+            quality_flags: r.quality_flags.iter().map(PyTopsidesFlag::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

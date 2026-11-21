@@ -141,6 +141,7 @@ from azoth.core.result import (
     TankResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
+    TopsidesFacilityCostResult,
     ToxicLibraryResult,
     Tr3001ComplianceResult,
     TrappedInventoryResult,
@@ -365,6 +366,7 @@ _SETTLE_OUT_PRESSURE = "process.settle_out_pressure"
 _SHORTCUT_DISTILLATION_COLUMN = "process.shortcut_distillation_column"
 _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
+_TOPSIDES_FACILITY_COST = "process.topsides_facility_cost"
 _TOXIC_LIBRARY = "process.toxic_library"
 _TR3001_COMPLIANCE = "process.tr3001_compliance"
 _TRAPPED_INVENTORY = "process.trapped_inventory"
@@ -4472,6 +4474,48 @@ def mah_bow_tie_skeleton(mah_type: str) -> MahBowTieSkeletonResult:
     """
     return resolve(_MAH_BOW_TIE_SKELETON)(  # type: ignore[no-any-return]
         mah_type=mah_type,
+    )
+
+
+def topsides_facility_cost(
+    equipment: list[dict[str, object]],
+    facility_type: str | None = None,
+    project_context: str | None = None,
+    location_factor: float | None = None,
+    piping_bulk_factor: float | None = None,
+    electrical_instrumentation_factor: float | None = None,
+    insulation_paint_fireproofing_factor: float | None = None,
+    hvac_telecom_safety_factor: float | None = None,
+    engineering_procurement_factor: float | None = None,
+    construction_management_factor: float | None = None,
+    project_contingency_factor: float | None = None,
+    owner_cost_factor: float | None = None,
+    include_utilities_and_offsites: bool | None = None,
+    estimate_class: float | None = None,
+) -> TopsidesFacilityCostResult:
+    """The topsides facility estimate over the process summary rows.
+
+    The facility type's five factors and the project context's congestion factor,
+    the module and bulk stack, the project lines and the material take-off. A
+    well or reservoir row is excluded from the topsides scope with its flag.
+
+    See :func:`azoth.process.reference.topsides_facility_cost`.
+    """
+    return resolve(_TOPSIDES_FACILITY_COST)(  # type: ignore[no-any-return]
+        equipment=equipment,
+        facility_type=facility_type,
+        project_context=project_context,
+        location_factor=location_factor,
+        piping_bulk_factor=piping_bulk_factor,
+        electrical_instrumentation_factor=electrical_instrumentation_factor,
+        insulation_paint_fireproofing_factor=insulation_paint_fireproofing_factor,
+        hvac_telecom_safety_factor=hvac_telecom_safety_factor,
+        engineering_procurement_factor=engineering_procurement_factor,
+        construction_management_factor=construction_management_factor,
+        project_contingency_factor=project_contingency_factor,
+        owner_cost_factor=owner_cost_factor,
+        include_utilities_and_offsites=include_utilities_and_offsites,
+        estimate_class=estimate_class,
     )
 
 

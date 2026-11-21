@@ -455,6 +455,15 @@ from azoth.core.result import (
     ThFlashResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
+    TopsidesBreakdownLine,
+    TopsidesCapitalLine,
+    TopsidesFacilityCostResult,
+    TopsidesFlag,
+    TopsidesMtoRow,
+    TopsidesProjectLine,
+    TopsidesProjectSummaryLine,
+    TopsidesSummaryLine,
+    TopsidesWeightLine,
     ToxicLibraryResult,
     TpFlashSaftResult,
     TpMultiflashResult,
@@ -875,6 +884,7 @@ __all__ = [
     "thermal_conductivity",
     "three_phase_separator",
     "throttling_valve",
+    "topsides_facility_cost",
     "toxic_library",
     "tp_flash_saft",
     "tp_multiflash",
@@ -10056,6 +10066,38 @@ def throttling_valve(components: list[str], inlet_n: Q, inlet_z: list[float], in
         choked=result.choked,
         gas_valve=result.gas_valve,
         calculated_molar_flow=from_si(result.calculated_molar_flow.magnitude_si, result.calculated_molar_flow.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def topsides_facility_cost(equipment: list[dict[str, object]], facility_type: str | None=None, project_context: str | None=None, location_factor: float | None=None, piping_bulk_factor: float | None=None, electrical_instrumentation_factor: float | None=None, insulation_paint_fireproofing_factor: float | None=None, hvac_telecom_safety_factor: float | None=None, engineering_procurement_factor: float | None=None, construction_management_factor: float | None=None, project_contingency_factor: float | None=None, owner_cost_factor: float | None=None, include_utilities_and_offsites: bool | None=None, estimate_class: float | None=None) -> TopsidesFacilityCostResult:
+    """``process.topsides_facility_cost``, computed in Rust."""
+    spec = _models_gen.model("process.topsides_facility_cost")
+    result = _core.topsides_facility_cost(
+        input_records_to_si(spec, "equipment", equipment),
+        facility_type,
+        project_context,
+        None if location_factor is None else location_factor,
+        None if piping_bulk_factor is None else piping_bulk_factor,
+        None if electrical_instrumentation_factor is None else electrical_instrumentation_factor,
+        None if insulation_paint_fireproofing_factor is None else insulation_paint_fireproofing_factor,
+        None if hvac_telecom_safety_factor is None else hvac_telecom_safety_factor,
+        None if engineering_procurement_factor is None else engineering_procurement_factor,
+        None if construction_management_factor is None else construction_management_factor,
+        None if project_contingency_factor is None else project_contingency_factor,
+        None if owner_cost_factor is None else owner_cost_factor,
+        include_utilities_and_offsites,
+        None if estimate_class is None else estimate_class,
+    )
+    return TopsidesFacilityCostResult(
+        capital_costs=tuple(TopsidesCapitalLine(name=c.name, cost=c.cost) for c in result.capital_costs),
+        capital_cost_summary=tuple(TopsidesSummaryLine(name=c.name, cost=c.cost) for c in result.capital_cost_summary),
+        capital_cost_breakdown=tuple(TopsidesBreakdownLine(name=c.name, cost=c.cost) for c in result.capital_cost_breakdown),
+        project_costs=tuple(TopsidesProjectLine(name=c.name, cost=c.cost) for c in result.project_costs),
+        project_cost_summary=tuple(TopsidesProjectSummaryLine(name=c.name, cost=c.cost) for c in result.project_cost_summary),
+        weight_basis=tuple(TopsidesWeightLine(name=c.name, weight_kg=from_si(c.weight_kg.magnitude_si, c.weight_kg.unit)) for c in result.weight_basis),
+        material_take_off=tuple(TopsidesMtoRow(item=c.item, category=c.category, quantity=c.quantity, unit=c.unit, weight_kg=from_si(c.weight_kg.magnitude_si, c.weight_kg.unit), has_weight=c.has_weight, cost_usd=c.cost_usd, source=c.source) for c in result.material_take_off),
+        quality_flags=tuple(TopsidesFlag(message=c.message) for c in result.quality_flags),
         warnings=_warnings(result.warnings),
     )
 
