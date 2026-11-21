@@ -246,7 +246,7 @@ equipment = [
 ]
 [cases.expected]
 equipment = [
-  { name = "", equipment_type = "piping", purchased_equipment_cost = 795792.2151429062, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+  { name = "", equipment_type = "piping", purchased_equipment_cost = 795792.2151429062, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 22690.43175690027 },
 ]
 [[cases]]
 id = "valve"

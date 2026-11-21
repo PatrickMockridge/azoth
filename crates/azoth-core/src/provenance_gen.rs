@@ -3667,7 +3667,7 @@ pub static ALL_PROVENANCE: &[ProvenanceStatic] = &[
         python_path: "python/src/azoth/process/reference/cost_estimation.py",
         python_sha256: "121b5d2f88bcdbd26245e967e3b8f1506822c28486c63c382f27a39cda3168dd",
         rust_path: "crates/azoth-process/src/models/cost_estimation.rs",
-        rust_sha256: "bf0cbe2b81457d17c9c76d6e203daa88f0c2d5a2fae20ad42669176fb89789f0",
+        rust_sha256: "f1814ed3d5a77d96b95ece3a391e240ca6c1e1ec5b8de27b71d7341839614595",
         source: "NeqSim process/costestimation/CostEstimationCalculator.java",
         verification: VerificationStatus::PartiallyVerified,
         validation_cases: 0,

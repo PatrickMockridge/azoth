@@ -36165,7 +36165,7 @@ static EQUIPMENT_COST_ESTIMATE_CASES: &[TestCase] = &[
                 },
                 RecordField {
                     name: "calculated_weight",
-                    value: FieldValue::Number(0.0),
+                    value: FieldValue::Number(22690.43175690027),
                 },
             ]],
         )],
@@ -78537,6 +78537,26 @@ static PROCESS_COST_ESTIMATE_CASES: &[TestCase] = &[TestCase {
                 &[
                     RecordField {
                         name: "name",
+                        value: FieldValue::Name("Streams"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Vessels"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(2710.0997797401924),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
                         value: FieldValue::Name("Compressors"),
                     },
                     RecordField {
@@ -78557,31 +78577,11 @@ static PROCESS_COST_ESTIMATE_CASES: &[TestCase] = &[TestCase {
                 &[
                     RecordField {
                         name: "name",
-                        value: FieldValue::Name("Streams"),
-                    },
-                    RecordField {
-                        name: "cost",
-                        value: FieldValue::Number(0.0),
-                    },
-                ],
-                &[
-                    RecordField {
-                        name: "name",
                         value: FieldValue::Name("Valves"),
                     },
                     RecordField {
                         name: "cost",
                         value: FieldValue::Number(52972.234870373686),
-                    },
-                ],
-                &[
-                    RecordField {
-                        name: "name",
-                        value: FieldValue::Name("Vessels"),
-                    },
-                    RecordField {
-                        name: "cost",
-                        value: FieldValue::Number(2710.0997797401924),
                     },
                 ],
             ],
@@ -78592,31 +78592,11 @@ static PROCESS_COST_ESTIMATE_CASES: &[TestCase] = &[TestCase {
                 &[
                     RecordField {
                         name: "name",
-                        value: FieldValue::Name("Civil & Structural"),
+                        value: FieldValue::Name("Process Equipment"),
                     },
                     RecordField {
                         name: "cost",
-                        value: FieldValue::Number(403080.0259288451),
-                    },
-                ],
-                &[
-                    RecordField {
-                        name: "name",
-                        value: FieldValue::Name("Electrical & Instrumentation"),
-                    },
-                    RecordField {
-                        name: "cost",
-                        value: FieldValue::Number(604620.0388932676),
-                    },
-                ],
-                &[
-                    RecordField {
-                        name: "name",
-                        value: FieldValue::Name("Other (HVAC, Paint, Insulation)"),
-                    },
-                    RecordField {
-                        name: "cost",
-                        value: FieldValue::Number(806160.0518576902),
+                        value: FieldValue::Number(293683.07900098007),
                     },
                 ],
                 &[
@@ -78632,11 +78612,31 @@ static PROCESS_COST_ESTIMATE_CASES: &[TestCase] = &[TestCase {
                 &[
                     RecordField {
                         name: "name",
-                        value: FieldValue::Name("Process Equipment"),
+                        value: FieldValue::Name("Electrical & Instrumentation"),
                     },
                     RecordField {
                         name: "cost",
-                        value: FieldValue::Number(293683.07900098007),
+                        value: FieldValue::Number(604620.0388932676),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Civil & Structural"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(403080.0259288451),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("Other (HVAC, Paint, Insulation)"),
+                    },
+                    RecordField {
+                        name: "cost",
+                        value: FieldValue::Number(806160.0518576902),
                     },
                 ],
             ],

@@ -639,11 +639,9 @@ fn correlation_answer(
             )?;
             Ok(correlations::control_valve(cv, material_factor, ratio))
         }
-        _ => {
-            return Err(AzothError::invalid_input(
-                format!("queries[{index}].correlation"),
-                "the correlation is not one this kernel dispatches",
-            ));
-        }
+        _ => Err(AzothError::invalid_input(
+            format!("queries[{index}].correlation"),
+            "the correlation is not one this kernel dispatches",
+        )),
     }
 }

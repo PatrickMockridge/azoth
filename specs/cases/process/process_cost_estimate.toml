@@ -39,18 +39,18 @@ equipment = [
   { name = "JTValve", equipment_class = "ThrottlingValve", equipment_type = "Valves", purchased_equipment_cost = 52972.234870373686, bare_module_cost = 218113.17707876363, total_module_cost = 272641.47134845454, grass_roots_cost = 408962.20702268183, total_cost = 272641.47134845454, installation_man_hours = 2.2539496985037624, weight = 64.3985628143932, located_purchased_equipment_cost = 52972.234870373686, location_factor = 1.0 },
 ]
 cost_by_equipment_type = [
+  { name = "Streams", cost = 0.0 },
+  { name = "Vessels", cost = 2710.0997797401924 },
   { name = "Compressors", cost = 236944.74435086618 },
   { name = "Heat Exchangers", cost = 1056.0 },
-  { name = "Streams", cost = 0.0 },
   { name = "Valves", cost = 52972.234870373686 },
-  { name = "Vessels", cost = 2710.0997797401924 },
 ]
 cost_by_discipline = [
-  { name = "Civil & Structural", cost = 403080.0259288451 },
-  { name = "Electrical & Instrumentation", cost = 604620.0388932676 },
-  { name = "Other (HVAC, Paint, Insulation)", cost = 806160.0518576902 },
-  { name = "Piping & Valves", cost = 1007700.0648221128 },
   { name = "Process Equipment", cost = 293683.07900098007 },
+  { name = "Piping & Valves", cost = 1007700.0648221128 },
+  { name = "Electrical & Instrumentation", cost = 604620.0388932676 },
+  { name = "Civil & Structural", cost = 403080.0259288451 },
+  { name = "Other (HVAC, Paint, Insulation)", cost = 806160.0518576902 },
 ]
 project_costs = [
   { name = "directInstalledCost", cost = 1511550.0972331692 },

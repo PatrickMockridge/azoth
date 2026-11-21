@@ -2692,7 +2692,7 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "calc_id": 'process.cost_estimation',
         "name": 'Cost-estimation calculator',
         "spec": {'path': 'specs/models/process/cost_estimation.toml', 'sha256': '36eba272493d4060379dd45f14481eca01a93a57b833b8a1b1eb613c0bbeae13'},
-        "code": [{'path': 'python/src/azoth/process/reference/cost_estimation.py', 'sha256': '121b5d2f88bcdbd26245e967e3b8f1506822c28486c63c382f27a39cda3168dd'}, {'path': 'crates/azoth-process/src/models/cost_estimation.rs', 'sha256': 'bf0cbe2b81457d17c9c76d6e203daa88f0c2d5a2fae20ad42669176fb89789f0'}],
+        "code": [{'path': 'python/src/azoth/process/reference/cost_estimation.py', 'sha256': '121b5d2f88bcdbd26245e967e3b8f1506822c28486c63c382f27a39cda3168dd'}, {'path': 'crates/azoth-process/src/models/cost_estimation.rs', 'sha256': 'f1814ed3d5a77d96b95ece3a391e240ca6c1e1ec5b8de27b71d7341839614595'}],
         "source": 'NeqSim process/costestimation/CostEstimationCalculator.java',
         "verification": 'partially_verified',
         "validation_cases": 0,
