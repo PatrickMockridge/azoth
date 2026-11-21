@@ -20530,5 +20530,86 @@ public class ProcessProbe {
     expander.setExpanderType("radial-inflow");
     expander.setLoadType("generator");
     printCostItem("equipment_expander", expander);
+
+    Stream hxHot = feed(new String[] {"methane", "n-butane"}, new double[] {0.8, 0.2}, 400.0,
+        20.0, 1.0);
+    Stream hxCold = feed(new String[] {"n-butane", "n-pentane"}, new double[] {0.5, 0.5}, 300.0,
+        5.0, 1.0);
+    hxHot.setName("hot");
+    hxCold.setName("cold");
+    neqsim.process.equipment.heatexchanger.HeatExchanger hx =
+        new neqsim.process.equipment.heatexchanger.HeatExchanger("hx1", hxHot, hxCold);
+    hx.setUAvalue(1000.0);
+    hx.run();
+    System.out.println("process_duty_w=" + hx.getDuty());
+    hx.initMechanicalDesign();
+    neqsim.process.mechanicaldesign.heatexchanger.HeatExchangerMechanicalDesign hxDesign =
+        hx.getMechanicalDesign();
+    hxDesign.setManualSelection(
+        neqsim.process.mechanicaldesign.heatexchanger.HeatExchangerType.SHELL_AND_TUBE);
+    hxDesign.calcDesign();
+    hxDesign.calculateCostEstimate();
+    System.out.println("equipment_heat_exchanger");
+    System.out.println("area_m2=" + hxDesign.getHeatTransferArea());
+    System.out.println("duty_kw=" + hxDesign.getDuty());
+    System.out.println("weight_total_kg=" + hxDesign.getWeightTotal());
+    System.out.println("max_design_pressure_barg=" + hxDesign.getMaxDesignPressure());
+    System.out.println("purchased_equipment_cost="
+        + hxDesign.getCostEstimate().getPurchasedEquipmentCost());
+    System.out.println("bare_module_cost=" + hxDesign.getCostEstimate().getBareModuleCost());
+    System.out.println("total_module_cost=" + hxDesign.getCostEstimate().getTotalModuleCost());
+    System.out.println("grass_roots_cost=" + hxDesign.getCostEstimate().getGrassRootsCost());
+    System.out.println("installation_man_hours="
+        + hxDesign.getCostEstimate().getInstallationManHours());
+    System.out.println("total_cost=" + hxDesign.getCostEstimate().getTotalCost());
+    System.out.println();
+
+    neqsim.process.costestimation.tank.TankCostEstimate tank =
+        new neqsim.process.costestimation.tank.TankCostEstimate(null);
+    tank.setTankType("fixed-cone-roof");
+    tank.setTankVolume(5000.0);
+    tank.setTankDiameter(20.0);
+    tank.setTankHeight(16.0);
+    tank.setDesignPressure(0.0);
+    tank.setIncludeFoundation(true);
+    printCostItem("equipment_tank", tank);
+
+    Stream filterInlet = filterDesignFeed(10000.0, 303.15, 50.0, false);
+    neqsim.process.equipment.filter.Filter coalescer =
+        new neqsim.process.equipment.filter.Filter("coalescer", filterInlet);
+    coalescer.setFilterServiceType(neqsim.process.equipment.filter.FilterType.COALESCER);
+    coalescer.setDeltaP(0.15);
+    coalescer.setTerminalDeltaP(1.0);
+    coalescer.setElementCollapsePressure(5.0);
+    coalescer.setElementIntegrityVerified(true);
+    neqsim.process.equipment.filter.FilterPerformanceCurve performance =
+        new neqsim.process.equipment.filter.FilterPerformanceCurve(
+            new double[] {1.0, 3.0, 10.0}, new double[] {10.0, 1000.0, 10000.0});
+    coalescer.setPerformanceCurve(performance);
+    coalescer.run();
+    coalescer.getMechanicalDesign().calcDesign();
+    neqsim.process.mechanicaldesign.filter.FilterMechanicalDesign filterDesign =
+        (neqsim.process.mechanicaldesign.filter.FilterMechanicalDesign) coalescer
+            .getMechanicalDesign();
+    filterDesign.calculateCostEstimate();
+    System.out.println("equipment_filter");
+    System.out.println("inner_diameter_m=" + filterDesign.getInnerDiameter());
+    System.out.println("vessel_length_m=" + filterDesign.getVesselLength());
+    System.out.println("required_elements=" + filterDesign.getRequiredElements());
+    System.out.println("design_pressure_bara=" + filterDesign.getDesignPressure());
+    System.out.println("material_grade=" + filterDesign.getMaterialGrade());
+    System.out.println("empty_vessel_weight_kg=" + filterDesign.getWeigthVesselShell());
+    System.out.println("weight_total_kg=" + filterDesign.getWeightTotal());
+    System.out.println("max_design_pressure_barg=" + filterDesign.getMaxDesignPressure());
+    System.out.println("purchased_equipment_cost="
+        + filterDesign.getCostEstimate().getPurchasedEquipmentCost());
+    System.out.println("bare_module_cost=" + filterDesign.getCostEstimate().getBareModuleCost());
+    System.out.println("total_module_cost="
+        + filterDesign.getCostEstimate().getTotalModuleCost());
+    System.out.println("grass_roots_cost=" + filterDesign.getCostEstimate().getGrassRootsCost());
+    System.out.println("installation_man_hours="
+        + filterDesign.getCostEstimate().getInstallationManHours());
+    System.out.println("total_cost=" + filterDesign.getCostEstimate().getTotalCost());
+    System.out.println();
   }
 }

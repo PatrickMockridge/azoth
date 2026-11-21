@@ -252,3 +252,43 @@ def test_the_machines_and_reactor_match_the_capture() -> None:
     assert close(result.equipment[3].purchased_equipment_cost, 1464123.3831943076)
     assert result.equipment[3].bare_module_cost == 0.0
     assert result.equipment[3].total_cost == 0.0
+
+
+def test_the_exchanger_tank_and_filter_match_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "heat_exchanger",
+                "exchanger_type": "shell-tube",
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(532.6884503426853, "kg"),
+            },
+            {
+                "equipment": "tank",
+                "tank_type": "fixed-cone-roof",
+                "volume": quantity(5000.0, "m**3"),
+                "diameter": quantity(20.0, "m"),
+                "height": quantity(16.0, "m"),
+                "include_foundation": True,
+            },
+            {
+                "equipment": "filter",
+                "inner_diameter": quantity(0.5, "m"),
+                "tangent_length": quantity(1.5, "m"),
+                "required_elements": 1.0,
+                "design_pressure_bara": quantity(55.00000000000001, "bar"),
+                "material_grade": "SA-516-70",
+                "empty_vessel_weight": quantity(323.91707924523325, "kg"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(55.00000000000001, "bar"),
+                "weight_total": quantity(431.0922030188032, "kg"),
+            },
+        ]
+    )
+    assert close(result.equipment[0].purchased_equipment_cost, 4261.5076027414825)
+    assert close(result.equipment[0].total_module_cost, 21933.446942860064)
+    assert close(result.equipment[1].purchased_equipment_cost, 179613.0916761046)
+    assert result.equipment[1].total_cost == 0.0
+    assert close(result.equipment[2].purchased_equipment_cost, 7651.934577484859)
+    assert close(hours(result.equipment[2].installation_man_hours), 15.088227105658111)

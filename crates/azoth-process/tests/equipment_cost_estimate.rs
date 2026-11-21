@@ -76,6 +76,25 @@ fn row(equipment: &str) -> EquipmentCostSpec {
         include_lube_oil_system: None,
         include_control_system: None,
         cryogenic_service: None,
+        area: None,
+        duty: None,
+        exchanger_type: None,
+        tema_type: None,
+        shell_passes: None,
+        tank_type: None,
+        volume: None,
+        floating_roof: None,
+        include_foundation: None,
+        include_heating_coils: None,
+        include_insulation: None,
+        insulation_thickness: None,
+        required_elements: None,
+        material_grade: None,
+        empty_vessel_weight: None,
+        element_cost: None,
+        auxiliaries_fraction: None,
+        fallback_steel_rate: None,
+        fallback_element_cost: None,
     }
 }
 
@@ -337,4 +356,54 @@ fn the_machines_and_reactor_match_the_capture() {
     ));
     assert_eq!(result.equipment[3].bare_module_cost, 0.0);
     assert_eq!(result.equipment[3].total_cost, 0.0);
+}
+
+#[test]
+fn the_exchanger_tank_and_filter_match_the_capture() {
+    let mut exchanger = row("heat_exchanger");
+    exchanger.exchanger_type = Some("shell-tube".to_string());
+    exchanger.mechanical_design_present = Some(true);
+    exchanger.max_design_pressure = Some(Pressure::new::<bar>(110.00000000000001));
+    exchanger.weight_total = Some(Mass::new::<kilogram>(532.6884503426853));
+
+    let mut tank = row("tank");
+    tank.tank_type = Some("fixed-cone-roof".to_string());
+    tank.volume = Some(Volume::new::<azoth_core::units::cubic_meter>(5000.0));
+    tank.diameter = Some(meters(20.0));
+    tank.height = Some(meters(16.0));
+    tank.include_foundation = Some(true);
+
+    let mut filter = row("filter");
+    filter.inner_diameter = Some(meters(0.5));
+    filter.tangent_length = Some(meters(1.5));
+    filter.required_elements = Some(1.0);
+    filter.design_pressure_bara = Some(Pressure::new::<bar>(55.00000000000001));
+    filter.material_grade = Some("SA-516-70".to_string());
+    filter.empty_vessel_weight = Some(Mass::new::<kilogram>(323.91707924523325));
+    filter.mechanical_design_present = Some(true);
+    filter.max_design_pressure = Some(Pressure::new::<bar>(55.00000000000001));
+    filter.weight_total = Some(Mass::new::<kilogram>(431.0922030188032));
+
+    let result = run(vec![exchanger, tank, filter]);
+    assert!(close(
+        result.equipment[0].purchased_equipment_cost,
+        4261.5076027414825
+    ));
+    assert!(close(
+        result.equipment[0].total_module_cost,
+        21933.446942860064
+    ));
+    assert!(close(
+        result.equipment[1].purchased_equipment_cost,
+        179613.0916761046
+    ));
+    assert_eq!(result.equipment[1].total_cost, 0.0);
+    assert!(close(
+        result.equipment[2].purchased_equipment_cost,
+        7651.934577484859
+    ));
+    assert!(close(
+        result.equipment[2].installation_man_hours,
+        15.088227105658111 * 3600.0
+    ));
 }

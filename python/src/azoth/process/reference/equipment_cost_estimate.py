@@ -23,7 +23,18 @@ from azoth.process.reference import _costing
 
 MODEL_ID = "process.equipment_cost_estimate"
 
-_KINDS = ("separator", "column", "absorber", "reactor", "compressor", "pump", "expander")
+_KINDS = (
+    "separator",
+    "column",
+    "absorber",
+    "reactor",
+    "compressor",
+    "pump",
+    "expander",
+    "heat_exchanger",
+    "tank",
+    "filter",
+)
 
 _MATERIALS = {
     "carbon_steel": "Carbon Steel",
@@ -185,6 +196,45 @@ def _machine_spec(index: int, row: dict[str, Any], kind: str) -> dict[str, Any]:
             "include_motor": _boolean(row, "include_motor", True),
             "api_rated": _boolean(row, "api_rated"),
             "seal_type": str(row.get("seal_type") or "single-mechanical"),
+        }
+    if kind == "heat_exchanger":
+        return {
+            "kind": "heat_exchanger",
+            "area_m2": _number(row, "area"),
+            "duty_kw": _number(row, "duty") / 1.0e3,
+            "exchanger_type": str(row.get("exchanger_type") or "shell-tube"),
+            "tema_type": str(row.get("tema_type") or "AES"),
+            "shell_passes": _number(row, "shell_passes", 1.0),
+        }
+    if kind == "tank":
+        return {
+            "kind": "tank",
+            "tank_type": str(row.get("tank_type") or "fixed-cone-roof"),
+            "volume_m3": _number(row, "volume"),
+            "diameter_m": _number(row, "diameter"),
+            "height_m": _number(row, "height"),
+            "design_pressure_barg": _number(row, "design_pressure_barg") / 1.0e5,
+            "floating_roof": _boolean(row, "floating_roof"),
+            "include_foundation": _boolean(row, "include_foundation", True),
+            "include_heating_coils": _boolean(row, "include_heating_coils"),
+            "include_insulation": _boolean(row, "include_insulation"),
+            "insulation_thickness_mm": _number(row, "insulation_thickness", 0.1) * 1.0e3,
+        }
+    if kind == "filter":
+        return {
+            "kind": "filter",
+            "inner_diameter_m": _number(row, "inner_diameter"),
+            "vessel_length_m": _number(row, "tangent_length"),
+            "required_elements": 0.0
+            if row.get("required_elements") is None
+            else _whole(index, "required_elements", float(row["required_elements"])),
+            "design_pressure_bara": _number(row, "design_pressure_bara") / 1.0e5,
+            "material_grade": str(row.get("material_grade") or ""),
+            "empty_vessel_weight_kg": _number(row, "empty_vessel_weight"),
+            "element_cost_usd": _number(row, "element_cost", 450.0),
+            "auxiliaries_fraction": _number(row, "auxiliaries_fraction", 0.35),
+            "fallback_steel_rate_usd_per_kg": _number(row, "fallback_steel_rate", 6.0),
+            "fallback_element_cost_usd": _number(row, "fallback_element_cost", 2500.0),
         }
     return {
         "kind": "expander",

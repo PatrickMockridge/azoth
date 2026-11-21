@@ -5,7 +5,7 @@
 //! purchased cost of the selected kind, the shared module stack, the labour
 //! hours and the weight bill of materials.
 
-use azoth_core::units::{Length, Mass, Power, Pressure, Time, Volume};
+use azoth_core::units::{Area, Length, Mass, Power, Pressure, Time, Volume};
 use azoth_core::{AzothError, Result, Warning};
 use serde::Serialize;
 
@@ -152,6 +152,44 @@ pub struct EquipmentCostSpec {
     pub include_control_system: Option<bool>,
     /// Whether the expander is cryogenic.
     pub cryogenic_service: Option<bool>,
+    /// The exchanger's heat-transfer area.
+    pub area: Option<Area>,
+    /// The exchanger's duty.
+    pub duty: Option<Power>,
+    /// The exchanger type.
+    pub exchanger_type: Option<String>,
+    /// The TEMA designation.
+    pub tema_type: Option<String>,
+    /// The exchanger's shell passes.
+    pub shell_passes: Option<f64>,
+    /// The tank type.
+    pub tank_type: Option<String>,
+    /// The tank's volume.
+    pub volume: Option<Volume>,
+    /// Whether a floating roof is fitted.
+    pub floating_roof: Option<bool>,
+    /// Whether the tank foundation is costed.
+    pub include_foundation: Option<bool>,
+    /// Whether heating coils are costed.
+    pub include_heating_coils: Option<bool>,
+    /// Whether insulation is costed.
+    pub include_insulation: Option<bool>,
+    /// The insulation thickness.
+    pub insulation_thickness: Option<Length>,
+    /// The filter's element count.
+    pub required_elements: Option<f64>,
+    /// The filter's material grade.
+    pub material_grade: Option<String>,
+    /// The filter's empty shell weight.
+    pub empty_vessel_weight: Option<Mass>,
+    /// The filter element's price.
+    pub element_cost: Option<f64>,
+    /// The filter's auxiliaries fraction.
+    pub auxiliaries_fraction: Option<f64>,
+    /// The design's steel rate.
+    pub fallback_steel_rate: Option<f64>,
+    /// The design's element price.
+    pub fallback_element_cost: Option<f64>,
 }
 
 /// One equipment row of the result.
@@ -299,7 +337,16 @@ pub fn equipment_cost_estimate(
         let kind = row.equipment.as_str();
         if !matches!(
             kind,
-            "separator" | "column" | "absorber" | "reactor" | "compressor" | "pump" | "expander"
+            "separator"
+                | "column"
+                | "absorber"
+                | "reactor"
+                | "compressor"
+                | "pump"
+                | "expander"
+                | "heat_exchanger"
+                | "tank"
+                | "filter"
         ) {
             return Err(AzothError::invalid_input(
                 format!("equipment[{index}].equipment"),
@@ -628,6 +675,108 @@ pub fn equipment_cost_estimate(
                     include_lube_oil_system: row.include_lube_oil_system.unwrap_or(true),
                     include_control_system: row.include_control_system.unwrap_or(true),
                     cryogenic_service: row.cryogenic_service.unwrap_or(false),
+                })
+            }
+            "heat_exchanger" => {
+                let area = match row.area {
+                    Some(value) => finite(format!("equipment[{index}].area"), value.value)?,
+                    None => 0.0,
+                };
+                let duty = match row.duty {
+                    Some(value) => finite(format!("equipment[{index}].duty"), value.value / 1.0e3)?,
+                    None => 0.0,
+                };
+                let shell_passes = finite(
+                    format!("equipment[{index}].shell_passes"),
+                    row.shell_passes.unwrap_or(1.0),
+                )?;
+                costing::EquipmentSpec::HeatExchanger(costing::HeatExchangerSpec {
+                    area_m2: area,
+                    duty_kw: duty,
+                    exchanger_type: row
+                        .exchanger_type
+                        .clone()
+                        .unwrap_or_else(|| "shell-tube".to_string()),
+                    tema_type: row.tema_type.clone().unwrap_or_else(|| "AES".to_string()),
+                    shell_passes,
+                })
+            }
+            "tank" => {
+                let volume = match row.volume {
+                    Some(value) => finite(format!("equipment[{index}].volume"), value.value)?,
+                    None => 0.0,
+                };
+                let diameter = match row.diameter {
+                    Some(value) => finite(format!("equipment[{index}].diameter"), value.value)?,
+                    None => 0.0,
+                };
+                let height = match row.height {
+                    Some(value) => finite(format!("equipment[{index}].height"), value.value)?,
+                    None => 0.0,
+                };
+                let insulation_thickness = match row.insulation_thickness {
+                    Some(value) => finite(
+                        format!("equipment[{index}].insulation_thickness"),
+                        value.value * 1.0e3,
+                    )?,
+                    None => 100.0,
+                };
+                costing::EquipmentSpec::Tank(costing::TankSpec {
+                    tank_type: row
+                        .tank_type
+                        .clone()
+                        .unwrap_or_else(|| "fixed-cone-roof".to_string()),
+                    volume_m3: volume,
+                    diameter_m: diameter,
+                    height_m: height,
+                    design_pressure_barg: design_barg.unwrap_or(0.0),
+                    floating_roof: row.floating_roof.unwrap_or(false),
+                    include_foundation: row.include_foundation.unwrap_or(true),
+                    include_heating_coils: row.include_heating_coils.unwrap_or(false),
+                    include_insulation: row.include_insulation.unwrap_or(false),
+                    insulation_thickness_mm: insulation_thickness,
+                })
+            }
+            "filter" => {
+                let inner_diameter = match row.inner_diameter {
+                    Some(value) => {
+                        finite(format!("equipment[{index}].inner_diameter"), value.value)?
+                    }
+                    None => 0.0,
+                };
+                let vessel_length = match row.tangent_length {
+                    Some(value) => {
+                        finite(format!("equipment[{index}].tangent_length"), value.value)?
+                    }
+                    None => 0.0,
+                };
+                let elements = match row.required_elements {
+                    Some(value) => whole(index, "required_elements", value)?,
+                    None => 0.0,
+                };
+                costing::EquipmentSpec::Filter(costing::FilterSpec {
+                    inner_diameter_m: inner_diameter,
+                    vessel_length_m: vessel_length,
+                    required_elements: elements,
+                    design_pressure_bara: design_bara.unwrap_or(0.0),
+                    material_grade: row.material_grade.clone().unwrap_or_default(),
+                    empty_vessel_weight_kg: mass(row.empty_vessel_weight),
+                    element_cost_usd: finite(
+                        format!("equipment[{index}].element_cost"),
+                        row.element_cost.unwrap_or(450.0),
+                    )?,
+                    auxiliaries_fraction: finite(
+                        format!("equipment[{index}].auxiliaries_fraction"),
+                        row.auxiliaries_fraction.unwrap_or(0.35),
+                    )?,
+                    fallback_steel_rate_usd_per_kg: finite(
+                        format!("equipment[{index}].fallback_steel_rate"),
+                        row.fallback_steel_rate.unwrap_or(6.0),
+                    )?,
+                    fallback_element_cost_usd: finite(
+                        format!("equipment[{index}].fallback_element_cost"),
+                        row.fallback_element_cost.unwrap_or(2500.0),
+                    )?,
                 })
             }
             _ => unreachable!("the kind list was checked above"),

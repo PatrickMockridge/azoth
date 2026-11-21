@@ -491,6 +491,44 @@ pub struct EquipmentCostSpec {
     pub include_control_system: Option<bool>,
     #[pyo3(item)]
     pub cryogenic_service: Option<bool>,
+    #[pyo3(item)]
+    pub area: Option<f64>,
+    #[pyo3(item)]
+    pub duty: Option<f64>,
+    #[pyo3(item)]
+    pub exchanger_type: Option<String>,
+    #[pyo3(item)]
+    pub tema_type: Option<String>,
+    #[pyo3(item)]
+    pub shell_passes: Option<f64>,
+    #[pyo3(item)]
+    pub tank_type: Option<String>,
+    #[pyo3(item)]
+    pub volume: Option<f64>,
+    #[pyo3(item)]
+    pub floating_roof: Option<bool>,
+    #[pyo3(item)]
+    pub include_foundation: Option<bool>,
+    #[pyo3(item)]
+    pub include_heating_coils: Option<bool>,
+    #[pyo3(item)]
+    pub include_insulation: Option<bool>,
+    #[pyo3(item)]
+    pub insulation_thickness: Option<f64>,
+    #[pyo3(item)]
+    pub required_elements: Option<f64>,
+    #[pyo3(item)]
+    pub material_grade: Option<String>,
+    #[pyo3(item)]
+    pub empty_vessel_weight: Option<f64>,
+    #[pyo3(item)]
+    pub element_cost: Option<f64>,
+    #[pyo3(item)]
+    pub auxiliaries_fraction: Option<f64>,
+    #[pyo3(item)]
+    pub fallback_steel_rate: Option<f64>,
+    #[pyo3(item)]
+    pub fallback_element_cost: Option<f64>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

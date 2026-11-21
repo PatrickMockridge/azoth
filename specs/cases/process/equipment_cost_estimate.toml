@@ -140,3 +140,39 @@ equipment = [
 equipment = [
   { name = "", equipment_type = "expander", purchased_equipment_cost = 1464123.3831943076, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
 ]
+[[cases]]
+id = "heat_exchanger"
+tolerance = 1.0e-12
+source = "`HeatExchangerCostEstimate` on the class's two-stream exchanger (`equipment_heat_exchanger`): **the mechanical design's `getHeatTransferArea` is the base class's 0.0 and no subclass overrides it**, so the estimator falls through to the weight basis even though the design sized 1.724 m2 of shell-and-tube. The case pins the fallback."
+[cases.inputs]
+equipment = [
+  { equipment = "heat_exchanger", exchanger_type = "shell-tube", mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 532.6884503426853 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "exchanger", purchased_equipment_cost = 4261.5076027414825, bare_module_cost = 17546.75755428805, total_module_cost = 21933.446942860064, grass_roots_cost = 32900.1704142901, total_cost = 21933.446942860064, installation_man_hours = 21.307538013707415, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "tank"
+tolerance = 1.0e-12
+source = "`TankCostEstimate` with no design: a 5000 m3 fixed cone-roof tank of 20 m diameter and 16 m height on its foundation (`equipment_tank`)."
+[cases.inputs]
+equipment = [
+  { equipment = "tank", tank_type = "fixed-cone-roof", volume = 5000.0, diameter = 20.0, height = 16.0, include_foundation = true },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "tank", purchased_equipment_cost = 179613.0916761046, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "filter"
+tolerance = 1.0e-12
+source = "`FilterCostEstimate` on the class's coalescer design (`equipment_filter`): a 0.5 m, 1.5 m vessel with one element at 55 bara, whose correlation and fallback costs are both computed and the larger taken."
+[cases.inputs]
+equipment = [
+  { equipment = "filter", inner_diameter = 0.5, tangent_length = 1.5, required_elements = 1.0, design_pressure_bara = 55.00000000000001, material_grade = "SA-516-70", empty_vessel_weight = 323.91707924523325, mechanical_design_present = true, max_design_pressure = 55.00000000000001, weight_total = 431.0922030188032 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "filter", purchased_equipment_cost = 7651.934577484859, bare_module_cost = 29957.323870853223, total_module_cost = 37446.65483856653, grass_roots_cost = 56169.9822578498, total_cost = 37446.65483856653, installation_man_hours = 15.088227105658111, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]

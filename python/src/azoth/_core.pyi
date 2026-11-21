@@ -651,6 +651,25 @@ class EquipmentCostSpec(TypedDict):
     include_lube_oil_system: bool | None
     include_control_system: bool | None
     cryogenic_service: bool | None
+    area: float | None
+    duty: float | None
+    exchanger_type: str | None
+    tema_type: str | None
+    shell_passes: float | None
+    tank_type: str | None
+    volume: float | None
+    floating_roof: bool | None
+    include_foundation: bool | None
+    include_heating_coils: bool | None
+    include_insulation: bool | None
+    insulation_thickness: float | None
+    required_elements: float | None
+    material_grade: str | None
+    empty_vessel_weight: float | None
+    element_cost: float | None
+    auxiliaries_fraction: float | None
+    fallback_steel_rate: float | None
+    fallback_element_cost: float | None
 
 class EscalationItem(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""

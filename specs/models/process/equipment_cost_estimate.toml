@@ -8,6 +8,7 @@ assumptions = [
     "**a zero or negative capacity answers zero**, the class's early return, while a non-finite value is refused.",
     "**the class caches its lazy results**, so a selector changed after a first read does not recompute; the port evaluates one stated state per row.",
     "**costs are USD magnitudes declared dimensionless** because the vocabulary has no currency unit; the installation hours are an `h` field and the weights are kg.",
+    "**the heat exchanger's design reports no area**: `HeatExchangerMechanicalDesign` leaves `getHeatTransferArea` at the base class's 0.0, so the class's estimator always falls back to its weight basis; the row can state the area the correlation takes, a port extension recorded here.",
     "**the tank's effective geometry is an expression, not a mutation**: the class writes the design's diameter and height back into itself, so the port publishes the effective values and recomputes the volume from them.",
     "**the ejector's pressure ratio is `discharge_bara 1000 / suction_mbar`**, the class's own unit convention, carried as the two stated fields.",
     "**`installation_factor` is stored and read by no formula**; it is not an input and the module stack applies no Lang factor.",
@@ -37,7 +38,7 @@ row_type = "EquipmentCostSpec"
 description = "one equipment item per row, in caller order; `equipment` selects the kind and the kind's fields.\n"
 [inputs.equipment.fields.equipment]
 type = "enum"
-values = ["separator", "column", "absorber", "reactor", "compressor", "pump", "expander"]
+values = ["separator", "column", "absorber", "reactor", "compressor", "pump", "expander", "heat_exchanger", "tank", "filter"]
 description = "the equipment kind, which selects the fields the row must carry.\n"
 [inputs.equipment.fields.name]
 type = "string"
@@ -318,6 +319,84 @@ description = "whether the control system is costed; **absent is true**, the cla
 type = "boolean"
 optional = true
 description = "whether the expander is cryogenic, which adds the class's 40 per cent; absent is false.\n"
+[inputs.equipment.fields.area]
+unit = "m**2"
+optional = true
+description = "the exchanger's heat-transfer area; the correlation's capacity basis.\n"
+[inputs.equipment.fields.duty]
+unit = "kW"
+optional = true
+description = "the exchanger's duty, which estimates the area when none is stated.\n"
+[inputs.equipment.fields.exchanger_type]
+type = "enum"
+values = ["shell-tube", "plate", "air-cooler", "double-pipe"]
+optional = true
+description = "the exchanger type; absent is shell-tube.\n"
+[inputs.equipment.fields.tema_type]
+type = "string"
+optional = true
+description = "the TEMA designation whose front and rear ends scale the cost; absent is AES.\n"
+[inputs.equipment.fields.shell_passes]
+unit = "dimensionless"
+optional = true
+description = "the exchanger's shell passes; above one the class multiplies the cost by `1 + 0.1 (n - 1)`.\n"
+[inputs.equipment.fields.tank_type]
+type = "enum"
+values = ["fixed-cone-roof", "fixed-dome-roof", "floating-roof", "spherical", "horizontal"]
+optional = true
+description = "the tank type; absent is fixed-cone-roof.\n"
+[inputs.equipment.fields.volume]
+unit = "m**3"
+optional = true
+description = "the tank's volume, which the class's type-specific curve prices.\n"
+[inputs.equipment.fields.floating_roof]
+type = "boolean"
+optional = true
+description = "whether a floating roof is fitted, which selects the floating-roof curve even on a fixed type; absent is false.\n"
+[inputs.equipment.fields.include_foundation]
+type = "boolean"
+optional = true
+description = "whether the ringwall foundation is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.include_heating_coils]
+type = "boolean"
+optional = true
+description = "whether heating coils are costed; absent is false.\n"
+[inputs.equipment.fields.include_insulation]
+type = "boolean"
+optional = true
+description = "whether insulation is costed; absent is false.\n"
+[inputs.equipment.fields.insulation_thickness]
+unit = "mm"
+optional = true
+description = "the insulation thickness; absent is 100 mm, and the class scales its cost by `1 + (t - 50)/100`.\n"
+[inputs.equipment.fields.required_elements]
+unit = "dimensionless"
+optional = true
+description = "the filter's cartridge element count.\n"
+[inputs.equipment.fields.material_grade]
+type = "string"
+optional = true
+description = "the filter's material grade, whose substring sets its factor: duplex 2.2, stainless 1.8, else 1.0.\n"
+[inputs.equipment.fields.empty_vessel_weight]
+unit = "kg"
+optional = true
+description = "the filter's empty shell weight, the fallback cost's basis.\n"
+[inputs.equipment.fields.element_cost]
+unit = "dimensionless"
+optional = true
+description = "the filter element's price, USD per installed element; absent is 450.\n"
+[inputs.equipment.fields.auxiliaries_fraction]
+unit = "dimensionless"
+optional = true
+description = "the filter's nozzle, skid and instrument allowance as a fraction; absent is 0.35.\n"
+[inputs.equipment.fields.fallback_steel_rate]
+unit = "dimensionless"
+optional = true
+description = "the design's own steel rate, USD/kg, which its fallback cost uses; absent is 6.\n"
+[inputs.equipment.fields.fallback_element_cost]
+unit = "dimensionless"
+optional = true
+description = "the design's own element price, USD per element; absent is 2500.\n"
 [outputs]
 [outputs.equipment]
 type = "record_list"
