@@ -10,6 +10,7 @@
 //!   its inputs against.
 
 pub mod black_oil_correlations;
+pub mod constant_mass_expansion;
 pub mod decline_curve;
 pub mod flash;
 pub mod fluid;
@@ -29,6 +30,7 @@ pub mod water_correlations;
 pub use black_oil_correlations::{
     BlackOilCorrelationsResult, BlackOilQuery, BlackOilResultRow, black_oil_correlations,
 };
+pub use constant_mass_expansion::{CcePoint, ConstantMassExpansionResult, constant_mass_expansion};
 pub use decline_curve::{DeclineCurveResult, decline_curve};
 pub use flash::{Flash, FlashMode, Phase};
 pub use fluid::{Fluid, GasTemplate};

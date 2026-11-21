@@ -10031,6 +10031,65 @@ pub fn black_oil_correlations(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Constant mass expansion.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, eos, mixing_rule, temperature, pressures, volume_correction))]
+#[pyo3(
+    text_signature = "(components, eos, mixing_rule, temperature, pressures, volume_correction)"
+)]
+pub fn constant_mass_expansion(
+    py: Python<'_>,
+    components: Vec<crate::records_gen::FluidComponent>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    temperature: f64,
+    pressures: Vec<f64>,
+    volume_correction: Option<bool>,
+) -> PyResult<crate::transport_gen::PyConstantMassExpansionResult> {
+    let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
+        .into_iter()
+        .map(
+            |row| azoth_characterization::component_row::FluidComponent {
+                fluid: row.fluid,
+                name: row.name,
+                pseudo_component: row.pseudo_component,
+                moles: row.moles,
+                molar_mass: row.molar_mass,
+                density: row.density,
+                normal_boiling_point: row.normal_boiling_point,
+                critical_temperature: row.critical_temperature,
+                critical_pressure: row.critical_pressure,
+                acentric_factor: row.acentric_factor,
+                critical_volume: row.critical_volume,
+                racket_z: row.racket_z,
+                racket_z_cpa: row.racket_z_cpa,
+                parachor: row.parachor,
+                critical_viscosity: row.critical_viscosity,
+                triple_point_temperature: row.triple_point_temperature,
+                heat_of_fusion: row.heat_of_fusion,
+                ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                cp_a: row.cp_a,
+                cp_b: row.cp_b,
+                cp_c: row.cp_c,
+                cp_d: row.cp_d,
+                attractive_m: row.attractive_m,
+            },
+        )
+        .collect();
+    azoth_pvt::constant_mass_expansion::constant_mass_expansion(
+        &components_records,
+        eos,
+        mixing_rule,
+        kelvins(temperature),
+        &pressures,
+        volume_correction,
+    )
+    .map(|r| crate::transport_gen::PyConstantMassExpansionResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Decline-curve analysis.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

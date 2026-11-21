@@ -22,6 +22,7 @@ from typing import Any
 from azoth._dispatch import resolve
 from azoth.core.result import (
     BlackOilCorrelationsResult,
+    ConstantMassExpansionResult,
     DeclineCurveResult,
     GasCorrelationsResult,
     GasMaterialBalanceResult,
@@ -32,6 +33,7 @@ from azoth.core.result import (
 from azoth.pvt import layers as layers
 
 _BLACK_OIL_CORRELATIONS = "pvt.black_oil_correlations"
+_CONSTANT_MASS_EXPANSION = "pvt.constant_mass_expansion"
 _DECLINE_CURVE = "pvt.decline_curve"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
@@ -41,6 +43,7 @@ _WATER_CORRELATIONS = "pvt.water_correlations"
 
 __all__ = [
     "black_oil_correlations",
+    "constant_mass_expansion",
     "decline_curve",
     "gas_correlations",
     "gas_material_balance",
@@ -125,6 +128,44 @@ def water_correlations(
     """
     return resolve(_WATER_CORRELATIONS)(  # type: ignore[no-any-return]
         queries=queries,
+    )
+
+
+def constant_mass_expansion(
+    components: Sequence[Mapping[str, Any]],
+    *,
+    pressures: Sequence[Any],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: Any = None,
+    volume_correction: bool | None = None,
+) -> ConstantMassExpansionResult:
+    """The constant-mass expansion of a fluid over a pressure schedule.
+
+    ``components`` is the characterization row list; the temperature is absolute and the
+    pressures absolute. The saturation state is the class's upward scan's last bisection
+    midpoint, and the schedule is reported in its own order. The saturation and total volumes
+    are untranslated; the phase densities and the gas volume are translated where
+    ``volume_correction`` is not false. A two-phase point carries ``liquid_relative_volume``
+    and ``y_factor`` and leaves ``viscosity`` and ``isothermal_compressibility`` absent; a
+    single-phase point does the reverse.
+
+    Returns:
+        The saturation scalars and one ``points`` row per pressure.
+
+    Raises:
+        InvalidInputError: for an unknown ``eos`` or ``mixing_rule``, no pressures, or a
+            non-positive temperature or pressure.
+
+    See :func:`azoth.pvt.reference.constant_mass_expansion.constant_mass_expansion`.
+    """
+    return resolve(_CONSTANT_MASS_EXPANSION)(  # type: ignore[no-any-return]
+        components=components,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        temperature=temperature,
+        pressures=pressures,
+        volume_correction=volume_correction,
     )
 
 

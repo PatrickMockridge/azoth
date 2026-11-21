@@ -2460,6 +2460,25 @@ class BlackOilResultRow:
     petrosky_farshad: Qty | None
 
 @final
+class CcePoint:
+    """one row per pressure."""
+
+    pressure: Qty
+    total_volume: Qty
+    relative_volume: float
+    density: Qty
+    gas_volume: Qty
+    gas_standard_volume: Qty
+    bg: float
+    z_gas: float
+    oil_density: Qty | None
+    oil_viscosity: Qty | None
+    liquid_relative_volume: float | None
+    y_factor: float | None
+    viscosity: Qty | None
+    isothermal_compressibility: float | None
+
+@final
 class GasResultRow:
     """one row per input row, in caller order; only the fields the calculation answers are present."""
 
@@ -6755,6 +6774,15 @@ class BlackOilCorrelationsResult:
     warnings: list[Warning]
 
 @final
+class ConstantMassExpansionResult:
+    saturation_pressure: Qty
+    saturation_volume: Qty
+    z_saturation: float
+    saturation_isothermal_compressibility: float
+    points: list[CcePoint]
+    warnings: list[Warning]
+
+@final
 class DeclineCurveResult:
     time: list[float] | None
     rate: list[float] | None
@@ -10949,6 +10977,14 @@ def vessel_rupture(
     tensile_strength_factor: float | None = None,
 ) -> VesselRuptureResult: ...
 def black_oil_correlations(queries: list[BlackOilQuery]) -> BlackOilCorrelationsResult: ...
+def constant_mass_expansion(
+    components: list[FluidComponent],
+    temperature: float,
+    pressures: list[float],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+) -> ConstantMassExpansionResult: ...
 def decline_curve(
     calculation: str,
     qi: float | None = None,

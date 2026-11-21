@@ -26,8 +26,61 @@ from typing import Any
 #: A model's inputs, keyed as a case states them, to its intermediate rows.
 Dumper = Callable[[Mapping[str, Any]], dict[str, float]]
 
+
+def _cce(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`pvt.constant_mass_expansion`'s captured quantities, keyed as the capture spells them."""
+    from azoth.core.units import quantity
+
+    from .reference.constant_mass_expansion import constant_mass_expansion
+
+    rows = [{**row, "moles": quantity(row["moles"], "mol")} for row in inputs["components"]]
+    result = constant_mass_expansion(
+        rows,
+        eos=inputs.get("eos"),
+        mixing_rule=inputs.get("mixing_rule"),
+        temperature=quantity(inputs["temperature"], "K"),
+        pressures=[quantity(value, "Pa") for value in inputs["pressures"]],
+        volume_correction=inputs.get("volume_correction"),
+    )
+    rows_out: dict[str, float] = {
+        "saturation_pressure_pa": result.saturation_pressure.to("Pa").magnitude,
+        "saturation_volume_m3": result.saturation_volume.to("m**3").magnitude,
+        "z_saturation": result.z_saturation,
+        "saturation_isothermal_compressibility": result.saturation_isothermal_compressibility,
+    }
+    for index, point in enumerate(result.points):
+        at = f"point_{index}_"
+        rows_out[at + "pressure_pa"] = point.pressure.to("Pa").magnitude
+        rows_out[at + "total_volume_m3"] = point.total_volume.to("m**3").magnitude
+        rows_out[at + "relative_volume"] = point.relative_volume
+        rows_out[at + "density"] = point.density.to("kg/m**3").magnitude
+        rows_out[at + "gas_volume_m3"] = point.gas_volume.to("m**3").magnitude
+        rows_out[at + "gas_standard_volume_m3"] = point.gas_standard_volume.to("m**3").magnitude
+        rows_out[at + "bg"] = point.bg
+        rows_out[at + "z_gas"] = point.z_gas
+        for name in (
+            "oil_density",
+            "oil_viscosity",
+            "liquid_relative_volume",
+            "y_factor",
+            "viscosity",
+            "isothermal_compressibility",
+        ):
+            value = getattr(point, name)
+            if value is not None:
+                if name in ("oil_density",):
+                    rows_out[at + name] = value.to("kg/m**3").magnitude
+                elif name in ("oil_viscosity", "viscosity"):
+                    rows_out[at + name] = value.to("Pa*s").magnitude
+                else:
+                    rows_out[at + name] = float(value)
+    return rows_out
+
+
 #: Models whose per-step arithmetic is dumped by a function here.
-DUMPERS: dict[str, Dumper] = {}
+DUMPERS: dict[str, Dumper] = {
+    "pvt.constant_mass_expansion": _cce,
+}
 
 #: Record-list models with no interior to dump: every published row is the answer. The value
 #: says why, and the layer-diff test counts each as evidence rather than silently skipping it.

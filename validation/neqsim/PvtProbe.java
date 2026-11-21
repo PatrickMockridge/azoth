@@ -1,11 +1,17 @@
 // The PVT probes. One subcommand per id; the states are the pinned tests' own where the
 // class is expressible in the id's boundary units, and each answer is printed as the id
 // publishes it.
+//
+// A few published diagnostics are private arrays in the classes and have no getter. The
+// probe reads those by reflection, walking the superclass chain. That is probe surface, not
+// class surface: the library never reflects, and a field rename at a later pin breaks this
+// file rather than an id.
 
 import java.util.Map;
 import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.GasMaterialBalance;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.OilMaterialBalance;
+import neqsim.pvtsimulation.simulation.ConstantMassExpansion;
 import neqsim.pvtsimulation.simulation.SaturationPressure;
 import neqsim.pvtsimulation.simulation.SaturationTemperature;
 import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
@@ -412,6 +418,94 @@ public final class PvtProbe {
     line("saturation_temperature_k", temperature.calcSaturationTemperature());
   }
 
+  // One private field, walking the superclass chain. Probe-only; see the header.
+  private static Object field(Object target, String name) {
+    Class<?> type = target.getClass();
+    while (type != null) {
+      try {
+        java.lang.reflect.Field found = type.getDeclaredField(name);
+        found.setAccessible(true);
+        return found.get(target);
+      } catch (NoSuchFieldException absent) {
+        type = type.getSuperclass();
+      } catch (IllegalAccessException denied) {
+        throw new IllegalStateException(denied);
+      }
+    }
+    throw new IllegalStateException("no field " + name + " on " + target.getClass().getName());
+  }
+
+  private static double[] array(Object target, String name) {
+    return (double[]) field(target, name);
+  }
+
+  private static double scalar(Object target, String name) {
+    return (Double) field(target, name);
+  }
+
+  private static void value(String key, double value) {
+    if (Double.isFinite(value)) {
+      line(key, value);
+    }
+  }
+
+  private static void cceBlock(String block, String first, double firstMoles, String second,
+      double secondMoles, double temperatureK, double[] pressuresBar) {
+    System.out.println("[" + block + "]");
+    ConstantMassExpansion expansion = new ConstantMassExpansion(
+        binary(first, firstMoles, second, secondMoles, temperatureK, pressuresBar[0]));
+    expansion.setTemperature(temperatureK);
+    expansion.setPressures(pressuresBar);
+    expansion.runCalc();
+
+    line("saturation_pressure_pa", expansion.getSaturationPressure() * 1.0e5);
+    line("saturation_volume_m3", scalar(expansion, "saturationVolume") / 1.0e5);
+    line("z_saturation", scalar(expansion, "Zsaturation"));
+    line("saturation_isothermal_compressibility",
+        expansion.getSaturationIsoThermalCompressibility() / 1.0e5);
+
+    double[] total = array(expansion, "totalVolume");
+    double[] gas = array(expansion, "gasVolume");
+    double[] gasStandard = array(expansion, "gasStandardVolume");
+    double[] relative = expansion.getRelativeVolume();
+    double[] liquidRelative = expansion.getLiquidRelativeVolume();
+    double[] yFactor = expansion.getYfactor();
+    double[] density = expansion.getDensity();
+    double[] viscosity = expansion.getViscosity();
+    double[] oilDensity = expansion.getOilDensity();
+    double[] oilViscosity = expansion.getOilViscosity();
+    double[] bg = expansion.getBg();
+    double[] zGas = expansion.getZgas();
+    double[] compressibility = expansion.getIsoThermalCompressibility();
+    for (int i = 0; i < pressuresBar.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "pressure_pa", pressuresBar[i] * 1.0e5);
+      line(at + "total_volume_m3", total[i] / 1.0e5);
+      line(at + "relative_volume", relative[i]);
+      line(at + "density", density[i]);
+      line(at + "gas_volume_m3", gas[i]);
+      line(at + "gas_standard_volume_m3", gasStandard[i] / 1.0e5);
+      line(at + "bg", bg[i]);
+      line(at + "z_gas", zGas[i]);
+      value(at + "oil_density", oilDensity[i]);
+      value(at + "oil_viscosity", oilViscosity[i]);
+      value(at + "liquid_relative_volume", liquidRelative[i] / 100.0);
+      value(at + "y_factor", yFactor[i]);
+      value(at + "viscosity", viscosity[i]);
+      value(at + "isothermal_compressibility", compressibility[i] / 1.0e5);
+    }
+  }
+
+  private static void cce() {
+    System.out.println("cce");
+    cceBlock("cce_methane_nc10_323", "methane", 0.70, "nC10", 0.30, 323.15,
+        new double[] {300.0, 250.0, 200.0, 150.0, 100.0, 50.0, 10.0});
+    cceBlock("cce_unsaturate_323", "methane", 0.70, "nC10", 0.30, 323.15,
+        new double[] {400.0, 350.0, 300.0, 250.0});
+    cceBlock("cce_methane_nbutane_275", "methane", 0.95, "n-butane", 0.05, 275.0,
+        new double[] {100.0, 50.0, 20.0, 10.0, 5.0});
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -435,6 +529,9 @@ public final class PvtProbe {
         break;
       case "saturation":
         saturation();
+        break;
+      case "cce":
+        cce();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

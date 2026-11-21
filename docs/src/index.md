@@ -467,6 +467,7 @@ Five sections, and the difference between them is the point:
 *Models* — whose specs fix a procedure rather than an equation:
 
 - [`pvt.black_oil_correlations`](./pvt/black_oil_correlations.md) — Black-oil correlation table
+- [`pvt.constant_mass_expansion`](./pvt/constant_mass_expansion.md) — Constant mass expansion
 - [`pvt.decline_curve`](./pvt/decline_curve.md) — Decline-curve analysis
 - [`pvt.gas_correlations`](./pvt/gas_correlations.md) — Gas correlation table
 - [`pvt.gas_material_balance`](./pvt/gas_material_balance.md) — Gas material balance

@@ -5,13 +5,11 @@
 //! pin: a descending 10-unit scan for the uppermost two-phase crossing, bisected to `1e-5`,
 //! with the classes' grid-top fallback carried as a warning.
 
-use azoth_characterization::KijSource;
 use azoth_characterization::component_row::FluidComponent;
 use azoth_core::units::{Pressure, ThermodynamicTemperature};
 use azoth_core::{AzothError, Result, Warning};
-use azoth_eos::Cubic;
 
-use crate::fluid::Fluid;
+use crate::fluid::{Fluid, cubic_named, kij_named};
 use crate::saturation::{upper_saturation_pressure, upper_saturation_temperature};
 
 /// Result of `pvt.saturation_test`.
@@ -42,7 +40,7 @@ pub fn saturation_test(
     temperature_search_min: Option<ThermodynamicTemperature>,
     temperature_search_max: Option<ThermodynamicTemperature>,
 ) -> Result<SaturationTestResult> {
-    let fluid = Fluid::from_rows(components, cubic(eos)?, kij_source(mixing_rule)?, true)?;
+    let fluid = Fluid::from_rows(components, cubic_named(eos)?, kij_named(mixing_rule)?, true)?;
 
     let bounds = match (temperature_search_min, temperature_search_max) {
         (None, None) => None,
@@ -90,28 +88,6 @@ pub fn saturation_test(
         other => Err(AzothError::invalid_input(
             "mode",
             format!("{other} is not a saturation search; use pressure or temperature"),
-        )),
-    }
-}
-
-fn cubic(eos: Option<&str>) -> Result<Cubic> {
-    match eos.unwrap_or("srk") {
-        "srk" => Ok(Cubic::Srk),
-        "pr" => Ok(Cubic::Pr),
-        other => Err(AzothError::invalid_input(
-            "eos",
-            format!("{other} is not one of srk and pr"),
-        )),
-    }
-}
-
-fn kij_source(mixing_rule: Option<&str>) -> Result<KijSource> {
-    match mixing_rule.unwrap_or("classic") {
-        "classic" => Ok(KijSource::Database),
-        "zero" => Ok(KijSource::Zero),
-        other => Err(AzothError::invalid_input(
-            "mixing_rule",
-            format!("{other} is not one of classic and zero"),
         )),
     }
 }

@@ -215,6 +215,36 @@ impl Fluid {
     }
 }
 
+/// The cubic an id's `eos` input names. Absent is SRK, the classes' `SystemSrkEos`.
+///
+/// # Errors
+/// * [`AzothError::InvalidInput`] for a name that is not `srk` or `pr`.
+pub fn cubic_named(eos: Option<&str>) -> Result<Cubic> {
+    match eos.unwrap_or("srk") {
+        "srk" => Ok(Cubic::Srk),
+        "pr" => Ok(Cubic::Pr),
+        other => Err(AzothError::invalid_input(
+            "eos",
+            format!("{other} is not one of srk and pr"),
+        )),
+    }
+}
+
+/// The interaction matrix an id's `mixing_rule` input names. Absent is the databank's.
+///
+/// # Errors
+/// * [`AzothError::InvalidInput`] for a name that is not `classic` or `zero`.
+pub fn kij_named(mixing_rule: Option<&str>) -> Result<KijSource> {
+    match mixing_rule.unwrap_or("classic") {
+        "classic" => Ok(KijSource::Database),
+        "zero" => Ok(KijSource::Zero),
+        other => Err(AzothError::invalid_input(
+            "mixing_rule",
+            format!("{other} is not one of classic and zero"),
+        )),
+    }
+}
+
 /// The checks every row list faces before a mixture is built.
 fn check_rows(rows: &[FluidComponent]) -> Result<()> {
     if rows.is_empty() {

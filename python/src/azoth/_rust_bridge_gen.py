@@ -54,6 +54,7 @@ from azoth.core.result import (
     BwrsPhaseResult,
     CalcIonicCompositionResult,
     CapillaryDewPointResult,
+    CcePoint,
     CdftSurfaceTensionResult,
     ChapmanEnskogDiffusivityResult,
     CharacterisePlusFractionResult,
@@ -79,6 +80,7 @@ from azoth.core.result import (
     ConductionPlaneWallResult,
     ConsequenceAnalysisResult,
     ConsequenceOutcomeResult,
+    ConstantMassExpansionResult,
     ControlValveCvResult,
     ControlValveFailureReliefResult,
     CooldownVerdict,
@@ -621,6 +623,7 @@ __all__ = [
     "compressor",
     "conduction_plane_wall",
     "consequence_analysis",
+    "constant_mass_expansion",
     "control_valve_cv",
     "control_valve_failure_relief",
     "cooler",
@@ -10457,6 +10460,27 @@ def black_oil_correlations(queries: Sequence[Mapping[str, Any]]) -> BlackOilCorr
     )
     return BlackOilCorrelationsResult(
         queries=tuple(BlackOilResultRow(calculation=c.calculation, pressure=None if c.pressure is None else from_si(c.pressure.magnitude_si, c.pressure.unit), solution_gor=c.solution_gor, oil_fvf=c.oil_fvf, compressibility=c.compressibility, viscosity=None if c.viscosity is None else from_si(c.viscosity.magnitude_si, c.viscosity.unit), gas_fvf=c.gas_fvf, factor=c.factor, average=None if c.average is None else from_si(c.average.magnitude_si, c.average.unit), minimum=None if c.minimum is None else from_si(c.minimum.magnitude_si, c.minimum.unit), maximum=None if c.maximum is None else from_si(c.maximum.magnitude_si, c.maximum.unit), std_dev=None if c.std_dev is None else from_si(c.std_dev.magnitude_si, c.std_dev.unit), standing=None if c.standing is None else from_si(c.standing.magnitude_si, c.standing.unit), vasquez_beggs=None if c.vasquez_beggs is None else from_si(c.vasquez_beggs.magnitude_si, c.vasquez_beggs.unit), glaso=None if c.glaso is None else from_si(c.glaso.magnitude_si, c.glaso.unit), petrosky_farshad=None if c.petrosky_farshad is None else from_si(c.petrosky_farshad.magnitude_si, c.petrosky_farshad.unit)) for c in result.queries),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def constant_mass_expansion(components: Sequence[Mapping[str, Any]], *, pressures: Sequence[Any], eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, volume_correction: bool | None=None) -> ConstantMassExpansionResult:
+    """``pvt.constant_mass_expansion``, computed in Rust."""
+    spec = _models_gen.model("pvt.constant_mass_expansion")
+    result = _core.constant_mass_expansion(
+        input_records_to_si(spec, "components", components),
+        eos,
+        mixing_rule,
+        _si(spec, "temperature", temperature),
+        [_si(spec, "pressures", v) for v in pressures],
+        volume_correction,
+    )
+    return ConstantMassExpansionResult(
+        saturation_pressure=from_si(result.saturation_pressure.magnitude_si, result.saturation_pressure.unit),
+        saturation_volume=from_si(result.saturation_volume.magnitude_si, result.saturation_volume.unit),
+        z_saturation=result.z_saturation,
+        saturation_isothermal_compressibility=result.saturation_isothermal_compressibility,
+        points=tuple(CcePoint(pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), total_volume=from_si(c.total_volume.magnitude_si, c.total_volume.unit), relative_volume=c.relative_volume, density=from_si(c.density.magnitude_si, c.density.unit), gas_volume=from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), gas_standard_volume=from_si(c.gas_standard_volume.magnitude_si, c.gas_standard_volume.unit), bg=c.bg, z_gas=c.z_gas, oil_density=None if c.oil_density is None else from_si(c.oil_density.magnitude_si, c.oil_density.unit), oil_viscosity=None if c.oil_viscosity is None else from_si(c.oil_viscosity.magnitude_si, c.oil_viscosity.unit), liquid_relative_volume=c.liquid_relative_volume, y_factor=c.y_factor, viscosity=None if c.viscosity is None else from_si(c.viscosity.magnitude_si, c.viscosity.unit), isothermal_compressibility=c.isothermal_compressibility) for c in result.points),
         warnings=_warnings(result.warnings),
     )
 

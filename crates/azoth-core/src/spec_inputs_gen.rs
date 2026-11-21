@@ -356,6 +356,7 @@
 //!   - specs/models/process/vessel_filling.toml
 //!   - specs/models/process/vessel_rupture.toml
 //!   - specs/models/pvt/black_oil_correlations.toml
+//!   - specs/models/pvt/constant_mass_expansion.toml
 //!   - specs/models/pvt/decline_curve.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
@@ -6826,6 +6827,12 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "tensile_strength_factor",
         "dimensionless",
     ),
+    (
+        "pvt.constant_mass_expansion",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.constant_mass_expansion", "pressures", "pressure"),
     ("pvt.decline_curve", "qi", "dimensionless"),
     ("pvt.decline_curve", "di", "dimensionless"),
     ("pvt.decline_curve", "b", "dimensionless"),

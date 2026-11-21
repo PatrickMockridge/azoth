@@ -239,6 +239,11 @@ fn two_phase(
             2
         }
         azoth_eos::Phase::AllLiquid => {
+            // **The single phase is the feed, not the negative flash's hypothetical
+            // liquid.** NeqSim clamps `beta` to zero and re-initialises at `z`, so the root
+            // and the fugacity coefficients are recomputed there; the negative flash's
+            // `z_liquid` belongs to the composition it invented.
+            let state = mixture.phase_state(reduced, z, RootSide::Liquid)?;
             phases.push(build(
                 mixture,
                 corrected,
@@ -246,13 +251,14 @@ fn two_phase(
                 p,
                 reduced,
                 z,
-                result.z_liquid,
+                state.z,
                 1.0,
-                &result.ln_phi_liquid,
+                &state.ln_phi,
             )?);
             1
         }
         azoth_eos::Phase::AllVapour => {
+            let state = mixture.phase_state(reduced, z, RootSide::Vapour)?;
             phases.push(build(
                 mixture,
                 corrected,
@@ -260,9 +266,9 @@ fn two_phase(
                 p,
                 reduced,
                 z,
-                result.z_vapour,
+                state.z,
                 1.0,
-                &result.ln_phi_vapour,
+                &state.ln_phi,
             )?);
             1
         }

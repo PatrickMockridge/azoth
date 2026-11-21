@@ -28,6 +28,7 @@ from azoth.core.record_outputs_gen import (
     BlackOilResultRow,
     BrineMixingPointRow,
     BubbleTransferZoneReleaseStation,
+    CcePoint,
     CharacterizationComponent,
     ChemicalWarningRow,
     ComponentSelectiveReleaseStation,
@@ -12256,6 +12257,31 @@ class BlackOilCorrelationsResult(_HasWarnings):
 
     #: one row per input row, in caller order; only the fields the calculation answers are present.
     queries: tuple[BlackOilResultRow, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ConstantMassExpansionResult(_HasWarnings):
+    """Result of ``pvt.constant_mass_expansion``."""
+
+    CALC_ID: ClassVar[str] = "pvt.constant_mass_expansion"
+
+    #: the saturation pressure at the last bisection midpoint.
+    saturation_pressure: Q
+
+    #: the untranslated saturation volume.
+    saturation_volume: Q
+
+    #: the mole-fraction-weighted compressibility at the saturation state.
+    z_saturation: float
+
+    #: the saturation state's isothermal compressibility, in 1/Pa; the vocabulary has no inverse-pressure unit.
+    saturation_isothermal_compressibility: float
+
+    #: one row per pressure.
+    points: tuple[CcePoint, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

@@ -149,10 +149,15 @@ def _two_phase(
         )
         count = 2
     elif result.phase is Phase.ALL_LIQUID:
-        phases.append(_build(fluid, reduced, t, p, z, result.z_liquid, 1.0, result.ln_phi_liquid))
+        # **The single phase is the feed, not the negative flash's hypothetical liquid.**
+        # NeqSim clamps `beta` to zero and re-initialises at `z`, so the root and the
+        # fugacity coefficients are recomputed there.
+        state = phase_state(reduced, fluid.mixture.kij, z, liquid=True)
+        phases.append(_build(fluid, reduced, t, p, z, state.z, 1.0, state.ln_phi))
         count = 1
     elif result.phase is Phase.ALL_VAPOUR:
-        phases.append(_build(fluid, reduced, t, p, z, result.z_vapour, 1.0, result.ln_phi_vapour))
+        state = phase_state(reduced, fluid.mixture.kij, z, liquid=False)
+        phases.append(_build(fluid, reduced, t, p, z, state.z, 1.0, state.ln_phi))
         count = 1
     else:
         root, ln_phi = _stable_root(fluid, reduced, z)

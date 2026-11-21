@@ -12,6 +12,7 @@
 use azoth_core::{CalcResult, Warning};
 
 use crate::black_oil_correlations::BlackOilCorrelationsResult;
+use crate::constant_mass_expansion::ConstantMassExpansionResult;
 use crate::decline_curve::DeclineCurveResult;
 use crate::gas_correlations::GasCorrelationsResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
@@ -22,6 +23,22 @@ use crate::water_correlations::WaterCorrelationsResult;
 impl CalcResult for BlackOilCorrelationsResult {
     const CALC_ID: &'static str = "pvt.black_oil_correlations";
     const FIELDS: &'static [&'static str] = &["queries", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ConstantMassExpansionResult {
+    const CALC_ID: &'static str = "pvt.constant_mass_expansion";
+    const FIELDS: &'static [&'static str] = &[
+        "saturation_pressure",
+        "saturation_volume",
+        "z_saturation",
+        "saturation_isothermal_compressibility",
+        "points",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

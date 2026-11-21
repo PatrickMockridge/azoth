@@ -15,14 +15,14 @@
 
 use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBlackOilResultRow,
-    PyBrineMixingPointRow, PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent,
-    PyChemicalWarningRow, PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult,
-    PyCostBomRow, PyCostEstimationResultRow, PyDepositionSegmentRow, PyDepressurizationPoint,
-    PyDisciplineCostLine, PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery,
-    PyEnvelopeSummary, PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
-    PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
-    PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyGasResultRow,
-    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyBrineMixingPointRow, PyBubbleTransferZoneReleaseStation, PyCcePoint,
+    PyCharacterizationComponent, PyChemicalWarningRow, PyComponentSelectiveReleaseStation,
+    PyConsequenceOutcomeResult, PyCostBomRow, PyCostEstimationResultRow, PyDepositionSegmentRow,
+    PyDepressurizationPoint, PyDisciplineCostLine, PyDriftFluxReleaseStation, PyEnvelopePoint,
+    PyEnvelopeQuery, PyEnvelopeSummary, PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow,
+    PyEquipmentMtoRow, PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution,
+    PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry,
+    PyGasResultRow, PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
     PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
     PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
@@ -30341,6 +30341,70 @@ impl From<&azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult>
     fn from(r: &azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult) -> Self {
         Self {
             queries: r.queries.iter().map(PyBlackOilResultRow::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.constant_mass_expansion`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ConstantMassExpansionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyConstantMassExpansionResult {
+    /// the saturation pressure at the last bisection midpoint.
+    #[pyo3(get)]
+    pub saturation_pressure: PyQty,
+    /// the untranslated saturation volume.
+    #[pyo3(get)]
+    pub saturation_volume: PyQty,
+    /// the mole-fraction-weighted compressibility at the saturation state.
+    #[pyo3(get)]
+    pub z_saturation: f64,
+    /// the saturation state's isothermal compressibility, in 1/Pa; the vocabulary has no inverse-pressure unit.
+    #[pyo3(get)]
+    pub saturation_isothermal_compressibility: f64,
+    /// one row per pressure.
+    #[pyo3(get)]
+    pub points: Vec<PyCcePoint>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyConstantMassExpansionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "ConstantMassExpansionResult(saturation_pressure={:?}, saturation_volume={:?}, z_saturation={:?}, saturation_isothermal_compressibility={:?}, points={:?}, {} warning(s))",
+            self.saturation_pressure,
+            self.saturation_volume,
+            self.z_saturation,
+            self.saturation_isothermal_compressibility,
+            self.points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::constant_mass_expansion::ConstantMassExpansionResult>
+    for PyConstantMassExpansionResult
+{
+    fn from(r: &azoth_pvt::constant_mass_expansion::ConstantMassExpansionResult) -> Self {
+        Self {
+            saturation_pressure: PyQty {
+                magnitude_si: r.saturation_pressure,
+                unit: "Pa".to_string(),
+            },
+            saturation_volume: PyQty {
+                magnitude_si: r.saturation_volume,
+                unit: "m**3".to_string(),
+            },
+            z_saturation: r.z_saturation,
+            saturation_isothermal_compressibility: r.saturation_isothermal_compressibility,
+            points: r.points.iter().map(PyCcePoint::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

@@ -434,6 +434,122 @@ impl From<&azoth_process::models::bubble_transfer_zone_release::BubbleTransferZo
     }
 }
 
+/// one row per pressure.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "CcePoint")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyCcePoint {
+    /// the absolute pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the untranslated total volume.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the total volume over the saturation volume.
+    #[pyo3(get)]
+    pub relative_volume: f64,
+    /// phase 0's mass density, volume-corrected where the fluid asks.
+    #[pyo3(get)]
+    pub density: PyQty,
+    /// phase 0's corrected extensive volume, the class's gas volume.
+    #[pyo3(get)]
+    pub gas_volume: PyQty,
+    /// the same amount at 288.15 K and 1.01325 bar, as an ideal gas.
+    #[pyo3(get)]
+    pub gas_standard_volume: PyQty,
+    /// the gas volume over the standard volume.
+    #[pyo3(get)]
+    pub bg: f64,
+    /// phase 0's cubic compressibility.
+    #[pyo3(get)]
+    pub z_gas: f64,
+    /// the oil phase's density; absent where the flash labels no oil.
+    #[pyo3(get)]
+    pub oil_density: Option<PyQty>,
+    /// the oil phase's viscosity; absent where the flash labels no oil.
+    #[pyo3(get)]
+    pub oil_viscosity: Option<PyQty>,
+    /// the oil phase's untranslated volume over the saturation volume; absent in a single phase.
+    #[pyo3(get)]
+    pub liquid_relative_volume: Option<f64>,
+    /// the class's Y-factor; absent in a single phase.
+    #[pyo3(get)]
+    pub y_factor: Option<f64>,
+    /// phase 0's viscosity; absent in a two-phase point.
+    #[pyo3(get)]
+    pub viscosity: Option<PyQty>,
+    /// phase 0's isothermal compressibility, in 1/Pa; absent in a two-phase point.
+    #[pyo3(get)]
+    pub isothermal_compressibility: Option<f64>,
+}
+
+#[pymethods]
+impl PyCcePoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "CcePoint(pressure={:?}, total_volume={:?}, relative_volume={}, density={:?}, gas_volume={:?}, gas_standard_volume={:?}, bg={}, z_gas={}, oil_density={:?}, oil_viscosity={:?}, liquid_relative_volume={:?}, y_factor={:?}, viscosity={:?}, isothermal_compressibility={:?})",
+            self.pressure,
+            self.total_volume,
+            self.relative_volume,
+            self.density,
+            self.gas_volume,
+            self.gas_standard_volume,
+            self.bg,
+            self.z_gas,
+            self.oil_density,
+            self.oil_viscosity,
+            self.liquid_relative_volume,
+            self.y_factor,
+            self.viscosity,
+            self.isothermal_compressibility
+        )
+    }
+}
+
+impl From<&azoth_pvt::constant_mass_expansion::CcePoint> for PyCcePoint {
+    fn from(row: &azoth_pvt::constant_mass_expansion::CcePoint) -> Self {
+        Self {
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            total_volume: PyQty {
+                magnitude_si: row.total_volume,
+                unit: "m**3".to_string(),
+            },
+            relative_volume: row.relative_volume,
+            density: PyQty {
+                magnitude_si: row.density,
+                unit: "kg/m**3".to_string(),
+            },
+            gas_volume: PyQty {
+                magnitude_si: row.gas_volume,
+                unit: "m**3".to_string(),
+            },
+            gas_standard_volume: PyQty {
+                magnitude_si: row.gas_standard_volume,
+                unit: "m**3".to_string(),
+            },
+            bg: row.bg,
+            z_gas: row.z_gas,
+            oil_density: row.oil_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            oil_viscosity: row.oil_viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            liquid_relative_volume: row.liquid_relative_volume,
+            y_factor: row.y_factor,
+            viscosity: row.viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            isothermal_compressibility: row.isothermal_compressibility,
+        }
+    }
+}
+
 /// The blended fluid's components: its merged base components first, in the fluids' order, then the combined pseudo-components in ascending cut order, named `PC1_PC`, `PC2_PC` and so on.
 #[pyclass(
     frozen,

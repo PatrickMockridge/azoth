@@ -166,6 +166,53 @@ class BubbleTransferZoneReleaseStation:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class CcePoint:
+    """one row per pressure."""
+
+    #: the absolute pressure.
+    pressure: Q
+
+    #: the untranslated total volume.
+    total_volume: Q
+
+    #: the total volume over the saturation volume.
+    relative_volume: float
+
+    #: phase 0's mass density, volume-corrected where the fluid asks.
+    density: Q
+
+    #: phase 0's corrected extensive volume, the class's gas volume.
+    gas_volume: Q
+
+    #: the same amount at 288.15 K and 1.01325 bar, as an ideal gas.
+    gas_standard_volume: Q
+
+    #: the gas volume over the standard volume.
+    bg: float
+
+    #: phase 0's cubic compressibility.
+    z_gas: float
+
+    #: the oil phase's density; absent where the flash labels no oil.
+    oil_density: Q | None
+
+    #: the oil phase's viscosity; absent where the flash labels no oil.
+    oil_viscosity: Q | None
+
+    #: the oil phase's untranslated volume over the saturation volume; absent in a single phase.
+    liquid_relative_volume: float | None
+
+    #: the class's Y-factor; absent in a single phase.
+    y_factor: float | None
+
+    #: phase 0's viscosity; absent in a two-phase point.
+    viscosity: Q | None
+
+    #: phase 0's isothermal compressibility, in 1/Pa; absent in a two-phase point.
+    isothermal_compressibility: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class CharacterizationComponent:
     """The blended fluid's components: its merged base components first, in the fluids' order, then the combined pseudo-components in ascending cut order, named `PC1_PC`, `PC2_PC` and so on."""
 

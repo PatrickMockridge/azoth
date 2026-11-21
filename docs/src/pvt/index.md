@@ -14,6 +14,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | Model | Scheme | Source |
 |---|---|---|
 | [`pvt.black_oil_correlations`](./black_oil_correlations.md) | `black_oil_correlation_dispatch` | NeqSim pvtsimulation/util/BlackOilCorrelations.java and SaturationPressureCorrelation.java |
+| [`pvt.constant_mass_expansion`](./constant_mass_expansion.md) | `direct composition` | NeqSim pvtsimulation/simulation/ConstantMassExpansion.java |
 | [`pvt.decline_curve`](./decline_curve.md) | `direct composition` | NeqSim pvtsimulation/util/DeclineCurveAnalysis.java |
 | [`pvt.gas_correlations`](./gas_correlations.md) | `gas_correlation_dispatch` | NeqSim pvtsimulation/util/ZFactorCorrelations.java, GasPseudoCriticalProperties.java, GasPseudoPressure.java and reservoirproperties/CompositionEstimation.java |
 | [`pvt.gas_material_balance`](./gas_material_balance.md) | `direct composition` | NeqSim reservoirproperties/materialbalance/GasMaterialBalance.java |
