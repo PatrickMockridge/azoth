@@ -868,16 +868,7 @@ fn evaluate_item(item: &Item, default_leak: f64, rows: &mut Vec<OpenDrainAssessm
             f64::NAN,
             &["maximumAllowedBackpressureBara"],
         );
-        if backflow > 0.0 {
-            push(
-                rows,
-                item,
-                "OD-OPS-TAGREADER",
-                "Operational evidence",
-                OpenDrainStatus::Fail,
-                OpenDrainSeverity::High,
-            );
-        } else if !observed.is_nan() && !maximum.is_nan() && observed > maximum {
+        if backflow > 0.0 || (!observed.is_nan() && !maximum.is_nan() && observed > maximum) {
             push(
                 rows,
                 item,

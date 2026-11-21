@@ -299,8 +299,8 @@ pub fn safety_envelope(
             margin: Vec::with_capacity(trace.len()),
         };
         for point in trace {
-            if !(point.pressure.value > 0.0)
-                || !(point.temperature.value > 0.0)
+            if point.pressure.value.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
+                || point.temperature.value.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
                 || !point.pressure.value.is_finite()
                 || !point.temperature.value.is_finite()
             {
@@ -514,10 +514,7 @@ fn mdmt_arm(
 
 fn query_arm(arm: &Arm, pressure_bar: f64, operating_temperature: f64) -> EnvelopeQuery {
     let temperature = temperature_at(arm, pressure_bar);
-    let safe_temperature = match temperature {
-        Some(value) => Some(value - margin_at(arm, pressure_bar)),
-        None => None,
-    };
+    let safe_temperature = temperature.map(|value| value - margin_at(arm, pressure_bar));
     let safe = if arm.envelope == EnvelopeKind::PhaseEnvelope {
         true
     } else {

@@ -4065,8 +4065,8 @@ def _safety_envelope(inputs: Mapping[str, Any]) -> dict[str, float]:
             dumped[f"envelope_{arm}_safe_temperature_at_operating_k"] = query.safe_temperature.to(
                 "K"
             ).magnitude
-        if row.margin is not None:
-            dumped[f"envelope_{arm}_margin_at_operating_k"] = row.margin.to("K").magnitude
+        if query.margin is not None:
+            dumped[f"envelope_{arm}_margin_at_operating_k"] = query.margin.to("K").magnitude
     return dumped
 
 

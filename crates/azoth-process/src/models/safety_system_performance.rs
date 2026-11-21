@@ -1102,21 +1102,23 @@ fn category_text(
         barrier.name.as_deref(),
         barrier.description.as_deref(),
         barrier.safety_function.as_deref(),
-    ] {
-        if let Some(part) = part {
-            text.push_str(part);
-            text.push(' ');
-        }
+    ]
+    .into_iter()
+    .flatten()
+    {
+        text.push_str(part);
+        text.push(' ');
     }
     if let Some(standard) = standard {
         for part in [
             standard.title.as_deref(),
             standard.safety_function.as_deref(),
-        ] {
-            if let Some(part) = part {
-                text.push_str(part);
-                text.push(' ');
-            }
+        ]
+        .into_iter()
+        .flatten()
+        {
+            text.push_str(part);
+            text.push(' ');
         }
         for criterion in &register.criteria {
             if criterion.standard_id == standard.id {

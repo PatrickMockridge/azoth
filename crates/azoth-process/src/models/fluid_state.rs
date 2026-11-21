@@ -115,7 +115,10 @@ pub(crate) fn flash(
     for (index, composition) in split.x.iter().enumerate() {
         let mole_fraction = split.phase_fractions[index];
         let root = split.z_factor[index];
-        if !(mole_fraction > 0.0) || !root.is_finite() || root <= 0.0 {
+        if mole_fraction.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
+            || !root.is_finite()
+            || root <= 0.0
+        {
             continue;
         }
         phases.push(phase_info(

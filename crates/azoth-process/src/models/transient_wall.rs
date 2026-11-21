@@ -29,10 +29,14 @@ impl TransientWall {
         initial_temperature: f64,
         num_nodes: usize,
     ) -> Result<Self> {
-        if !(thickness > 0.0 && thickness.is_finite())
-            || !(conductivity > 0.0 && conductivity.is_finite())
-            || !(density > 0.0 && density.is_finite())
-            || !(heat_capacity > 0.0 && heat_capacity.is_finite())
+        if !(thickness > 0.0
+            && thickness.is_finite()
+            && conductivity > 0.0
+            && conductivity.is_finite()
+            && density > 0.0
+            && density.is_finite()
+            && heat_capacity > 0.0
+            && heat_capacity.is_finite())
         {
             return Err(AzothError::invalid_input(
                 "wall",
@@ -136,7 +140,7 @@ impl TransientWall {
         additional_outer_flux: f64,
     ) {
         let mut next = vec![0.0; self.num_nodes];
-        for i in 1..self.num_nodes - 1 {
+        for (i, slot) in next.iter_mut().enumerate().take(self.num_nodes - 1).skip(1) {
             let k_left = 2.0 * self.conductivity[i] * self.conductivity[i - 1]
                 / (self.conductivity[i] + self.conductivity[i - 1]);
             let k_right = 2.0 * self.conductivity[i] * self.conductivity[i + 1]
@@ -144,7 +148,7 @@ impl TransientWall {
             let k_effective = (k_left + k_right) / 2.0;
             let alpha_effective = k_effective / (self.density[i] * self.heat_capacity[i]);
             let fourier = alpha_effective * dt / (self.dx * self.dx);
-            next[i] = self.temperature[i]
+            *slot = self.temperature[i]
                 + fourier
                     * (self.temperature[i - 1] - 2.0 * self.temperature[i]
                         + self.temperature[i + 1]);

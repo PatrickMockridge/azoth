@@ -2499,6 +2499,7 @@ pub fn pipe_fire_rupture_material(
 ///
 /// The module and bulk stack, the project lines and the material take-off.
 #[pyfunction]
+#[allow(clippy::too_many_arguments)]
 #[pyo3(signature = (equipment = None, facility_type = None, project_context = None, location_factor = None, piping_bulk_factor = None, electrical_instrumentation_factor = None, insulation_paint_fireproofing_factor = None, hvac_telecom_safety_factor = None, engineering_procurement_factor = None, construction_management_factor = None, project_contingency_factor = None, owner_cost_factor = None, include_utilities_and_offsites = None, estimate_class = None))]
 #[pyo3(
     text_signature = "(equipment=None, facility_type=None, project_context=None, location_factor=None, piping_bulk_factor=None, electrical_instrumentation_factor=None, insulation_paint_fireproofing_factor=None, hvac_telecom_safety_factor=None, engineering_procurement_factor=None, construction_management_factor=None, project_contingency_factor=None, owner_cost_factor=None, include_utilities_and_offsites=None, estimate_class=None)"

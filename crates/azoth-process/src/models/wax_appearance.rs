@@ -50,7 +50,10 @@ impl Probe<'_> {
             pascals(self.pressure),
             self.z,
         )?;
-        if !result.converged || result.phase_count < 3 || !(result.wax_fraction > 0.0) {
+        if !result.converged
+            || result.phase_count < 3
+            || result.wax_fraction.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
+        {
             return Ok(false);
         }
         let Some(composition) = result.x.last() else {
