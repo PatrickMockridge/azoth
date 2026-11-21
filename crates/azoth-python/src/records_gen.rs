@@ -441,6 +441,56 @@ pub struct EquipmentCostSpec {
     pub condenser_duty: Option<f64>,
     #[pyo3(item)]
     pub absorber_type: Option<String>,
+    #[pyo3(item)]
+    pub vessel_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub vessel_length: Option<f64>,
+    #[pyo3(item)]
+    pub catalyst_mass: Option<f64>,
+    #[pyo3(item)]
+    pub number_of_beds: Option<f64>,
+    #[pyo3(item)]
+    pub total_equipped_weight: Option<f64>,
+    #[pyo3(item)]
+    pub catalyst_cost_per_kg: Option<f64>,
+    #[pyo3(item)]
+    pub internals_fraction: Option<f64>,
+    #[pyo3(item)]
+    pub bed_allowance: Option<f64>,
+    #[pyo3(item)]
+    pub power: Option<f64>,
+    #[pyo3(item)]
+    pub compressor_type: Option<String>,
+    #[pyo3(item)]
+    pub driver_type: Option<String>,
+    #[pyo3(item)]
+    pub include_driver: Option<bool>,
+    #[pyo3(item)]
+    pub include_intercoolers: Option<bool>,
+    #[pyo3(item)]
+    pub pump_type: Option<String>,
+    #[pyo3(item)]
+    pub include_motor: Option<bool>,
+    #[pyo3(item)]
+    pub api_rated: Option<bool>,
+    #[pyo3(item)]
+    pub seal_type: Option<String>,
+    #[pyo3(item)]
+    pub shaft_power: Option<f64>,
+    #[pyo3(item)]
+    pub expander_type: Option<String>,
+    #[pyo3(item)]
+    pub load_type: Option<String>,
+    #[pyo3(item)]
+    pub include_load: Option<bool>,
+    #[pyo3(item)]
+    pub include_gearbox: Option<bool>,
+    #[pyo3(item)]
+    pub include_lube_oil_system: Option<bool>,
+    #[pyo3(item)]
+    pub include_control_system: Option<bool>,
+    #[pyo3(item)]
+    pub cryogenic_service: Option<bool>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

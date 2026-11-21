@@ -20428,5 +20428,107 @@ public class ProcessProbe {
       System.out.println("bom_" + i + "_unit_cost_usd=" + row.get("unit_cost_USD"));
     }
     System.out.println();
+
+    SystemSrkEos reactorFluid = new SystemSrkEos(553.15, 50.0);
+    reactorFluid.addComponent("methane", 0.85);
+    reactorFluid.addComponent("ethane", 0.10);
+    reactorFluid.addComponent("propane", 0.05);
+    reactorFluid.setMixingRule(2);
+    Stream reactorFeed = new Stream("reactor feed", reactorFluid);
+    reactorFeed.setFlowRate(20000.0, "kg/hr");
+    reactorFeed.run();
+    neqsim.process.equipment.reactor.GibbsReactor reactor =
+        new neqsim.process.equipment.reactor.GibbsReactor("Topside Reactor", reactorFeed);
+    reactor.initMechanicalDesign();
+    neqsim.process.mechanicaldesign.reactor.ReactorMechanicalDesign reactorDesign =
+        reactor.getMechanicalDesign();
+    reactorDesign.calcDesign();
+    reactorDesign.calculateCostEstimate();
+    System.out.println("equipment_reactor");
+    System.out.println("vessel_diameter_m=" + reactorDesign.getVesselDiameter());
+    System.out.println("vessel_length_m=" + reactorDesign.getVesselLength());
+    System.out.println("design_pressure_bara=" + reactorDesign.getDesignPressureBara());
+    System.out.println("catalyst_mass_kg=" + reactorDesign.getCatalystMass());
+    System.out.println("number_of_beds=" + reactorDesign.getNumberOfBeds());
+    System.out.println("total_equipped_weight_kg=" + reactorDesign.getTotalEquippedWeight());
+    System.out.println("weight_total_kg=" + reactorDesign.getWeightTotal());
+    System.out.println("max_design_pressure_barg=" + reactorDesign.getMaxDesignPressure());
+    System.out.println("purchased_equipment_cost="
+        + reactorDesign.getCostEstimate().getPurchasedEquipmentCost());
+    System.out.println("bare_module_cost=" + reactorDesign.getCostEstimate().getBareModuleCost());
+    System.out.println("total_module_cost=" + reactorDesign.getCostEstimate().getTotalModuleCost());
+    System.out.println("grass_roots_cost=" + reactorDesign.getCostEstimate().getGrassRootsCost());
+    System.out.println("installation_man_hours="
+        + reactorDesign.getCostEstimate().getInstallationManHours());
+    System.out.println("total_cost=" + reactorDesign.getCostEstimate().getTotalCost());
+    System.out.println();
+
+    SystemSrkEos compressorFluid = new SystemSrkEos(298.15, 60.0);
+    compressorFluid.addComponent("methane", 0.85);
+    compressorFluid.addComponent("ethane", 0.10);
+    compressorFluid.addComponent("propane", 0.05);
+    compressorFluid.setMixingRule(2);
+    Stream compressorFeed = new Stream("compressor feed", compressorFluid);
+    compressorFeed.setFlowRate(50000.0, "kg/hr");
+    compressorFeed.run();
+    neqsim.process.equipment.compressor.Compressor compressor =
+        new neqsim.process.equipment.compressor.Compressor("Export Compressor", compressorFeed);
+    compressor.setOutletPressure(120.0);
+    compressor.run();
+    compressor.initMechanicalDesign();
+    neqsim.process.mechanicaldesign.compressor.CompressorMechanicalDesign compressorDesign =
+        compressor.getMechanicalDesign();
+    compressorDesign.calcDesign();
+    compressorDesign.calculateCostEstimate();
+    System.out.println("equipment_compressor");
+    System.out.println("power_kw=" + compressorDesign.getPower());
+    System.out.println("weight_total_kg=" + compressorDesign.getWeightTotal());
+    System.out.println("max_design_pressure_barg=" + compressorDesign.getMaxDesignPressure());
+    System.out.println("number_of_stages=" + compressorDesign.getNumberOfStages());
+    System.out.println("purchased_equipment_cost="
+        + compressorDesign.getCostEstimate().getPurchasedEquipmentCost());
+    System.out.println("bare_module_cost=" + compressorDesign.getCostEstimate().getBareModuleCost());
+    System.out.println("total_module_cost="
+        + compressorDesign.getCostEstimate().getTotalModuleCost());
+    System.out.println("grass_roots_cost=" + compressorDesign.getCostEstimate().getGrassRootsCost());
+    System.out.println("installation_man_hours="
+        + compressorDesign.getCostEstimate().getInstallationManHours());
+    System.out.println("total_cost=" + compressorDesign.getCostEstimate().getTotalCost());
+    System.out.println();
+
+    SystemSrkEos pumpFluid = new SystemSrkEos(298.15, 3.0);
+    pumpFluid.addComponent("water", 1.0);
+    pumpFluid.setMixingRule(2);
+    Stream pumpFeed = new Stream("pump feed", pumpFluid);
+    pumpFeed.setFlowRate(100000.0, "kg/hr");
+    pumpFeed.run();
+    neqsim.process.equipment.pump.Pump pump =
+        new neqsim.process.equipment.pump.Pump("Export Pump", pumpFeed);
+    pump.setOutletPressure(20.0);
+    pump.run();
+    pump.initMechanicalDesign();
+    neqsim.process.mechanicaldesign.pump.PumpMechanicalDesign pumpDesign = pump.getMechanicalDesign();
+    pumpDesign.calcDesign();
+    pumpDesign.calculateCostEstimate();
+    System.out.println("equipment_pump");
+    System.out.println("power_kw=" + pumpDesign.getPower());
+    System.out.println("weight_total_kg=" + pumpDesign.getWeightTotal());
+    System.out.println("max_design_pressure_barg=" + pumpDesign.getMaxDesignPressure());
+    System.out.println("purchased_equipment_cost="
+        + pumpDesign.getCostEstimate().getPurchasedEquipmentCost());
+    System.out.println("bare_module_cost=" + pumpDesign.getCostEstimate().getBareModuleCost());
+    System.out.println("total_module_cost=" + pumpDesign.getCostEstimate().getTotalModuleCost());
+    System.out.println("grass_roots_cost=" + pumpDesign.getCostEstimate().getGrassRootsCost());
+    System.out.println("installation_man_hours="
+        + pumpDesign.getCostEstimate().getInstallationManHours());
+    System.out.println("total_cost=" + pumpDesign.getCostEstimate().getTotalCost());
+    System.out.println();
+
+    neqsim.process.costestimation.expander.ExpanderCostEstimate expander =
+        new neqsim.process.costestimation.expander.ExpanderCostEstimate(null);
+    expander.setShaftPower(2000.0);
+    expander.setExpanderType("radial-inflow");
+    expander.setLoadType("generator");
+    printCostItem("equipment_expander", expander);
   }
 }

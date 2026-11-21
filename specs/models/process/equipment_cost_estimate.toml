@@ -37,7 +37,7 @@ row_type = "EquipmentCostSpec"
 description = "one equipment item per row, in caller order; `equipment` selects the kind and the kind's fields.\n"
 [inputs.equipment.fields.equipment]
 type = "enum"
-values = ["separator", "column", "absorber"]
+values = ["separator", "column", "absorber", "reactor", "compressor", "pump", "expander"]
 description = "the equipment kind, which selects the fields the row must carry.\n"
 [inputs.equipment.fields.name]
 type = "string"
@@ -212,6 +212,112 @@ type = "enum"
 values = ["packed", "trayed", "spray"]
 optional = true
 description = "the absorber internals; absent is packed.\n"
+[inputs.equipment.fields.vessel_diameter]
+unit = "m"
+optional = true
+description = "the reactor vessel's diameter.\n"
+[inputs.equipment.fields.vessel_length]
+unit = "m"
+optional = true
+description = "the reactor vessel's length.\n"
+[inputs.equipment.fields.catalyst_mass]
+unit = "kg"
+optional = true
+description = "the loaded catalyst mass, which the reactor's purchased cost prices.\n"
+[inputs.equipment.fields.number_of_beds]
+unit = "dimensionless"
+optional = true
+description = "the reactor's catalyst-bed count; absent is one.\n"
+[inputs.equipment.fields.total_equipped_weight]
+unit = "kg"
+optional = true
+description = "the reactor's total equipped weight, the class's fallback cost basis.\n"
+[inputs.equipment.fields.catalyst_cost_per_kg]
+unit = "dimensionless"
+optional = true
+description = "the loaded catalyst's price, USD/kg; absent is 8.\n"
+[inputs.equipment.fields.internals_fraction]
+unit = "dimensionless"
+optional = true
+description = "the reactor internals' cost as a fraction of the vessel; absent is 0.45.\n"
+[inputs.equipment.fields.bed_allowance]
+unit = "dimensionless"
+optional = true
+description = "the distributor and support allowance per bed, USD; absent is 25000.\n"
+[inputs.equipment.fields.power]
+unit = "kW"
+optional = true
+description = "the compressor's or pump's shaft power, which the machine correlation prices.\n"
+[inputs.equipment.fields.compressor_type]
+type = "enum"
+values = ["centrifugal", "reciprocating", "screw", "axial"]
+optional = true
+description = "the compressor type; absent is centrifugal.\n"
+[inputs.equipment.fields.driver_type]
+type = "enum"
+values = ["electric-motor", "gas-turbine", "steam-turbine", "gas-engine"]
+optional = true
+description = "the compressor's driver; absent is an electric motor.\n"
+[inputs.equipment.fields.include_driver]
+type = "boolean"
+optional = true
+description = "whether the driver is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.include_intercoolers]
+type = "boolean"
+optional = true
+description = "whether the compressor's intercoolers are costed; absent is false.\n"
+[inputs.equipment.fields.pump_type]
+type = "enum"
+values = ["centrifugal", "reciprocating", "gear", "screw", "diaphragm"]
+optional = true
+description = "the pump type; absent is centrifugal.\n"
+[inputs.equipment.fields.include_motor]
+type = "boolean"
+optional = true
+description = "whether the pump's motor is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.api_rated]
+type = "boolean"
+optional = true
+description = "whether the pump is API 610 rated; absent is false.\n"
+[inputs.equipment.fields.seal_type]
+type = "enum"
+values = ["single-mechanical", "double-mechanical", "packed", "mag-drive", "canned"]
+optional = true
+description = "the pump seal; absent is a single mechanical seal.\n"
+[inputs.equipment.fields.shaft_power]
+unit = "kW"
+optional = true
+description = "the expander's shaft power, which its correlation prices.\n"
+[inputs.equipment.fields.expander_type]
+type = "enum"
+values = ["radial-inflow", "axial", "mixed-flow"]
+optional = true
+description = "the expander type; absent is radial-inflow.\n"
+[inputs.equipment.fields.load_type]
+type = "enum"
+values = ["generator", "compressor", "brake"]
+optional = true
+description = "the expander's load; absent is a generator.\n"
+[inputs.equipment.fields.include_load]
+type = "boolean"
+optional = true
+description = "whether the load is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.include_gearbox]
+type = "boolean"
+optional = true
+description = "whether a gearbox is costed; absent is false.\n"
+[inputs.equipment.fields.include_lube_oil_system]
+type = "boolean"
+optional = true
+description = "whether the lube-oil system is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.include_control_system]
+type = "boolean"
+optional = true
+description = "whether the control system is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.cryogenic_service]
+type = "boolean"
+optional = true
+description = "whether the expander is cryogenic, which adds the class's 40 per cent; absent is false.\n"
 [outputs]
 [outputs.equipment]
 type = "record_list"

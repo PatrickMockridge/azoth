@@ -23,7 +23,7 @@ from azoth.process.reference import _costing
 
 MODEL_ID = "process.equipment_cost_estimate"
 
-_KINDS = ("separator", "column", "absorber")
+_KINDS = ("separator", "column", "absorber", "reactor", "compressor", "pump", "expander")
 
 _MATERIALS = {
     "carbon_steel": "Carbon Steel",
@@ -142,6 +142,63 @@ def _spec_for_row(index: int, row: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _machine_spec(index: int, row: dict[str, Any], kind: str) -> dict[str, Any]:
+    """The reactor and machine rows, whose fields differ by kind."""
+    if kind == "reactor":
+        return {
+            "kind": "reactor",
+            "vessel_diameter_m": _finite(
+                f"equipment[{index}].vessel_diameter",
+                float(_require(index, row, kind, "vessel_diameter")),
+            ),
+            "vessel_length_m": _finite(
+                f"equipment[{index}].vessel_length",
+                float(_require(index, row, kind, "vessel_length")),
+            ),
+            "design_pressure_bara": _number(row, "design_pressure_bara") / 1.0e5,
+            "catalyst_mass_kg": _number(row, "catalyst_mass"),
+            "number_of_beds": 1.0
+            if row.get("number_of_beds") is None
+            else _whole(index, "number_of_beds", float(row["number_of_beds"])),
+            "total_equipped_weight_kg": _number(row, "total_equipped_weight"),
+            "catalyst_cost_per_kg": _number(row, "catalyst_cost_per_kg", 8.0),
+            "internals_fraction": _number(row, "internals_fraction", 0.45),
+            "bed_allowance_usd": _number(row, "bed_allowance", 25000.0),
+        }
+    if kind == "compressor":
+        return {
+            "kind": "compressor",
+            "power_kw": _number(row, "power") / 1.0e3,
+            "compressor_type": str(row.get("compressor_type") or "centrifugal"),
+            "driver_type": str(row.get("driver_type") or "electric-motor"),
+            "include_driver": _boolean(row, "include_driver", True),
+            "number_of_stages": 1.0
+            if row.get("number_of_stages") is None
+            else _whole(index, "number_of_stages", float(row["number_of_stages"])),
+            "include_intercoolers": _boolean(row, "include_intercoolers"),
+        }
+    if kind == "pump":
+        return {
+            "kind": "pump",
+            "power_kw": _number(row, "power") / 1.0e3,
+            "pump_type": str(row.get("pump_type") or "centrifugal"),
+            "include_motor": _boolean(row, "include_motor", True),
+            "api_rated": _boolean(row, "api_rated"),
+            "seal_type": str(row.get("seal_type") or "single-mechanical"),
+        }
+    return {
+        "kind": "expander",
+        "shaft_power_kw": _number(row, "shaft_power") / 1.0e3,
+        "expander_type": str(row.get("expander_type") or "radial-inflow"),
+        "load_type": str(row.get("load_type") or "generator"),
+        "include_load": _boolean(row, "include_load", True),
+        "include_gearbox": _boolean(row, "include_gearbox"),
+        "include_lube_oil_system": _boolean(row, "include_lube_oil_system", True),
+        "include_control_system": _boolean(row, "include_control_system", True),
+        "cryogenic_service": _boolean(row, "cryogenic_service"),
+    }
+
+
 def equipment_cost_estimate(
     equipment: list[dict[str, Any]],
 ) -> EquipmentCostEstimateResult:
@@ -224,7 +281,11 @@ def equipment_cost_estimate(
             "contingency": contingency,
             "engineering": engineering,
         }
-        item = _spec_for_row(index, row, kind)
+        item = (
+            _spec_for_row(index, row, kind)
+            if kind in ("separator", "column", "absorber")
+            else _machine_spec(index, row, kind)
+        )
         # The design pressures arrive in Pa; the kinds read them in bar.
         if "design_pressure_barg" in item:
             item["design_pressure_barg"] = _number(row, "design_pressure_barg") / 1.0e5

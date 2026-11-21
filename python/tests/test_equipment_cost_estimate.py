@@ -204,3 +204,51 @@ def test_the_estimate_refuses_what_it_cannot_express() -> None:
         equipment_cost_estimate(
             [{"equipment": "separator", "vessel_volume": quantity(float("inf"), "m**3")}]
         )
+
+
+def test_the_machines_and_reactor_match_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "reactor",
+                "vessel_diameter": quantity(0.5, "m"),
+                "vessel_length": quantity(2.0, "m"),
+                "design_pressure_bara": quantity(110.00000000000001, "bar"),
+                "catalyst_mass": quantity(157.0102926847301, "kg"),
+                "number_of_beds": 1.0,
+                "total_equipped_weight": quantity(839.1623792871716, "kg"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(839.1623792871716, "kg"),
+            },
+            {
+                "equipment": "compressor",
+                "power": quantity(1314.898215238133, "kW"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(702848.7190347943, "kg"),
+            },
+            {
+                "equipment": "pump",
+                "power": quantity(75.0, "kW"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(753.7347107302816, "kg"),
+            },
+            {
+                "equipment": "expander",
+                "shaft_power": quantity(2000.0, "kW"),
+                "expander_type": "radial-inflow",
+                "load_type": "generator",
+            },
+        ]
+    )
+    assert close(result.equipment[0].purchased_equipment_cost, 32507.612368330385)
+    assert close(result.equipment[0].bare_module_cost, 133850.09392660036)
+    assert close(hours(result.equipment[0].installation_man_hours), 29.370683275051004)
+    assert close(result.equipment[1].purchased_equipment_cost, 566585.9790593369)
+    assert close(hours(result.equipment[1].installation_man_hours), 42170.92314208765)
+    assert close(result.equipment[2].purchased_equipment_cost, 22458.556775479567)
+    assert close(result.equipment[3].purchased_equipment_cost, 1464123.3831943076)
+    assert result.equipment[3].bare_module_cost == 0.0
+    assert result.equipment[3].total_cost == 0.0

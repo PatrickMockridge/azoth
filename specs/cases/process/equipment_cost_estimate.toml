@@ -92,3 +92,51 @@ material_take_off = [
   { equipment_index = 0.0, item = "Electrical & Instrumentation", material = "", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 167.89567997747764, has_weight = true, cost_usd = 4029.4963194594634, source = "" },
   { equipment_index = 0.0, item = "Structural Steel", material = "Carbon Steel", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 209.86959997184704, has_weight = true, cost_usd = 1343.1654398198211, source = "" },
 ]
+[[cases]]
+id = "reactor"
+tolerance = 1.0e-12
+source = "`ReactorCostEstimate` on the class's own Gibbs-reactor design (`equipment_reactor`): a 0.5 m, 2.0 m vessel at 110 bara with 157.01 kg of catalyst in one bed, whose stack and labour are the class's."
+[cases.inputs]
+equipment = [
+  { equipment = "reactor", vessel_diameter = 0.5, vessel_length = 2.0, design_pressure_bara = 110.00000000000001, catalyst_mass = 157.0102926847301, number_of_beds = 1.0, total_equipped_weight = 839.1623792871716, mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 839.1623792871716 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "reactor", purchased_equipment_cost = 32507.612368330385, bare_module_cost = 133850.09392660036, total_module_cost = 167312.61740825046, grass_roots_cost = 250968.9261123757, total_cost = 167312.61740825046, installation_man_hours = 29.370683275051004, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "compressor"
+tolerance = 1.0e-12
+source = "`CompressorCostEstimate` on the class's 50 000 kg/hr export compressor (`equipment_compressor`): a centrifugal machine of 1314.9 kW with an electric-motor driver; **the estimator's own stage count stays at its default of one**, because the class does not read the design's three stages."
+[cases.inputs]
+equipment = [
+  { equipment = "compressor", power = 1314.898215238133, mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 702848.7190347943 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "compressor", purchased_equipment_cost = 566585.9790593369, bare_module_cost = 2332917.7687768196, total_module_cost = 2916147.2109710244, grass_roots_cost = 4374220.816456537, total_cost = 2916147.2109710244, installation_man_hours = 42170.92314208765, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "pump"
+tolerance = 1.0e-12
+source = "`PumpCostEstimate` on the class's 100 000 kg/hr water pump (`equipment_pump`): a 75 kW centrifugal machine with its motor."
+[cases.inputs]
+equipment = [
+  { equipment = "pump", power = 75.0, mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 753.7347107302816 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "pump", purchased_equipment_cost = 22458.556775479567, bare_module_cost = 92473.1075230371, total_module_cost = 115591.38440379639, grass_roots_cost = 173387.07660569457, total_cost = 115591.38440379639, installation_man_hours = 37.68673553651408, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "expander"
+tolerance = 1.0e-12
+source = "`ExpanderCostEstimate` with a manually stated 2000 kW radial-inflow expander driving a generator (`equipment_expander`): the class's radial correlation with the generator, lube-oil and control extras, and no design so no stack."
+[cases.inputs]
+equipment = [
+  { equipment = "expander", shaft_power = 2000.0, expander_type = "radial-inflow", load_type = "generator" },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "expander", purchased_equipment_cost = 1464123.3831943076, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]

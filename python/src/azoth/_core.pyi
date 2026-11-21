@@ -626,6 +626,31 @@ class EquipmentCostSpec(TypedDict):
     reboiler_duty: float | None
     condenser_duty: float | None
     absorber_type: str | None
+    vessel_diameter: float | None
+    vessel_length: float | None
+    catalyst_mass: float | None
+    number_of_beds: float | None
+    total_equipped_weight: float | None
+    catalyst_cost_per_kg: float | None
+    internals_fraction: float | None
+    bed_allowance: float | None
+    power: float | None
+    compressor_type: str | None
+    driver_type: str | None
+    include_driver: bool | None
+    include_intercoolers: bool | None
+    pump_type: str | None
+    include_motor: bool | None
+    api_rated: bool | None
+    seal_type: str | None
+    shaft_power: float | None
+    expander_type: str | None
+    load_type: str | None
+    include_load: bool | None
+    include_gearbox: bool | None
+    include_lube_oil_system: bool | None
+    include_control_system: bool | None
+    cryogenic_service: bool | None
 
 class EscalationItem(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""

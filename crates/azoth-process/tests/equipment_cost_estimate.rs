@@ -51,6 +51,31 @@ fn row(equipment: &str) -> EquipmentCostSpec {
         reboiler_duty: None,
         condenser_duty: None,
         absorber_type: None,
+        vessel_diameter: None,
+        vessel_length: None,
+        catalyst_mass: None,
+        number_of_beds: None,
+        total_equipped_weight: None,
+        catalyst_cost_per_kg: None,
+        internals_fraction: None,
+        bed_allowance: None,
+        power: None,
+        compressor_type: None,
+        driver_type: None,
+        include_driver: None,
+        include_intercoolers: None,
+        pump_type: None,
+        include_motor: None,
+        api_rated: None,
+        seal_type: None,
+        shaft_power: None,
+        expander_type: None,
+        load_type: None,
+        include_load: None,
+        include_gearbox: None,
+        include_lube_oil_system: None,
+        include_control_system: None,
+        cryogenic_service: None,
     }
 }
 
@@ -249,4 +274,67 @@ fn the_estimate_refuses_what_it_cannot_express() {
     let mut infinite = row("separator");
     infinite.vessel_volume = Some(Volume::new::<azoth_core::units::cubic_meter>(f64::INFINITY));
     assert!(equipment_cost_estimate(&[infinite]).is_err());
+}
+
+#[test]
+fn the_machines_and_reactor_match_the_capture() {
+    let mut reactor = row("reactor");
+    reactor.vessel_diameter = Some(meters(0.5));
+    reactor.vessel_length = Some(meters(2.0));
+    reactor.design_pressure_bara = Some(Pressure::new::<bar>(110.00000000000001));
+    reactor.catalyst_mass = Some(Mass::new::<kilogram>(157.0102926847301));
+    reactor.number_of_beds = Some(1.0);
+    reactor.total_equipped_weight = Some(Mass::new::<kilogram>(839.1623792871716));
+    reactor.mechanical_design_present = Some(true);
+    reactor.max_design_pressure = Some(Pressure::new::<bar>(110.00000000000001));
+    reactor.weight_total = Some(Mass::new::<kilogram>(839.1623792871716));
+
+    let mut compressor = row("compressor");
+    compressor.power = Some(Power::new::<kilowatt>(1314.898215238133));
+    compressor.mechanical_design_present = Some(true);
+    compressor.max_design_pressure = Some(Pressure::new::<bar>(110.00000000000001));
+    compressor.weight_total = Some(Mass::new::<kilogram>(702848.7190347943));
+
+    let mut pump = row("pump");
+    pump.power = Some(Power::new::<kilowatt>(75.0));
+    pump.mechanical_design_present = Some(true);
+    pump.max_design_pressure = Some(Pressure::new::<bar>(110.00000000000001));
+    pump.weight_total = Some(Mass::new::<kilogram>(753.7347107302816));
+
+    let mut expander = row("expander");
+    expander.shaft_power = Some(Power::new::<kilowatt>(2000.0));
+    expander.expander_type = Some("radial-inflow".to_string());
+    expander.load_type = Some("generator".to_string());
+
+    let result = run(vec![reactor, compressor, pump, expander]);
+    assert!(close(
+        result.equipment[0].purchased_equipment_cost,
+        32507.612368330385
+    ));
+    assert!(close(
+        result.equipment[0].bare_module_cost,
+        133850.09392660036
+    ));
+    assert!(close(
+        result.equipment[0].installation_man_hours,
+        29.370683275051004 * 3600.0
+    ));
+    assert!(close(
+        result.equipment[1].purchased_equipment_cost,
+        566585.9790593369
+    ));
+    assert!(close(
+        result.equipment[1].installation_man_hours,
+        42170.92314208765 * 3600.0
+    ));
+    assert!(close(
+        result.equipment[2].purchased_equipment_cost,
+        22458.556775479567
+    ));
+    assert!(close(
+        result.equipment[3].purchased_equipment_cost,
+        1464123.3831943076
+    ));
+    assert_eq!(result.equipment[3].bare_module_cost, 0.0);
+    assert_eq!(result.equipment[3].total_cost, 0.0);
 }

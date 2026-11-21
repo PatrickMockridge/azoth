@@ -102,6 +102,56 @@ pub struct EquipmentCostSpec {
     pub condenser_duty: Option<Power>,
     /// The absorber internals.
     pub absorber_type: Option<String>,
+    /// The reactor vessel's diameter.
+    pub vessel_diameter: Option<Length>,
+    /// The reactor vessel's length.
+    pub vessel_length: Option<Length>,
+    /// The loaded catalyst mass.
+    pub catalyst_mass: Option<Mass>,
+    /// The reactor's catalyst-bed count.
+    pub number_of_beds: Option<f64>,
+    /// The reactor's total equipped weight.
+    pub total_equipped_weight: Option<Mass>,
+    /// The catalyst's price, USD/kg.
+    pub catalyst_cost_per_kg: Option<f64>,
+    /// The reactor internals' cost fraction.
+    pub internals_fraction: Option<f64>,
+    /// The distributor allowance per bed, USD.
+    pub bed_allowance: Option<f64>,
+    /// The compressor's or pump's shaft power.
+    pub power: Option<Power>,
+    /// The compressor type.
+    pub compressor_type: Option<String>,
+    /// The compressor's driver.
+    pub driver_type: Option<String>,
+    /// Whether the driver is costed.
+    pub include_driver: Option<bool>,
+    /// Whether the compressor's intercoolers are costed.
+    pub include_intercoolers: Option<bool>,
+    /// The pump type.
+    pub pump_type: Option<String>,
+    /// Whether the pump's motor is costed.
+    pub include_motor: Option<bool>,
+    /// Whether the pump is API 610 rated.
+    pub api_rated: Option<bool>,
+    /// The pump seal.
+    pub seal_type: Option<String>,
+    /// The expander's shaft power.
+    pub shaft_power: Option<Power>,
+    /// The expander type.
+    pub expander_type: Option<String>,
+    /// The expander's load.
+    pub load_type: Option<String>,
+    /// Whether the load is costed.
+    pub include_load: Option<bool>,
+    /// Whether a gearbox is costed.
+    pub include_gearbox: Option<bool>,
+    /// Whether the lube-oil system is costed.
+    pub include_lube_oil_system: Option<bool>,
+    /// Whether the control system is costed.
+    pub include_control_system: Option<bool>,
+    /// Whether the expander is cryogenic.
+    pub cryogenic_service: Option<bool>,
 }
 
 /// One equipment row of the result.
@@ -247,7 +297,10 @@ pub fn equipment_cost_estimate(
 
     for (index, row) in equipment.iter().enumerate() {
         let kind = row.equipment.as_str();
-        if !matches!(kind, "separator" | "column" | "absorber") {
+        if !matches!(
+            kind,
+            "separator" | "column" | "absorber" | "reactor" | "compressor" | "pump" | "expander"
+        ) {
             return Err(AzothError::invalid_input(
                 format!("equipment[{index}].equipment"),
                 format!("{kind:?} is not a kind this port has reached"),
@@ -302,7 +355,7 @@ pub fn equipment_cost_estimate(
             )?),
             None => None,
         };
-        let _design_bara = match row.design_pressure_bara {
+        let design_bara = match row.design_pressure_bara {
             Some(pressure) => Some(finite(
                 format!("equipment[{index}].design_pressure_bara"),
                 pressure.value / 1.0e5,
@@ -453,6 +506,128 @@ pub fn equipment_cost_estimate(
                     include_reboiler: row.include_reboiler.unwrap_or(false),
                     include_reflux_system: row.include_reflux_system.unwrap_or(false),
                     reboiler_duty_kw: reboiler_duty,
+                })
+            }
+            "reactor" => {
+                let diameter = finite(
+                    format!("equipment[{index}].vessel_diameter"),
+                    require(index, kind, "vessel_diameter", row.vessel_diameter)?.value,
+                )?;
+                let length = finite(
+                    format!("equipment[{index}].vessel_length"),
+                    require(index, kind, "vessel_length", row.vessel_length)?.value,
+                )?;
+                let catalyst = match row.catalyst_mass {
+                    Some(value) => {
+                        finite(format!("equipment[{index}].catalyst_mass"), value.value)?
+                    }
+                    None => 0.0,
+                };
+                let beds = match row.number_of_beds {
+                    Some(value) => whole(index, "number_of_beds", value)?,
+                    None => 1.0,
+                };
+                let equipped = match row.total_equipped_weight {
+                    Some(value) => finite(
+                        format!("equipment[{index}].total_equipped_weight"),
+                        value.value,
+                    )?,
+                    None => 0.0,
+                };
+                let catalyst_cost = finite(
+                    format!("equipment[{index}].catalyst_cost_per_kg"),
+                    row.catalyst_cost_per_kg.unwrap_or(8.0),
+                )?;
+                let internals = finite(
+                    format!("equipment[{index}].internals_fraction"),
+                    row.internals_fraction.unwrap_or(0.45),
+                )?;
+                let allowance = finite(
+                    format!("equipment[{index}].bed_allowance"),
+                    row.bed_allowance.unwrap_or(25000.0),
+                )?;
+                costing::EquipmentSpec::Reactor(costing::ReactorSpec {
+                    vessel_diameter_m: diameter,
+                    vessel_length_m: length,
+                    design_pressure_bara: design_bara.unwrap_or(0.0),
+                    catalyst_mass_kg: catalyst,
+                    number_of_beds: beds,
+                    total_equipped_weight_kg: equipped,
+                    catalyst_cost_per_kg: catalyst_cost,
+                    internals_fraction: internals,
+                    bed_allowance_usd: allowance,
+                })
+            }
+            "compressor" => {
+                let power = match row.power {
+                    Some(value) => {
+                        finite(format!("equipment[{index}].power"), value.value / 1.0e3)?
+                    }
+                    None => 0.0,
+                };
+                let stages = match row.number_of_stages {
+                    Some(value) => whole(index, "number_of_stages", value)?,
+                    None => 1.0,
+                };
+                costing::EquipmentSpec::Compressor(costing::CompressorSpec {
+                    power_kw: power,
+                    compressor_type: row
+                        .compressor_type
+                        .clone()
+                        .unwrap_or_else(|| "centrifugal".to_string()),
+                    driver_type: row
+                        .driver_type
+                        .clone()
+                        .unwrap_or_else(|| "electric-motor".to_string()),
+                    include_driver: row.include_driver.unwrap_or(true),
+                    number_of_stages: stages,
+                    include_intercoolers: row.include_intercoolers.unwrap_or(false),
+                })
+            }
+            "pump" => {
+                let power = match row.power {
+                    Some(value) => {
+                        finite(format!("equipment[{index}].power"), value.value / 1.0e3)?
+                    }
+                    None => 0.0,
+                };
+                costing::EquipmentSpec::Pump(costing::PumpSpec {
+                    power_kw: power,
+                    pump_type: row
+                        .pump_type
+                        .clone()
+                        .unwrap_or_else(|| "centrifugal".to_string()),
+                    include_motor: row.include_motor.unwrap_or(true),
+                    api_rated: row.api_rated.unwrap_or(false),
+                    seal_type: row
+                        .seal_type
+                        .clone()
+                        .unwrap_or_else(|| "single-mechanical".to_string()),
+                })
+            }
+            "expander" => {
+                let power = match row.shaft_power {
+                    Some(value) => finite(
+                        format!("equipment[{index}].shaft_power"),
+                        value.value / 1.0e3,
+                    )?,
+                    None => 0.0,
+                };
+                costing::EquipmentSpec::Expander(costing::ExpanderSpec {
+                    shaft_power_kw: power,
+                    expander_type: row
+                        .expander_type
+                        .clone()
+                        .unwrap_or_else(|| "radial-inflow".to_string()),
+                    load_type: row
+                        .load_type
+                        .clone()
+                        .unwrap_or_else(|| "generator".to_string()),
+                    include_load: row.include_load.unwrap_or(true),
+                    include_gearbox: row.include_gearbox.unwrap_or(false),
+                    include_lube_oil_system: row.include_lube_oil_system.unwrap_or(true),
+                    include_control_system: row.include_control_system.unwrap_or(true),
+                    cryogenic_service: row.cryogenic_service.unwrap_or(false),
                 })
             }
             _ => unreachable!("the kind list was checked above"),
