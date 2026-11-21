@@ -252,6 +252,7 @@
 //!   - specs/models/process/drift_flux_release.toml
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
+//!   - specs/models/process/equipment_cost_estimate.toml
 //!   - specs/models/process/escalation_graph.toml
 //!   - specs/models/process/esd_response_time.toml
 //!   - specs/models/process/event_tree.toml

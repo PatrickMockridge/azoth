@@ -1,0 +1,94 @@
+model = "process.equipment_cost_estimate"
+[[cases]]
+id = "column_trayed"
+tolerance = 1.0e-12
+source = "`ColumnCostEstimate` with no mechanical design: a 2 m, 25 m sieve-tray column of 30 trays at 15 barg, a 2000 kW reboiler and a 1500 kW condenser, from `validation/neqsim/captures/process_cost_equipment.tsv` (`equipment_column_trayed`). The class computes the purchased cost and no stack without a design."
+[cases.inputs]
+equipment = [
+  { equipment = "column", name = "Depropaniser", column_type = "trayed", tray_type = "sieve", diameter = 2.0, height = 25.0, number_of_trays = 30.0, design_pressure_barg = 15.0, include_reboiler = true, include_condenser = true, reboiler_duty = 2000.0, condenser_duty = 1500.0, material = "carbon_steel" },
+]
+[cases.expected]
+equipment = [
+  { name = "Depropaniser", equipment_type = "column", purchased_equipment_cost = 186272.12543695548, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "column_stainless"
+tolerance = 1.0e-12
+source = "The same column in SS316 (`equipment_column_stainless`): the purchased cost is `2.1` times the carbon-steel answer, because the class applies the material factor inside the shell, the trays, the reboiler and the condenser."
+[cases.inputs]
+equipment = [
+  { equipment = "column", name = "Depropaniser", column_type = "trayed", tray_type = "sieve", diameter = 2.0, height = 25.0, number_of_trays = 30.0, design_pressure_barg = 15.0, include_reboiler = true, include_condenser = true, reboiler_duty = 2000.0, condenser_duty = 1500.0, material = "ss316" },
+]
+[cases.expected]
+equipment = [
+  { name = "Depropaniser", equipment_type = "column", purchased_equipment_cost = 391171.4634176065, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 2.1, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "column_packed"
+tolerance = 1.0e-12
+source = "A 1.5 m, 15 m column with 10 m of structured packing at 15 barg (`equipment_column_packed`); the class's reboiler and condenser defaults are on, so the case states their 1000 kW and 800 kW duties."
+[cases.inputs]
+equipment = [
+  { equipment = "column", column_type = "packed", packing_type = "structured", diameter = 1.5, height = 15.0, packing_height = 10.0, design_pressure_barg = 15.0, include_reboiler = true, include_condenser = true, reboiler_duty = 1000.0, condenser_duty = 800.0, material = "carbon_steel" },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "column", purchased_equipment_cost = 149981.67037473136, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "column_zero"
+tolerance = 1.0e-12
+source = "A zero-diameter column with the reboiler and condenser switched off (`equipment_column_zero`): the purchased cost is the class's zero and the total cost is zero."
+[cases.inputs]
+equipment = [
+  { equipment = "column", column_type = "trayed", diameter = 0.0, height = 0.0, include_reboiler = false, include_condenser = false },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "column", purchased_equipment_cost = 0.0, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+quality_flags = [
+  { equipment_index = 0.0, message = "The purchased cost is zero; check the capacity basis." },
+]
+[[cases]]
+id = "absorber_packed"
+tolerance = 1.0e-12
+source = "`AbsorberCostEstimate`'s defaults on a 2 m, 15 m absorber with 10 m of structured packing (`equipment_absorber_packed`): the shell has no pressure factor, and the distributor and mist eliminator are on by default."
+[cases.inputs]
+equipment = [
+  { equipment = "absorber", absorber_type = "packed", packing_type = "structured", diameter = 2.0, height = 15.0, packing_height = 10.0, design_pressure_barg = 60.0 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "absorber", purchased_equipment_cost = 155322.29397076587, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "absorber_trayed"
+tolerance = 1.0e-12
+source = "The same absorber trayed with 12 valve trays, the distributor and mist eliminator off (`equipment_absorber_trayed`)."
+[cases.inputs]
+equipment = [
+  { equipment = "absorber", absorber_type = "trayed", tray_type = "valve", diameter = 2.0, height = 15.0, number_of_stages = 12.0, design_pressure_barg = 60.0, include_liquid_distributor = false, include_mist_eliminator = false },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "absorber", purchased_equipment_cost = 62090.37414978155, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "separator_with_stack"
+tolerance = 1.0e-12
+source = "The class's own SRK separator state (`equipment_separator`): a 0.836 m, 1.672 m vessel at a 110 barg design pressure and 3315.94 kg, which gives the module stack and the labour hours. The bill-of-materials material labels are the calculator's canonical name where the design carries `steel`."
+[cases.inputs]
+equipment = [
+  { equipment = "separator", name = "InletSeparator", inner_diameter = 0.8361865022733448, tangent_length = 1.6723730045466896, mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 3315.9396795551834, material = "carbon_steel", include_material_take_off = true, shell_weight = 2098.6959997184704, piping_weight = 839.4783998873882, electro_instrument_weight = 167.89567997747764, structural_weight = 209.86959997184704 },
+]
+[cases.expected]
+equipment = [
+  { name = "InletSeparator", equipment_type = "vessel", purchased_equipment_cost = 4185.028871129008, bare_module_cost = 17231.85637687369, total_module_cost = 21539.820471092113, grass_roots_cost = 32309.73070663817, total_cost = 21539.820471092113, installation_man_hours = 99.47819038665551, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+material_take_off = [
+  { equipment_index = 0.0, item = "Vessel Shell", material = "Carbon Steel", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 2098.6959997184704, has_weight = true, cost_usd = 16789.567997747763, source = "" },
+  { equipment_index = 0.0, item = "Piping", material = "Carbon Steel", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 839.4783998873882, has_weight = true, cost_usd = 8058.992638918926, source = "" },
+  { equipment_index = 0.0, item = "Electrical & Instrumentation", material = "", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 167.89567997747764, has_weight = true, cost_usd = 4029.4963194594634, source = "" },
+  { equipment_index = 0.0, item = "Structural Steel", material = "Carbon Steel", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 209.86959997184704, has_weight = true, cost_usd = 1343.1654398198211, source = "" },
+]

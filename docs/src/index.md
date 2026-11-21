@@ -357,6 +357,7 @@ Five sections, and the difference between them is the point:
 - [`process.drift_flux_release`](./process/drift_flux_release.md) — Vertical drift-flux orifice release
 - [`process.dynamic_psv_sizing`](./process/dynamic_psv_sizing.md) — Dynamic PSV sizing
 - [`process.ejector`](./process/ejector.md) — Ejector
+- [`process.equipment_cost_estimate`](./process/equipment_cost_estimate.md) — Equipment cost estimate
 - [`process.escalation_graph`](./process/escalation_graph.md) — Escalation graph analysis
 - [`process.esd_response_time`](./process/esd_response_time.md) — ESD response time
 - [`process.event_tree`](./process/event_tree.md) — Event tree

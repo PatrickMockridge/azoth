@@ -354,6 +354,97 @@ pub struct EnvelopeTracePoint {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct EquipmentCostSpec {
+    #[pyo3(item)]
+    pub equipment: String,
+    #[pyo3(item)]
+    pub name: Option<String>,
+    #[pyo3(item)]
+    pub material: Option<String>,
+    #[pyo3(item)]
+    pub material_factor: Option<f64>,
+    #[pyo3(item)]
+    pub cepci: Option<f64>,
+    #[pyo3(item)]
+    pub mechanical_design_present: Option<bool>,
+    #[pyo3(item)]
+    pub max_design_pressure: Option<f64>,
+    #[pyo3(item)]
+    pub weight_total: Option<f64>,
+    #[pyo3(item)]
+    pub design_pressure_barg: Option<f64>,
+    #[pyo3(item)]
+    pub design_pressure_bara: Option<f64>,
+    #[pyo3(item)]
+    pub contingency_factor: Option<f64>,
+    #[pyo3(item)]
+    pub engineering_factor: Option<f64>,
+    #[pyo3(item)]
+    pub include_material_take_off: Option<bool>,
+    #[pyo3(item)]
+    pub shell_weight: Option<f64>,
+    #[pyo3(item)]
+    pub internals_weight: Option<f64>,
+    #[pyo3(item)]
+    pub nozzle_weight: Option<f64>,
+    #[pyo3(item)]
+    pub piping_weight: Option<f64>,
+    #[pyo3(item)]
+    pub electro_instrument_weight: Option<f64>,
+    #[pyo3(item)]
+    pub structural_weight: Option<f64>,
+    #[pyo3(item)]
+    pub operating_hours: Option<f64>,
+    #[pyo3(item)]
+    pub electricity_cost_per_kwh: Option<f64>,
+    #[pyo3(item)]
+    pub steam_cost_per_tonne: Option<f64>,
+    #[pyo3(item)]
+    pub cooling_water_cost_per_m3: Option<f64>,
+    #[pyo3(item)]
+    pub fuel_cost_per_gj: Option<f64>,
+    #[pyo3(item)]
+    pub inner_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub tangent_length: Option<f64>,
+    #[pyo3(item)]
+    pub vessel_volume: Option<f64>,
+    #[pyo3(item)]
+    pub column_type: Option<String>,
+    #[pyo3(item)]
+    pub tray_type: Option<String>,
+    #[pyo3(item)]
+    pub packing_type: Option<String>,
+    #[pyo3(item)]
+    pub diameter: Option<f64>,
+    #[pyo3(item)]
+    pub height: Option<f64>,
+    #[pyo3(item)]
+    pub number_of_trays: Option<f64>,
+    #[pyo3(item)]
+    pub number_of_stages: Option<f64>,
+    #[pyo3(item)]
+    pub packing_height: Option<f64>,
+    #[pyo3(item)]
+    pub include_reboiler: Option<bool>,
+    #[pyo3(item)]
+    pub include_condenser: Option<bool>,
+    #[pyo3(item)]
+    pub include_liquid_distributor: Option<bool>,
+    #[pyo3(item)]
+    pub include_mist_eliminator: Option<bool>,
+    #[pyo3(item)]
+    pub include_reflux_system: Option<bool>,
+    #[pyo3(item)]
+    pub reboiler_duty: Option<f64>,
+    #[pyo3(item)]
+    pub condenser_duty: Option<f64>,
+    #[pyo3(item)]
+    pub absorber_type: Option<String>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct EscalationExposure {
     #[pyo3(item)]
     pub source: String,

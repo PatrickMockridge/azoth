@@ -362,6 +362,9 @@ import neqsim.process.safety.vibration.FlowInducedPulsationScreening;
 import neqsim.process.safety.vibration.FlowInducedPulsationScreening.AcousticTermination;
 import neqsim.process.safety.vibration.PipingFivScreening;
 import neqsim.process.costestimation.CostEstimationCalculator;
+import neqsim.process.costestimation.UnitCostEstimateBaseClass;
+import neqsim.process.costestimation.absorber.AbsorberCostEstimate;
+import neqsim.process.costestimation.column.ColumnCostEstimate;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -696,6 +699,9 @@ public class ProcessProbe {
         break;
       case "cost_estimation":
         costEstimationRows();
+        break;
+      case "equipment_cost":
+        equipmentCostRows();
         break;
       case "mass_balance_leak_detection":
         massBalanceLeakRows();
@@ -20295,6 +20301,131 @@ public class ProcessProbe {
       System.out.println("bom_" + i + "_weight_kg=" + row.get("weight_kg"));
       System.out.println("bom_" + i + "_quantity=" + row.get("quantity"));
       System.out.println("bom_" + i + "_unit_cost=" + row.get("unit_cost"));
+    }
+    System.out.println();
+  }
+
+  static void printCostItem(String label, UnitCostEstimateBaseClass estimate) {
+    System.out.println(label);
+    System.out.println("purchased_equipment_cost=" + estimate.getPurchasedEquipmentCost());
+    System.out.println("bare_module_cost=" + estimate.getBareModuleCost());
+    System.out.println("total_module_cost=" + estimate.getTotalModuleCost());
+    System.out.println("grass_roots_cost=" + estimate.getGrassRootsCost());
+    System.out.println("installation_man_hours=" + estimate.getInstallationManHours());
+    System.out.println("total_cost=" + estimate.getTotalCost());
+    System.out.println();
+  }
+
+  static void equipmentCostRows() {
+    ColumnCostEstimate trayed = new ColumnCostEstimate(null);
+    trayed.setColumnType("trayed");
+    trayed.setTrayType("sieve");
+    trayed.setColumnDiameter(2.0);
+    trayed.setColumnHeight(25.0);
+    trayed.setNumberOfTrays(30);
+    trayed.setDesignPressure(15.0);
+    trayed.setIncludeReboiler(true);
+    trayed.setReboilerDuty(2000.0);
+    trayed.setIncludeCondenser(true);
+    trayed.setCondenserDuty(1500.0);
+    printCostItem("equipment_column_trayed", trayed);
+
+    ColumnCostEstimate stainless = new ColumnCostEstimate(null);
+    stainless.setColumnType("trayed");
+    stainless.setTrayType("sieve");
+    stainless.setColumnDiameter(2.0);
+    stainless.setColumnHeight(25.0);
+    stainless.setNumberOfTrays(30);
+    stainless.setDesignPressure(15.0);
+    stainless.setIncludeReboiler(true);
+    stainless.setReboilerDuty(2000.0);
+    stainless.setIncludeCondenser(true);
+    stainless.setCondenserDuty(1500.0);
+    stainless.setMaterialOfConstruction("SS316");
+    printCostItem("equipment_column_stainless", stainless);
+
+    ColumnCostEstimate packed = new ColumnCostEstimate(null);
+    packed.setColumnType("packed");
+    packed.setPackingType("structured");
+    packed.setColumnDiameter(1.5);
+    packed.setColumnHeight(15.0);
+    packed.setPackingHeight(10.0);
+    packed.setDesignPressure(15.0);
+    printCostItem("equipment_column_packed", packed);
+
+    ColumnCostEstimate zero = new ColumnCostEstimate(null);
+    zero.setColumnType("trayed");
+    zero.setColumnDiameter(0.0);
+    zero.setColumnHeight(0.0);
+    zero.setIncludeReboiler(false);
+    zero.setIncludeCondenser(false);
+    printCostItem("equipment_column_zero", zero);
+
+    AbsorberCostEstimate absorber = new AbsorberCostEstimate(null);
+    absorber.setAbsorberType("packed");
+    absorber.setPackingType("structured");
+    absorber.setColumnDiameter(2.0);
+    absorber.setColumnHeight(15.0);
+    absorber.setPackingHeight(10.0);
+    absorber.setDesignPressure(60.0);
+    printCostItem("equipment_absorber_packed", absorber);
+
+    AbsorberCostEstimate absorberTrayed = new AbsorberCostEstimate(null);
+    absorberTrayed.setAbsorberType("trayed");
+    absorberTrayed.setTrayType("valve");
+    absorberTrayed.setColumnDiameter(2.0);
+    absorberTrayed.setColumnHeight(15.0);
+    absorberTrayed.setNumberOfStages(12);
+    absorberTrayed.setDesignPressure(60.0);
+    absorberTrayed.setIncludeLiquidDistributor(false);
+    absorberTrayed.setIncludeMistEliminator(false);
+    printCostItem("equipment_absorber_trayed", absorberTrayed);
+
+    SystemSrkEos separatorFluid = new SystemSrkEos(288.15, 60.0);
+    separatorFluid.addComponent("methane", 0.85);
+    separatorFluid.addComponent("ethane", 0.10);
+    separatorFluid.addComponent("propane", 0.05);
+    separatorFluid.setMixingRule(2);
+    Stream separatorFeed = new Stream("separator feed", separatorFluid);
+    separatorFeed.setFlowRate(50000.0, "kg/hr");
+    separatorFeed.run();
+    neqsim.process.equipment.separator.Separator separator =
+        new neqsim.process.equipment.separator.Separator("separator", separatorFeed);
+    separator.run();
+    separator.getMechanicalDesign().calcDesign();
+    separator.getMechanicalDesign().calculateCostEstimate();
+    neqsim.process.mechanicaldesign.separator.SeparatorMechanicalDesign separatorDesign =
+        separator.getMechanicalDesign();
+    System.out.println("equipment_separator");
+    System.out.println("inner_diameter_m=" + separatorDesign.getInnerDiameter());
+    System.out.println("tangent_length_m=" + separatorDesign.getTantanLength());
+    System.out.println("vessel_volume_m3=" + separatorDesign.getVolumeTotal());
+    System.out.println("weight_total_kg=" + separatorDesign.getWeightTotal());
+    System.out.println("max_design_pressure_barg=" + separatorDesign.getMaxDesignPressure());
+    System.out.println(
+        "purchased_equipment_cost=" + separatorDesign.getCostEstimate().getPurchasedEquipmentCost());
+    System.out.println(
+        "bare_module_cost=" + separatorDesign.getCostEstimate().getBareModuleCost());
+    System.out.println(
+        "total_module_cost=" + separatorDesign.getCostEstimate().getTotalModuleCost());
+    System.out.println(
+        "grass_roots_cost=" + separatorDesign.getCostEstimate().getGrassRootsCost());
+    System.out.println(
+        "installation_man_hours=" + separatorDesign.getCostEstimate().getInstallationManHours());
+    System.out.println("total_cost=" + separatorDesign.getCostEstimate().getTotalCost());
+    System.out.println("shell_weight_kg=" + separatorDesign.getWeigthVesselShell());
+    System.out.println("internals_weight_kg=" + separatorDesign.getWeigthInternals());
+    System.out.println("nozzle_weight_kg=" + separatorDesign.getWeightNozzle());
+    System.out.println("piping_weight_kg=" + separatorDesign.getWeightPiping());
+    System.out.println("electro_instrument_weight_kg=" + separatorDesign.getWeightElectroInstrument());
+    System.out.println("structural_weight_kg=" + separatorDesign.getWeightStructualSteel());
+    List<Map<String, Object>> separatorBom = separatorDesign.getCostEstimate().generateBillOfMaterials();
+    for (int i = 0; i < separatorBom.size(); i++) {
+      Map<String, Object> row = separatorBom.get(i);
+      System.out.println("bom_" + i + "_item=" + row.get("item"));
+      System.out.println("bom_" + i + "_material=" + row.get("material"));
+      System.out.println("bom_" + i + "_weight_kg=" + row.get("weight_kg"));
+      System.out.println("bom_" + i + "_unit_cost_usd=" + row.get("unit_cost_USD"));
     }
     System.out.println();
   }

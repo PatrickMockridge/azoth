@@ -6541,6 +6541,72 @@ pub fn dynamic_psv_sizing(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Equipment cost estimate.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (equipment))]
+#[pyo3(text_signature = "(equipment)")]
+pub fn equipment_cost_estimate(
+    py: Python<'_>,
+    equipment: Vec<crate::records_gen::EquipmentCostSpec>,
+) -> PyResult<crate::transport_gen::PyEquipmentCostEstimateResult> {
+    let equipment_records: Vec<azoth_process::models::equipment_cost_estimate::EquipmentCostSpec> =
+        equipment
+            .into_iter()
+            .map(
+                |row| azoth_process::models::equipment_cost_estimate::EquipmentCostSpec {
+                    equipment: row.equipment,
+                    name: row.name,
+                    material: row.material,
+                    material_factor: row.material_factor,
+                    cepci: row.cepci,
+                    mechanical_design_present: row.mechanical_design_present,
+                    max_design_pressure: row.max_design_pressure.map(pascals),
+                    weight_total: row.weight_total.map(kilograms),
+                    design_pressure_barg: row.design_pressure_barg.map(pascals),
+                    design_pressure_bara: row.design_pressure_bara.map(pascals),
+                    contingency_factor: row.contingency_factor,
+                    engineering_factor: row.engineering_factor,
+                    include_material_take_off: row.include_material_take_off,
+                    shell_weight: row.shell_weight.map(kilograms),
+                    internals_weight: row.internals_weight.map(kilograms),
+                    nozzle_weight: row.nozzle_weight.map(kilograms),
+                    piping_weight: row.piping_weight.map(kilograms),
+                    electro_instrument_weight: row.electro_instrument_weight.map(kilograms),
+                    structural_weight: row.structural_weight.map(kilograms),
+                    operating_hours: row.operating_hours.map(seconds),
+                    electricity_cost_per_kwh: row.electricity_cost_per_kwh,
+                    steam_cost_per_tonne: row.steam_cost_per_tonne,
+                    cooling_water_cost_per_m3: row.cooling_water_cost_per_m3,
+                    fuel_cost_per_gj: row.fuel_cost_per_gj,
+                    inner_diameter: row.inner_diameter.map(meters),
+                    tangent_length: row.tangent_length.map(meters),
+                    vessel_volume: row.vessel_volume.map(cubic_meters),
+                    column_type: row.column_type,
+                    tray_type: row.tray_type,
+                    packing_type: row.packing_type,
+                    diameter: row.diameter.map(meters),
+                    height: row.height.map(meters),
+                    number_of_trays: row.number_of_trays,
+                    number_of_stages: row.number_of_stages,
+                    packing_height: row.packing_height.map(meters),
+                    include_reboiler: row.include_reboiler,
+                    include_condenser: row.include_condenser,
+                    include_liquid_distributor: row.include_liquid_distributor,
+                    include_mist_eliminator: row.include_mist_eliminator,
+                    include_reflux_system: row.include_reflux_system,
+                    reboiler_duty: row.reboiler_duty.map(watts),
+                    condenser_duty: row.condenser_duty.map(watts),
+                    absorber_type: row.absorber_type,
+                },
+            )
+            .collect();
+    azoth_process::models::equipment_cost_estimate::equipment_cost_estimate(&equipment_records)
+        .map(|r| crate::transport_gen::PyEquipmentCostEstimateResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Escalation graph analysis.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

@@ -43,6 +43,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.drift_flux_release`](./drift_flux_release.md) | `drift_flux_partition` | NeqSim process/safety/release/DriftFluxHomogeneousEquilibriumReleaseModel.java |
 | [`process.dynamic_psv_sizing`](./dynamic_psv_sizing.md) | `bisection_over_psv_area` | NeqSim process/safety/depressurization/DynamicPsvSizingStudy.java |
 | [`process.ejector`](./ejector.md) | `direct composition` | NeqSim process/equipment/ejector/Ejector.java |
+| [`process.equipment_cost_estimate`](./equipment_cost_estimate.md) | `equipment_cost_dispatch` | NeqSim process/costestimation/UnitCostEstimateBaseClass.java |
 | [`process.escalation_graph`](./escalation_graph.md) | `domino_failure_propagation` | NeqSim process/safety/escalation/EscalationGraphAnalyzer.java |
 | [`process.esd_response_time`](./esd_response_time.md) | `esd_response_time` | NeqSim process/safety/esd/EsdResponseTimeSimulator.java |
 | [`process.event_tree`](./event_tree.md) | `full_binary_enumeration` | NeqSim process/safety/risk/eta/EventTreeAnalyzer.java |

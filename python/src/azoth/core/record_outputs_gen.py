@@ -526,6 +526,108 @@ class EquilibriumSoundSpeedSample:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class EquipmentCostResultRow:
+    """one row per equipment item, in caller order."""
+
+    #: the stated name, or the empty string.
+    name: str
+
+    #: the class's equipment-type string, which selects the labour rate.
+    equipment_type: str
+
+    #: the kind's purchased cost, USD.
+    purchased_equipment_cost: float
+
+    #: the bare module cost, USD, zero without a stated design.
+    bare_module_cost: float
+
+    #: the total module cost, USD, zero without a stated design.
+    total_module_cost: float
+
+    #: the grass roots cost, USD, zero without a stated design.
+    grass_roots_cost: float
+
+    #: the class's `getTotalCost` answer, USD.
+    total_cost: float
+
+    #: the installation labour hours.
+    installation_man_hours: Q
+
+    #: the material factor the row used.
+    material_factor: float
+
+    #: a published ex-works equipment cost, USD, zero where the kind publishes none.
+    equipment_cost: float
+
+    #: a published installed cost, USD, zero where the kind publishes none.
+    installed_cost: float
+
+    #: a published USD cost per square metre, zero where the kind publishes none.
+    specific_cost_per_m2: float
+
+    #: a published USD cost per kilowatt, zero where the kind publishes none.
+    specific_capex_per_kw: float
+
+    #: a published annual maintenance cost, USD, zero where the kind publishes none.
+    annual_maintenance_cost: float
+
+    #: a published sorbent replacement cost, USD, zero where the kind publishes none.
+    sorbent_replacement_cost: float
+
+    #: the class's annual operating cost at the stated operating basis, USD, zero where the kind does not override the base five per cent.
+    annual_operating_cost: float
+
+    #: a weight the class computes rather than carries, zero where the kind computes none.
+    calculated_weight: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EquipmentMtoRow:
+    """the weighted bill of materials, one row per line."""
+
+    #: the equipment row this line belongs to.
+    equipment_index: float
+
+    #: the line's item.
+    item: str
+
+    #: the line's material, or the empty string.
+    material: str
+
+    #: the count, where the line is a count.
+    quantity: float
+
+    #: whether the line carries a count.
+    has_quantity: bool
+
+    #: the count's unit, or the empty string.
+    unit: str
+
+    #: the line's weight.
+    weight_kg: Q
+
+    #: whether the line carries a weight.
+    has_weight: bool
+
+    #: the line's USD cost.
+    cost_usd: float
+
+    #: the line's source, or the empty string.
+    source: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EquipmentQualityFlag:
+    """the class's quality flags, one row per flag."""
+
+    #: the equipment row the flag belongs to.
+    equipment_index: float
+
+    #: the flag's message.
+    message: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class EscalationItemResult:
     """the largest propagation over every registered item, in the items order."""
 

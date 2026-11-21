@@ -3322,3 +3322,22 @@ materials. Costs are USD magnitudes; the class's 2025 CEPCI of 840 against the c
 The two deprecated weight-based vessel routes are printed as the class answers them; the
 volume routes are the ones its subclasses reach. `summary_purchased` is unchanged at 50 000
 because the calculator's material and location factors are at their defaults there.
+
+### `process_cost_equipment.tsv`
+
+The equipment estimators with no `ProcessSystem`: a trayed column with its reboiler and
+condenser, the same column in SS316, a packed column, a zero-diameter column with its
+auxiliaries off, two absorbers, and the separator whose sized vessel is built from the class's
+own SRK feed. The separator block also prints the design's weight components and the base
+class's bill of materials, so the port's weighted MTO can be held to it.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe equipment_cost \
+  > captures/process_cost_equipment.tsv
+```
+
+The column and absorber estimators ignore their design object, so their states are stored
+fields and their module stacks are zero - the class's `calculateCostEstimate` returns early
+without a design. The separator's stack and labour are the class's own on the sized vessel.
+The column's reboiler and condenser default on, so a state that wants neither states both
+flags false.

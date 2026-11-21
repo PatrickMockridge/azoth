@@ -60,6 +60,7 @@ pub mod distillation_column;
 pub mod drift_flux_release;
 pub mod dynamic_psv_sizing;
 pub mod ejector;
+pub mod equipment_cost_estimate;
 pub mod escalation_graph;
 pub mod esd_response_time;
 pub mod event_tree;
@@ -244,6 +245,10 @@ pub use distillation_column::{DistillationColumnResult, distillation_column};
 pub use drift_flux_release::{DriftFluxReleaseResult, drift_flux_release};
 pub use dynamic_psv_sizing::{DynamicPsvSizingResult, dynamic_psv_sizing};
 pub use ejector::{EjectorResult, ejector};
+pub use equipment_cost_estimate::{
+    EquipmentCostEstimateResult, EquipmentCostResultRow, EquipmentCostSpec, EquipmentMtoRow,
+    EquipmentQualityFlag, equipment_cost_estimate,
+};
 pub use escalation_graph::{
     EscalationExposure, EscalationGraphResult, EscalationItem, EscalationItemResult,
     escalation_graph,

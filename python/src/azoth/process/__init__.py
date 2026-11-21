@@ -49,6 +49,7 @@ from azoth.core.result import (
     DriftFluxReleaseResult,
     DynamicPsvSizingResult,
     EjectorResult,
+    EquipmentCostEstimateResult,
     EscalationGraphResult,
     EsdResponseTimeResult,
     EventTreeResult,
@@ -309,6 +310,7 @@ _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
 _ALARP_AUDIT = "process.alarp_audit"
+_EQUIPMENT_COST_ESTIMATE = "process.equipment_cost_estimate"
 _ESCALATION_GRAPH = "process.escalation_graph"
 _ESD_RESPONSE_TIME = "process.esd_response_time"
 _INHERENT_SAFETY = "process.inherent_safety"
@@ -2900,6 +2902,22 @@ def ejector(
         suction_nozzle_efficiency=suction_nozzle_efficiency,
         mixing_efficiency=mixing_efficiency,
         diffuser_efficiency=diffuser_efficiency,
+    )
+
+
+def equipment_cost_estimate(
+    equipment: list[dict[str, object]],
+) -> EquipmentCostEstimateResult:
+    """One equipment item's purchased cost, module stack, labour and bill of materials.
+
+    ``equipment`` selects the kind and that kind's fields; a missing field the
+    kind needs is refused. **Costs are USD magnitudes declared dimensionless**,
+    because the vocabulary has no currency unit.
+
+    See :func:`azoth.process.reference.equipment_cost_estimate`.
+    """
+    return resolve(_EQUIPMENT_COST_ESTIMATE)(  # type: ignore[no-any-return]
+        equipment=equipment,
     )
 
 

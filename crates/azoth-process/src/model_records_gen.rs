@@ -41,6 +41,7 @@ use crate::models::distillation_column::DistillationColumnResult;
 use crate::models::drift_flux_release::DriftFluxReleaseResult;
 use crate::models::dynamic_psv_sizing::DynamicPsvSizingResult;
 use crate::models::ejector::EjectorResult;
+use crate::models::equipment_cost_estimate::EquipmentCostEstimateResult;
 use crate::models::escalation_graph::EscalationGraphResult;
 use crate::models::esd_response_time::EsdResponseTimeResult;
 use crate::models::event_tree::EventTreeResult;
@@ -814,6 +815,20 @@ impl CalcResult for EjectorResult {
         "total_volume",
         "suction_connection_length",
         "discharge_connection_length",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for EquipmentCostEstimateResult {
+    const CALC_ID: &'static str = "process.equipment_cost_estimate";
+    const FIELDS: &'static [&'static str] = &[
+        "equipment",
+        "material_take_off",
+        "quality_flags",
         "warnings",
     ];
 

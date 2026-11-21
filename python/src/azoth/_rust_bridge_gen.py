@@ -116,6 +116,10 @@ from azoth.core.result import (
     EquilibriumConstantResult,
     EquilibriumSoundSpeedResult,
     EquilibriumSoundSpeedSample,
+    EquipmentCostEstimateResult,
+    EquipmentCostResultRow,
+    EquipmentMtoRow,
+    EquipmentQualityFlag,
     ErosionPredictionResult,
     ErosionRiskLevel,
     EscalationGraphResult,
@@ -616,6 +620,7 @@ __all__ = [
     "eos_cg_phase",
     "equilibrium_constant",
     "equilibrium_sound_speed",
+    "equipment_cost_estimate",
     "erosion_prediction",
     "escalation_graph",
     "esd_response_time",
@@ -6749,6 +6754,20 @@ def ejector(motive_components: list[str], motive_n: Q, motive_z: list[float], mo
         total_volume=from_si(result.total_volume.magnitude_si, result.total_volume.unit),
         suction_connection_length=from_si(result.suction_connection_length.magnitude_si, result.suction_connection_length.unit),
         discharge_connection_length=from_si(result.discharge_connection_length.magnitude_si, result.discharge_connection_length.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def equipment_cost_estimate(equipment: list[dict[str, object]]) -> EquipmentCostEstimateResult:
+    """``process.equipment_cost_estimate``, computed in Rust."""
+    spec = _models_gen.model("process.equipment_cost_estimate")
+    result = _core.equipment_cost_estimate(
+        input_records_to_si(spec, "equipment", equipment),
+    )
+    return EquipmentCostEstimateResult(
+        equipment=tuple(EquipmentCostResultRow(name=c.name, equipment_type=c.equipment_type, purchased_equipment_cost=c.purchased_equipment_cost, bare_module_cost=c.bare_module_cost, total_module_cost=c.total_module_cost, grass_roots_cost=c.grass_roots_cost, total_cost=c.total_cost, installation_man_hours=from_si(c.installation_man_hours.magnitude_si, c.installation_man_hours.unit), material_factor=c.material_factor, equipment_cost=c.equipment_cost, installed_cost=c.installed_cost, specific_cost_per_m2=c.specific_cost_per_m2, specific_capex_per_kw=c.specific_capex_per_kw, annual_maintenance_cost=c.annual_maintenance_cost, sorbent_replacement_cost=c.sorbent_replacement_cost, annual_operating_cost=c.annual_operating_cost, calculated_weight=from_si(c.calculated_weight.magnitude_si, c.calculated_weight.unit)) for c in result.equipment),
+        material_take_off=tuple(EquipmentMtoRow(equipment_index=c.equipment_index, item=c.item, material=c.material, quantity=c.quantity, has_quantity=c.has_quantity, unit=c.unit, weight_kg=from_si(c.weight_kg.magnitude_si, c.weight_kg.unit), has_weight=c.has_weight, cost_usd=c.cost_usd, source=c.source) for c in result.material_take_off),
+        quality_flags=tuple(EquipmentQualityFlag(equipment_index=c.equipment_index, message=c.message) for c in result.quality_flags),
         warnings=_warnings(result.warnings),
     )
 

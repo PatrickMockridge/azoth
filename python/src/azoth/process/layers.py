@@ -5113,6 +5113,11 @@ DUMPERS: dict[str, Dumper] = {
 #: **This is not "the model is too simple to check".** Each entry names the arithmetic and
 #: what would have to exist for there to be a layer.
 NO_INTERIOR: dict[str, str] = {
+    "process.equipment_cost_estimate": (
+        "each row's purchased cost is one kind's correlation and the stack above it is the "
+        "shared module formula, so every number the kernel forms is on an output row. The "
+        "cases are the oracle and ``process_cost_equipment.tsv`` is their evidence"
+    ),
     "process.cost_estimation": (
         "each row is one calculator method - a correlation, a factor lookup or the module "
         "stack - so the kernel has no composed model beneath it. The cases are the oracle "
@@ -9385,6 +9390,9 @@ UNCASED_ROWS: dict[str, int] = {
     # The calculator's five states - factors, correlations, the module stack, currencies
     # and the vessel BOM - are the cases' evidence; the id is a `NO_INTERIOR` model.
     "process_cost_calculator.tsv": 5,
+    # The equipment estimate's seven states: three columns, two absorbers and the separator
+    # with its bill of materials. The id is a `NO_INTERIOR` model.
+    "process_cost_equipment.tsv": 7,
     # The dispersion capture's five: four SRK rows, the class's own tests' cubic kept as
     # evidence beside the PR oracle, and the zero-rate refusal the port raises rather than
     # reproduces.

@@ -270,6 +270,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyDriftFluxReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyDynamicPsvSizingResult>()?;
     m.add_class::<crate::transport_gen::PyEjectorResult>()?;
+    m.add_class::<crate::transport_gen::PyEquipmentCostEstimateResult>()?;
     m.add_class::<crate::transport_gen::PyEscalationGraphResult>()?;
     m.add_class::<crate::transport_gen::PyEsdResponseTimeResult>()?;
     m.add_class::<crate::transport_gen::PyEventTreeResult>()?;
@@ -412,6 +413,9 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyEnvelopeQuery>()?;
     m.add_class::<crate::record_outputs_gen::PyEnvelopeSummary>()?;
     m.add_class::<crate::record_outputs_gen::PyEquilibriumSoundSpeedSample>()?;
+    m.add_class::<crate::record_outputs_gen::PyEquipmentCostResultRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyEquipmentMtoRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyEquipmentQualityFlag>()?;
     m.add_class::<crate::record_outputs_gen::PyEscalationItemResult>()?;
     m.add_class::<crate::record_outputs_gen::PyEsdContribution>()?;
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
@@ -1107,6 +1111,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::process::ejector, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::equipment_cost_estimate,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::escalation_graph, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::esd_response_time, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::event_tree, m)?)?;

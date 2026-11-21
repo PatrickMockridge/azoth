@@ -1409,6 +1409,244 @@ impl From<&azoth_eos::results::EquilibriumSoundSpeedSample> for PyEquilibriumSou
     }
 }
 
+/// one row per equipment item, in caller order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EquipmentCostResultRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEquipmentCostResultRow {
+    /// the stated name, or the empty string.
+    #[pyo3(get)]
+    pub name: String,
+    /// the class's equipment-type string, which selects the labour rate.
+    #[pyo3(get)]
+    pub equipment_type: String,
+    /// the kind's purchased cost, USD.
+    #[pyo3(get)]
+    pub purchased_equipment_cost: f64,
+    /// the bare module cost, USD, zero without a stated design.
+    #[pyo3(get)]
+    pub bare_module_cost: f64,
+    /// the total module cost, USD, zero without a stated design.
+    #[pyo3(get)]
+    pub total_module_cost: f64,
+    /// the grass roots cost, USD, zero without a stated design.
+    #[pyo3(get)]
+    pub grass_roots_cost: f64,
+    /// the class's `getTotalCost` answer, USD.
+    #[pyo3(get)]
+    pub total_cost: f64,
+    /// the installation labour hours.
+    #[pyo3(get)]
+    pub installation_man_hours: PyQty,
+    /// the material factor the row used.
+    #[pyo3(get)]
+    pub material_factor: f64,
+    /// a published ex-works equipment cost, USD, zero where the kind publishes none.
+    #[pyo3(get)]
+    pub equipment_cost: f64,
+    /// a published installed cost, USD, zero where the kind publishes none.
+    #[pyo3(get)]
+    pub installed_cost: f64,
+    /// a published USD cost per square metre, zero where the kind publishes none.
+    #[pyo3(get)]
+    pub specific_cost_per_m2: f64,
+    /// a published USD cost per kilowatt, zero where the kind publishes none.
+    #[pyo3(get)]
+    pub specific_capex_per_kw: f64,
+    /// a published annual maintenance cost, USD, zero where the kind publishes none.
+    #[pyo3(get)]
+    pub annual_maintenance_cost: f64,
+    /// a published sorbent replacement cost, USD, zero where the kind publishes none.
+    #[pyo3(get)]
+    pub sorbent_replacement_cost: f64,
+    /// the class's annual operating cost at the stated operating basis, USD, zero where the kind does not override the base five per cent.
+    #[pyo3(get)]
+    pub annual_operating_cost: f64,
+    /// a weight the class computes rather than carries, zero where the kind computes none.
+    #[pyo3(get)]
+    pub calculated_weight: PyQty,
+}
+
+#[pymethods]
+impl PyEquipmentCostResultRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "EquipmentCostResultRow(name={}, equipment_type={}, purchased_equipment_cost={}, bare_module_cost={}, total_module_cost={}, grass_roots_cost={}, total_cost={}, installation_man_hours={:?}, material_factor={}, equipment_cost={}, installed_cost={}, specific_cost_per_m2={}, specific_capex_per_kw={}, annual_maintenance_cost={}, sorbent_replacement_cost={}, annual_operating_cost={}, calculated_weight={:?})",
+            self.name,
+            self.equipment_type,
+            self.purchased_equipment_cost,
+            self.bare_module_cost,
+            self.total_module_cost,
+            self.grass_roots_cost,
+            self.total_cost,
+            self.installation_man_hours,
+            self.material_factor,
+            self.equipment_cost,
+            self.installed_cost,
+            self.specific_cost_per_m2,
+            self.specific_capex_per_kw,
+            self.annual_maintenance_cost,
+            self.sorbent_replacement_cost,
+            self.annual_operating_cost,
+            self.calculated_weight
+        )
+    }
+}
+
+impl From<&azoth_process::models::equipment_cost_estimate::EquipmentCostResultRow>
+    for PyEquipmentCostResultRow
+{
+    fn from(row: &azoth_process::models::equipment_cost_estimate::EquipmentCostResultRow) -> Self {
+        Self {
+            name: row.name.clone(),
+            equipment_type: row.equipment_type.clone(),
+            purchased_equipment_cost: row.purchased_equipment_cost,
+            bare_module_cost: row.bare_module_cost,
+            total_module_cost: row.total_module_cost,
+            grass_roots_cost: row.grass_roots_cost,
+            total_cost: row.total_cost,
+            installation_man_hours: PyQty {
+                magnitude_si: row.installation_man_hours,
+                unit: "h".to_string(),
+            },
+            material_factor: row.material_factor,
+            equipment_cost: row.equipment_cost,
+            installed_cost: row.installed_cost,
+            specific_cost_per_m2: row.specific_cost_per_m2,
+            specific_capex_per_kw: row.specific_capex_per_kw,
+            annual_maintenance_cost: row.annual_maintenance_cost,
+            sorbent_replacement_cost: row.sorbent_replacement_cost,
+            annual_operating_cost: row.annual_operating_cost,
+            calculated_weight: PyQty {
+                magnitude_si: row.calculated_weight,
+                unit: "kg".to_string(),
+            },
+        }
+    }
+}
+
+/// the weighted bill of materials, one row per line.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EquipmentMtoRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEquipmentMtoRow {
+    /// the equipment row this line belongs to.
+    #[pyo3(get)]
+    pub equipment_index: f64,
+    /// the line's item.
+    #[pyo3(get)]
+    pub item: String,
+    /// the line's material, or the empty string.
+    #[pyo3(get)]
+    pub material: String,
+    /// the count, where the line is a count.
+    #[pyo3(get)]
+    pub quantity: f64,
+    /// whether the line carries a count.
+    #[pyo3(get)]
+    pub has_quantity: bool,
+    /// the count's unit, or the empty string.
+    #[pyo3(get)]
+    pub unit: String,
+    /// the line's weight.
+    #[pyo3(get)]
+    pub weight_kg: PyQty,
+    /// whether the line carries a weight.
+    #[pyo3(get)]
+    pub has_weight: bool,
+    /// the line's USD cost.
+    #[pyo3(get)]
+    pub cost_usd: f64,
+    /// the line's source, or the empty string.
+    #[pyo3(get)]
+    pub source: String,
+}
+
+#[pymethods]
+impl PyEquipmentMtoRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "EquipmentMtoRow(equipment_index={}, item={}, material={}, quantity={}, has_quantity={:?}, unit={}, weight_kg={:?}, has_weight={:?}, cost_usd={}, source={})",
+            self.equipment_index,
+            self.item,
+            self.material,
+            self.quantity,
+            self.has_quantity,
+            self.unit,
+            self.weight_kg,
+            self.has_weight,
+            self.cost_usd,
+            self.source
+        )
+    }
+}
+
+impl From<&azoth_process::models::equipment_cost_estimate::EquipmentMtoRow> for PyEquipmentMtoRow {
+    fn from(row: &azoth_process::models::equipment_cost_estimate::EquipmentMtoRow) -> Self {
+        Self {
+            equipment_index: row.equipment_index,
+            item: row.item.clone(),
+            material: row.material.clone(),
+            quantity: row.quantity,
+            has_quantity: row.has_quantity,
+            unit: row.unit.clone(),
+            weight_kg: PyQty {
+                magnitude_si: row.weight_kg,
+                unit: "kg".to_string(),
+            },
+            has_weight: row.has_weight,
+            cost_usd: row.cost_usd,
+            source: row.source.clone(),
+        }
+    }
+}
+
+/// the class's quality flags, one row per flag.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EquipmentQualityFlag"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEquipmentQualityFlag {
+    /// the equipment row the flag belongs to.
+    #[pyo3(get)]
+    pub equipment_index: f64,
+    /// the flag's message.
+    #[pyo3(get)]
+    pub message: String,
+}
+
+#[pymethods]
+impl PyEquipmentQualityFlag {
+    fn __repr__(&self) -> String {
+        format!(
+            "EquipmentQualityFlag(equipment_index={}, message={})",
+            self.equipment_index, self.message
+        )
+    }
+}
+
+impl From<&azoth_process::models::equipment_cost_estimate::EquipmentQualityFlag>
+    for PyEquipmentQualityFlag
+{
+    fn from(row: &azoth_process::models::equipment_cost_estimate::EquipmentQualityFlag) -> Self {
+        Self {
+            equipment_index: row.equipment_index,
+            message: row.message.clone(),
+        }
+    }
+}
+
 /// the largest propagation over every registered item, in the items order.
 #[pyclass(
     frozen,

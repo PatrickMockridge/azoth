@@ -40,6 +40,9 @@ from azoth.core.record_outputs_gen import (
     EnvelopeQuery,
     EnvelopeSummary,
     EquilibriumSoundSpeedSample,
+    EquipmentCostResultRow,
+    EquipmentMtoRow,
+    EquipmentQualityFlag,
     EscalationItemResult,
     EsdContribution,
     EventTreeOutcome,
@@ -6956,6 +6959,25 @@ class EjectorResult(_HasWarnings):
 
     #: `getDischargeConnectionLength`: `5 + 2*clamp(discharge/mixing - 1, 0, 3)` times the diffuser outlet's diameter, in bara.
     discharge_connection_length: Q
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EquipmentCostEstimateResult(_HasWarnings):
+    """Result of ``process.equipment_cost_estimate``."""
+
+    CALC_ID: ClassVar[str] = "process.equipment_cost_estimate"
+
+    #: one row per equipment item, in caller order.
+    equipment: tuple[EquipmentCostResultRow, ...]
+
+    #: the weighted bill of materials, one row per line.
+    material_take_off: tuple[EquipmentMtoRow, ...]
+
+    #: the class's quality flags, one row per flag.
+    quality_flags: tuple[EquipmentQualityFlag, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

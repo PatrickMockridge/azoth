@@ -19,7 +19,8 @@ use crate::record_outputs_gen::{
     PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult, PyCostBomRow,
     PyCostEstimationResultRow, PyDepositionSegmentRow, PyDepressurizationPoint,
     PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery, PyEnvelopeSummary,
-    PyEquilibriumSoundSpeedSample, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
+    PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
+    PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
     PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
     PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
     PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
@@ -17228,6 +17229,68 @@ impl From<&azoth_process::models::ejector::EjectorResult> for PyEjectorResult {
                 magnitude_si: r.discharge_connection_length.value,
                 unit: "m".to_string(),
             },
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.equipment_cost_estimate`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "EquipmentCostEstimateResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyEquipmentCostEstimateResult {
+    /// one row per equipment item, in caller order.
+    #[pyo3(get)]
+    pub equipment: Vec<PyEquipmentCostResultRow>,
+    /// the weighted bill of materials, one row per line.
+    #[pyo3(get)]
+    pub material_take_off: Vec<PyEquipmentMtoRow>,
+    /// the class's quality flags, one row per flag.
+    #[pyo3(get)]
+    pub quality_flags: Vec<PyEquipmentQualityFlag>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyEquipmentCostEstimateResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "EquipmentCostEstimateResult(equipment={:?}, material_take_off={:?}, quality_flags={:?}, {} warning(s))",
+            self.equipment,
+            self.material_take_off,
+            self.quality_flags,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::equipment_cost_estimate::EquipmentCostEstimateResult>
+    for PyEquipmentCostEstimateResult
+{
+    fn from(
+        r: &azoth_process::models::equipment_cost_estimate::EquipmentCostEstimateResult,
+    ) -> Self {
+        Self {
+            equipment: r
+                .equipment
+                .iter()
+                .map(PyEquipmentCostResultRow::from)
+                .collect(),
+            material_take_off: r
+                .material_take_off
+                .iter()
+                .map(PyEquipmentMtoRow::from)
+                .collect(),
+            quality_flags: r
+                .quality_flags
+                .iter()
+                .map(PyEquipmentQualityFlag::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }

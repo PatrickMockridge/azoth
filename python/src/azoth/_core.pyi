@@ -580,6 +580,53 @@ class DepressurizationAcceptancePoint(TypedDict):
     mass: float
     mass_flow: float
 
+class EquipmentCostSpec(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    equipment: str
+    name: str | None
+    material: str | None
+    material_factor: float | None
+    cepci: float | None
+    mechanical_design_present: bool | None
+    max_design_pressure: float | None
+    weight_total: float | None
+    design_pressure_barg: float | None
+    design_pressure_bara: float | None
+    contingency_factor: float | None
+    engineering_factor: float | None
+    include_material_take_off: bool | None
+    shell_weight: float | None
+    internals_weight: float | None
+    nozzle_weight: float | None
+    piping_weight: float | None
+    electro_instrument_weight: float | None
+    structural_weight: float | None
+    operating_hours: float | None
+    electricity_cost_per_kwh: float | None
+    steam_cost_per_tonne: float | None
+    cooling_water_cost_per_m3: float | None
+    fuel_cost_per_gj: float | None
+    inner_diameter: float | None
+    tangent_length: float | None
+    vessel_volume: float | None
+    column_type: str | None
+    tray_type: str | None
+    packing_type: str | None
+    diameter: float | None
+    height: float | None
+    number_of_trays: float | None
+    number_of_stages: float | None
+    packing_height: float | None
+    include_reboiler: bool | None
+    include_condenser: bool | None
+    include_liquid_distributor: bool | None
+    include_mist_eliminator: bool | None
+    include_reflux_system: bool | None
+    reboiler_duty: float | None
+    condenser_duty: float | None
+    absorber_type: str | None
+
 class EscalationItem(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1408,6 +1455,50 @@ class DriftFluxReleaseStation:
     liquid_density: Qty | None
     gas_velocity: Qty | None
     liquid_velocity: Qty | None
+
+@final
+class EquipmentCostResultRow:
+    """one row per equipment item, in caller order."""
+
+    name: str
+    equipment_type: str
+    purchased_equipment_cost: float
+    bare_module_cost: float
+    total_module_cost: float
+    grass_roots_cost: float
+    total_cost: float
+    installation_man_hours: Qty
+    material_factor: float
+    equipment_cost: float
+    installed_cost: float
+    specific_cost_per_m2: float
+    specific_capex_per_kw: float
+    annual_maintenance_cost: float
+    sorbent_replacement_cost: float
+    annual_operating_cost: float
+    calculated_weight: Qty
+
+@final
+class EquipmentMtoRow:
+    """the weighted bill of materials, one row per line."""
+
+    equipment_index: float
+    item: str
+    material: str
+    quantity: float
+    has_quantity: bool
+    unit: str
+    weight_kg: Qty
+    has_weight: bool
+    cost_usd: float
+    source: str
+
+@final
+class EquipmentQualityFlag:
+    """the class's quality flags, one row per flag."""
+
+    equipment_index: float
+    message: str
 
 @final
 class EscalationItemResult:
@@ -4503,6 +4594,13 @@ class EjectorResult:
     total_volume: Qty
     suction_connection_length: Qty
     discharge_connection_length: Qty
+    warnings: list[Warning]
+
+@final
+class EquipmentCostEstimateResult:
+    equipment: list[EquipmentCostResultRow]
+    material_take_off: list[EquipmentMtoRow]
+    quality_flags: list[EquipmentQualityFlag]
     warnings: list[Warning]
 
 @final
@@ -8928,6 +9026,7 @@ def ejector(
     mixing_efficiency: float,
     diffuser_efficiency: float,
 ) -> EjectorResult: ...
+def equipment_cost_estimate(equipment: list[EquipmentCostSpec]) -> EquipmentCostEstimateResult: ...
 def escalation_graph(
     items: list[EscalationItem],
     exposures: list[EscalationExposure],
