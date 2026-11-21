@@ -470,7 +470,7 @@ fn wichert_aziz(tpc_k: f64, ppc_bara: f64, y_h2s: f64, y_co2: f64) -> (f64, f64)
     let ppc_psia = ppc_bara * PSIA_PER_BAR;
     let a = y_h2s + y_co2;
     let b = y_h2s;
-    let epsilon = 120.0 * (a.powf(0.9) - a.powf(1.6)) + 15.0 * (b.powf(0.5) - b.powf(4.0));
+    let epsilon = 120.0 * (a.powf(0.9) - a.powf(1.6)) + 15.0 * (b.powf(0.5) - b.powi(4));
     let tpc_corr_r = tpc_r - epsilon;
     let ppc_corr_psia = ppc_psia * tpc_corr_r / (tpc_r + b * (1.0 - b) * epsilon);
     (tpc_corr_r * 5.0 / 9.0, ppc_corr_psia / PSIA_PER_BAR)
@@ -487,10 +487,10 @@ fn hall_yarborough_zfactor(tpr: f64, ppr: f64) -> f64 {
     let d = 2.18 + 2.82 * t;
     let mut y: f64 = 0.001;
     for _ in 0..200 {
-        let fy = a + (y + y * y + y * y * y - y * y * y * y) / (1.0 - y).powf(3.0) - b * y * y
+        let fy = a + (y + y * y + y * y * y - y * y * y * y) / (1.0 - y).powi(3) - b * y * y
             + c * y.powf(d);
         let dfy = (1.0 + 4.0 * y + 4.0 * y * y - 4.0 * y * y * y + y * y * y * y)
-            / (1.0 - y).powf(4.0)
+            / (1.0 - y).powi(4)
             - 2.0 * b * y
             + c * d * y.powf(d - 1.0);
         let y_new = (y - fy / dfy).clamp(1.0e-12, 0.9999);
@@ -523,15 +523,15 @@ fn dranchuk_abou_kassem(tpr: f64, ppr: f64) -> f64 {
     for _ in 0..200 {
         let rr = rho;
         let rr2 = rr * rr;
-        let c1 = a1 + a2 / tpr + a3 / tpr.powf(3.0) + a4 / tpr.powf(4.0) + a5 / tpr.powf(5.0);
+        let c1 = a1 + a2 / tpr + a3 / tpr.powi(3) + a4 / tpr.powi(4) + a5 / tpr.powi(5);
         let c2 = a6 + a7 / tpr + a8 / (tpr * tpr);
         let c3 = a9 * (a7 / tpr + a8 / (tpr * tpr));
         let fz = 1.0 + c1 * rr + c2 * rr2 - c3 * rr2 * rr2 * rr
-            + a10 * (1.0 + a11 * rr2) * (rr2 / tpr.powf(3.0)) * (-a11 * rr2).exp()
+            + a10 * (1.0 + a11 * rr2) * (rr2 / tpr.powi(3)) * (-a11 * rr2).exp()
             - 0.27 * ppr / (rho * tpr);
         let dfz = c1 + 2.0 * c2 * rr - 5.0 * c3 * rr2 * rr2
             + a10
-                * (rr / tpr.powf(3.0))
+                * (rr / tpr.powi(3))
                 * (2.0 + 4.0 * a11 * rr2 - 2.0 * a11 * a11 * rr2 * rr2)
                 * (-a11 * rr2).exp()
             + 0.27 * ppr / (rho * rho * tpr);
@@ -604,11 +604,10 @@ fn hall_yarborough_pseudo(tpr: f64, ppr: f64) -> Result<f64> {
     let mut y: f64 = 0.001;
     let mut converged = false;
     for _ in 0..100 {
-        let fy = a0 * ppr + (y + y * y + y * y * y - y * y * y * y) / (1.0 - y).powf(3.0)
-            - b * y * y
+        let fy = a0 * ppr + (y + y * y + y * y * y - y * y * y * y) / (1.0 - y).powi(3) - b * y * y
             + c * y.powf(d);
         let dfy = (1.0 + 4.0 * y + 4.0 * y * y - 4.0 * y * y * y + y * y * y * y)
-            / (1.0 - y).powf(4.0)
+            / (1.0 - y).powi(4)
             - 2.0 * b * y
             + c * d * y.powf(d - 1.0);
         if dfy.abs() < 1.0e-30 {
