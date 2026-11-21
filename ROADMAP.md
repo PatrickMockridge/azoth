@@ -653,6 +653,24 @@ lists are the statement, and the class that would close the gap is named here in
 sentence claiming the same fact in a spec is refused by that same tool, because a sentence is
 a claim nothing holds.
 
+- **The cost-estimation package is ported, as four ids.** `process.cost_estimation` is
+  `CostEstimationCalculator`'s factor tables, Turton correlations, module stack, labour hours
+  and vessel BOM; `process.equipment_cost_estimate` is the 21 per-equipment estimators behind
+  one flat discriminated record row; `process.process_cost_estimate` is `ProcessCostEstimate`'s
+  roll-up, discipline split, project stack, OPEX and simple economics over stated per-unit
+  summaries; and `process.topsides_facility_cost` is `TopsidesFacilityCostEstimator`'s module,
+  bulk, project and MTO stack. **The live `ProcessSystem` walks are the oracle's, not the
+  ids'**: the probe runs them, the ids take the rows they print, the same flattening
+  `process.risk_matrix` makes. The class's own quirks travel with the arithmetic - the
+  material factor applied both inside several estimators and again in the module stack, the
+  heat exchanger design's `getHeatTransferArea` returning the base class's zero so its
+  estimator always falls back to weight, the electrolyzer design returning the base
+  weight-based estimator unless the electrolyzer one is constructed explicitly, and the
+  operating-cost walk reading `getDuty()` as kilowatts where the cooler returns watts. Costs
+  are USD magnitudes declared dimensionless, the `total_pressure_drop_mbar` precedent, so no
+  currency dimension is added; the JSON adapters, the reports and the serialization remain
+  session surface. Held to four captures and the class's own tests.
+
 - **The mechanical-design tree** — `process/mechanicaldesign/` and the `*MechanicalDesign`
   class beside each equipment class — is where most of them are. **The entries that carry a
   design declare the parameters it reads**, behind `mechanical_design` or on the entry's own
@@ -727,8 +745,9 @@ a claim nothing holds.
   A port would be a class nothing calls.
 - **`MechanicalDesign`** — `process.ejector`'s `updateDesign` container is ported: the four
   areas, their diameters, the fixed length multiples, the two connection estimates and the
-  swept volumes. The base class's weights and cost estimate are a separate tree and are still
-  absent rather than guessed.
+  swept volumes. The base class's weights are still absent rather than guessed, and its cost
+  estimate is the cost tranche's: `process.equipment_cost_estimate` carries the per-equipment
+  stacks and `process.process_cost_estimate` the roll-up.
 - **`process.filter`'s loaded state, one transient step and mechanical design landed** — the
   carried solids loading, breakthrough, the loading's pressure drop, the bypass above its
   cracking drop and the terminal-drop replacement check; then `runTransient`'s
@@ -737,7 +756,8 @@ a claim nothing holds.
   then `FilterMechanicalDesign.calcDesign`'s element count, vessel, ASME-shaped pressure
   boundary, nozzle and weights. The class's "element-integrity check" is two stored values: the
   steady run reads neither, while the design's collapse utilization and integrity warning do.
-  What remains is the session-level loop, `FilterCostEstimate` (USD) and the `toJson` DTO.
+  What remains is the session-level loop and the `toJson` DTO; `FilterCostEstimate` (USD) is
+  `process.equipment_cost_estimate`'s filter branch.
 - **`getCapacityUtilization` is ported**, as a pair of optional inputs — `internal_diameter` and
   `design_gas_load_factor`, **both or neither**, because half a vessel has nothing to check — and
   an optional `capacity_utilization`. **It reads the system `run` entrained rather than the flash
@@ -1154,8 +1174,9 @@ a claim nothing holds.
   entry: **`Splitter`'s capacity map and mechanical design landed** - the two lazy SOFT
   constraints, the header-diameter read and the empty-map answers, and `calcDesign`'s NPS
   sizing, wall, manifold volume, drop and weights - and what remains owed there is
-  `runTransient` and `calculateSplitterCost`, which needs a currency dimension the unit system
-  does not carry; **`Flare`'s radiation model, dispersion surrogate and
+  `runTransient`; `calculateSplitterCost` is the splitter branch of
+  `process.equipment_cost_estimate`, its costs dimensionless USD magnitudes because the
+  vocabulary has no currency unit; **`Flare`'s radiation model, dispersion surrogate and
   capacity check landed** - the point-source flux and its inverse, the tip's exit velocity and
   momentum flux over the system density, and the three design-axis utilisations with their
   overload flag - what remains owed there is `runTransient`, the cumulative accumulators and
@@ -1250,8 +1271,8 @@ a claim nothing holds.
   `process.separator_performance`; **`GasScrubber`'s vessel sizing and mesh pad landed**;
   still owed are `Tank`'s residence-time `autoSize` — its wall temperature and steel mass are
   `runTransient`'s, with the level solve —; `ThrottlingValve`'s controller path;
-  `Filter`'s session transient loop and cost, its loading, one step and mechanical design
-  having landed; **`StirredTankReactor`'s vessel volume, residence time and agitator power landed as
+  `Filter`'s session transient loop, its loading, one step, mechanical design and cost having
+  landed (`process.equipment_cost_estimate`); **`StirredTankReactor`'s vessel volume, residence time and agitator power landed as
   carried state** - declared, echoed, and their product published - with only its
   `runTransient` still owed. **The
   turbo-expander landed**: `TurboExpanderCompressor` and `ExpanderChartKhader` are one coupled
