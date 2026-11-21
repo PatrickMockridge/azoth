@@ -2200,6 +2200,82 @@ impl From<&azoth_process::models::fmea_worksheet::FmeaRankedEntry> for PyFmeaRan
     }
 }
 
+/// one row per input row, in caller order; only the fields the calculation answers are present.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GasResultRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGasResultRow {
+    /// the call this row answered.
+    #[pyo3(get)]
+    pub calculation: String,
+    /// the pseudocritical or corrected pseudocritical temperature.
+    #[pyo3(get)]
+    pub temperature: Option<PyQty>,
+    /// the pseudocritical or corrected pseudocritical pressure.
+    #[pyo3(get)]
+    pub pressure: Option<PyQty>,
+    /// a Z factor or a reduced ratio.
+    #[pyo3(get)]
+    pub factor: Option<f64>,
+    /// the gas density.
+    #[pyo3(get)]
+    pub density: Option<PyQty>,
+    /// the gas formation volume factor, reservoir m3 per standard m3.
+    #[pyo3(get)]
+    pub gas_fvf: Option<f64>,
+    /// the pseudopressure in the class's bara^2/cP.
+    #[pyo3(get)]
+    pub pseudo_pressure: Option<f64>,
+    /// the Haaland H2S estimate, in the class's dimensionless fraction.
+    #[pyo3(get)]
+    pub h2s_fraction: Option<f64>,
+}
+
+#[pymethods]
+impl PyGasResultRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "GasResultRow(calculation={}, temperature={:?}, pressure={:?}, factor={:?}, density={:?}, gas_fvf={:?}, pseudo_pressure={:?}, h2s_fraction={:?})",
+            self.calculation,
+            self.temperature,
+            self.pressure,
+            self.factor,
+            self.density,
+            self.gas_fvf,
+            self.pseudo_pressure,
+            self.h2s_fraction
+        )
+    }
+}
+
+impl From<&azoth_pvt::gas_correlations::GasResultRow> for PyGasResultRow {
+    fn from(row: &azoth_pvt::gas_correlations::GasResultRow) -> Self {
+        Self {
+            calculation: row.calculation.clone(),
+            temperature: row.temperature.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "K".to_string(),
+            }),
+            pressure: row.pressure.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            factor: row.factor,
+            density: row.density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            gas_fvf: row.gas_fvf,
+            pseudo_pressure: row.pseudo_pressure,
+            h2s_fraction: row.h2s_fraction,
+        }
+    }
+}
+
 /// the populated rows, one per input row and in its order.
 #[pyclass(
     frozen,

@@ -2,9 +2,13 @@
 // class is expressible in the id's boundary units, and each answer is printed as the id
 // publishes it.
 
+import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
 import neqsim.pvtsimulation.util.BlackOilCorrelations;
 import neqsim.pvtsimulation.util.BlackOilUnits;
+import neqsim.pvtsimulation.util.GasPseudoCriticalProperties;
+import neqsim.pvtsimulation.util.GasPseudoPressure;
 import neqsim.pvtsimulation.util.SaturationPressureCorrelation;
+import neqsim.pvtsimulation.util.ZFactorCorrelations;
 
 public final class PvtProbe {
 
@@ -109,11 +113,59 @@ public final class PvtProbe {
         BlackOilCorrelations.bubblePointGlaso(rs, 0.8, 30.0, tC, BlackOilUnits.SI) * 1.0e5);
   }
 
+  private static void gas() {
+    System.out.println("gas_correlations");
+
+    line("pseudo_critical_temperature_standing_0.75",
+        GasPseudoCriticalProperties.pseudoCriticalTemperatureStanding(0.75));
+    line("pseudo_critical_pressure_standing_0.75",
+        GasPseudoCriticalProperties.pseudoCriticalPressureStanding(0.75) * 1.0e5);
+    line("pseudo_critical_temperature_sutton_0.75",
+        GasPseudoCriticalProperties.pseudoCriticalTemperatureSutton(0.75));
+    line("pseudo_critical_pressure_sutton_0.75",
+        GasPseudoCriticalProperties.pseudoCriticalPressureSutton(0.75) * 1.0e5);
+    line("pseudo_critical_temperature_piper",
+        GasPseudoCriticalProperties.pseudoCriticalTemperaturePiper(0.75, 0.05, 0.03, 0.02));
+    line("pseudo_critical_pressure_piper",
+        GasPseudoCriticalProperties.pseudoCriticalPressurePiper(0.75, 0.05, 0.03, 0.02) * 1.0e5);
+
+    double[] corrected = GasPseudoCriticalProperties.wichertAzizCorrection(222.22, 45.51, 0.10, 0.05);
+    line("wichert_aziz_temperature", corrected[0]);
+    line("wichert_aziz_pressure", corrected[1] * 1.0e5);
+
+    line("pseudo_reduced_temperature", GasPseudoCriticalProperties.pseudoReducedTemperature(366.48, 222.22));
+    line("pseudo_reduced_pressure", GasPseudoCriticalProperties.pseudoReducedPressure(137.9, 45.5));
+
+    line("z_factor_hall_yarborough_1.5_2.0", ZFactorCorrelations.hallYarborough(1.5, 2.0));
+    line("z_factor_hall_yarborough_2.0_10.0", ZFactorCorrelations.hallYarborough(2.0, 10.0));
+    line("z_factor_hall_yarborough_1.5_0.0", ZFactorCorrelations.hallYarborough(1.5, 0.0));
+    line("z_factor_dranchuk_abou_kassem_1.5_2.0", ZFactorCorrelations.dranchukAbouKassem(1.5, 2.0));
+    line("z_factor_dranchuk_abou_kassem_2.0_10.0", ZFactorCorrelations.dranchukAbouKassem(2.0, 10.0));
+    line("z_factor_papay_1.5_2.0", ZFactorCorrelations.papay(1.5, 2.0));
+    line("z_factor_papay_1.5_10.0", ZFactorCorrelations.papay(1.5, 10.0));
+    line("z_factor_sutton", ZFactorCorrelations.zFactorSutton(137.9, 366.48, 0.65));
+    line("z_factor_sour_gas", ZFactorCorrelations.zFactorSourGas(137.9, 366.48, 0.75, 0.10, 0.05));
+    line("gas_density", ZFactorCorrelations.gasDensity(137.9, 366.48, 0.65, 16.04));
+    line("gas_fvf_from_z", ZFactorCorrelations.gasFVFFromZ(137.9, 366.48, 0.65));
+
+    line("pseudo_pressure_from_correlation",
+        GasPseudoPressure.calculateFromCorrelation(206.84, 1.01325, 366.48, 0.65, 16.04));
+    line("delta_pseudo_pressure",
+        GasPseudoPressure.deltaPseudoPressure(206.84, 68.95, 366.48, 0.65, 16.04));
+
+    CompositionEstimation composition = new CompositionEstimation(366.48, 206.84);
+    line("h2s_concentration_from_temperature", composition.estimateH2Sconcentration());
+    line("h2s_concentration_from_co2", composition.estimateH2Sconcentration(0.05));
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
       case "black_oil":
         blackOil();
+        break;
+      case "gas":
+        gas();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

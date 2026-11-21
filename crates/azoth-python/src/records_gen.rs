@@ -842,6 +842,37 @@ pub struct FmeaEntry {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct GasQuery {
+    #[pyo3(item)]
+    pub calculation: String,
+    #[pyo3(item)]
+    pub gamma_g: Option<f64>,
+    #[pyo3(item)]
+    pub y_h2s: Option<f64>,
+    #[pyo3(item)]
+    pub y_co2: Option<f64>,
+    #[pyo3(item)]
+    pub y_n2: Option<f64>,
+    #[pyo3(item)]
+    pub temperature: Option<f64>,
+    #[pyo3(item)]
+    pub pressure: Option<f64>,
+    #[pyo3(item)]
+    pub reference_pressure: Option<f64>,
+    #[pyo3(item)]
+    pub tpc: Option<f64>,
+    #[pyo3(item)]
+    pub ppc: Option<f64>,
+    #[pyo3(item)]
+    pub tpr: Option<f64>,
+    #[pyo3(item)]
+    pub ppr: Option<f64>,
+    #[pyo3(item)]
+    pub molar_mass: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct HazopDeviationInput {
     #[pyo3(item)]
     pub guide_word: String,

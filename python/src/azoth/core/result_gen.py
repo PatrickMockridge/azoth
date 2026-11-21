@@ -51,6 +51,7 @@ from azoth.core.record_outputs_gen import (
     FiniteRateReleaseStation,
     FlowlineScaleSegment,
     FmeaRankedEntry,
+    GasResultRow,
     HazopPopulationRow,
     HazopTemplateDeviation,
     HeaterInstrument,
@@ -12254,6 +12255,19 @@ class BlackOilCorrelationsResult(_HasWarnings):
 
     #: one row per input row, in caller order; only the fields the calculation answers are present.
     queries: tuple[BlackOilResultRow, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class GasCorrelationsResult(_HasWarnings):
+    """Result of ``pvt.gas_correlations``."""
+
+    CALC_ID: ClassVar[str] = "pvt.gas_correlations"
+
+    #: one row per input row, in caller order; only the fields the calculation answers are present.
+    queries: tuple[GasResultRow, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

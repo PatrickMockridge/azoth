@@ -356,6 +356,7 @@
 //!   - specs/models/process/vessel_filling.toml
 //!   - specs/models/process/vessel_rupture.toml
 //!   - specs/models/pvt/black_oil_correlations.toml
+//!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
 //!   - specs/models/reactions/kinetic_rate_law.toml

@@ -815,8 +815,5 @@ fn gas_viscosity_lee_gonzalez_eakin(t_k: f64, rho_kg_m3: f64, molar_mass_kg_mol:
     let t_r = fahrenheit(t_k) + RANKINE_OFFSET;
     let rho_field = kg_m3_to_lb_ft3(rho_kg_m3);
     let mg = molar_mass_kg_mol * 1000.0;
-    let k = (9.4 + 0.02 * mg) * t_r.powf(1.5) / (209.0 + 19.0 * mg + t_r);
-    let x = 3.5 + 986.0 / t_r + 0.01 * mg;
-    let y = 2.4 - 0.2 * x;
-    1.0e-4 * k * (x * (rho_field / 62.4).powf(y)).exp()
+    crate::gas_correlations::lee_gonzalez_eakin_field(t_r, rho_field, mg)
 }

@@ -160,7 +160,9 @@ from azoth.core.result import (
     FurstElectrolyteMod2004PhaseResult,
     FurstElectrolytePhaseResult,
     GasBlowbyResult,
+    GasCorrelationsResult,
     GasDispersionResult,
+    GasResultRow,
     GasScrubberResult,
     GaussianPlumeResult,
     GeFlashResult,
@@ -670,6 +672,7 @@ __all__ = [
     "furst_electrolyte_mod2004_phase",
     "furst_electrolyte_phase",
     "gas_blowby",
+    "gas_correlations",
     "gas_dispersion",
     "gas_scrubber",
     "gaussian_plume",
@@ -10443,6 +10446,18 @@ def black_oil_correlations(queries: Sequence[Mapping[str, Any]]) -> BlackOilCorr
     )
     return BlackOilCorrelationsResult(
         queries=tuple(BlackOilResultRow(calculation=c.calculation, pressure=None if c.pressure is None else from_si(c.pressure.magnitude_si, c.pressure.unit), solution_gor=c.solution_gor, oil_fvf=c.oil_fvf, compressibility=c.compressibility, viscosity=None if c.viscosity is None else from_si(c.viscosity.magnitude_si, c.viscosity.unit), gas_fvf=c.gas_fvf, factor=c.factor, average=None if c.average is None else from_si(c.average.magnitude_si, c.average.unit), minimum=None if c.minimum is None else from_si(c.minimum.magnitude_si, c.minimum.unit), maximum=None if c.maximum is None else from_si(c.maximum.magnitude_si, c.maximum.unit), std_dev=None if c.std_dev is None else from_si(c.std_dev.magnitude_si, c.std_dev.unit), standing=None if c.standing is None else from_si(c.standing.magnitude_si, c.standing.unit), vasquez_beggs=None if c.vasquez_beggs is None else from_si(c.vasquez_beggs.magnitude_si, c.vasquez_beggs.unit), glaso=None if c.glaso is None else from_si(c.glaso.magnitude_si, c.glaso.unit), petrosky_farshad=None if c.petrosky_farshad is None else from_si(c.petrosky_farshad.magnitude_si, c.petrosky_farshad.unit)) for c in result.queries),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def gas_correlations(queries: Sequence[Mapping[str, Any]]) -> GasCorrelationsResult:
+    """``pvt.gas_correlations``, computed in Rust."""
+    spec = _models_gen.model("pvt.gas_correlations")
+    result = _core.gas_correlations(
+        input_records_to_si(spec, "queries", queries),
+    )
+    return GasCorrelationsResult(
+        queries=tuple(GasResultRow(calculation=c.calculation, temperature=None if c.temperature is None else from_si(c.temperature.magnitude_si, c.temperature.unit), pressure=None if c.pressure is None else from_si(c.pressure.magnitude_si, c.pressure.unit), factor=c.factor, density=None if c.density is None else from_si(c.density.magnitude_si, c.density.unit), gas_fvf=c.gas_fvf, pseudo_pressure=c.pseudo_pressure, h2s_fraction=c.h2s_fraction) for c in result.queries),
         warnings=_warnings(result.warnings),
     )
 

@@ -370,6 +370,7 @@
   - [Vessel rupture](./process/vessel_rupture.md)
 - [PVT simulation](./pvt/index.md)
   - [Black-oil correlation table](./pvt/black_oil_correlations.md)
+  - [Gas correlation table](./pvt/gas_correlations.md)
 - [Reactions](./reactions/index.md)
   - [Equilibrium constant of one reaction](./reactions/equilibrium_constant.md)
   - [Reactive chemical equilibrium by the Smith-Missen method](./reactions/chemical_equilibrium.md)

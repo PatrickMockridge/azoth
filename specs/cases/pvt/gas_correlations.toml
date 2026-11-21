@@ -1,0 +1,59 @@
+model = "pvt.gas_correlations"
+[[cases]]
+id = "capture_states"
+tolerance = 1.0e-9
+source = "The classes' own test states and the correlation boundaries, from `validation/neqsim/captures/pvt_gas.tsv` (`gas_correlations`)."
+[cases.inputs]
+queries = [
+  { calculation = "pseudo_critical_temperature_standing", gamma_g = 0.75 },
+  { calculation = "pseudo_critical_pressure_standing", gamma_g = 0.75 },
+  { calculation = "pseudo_critical_temperature_sutton", gamma_g = 0.75 },
+  { calculation = "pseudo_critical_pressure_sutton", gamma_g = 0.75 },
+  { calculation = "pseudo_critical_temperature_piper", gamma_g = 0.75, y_h2s = 0.05, y_co2 = 0.03, y_n2 = 0.02 },
+  { calculation = "pseudo_critical_pressure_piper", gamma_g = 0.75, y_h2s = 0.05, y_co2 = 0.03, y_n2 = 0.02 },
+  { calculation = "wichert_aziz", tpc = 222.22, ppc = 4551000.0, y_h2s = 0.1, y_co2 = 0.05 },
+  { calculation = "pseudo_reduced_temperature", temperature = 366.48, tpc = 222.22 },
+  { calculation = "pseudo_reduced_pressure", pressure = 13790000.0, ppc = 4550000.0 },
+  { calculation = "z_factor_hall_yarborough", tpr = 1.5, ppr = 2.0 },
+  { calculation = "z_factor_hall_yarborough", tpr = 2.0, ppr = 10.0 },
+  { calculation = "z_factor_hall_yarborough", tpr = 1.5, ppr = 0.0 },
+  { calculation = "z_factor_dranchuk_abou_kassem", tpr = 1.5, ppr = 2.0 },
+  { calculation = "z_factor_dranchuk_abou_kassem", tpr = 2.0, ppr = 10.0 },
+  { calculation = "z_factor_papay", tpr = 1.5, ppr = 2.0 },
+  { calculation = "z_factor_papay", tpr = 1.5, ppr = 10.0 },
+  { calculation = "z_factor_sutton", pressure = 13790000.0, temperature = 366.48, gamma_g = 0.65 },
+  { calculation = "z_factor_sour_gas", pressure = 13790000.0, temperature = 366.48, gamma_g = 0.75, y_h2s = 0.1, y_co2 = 0.05 },
+  { calculation = "gas_density", pressure = 13790000.0, temperature = 366.48, gamma_g = 0.65, molar_mass = 0.01604 },
+  { calculation = "gas_fvf_from_z", pressure = 13790000.0, temperature = 366.48, gamma_g = 0.65 },
+  { calculation = "pseudo_pressure_from_correlation", pressure = 20684000.0, reference_pressure = 101325.0, temperature = 366.48, gamma_g = 0.65, molar_mass = 0.01604 },
+  { calculation = "delta_pseudo_pressure", pressure = 20684000.0, reference_pressure = 6895000.0, temperature = 366.48, gamma_g = 0.65, molar_mass = 0.01604 },
+  { calculation = "h2s_concentration_from_temperature", temperature = 366.48 },
+  { calculation = "h2s_concentration_from_co2", temperature = 366.48, y_co2 = 0.05 },
+]
+[cases.expected]
+queries = [
+  { calculation = "pseudo_critical_temperature_standing", temperature = 224.84375 },
+  { calculation = "pseudo_critical_pressure_standing", pressure = 4599872.102483487 },
+  { calculation = "pseudo_critical_temperature_sutton", temperature = 216.5 },
+  { calculation = "pseudo_critical_pressure_sutton", pressure = 4526572.346557454 },
+  { calculation = "pseudo_critical_temperature_piper", temperature = 216.11514014202226 },
+  { calculation = "pseudo_critical_pressure_piper", pressure = 5120813.200459205 },
+  { calculation = "wichert_aziz", temperature = 210.70030962648485, pressure = 4295041.534221613 },
+  { calculation = "pseudo_reduced_temperature", factor = 1.6491764917649177 },
+  { calculation = "pseudo_reduced_pressure", factor = 3.030769230769231 },
+  { calculation = "z_factor_hall_yarborough", factor = 0.8208337797850295 },
+  { calculation = "z_factor_hall_yarborough", factor = 1.143899379647683 },
+  { calculation = "z_factor_hall_yarborough", factor = 1.0 },
+  { calculation = "z_factor_dranchuk_abou_kassem", factor = 0.8214651256147786 },
+  { calculation = "z_factor_dranchuk_abou_kassem", factor = 1.144448554810509 },
+  { calculation = "z_factor_papay", factor = 0.8280252996216065 },
+  { calculation = "z_factor_papay", factor = 1.4501845773728723 },
+  { calculation = "z_factor_sutton", factor = 0.8977390529533832 },
+  { calculation = "z_factor_sour_gas", factor = 0.8903633369255738 },
+  { calculation = "gas_density", density = 80.85998616241369 },
+  { calculation = "gas_fvf_from_z", gas_fvf = 0.008373189425724832 },
+  { calculation = "pseudo_pressure_from_correlation", pseudo_pressure = 2865418.4358585384 },
+  { calculation = "delta_pseudo_pressure", pseudo_pressure = 2520842.0799756097 },
+  { calculation = "h2s_concentration_from_temperature", h2s_fraction = 0.8815257956532984 },
+  { calculation = "h2s_concentration_from_co2", h2s_fraction = 2.0462044448947316 },
+]

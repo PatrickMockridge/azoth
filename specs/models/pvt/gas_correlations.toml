@@ -1,0 +1,151 @@
+id = "pvt.gas_correlations"
+name = "Gas correlation table"
+kind = "procedure"
+assumptions = [
+    "**the classes' own units**: pseudo-critical properties answer K and bara, the Z factors are dimensionless, gas density is kg/m3, and the pseudo-pressure is the class's bara^2/cP, declared dimensionless because the vocabulary has no such dimension.",
+    "**two Hall-Yarborough variants are carried.** `ZFactorCorrelations.hallYarborough` iterates 200 times, clamps y to [1e-12, 0.9999] and falls back to Z = 1 outside [0.05, 5]; `GasPseudoPressure.hallYarboroughZ` iterates 100 times, halves a step and throws on non-convergence.",
+    "**the pseudo-pressure integration is Simpson's rule with 200 steps** over 2 P/(mu Z), with Standing pseudo-critical properties, the pseudo-pressure HY variant and the Lee-Gonzalez-Eakin viscosity. The result is bara^2/cP.",
+    "**`gasFVFFromZ` uses 1.01325 bara and 288.71 K as its standard state**, not the 288.15 K of the laboratory gas volumes.",
+    "**Standing and Sutton refuse a gas specific gravity outside [0.55, 1.8] and [0.57, 1.68]**; the Piper regression clamps yHC and gammaGHC instead and has no range refusal.",
+    "**the sour-gas Z applies Wichert-Aziz to Sutton's pseudo-critical properties** before the reduced ratios; a no-impurity input returns the input pair.",
+    "**the H2S estimates are the Haaland correlations with no stated unit**, published as the class's dimensionless fractions.",
+    "**the EOS pseudo-pressure path is owed with `GasPseudoPressure`'s instance methods**: it needs a fluid and re-flashes at every step. The static correlation route is the id.",
+    "**reports, `compareAll`, `printResults` and the unit-string overloads are session surface**; `compareAll` is the three Z rows.",
+]
+references = [
+    "Standing, M. B. (1981). Volumetric and Phase Behavior of Oil Field Hydrocarbon Systems, 9th Ed. Society of Petroleum Engineers.",
+    "Sutton, R. P. (1985). \"Compressibility Factors for High-Molecular-Weight Reservoir Gases.\" SPE 14265.",
+    "Piper, L. D., McCain, W. D. & Corredor, J. H. (1993). \"Compressibility Factors for Naturally Occurring Petroleum Gases.\" SPE 26668.",
+    "Wichert, E. & Aziz, K. (1972). \"Calculate Zs for Sour Gases.\" Hydrocarbon Processing 51(5), 119-122.",
+    "Hall, K. R. & Yarborough, L. (1973). \"A New Equation of State for Z-Factor Calculations.\" Oil & Gas Journal 71(25), 82-92.",
+    "Dranchuk, P. M. & Abou-Kassem, J. H. (1975). \"Calculation of Z Factors for Natural Gases Using Equations of State.\" Journal of Canadian Petroleum Technology 14(3), 34-36.",
+    "Papay, J. (1968). \"A Termelestechnologiai Parameterek Valtozasa a Gaztelepek Muvelese Soran.\" OGIL Muszaki Tudomanyos Kozlemenyek.",
+    "Lee, A. L., Gonzalez, M. H. & Eakin, B. E. (1966). \"The Viscosity of Natural Gases.\" Journal of Petroleum Technology 18(8), 997-1000. DOI 10.2118/1340-PA.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/util/ZFactorCorrelations.java`, `GasPseudoCriticalProperties.java`, `GasPseudoPressure.java` and `reservoirproperties/CompositionEstimation.java` are the port source.",
+    "`validation/neqsim/captures/pvt_gas.tsv` - the correlation states, the two HY variants, the pseudo-pressure integration and the Wichert-Aziz pair.",
+]
+[source]
+standard = "NeqSim pvtsimulation/util/ZFactorCorrelations.java, GasPseudoCriticalProperties.java, GasPseudoPressure.java and reservoirproperties/CompositionEstimation.java"
+edition = "The static correlation routes; the EOS pseudo-pressure instance methods are named in the assumptions rather than ported."
+[algorithm]
+scheme = "gas_correlation_dispatch"
+initialisation = "first_query_in_caller_order"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.queries]
+type = "record_list"
+row_type = "GasQuery"
+description = "one gas correlation call per row, in caller order; `calculation` selects the fields the row must carry.\n"
+[inputs.queries.fields.calculation]
+type = "enum"
+values = [
+    "pseudo_critical_temperature_standing",
+    "pseudo_critical_pressure_standing",
+    "pseudo_critical_temperature_sutton",
+    "pseudo_critical_pressure_sutton",
+    "pseudo_critical_temperature_piper",
+    "pseudo_critical_pressure_piper",
+    "wichert_aziz",
+    "pseudo_reduced_temperature",
+    "pseudo_reduced_pressure",
+    "z_factor_hall_yarborough",
+    "z_factor_dranchuk_abou_kassem",
+    "z_factor_papay",
+    "z_factor_sutton",
+    "z_factor_sour_gas",
+    "gas_density",
+    "gas_fvf_from_z",
+    "pseudo_pressure_from_correlation",
+    "delta_pseudo_pressure",
+    "h2s_concentration_from_temperature",
+    "h2s_concentration_from_co2",
+]
+description = "the correlation this row asks for.\n"
+[inputs.queries.fields.gamma_g]
+unit = "dimensionless"
+optional = true
+description = "gas specific gravity, air = 1.\n"
+[inputs.queries.fields.y_h2s]
+unit = "dimensionless"
+optional = true
+description = "H2S mole fraction.\n"
+[inputs.queries.fields.y_co2]
+unit = "dimensionless"
+optional = true
+description = "CO2 mole fraction.\n"
+[inputs.queries.fields.y_n2]
+unit = "dimensionless"
+optional = true
+description = "N2 mole fraction.\n"
+[inputs.queries.fields.temperature]
+unit = "K"
+optional = true
+description = "absolute temperature.\n"
+[inputs.queries.fields.pressure]
+unit = "Pa"
+optional = true
+description = "absolute pressure.\n"
+[inputs.queries.fields.reference_pressure]
+unit = "Pa"
+optional = true
+description = "the lower absolute pressure, for the pseudo-pressure integral and its absolute difference.\n"
+[inputs.queries.fields.tpc]
+unit = "K"
+optional = true
+description = "pseudocritical temperature, for the reduced ratios and the Wichert-Aziz correction.\n"
+[inputs.queries.fields.ppc]
+unit = "Pa"
+optional = true
+description = "pseudocritical pressure, for the reduced ratios and the Wichert-Aziz correction.\n"
+[inputs.queries.fields.tpr]
+unit = "dimensionless"
+optional = true
+description = "pseudoreduced temperature, for the reduced-property Z correlations.\n"
+[inputs.queries.fields.ppr]
+unit = "dimensionless"
+optional = true
+description = "pseudoreduced pressure, for the reduced-property Z correlations.\n"
+[inputs.queries.fields.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "gas molar mass; the correlations take g/mol and the id multiplies by 1000.\n"
+[outputs]
+[outputs.queries]
+type = "record_list"
+description = "one row per input row, in caller order; only the fields the calculation answers are present.\n"
+[outputs.queries.fields.calculation]
+type = "string"
+description = "the call this row answered.\n"
+[outputs.queries.fields.temperature]
+unit = "K"
+optional = true
+description = "the pseudocritical or corrected pseudocritical temperature.\n"
+[outputs.queries.fields.pressure]
+unit = "Pa"
+optional = true
+description = "the pseudocritical or corrected pseudocritical pressure.\n"
+[outputs.queries.fields.factor]
+unit = "dimensionless"
+optional = true
+description = "a Z factor or a reduced ratio.\n"
+[outputs.queries.fields.density]
+unit = "kg/m**3"
+optional = true
+description = "the gas density.\n"
+[outputs.queries.fields.gas_fvf]
+unit = "dimensionless"
+optional = true
+description = "the gas formation volume factor, reservoir m3 per standard m3.\n"
+[outputs.queries.fields.pseudo_pressure]
+unit = "dimensionless"
+optional = true
+description = "the pseudopressure in the class's bara^2/cP.\n"
+[outputs.queries.fields.h2s_fraction]
+unit = "dimensionless"
+optional = true
+description = "the Haaland H2S estimate, in the class's dimensionless fraction.\n"
+[implementations]
+python = "azoth.pvt.gas_correlations"
+rust = "azoth_pvt::gas_correlations"

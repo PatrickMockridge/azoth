@@ -12,9 +12,19 @@
 use azoth_core::{CalcResult, Warning};
 
 use crate::black_oil_correlations::BlackOilCorrelationsResult;
+use crate::gas_correlations::GasCorrelationsResult;
 
 impl CalcResult for BlackOilCorrelationsResult {
     const CALC_ID: &'static str = "pvt.black_oil_correlations";
+    const FIELDS: &'static [&'static str] = &["queries", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for GasCorrelationsResult {
+    const CALC_ID: &'static str = "pvt.gas_correlations";
     const FIELDS: &'static [&'static str] = &["queries", "warnings"];
 
     fn warnings(&self) -> &[Warning] {

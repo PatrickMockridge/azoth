@@ -21,23 +21,23 @@ use crate::record_outputs_gen::{
     PyDisciplineCostLine, PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery,
     PyEnvelopeSummary, PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
     PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
-    PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
-    PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
-    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
-    PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent,
-    PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation,
-    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
-    PyMinimalCutSet, PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
-    PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyOperatingCostLine,
-    PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument,
-    PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
-    PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
-    PyPulsationModeResult, PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation,
-    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
-    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyGasResultRow,
+    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
+    PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
+    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
+    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
+    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
+    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment,
+    PyOpenDrainResult, PyOperatingCostLine, PyP002FindingResult, PyPerformanceAssessment,
+    PyPerformanceFinding, PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint,
+    PyPrescribedSlipReleaseStation, PyProcessCostEquipmentResult, PyProcessCostFlag,
+    PyProcessCostMtoRow, PyProjectCostLine, PyPulsationModeResult, PyRanzMarshallReleaseStation,
+    PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
+    PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
+    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult,
+    PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
     PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow,
     PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
     PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
@@ -30340,6 +30340,42 @@ impl From<&azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult>
     fn from(r: &azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult) -> Self {
         Self {
             queries: r.queries.iter().map(PyBlackOilResultRow::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.gas_correlations`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GasCorrelationsResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGasCorrelationsResult {
+    /// one row per input row, in caller order; only the fields the calculation answers are present.
+    #[pyo3(get)]
+    pub queries: Vec<PyGasResultRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyGasCorrelationsResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "GasCorrelationsResult(queries={:?}, {} warning(s))",
+            self.queries,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::gas_correlations::GasCorrelationsResult> for PyGasCorrelationsResult {
+    fn from(r: &azoth_pvt::gas_correlations::GasCorrelationsResult) -> Self {
+        Self {
+            queries: r.queries.iter().map(PyGasResultRow::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

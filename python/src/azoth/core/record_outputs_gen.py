@@ -830,6 +830,35 @@ class FmeaRankedEntry:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class GasResultRow:
+    """one row per input row, in caller order; only the fields the calculation answers are present."""
+
+    #: the call this row answered.
+    calculation: str
+
+    #: the pseudocritical or corrected pseudocritical temperature.
+    temperature: Q | None
+
+    #: the pseudocritical or corrected pseudocritical pressure.
+    pressure: Q | None
+
+    #: a Z factor or a reduced ratio.
+    factor: float | None
+
+    #: the gas density.
+    density: Q | None
+
+    #: the gas formation volume factor, reservoir m3 per standard m3.
+    gas_fvf: float | None
+
+    #: the pseudopressure in the class's bara^2/cP.
+    pseudo_pressure: float | None
+
+    #: the Haaland H2S estimate, in the class's dimensionless fraction.
+    h2s_fraction: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class HazopPopulationRow:
     """the populated rows, one per input row and in its order."""
 

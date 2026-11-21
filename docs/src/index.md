@@ -467,6 +467,7 @@ Five sections, and the difference between them is the point:
 *Models* — whose specs fix a procedure rather than an equation:
 
 - [`pvt.black_oil_correlations`](./pvt/black_oil_correlations.md) — Black-oil correlation table
+- [`pvt.gas_correlations`](./pvt/gas_correlations.md) — Gas correlation table
 
 **Reactions** - [`reactions/index.md`](./reactions/index.md):
 

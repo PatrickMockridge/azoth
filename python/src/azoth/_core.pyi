@@ -1192,6 +1192,23 @@ class BlackOilQuery(TypedDict):
     molar_mass: float | None
     z: float | None
 
+class GasQuery(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    calculation: str
+    gamma_g: float | None
+    y_h2s: float | None
+    y_co2: float | None
+    y_n2: float | None
+    temperature: float | None
+    pressure: float | None
+    reference_pressure: float | None
+    tpc: float | None
+    ppc: float | None
+    tpr: float | None
+    ppr: float | None
+    molar_mass: float | None
+
 @final
 class KComponent:
     """one row per fitting supplied, in the order they were listed"""
@@ -2431,6 +2448,19 @@ class BlackOilResultRow:
     vasquez_beggs: Qty | None
     glaso: Qty | None
     petrosky_farshad: Qty | None
+
+@final
+class GasResultRow:
+    """one row per input row, in caller order; only the fields the calculation answers are present."""
+
+    calculation: str
+    temperature: Qty | None
+    pressure: Qty | None
+    factor: float | None
+    density: Qty | None
+    gas_fvf: float | None
+    pseudo_pressure: float | None
+    h2s_fraction: float | None
 
 # --- results --------------------------------------------------------------
 # Generated from the result dataclasses, so the stub and `azoth.core.result`
@@ -6703,6 +6733,11 @@ class BlackOilCorrelationsResult:
     warnings: list[Warning]
 
 @final
+class GasCorrelationsResult:
+    queries: list[GasResultRow]
+    warnings: list[Warning]
+
+@final
 class ChemicalEquilibriumResult:
     moles: list[Qty]
     iterations: int
@@ -10821,6 +10856,7 @@ def vessel_rupture(
     tensile_strength_factor: float | None = None,
 ) -> VesselRuptureResult: ...
 def black_oil_correlations(queries: list[BlackOilQuery]) -> BlackOilCorrelationsResult: ...
+def gas_correlations(queries: list[GasQuery]) -> GasCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],
     b: list[float],

@@ -10,6 +10,7 @@
 //!   its inputs against.
 
 pub mod black_oil_correlations;
+pub mod gas_correlations;
 pub mod model_gen;
 pub mod model_records_gen;
 pub mod standard;
@@ -17,3 +18,4 @@ pub mod standard;
 pub use black_oil_correlations::{
     BlackOilCorrelationsResult, BlackOilQuery, BlackOilResultRow, black_oil_correlations,
 };
+pub use gas_correlations::{GasCorrelationsResult, GasQuery, GasResultRow, gas_correlations};

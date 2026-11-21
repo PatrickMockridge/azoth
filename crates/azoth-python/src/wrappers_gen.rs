@@ -10031,6 +10031,39 @@ pub fn black_oil_correlations(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Gas correlation table.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (queries))]
+#[pyo3(text_signature = "(queries)")]
+pub fn gas_correlations(
+    py: Python<'_>,
+    queries: Vec<crate::records_gen::GasQuery>,
+) -> PyResult<crate::transport_gen::PyGasCorrelationsResult> {
+    let queries_records: Vec<azoth_pvt::gas_correlations::GasQuery> = queries
+        .into_iter()
+        .map(|row| azoth_pvt::gas_correlations::GasQuery {
+            calculation: row.calculation,
+            gamma_g: row.gamma_g,
+            y_h2s: row.y_h2s,
+            y_co2: row.y_co2,
+            y_n2: row.y_n2,
+            temperature: row.temperature.map(kelvins),
+            pressure: row.pressure.map(pascals),
+            reference_pressure: row.reference_pressure.map(pascals),
+            tpc: row.tpc.map(kelvins),
+            ppc: row.ppc.map(pascals),
+            tpr: row.tpr,
+            ppr: row.ppr,
+            molar_mass: row.molar_mass.map(kilograms_per_mole),
+        })
+        .collect();
+    azoth_pvt::gas_correlations::gas_correlations(&queries_records)
+        .map(|r| crate::transport_gen::PyGasCorrelationsResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Reactive chemical equilibrium by the Smith-Missen method.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

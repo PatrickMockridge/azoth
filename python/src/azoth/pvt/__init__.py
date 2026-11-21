@@ -20,12 +20,13 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from azoth._dispatch import resolve
-from azoth.core.result import BlackOilCorrelationsResult
+from azoth.core.result import BlackOilCorrelationsResult, GasCorrelationsResult
 from azoth.pvt import layers as layers
 
 _BLACK_OIL_CORRELATIONS = "pvt.black_oil_correlations"
+_GAS_CORRELATIONS = "pvt.gas_correlations"
 
-__all__ = ["black_oil_correlations", "layers"]
+__all__ = ["black_oil_correlations", "gas_correlations", "layers"]
 
 
 def black_oil_correlations(
@@ -52,5 +53,29 @@ def black_oil_correlations(
     See :func:`azoth.pvt.reference.black_oil_correlations.black_oil_correlations`.
     """
     return resolve(_BLACK_OIL_CORRELATIONS)(  # type: ignore[no-any-return]
+        queries=queries,
+    )
+
+
+def gas_correlations(
+    queries: Sequence[Mapping[str, Any]],
+) -> GasCorrelationsResult:
+    """The gas correlation table over the stated calls.
+
+    ``queries`` states the call and only the inputs it reads: a gas specific gravity, the
+    acid-gas mole fractions, an absolute temperature in K, a pressure in Pa and a molar mass
+    in kg/mol. Pseudo-critical properties answer K and Pa, the Z factors are dimensionless,
+    the density is kg/m3, and the pseudo-pressure is the class's bara^2/cP.
+
+    Returns:
+        One row per input row, with only the fields the calculation answers.
+
+    Raises:
+        InvalidInputError: for a missing field, a gas gravity outside the correlation's
+            range, a reduced state Hall-Yarborough refuses, or a non-finite answer.
+
+    See :func:`azoth.pvt.reference.gas_correlations.gas_correlations`.
+    """
+    return resolve(_GAS_CORRELATIONS)(  # type: ignore[no-any-return]
         queries=queries,
     )

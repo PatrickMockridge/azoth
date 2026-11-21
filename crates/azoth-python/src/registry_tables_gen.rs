@@ -375,6 +375,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.vessel_filling" => azoth_process::models::vessel_filling::VesselFillingResult::FIELDS.to_vec(),
         "process.vessel_rupture" => azoth_process::models::vessel_rupture::VesselRuptureResult::FIELDS.to_vec(),
         "pvt.black_oil_correlations" => azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult::FIELDS.to_vec(),
+        "pvt.gas_correlations" => azoth_pvt::gas_correlations::GasCorrelationsResult::FIELDS.to_vec(),
         "reactions.chemical_equilibrium" => azoth_reactions::chemical_equilibrium::ChemicalEquilibriumResult::FIELDS.to_vec(),
         "reactions.equilibrium_constant" => azoth_reactions::equilibrium_constant::EquilibriumConstantResult::FIELDS.to_vec(),
         "reactions.kinetic_rate_law" => azoth_reactions::kinetic_rate_law::KineticRateLawResult::FIELDS.to_vec(),
