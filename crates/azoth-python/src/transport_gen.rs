@@ -30492,18 +30492,9 @@ impl PyDeclineCurveResult {
 impl From<&azoth_pvt::decline_curve::DeclineCurveResult> for PyDeclineCurveResult {
     fn from(r: &azoth_pvt::decline_curve::DeclineCurveResult) -> Self {
         Self {
-            time: r
-                .time
-                .as_ref()
-                .map(|values| values.iter().map(|v| *v).collect()),
-            rate: r
-                .rate
-                .as_ref()
-                .map(|values| values.iter().map(|v| *v).collect()),
-            cumulative: r
-                .cumulative
-                .as_ref()
-                .map(|values| values.iter().map(|v| *v).collect()),
+            time: r.time.as_ref().map(|values| values.to_vec()),
+            rate: r.rate.as_ref().map(|values| values.to_vec()),
+            cumulative: r.cumulative.as_ref().map(|values| values.to_vec()),
             rate_value: r.rate_value,
             cumulative_value: r.cumulative_value,
             nominal: r.nominal,
@@ -30636,14 +30627,8 @@ impl From<&azoth_pvt::gas_material_balance::GasMaterialBalanceResult>
             }),
             slope: r.slope,
             r_squared: r.r_squared,
-            cole_gp: r
-                .cole_gp
-                .as_ref()
-                .map(|values| values.iter().map(|v| *v).collect()),
-            cole_f_over_eg: r
-                .cole_f_over_eg
-                .as_ref()
-                .map(|values| values.iter().map(|v| *v).collect()),
+            cole_gp: r.cole_gp.as_ref().map(|values| values.to_vec()),
+            cole_f_over_eg: r.cole_f_over_eg.as_ref().map(|values| values.to_vec()),
             warnings: transport(&r.warnings),
         }
     }

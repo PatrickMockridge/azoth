@@ -179,6 +179,14 @@ def field_expr(
         # factors, whose unit is `m/s`; the scalar branch below would bind the whole `Vec` to
         # one element and fail to compile. The element binding follows the depth-1 branch.
         src = "*v" if kind == "number" else "v"
+        if element_expr(kind, unit, src, element) == src:
+            # An identity element is `Copy`, so `to_vec()` is the copy clippy asks for;
+            # `map(|v| *v)` is `clippy::map_clone`'s complaint and `iter().copied().collect()`
+            # is `clippy::iter_cloned_collect`'s. The branch had only met a dimensioned
+            # element - the separator's `m/s` load factors - until the pvt vectors arrived.
+            if depth == 1:
+                return f"{base}.as_ref().map(|values| values.to_vec())"
+            return f"{base}.as_ref().map(|rows| rows.iter().map(|row| row.to_vec()).collect())"
         if depth == 1:
             return (
                 f"{base}.as_ref().map(|values| values.iter().map(|v| "

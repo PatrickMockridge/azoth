@@ -48,6 +48,27 @@ def test_the_committed_transports_are_current() -> None:
     )
 
 
+def test_an_optional_vector_of_plain_numbers_is_copied_not_mapped() -> None:
+    """`Option<Vec<f64>>` transports as `to_vec()`.
+
+    The optional-vector branch first met a dimensioned element (the separator's `m/s` load
+    factors), so it built a closure per element. A plain `f64` element makes that closure
+    `|v| *v`, which `cargo clippy -D warnings` refuses as `map_clone`, and
+    `iter().copied().collect()` is refused as `iter_cloned_collect` in turn. Pinned here
+    because the generated file's meaning does not depend on which spelling it uses, so the
+    suite alone would not notice the lint's next visit.
+    """
+    field_expr = _tools_module("gen_python_transport").field_expr
+    assert (
+        field_expr("rate", "number", 1, True, None, "")
+        == "r.rate.as_ref().map(|values| values.to_vec())"
+    )
+    assert (
+        field_expr("k_values", "number", 2, True, None, "")
+        == "r.k_values.as_ref().map(|rows| rows.iter().map(|row| row.to_vec()).collect())"
+    )
+
+
 def test_one_struct_per_result_and_every_field_paired() -> None:
     """Every indexed result gets a struct, and every field in it is the spec's own name.
 
