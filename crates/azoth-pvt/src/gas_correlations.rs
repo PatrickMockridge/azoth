@@ -555,7 +555,7 @@ fn papay(tpr: f64, ppr: f64) -> f64 {
     z.max(0.05)
 }
 
-fn z_factor_sutton(p_bara: f64, t_k: f64, gamma: f64) -> f64 {
+pub(crate) fn z_factor_sutton(p_bara: f64, t_k: f64, gamma: f64) -> f64 {
     let tpc = sutton_tpc(gamma);
     let ppc = sutton_ppc(gamma);
     hall_yarborough_zfactor(t_k / tpc, p_bara / ppc)

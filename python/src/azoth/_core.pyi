@@ -6794,6 +6794,32 @@ class GasCorrelationsResult:
     warnings: list[Warning]
 
 @final
+class GasMaterialBalanceResult:
+    gas_fvf: float | None
+    ogip: float | None
+    pi_over_zi: Qty | None
+    slope: float | None
+    r_squared: float | None
+    cole_gp: list[float] | None
+    cole_f_over_eg: list[float] | None
+    warnings: list[Warning]
+
+@final
+class OilMaterialBalanceResult:
+    f: float | None
+    eo_value: float | None
+    eg_value: float | None
+    efw_value: float | None
+    ooip: float | None
+    m_fit: float | None
+    r_squared: float | None
+    ddi: float | None
+    sdi: float | None
+    wdi: float | None
+    edi: float | None
+    warnings: list[Warning]
+
+@final
 class WaterCorrelationsResult:
     queries: list[WaterResultRow]
     warnings: list[Warning]
@@ -10944,6 +10970,45 @@ def decline_curve(
     history_rate: list[float] | None = None,
 ) -> DeclineCurveResult: ...
 def gas_correlations(queries: list[GasQuery]) -> GasCorrelationsResult: ...
+def gas_material_balance(
+    calculation: str,
+    pressure: list[float] | None = None,
+    z: list[float] | None = None,
+    gp: list[float] | None = None,
+    we: list[float] | None = None,
+    pressure_value: float | None = None,
+    z_value: float | None = None,
+    temperature: float | None = None,
+    gas_gravity: float | None = None,
+) -> GasMaterialBalanceResult: ...
+def oil_material_balance(
+    calculation: str,
+    np: float | None = None,
+    rp: float | None = None,
+    bo: float | None = None,
+    rs: float | None = None,
+    bg: float | None = None,
+    wp: float | None = None,
+    bw: float | None = None,
+    boi: float | None = None,
+    rsi: float | None = None,
+    bgi: float | None = None,
+    cw: float | None = None,
+    swi: float | None = None,
+    cf: float | None = None,
+    delta_p: float | None = None,
+    m: float | None = None,
+    n: float | None = None,
+    eo_term: float | None = None,
+    eg_term: float | None = None,
+    efw_term: float | None = None,
+    we_value: float | None = None,
+    f_value: float | None = None,
+    f_history: list[float] | None = None,
+    eo_history: list[float] | None = None,
+    eg_history: list[float] | None = None,
+    we_history: list[float] | None = None,
+) -> OilMaterialBalanceResult: ...
 def water_correlations(queries: list[WaterQuery]) -> WaterCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],

@@ -24,6 +24,8 @@ from azoth.core.result import (
     BlackOilCorrelationsResult,
     DeclineCurveResult,
     GasCorrelationsResult,
+    GasMaterialBalanceResult,
+    OilMaterialBalanceResult,
     WaterCorrelationsResult,
 )
 from azoth.pvt import layers as layers
@@ -31,13 +33,17 @@ from azoth.pvt import layers as layers
 _BLACK_OIL_CORRELATIONS = "pvt.black_oil_correlations"
 _DECLINE_CURVE = "pvt.decline_curve"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
+_GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
+_OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
 _WATER_CORRELATIONS = "pvt.water_correlations"
 
 __all__ = [
     "black_oil_correlations",
     "decline_curve",
     "gas_correlations",
+    "gas_material_balance",
     "layers",
+    "oil_material_balance",
     "water_correlations",
 ]
 
@@ -188,4 +194,121 @@ def decline_curve(
         end_index=end_index,
         history_time=history_time,
         history_rate=history_rate,
+    )
+
+
+def gas_material_balance(
+    calculation: str,
+    *,
+    pressure: Sequence[Any] | None = None,
+    z: Sequence[float] | None = None,
+    gp: Sequence[float] | None = None,
+    we: Sequence[float] | None = None,
+    pressure_value: Any = None,
+    z_value: float | None = None,
+    temperature: Any = None,
+    gas_gravity: float | None = None,
+) -> GasMaterialBalanceResult:
+    """The gas material balance over the stated history.
+
+    ``pressure`` is an absolute pressure and ``temperature`` an absolute temperature; the
+    p/Z quantities are bar, the gas FVF a reservoir/surface ratio, and OGIP is in the
+    cumulative gas unit. A p/Z line that does not decline leaves the OGIP absent with a
+    warning rather than publishing an infinity.
+
+    Returns:
+        The published fields; the others are absent.
+
+    Raises:
+        InvalidInputError: for a missing input, arrays of different lengths or fewer than
+            two points, a non-positive pressure, Z or temperature, a singular regression, a
+            non-positive Cole expansion, or a non-finite answer.
+
+    See :func:`azoth.pvt.reference.gas_material_balance.gas_material_balance`.
+    """
+    return resolve(_GAS_MATERIAL_BALANCE)(  # type: ignore[no-any-return]
+        calculation=calculation,
+        pressure=pressure,
+        z=z,
+        gp=gp,
+        we=we,
+        pressure_value=pressure_value,
+        z_value=z_value,
+        temperature=temperature,
+        gas_gravity=gas_gravity,
+    )
+
+
+def oil_material_balance(
+    calculation: str,
+    *,
+    np: float | None = None,
+    rp: float | None = None,
+    bo: float | None = None,
+    rs: float | None = None,
+    bg: float | None = None,
+    wp: float | None = None,
+    bw: float | None = None,
+    boi: float | None = None,
+    rsi: float | None = None,
+    bgi: float | None = None,
+    cw: float | None = None,
+    swi: float | None = None,
+    cf: float | None = None,
+    delta_p: float | None = None,
+    m: float | None = None,
+    n: float | None = None,
+    eo_term: float | None = None,
+    eg_term: float | None = None,
+    efw_term: float | None = None,
+    we_value: float | None = None,
+    f_value: float | None = None,
+    f_history: Sequence[float] | None = None,
+    eo_history: Sequence[float] | None = None,
+    eg_history: Sequence[float] | None = None,
+    we_history: Sequence[float] | None = None,
+) -> OilMaterialBalanceResult:
+    """The oil material balance over the stated history.
+
+    Every term is unit-consistent and crosses as a dimensionless magnitude. The four fits
+    are the class's: depletion and water drive through the origin/linear fit, gas cap with
+    the two-predictor normal equations.
+
+    Returns:
+        The published fields; the others are absent.
+
+    Raises:
+        InvalidInputError: for a missing scalar, a history of different lengths or fewer
+            than two points, a zero Eo in the water-drive plot, a water saturation at or
+            above one, a singular regression, or a non-finite answer.
+
+    See :func:`azoth.pvt.reference.oil_material_balance.oil_material_balance`.
+    """
+    return resolve(_OIL_MATERIAL_BALANCE)(  # type: ignore[no-any-return]
+        calculation=calculation,
+        np=np,
+        rp=rp,
+        bo=bo,
+        rs=rs,
+        bg=bg,
+        wp=wp,
+        bw=bw,
+        boi=boi,
+        rsi=rsi,
+        bgi=bgi,
+        cw=cw,
+        swi=swi,
+        cf=cf,
+        delta_p=delta_p,
+        m=m,
+        n=n,
+        eo_term=eo_term,
+        eg_term=eg_term,
+        efw_term=efw_term,
+        we_value=we_value,
+        f_value=f_value,
+        f_history=f_history,
+        eo_history=eo_history,
+        eg_history=eg_history,
+        we_history=we_history,
     )

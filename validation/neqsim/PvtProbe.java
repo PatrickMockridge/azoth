@@ -4,6 +4,8 @@
 
 import java.util.Map;
 import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
+import neqsim.pvtsimulation.reservoirproperties.materialbalance.GasMaterialBalance;
+import neqsim.pvtsimulation.reservoirproperties.materialbalance.OilMaterialBalance;
 import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
 import neqsim.pvtsimulation.util.BlackOilCorrelations;
 import neqsim.pvtsimulation.util.DeclineCurveAnalysis;
@@ -288,6 +290,74 @@ public final class PvtProbe {
     line("summary_eur", summary.get("EUR"));
   }
 
+  private static void gasMaterialBalance() {
+    double[] pressure = {300.0, 250.0, 200.0, 150.0, 100.0};
+    double[] z = {0.9, 0.88, 0.85, 0.82, 0.80};
+    double[] gp = {0.0, 1.0e6, 2.0e6, 3.0e6, 4.0e6};
+    double[] we = {0.0, 0.0, 0.0, 0.0, 0.0};
+    double temperature = 350.0;
+    System.out.println("gas_material_balance");
+
+    line("bg", GasMaterialBalance.bg(300.0, 0.9, temperature));
+    GasMaterialBalance.Result fit = GasMaterialBalance.fitVolumetric(pressure, z, gp);
+    line("fit_ogip", fit.getOgip());
+    line("fit_pi_over_zi", fit.getPiOverZi());
+    line("fit_slope", fit.getSlope());
+    line("fit_r_squared", fit.getRSquared());
+    GasMaterialBalance.Result gravity =
+        GasMaterialBalance.fitVolumetric(pressure, gp, temperature, 0.7);
+    line("gravity_ogip", gravity.getOgip());
+    line("gravity_pi_over_zi", gravity.getPiOverZi());
+    line("gravity_slope", gravity.getSlope());
+    line("gravity_r_squared", gravity.getRSquared());
+    double[][] cole = GasMaterialBalance.colePlot(pressure, z, gp, temperature);
+    for (int i = 0; i < cole[0].length; i++) {
+      line("cole_gp_" + i, cole[0][i]);
+      line("cole_f_over_eg_" + i, cole[1][i]);
+    }
+    GasMaterialBalance.Result havlena =
+        GasMaterialBalance.fitHavlenaOdeh(pressure, z, gp, we, temperature);
+    line("havlena_ogip", havlena.getOgip());
+    line("havlena_pi_over_zi", havlena.getPiOverZi());
+    line("havlena_slope", havlena.getSlope());
+    line("havlena_r_squared", havlena.getRSquared());
+  }
+
+  private static void oilMaterialBalance() {
+    System.out.println("oil_material_balance");
+    line("withdrawal_f", OilMaterialBalance.withdrawalF(1.0e6, 500.0, 1.2, 300.0, 0.005, 1.0e5, 1.01));
+    line("eo", OilMaterialBalance.eo(1.2, 1.3, 400.0, 300.0, 0.005));
+    line("eg", OilMaterialBalance.eg(1.3, 0.005, 0.004));
+    line("efw", OilMaterialBalance.efw(1.3, 0.2, 4.0e-5, 0.2, 3.0e-5, 50.0));
+
+    double[] eo = {0.1, 0.2, 0.3};
+    double[] depletion = {1.0e6, 2.0e6, 3.0e6};
+    OilMaterialBalance.Result depletionFit = OilMaterialBalance.fitDepletionDrive(depletion, eo);
+    line("depletion_ooip", depletionFit.getOoip());
+    line("depletion_m", depletionFit.getM());
+    line("depletion_r_squared", depletionFit.getRSquared());
+
+    double[] eg = {0.015, 0.018, 0.03};
+    double[] gasCap = {1.03e6, 2.036e6, 3.06e6};
+    OilMaterialBalance.Result gasCapFit = OilMaterialBalance.fitGasCapDrive(gasCap, eo, eg);
+    line("gas_cap_ooip", gasCapFit.getOoip());
+    line("gas_cap_m", gasCapFit.getM());
+    line("gas_cap_r_squared", gasCapFit.getRSquared());
+
+    double[] we = {0.0, 1.0e5, 2.0e5};
+    double[] water = {1.0e6, 2.101e6, 3.202e6};
+    OilMaterialBalance.Result waterFit = OilMaterialBalance.fitWaterDrive(water, eo, we, 1.01);
+    line("water_ooip", waterFit.getOoip());
+    line("water_m", waterFit.getM());
+    line("water_r_squared", waterFit.getRSquared());
+
+    double[] indices = OilMaterialBalance.driveIndices(1.0e7, 0.2, 0.2, 0.02, 0.001, 1.0e5, 1.01, 3.0e6);
+    line("ddi", indices[0]);
+    line("sdi", indices[1]);
+    line("wdi", indices[2]);
+    line("edi", indices[3]);
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -302,6 +372,12 @@ public final class PvtProbe {
         break;
       case "decline":
         decline();
+        break;
+      case "gas_mb":
+        gasMaterialBalance();
+        break;
+      case "oil_mb":
+        oilMaterialBalance();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

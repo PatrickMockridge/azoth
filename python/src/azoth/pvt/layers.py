@@ -44,6 +44,12 @@ NO_INTERIOR: dict[str, str] = {
     "pvt.decline_curve": (
         "each call is one closed-form answer; the fits' grid search is the answer, not an interior"
     ),
+    "pvt.gas_material_balance": (
+        "each call is one regression's answer; the fit is the output, not an interior"
+    ),
+    "pvt.oil_material_balance": (
+        "each call is one regression's answer; the fit is the output, not an interior"
+    ),
 }
 
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the

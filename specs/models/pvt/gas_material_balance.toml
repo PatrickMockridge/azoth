@@ -1,0 +1,96 @@
+id = "pvt.gas_material_balance"
+name = "Gas material balance"
+kind = "direct"
+assumptions = [
+    "**the class is unit-consistent, not SI**: pressure and p/Z are bar, temperature K, the gas FVF a reservoir/surface volume ratio, and OGIP in the cumulative gas unit. The standard state is the class's 1.01325 bar and 288.71 K.",
+    "**the p/Z fit regresses p/Z against cumulative gas and takes OGIP = -intercept/slope**; when the line does not decline the OGIP is absent with a warning rather than the class's +Infinity.",
+    "**the gravity route computes Z with Sutton and Hall-Yarborough** through `pvt.gas_correlations`' function, at the Sutton specific-gravity range.",
+    "**the Cole plot's ratio is refused where the expansion is not positive**, the state the class answers NaN for; the plot starts at the second history point.",
+    "**Havlena-Odeh regresses (F - We) against Eg through the origin** and reports its slope as OGIP with a zero intercept.",
+    "**an array of a different length, fewer than two points, a non-positive pressure, Z or temperature, a singular regression and a non-finite answer are refused.**",
+]
+references = [
+    "Havlena, D. & Odeh, A. S. (1963). \"The Material Balance as an Equation of a Straight Line.\" Journal of Petroleum Technology 15(8), 896-900. DOI 10.2118/559-PA.",
+    "Cole, F. W. (1969). \"Reservoir Engineering Manual.\" Gulf Publishing.",
+    "Sutton, R. P. (1985). \"Compressibility Factors for High-Molecular-Weight Reservoir Gases.\" SPE 14265.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/GasMaterialBalance.java` is the port source.",
+    "`validation/neqsim/captures/pvt_gas_material_balance.tsv` - the p/Z fit with and without supplied Z, the Cole plot and Havlena-Odeh.",
+]
+[source]
+standard = "NeqSim reservoirproperties/materialbalance/GasMaterialBalance.java"
+edition = "The p/Z fit, the gravity route, the Cole plot and the Havlena-Odeh fit; the result struct's getters are the published fields."
+[inputs]
+[inputs.calculation]
+type = "enum"
+values = ["bg", "fit_volumetric", "fit_volumetric_from_gravity", "cole_plot", "fit_havlena_odeh"]
+description = "the gas material-balance calculation this call asks for.\n"
+[inputs.pressure]
+type = "vector"
+unit = "Pa"
+optional = true
+description = "the measured absolute pressures, index 0 the initial pressure.\n"
+[inputs.z]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the Z-factors at each pressure.\n"
+[inputs.gp]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the cumulative gas produced at each pressure, in any consistent surface volume.\n"
+[inputs.we]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the cumulative water influx at each pressure, in the same surface unit as Bg.\n"
+[inputs.pressure_value]
+unit = "Pa"
+optional = true
+description = "the absolute pressure for the single-state gas FVF.\n"
+[inputs.z_value]
+unit = "dimensionless"
+optional = true
+description = "the Z-factor for the single-state gas FVF.\n"
+[inputs.temperature]
+unit = "K"
+optional = true
+description = "the reservoir temperature.\n"
+[inputs.gas_gravity]
+unit = "dimensionless"
+optional = true
+description = "the gas specific gravity, for the gravity route.\n"
+[outputs]
+[outputs.gas_fvf]
+unit = "dimensionless"
+optional = true
+description = "the gas formation volume factor, reservoir volume per surface volume.\n"
+[outputs.ogip]
+unit = "dimensionless"
+optional = true
+description = "the original gas in place, in the cumulative gas unit; absent when the line does not decline.\n"
+[outputs.pi_over_zi]
+unit = "bar"
+optional = true
+description = "the initial p/Z intercept.\n"
+[outputs.slope]
+unit = "dimensionless"
+optional = true
+description = "the p/Z line's slope in bar per cumulative-gas unit for the p/Z fit; the OGIP for Havlena-Odeh.\n"
+[outputs.r_squared]
+unit = "dimensionless"
+optional = true
+description = "the fit's coefficient of determination.\n"
+[outputs.cole_gp]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the Cole plot's cumulative gas, from the second history point.\n"
+[outputs.cole_f_over_eg]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the Cole plot's F/Eg, from the second history point.\n"
+[implementations]
+python = "azoth.pvt.gas_material_balance"
+rust = "azoth_pvt::gas_material_balance"

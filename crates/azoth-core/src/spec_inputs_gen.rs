@@ -358,6 +358,8 @@
 //!   - specs/models/pvt/black_oil_correlations.toml
 //!   - specs/models/pvt/decline_curve.toml
 //!   - specs/models/pvt/gas_correlations.toml
+//!   - specs/models/pvt/gas_material_balance.toml
+//!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
@@ -6846,6 +6848,43 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("pvt.decline_curve", "end_index", "dimensionless"),
     ("pvt.decline_curve", "history_time", "dimensionless"),
     ("pvt.decline_curve", "history_rate", "dimensionless"),
+    ("pvt.gas_material_balance", "pressure", "pressure"),
+    ("pvt.gas_material_balance", "z", "dimensionless"),
+    ("pvt.gas_material_balance", "gp", "dimensionless"),
+    ("pvt.gas_material_balance", "we", "dimensionless"),
+    ("pvt.gas_material_balance", "pressure_value", "pressure"),
+    ("pvt.gas_material_balance", "z_value", "dimensionless"),
+    (
+        "pvt.gas_material_balance",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.gas_material_balance", "gas_gravity", "dimensionless"),
+    ("pvt.oil_material_balance", "np", "dimensionless"),
+    ("pvt.oil_material_balance", "rp", "dimensionless"),
+    ("pvt.oil_material_balance", "bo", "dimensionless"),
+    ("pvt.oil_material_balance", "rs", "dimensionless"),
+    ("pvt.oil_material_balance", "bg", "dimensionless"),
+    ("pvt.oil_material_balance", "wp", "dimensionless"),
+    ("pvt.oil_material_balance", "bw", "dimensionless"),
+    ("pvt.oil_material_balance", "boi", "dimensionless"),
+    ("pvt.oil_material_balance", "rsi", "dimensionless"),
+    ("pvt.oil_material_balance", "bgi", "dimensionless"),
+    ("pvt.oil_material_balance", "cw", "dimensionless"),
+    ("pvt.oil_material_balance", "swi", "dimensionless"),
+    ("pvt.oil_material_balance", "cf", "dimensionless"),
+    ("pvt.oil_material_balance", "delta_p", "dimensionless"),
+    ("pvt.oil_material_balance", "m", "dimensionless"),
+    ("pvt.oil_material_balance", "n", "dimensionless"),
+    ("pvt.oil_material_balance", "eo_term", "dimensionless"),
+    ("pvt.oil_material_balance", "eg_term", "dimensionless"),
+    ("pvt.oil_material_balance", "efw_term", "dimensionless"),
+    ("pvt.oil_material_balance", "we_value", "dimensionless"),
+    ("pvt.oil_material_balance", "f_value", "dimensionless"),
+    ("pvt.oil_material_balance", "f_history", "dimensionless"),
+    ("pvt.oil_material_balance", "eo_history", "dimensionless"),
+    ("pvt.oil_material_balance", "eg_history", "dimensionless"),
+    ("pvt.oil_material_balance", "we_history", "dimensionless"),
     (
         "reactions.chemical_equilibrium",
         "a_matrix",

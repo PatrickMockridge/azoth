@@ -163,6 +163,7 @@ from azoth.core.result import (
     GasBlowbyResult,
     GasCorrelationsResult,
     GasDispersionResult,
+    GasMaterialBalanceResult,
     GasResultRow,
     GasScrubberResult,
     GaussianPlumeResult,
@@ -270,6 +271,7 @@ from azoth.core.result import (
     NorsokP002ComplianceResult,
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
+    OilMaterialBalanceResult,
     OpenDrainAssessment,
     OpenDrainResult,
     OpenDrainReviewResult,
@@ -678,6 +680,7 @@ __all__ = [
     "gas_blowby",
     "gas_correlations",
     "gas_dispersion",
+    "gas_material_balance",
     "gas_scrubber",
     "gaussian_plume",
     "ge_flash",
@@ -754,6 +757,7 @@ __all__ = [
     "norsok_p002_compliance",
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
+    "oil_material_balance",
     "open_drain_review",
     "orifice_flow",
     "overpressure_acceptance",
@@ -10526,6 +10530,78 @@ def gas_correlations(queries: Sequence[Mapping[str, Any]]) -> GasCorrelationsRes
     )
     return GasCorrelationsResult(
         queries=tuple(GasResultRow(calculation=c.calculation, temperature=None if c.temperature is None else from_si(c.temperature.magnitude_si, c.temperature.unit), pressure=None if c.pressure is None else from_si(c.pressure.magnitude_si, c.pressure.unit), factor=c.factor, density=None if c.density is None else from_si(c.density.magnitude_si, c.density.unit), gas_fvf=c.gas_fvf, pseudo_pressure=c.pseudo_pressure, h2s_fraction=c.h2s_fraction) for c in result.queries),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def gas_material_balance(calculation: str, *, pressure: Sequence[Any] | None=None, z: Sequence[float] | None=None, gp: Sequence[float] | None=None, we: Sequence[float] | None=None, pressure_value: Any=None, z_value: float | None=None, temperature: Any=None, gas_gravity: float | None=None) -> GasMaterialBalanceResult:
+    """``pvt.gas_material_balance``, computed in Rust."""
+    spec = _models_gen.model("pvt.gas_material_balance")
+    result = _core.gas_material_balance(
+        calculation,
+        None if pressure is None else [_si(spec, "pressure", v) for v in pressure],
+        None if z is None else list(z),
+        None if gp is None else list(gp),
+        None if we is None else list(we),
+        None if pressure_value is None else _si(spec, "pressure_value", pressure_value),
+        None if z_value is None else z_value,
+        None if temperature is None else _si(spec, "temperature", temperature),
+        None if gas_gravity is None else gas_gravity,
+    )
+    return GasMaterialBalanceResult(
+        gas_fvf=result.gas_fvf,
+        ogip=result.ogip,
+        pi_over_zi=None if result.pi_over_zi is None else from_si(result.pi_over_zi.magnitude_si, result.pi_over_zi.unit),
+        slope=result.slope,
+        r_squared=result.r_squared,
+        cole_gp=None if result.cole_gp is None else tuple(result.cole_gp),
+        cole_f_over_eg=None if result.cole_f_over_eg is None else tuple(result.cole_f_over_eg),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def oil_material_balance(calculation: str, *, np: float | None=None, rp: float | None=None, bo: float | None=None, rs: float | None=None, bg: float | None=None, wp: float | None=None, bw: float | None=None, boi: float | None=None, rsi: float | None=None, bgi: float | None=None, cw: float | None=None, swi: float | None=None, cf: float | None=None, delta_p: float | None=None, m: float | None=None, n: float | None=None, eo_term: float | None=None, eg_term: float | None=None, efw_term: float | None=None, we_value: float | None=None, f_value: float | None=None, f_history: Sequence[float] | None=None, eo_history: Sequence[float] | None=None, eg_history: Sequence[float] | None=None, we_history: Sequence[float] | None=None) -> OilMaterialBalanceResult:
+    """``pvt.oil_material_balance``, computed in Rust."""
+    result = _core.oil_material_balance(
+        calculation,
+        None if np is None else np,
+        None if rp is None else rp,
+        None if bo is None else bo,
+        None if rs is None else rs,
+        None if bg is None else bg,
+        None if wp is None else wp,
+        None if bw is None else bw,
+        None if boi is None else boi,
+        None if rsi is None else rsi,
+        None if bgi is None else bgi,
+        None if cw is None else cw,
+        None if swi is None else swi,
+        None if cf is None else cf,
+        None if delta_p is None else delta_p,
+        None if m is None else m,
+        None if n is None else n,
+        None if eo_term is None else eo_term,
+        None if eg_term is None else eg_term,
+        None if efw_term is None else efw_term,
+        None if we_value is None else we_value,
+        None if f_value is None else f_value,
+        None if f_history is None else list(f_history),
+        None if eo_history is None else list(eo_history),
+        None if eg_history is None else list(eg_history),
+        None if we_history is None else list(we_history),
+    )
+    return OilMaterialBalanceResult(
+        f=result.f,
+        eo_value=result.eo_value,
+        eg_value=result.eg_value,
+        efw_value=result.efw_value,
+        ooip=result.ooip,
+        m_fit=result.m_fit,
+        r_squared=result.r_squared,
+        ddi=result.ddi,
+        sdi=result.sdi,
+        wdi=result.wdi,
+        edi=result.edi,
         warnings=_warnings(result.warnings),
     )
 

@@ -30571,6 +30571,171 @@ impl From<&azoth_pvt::gas_correlations::GasCorrelationsResult> for PyGasCorrelat
         }
     }
 }
+/// Result of `pvt.gas_material_balance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GasMaterialBalanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGasMaterialBalanceResult {
+    /// the gas formation volume factor, reservoir volume per surface volume.
+    #[pyo3(get)]
+    pub gas_fvf: Option<f64>,
+    /// the original gas in place, in the cumulative gas unit; absent when the line does not decline.
+    #[pyo3(get)]
+    pub ogip: Option<f64>,
+    /// the initial p/Z intercept.
+    #[pyo3(get)]
+    pub pi_over_zi: Option<PyQty>,
+    /// the p/Z line's slope in bar per cumulative-gas unit for the p/Z fit; the OGIP for Havlena-Odeh.
+    #[pyo3(get)]
+    pub slope: Option<f64>,
+    /// the fit's coefficient of determination.
+    #[pyo3(get)]
+    pub r_squared: Option<f64>,
+    /// the Cole plot's cumulative gas, from the second history point.
+    #[pyo3(get)]
+    pub cole_gp: Option<Vec<f64>>,
+    /// the Cole plot's F/Eg, from the second history point.
+    #[pyo3(get)]
+    pub cole_f_over_eg: Option<Vec<f64>>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyGasMaterialBalanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "GasMaterialBalanceResult(gas_fvf={:?}, ogip={:?}, pi_over_zi={:?}, slope={:?}, r_squared={:?}, cole_gp={:?}, cole_f_over_eg={:?}, {} warning(s))",
+            self.gas_fvf,
+            self.ogip,
+            self.pi_over_zi,
+            self.slope,
+            self.r_squared,
+            self.cole_gp,
+            self.cole_f_over_eg,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::gas_material_balance::GasMaterialBalanceResult>
+    for PyGasMaterialBalanceResult
+{
+    fn from(r: &azoth_pvt::gas_material_balance::GasMaterialBalanceResult) -> Self {
+        Self {
+            gas_fvf: r.gas_fvf,
+            ogip: r.ogip,
+            pi_over_zi: r.pi_over_zi.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "bar".to_string(),
+            }),
+            slope: r.slope,
+            r_squared: r.r_squared,
+            cole_gp: r
+                .cole_gp
+                .as_ref()
+                .map(|values| values.iter().map(|v| *v).collect()),
+            cole_f_over_eg: r
+                .cole_f_over_eg
+                .as_ref()
+                .map(|values| values.iter().map(|v| *v).collect()),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.oil_material_balance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OilMaterialBalanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOilMaterialBalanceResult {
+    /// the reservoir withdrawal term F.
+    #[pyo3(get)]
+    pub f: Option<f64>,
+    /// the oil and dissolved-gas expansion term Eo.
+    #[pyo3(get)]
+    pub eo_value: Option<f64>,
+    /// the gas-cap expansion term Eg.
+    #[pyo3(get)]
+    pub eg_value: Option<f64>,
+    /// the connate-water and rock expansion term Efw.
+    #[pyo3(get)]
+    pub efw_value: Option<f64>,
+    /// the fitted original oil in place.
+    #[pyo3(get)]
+    pub ooip: Option<f64>,
+    /// the fitted gas-cap ratio.
+    #[pyo3(get)]
+    pub m_fit: Option<f64>,
+    /// the fit's coefficient of determination.
+    #[pyo3(get)]
+    pub r_squared: Option<f64>,
+    /// the depletion drive index.
+    #[pyo3(get)]
+    pub ddi: Option<f64>,
+    /// the segregation (gas-cap) drive index.
+    #[pyo3(get)]
+    pub sdi: Option<f64>,
+    /// the water drive index.
+    #[pyo3(get)]
+    pub wdi: Option<f64>,
+    /// the expansion drive index.
+    #[pyo3(get)]
+    pub edi: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyOilMaterialBalanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "OilMaterialBalanceResult(f={:?}, eo_value={:?}, eg_value={:?}, efw_value={:?}, ooip={:?}, m_fit={:?}, r_squared={:?}, ddi={:?}, sdi={:?}, wdi={:?}, edi={:?}, {} warning(s))",
+            self.f,
+            self.eo_value,
+            self.eg_value,
+            self.efw_value,
+            self.ooip,
+            self.m_fit,
+            self.r_squared,
+            self.ddi,
+            self.sdi,
+            self.wdi,
+            self.edi,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::oil_material_balance::OilMaterialBalanceResult>
+    for PyOilMaterialBalanceResult
+{
+    fn from(r: &azoth_pvt::oil_material_balance::OilMaterialBalanceResult) -> Self {
+        Self {
+            f: r.f,
+            eo_value: r.eo_value,
+            eg_value: r.eg_value,
+            efw_value: r.efw_value,
+            ooip: r.ooip,
+            m_fit: r.m_fit,
+            r_squared: r.r_squared,
+            ddi: r.ddi,
+            sdi: r.sdi,
+            wdi: r.wdi,
+            edi: r.edi,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `pvt.water_correlations`, transported.
 #[pyclass(
     frozen,

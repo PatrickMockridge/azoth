@@ -10130,6 +10130,112 @@ pub fn gas_correlations(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Gas material balance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (calculation, pressure, z, gp, we, pressure_value, z_value, temperature, gas_gravity))]
+#[pyo3(
+    text_signature = "(calculation, pressure, z, gp, we, pressure_value, z_value, temperature, gas_gravity)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn gas_material_balance(
+    py: Python<'_>,
+    calculation: &str,
+    pressure: Option<Vec<f64>>,
+    z: Option<Vec<f64>>,
+    gp: Option<Vec<f64>>,
+    we: Option<Vec<f64>>,
+    pressure_value: Option<f64>,
+    z_value: Option<f64>,
+    temperature: Option<f64>,
+    gas_gravity: Option<f64>,
+) -> PyResult<crate::transport_gen::PyGasMaterialBalanceResult> {
+    azoth_pvt::gas_material_balance::gas_material_balance(
+        calculation,
+        pressure.as_deref(),
+        z.as_deref(),
+        gp.as_deref(),
+        we.as_deref(),
+        pressure_value,
+        z_value,
+        temperature.map(kelvins),
+        gas_gravity,
+    )
+    .map(|r| crate::transport_gen::PyGasMaterialBalanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Oil material balance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (calculation, np, rp, bo, rs, bg, wp, bw, boi, rsi, bgi, cw, swi, cf, delta_p, m, n, eo_term, eg_term, efw_term, we_value, f_value, f_history, eo_history, eg_history, we_history))]
+#[pyo3(
+    text_signature = "(calculation, np, rp, bo, rs, bg, wp, bw, boi, rsi, bgi, cw, swi, cf, delta_p, m, n, eo_term, eg_term, efw_term, we_value, f_value, f_history, eo_history, eg_history, we_history)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn oil_material_balance(
+    py: Python<'_>,
+    calculation: &str,
+    np: Option<f64>,
+    rp: Option<f64>,
+    bo: Option<f64>,
+    rs: Option<f64>,
+    bg: Option<f64>,
+    wp: Option<f64>,
+    bw: Option<f64>,
+    boi: Option<f64>,
+    rsi: Option<f64>,
+    bgi: Option<f64>,
+    cw: Option<f64>,
+    swi: Option<f64>,
+    cf: Option<f64>,
+    delta_p: Option<f64>,
+    m: Option<f64>,
+    n: Option<f64>,
+    eo_term: Option<f64>,
+    eg_term: Option<f64>,
+    efw_term: Option<f64>,
+    we_value: Option<f64>,
+    f_value: Option<f64>,
+    f_history: Option<Vec<f64>>,
+    eo_history: Option<Vec<f64>>,
+    eg_history: Option<Vec<f64>>,
+    we_history: Option<Vec<f64>>,
+) -> PyResult<crate::transport_gen::PyOilMaterialBalanceResult> {
+    azoth_pvt::oil_material_balance::oil_material_balance(
+        calculation,
+        np,
+        rp,
+        bo,
+        rs,
+        bg,
+        wp,
+        bw,
+        boi,
+        rsi,
+        bgi,
+        cw,
+        swi,
+        cf,
+        delta_p,
+        m,
+        n,
+        eo_term,
+        eg_term,
+        efw_term,
+        we_value,
+        f_value,
+        f_history.as_deref(),
+        eo_history.as_deref(),
+        eg_history.as_deref(),
+        we_history.as_deref(),
+    )
+    .map(|r| crate::transport_gen::PyOilMaterialBalanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Water and brine correlation table.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

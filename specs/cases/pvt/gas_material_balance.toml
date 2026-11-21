@@ -1,0 +1,71 @@
+model = "pvt.gas_material_balance"
+[[cases]]
+id = "bg"
+tolerance = 1.0e-9
+source = "The class's gas FVF at 300 bara, Z 0.9 and 350 K, from `validation/neqsim/captures/pvt_gas_material_balance.tsv`."
+[cases.inputs]
+calculation = "bg"
+pressure_value = 30000000.0
+z_value = 0.9
+temperature = 350.0
+[cases.expected]
+gas_fvf = 0.0036850559384849855
+[[cases]]
+id = "fit_volumetric"
+tolerance = 1.0e-9
+source = "The p/Z fit over five history points with supplied Z."
+[cases.inputs]
+calculation = "fit_volumetric"
+pressure = [30000000.0, 25000000.0, 20000000.0, 15000000.0, 10000000.0]
+z = [0.9, 0.88, 0.85, 0.82, 0.8]
+gp = [0.0, 1000000.0, 2000000.0, 3000000.0, 4000000.0]
+[cases.expected]
+ogip = 6482720.260271815
+pi_over_zi = 335.6951871657755
+slope = -5.178307464892834e-05
+r_squared = 0.998697084170453
+[[cases]]
+id = "fit_volumetric_from_gravity"
+tolerance = 1.0e-9
+source = "The same history with Sutton and Hall-Yarborough Z at gas gravity 0.7."
+[cases.inputs]
+calculation = "fit_volumetric_from_gravity"
+pressure = [30000000.0, 25000000.0, 20000000.0, 15000000.0, 10000000.0]
+z = [0.9, 0.88, 0.85, 0.82, 0.8]
+gp = [0.0, 1000000.0, 2000000.0, 3000000.0, 4000000.0]
+temperature = 350.0
+gas_gravity = 0.7
+[cases.expected]
+ogip = 6345454.146515704
+pi_over_zi = 329.1505120788961
+slope = -5.187186046559536e-05
+r_squared = 0.9917433750054927
+[[cases]]
+id = "cole_plot"
+tolerance = 1.0e-9
+source = "The Cole plot over the same four produced points."
+[cases.inputs]
+calculation = "cole_plot"
+pressure = [30000000.0, 25000000.0, 20000000.0, 15000000.0, 10000000.0]
+z = [0.9, 0.88, 0.85, 0.82, 0.8]
+gp = [0.0, 1000000.0, 2000000.0, 3000000.0, 4000000.0]
+temperature = 350.0
+[cases.expected]
+cole_gp = [1000000.0, 2000000.0, 3000000.0, 4000000.0]
+cole_f_over_eg = [6769230.769230775, 6800000.000000002, 6648648.64864865, 6400000.000000001]
+[[cases]]
+id = "fit_havlena_odeh"
+tolerance = 1.0e-9
+source = "The Havlena-Odeh fit with a zero water influx."
+[cases.inputs]
+calculation = "fit_havlena_odeh"
+pressure = [30000000.0, 25000000.0, 20000000.0, 15000000.0, 10000000.0]
+z = [0.9, 0.88, 0.85, 0.82, 0.8]
+gp = [0.0, 1000000.0, 2000000.0, 3000000.0, 4000000.0]
+we = [0.0, 0.0, 0.0, 0.0, 0.0]
+temperature = 350.0
+[cases.expected]
+ogip = 6467980.237368953
+pi_over_zi = 0.0
+slope = 6467980.237368953
+r_squared = 0.9989011431036772

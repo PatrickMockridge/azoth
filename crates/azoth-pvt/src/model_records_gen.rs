@@ -14,6 +14,8 @@ use azoth_core::{CalcResult, Warning};
 use crate::black_oil_correlations::BlackOilCorrelationsResult;
 use crate::decline_curve::DeclineCurveResult;
 use crate::gas_correlations::GasCorrelationsResult;
+use crate::gas_material_balance::GasMaterialBalanceResult;
+use crate::oil_material_balance::OilMaterialBalanceResult;
 use crate::water_correlations::WaterCorrelationsResult;
 
 impl CalcResult for BlackOilCorrelationsResult {
@@ -69,6 +71,46 @@ impl CalcResult for DeclineCurveResult {
 impl CalcResult for GasCorrelationsResult {
     const CALC_ID: &'static str = "pvt.gas_correlations";
     const FIELDS: &'static [&'static str] = &["queries", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for GasMaterialBalanceResult {
+    const CALC_ID: &'static str = "pvt.gas_material_balance";
+    const FIELDS: &'static [&'static str] = &[
+        "gas_fvf",
+        "ogip",
+        "pi_over_zi",
+        "slope",
+        "r_squared",
+        "cole_gp",
+        "cole_f_over_eg",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for OilMaterialBalanceResult {
+    const CALC_ID: &'static str = "pvt.oil_material_balance";
+    const FIELDS: &'static [&'static str] = &[
+        "f",
+        "eo_value",
+        "eg_value",
+        "efw_value",
+        "ooip",
+        "m_fit",
+        "r_squared",
+        "ddi",
+        "sdi",
+        "wdi",
+        "edi",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

@@ -12,8 +12,10 @@
 pub mod black_oil_correlations;
 pub mod decline_curve;
 pub mod gas_correlations;
+pub mod gas_material_balance;
 pub mod model_gen;
 pub mod model_records_gen;
+pub mod oil_material_balance;
 pub mod standard;
 pub mod water_correlations;
 
@@ -22,6 +24,8 @@ pub use black_oil_correlations::{
 };
 pub use decline_curve::{DeclineCurveResult, decline_curve};
 pub use gas_correlations::{GasCorrelationsResult, GasQuery, GasResultRow, gas_correlations};
+pub use gas_material_balance::{GasMaterialBalanceResult, gas_material_balance};
+pub use oil_material_balance::{OilMaterialBalanceResult, oil_material_balance};
 pub use water_correlations::{
     WaterCorrelationsResult, WaterQuery, WaterResultRow, water_correlations,
 };

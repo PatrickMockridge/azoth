@@ -376,6 +376,8 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyBlackOilCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyDeclineCurveResult>()?;
     m.add_class::<crate::transport_gen::PyGasCorrelationsResult>()?;
+    m.add_class::<crate::transport_gen::PyGasMaterialBalanceResult>()?;
+    m.add_class::<crate::transport_gen::PyOilMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyWaterCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
     m.add_class::<crate::transport_gen::PyEquilibriumConstantResult>()?;
@@ -1361,6 +1363,14 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::decline_curve, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_correlations, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::gas_material_balance,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::oil_material_balance,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::water_correlations,
         m

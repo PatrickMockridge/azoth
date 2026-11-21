@@ -12375,6 +12375,80 @@ class GasCorrelationsResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class GasMaterialBalanceResult(_HasWarnings):
+    """Result of ``pvt.gas_material_balance``."""
+
+    CALC_ID: ClassVar[str] = "pvt.gas_material_balance"
+
+    #: the gas formation volume factor, reservoir volume per surface volume.
+    gas_fvf: float | None
+
+    #: the original gas in place, in the cumulative gas unit; absent when the line does not decline.
+    ogip: float | None
+
+    #: the initial p/Z intercept.
+    pi_over_zi: Q | None
+
+    #: the p/Z line's slope in bar per cumulative-gas unit for the p/Z fit; the OGIP for Havlena-Odeh.
+    slope: float | None
+
+    #: the fit's coefficient of determination.
+    r_squared: float | None
+
+    #: the Cole plot's cumulative gas, from the second history point.
+    cole_gp: tuple[float, ...] | None
+
+    #: the Cole plot's F/Eg, from the second history point.
+    cole_f_over_eg: tuple[float, ...] | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class OilMaterialBalanceResult(_HasWarnings):
+    """Result of ``pvt.oil_material_balance``."""
+
+    CALC_ID: ClassVar[str] = "pvt.oil_material_balance"
+
+    #: the reservoir withdrawal term F.
+    f: float | None
+
+    #: the oil and dissolved-gas expansion term Eo.
+    eo_value: float | None
+
+    #: the gas-cap expansion term Eg.
+    eg_value: float | None
+
+    #: the connate-water and rock expansion term Efw.
+    efw_value: float | None
+
+    #: the fitted original oil in place.
+    ooip: float | None
+
+    #: the fitted gas-cap ratio.
+    m_fit: float | None
+
+    #: the fit's coefficient of determination.
+    r_squared: float | None
+
+    #: the depletion drive index.
+    ddi: float | None
+
+    #: the segregation (gas-cap) drive index.
+    sdi: float | None
+
+    #: the water drive index.
+    wdi: float | None
+
+    #: the expansion drive index.
+    edi: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class WaterCorrelationsResult(_HasWarnings):
     """Result of ``pvt.water_correlations``."""
 
