@@ -526,7 +526,13 @@ jobs:
   docs-drift:
     name: docs-drift
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # **30, and the reason is measured.** The twenty-generator sequence below is not a
+    # budget to spend but a check that must reach its diff: `gen_python_bridge` alone
+    # walks the runtime for every model's signature and spends over five minutes, and the
+    # 2026-11-21 run reached generator 18 of 20 at the old 15-minute ceiling, was
+    # cancelled before the diff step, and reported no drift when the same sequence was
+    # run locally. The ceiling still fails a hang rather than spending the afternoon.
+    timeout-minutes: 30
     needs: scope
     if: needs.scope.outputs.docs-drift == 'true'
     env:
