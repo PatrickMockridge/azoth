@@ -38,7 +38,7 @@ row_type = "EquipmentCostSpec"
 description = "one equipment item per row, in caller order; `equipment` selects the kind and the kind's fields.\n"
 [inputs.equipment.fields.equipment]
 type = "enum"
-values = ["separator", "column", "absorber", "reactor", "compressor", "pump", "expander", "heat_exchanger", "tank", "filter"]
+values = ["separator", "column", "absorber", "reactor", "compressor", "pump", "expander", "heat_exchanger", "tank", "filter", "manifold", "mercury_removal", "electrolyzer", "psa", "ejector"]
 description = "the equipment kind, which selects the fields the row must carry.\n"
 [inputs.equipment.fields.name]
 type = "string"
@@ -228,7 +228,7 @@ description = "the loaded catalyst mass, which the reactor's purchased cost pric
 [inputs.equipment.fields.number_of_beds]
 unit = "dimensionless"
 optional = true
-description = "the reactor's catalyst-bed count; absent is one.\n"
+description = "the reactor's catalyst-bed count, or the PSA cascade's bed count; absent is one for the reactor.\n"
 [inputs.equipment.fields.total_equipped_weight]
 unit = "kg"
 optional = true
@@ -397,6 +397,103 @@ description = "the design's own steel rate, USD/kg, which its fallback cost uses
 unit = "dimensionless"
 optional = true
 description = "the design's own element price, USD per element; absent is 2500.\n"
+[inputs.equipment.fields.inlets]
+unit = "dimensionless"
+optional = true
+description = "the manifold's inlet count.\n"
+[inputs.equipment.fields.outlets]
+unit = "dimensionless"
+optional = true
+description = "the manifold's outlet count.\n"
+[inputs.equipment.fields.location]
+type = "enum"
+values = ["topside", "subsea", "onshore"]
+optional = true
+description = "the manifold's location, whose factor is 2.6 subsea, 0.75 onshore and 1.0 topside.\n"
+[inputs.equipment.fields.manifold_type]
+type = "enum"
+values = ["production", "injection", "pigging", "test"]
+optional = true
+description = "the manifold service; pigging and test scale by 1.2 and injection by 1.1.\n"
+[inputs.equipment.fields.header_diameter]
+unit = "m"
+optional = true
+description = "the manifold header's diameter, which also selects the branch allowance's pressure factor.\n"
+[inputs.equipment.fields.branch_diameter]
+unit = "m"
+optional = true
+description = "the manifold branch's diameter, used where the design carries no weight.\n"
+[inputs.equipment.fields.water_depth]
+unit = "m"
+optional = true
+description = "the water depth a subsea manifold's installation allowance runs on.\n"
+[inputs.equipment.fields.base_cost_per_kg]
+unit = "dimensionless"
+optional = true
+description = "the manifold's fabricated cost per kilogram, USD/kg; absent is 65.\n"
+[inputs.equipment.fields.branch_allowance]
+unit = "dimensionless"
+optional = true
+description = "the valve, hub and instrument allowance per branch, USD; absent is 18000.\n"
+[inputs.equipment.fields.sorbent_charge_weight]
+unit = "kg"
+optional = true
+description = "the mercury bed's initial sorbent charge.\n"
+[inputs.equipment.fields.sorbent_unit_price]
+unit = "dimensionless"
+optional = true
+description = "the sorbent's price, USD/kg; absent is 25.\n"
+[inputs.equipment.fields.steel_cost_per_kg]
+unit = "dimensionless"
+optional = true
+description = "the mercury bed's fabricated steel rate, USD/kg; absent is 8.\n"
+[inputs.equipment.fields.technology]
+type = "enum"
+values = ["PEM", "ALKALINE", "SOEC", "AEM"]
+optional = true
+description = "the electrolyzer technology, whose specific capex is 1250, 800, 2500 and 1500 USD/kW.\n"
+[inputs.equipment.fields.include_balance_of_plant]
+type = "boolean"
+optional = true
+description = "whether the electrolyzer or PSA balance of plant is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.sorbent]
+type = "enum"
+values = ["activated_carbon", "zeolite_13x"]
+optional = true
+description = "the PSA sorbent, whose price is 4 or 10 USD/kg.\n"
+[inputs.equipment.fields.sorbent_mass_per_bed]
+unit = "kg"
+optional = true
+description = "the PSA sorbent mass per bed.\n"
+[inputs.equipment.fields.bed_diameter]
+unit = "m"
+optional = true
+description = "the PSA bed's diameter; with the length it sets the bed volume, else the class's 12.566 m3 reference.\n"
+[inputs.equipment.fields.bed_length]
+unit = "m"
+optional = true
+description = "the PSA bed's length.\n"
+[inputs.equipment.fields.ejector_type]
+type = "enum"
+values = ["steam", "gas", "liquid", "hybrid"]
+optional = true
+description = "the ejector type; absent is steam.\n"
+[inputs.equipment.fields.suction_pressure]
+unit = "dimensionless"
+optional = true
+description = "the ejector's suction pressure in mbar absolute, declared dimensionless for want of a vocabulary unit.\n"
+[inputs.equipment.fields.suction_capacity]
+unit = "kg/h"
+optional = true
+description = "the ejector's suction capacity.\n"
+[inputs.equipment.fields.include_intercondensers]
+type = "boolean"
+optional = true
+description = "whether the ejector's intercondensers are costed; absent is false.\n"
+[inputs.equipment.fields.include_aftercondenser]
+type = "boolean"
+optional = true
+description = "whether the ejector's aftercondenser is costed; **absent is true**, the class's default.\n"
 [outputs]
 [outputs.equipment]
 type = "record_list"

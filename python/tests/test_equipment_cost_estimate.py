@@ -292,3 +292,67 @@ def test_the_exchanger_tank_and_filter_match_the_capture() -> None:
     assert result.equipment[1].total_cost == 0.0
     assert close(result.equipment[2].purchased_equipment_cost, 7651.934577484859)
     assert close(hours(result.equipment[2].installation_man_hours), 15.088227105658111)
+
+
+def test_the_manifold_mercury_electrolyzer_psa_and_ejector_match_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "manifold",
+                "inlets": 2.0,
+                "outlets": 3.0,
+                "weight_total": quantity(2653.866258910617, "kg"),
+                "location": "topside",
+                "material_grade": "A106-B",
+                "manifold_type": "production",
+                "header_diameter": quantity(0.3048, "m"),
+                "branch_diameter": quantity(0.0, "m"),
+                "water_depth": quantity(0.0, "m"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+            },
+            {
+                "equipment": "mercury_removal",
+                "shell_weight": quantity(19496.039027883457, "kg"),
+                "internals_weight": quantity(383.2632545290422, "kg"),
+                "nozzle_weight": quantity(974.8019513941729, "kg"),
+                "sorbent_charge_weight": quantity(4665.265090580843, "kg"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(32161.80686997908, "kg"),
+            },
+            {
+                "equipment": "electrolyzer",
+                "power": quantity(3271.185, "kW"),
+                "technology": "PEM",
+                "include_balance_of_plant": True,
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(33.0, "bar"),
+                "weight_total": quantity(27805.0725, "kg"),
+            },
+            {
+                "equipment": "psa",
+                "number_of_beds": 4.0,
+                "sorbent": "activated_carbon",
+                "sorbent_mass_per_bed": quantity(20000.0, "kg"),
+                "include_balance_of_plant": True,
+            },
+            {
+                "equipment": "ejector",
+                "ejector_type": "steam",
+                "number_of_stages": 2.0,
+                "suction_pressure": 50.0,
+                "design_pressure_bara": quantity(1.013, "bar"),
+                "suction_capacity": quantity(500.0, "kg/h"),
+            },
+        ]
+    )
+    assert close(result.equipment[0].purchased_equipment_cost, 298501.3068291901)
+    assert close(result.equipment[0].total_module_cost, 1536348.9135864878)
+    assert close(result.equipment[1].purchased_equipment_cost, 283464.4611349745)
+    assert close(result.equipment[1].sorbent_replacement_cost, 145789.53408065136)
+    assert close(result.equipment[2].purchased_equipment_cost, 3594170.3093879404)
+    assert close(result.equipment[2].specific_capex_per_kw, 1250.0)
+    assert close(result.equipment[3].purchased_equipment_cost, 1638000.0)
+    assert close(result.equipment[4].purchased_equipment_cost, 150282.87211884474)
+    assert result.equipment[4].total_cost == 0.0

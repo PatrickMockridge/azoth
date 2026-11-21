@@ -95,6 +95,29 @@ fn row(equipment: &str) -> EquipmentCostSpec {
         auxiliaries_fraction: None,
         fallback_steel_rate: None,
         fallback_element_cost: None,
+        inlets: None,
+        outlets: None,
+        location: None,
+        manifold_type: None,
+        header_diameter: None,
+        branch_diameter: None,
+        water_depth: None,
+        base_cost_per_kg: None,
+        branch_allowance: None,
+        sorbent_charge_weight: None,
+        sorbent_unit_price: None,
+        steel_cost_per_kg: None,
+        technology: None,
+        include_balance_of_plant: None,
+        sorbent: None,
+        sorbent_mass_per_bed: None,
+        bed_diameter: None,
+        bed_length: None,
+        ejector_type: None,
+        suction_pressure: None,
+        suction_capacity: None,
+        include_intercondensers: None,
+        include_aftercondenser: None,
     }
 }
 
@@ -406,4 +429,84 @@ fn the_exchanger_tank_and_filter_match_the_capture() {
         result.equipment[2].installation_man_hours,
         15.088227105658111 * 3600.0
     ));
+}
+
+#[test]
+fn the_manifold_mercury_electrolyzer_psa_and_ejector_match_the_capture() {
+    let mut manifold = row("manifold");
+    manifold.inlets = Some(2.0);
+    manifold.outlets = Some(3.0);
+    manifold.weight_total = Some(Mass::new::<kilogram>(2653.866258910617));
+    manifold.location = Some("topside".to_string());
+    manifold.material_grade = Some("A106-B".to_string());
+    manifold.manifold_type = Some("production".to_string());
+    manifold.header_diameter = Some(meters(0.3048));
+    manifold.branch_diameter = Some(meters(0.0));
+    manifold.water_depth = Some(meters(0.0));
+    manifold.mechanical_design_present = Some(true);
+    manifold.max_design_pressure = Some(Pressure::new::<bar>(110.00000000000001));
+
+    let mut mercury = row("mercury_removal");
+    mercury.shell_weight = Some(Mass::new::<kilogram>(19496.039027883457));
+    mercury.internals_weight = Some(Mass::new::<kilogram>(383.2632545290422));
+    mercury.nozzle_weight = Some(Mass::new::<kilogram>(974.8019513941729));
+    mercury.sorbent_charge_weight = Some(Mass::new::<kilogram>(4665.265090580843));
+    mercury.mechanical_design_present = Some(true);
+    mercury.max_design_pressure = Some(Pressure::new::<bar>(110.00000000000001));
+    mercury.weight_total = Some(Mass::new::<kilogram>(32161.80686997908));
+
+    let mut electrolyzer = row("electrolyzer");
+    electrolyzer.power = Some(Power::new::<kilowatt>(3271.185));
+    electrolyzer.technology = Some("PEM".to_string());
+    electrolyzer.include_balance_of_plant = Some(true);
+    electrolyzer.mechanical_design_present = Some(true);
+    electrolyzer.max_design_pressure = Some(Pressure::new::<bar>(33.0));
+    electrolyzer.weight_total = Some(Mass::new::<kilogram>(27805.0725));
+
+    let mut psa = row("psa");
+    psa.number_of_beds = Some(4.0);
+    psa.sorbent = Some("activated_carbon".to_string());
+    psa.sorbent_mass_per_bed = Some(Mass::new::<kilogram>(20000.0));
+    psa.include_balance_of_plant = Some(true);
+
+    let mut ejector = row("ejector");
+    ejector.ejector_type = Some("steam".to_string());
+    ejector.number_of_stages = Some(2.0);
+    ejector.suction_pressure = Some(50.0);
+    ejector.design_pressure_bara = Some(Pressure::new::<bar>(1.013));
+    ejector.suction_capacity = Some(azoth_core::units::MassRate::new::<
+        azoth_core::units::kilogram_per_hour,
+    >(500.0));
+
+    let result = run(vec![manifold, mercury, electrolyzer, psa, ejector]);
+    assert!(close(
+        result.equipment[0].purchased_equipment_cost,
+        298501.3068291901
+    ));
+    assert!(close(
+        result.equipment[0].total_module_cost,
+        1536348.9135864878
+    ));
+    assert!(close(
+        result.equipment[1].purchased_equipment_cost,
+        283464.4611349745
+    ));
+    assert!(close(
+        result.equipment[1].sorbent_replacement_cost,
+        145789.53408065136
+    ));
+    assert!(close(
+        result.equipment[2].purchased_equipment_cost,
+        3594170.3093879404
+    ));
+    assert!(close(result.equipment[2].specific_capex_per_kw, 1250.0));
+    assert!(close(
+        result.equipment[3].purchased_equipment_cost,
+        1638000.0
+    ));
+    assert!(close(
+        result.equipment[4].purchased_equipment_cost,
+        150282.87211884474
+    ));
+    assert_eq!(result.equipment[4].total_cost, 0.0);
 }

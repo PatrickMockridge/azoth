@@ -176,3 +176,63 @@ equipment = [
 equipment = [
   { name = "", equipment_type = "filter", purchased_equipment_cost = 7651.934577484859, bare_module_cost = 29957.323870853223, total_module_cost = 37446.65483856653, grass_roots_cost = 56169.9822578498, total_cost = 37446.65483856653, installation_man_hours = 15.088227105658111, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
 ]
+[[cases]]
+id = "manifold"
+tolerance = 1.0e-12
+source = "`ManifoldCostEstimate` on the class's two-inlet, three-outlet topside manifold (`equipment_manifold`): an A106-B production header of 0.3048 m and 2653.87 kg."
+[cases.inputs]
+equipment = [
+  { equipment = "manifold", inlets = 2.0, outlets = 3.0, weight_total = 2653.866258910617, location = "topside", material_grade = "A106-B", manifold_type = "production", header_diameter = 0.3048, branch_diameter = 0.0, water_depth = 0.0, mechanical_design_present = true, max_design_pressure = 110.00000000000001 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "manifold", purchased_equipment_cost = 298501.3068291901, bare_module_cost = 1229079.1308691902, total_module_cost = 1536348.9135864878, grass_roots_cost = 2304523.3703797315, total_cost = 1536348.9135864878, installation_man_hours = 92.88531906187158, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "mercury_removal"
+tolerance = 1.0e-12
+source = "`MercuryRemovalCostEstimate` on the class's 1.5 m by 4 m guard bed (`equipment_mercury`): the steel and sorbent charge costs, then the shared stack."
+[cases.inputs]
+equipment = [
+  { equipment = "mercury_removal", shell_weight = 19496.039027883457, internals_weight = 383.2632545290422, nozzle_weight = 974.8019513941729, sorbent_charge_weight = 4665.265090580843, mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 32161.80686997908 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "vessel", purchased_equipment_cost = 283464.4611349745, bare_module_cost = 1167164.9187232575, total_module_cost = 1458956.1484040718, grass_roots_cost = 2188434.2226061076, total_cost = 1458956.1484040718, installation_man_hours = 964.8542060993724, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 145789.53408065136, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "electrolyzer"
+tolerance = 1.0e-12
+source = "`ElectrolyzerCostEstimate` on the class's 100 kg/hr PEM stack (`equipment_electrolyzer`): 3271.185 kW at 1250 USD/kW with the scale exponent, the balance of plant and the 2024 CEPCI basis."
+[cases.inputs]
+equipment = [
+  { equipment = "electrolyzer", power = 3271.185, technology = "PEM", include_balance_of_plant = true, mechanical_design_present = true, max_design_pressure = 33.0, weight_total = 27805.0725 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "electrolyzer", purchased_equipment_cost = 3594170.3093879404, bare_module_cost = 13100750.777719043, total_module_cost = 16375938.472148804, grass_roots_cost = 24563907.708223205, total_cost = 16375938.472148804, installation_man_hours = 973.1775375, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 1250.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "psa"
+tolerance = 1.0e-12
+source = "`PSACostEstimate`'s own test recipe (`equipment_psa`): four beds of 20 000 kg activated carbon, balance of plant included, on the class's 12.566 m3 reference bed."
+[cases.inputs]
+equipment = [
+  { equipment = "psa", number_of_beds = 4.0, sorbent = "activated_carbon", sorbent_mass_per_bed = 20000.0, include_balance_of_plant = true },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "psa-cascade", purchased_equipment_cost = 1638000.0, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "ejector"
+tolerance = 1.0e-12
+source = "`EjectorCostEstimate`'s own test recipe (`equipment_ejector`): a two-stage steam ejector lifting 500 kg/hr from 50 mbar to 1.013 bara."
+[cases.inputs]
+equipment = [
+  { equipment = "ejector", ejector_type = "steam", number_of_stages = 2.0, suction_pressure = 50.0, design_pressure_bara = 1.013, suction_capacity = 500.0 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "ejector", purchased_equipment_cost = 150282.87211884474, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]

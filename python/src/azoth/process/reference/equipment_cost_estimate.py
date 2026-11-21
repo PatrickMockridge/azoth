@@ -34,6 +34,11 @@ _KINDS = (
     "heat_exchanger",
     "tank",
     "filter",
+    "manifold",
+    "mercury_removal",
+    "electrolyzer",
+    "psa",
+    "ejector",
 )
 
 _MATERIALS = {
@@ -235,6 +240,72 @@ def _machine_spec(index: int, row: dict[str, Any], kind: str) -> dict[str, Any]:
             "auxiliaries_fraction": _number(row, "auxiliaries_fraction", 0.35),
             "fallback_steel_rate_usd_per_kg": _number(row, "fallback_steel_rate", 6.0),
             "fallback_element_cost_usd": _number(row, "fallback_element_cost", 2500.0),
+        }
+    if kind == "manifold":
+        return {
+            "kind": "manifold",
+            "inlets": 0.0
+            if row.get("inlets") is None
+            else _whole(index, "inlets", float(row["inlets"])),
+            "outlets": 0.0
+            if row.get("outlets") is None
+            else _whole(index, "outlets", float(row["outlets"])),
+            "weight_kg": _number(row, "weight_total"),
+            "location": str(row.get("location") or "topside"),
+            "material_grade": str(row.get("material_grade") or ""),
+            "manifold_type": str(row.get("manifold_type") or "production"),
+            "header_diameter_m": _number(row, "header_diameter"),
+            "branch_diameter_m": _number(row, "branch_diameter"),
+            "water_depth_m": _number(row, "water_depth"),
+            "base_cost_per_kg": _number(row, "base_cost_per_kg", 65.0),
+            "branch_allowance_usd": _number(row, "branch_allowance", 18000.0),
+        }
+    if kind == "mercury_removal":
+        return {
+            "kind": "mercury_removal",
+            "vessel_shell_weight_kg": _number(row, "shell_weight"),
+            "internals_weight_kg": _number(row, "internals_weight"),
+            "nozzle_weight_kg": _number(row, "nozzle_weight"),
+            "sorbent_charge_weight_kg": _number(row, "sorbent_charge_weight"),
+            "sorbent_unit_price_usd_per_kg": _number(row, "sorbent_unit_price", 25.0),
+            "steel_cost_per_kg": _number(row, "steel_cost_per_kg", 8.0),
+            "bed_lifetime_years": 5.0,
+        }
+    if kind == "electrolyzer":
+        return {
+            "kind": "electrolyzer",
+            "power_kw": _number(row, "power") / 1.0e3,
+            "technology": str(row.get("technology") or "PEM"),
+            "include_balance_of_plant": _boolean(row, "include_balance_of_plant", True),
+        }
+    if kind == "psa":
+        return {
+            "kind": "psa",
+            "number_of_beds": _whole(
+                index,
+                "number_of_beds",
+                float(_require(index, row, kind, "number_of_beds")),
+            ),
+            "sorbent": str(row.get("sorbent") or "ACTIVATED_CARBON").upper(),
+            "sorbent_mass_per_bed_kg": _number(row, "sorbent_mass_per_bed"),
+            "include_balance_of_plant": _boolean(row, "include_balance_of_plant", True),
+            "bed_diameter_m": None
+            if row.get("bed_diameter") is None
+            else float(row["bed_diameter"]),
+            "bed_length_m": None if row.get("bed_length") is None else float(row["bed_length"]),
+        }
+    if kind == "ejector":
+        return {
+            "kind": "ejector",
+            "ejector_type": str(row.get("ejector_type") or "steam"),
+            "number_of_stages": 1.0
+            if row.get("number_of_stages") is None
+            else _whole(index, "number_of_stages", float(row["number_of_stages"])),
+            "suction_pressure_mbar": _number(row, "suction_pressure", 100.0),
+            "discharge_pressure_bara": _number(row, "design_pressure_bara") / 1.0e5,
+            "suction_capacity_kg_per_h": _number(row, "suction_capacity") * 3600.0,
+            "include_intercondensers": _boolean(row, "include_intercondensers"),
+            "include_aftercondenser": _boolean(row, "include_aftercondenser", True),
         }
     return {
         "kind": "expander",

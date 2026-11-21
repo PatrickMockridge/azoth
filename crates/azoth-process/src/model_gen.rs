@@ -35410,6 +35410,633 @@ static EQUIPMENT_COST_ESTIMATE_CASES: &[TestCase] = &[
             ]],
         )],
     },
+    TestCase {
+        id: "manifold",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "equipment",
+                    value: FieldValue::Name("manifold"),
+                },
+                RecordField {
+                    name: "inlets",
+                    value: FieldValue::Number(2.0),
+                },
+                RecordField {
+                    name: "outlets",
+                    value: FieldValue::Number(3.0),
+                },
+                RecordField {
+                    name: "weight_total",
+                    value: FieldValue::Number(2653.866258910617),
+                },
+                RecordField {
+                    name: "location",
+                    value: FieldValue::Name("topside"),
+                },
+                RecordField {
+                    name: "material_grade",
+                    value: FieldValue::Name("A106-B"),
+                },
+                RecordField {
+                    name: "manifold_type",
+                    value: FieldValue::Name("production"),
+                },
+                RecordField {
+                    name: "header_diameter",
+                    value: FieldValue::Number(0.3048),
+                },
+                RecordField {
+                    name: "branch_diameter",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "water_depth",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "mechanical_design_present",
+                    value: FieldValue::Flag(true),
+                },
+                RecordField {
+                    name: "max_design_pressure",
+                    value: FieldValue::Number(110.00000000000001),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name(""),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("manifold"),
+                },
+                RecordField {
+                    name: "purchased_equipment_cost",
+                    value: FieldValue::Number(298501.3068291901),
+                },
+                RecordField {
+                    name: "bare_module_cost",
+                    value: FieldValue::Number(1229079.1308691902),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(1536348.9135864878),
+                },
+                RecordField {
+                    name: "grass_roots_cost",
+                    value: FieldValue::Number(2304523.3703797315),
+                },
+                RecordField {
+                    name: "total_cost",
+                    value: FieldValue::Number(1536348.9135864878),
+                },
+                RecordField {
+                    name: "installation_man_hours",
+                    value: FieldValue::Number(92.88531906187158),
+                },
+                RecordField {
+                    name: "material_factor",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "equipment_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "installed_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "specific_cost_per_m2",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "specific_capex_per_kw",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annual_maintenance_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "sorbent_replacement_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annual_operating_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "calculated_weight",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "mercury_removal",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "equipment",
+                    value: FieldValue::Name("mercury_removal"),
+                },
+                RecordField {
+                    name: "shell_weight",
+                    value: FieldValue::Number(19496.039027883457),
+                },
+                RecordField {
+                    name: "internals_weight",
+                    value: FieldValue::Number(383.2632545290422),
+                },
+                RecordField {
+                    name: "nozzle_weight",
+                    value: FieldValue::Number(974.8019513941729),
+                },
+                RecordField {
+                    name: "sorbent_charge_weight",
+                    value: FieldValue::Number(4665.265090580843),
+                },
+                RecordField {
+                    name: "mechanical_design_present",
+                    value: FieldValue::Flag(true),
+                },
+                RecordField {
+                    name: "max_design_pressure",
+                    value: FieldValue::Number(110.00000000000001),
+                },
+                RecordField {
+                    name: "weight_total",
+                    value: FieldValue::Number(32161.80686997908),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name(""),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("vessel"),
+                },
+                RecordField {
+                    name: "purchased_equipment_cost",
+                    value: FieldValue::Number(283464.4611349745),
+                },
+                RecordField {
+                    name: "bare_module_cost",
+                    value: FieldValue::Number(1167164.9187232575),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(1458956.1484040718),
+                },
+                RecordField {
+                    name: "grass_roots_cost",
+                    value: FieldValue::Number(2188434.2226061076),
+                },
+                RecordField {
+                    name: "total_cost",
+                    value: FieldValue::Number(1458956.1484040718),
+                },
+                RecordField {
+                    name: "installation_man_hours",
+                    value: FieldValue::Number(964.8542060993724),
+                },
+                RecordField {
+                    name: "material_factor",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "equipment_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "installed_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "specific_cost_per_m2",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "specific_capex_per_kw",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annual_maintenance_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "sorbent_replacement_cost",
+                    value: FieldValue::Number(145789.53408065136),
+                },
+                RecordField {
+                    name: "annual_operating_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "calculated_weight",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "electrolyzer",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "equipment",
+                    value: FieldValue::Name("electrolyzer"),
+                },
+                RecordField {
+                    name: "power",
+                    value: FieldValue::Number(3271.185),
+                },
+                RecordField {
+                    name: "technology",
+                    value: FieldValue::Name("PEM"),
+                },
+                RecordField {
+                    name: "include_balance_of_plant",
+                    value: FieldValue::Flag(true),
+                },
+                RecordField {
+                    name: "mechanical_design_present",
+                    value: FieldValue::Flag(true),
+                },
+                RecordField {
+                    name: "max_design_pressure",
+                    value: FieldValue::Number(33.0),
+                },
+                RecordField {
+                    name: "weight_total",
+                    value: FieldValue::Number(27805.0725),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name(""),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("electrolyzer"),
+                },
+                RecordField {
+                    name: "purchased_equipment_cost",
+                    value: FieldValue::Number(3594170.3093879404),
+                },
+                RecordField {
+                    name: "bare_module_cost",
+                    value: FieldValue::Number(13100750.777719043),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(16375938.472148804),
+                },
+                RecordField {
+                    name: "grass_roots_cost",
+                    value: FieldValue::Number(24563907.708223205),
+                },
+                RecordField {
+                    name: "total_cost",
+                    value: FieldValue::Number(16375938.472148804),
+                },
+                RecordField {
+                    name: "installation_man_hours",
+                    value: FieldValue::Number(973.1775375),
+                },
+                RecordField {
+                    name: "material_factor",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "equipment_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "installed_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "specific_cost_per_m2",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "specific_capex_per_kw",
+                    value: FieldValue::Number(1250.0),
+                },
+                RecordField {
+                    name: "annual_maintenance_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "sorbent_replacement_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annual_operating_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "calculated_weight",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "psa",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "equipment",
+                    value: FieldValue::Name("psa"),
+                },
+                RecordField {
+                    name: "number_of_beds",
+                    value: FieldValue::Number(4.0),
+                },
+                RecordField {
+                    name: "sorbent",
+                    value: FieldValue::Name("activated_carbon"),
+                },
+                RecordField {
+                    name: "sorbent_mass_per_bed",
+                    value: FieldValue::Number(20000.0),
+                },
+                RecordField {
+                    name: "include_balance_of_plant",
+                    value: FieldValue::Flag(true),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name(""),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("psa-cascade"),
+                },
+                RecordField {
+                    name: "purchased_equipment_cost",
+                    value: FieldValue::Number(1638000.0),
+                },
+                RecordField {
+                    name: "bare_module_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "grass_roots_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "total_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "installation_man_hours",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "material_factor",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "equipment_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "installed_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "specific_cost_per_m2",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "specific_capex_per_kw",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annual_maintenance_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "sorbent_replacement_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annual_operating_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "calculated_weight",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+    },
+    TestCase {
+        id: "ejector",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "equipment",
+                    value: FieldValue::Name("ejector"),
+                },
+                RecordField {
+                    name: "ejector_type",
+                    value: FieldValue::Name("steam"),
+                },
+                RecordField {
+                    name: "number_of_stages",
+                    value: FieldValue::Number(2.0),
+                },
+                RecordField {
+                    name: "suction_pressure",
+                    value: FieldValue::Number(50.0),
+                },
+                RecordField {
+                    name: "design_pressure_bara",
+                    value: FieldValue::Number(1.013),
+                },
+                RecordField {
+                    name: "suction_capacity",
+                    value: FieldValue::Number(500.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name(""),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("ejector"),
+                },
+                RecordField {
+                    name: "purchased_equipment_cost",
+                    value: FieldValue::Number(150282.87211884474),
+                },
+                RecordField {
+                    name: "bare_module_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "grass_roots_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "total_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "installation_man_hours",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "material_factor",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "equipment_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "installed_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "specific_cost_per_m2",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "specific_capex_per_kw",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annual_maintenance_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "sorbent_replacement_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annual_operating_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "calculated_weight",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+    },
 ];
 
 static EQUIPMENT_COST_ESTIMATE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {

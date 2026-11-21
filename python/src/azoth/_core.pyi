@@ -670,6 +670,29 @@ class EquipmentCostSpec(TypedDict):
     auxiliaries_fraction: float | None
     fallback_steel_rate: float | None
     fallback_element_cost: float | None
+    inlets: float | None
+    outlets: float | None
+    location: str | None
+    manifold_type: str | None
+    header_diameter: float | None
+    branch_diameter: float | None
+    water_depth: float | None
+    base_cost_per_kg: float | None
+    branch_allowance: float | None
+    sorbent_charge_weight: float | None
+    sorbent_unit_price: float | None
+    steel_cost_per_kg: float | None
+    technology: str | None
+    include_balance_of_plant: bool | None
+    sorbent: str | None
+    sorbent_mass_per_bed: float | None
+    bed_diameter: float | None
+    bed_length: float | None
+    ejector_type: str | None
+    suction_pressure: float | None
+    suction_capacity: float | None
+    include_intercondensers: bool | None
+    include_aftercondenser: bool | None
 
 class EscalationItem(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""

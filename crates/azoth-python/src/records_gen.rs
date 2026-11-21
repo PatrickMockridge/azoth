@@ -529,6 +529,52 @@ pub struct EquipmentCostSpec {
     pub fallback_steel_rate: Option<f64>,
     #[pyo3(item)]
     pub fallback_element_cost: Option<f64>,
+    #[pyo3(item)]
+    pub inlets: Option<f64>,
+    #[pyo3(item)]
+    pub outlets: Option<f64>,
+    #[pyo3(item)]
+    pub location: Option<String>,
+    #[pyo3(item)]
+    pub manifold_type: Option<String>,
+    #[pyo3(item)]
+    pub header_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub branch_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub water_depth: Option<f64>,
+    #[pyo3(item)]
+    pub base_cost_per_kg: Option<f64>,
+    #[pyo3(item)]
+    pub branch_allowance: Option<f64>,
+    #[pyo3(item)]
+    pub sorbent_charge_weight: Option<f64>,
+    #[pyo3(item)]
+    pub sorbent_unit_price: Option<f64>,
+    #[pyo3(item)]
+    pub steel_cost_per_kg: Option<f64>,
+    #[pyo3(item)]
+    pub technology: Option<String>,
+    #[pyo3(item)]
+    pub include_balance_of_plant: Option<bool>,
+    #[pyo3(item)]
+    pub sorbent: Option<String>,
+    #[pyo3(item)]
+    pub sorbent_mass_per_bed: Option<f64>,
+    #[pyo3(item)]
+    pub bed_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub bed_length: Option<f64>,
+    #[pyo3(item)]
+    pub ejector_type: Option<String>,
+    #[pyo3(item)]
+    pub suction_pressure: Option<f64>,
+    #[pyo3(item)]
+    pub suction_capacity: Option<f64>,
+    #[pyo3(item)]
+    pub include_intercondensers: Option<bool>,
+    #[pyo3(item)]
+    pub include_aftercondenser: Option<bool>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

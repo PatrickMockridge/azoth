@@ -20611,5 +20611,133 @@ public class ProcessProbe {
         + filterDesign.getCostEstimate().getInstallationManHours());
     System.out.println("total_cost=" + filterDesign.getCostEstimate().getTotalCost());
     System.out.println();
+
+    Stream manifoldA = feed(new String[] {"methane", "n-butane"}, new double[] {0.8, 0.2}, 300.0,
+        60.0, 1.0);
+    Stream manifoldB = feed(new String[] {"methane", "n-butane"}, new double[] {0.8, 0.2}, 300.0,
+        60.0, 1.0);
+    neqsim.process.equipment.manifold.Manifold manifold =
+        new neqsim.process.equipment.manifold.Manifold("Topside Production Manifold");
+    manifold.addStream(manifoldA);
+    manifold.addStream(manifoldB);
+    manifold.setSplitFactors(new double[] {0.4, 0.4, 0.2});
+    manifold.run();
+    manifold.initMechanicalDesign();
+    neqsim.process.mechanicaldesign.manifold.ManifoldMechanicalDesign manifoldDesign =
+        manifold.getMechanicalDesign();
+    manifoldDesign.setNumberOfInlets(2);
+    manifoldDesign.setNumberOfOutlets(3);
+    manifoldDesign.calcDesign();
+    manifoldDesign.calculateCostEstimate();
+    System.out.println("equipment_manifold");
+    System.out.println("inlets=" + manifoldDesign.getNumberOfInlets());
+    System.out.println("outlets=" + manifoldDesign.getNumberOfOutlets());
+    System.out.println("weight_total_kg=" + manifoldDesign.getWeightTotal());
+    System.out.println("location=" + manifoldDesign.getLocation());
+    System.out.println("material_grade=" + manifoldDesign.getMaterialGrade());
+    System.out.println("manifold_type=" + manifoldDesign.getManifoldType());
+    System.out.println("header_diameter_m=" + manifoldDesign.getHeaderDiameter());
+    System.out.println("water_depth_m=" + manifoldDesign.getWaterDepth());
+    System.out.println("max_design_pressure_barg=" + manifoldDesign.getMaxDesignPressure());
+    System.out.println("purchased_equipment_cost="
+        + manifoldDesign.getCostEstimate().getPurchasedEquipmentCost());
+    System.out.println("bare_module_cost=" + manifoldDesign.getCostEstimate().getBareModuleCost());
+    System.out.println("total_module_cost="
+        + manifoldDesign.getCostEstimate().getTotalModuleCost());
+    System.out.println("grass_roots_cost=" + manifoldDesign.getCostEstimate().getGrassRootsCost());
+    System.out.println("installation_man_hours="
+        + manifoldDesign.getCostEstimate().getInstallationManHours());
+    System.out.println("total_cost=" + manifoldDesign.getCostEstimate().getTotalCost());
+    System.out.println();
+
+    SystemSrkEos mercuryGas = new SystemSrkEos(303.15, 60.0);
+    mercuryGas.addComponent("methane", 0.85);
+    mercuryGas.addComponent("ethane", 0.07);
+    mercuryGas.addComponent("propane", 0.03);
+    mercuryGas.addComponent("nitrogen", 0.04);
+    mercuryGas.addComponent("mercury", 1.0e-9);
+    mercuryGas.setMixingRule(2);
+    Stream mercuryFeed = new Stream("mercury feed", mercuryGas);
+    mercuryFeed.setFlowRate(1.0, "mole/sec");
+    mercuryFeed.run();
+    neqsim.process.equipment.adsorber.MercuryRemovalBed mercuryBed =
+        new neqsim.process.equipment.adsorber.MercuryRemovalBed("HgGuardBed", mercuryFeed);
+    mercuryBed.setBedDiameter(1.5);
+    mercuryBed.setBedLength(4.0);
+    mercuryBed.setVoidFraction(0.40);
+    mercuryBed.setSorbentType("PuraSpec");
+    mercuryBed.setSorbentBulkDensity(1100.0);
+    mercuryBed.setParticleDiameter(0.004);
+    mercuryBed.setMaxMercuryCapacity(100000.0);
+    mercuryBed.setReactionRateConstant(0.5);
+    mercuryBed.run();
+    mercuryBed.initMechanicalDesign();
+    neqsim.process.mechanicaldesign.adsorber.MercuryRemovalMechanicalDesign mercuryDesign =
+        mercuryBed.getMechanicalDesign();
+    mercuryDesign.calcDesign();
+    mercuryDesign.calculateCostEstimate();
+    System.out.println("equipment_mercury");
+    System.out.println("vessel_shell_weight_kg=" + mercuryDesign.getWeigthVesselShell());
+    System.out.println("internals_weight_kg=" + mercuryDesign.getInternalsWeight());
+    System.out.println("nozzle_weight_kg=" + mercuryDesign.getWeightNozzle());
+    System.out.println("sorbent_charge_weight_kg=" + mercuryDesign.getSorbentChargeWeight());
+    System.out.println("weight_total_kg=" + mercuryDesign.getWeightTotal());
+    System.out.println("max_design_pressure_barg=" + mercuryDesign.getMaxDesignPressure());
+    System.out.println("purchased_equipment_cost="
+        + mercuryDesign.getCostEstimate().getPurchasedEquipmentCost());
+    System.out.println("bare_module_cost=" + mercuryDesign.getCostEstimate().getBareModuleCost());
+    System.out.println("total_module_cost="
+        + mercuryDesign.getCostEstimate().getTotalModuleCost());
+    System.out.println("grass_roots_cost=" + mercuryDesign.getCostEstimate().getGrassRootsCost());
+    System.out.println("installation_man_hours="
+        + mercuryDesign.getCostEstimate().getInstallationManHours());
+    System.out.println("total_cost=" + mercuryDesign.getCostEstimate().getTotalCost());
+    System.out.println();
+
+    SystemInterface water = new neqsim.thermo.Fluid().create("water");
+    Stream waterFeed = new Stream("water", water);
+    waterFeed.setPressure(1.0, "bara");
+    waterFeed.setTemperature(298.15, "K");
+    double molH2PerSec = (100.0 / 3600.0) / 2.016e-3;
+    waterFeed.setFlowRate(molH2PerSec, "mole/sec");
+    waterFeed.run();
+    neqsim.process.equipment.electrolyzer.Electrolyzer electrolyzer =
+        new neqsim.process.equipment.electrolyzer.Electrolyzer("el", waterFeed);
+    electrolyzer.run();
+    neqsim.process.mechanicaldesign.electrolyzer.ElectrolyzerMechanicalDesign electrolyzerDesign =
+        new neqsim.process.mechanicaldesign.electrolyzer.ElectrolyzerMechanicalDesign(electrolyzer);
+    electrolyzerDesign.calcDesign();
+    neqsim.process.costestimation.electrolyzer.ElectrolyzerCostEstimate electrolyzerCost =
+        new neqsim.process.costestimation.electrolyzer.ElectrolyzerCostEstimate(electrolyzerDesign);
+    electrolyzerCost.calculateCostEstimate();
+    System.out.println("equipment_electrolyzer");
+    System.out.println("power_kw=" + electrolyzerDesign.getTotalPowerKW());
+    System.out.println("weight_total_kg=" + electrolyzerDesign.getWeightTotal());
+    System.out.println("max_design_pressure_barg=" + electrolyzerDesign.getMaxDesignPressure());
+    System.out.println("purchased_equipment_cost=" + electrolyzerCost.getPurchasedEquipmentCost());
+    System.out.println("bare_module_cost=" + electrolyzerCost.getBareModuleCost());
+    System.out.println("total_module_cost=" + electrolyzerCost.getTotalModuleCost());
+    System.out.println("grass_roots_cost=" + electrolyzerCost.getGrassRootsCost());
+    System.out.println("installation_man_hours=" + electrolyzerCost.getInstallationManHours());
+    System.out.println("total_cost=" + electrolyzerCost.getTotalCost());
+    System.out.println();
+
+    neqsim.process.costestimation.adsorber.PSACostEstimate psa =
+        new neqsim.process.costestimation.adsorber.PSACostEstimate();
+    psa.setNumberOfBeds(4);
+    psa.setSorbentMassPerBedKg(20000.0);
+    psa.setSorbent(
+        neqsim.process.equipment.adsorber.PressureSwingAdsorptionBed.SorbentType.ACTIVATED_CARBON);
+    psa.setIncludeBalanceOfPlant(true);
+    printCostItem("equipment_psa", psa);
+
+    neqsim.process.costestimation.ejector.EjectorCostEstimate ejector =
+        new neqsim.process.costestimation.ejector.EjectorCostEstimate(null);
+    ejector.setEjectorType("steam");
+    ejector.setNumberOfStages(2);
+    ejector.setSuctionPressure(50.0);
+    ejector.setDischargePressure(1.013);
+    ejector.setSuctionCapacity(500.0);
+    printCostItem("equipment_ejector", ejector);
   }
 }

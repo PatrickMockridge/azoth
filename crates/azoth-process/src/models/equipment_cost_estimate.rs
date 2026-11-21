@@ -5,7 +5,7 @@
 //! purchased cost of the selected kind, the shared module stack, the labour
 //! hours and the weight bill of materials.
 
-use azoth_core::units::{Area, Length, Mass, Power, Pressure, Time, Volume};
+use azoth_core::units::{Area, Length, Mass, MassRate, Power, Pressure, Time, Volume};
 use azoth_core::{AzothError, Result, Warning};
 use serde::Serialize;
 
@@ -190,6 +190,52 @@ pub struct EquipmentCostSpec {
     pub fallback_steel_rate: Option<f64>,
     /// The design's element price.
     pub fallback_element_cost: Option<f64>,
+    /// The manifold's inlet count.
+    pub inlets: Option<f64>,
+    /// The manifold's outlet count.
+    pub outlets: Option<f64>,
+    /// The manifold's location.
+    pub location: Option<String>,
+    /// The manifold service.
+    pub manifold_type: Option<String>,
+    /// The manifold header's diameter.
+    pub header_diameter: Option<Length>,
+    /// The manifold branch's diameter.
+    pub branch_diameter: Option<Length>,
+    /// The water depth.
+    pub water_depth: Option<Length>,
+    /// The manifold's fabricated cost per kilogram.
+    pub base_cost_per_kg: Option<f64>,
+    /// The manifold's branch allowance.
+    pub branch_allowance: Option<f64>,
+    /// The mercury bed's sorbent charge weight.
+    pub sorbent_charge_weight: Option<Mass>,
+    /// The sorbent price.
+    pub sorbent_unit_price: Option<f64>,
+    /// The mercury bed's steel rate.
+    pub steel_cost_per_kg: Option<f64>,
+    /// The electrolyzer technology.
+    pub technology: Option<String>,
+    /// Whether the balance of plant is costed.
+    pub include_balance_of_plant: Option<bool>,
+    /// The PSA sorbent.
+    pub sorbent: Option<String>,
+    /// The PSA sorbent mass per bed.
+    pub sorbent_mass_per_bed: Option<Mass>,
+    /// The PSA bed diameter.
+    pub bed_diameter: Option<Length>,
+    /// The PSA bed length.
+    pub bed_length: Option<Length>,
+    /// The ejector type.
+    pub ejector_type: Option<String>,
+    /// The ejector's suction pressure, mbar.
+    pub suction_pressure: Option<f64>,
+    /// The ejector's suction capacity.
+    pub suction_capacity: Option<MassRate>,
+    /// Whether the ejector's intercondensers are costed.
+    pub include_intercondensers: Option<bool>,
+    /// Whether the ejector's aftercondenser is costed.
+    pub include_aftercondenser: Option<bool>,
 }
 
 /// One equipment row of the result.
@@ -347,6 +393,11 @@ pub fn equipment_cost_estimate(
                 | "heat_exchanger"
                 | "tank"
                 | "filter"
+                | "manifold"
+                | "mercury_removal"
+                | "electrolyzer"
+                | "psa"
+                | "ejector"
         ) {
             return Err(AzothError::invalid_input(
                 format!("equipment[{index}].equipment"),
@@ -777,6 +828,137 @@ pub fn equipment_cost_estimate(
                         format!("equipment[{index}].fallback_element_cost"),
                         row.fallback_element_cost.unwrap_or(2500.0),
                     )?,
+                })
+            }
+            "manifold" => {
+                let inlets = match row.inlets {
+                    Some(value) => whole(index, "inlets", value)?,
+                    None => 0.0,
+                };
+                let outlets = match row.outlets {
+                    Some(value) => whole(index, "outlets", value)?,
+                    None => 0.0,
+                };
+                let length = |value: Option<Length>, field: &'static str| -> Result<f64> {
+                    match value {
+                        Some(value) => finite(format!("equipment[{index}].{field}"), value.value),
+                        None => Ok(0.0),
+                    }
+                };
+                costing::EquipmentSpec::Manifold(costing::ManifoldSpec {
+                    inlets,
+                    outlets,
+                    weight_kg: weight,
+                    location: row
+                        .location
+                        .clone()
+                        .unwrap_or_else(|| "topside".to_string()),
+                    material_grade: row.material_grade.clone().unwrap_or_default(),
+                    manifold_type: row
+                        .manifold_type
+                        .clone()
+                        .unwrap_or_else(|| "production".to_string()),
+                    header_diameter_m: length(row.header_diameter, "header_diameter")?,
+                    branch_diameter_m: length(row.branch_diameter, "branch_diameter")?,
+                    water_depth_m: length(row.water_depth, "water_depth")?,
+                    base_cost_per_kg: finite(
+                        format!("equipment[{index}].base_cost_per_kg"),
+                        row.base_cost_per_kg.unwrap_or(65.0),
+                    )?,
+                    branch_allowance_usd: finite(
+                        format!("equipment[{index}].branch_allowance"),
+                        row.branch_allowance.unwrap_or(18000.0),
+                    )?,
+                })
+            }
+            "mercury_removal" => {
+                costing::EquipmentSpec::MercuryRemoval(costing::MercuryRemovalSpec {
+                    vessel_shell_weight_kg: mass(row.shell_weight),
+                    internals_weight_kg: mass(row.internals_weight),
+                    nozzle_weight_kg: mass(row.nozzle_weight),
+                    sorbent_charge_weight_kg: mass(row.sorbent_charge_weight),
+                    sorbent_unit_price_usd_per_kg: finite(
+                        format!("equipment[{index}].sorbent_unit_price"),
+                        row.sorbent_unit_price.unwrap_or(25.0),
+                    )?,
+                    steel_cost_per_kg: finite(
+                        format!("equipment[{index}].steel_cost_per_kg"),
+                        row.steel_cost_per_kg.unwrap_or(8.0),
+                    )?,
+                    bed_lifetime_years: 5.0,
+                })
+            }
+            "electrolyzer" => {
+                let power = match row.power {
+                    Some(value) => {
+                        finite(format!("equipment[{index}].power"), value.value / 1.0e3)?
+                    }
+                    None => 0.0,
+                };
+                costing::EquipmentSpec::Electrolyzer(costing::ElectrolyzerSpec {
+                    power_kw: power,
+                    technology: row.technology.clone().unwrap_or_else(|| "PEM".to_string()),
+                    include_balance_of_plant: row.include_balance_of_plant.unwrap_or(true),
+                })
+            }
+            "psa" => {
+                let beds = whole(
+                    index,
+                    "number_of_beds",
+                    require(index, kind, "number_of_beds", row.number_of_beds)?,
+                )?;
+                let bed_diameter = match row.bed_diameter {
+                    Some(value) => Some(finite(
+                        format!("equipment[{index}].bed_diameter"),
+                        value.value,
+                    )?),
+                    None => None,
+                };
+                let bed_length = match row.bed_length {
+                    Some(value) => Some(finite(
+                        format!("equipment[{index}].bed_length"),
+                        value.value,
+                    )?),
+                    None => None,
+                };
+                costing::EquipmentSpec::Psa(costing::PsaSpec {
+                    number_of_beds: beds,
+                    sorbent: row
+                        .sorbent
+                        .clone()
+                        .unwrap_or_else(|| "ACTIVATED_CARBON".to_string()),
+                    sorbent_mass_per_bed_kg: mass(row.sorbent_mass_per_bed),
+                    include_balance_of_plant: row.include_balance_of_plant.unwrap_or(true),
+                    bed_diameter_m: bed_diameter,
+                    bed_length_m: bed_length,
+                })
+            }
+            "ejector" => {
+                let stages = match row.number_of_stages {
+                    Some(value) => whole(index, "number_of_stages", value)?,
+                    None => 1.0,
+                };
+                let capacity = match row.suction_capacity {
+                    Some(value) => finite(
+                        format!("equipment[{index}].suction_capacity"),
+                        value.value * 3600.0,
+                    )?,
+                    None => 0.0,
+                };
+                costing::EquipmentSpec::Ejector(costing::EjectorSpec {
+                    ejector_type: row
+                        .ejector_type
+                        .clone()
+                        .unwrap_or_else(|| "steam".to_string()),
+                    number_of_stages: stages,
+                    suction_pressure_mbar: finite(
+                        format!("equipment[{index}].suction_pressure"),
+                        row.suction_pressure.unwrap_or(100.0),
+                    )?,
+                    discharge_pressure_bara: design_bara.unwrap_or(1.013),
+                    suction_capacity_kg_per_h: capacity,
+                    include_intercondensers: row.include_intercondensers.unwrap_or(false),
+                    include_aftercondenser: row.include_aftercondenser.unwrap_or(true),
                 })
             }
             _ => unreachable!("the kind list was checked above"),
