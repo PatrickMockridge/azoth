@@ -693,6 +693,30 @@ class EquipmentCostSpec(TypedDict):
     suction_capacity: float | None
     include_intercondensers: bool | None
     include_aftercondenser: bool | None
+    nominal_diameter_in: float | None
+    length: float | None
+    schedule: str | None
+    installation_type: str | None
+    include_fittings: bool | None
+    fittings_per_hundred_m: float | None
+    number_of_flanges: float | None
+    valve_type: str | None
+    nominal_size_in: float | None
+    valve_cv: float | None
+    pressure_class: float | None
+    include_actuator: bool | None
+    actuator_type: str | None
+    mixer_type: str | None
+    pipe_diameter_in: float | None
+    number_of_elements: float | None
+    flanged_connections: bool | None
+    splitter_type: str | None
+    number_of_outlets: float | None
+    inlet_diameter_in: float | None
+    outlet_diameter_in: float | None
+    include_control_valves: bool | None
+    include_flow_meters: bool | None
+    well_capex: float | None
 
 class EscalationItem(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""

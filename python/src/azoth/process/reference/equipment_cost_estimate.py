@@ -39,6 +39,11 @@ _KINDS = (
     "electrolyzer",
     "psa",
     "ejector",
+    "pipe",
+    "valve",
+    "mixer",
+    "splitter",
+    "well",
 )
 
 _MATERIALS = {
@@ -306,6 +311,62 @@ def _machine_spec(index: int, row: dict[str, Any], kind: str) -> dict[str, Any]:
             "suction_capacity_kg_per_h": _number(row, "suction_capacity") * 3600.0,
             "include_intercondensers": _boolean(row, "include_intercondensers"),
             "include_aftercondenser": _boolean(row, "include_aftercondenser", True),
+        }
+    if kind == "pipe":
+        return {
+            "kind": "pipe",
+            "nominal_diameter_in": _number(row, "nominal_diameter_in", 6.0),
+            "length_m": _number(row, "length", 100.0),
+            "schedule": str(row.get("schedule") or "40"),
+            "installation_type": str(row.get("installation_type") or "above-ground"),
+            "include_fittings": _boolean(row, "include_fittings", True),
+            "fittings_per_hundred_m": _number(row, "fittings_per_hundred_m", 10.0),
+            "number_of_flanges": 2.0
+            if row.get("number_of_flanges") is None
+            else _whole(index, "number_of_flanges", float(row["number_of_flanges"])),
+            "include_insulation": _boolean(row, "include_insulation"),
+            "insulation_thickness_mm": _number(row, "insulation_thickness", 0.05) * 1.0e3,
+        }
+    if kind == "valve":
+        return {
+            "kind": "valve",
+            "valve_type": str(row.get("valve_type") or "control"),
+            "nominal_size_in": _number(row, "nominal_size_in", 4.0),
+            "valve_cv": _number(row, "valve_cv", 100.0),
+            "pressure_class": _number(row, "pressure_class", 300.0),
+            "include_actuator": _boolean(row, "include_actuator", True),
+            "actuator_type": str(row.get("actuator_type") or "pneumatic"),
+        }
+    if kind == "mixer":
+        return {
+            "kind": "mixer",
+            "mixer_type": str(row.get("mixer_type") or "static"),
+            "pipe_diameter_in": _number(row, "pipe_diameter_in", 6.0),
+            "number_of_elements": 6.0
+            if row.get("number_of_elements") is None
+            else _whole(index, "number_of_elements", float(row["number_of_elements"])),
+            "pressure_class": _number(row, "pressure_class", 300.0),
+            "flanged_connections": _boolean(row, "flanged_connections", True),
+            "header_cost_usd": None,
+        }
+    if kind == "splitter":
+        return {
+            "kind": "splitter",
+            "splitter_type": str(row.get("splitter_type") or "manifold"),
+            "number_of_outlets": 2.0
+            if row.get("number_of_outlets") is None
+            else _whole(index, "number_of_outlets", float(row["number_of_outlets"])),
+            "inlet_diameter_in": _number(row, "inlet_diameter_in", 8.0),
+            "outlet_diameter_in": _number(row, "outlet_diameter_in", 6.0),
+            "pressure_class": _number(row, "pressure_class", 300.0),
+            "include_control_valves": _boolean(row, "include_control_valves"),
+            "include_flow_meters": _boolean(row, "include_flow_meters"),
+            "header_cost_usd": None,
+        }
+    if kind == "well":
+        return {
+            "kind": "well",
+            "well_capex_usd": max(_number(row, "well_capex", 75.0e6), 0.0),
         }
     return {
         "kind": "expander",

@@ -38,7 +38,7 @@ row_type = "EquipmentCostSpec"
 description = "one equipment item per row, in caller order; `equipment` selects the kind and the kind's fields.\n"
 [inputs.equipment.fields.equipment]
 type = "enum"
-values = ["separator", "column", "absorber", "reactor", "compressor", "pump", "expander", "heat_exchanger", "tank", "filter", "manifold", "mercury_removal", "electrolyzer", "psa", "ejector"]
+values = ["separator", "column", "absorber", "reactor", "compressor", "pump", "expander", "heat_exchanger", "tank", "filter", "manifold", "mercury_removal", "electrolyzer", "psa", "ejector", "pipe", "valve", "mixer", "splitter", "well"]
 description = "the equipment kind, which selects the fields the row must carry.\n"
 [inputs.equipment.fields.name]
 type = "string"
@@ -494,6 +494,108 @@ description = "whether the ejector's intercondensers are costed; absent is false
 type = "boolean"
 optional = true
 description = "whether the ejector's aftercondenser is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.nominal_diameter_in]
+unit = "dimensionless"
+optional = true
+description = "the pipe's nominal diameter in inches.\n"
+[inputs.equipment.fields.length]
+unit = "m"
+optional = true
+description = "the pipe's length.\n"
+[inputs.equipment.fields.schedule]
+type = "enum"
+values = ["10", "40", "80", "160", "XXS"]
+optional = true
+description = "the pipe schedule; 80 scales the cost by 1.5 and 160 by 2.5, while the weight factors are 0.7, 1.4, 2.0 and 2.5.\n"
+[inputs.equipment.fields.installation_type]
+type = "enum"
+values = ["above-ground", "buried", "subsea"]
+optional = true
+description = "the pipe's installation, which multiplies the cost by 1, 1.5 or 3.\n"
+[inputs.equipment.fields.include_fittings]
+type = "boolean"
+optional = true
+description = "whether fittings are costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.fittings_per_hundred_m]
+unit = "dimensionless"
+optional = true
+description = "the fitting count per hundred metres, truncated as the class's integer does; absent is 10.\n"
+[inputs.equipment.fields.number_of_flanges]
+unit = "dimensionless"
+optional = true
+description = "the flanged connection count; absent is 2.\n"
+[inputs.equipment.fields.valve_type]
+type = "enum"
+values = ["control", "gate", "ball", "globe", "check", "butterfly"]
+optional = true
+description = "the valve type; absent is control.\n"
+[inputs.equipment.fields.nominal_size_in]
+unit = "dimensionless"
+optional = true
+description = "the valve's nominal size in inches.\n"
+[inputs.equipment.fields.valve_cv]
+unit = "dimensionless"
+optional = true
+description = "the control valve's flow coefficient.\n"
+[inputs.equipment.fields.pressure_class]
+unit = "dimensionless"
+optional = true
+description = "the ASME pressure class, or the mixer and splitter's own class factor table.\n"
+[inputs.equipment.fields.include_actuator]
+type = "boolean"
+optional = true
+description = "whether the control valve's actuator is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.actuator_type]
+type = "enum"
+values = ["pneumatic", "electric", "hydraulic", "manual"]
+optional = true
+description = "the actuator type; absent is pneumatic.\n"
+[inputs.equipment.fields.mixer_type]
+type = "enum"
+values = ["static", "inline", "tee", "vessel"]
+optional = true
+description = "the mixer type; absent is static.\n"
+[inputs.equipment.fields.pipe_diameter_in]
+unit = "dimensionless"
+optional = true
+description = "the mixer's pipe diameter in inches.\n"
+[inputs.equipment.fields.number_of_elements]
+unit = "dimensionless"
+optional = true
+description = "the static mixer's element count; absent is 6.\n"
+[inputs.equipment.fields.flanged_connections]
+type = "boolean"
+optional = true
+description = "whether the mixer's flanged connections are costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.splitter_type]
+type = "enum"
+values = ["manifold", "header", "tee", "vessel"]
+optional = true
+description = "the splitter type; absent is manifold.\n"
+[inputs.equipment.fields.number_of_outlets]
+unit = "dimensionless"
+optional = true
+description = "the splitter's outlet count.\n"
+[inputs.equipment.fields.inlet_diameter_in]
+unit = "dimensionless"
+optional = true
+description = "the splitter's inlet diameter in inches.\n"
+[inputs.equipment.fields.outlet_diameter_in]
+unit = "dimensionless"
+optional = true
+description = "the splitter's outlet diameter in inches.\n"
+[inputs.equipment.fields.include_control_valves]
+type = "boolean"
+optional = true
+description = "whether a control valve is costed on every splitter outlet; absent is false.\n"
+[inputs.equipment.fields.include_flow_meters]
+type = "boolean"
+optional = true
+description = "whether a flow meter is costed on every splitter outlet; absent is false.\n"
+[inputs.equipment.fields.well_capex]
+unit = "dimensionless"
+optional = true
+description = "the well's all-in drilling and completion capex, USD; absent is 75e6 and negative values clamp to zero.\n"
 [outputs]
 [outputs.equipment]
 type = "record_list"

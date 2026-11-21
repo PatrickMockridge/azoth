@@ -356,3 +356,60 @@ def test_the_manifold_mercury_electrolyzer_psa_and_ejector_match_the_capture() -
     assert close(result.equipment[3].purchased_equipment_cost, 1638000.0)
     assert close(result.equipment[4].purchased_equipment_cost, 150282.87211884474)
     assert result.equipment[4].total_cost == 0.0
+
+
+def test_the_pipework_states_match_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "pipe",
+                "nominal_diameter_in": 8.0,
+                "length": quantity(500.0, "m"),
+                "schedule": "40",
+                "installation_type": "above-ground",
+                "include_fittings": True,
+                "fittings_per_hundred_m": 15.0,
+                "number_of_flanges": 4.0,
+                "include_insulation": False,
+            },
+            {
+                "equipment": "valve",
+                "valve_type": "control",
+                "nominal_size_in": 4.0,
+                "valve_cv": 150.0,
+                "pressure_class": 600.0,
+                "include_actuator": True,
+                "actuator_type": "pneumatic",
+            },
+            {
+                "equipment": "mixer",
+                "mixer_type": "static",
+                "pipe_diameter_in": 8.0,
+                "number_of_elements": 12.0,
+                "pressure_class": 300.0,
+                "flanged_connections": True,
+            },
+            {
+                "equipment": "splitter",
+                "splitter_type": "manifold",
+                "number_of_outlets": 4.0,
+                "inlet_diameter_in": 10.0,
+                "outlet_diameter_in": 6.0,
+                "pressure_class": 600.0,
+                "include_control_valves": False,
+                "include_flow_meters": False,
+            },
+            {
+                "equipment": "well",
+                "well_capex": 80000000.0,
+            },
+        ]
+    )
+    assert close(result.equipment[0].purchased_equipment_cost, 795792.2151429062)
+    assert close(result.equipment[1].purchased_equipment_cost, 82335.92259507756)
+    assert close(result.equipment[2].purchased_equipment_cost, 13180.74384039505)
+    assert close(result.equipment[3].purchased_equipment_cost, 4004.770953582229)
+    assert result.equipment[4].purchased_equipment_cost == 80000000.0
+    assert result.equipment[4].bare_module_cost == 80000000.0
+    assert result.equipment[4].total_cost == 80000000.0
+    assert hours(result.equipment[4].installation_man_hours) == 0.0

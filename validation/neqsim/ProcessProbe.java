@@ -20739,5 +20739,52 @@ public class ProcessProbe {
     ejector.setDischargePressure(1.013);
     ejector.setSuctionCapacity(500.0);
     printCostItem("equipment_ejector", ejector);
+
+    neqsim.process.costestimation.pipe.PipeCostEstimate pipe =
+        new neqsim.process.costestimation.pipe.PipeCostEstimate(null);
+    pipe.setNominalDiameter(8.0);
+    pipe.setPipeLength(500.0);
+    pipe.setPipeSchedule("40");
+    pipe.setInstallationType("above-ground");
+    pipe.setIncludeFittings(true);
+    pipe.setFittingsPerHundredMeters(15);
+    pipe.setNumberOfFlanges(4);
+    pipe.setIncludeInsulation(false);
+    printCostItem("equipment_pipe", pipe);
+
+    neqsim.process.costestimation.valve.ValveCostEstimate valve =
+        new neqsim.process.costestimation.valve.ValveCostEstimate(null);
+    valve.setValveType("control");
+    valve.setNominalSize(4.0);
+    valve.setValveCv(150.0);
+    valve.setPressureClass(600);
+    valve.setIncludeActuator(true);
+    valve.setActuatorType("pneumatic");
+    printCostItem("equipment_valve", valve);
+
+    neqsim.process.costestimation.mixer.MixerCostEstimate mixer =
+        new neqsim.process.costestimation.mixer.MixerCostEstimate(null);
+    mixer.setMixerType("static");
+    mixer.setPipeDiameter(8.0);
+    mixer.setNumberOfElements(12);
+    mixer.setPressureClass(300);
+    mixer.setFlangedConnections(true);
+    printCostItem("equipment_mixer", mixer);
+
+    neqsim.process.costestimation.splitter.SplitterCostEstimate splitter =
+        new neqsim.process.costestimation.splitter.SplitterCostEstimate(null);
+    splitter.setSplitterType("manifold");
+    splitter.setNumberOfOutlets(4);
+    splitter.setInletDiameter(10.0);
+    splitter.setOutletDiameter(6.0);
+    splitter.setPressureClass(600);
+    splitter.setIncludeControlValves(false);
+    splitter.setIncludeFlowMeters(false);
+    printCostItem("equipment_splitter", splitter);
+
+    neqsim.process.costestimation.well.WellFlowCostEstimate well =
+        new neqsim.process.costestimation.well.WellFlowCostEstimate(null);
+    well.setWellCapexUsd(80.0e6);
+    printCostItem("equipment_well", well);
   }
 }

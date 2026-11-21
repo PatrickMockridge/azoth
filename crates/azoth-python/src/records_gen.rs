@@ -575,6 +575,54 @@ pub struct EquipmentCostSpec {
     pub include_intercondensers: Option<bool>,
     #[pyo3(item)]
     pub include_aftercondenser: Option<bool>,
+    #[pyo3(item)]
+    pub nominal_diameter_in: Option<f64>,
+    #[pyo3(item)]
+    pub length: Option<f64>,
+    #[pyo3(item)]
+    pub schedule: Option<String>,
+    #[pyo3(item)]
+    pub installation_type: Option<String>,
+    #[pyo3(item)]
+    pub include_fittings: Option<bool>,
+    #[pyo3(item)]
+    pub fittings_per_hundred_m: Option<f64>,
+    #[pyo3(item)]
+    pub number_of_flanges: Option<f64>,
+    #[pyo3(item)]
+    pub valve_type: Option<String>,
+    #[pyo3(item)]
+    pub nominal_size_in: Option<f64>,
+    #[pyo3(item)]
+    pub valve_cv: Option<f64>,
+    #[pyo3(item)]
+    pub pressure_class: Option<f64>,
+    #[pyo3(item)]
+    pub include_actuator: Option<bool>,
+    #[pyo3(item)]
+    pub actuator_type: Option<String>,
+    #[pyo3(item)]
+    pub mixer_type: Option<String>,
+    #[pyo3(item)]
+    pub pipe_diameter_in: Option<f64>,
+    #[pyo3(item)]
+    pub number_of_elements: Option<f64>,
+    #[pyo3(item)]
+    pub flanged_connections: Option<bool>,
+    #[pyo3(item)]
+    pub splitter_type: Option<String>,
+    #[pyo3(item)]
+    pub number_of_outlets: Option<f64>,
+    #[pyo3(item)]
+    pub inlet_diameter_in: Option<f64>,
+    #[pyo3(item)]
+    pub outlet_diameter_in: Option<f64>,
+    #[pyo3(item)]
+    pub include_control_valves: Option<bool>,
+    #[pyo3(item)]
+    pub include_flow_meters: Option<bool>,
+    #[pyo3(item)]
+    pub well_capex: Option<f64>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

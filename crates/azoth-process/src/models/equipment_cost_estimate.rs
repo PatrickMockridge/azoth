@@ -236,6 +236,54 @@ pub struct EquipmentCostSpec {
     pub include_intercondensers: Option<bool>,
     /// Whether the ejector's aftercondenser is costed.
     pub include_aftercondenser: Option<bool>,
+    /// The pipe's nominal diameter, inches.
+    pub nominal_diameter_in: Option<f64>,
+    /// The pipe's length.
+    pub length: Option<Length>,
+    /// The pipe schedule.
+    pub schedule: Option<String>,
+    /// The pipe's installation type.
+    pub installation_type: Option<String>,
+    /// Whether fittings are costed.
+    pub include_fittings: Option<bool>,
+    /// The fitting count per hundred metres.
+    pub fittings_per_hundred_m: Option<f64>,
+    /// The flanged connection count.
+    pub number_of_flanges: Option<f64>,
+    /// The valve type.
+    pub valve_type: Option<String>,
+    /// The valve's nominal size, inches.
+    pub nominal_size_in: Option<f64>,
+    /// The control valve's flow coefficient.
+    pub valve_cv: Option<f64>,
+    /// The ASME pressure class.
+    pub pressure_class: Option<f64>,
+    /// Whether the valve actuator is costed.
+    pub include_actuator: Option<bool>,
+    /// The actuator type.
+    pub actuator_type: Option<String>,
+    /// The mixer type.
+    pub mixer_type: Option<String>,
+    /// The mixer's pipe diameter, inches.
+    pub pipe_diameter_in: Option<f64>,
+    /// The static mixer's element count.
+    pub number_of_elements: Option<f64>,
+    /// Whether the mixer's flanged connections are costed.
+    pub flanged_connections: Option<bool>,
+    /// The splitter type.
+    pub splitter_type: Option<String>,
+    /// The splitter's outlet count.
+    pub number_of_outlets: Option<f64>,
+    /// The splitter's inlet diameter, inches.
+    pub inlet_diameter_in: Option<f64>,
+    /// The splitter's outlet diameter, inches.
+    pub outlet_diameter_in: Option<f64>,
+    /// Whether a control valve is costed on every outlet.
+    pub include_control_valves: Option<bool>,
+    /// Whether a flow meter is costed on every outlet.
+    pub include_flow_meters: Option<bool>,
+    /// The well's all-in capex.
+    pub well_capex: Option<f64>,
 }
 
 /// One equipment row of the result.
@@ -398,6 +446,11 @@ pub fn equipment_cost_estimate(
                 | "electrolyzer"
                 | "psa"
                 | "ejector"
+                | "pipe"
+                | "valve"
+                | "mixer"
+                | "splitter"
+                | "well"
         ) {
             return Err(AzothError::invalid_input(
                 format!("equipment[{index}].equipment"),
@@ -961,6 +1014,122 @@ pub fn equipment_cost_estimate(
                     include_aftercondenser: row.include_aftercondenser.unwrap_or(true),
                 })
             }
+            "pipe" => {
+                let nominal = finite(
+                    format!("equipment[{index}].nominal_diameter_in"),
+                    row.nominal_diameter_in.unwrap_or(6.0),
+                )?;
+                let length = match row.length {
+                    Some(value) => finite(format!("equipment[{index}].length"), value.value)?,
+                    None => 100.0,
+                };
+                let fittings = match row.fittings_per_hundred_m {
+                    Some(value) => {
+                        finite(format!("equipment[{index}].fittings_per_hundred_m"), value)?
+                    }
+                    None => 10.0,
+                };
+                let flanges = match row.number_of_flanges {
+                    Some(value) => whole(index, "number_of_flanges", value)?,
+                    None => 2.0,
+                };
+                let insulation = match row.insulation_thickness {
+                    Some(value) => finite(
+                        format!("equipment[{index}].insulation_thickness"),
+                        value.value * 1.0e3,
+                    )?,
+                    None => 50.0,
+                };
+                costing::EquipmentSpec::Pipe(costing::PipeSpec {
+                    nominal_diameter_in: nominal,
+                    length_m: length,
+                    schedule: row.schedule.clone().unwrap_or_else(|| "40".to_string()),
+                    installation_type: row
+                        .installation_type
+                        .clone()
+                        .unwrap_or_else(|| "above-ground".to_string()),
+                    include_fittings: row.include_fittings.unwrap_or(true),
+                    fittings_per_hundred_m: fittings,
+                    number_of_flanges: flanges,
+                    include_insulation: row.include_insulation.unwrap_or(false),
+                    insulation_thickness_mm: insulation,
+                })
+            }
+            "valve" => costing::EquipmentSpec::Valve(costing::ValveSpec {
+                valve_type: row
+                    .valve_type
+                    .clone()
+                    .unwrap_or_else(|| "control".to_string()),
+                nominal_size_in: finite(
+                    format!("equipment[{index}].nominal_size_in"),
+                    row.nominal_size_in.unwrap_or(4.0),
+                )?,
+                valve_cv: finite(
+                    format!("equipment[{index}].valve_cv"),
+                    row.valve_cv.unwrap_or(100.0),
+                )?,
+                pressure_class: finite(
+                    format!("equipment[{index}].pressure_class"),
+                    row.pressure_class.unwrap_or(300.0),
+                )?,
+                include_actuator: row.include_actuator.unwrap_or(true),
+                actuator_type: row
+                    .actuator_type
+                    .clone()
+                    .unwrap_or_else(|| "pneumatic".to_string()),
+            }),
+            "mixer" => costing::EquipmentSpec::Mixer(costing::MixerSpec {
+                mixer_type: row
+                    .mixer_type
+                    .clone()
+                    .unwrap_or_else(|| "static".to_string()),
+                pipe_diameter_in: finite(
+                    format!("equipment[{index}].pipe_diameter_in"),
+                    row.pipe_diameter_in.unwrap_or(6.0),
+                )?,
+                number_of_elements: match row.number_of_elements {
+                    Some(value) => whole(index, "number_of_elements", value)?,
+                    None => 6.0,
+                },
+                pressure_class: finite(
+                    format!("equipment[{index}].pressure_class"),
+                    row.pressure_class.unwrap_or(300.0),
+                )?,
+                flanged_connections: row.flanged_connections.unwrap_or(true),
+                header_cost_usd: None,
+            }),
+            "splitter" => costing::EquipmentSpec::Splitter(costing::SplitterSpec {
+                splitter_type: row
+                    .splitter_type
+                    .clone()
+                    .unwrap_or_else(|| "manifold".to_string()),
+                number_of_outlets: match row.number_of_outlets {
+                    Some(value) => whole(index, "number_of_outlets", value)?,
+                    None => 2.0,
+                },
+                inlet_diameter_in: finite(
+                    format!("equipment[{index}].inlet_diameter_in"),
+                    row.inlet_diameter_in.unwrap_or(8.0),
+                )?,
+                outlet_diameter_in: finite(
+                    format!("equipment[{index}].outlet_diameter_in"),
+                    row.outlet_diameter_in.unwrap_or(6.0),
+                )?,
+                pressure_class: finite(
+                    format!("equipment[{index}].pressure_class"),
+                    row.pressure_class.unwrap_or(300.0),
+                )?,
+                include_control_valves: row.include_control_valves.unwrap_or(false),
+                include_flow_meters: row.include_flow_meters.unwrap_or(false),
+                header_cost_usd: None,
+            }),
+            "well" => costing::EquipmentSpec::Well(costing::WellSpec {
+                well_capex_usd: finite(
+                    format!("equipment[{index}].well_capex"),
+                    row.well_capex.unwrap_or(75.0e6),
+                )?
+                .max(0.0),
+            }),
             _ => unreachable!("the kind list was checked above"),
         };
 

@@ -118,6 +118,30 @@ fn row(equipment: &str) -> EquipmentCostSpec {
         suction_capacity: None,
         include_intercondensers: None,
         include_aftercondenser: None,
+        nominal_diameter_in: None,
+        length: None,
+        schedule: None,
+        installation_type: None,
+        include_fittings: None,
+        fittings_per_hundred_m: None,
+        number_of_flanges: None,
+        valve_type: None,
+        nominal_size_in: None,
+        valve_cv: None,
+        pressure_class: None,
+        include_actuator: None,
+        actuator_type: None,
+        mixer_type: None,
+        pipe_diameter_in: None,
+        number_of_elements: None,
+        flanged_connections: None,
+        splitter_type: None,
+        number_of_outlets: None,
+        inlet_diameter_in: None,
+        outlet_diameter_in: None,
+        include_control_valves: None,
+        include_flow_meters: None,
+        well_capex: None,
     }
 }
 
@@ -509,4 +533,66 @@ fn the_manifold_mercury_electrolyzer_psa_and_ejector_match_the_capture() {
         150282.87211884474
     ));
     assert_eq!(result.equipment[4].total_cost, 0.0);
+}
+
+#[test]
+fn the_pipework_states_match_the_capture() {
+    let mut pipe = row("pipe");
+    pipe.nominal_diameter_in = Some(8.0);
+    pipe.length = Some(meters(500.0));
+    pipe.schedule = Some("40".to_string());
+    pipe.installation_type = Some("above-ground".to_string());
+    pipe.include_fittings = Some(true);
+    pipe.fittings_per_hundred_m = Some(15.0);
+    pipe.number_of_flanges = Some(4.0);
+    pipe.include_insulation = Some(false);
+
+    let mut valve = row("valve");
+    valve.valve_type = Some("control".to_string());
+    valve.nominal_size_in = Some(4.0);
+    valve.valve_cv = Some(150.0);
+    valve.pressure_class = Some(600.0);
+    valve.include_actuator = Some(true);
+    valve.actuator_type = Some("pneumatic".to_string());
+
+    let mut mixer = row("mixer");
+    mixer.mixer_type = Some("static".to_string());
+    mixer.pipe_diameter_in = Some(8.0);
+    mixer.number_of_elements = Some(12.0);
+    mixer.pressure_class = Some(300.0);
+    mixer.flanged_connections = Some(true);
+
+    let mut splitter = row("splitter");
+    splitter.splitter_type = Some("manifold".to_string());
+    splitter.number_of_outlets = Some(4.0);
+    splitter.inlet_diameter_in = Some(10.0);
+    splitter.outlet_diameter_in = Some(6.0);
+    splitter.pressure_class = Some(600.0);
+    splitter.include_control_valves = Some(false);
+    splitter.include_flow_meters = Some(false);
+
+    let mut well = row("well");
+    well.well_capex = Some(80.0e6);
+
+    let result = run(vec![pipe, valve, mixer, splitter, well]);
+    assert!(close(
+        result.equipment[0].purchased_equipment_cost,
+        795792.2151429062
+    ));
+    assert!(close(
+        result.equipment[1].purchased_equipment_cost,
+        82335.92259507756
+    ));
+    assert!(close(
+        result.equipment[2].purchased_equipment_cost,
+        13180.74384039505
+    ));
+    assert!(close(
+        result.equipment[3].purchased_equipment_cost,
+        4004.770953582229
+    ));
+    assert_eq!(result.equipment[4].purchased_equipment_cost, 80.0e6);
+    assert_eq!(result.equipment[4].bare_module_cost, 80.0e6);
+    assert_eq!(result.equipment[4].total_cost, 80.0e6);
+    assert_eq!(result.equipment[4].installation_man_hours, 0.0);
 }

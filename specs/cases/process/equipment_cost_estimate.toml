@@ -236,3 +236,63 @@ equipment = [
 equipment = [
   { name = "", equipment_type = "ejector", purchased_equipment_cost = 150282.87211884474, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
 ]
+[[cases]]
+id = "pipe"
+tolerance = 1.0e-12
+source = "`PipeCostEstimate` on the class's 8-inch schedule-40 line (`equipment_pipe`): 500 m above ground, 15 fittings per hundred metres and four flanges; **the estimator applies the material factor inside the piping correlation and again after it**."
+[cases.inputs]
+equipment = [
+  { equipment = "pipe", nominal_diameter_in = 8.0, length = 500.0, schedule = "40", installation_type = "above-ground", include_fittings = true, fittings_per_hundred_m = 15.0, number_of_flanges = 4.0, include_insulation = false },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "piping", purchased_equipment_cost = 795792.2151429062, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "valve"
+tolerance = 1.0e-12
+source = "`ValveCostEstimate` on a Cv 150 control valve of class 600 with a pneumatic actuator (`equipment_valve`)."
+[cases.inputs]
+equipment = [
+  { equipment = "valve", valve_type = "control", nominal_size_in = 4.0, valve_cv = 150.0, pressure_class = 600.0, include_actuator = true, actuator_type = "pneumatic" },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "valve", purchased_equipment_cost = 82335.92259507756, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "mixer"
+tolerance = 1.0e-12
+source = "`MixerCostEstimate` on a 12-element static mixer in 8-inch pipe at class 300 (`equipment_mixer`)."
+[cases.inputs]
+equipment = [
+  { equipment = "mixer", mixer_type = "static", pipe_diameter_in = 8.0, number_of_elements = 12.0, pressure_class = 300.0, flanged_connections = true },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "mixer", purchased_equipment_cost = 13180.74384039505, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "splitter"
+tolerance = 1.0e-12
+source = "`SplitterCostEstimate` on a four-outlet manifold with a 10-inch inlet and 6-inch outlets at class 600, without valves or meters (`equipment_splitter`)."
+[cases.inputs]
+equipment = [
+  { equipment = "splitter", splitter_type = "manifold", number_of_outlets = 4.0, inlet_diameter_in = 10.0, outlet_diameter_in = 6.0, pressure_class = 600.0, include_control_valves = false, include_flow_meters = false },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "splitter", purchased_equipment_cost = 4004.770953582229, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "well"
+tolerance = 1.0e-12
+source = "`WellFlowCostEstimate` with the 80e6 all-in capex its own test states (`equipment_well`): the purchased, module and grass-roots costs are all the capex, and the labour is zero."
+[cases.inputs]
+equipment = [
+  { equipment = "well", well_capex = 80000000.0 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "well", purchased_equipment_cost = 80000000.0, bare_module_cost = 80000000.0, total_module_cost = 80000000.0, grass_roots_cost = 80000000.0, total_cost = 80000000.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
