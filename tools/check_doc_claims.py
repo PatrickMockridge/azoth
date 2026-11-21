@@ -347,6 +347,7 @@ def _wrapper_counts() -> tuple[int, int]:
         "standards",
         "process",
         "characterization",
+        "pvt",
     ):
         path = ROOT / "crates" / "azoth-python" / "src" / f"{module}.rs"
         if not path.exists():

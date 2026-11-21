@@ -41,6 +41,7 @@ mod hydraulics;
 mod overlay;
 mod process;
 mod provenance;
+mod pvt;
 mod reactions;
 mod record_outputs_gen;
 mod records_gen;

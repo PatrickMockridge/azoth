@@ -63,6 +63,7 @@ NAMESPACES = {
     "standards": "Standards",
     "process": "Unit operations",
     "characterization": "Petroleum fraction characterisation",
+    "pvt": "PVT simulation",
 }
 
 #: The book's prose pages — architecture, calculus, agentic — are listed by hand in
