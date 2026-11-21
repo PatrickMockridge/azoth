@@ -1,0 +1,86 @@
+model = "process.process_cost_estimate"
+[[cases]]
+id = "class_process"
+tolerance = 1.0e-12
+source = "`ProcessCostEstimateTest`'s four-unit SRK flowsheet re-run in `validation/neqsim/captures/process_cost_process.tsv`: the feed, the separator, the export compressor, the aftercooler and the JT valve at a 1.0 location, a 1.0 complexity, 8000 operating hours and a 5e6 annual revenue. **The operating-cost walk reads `getDuty()` as kW although the cooler returns watts**, so the case states the duty the walk read."
+[cases.inputs]
+equipment = [
+  { name = "Feed", equipment_class = "Stream", purchased_equipment_cost = 0.0, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, weight = 0.0 },
+  { name = "InletSeparator", equipment_class = "Separator", purchased_equipment_cost = 2710.0997797401924, bare_module_cost = 11158.835843080242, total_module_cost = 13948.544803850302, grass_roots_cost = 20922.817205775453, total_cost = 13948.544803850302, installation_man_hours = 10.761660837894372, weight = 358.7220279298124 },
+  { name = "MainCompressor", equipment_class = "Compressor", purchased_equipment_cost = 236944.74435086618, bare_module_cost = 975619.9848646914, total_module_cost = 1219524.9810808643, grass_roots_cost = 1829287.4716212964, total_cost = 1219524.9810808643, installation_man_hours = 36086.44083680164, weight = 601440.6806133607, power = 243.39509113104845 },
+  { name = "AfterCooler", equipment_class = "Cooler", purchased_equipment_cost = 1056.0, bare_module_cost = 4348.08, total_module_cost = 5435.1, grass_roots_cost = 8152.650000000001, total_cost = 5435.1, installation_man_hours = 5.28, weight = 132.0, duty = -339531.601308147 },
+  { name = "JTValve", equipment_class = "ThrottlingValve", purchased_equipment_cost = 52972.234870373686, bare_module_cost = 218113.17707876363, total_module_cost = 272641.47134845454, grass_roots_cost = 408962.20702268183, total_cost = 272641.47134845454, installation_man_hours = 2.2539496985037624, weight = 64.3985628143932 },
+]
+location_factor = 1.0
+complexity_factor = 1.0
+project_contingency = 0.10
+working_capital = 0.15
+system_total_weight = 601995.8012041049
+capex_per_weight = 1000.0
+operating_hours = 8000.0
+electricity_cost_per_kwh = 0.08
+steam_cost_per_tonne = 15.0
+cooling_water_cost_per_m3 = 0.05
+labor_cost_per_hour = 50.0
+annual_revenue = 5000000.0
+discount_rate = 0.10
+project_life_years = 10.0
+[cases.expected]
+total_purchased_equipment_cost = 293683.07900098007
+total_bare_module_cost = 1209240.0777865353
+total_module_cost = 1511550.0972331692
+total_grass_roots_cost = 1738282.6118181446
+total_installation_man_hours = 36104.73644733804
+equipment = [
+  { name = "Feed", equipment_class = "Stream", equipment_type = "Streams", purchased_equipment_cost = 0.0, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, weight = 0.0, located_purchased_equipment_cost = 0.0, location_factor = 1.0 },
+  { name = "InletSeparator", equipment_class = "Separator", equipment_type = "Vessels", purchased_equipment_cost = 2710.0997797401924, bare_module_cost = 11158.835843080242, total_module_cost = 13948.544803850302, grass_roots_cost = 20922.817205775453, total_cost = 13948.544803850302, installation_man_hours = 10.761660837894372, weight = 358.7220279298124, located_purchased_equipment_cost = 2710.0997797401924, location_factor = 1.0 },
+  { name = "MainCompressor", equipment_class = "Compressor", equipment_type = "Compressors", purchased_equipment_cost = 236944.74435086618, bare_module_cost = 975619.9848646914, total_module_cost = 1219524.9810808643, grass_roots_cost = 1829287.4716212964, total_cost = 1219524.9810808643, installation_man_hours = 36086.44083680164, weight = 601440.6806133607, located_purchased_equipment_cost = 236944.74435086618, location_factor = 1.0 },
+  { name = "AfterCooler", equipment_class = "Cooler", equipment_type = "Heat Exchangers", purchased_equipment_cost = 1056.0, bare_module_cost = 4348.08, total_module_cost = 5435.1, grass_roots_cost = 8152.650000000001, total_cost = 5435.1, installation_man_hours = 5.28, weight = 132.0, located_purchased_equipment_cost = 1056.0, location_factor = 1.0 },
+  { name = "JTValve", equipment_class = "ThrottlingValve", equipment_type = "Valves", purchased_equipment_cost = 52972.234870373686, bare_module_cost = 218113.17707876363, total_module_cost = 272641.47134845454, grass_roots_cost = 408962.20702268183, total_cost = 272641.47134845454, installation_man_hours = 2.2539496985037624, weight = 64.3985628143932, located_purchased_equipment_cost = 52972.234870373686, location_factor = 1.0 },
+]
+cost_by_equipment_type = [
+  { name = "Streams", cost = 0.0 },
+  { name = "Vessels", cost = 2710.0997797401924 },
+  { name = "Compressors", cost = 236944.74435086618 },
+  { name = "Heat Exchangers", cost = 1056.0 },
+  { name = "Valves", cost = 52972.234870373686 },
+]
+cost_by_discipline = [
+  { name = "Process Equipment", cost = 293683.07900098007 },
+  { name = "Piping & Valves", cost = 1007700.0648221128 },
+  { name = "Electrical & Instrumentation", cost = 604620.0388932676 },
+  { name = "Civil & Structural", cost = 403080.0259288451 },
+  { name = "Other (HVAC, Paint, Insulation)", cost = 806160.0518576902 },
+]
+project_costs = [
+  { name = "directInstalledCost", cost = 1511550.0972331692 },
+  { name = "indirectCost", cost = 226732.51458497532 },
+  { name = "projectContingency", cost = 173828.26118181448 },
+  { name = "ownerCost", cost = 260742.39177272166 },
+  { name = "totalProjectCost", cost = 2172853.2647726806 },
+]
+total_project_cost = 2172853.2647726806
+operating_costs = [
+  { name = "Electricity", cost = 155772.858323871 },
+  { name = "Steam", cost = 0.0 },
+  { name = "Cooling Water", cost = 11696.78243740985 },
+  { name = "Maintenance", cost = 60462.00388932677 },
+  { name = "Operating Labor", cost = 800000.0 },
+  { name = "Supervision", cost = 144000.0 },
+  { name = "Operating Supplies", cost = 7255.440466719212 },
+  { name = "Laboratory", cost = 120000.0 },
+  { name = "Overhead", cost = 552454.1021391298 },
+]
+total_annual_operating_cost = 1851641.1872564566
+payback_period_years = 0.5521234126117187
+roi_percent = 181.118926884423
+npv = 1.7607019385921277E7
+summed_unit_total_cost = 1511550.0972331692
+weight_based_capex = 6.019958012041049E8
+material_take_off = [
+  { name = "Feed", equipment_type = "Streams", weight_kg = 0.0, cost_usd = 0.0 },
+  { name = "InletSeparator", equipment_type = "Vessels", weight_kg = 358.7220279298124, cost_usd = 2710.0997797401924 },
+  { name = "MainCompressor", equipment_type = "Compressors", weight_kg = 601440.6806133607, cost_usd = 236944.74435086618 },
+  { name = "AfterCooler", equipment_type = "Heat Exchangers", weight_kg = 132.0, cost_usd = 1056.0 },
+  { name = "JTValve", equipment_type = "Valves", weight_kg = 64.3985628143932, cost_usd = 52972.234870373686 },
+]

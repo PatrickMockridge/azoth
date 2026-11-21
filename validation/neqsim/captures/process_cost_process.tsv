@@ -1,0 +1,104 @@
+process_cost_summary
+total_purchased_equipment_cost=293683.07900098007
+total_bare_module_cost=1209240.0777865353
+total_module_cost=1511550.0972331692
+total_grass_roots_cost=1738282.6118181446
+total_installation_man_hours=36104.73644733804
+unit_count=5
+unit_0_name=Feed
+unit_0_type=Streams
+unit_0_purchased_equipment_cost=0.0
+unit_0_bare_module_cost=0.0
+unit_0_total_module_cost=0.0
+unit_0_grass_roots_cost=0.0
+unit_0_installation_man_hours=0.0
+unit_0_weight_kg=0.0
+unit_0_located_purchased_equipment_cost=0.0
+unit_0_power_kw=0.0
+unit_0_duty_kw=0.0
+unit_1_name=InletSeparator
+unit_1_type=Vessels
+unit_1_purchased_equipment_cost=2710.0997797401924
+unit_1_bare_module_cost=11158.835843080242
+unit_1_total_module_cost=13948.544803850302
+unit_1_grass_roots_cost=20922.817205775453
+unit_1_installation_man_hours=10.761660837894372
+unit_1_weight_kg=358.7220279298124
+unit_1_located_purchased_equipment_cost=2710.0997797401924
+unit_1_power_kw=0.0
+unit_1_duty_kw=0.0
+unit_2_name=MainCompressor
+unit_2_type=Compressors
+unit_2_purchased_equipment_cost=236944.74435086618
+unit_2_bare_module_cost=975619.9848646914
+unit_2_total_module_cost=1219524.9810808643
+unit_2_grass_roots_cost=1829287.4716212964
+unit_2_installation_man_hours=36086.44083680164
+unit_2_weight_kg=601440.6806133607
+unit_2_located_purchased_equipment_cost=236944.74435086618
+unit_2_power_kw=243.39509113104845
+unit_2_duty_kw=0.0
+unit_3_name=AfterCooler
+unit_3_type=Heat Exchangers
+unit_3_purchased_equipment_cost=1056.0
+unit_3_bare_module_cost=4348.08
+unit_3_total_module_cost=5435.1
+unit_3_grass_roots_cost=8152.650000000001
+unit_3_installation_man_hours=5.28
+unit_3_weight_kg=132.0
+unit_3_located_purchased_equipment_cost=1056.0
+unit_3_power_kw=0.0
+unit_3_duty_kw=-339531.601308147
+unit_4_name=JTValve
+unit_4_type=Valves
+unit_4_purchased_equipment_cost=52972.234870373686
+unit_4_bare_module_cost=218113.17707876363
+unit_4_total_module_cost=272641.47134845454
+unit_4_grass_roots_cost=408962.20702268183
+unit_4_installation_man_hours=2.2539496985037624
+unit_4_weight_kg=64.3985628143932
+unit_4_located_purchased_equipment_cost=52972.234870373686
+unit_4_power_kw=0.0
+unit_4_duty_kw=0.0
+
+cost_by_equipment_type
+type_Streams=0.0
+type_Vessels=2710.0997797401924
+type_Compressors=236944.74435086618
+type_Heat Exchangers=1056.0
+type_Valves=52972.234870373686
+
+cost_by_discipline
+discipline_Process Equipment=293683.07900098007
+discipline_Piping & Valves=1007700.0648221128
+discipline_Electrical & Instrumentation=604620.0388932676
+discipline_Civil & Structural=403080.0259288451
+discipline_Other (HVAC, Paint, Insulation)=806160.0518576902
+
+project_costs
+project_directInstalledCost=1511550.0972331692
+project_indirectCost=226732.51458497532
+project_projectContingency=173828.26118181448
+project_ownerCost=260742.39177272166
+project_totalProjectCost=2172853.2647726806
+total_project_cost=2172853.2647726806
+
+operating_costs
+opex_Electricity=155772.858323871
+opex_Steam=0.0
+opex_Cooling Water=11696.78243740985
+opex_Maintenance=60462.00388932677
+opex_Operating Labor=800000.0
+opex_Supervision=144000.0
+opex_Operating Supplies=7255.440466719212
+opex_Laboratory=120000.0
+opex_Overhead=552454.1021391298
+total_annual_operating_cost=1851641.1872564566
+
+economics
+payback_period_years=0.5521234126117187
+roi_percent=181.118926884423
+npv=1.7607019385921277E7
+system_total_weight_kg=601995.8012041049
+weight_based_capex=6.019958012041049E8
+

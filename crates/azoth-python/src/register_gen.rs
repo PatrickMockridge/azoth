@@ -262,6 +262,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyConsequenceAnalysisResult>()?;
     m.add_class::<crate::transport_gen::PyControlValveFailureReliefResult>()?;
     m.add_class::<crate::transport_gen::PyCoolerResult>()?;
+    m.add_class::<crate::transport_gen::PyCostEstimationResult>()?;
     m.add_class::<crate::transport_gen::PyDelugeNozzleLayoutResult>()?;
     m.add_class::<crate::transport_gen::PyDepressurizationResult>()?;
     m.add_class::<crate::transport_gen::PyDepressurizationAcceptanceResult>()?;
@@ -269,6 +270,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyDriftFluxReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyDynamicPsvSizingResult>()?;
     m.add_class::<crate::transport_gen::PyEjectorResult>()?;
+    m.add_class::<crate::transport_gen::PyEquipmentCostEstimateResult>()?;
     m.add_class::<crate::transport_gen::PyEscalationGraphResult>()?;
     m.add_class::<crate::transport_gen::PyEsdResponseTimeResult>()?;
     m.add_class::<crate::transport_gen::PyEventTreeResult>()?;
@@ -328,6 +330,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPorousMediaSelfHeatingResult>()?;
     m.add_class::<crate::transport_gen::PyPrescribedSlipReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyProbitResult>()?;
+    m.add_class::<crate::transport_gen::PyProcessCostEstimateResult>()?;
     m.add_class::<crate::transport_gen::PyPsvFireSizingResult>()?;
     m.add_class::<crate::transport_gen::PyPsvSizingResult>()?;
     m.add_class::<crate::transport_gen::PyPsvValveResult>()?;
@@ -359,6 +362,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyTankResult>()?;
     m.add_class::<crate::transport_gen::PyThreePhaseSeparatorResult>()?;
     m.add_class::<crate::transport_gen::PyThrottlingValveResult>()?;
+    m.add_class::<crate::transport_gen::PyTopsidesFacilityCostResult>()?;
     m.add_class::<crate::transport_gen::PyToxicLibraryResult>()?;
     m.add_class::<crate::transport_gen::PyTr3001ComplianceResult>()?;
     m.add_class::<crate::transport_gen::PyTrappedInventoryResult>()?;
@@ -402,13 +406,19 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyChemicalWarningRow>()?;
     m.add_class::<crate::record_outputs_gen::PyComponentSelectiveReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyConsequenceOutcomeResult>()?;
+    m.add_class::<crate::record_outputs_gen::PyCostBomRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyCostEstimationResultRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepressurizationPoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyDisciplineCostLine>()?;
     m.add_class::<crate::record_outputs_gen::PyDriftFluxReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyEnvelopePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyEnvelopeQuery>()?;
     m.add_class::<crate::record_outputs_gen::PyEnvelopeSummary>()?;
     m.add_class::<crate::record_outputs_gen::PyEquilibriumSoundSpeedSample>()?;
+    m.add_class::<crate::record_outputs_gen::PyEquipmentCostResultRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyEquipmentMtoRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyEquipmentQualityFlag>()?;
     m.add_class::<crate::record_outputs_gen::PyEscalationItemResult>()?;
     m.add_class::<crate::record_outputs_gen::PyEsdContribution>()?;
     m.add_class::<crate::record_outputs_gen::PyEventTreeOutcome>()?;
@@ -442,6 +452,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyNonEquilibriumBlowdownPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyOpenDrainAssessment>()?;
     m.add_class::<crate::record_outputs_gen::PyOpenDrainResult>()?;
+    m.add_class::<crate::record_outputs_gen::PyOperatingCostLine>()?;
     m.add_class::<crate::record_outputs_gen::PyP002FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PyPerformanceAssessment>()?;
     m.add_class::<crate::record_outputs_gen::PyPerformanceFinding>()?;
@@ -449,6 +460,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyPerformanceSif>()?;
     m.add_class::<crate::record_outputs_gen::PyPipeFireRupturePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyPrescribedSlipReleaseStation>()?;
+    m.add_class::<crate::record_outputs_gen::PyProcessCostEquipmentResult>()?;
+    m.add_class::<crate::record_outputs_gen::PyProcessCostFlag>()?;
+    m.add_class::<crate::record_outputs_gen::PyProcessCostMtoRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyProjectCostLine>()?;
     m.add_class::<crate::record_outputs_gen::PyPulsationModeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyRanzMarshallReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyRealGasFannoReleaseStation>()?;
@@ -473,8 +488,17 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
     m.add_class::<crate::record_outputs_gen::PySts0131FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesBreakdownLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesCapitalLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesFlag>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesMtoRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesProjectLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesProjectSummaryLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesSummaryLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyTopsidesWeightLine>()?;
     m.add_class::<crate::record_outputs_gen::PyTr3001Finding>()?;
     m.add_class::<crate::record_outputs_gen::PyTrappedInventorySegmentResult>()?;
+    m.add_class::<crate::record_outputs_gen::PyTypeCostLine>()?;
     m.add_class::<crate::record_outputs_gen::PyVesselFillingPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyVesselRuptureStep>()?;
     m.add_class::<crate::record_outputs_gen::PyWaterMixingResult>()?;
@@ -1081,6 +1105,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::cooler, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::cost_estimation, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::deluge_nozzle_layout,
         m
@@ -1103,6 +1128,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::process::ejector, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::equipment_cost_estimate,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::escalation_graph, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::esd_response_time, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::event_tree, m)?)?;
@@ -1225,6 +1254,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::probit, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::process_cost_estimate,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::psv_fire_sizing, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::psv_sizing, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::psv_valve, m)?)?;
@@ -1295,6 +1328,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::throttling_valve, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::process::topsides_facility_cost, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::toxic_library, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::tr3001_compliance, m)?)?;
     m.add_function(wrap_pyfunction!(crate::process::trapped_inventory, m)?)?;

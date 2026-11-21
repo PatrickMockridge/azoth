@@ -236,7 +236,7 @@ fn the_relief_and_pfp_states() {
         520.0,
         "pfp pipe time",
     );
-    close(pfp.final_pressure.value, 41687831.037177796, "pfp pressure");
+    close(pfp.final_pressure.value, 41687831.0371778, "pfp pressure");
     close(
         pfp.final_outer_wall_temperature.value,
         642.2964759288351,

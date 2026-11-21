@@ -4065,8 +4065,8 @@ def _safety_envelope(inputs: Mapping[str, Any]) -> dict[str, float]:
             dumped[f"envelope_{arm}_safe_temperature_at_operating_k"] = query.safe_temperature.to(
                 "K"
             ).magnitude
-        if row.margin is not None:
-            dumped[f"envelope_{arm}_margin_at_operating_k"] = row.margin.to("K").magnitude
+        if query.margin is not None:
+            dumped[f"envelope_{arm}_margin_at_operating_k"] = query.margin.to("K").magnitude
     return dumped
 
 
@@ -5113,6 +5113,26 @@ DUMPERS: dict[str, Dumper] = {
 #: **This is not "the model is too simple to check".** Each entry names the arithmetic and
 #: what would have to exist for there to be a layer.
 NO_INTERIOR: dict[str, str] = {
+    "process.topsides_facility_cost": (
+        "the facility stack is a set of factor products over the stated rows, so every number "
+        "the kernel forms is on a capital line, a project line or an MTO row. The capture's "
+        "block is the case's evidence"
+    ),
+    "process.process_cost_estimate": (
+        "the roll-up's totals are sums of the stated rows and its splits are fixed percentages "
+        "of them, so every number the kernel forms is on an output row or a named cost line. "
+        "The capture's blocks are the case's evidence"
+    ),
+    "process.equipment_cost_estimate": (
+        "each row's purchased cost is one kind's correlation and the stack above it is the "
+        "shared module formula, so every number the kernel forms is on an output row. The "
+        "cases are the oracle and ``process_cost_equipment.tsv`` is their evidence"
+    ),
+    "process.cost_estimation": (
+        "each row is one calculator method - a correlation, a factor lookup or the module "
+        "stack - so the kernel has no composed model beneath it. The cases are the oracle "
+        "and ``process_cost_calculator.tsv`` is their evidence"
+    ),
     "process.real_gas_fanno_release": (
         "the real-gas Fanno march is thousands of PH flashes per state, and its Python "
         "reference takes about sixteen minutes for one case; a layer diff would run it "
@@ -9377,6 +9397,17 @@ LAYER_CASES: tuple[LayerCase, ...] = (
 #: held to the `reference_pin_*` rows instead. Counting them here rather than leaving the
 #: block count open keeps the check exact: a probe row added without a case still fails.
 UNCASED_ROWS: dict[str, int] = {
+    # The calculator's five states - factors, correlations, the module stack, currencies
+    # and the vessel BOM - are the cases' evidence; the id is a `NO_INTERIOR` model.
+    "process_cost_calculator.tsv": 5,
+    # The equipment estimate's seven states: three columns, two absorbers and the separator
+    # with its bill of materials. The id is a `NO_INTERIOR` model.
+    "process_cost_equipment.tsv": 25,
+    # The roll-up's six states: the summary, the type and discipline splits, the project
+    # stack, the OPEX lines and the economics. The id is a `NO_INTERIOR` model.
+    "process_cost_process.tsv": 6,
+    # The topsides estimator's one fixed-platform state. The id is a `NO_INTERIOR` model.
+    "process_cost_topsides.tsv": 1,
     # The dispersion capture's five: four SRK rows, the class's own tests' cubic kept as
     # evidence beside the PR oracle, and the zero-rate refusal the port raises rather than
     # reproduces.

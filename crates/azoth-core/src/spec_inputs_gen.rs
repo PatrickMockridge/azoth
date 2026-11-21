@@ -244,6 +244,7 @@
 //!   - specs/models/process/consequence_analysis.toml
 //!   - specs/models/process/control_valve_failure_relief.toml
 //!   - specs/models/process/cooler.toml
+//!   - specs/models/process/cost_estimation.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/depressurization.toml
 //!   - specs/models/process/depressurization_acceptance.toml
@@ -251,6 +252,7 @@
 //!   - specs/models/process/drift_flux_release.toml
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
+//!   - specs/models/process/equipment_cost_estimate.toml
 //!   - specs/models/process/escalation_graph.toml
 //!   - specs/models/process/esd_response_time.toml
 //!   - specs/models/process/event_tree.toml
@@ -310,6 +312,7 @@
 //!   - specs/models/process/porous_media_self_heating.toml
 //!   - specs/models/process/prescribed_slip_release.toml
 //!   - specs/models/process/probit.toml
+//!   - specs/models/process/process_cost_estimate.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/psv_valve.toml
@@ -341,6 +344,7 @@
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml
+//!   - specs/models/process/topsides_facility_cost.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/trapped_inventory.toml
@@ -5188,6 +5192,72 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.probit", "n", "dimensionless"),
     ("process.probit", "dose", "dimensionless"),
     ("process.probit", "probit_value", "dimensionless"),
+    (
+        "process.process_cost_estimate",
+        "location_factor",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "complexity_factor",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "project_contingency",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "working_capital",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "system_total_weight",
+        "mass",
+    ),
+    (
+        "process.process_cost_estimate",
+        "capex_per_weight",
+        "dimensionless",
+    ),
+    ("process.process_cost_estimate", "operating_hours", "time"),
+    (
+        "process.process_cost_estimate",
+        "electricity_cost_per_kwh",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "steam_cost_per_tonne",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "cooling_water_cost_per_m3",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "labor_cost_per_hour",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "annual_revenue",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "discount_rate",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "project_life_years",
+        "dimensionless",
+    ),
     ("process.psv_fire_sizing", "initial_mass", "mass"),
     ("process.psv_fire_sizing", "initial_pressure", "pressure"),
     ("process.psv_fire_sizing", "set_pressure", "pressure"),
@@ -6303,6 +6373,56 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "dimensionless",
     ),
     ("process.throttling_valve", "xt", "dimensionless"),
+    (
+        "process.topsides_facility_cost",
+        "location_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "piping_bulk_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "electrical_instrumentation_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "insulation_paint_fireproofing_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "hvac_telecom_safety_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "engineering_procurement_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "construction_management_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "project_contingency_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "owner_cost_factor",
+        "dimensionless",
+    ),
+    (
+        "process.topsides_facility_cost",
+        "estimate_class",
+        "dimensionless",
+    ),
     (
         "process.toxic_library",
         "concentration_ppm",

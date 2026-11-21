@@ -349,6 +349,7 @@ Five sections, and the difference between them is the point:
 - [`process.consequence_analysis`](./process/consequence_analysis.md) — Consequence analysis
 - [`process.control_valve_failure_relief`](./process/control_valve_failure_relief.md) — Control valve failure relief
 - [`process.cooler`](./process/cooler.md) — Cooler
+- [`process.cost_estimation`](./process/cost_estimation.md) — Cost-estimation calculator
 - [`process.deluge_nozzle_layout`](./process/deluge_nozzle_layout.md) — Deluge nozzle layout
 - [`process.depressurization`](./process/depressurization.md) — Vessel depressurization
 - [`process.depressurization_acceptance`](./process/depressurization_acceptance.md) — Depressurization acceptance
@@ -356,6 +357,7 @@ Five sections, and the difference between them is the point:
 - [`process.drift_flux_release`](./process/drift_flux_release.md) — Vertical drift-flux orifice release
 - [`process.dynamic_psv_sizing`](./process/dynamic_psv_sizing.md) — Dynamic PSV sizing
 - [`process.ejector`](./process/ejector.md) — Ejector
+- [`process.equipment_cost_estimate`](./process/equipment_cost_estimate.md) — Equipment cost estimate
 - [`process.escalation_graph`](./process/escalation_graph.md) — Escalation graph analysis
 - [`process.esd_response_time`](./process/esd_response_time.md) — ESD response time
 - [`process.event_tree`](./process/event_tree.md) — Event tree
@@ -415,6 +417,7 @@ Five sections, and the difference between them is the point:
 - [`process.porous_media_self_heating`](./process/porous_media_self_heating.md) — Porous media self-heating
 - [`process.prescribed_slip_release`](./process/prescribed_slip_release.md) — Prescribed-slip orifice release
 - [`process.probit`](./process/probit.md) — Probit dose-response
+- [`process.process_cost_estimate`](./process/process_cost_estimate.md) — Process cost estimate
 - [`process.psv_fire_sizing`](./process/psv_fire_sizing.md) — PSV fire sizing
 - [`process.psv_sizing`](./process/psv_sizing.md) — PSV sizing
 - [`process.psv_valve`](./process/psv_valve.md) — PSV latch and relief flow
@@ -446,6 +449,7 @@ Five sections, and the difference between them is the point:
 - [`process.tank`](./process/tank.md) — Tank
 - [`process.three_phase_separator`](./process/three_phase_separator.md) — Three-phase separator
 - [`process.throttling_valve`](./process/throttling_valve.md) — Throttling valve
+- [`process.topsides_facility_cost`](./process/topsides_facility_cost.md) — Topsides facility cost
 - [`process.toxic_library`](./process/toxic_library.md) — Toxic-exposure thresholds
 - [`process.tr3001_compliance`](./process/tr3001_compliance.md) — TR3001 compliance
 - [`process.trapped_inventory`](./process/trapped_inventory.md) — Trapped inventory

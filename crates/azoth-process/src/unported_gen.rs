@@ -23,6 +23,7 @@
 //!   - specs/models/process/consequence_analysis.toml
 //!   - specs/models/process/control_valve_failure_relief.toml
 //!   - specs/models/process/cooler.toml
+//!   - specs/models/process/cost_estimation.toml
 //!   - specs/models/process/deluge_nozzle_layout.toml
 //!   - specs/models/process/depressurization.toml
 //!   - specs/models/process/depressurization_acceptance.toml
@@ -30,6 +31,7 @@
 //!   - specs/models/process/drift_flux_release.toml
 //!   - specs/models/process/dynamic_psv_sizing.toml
 //!   - specs/models/process/ejector.toml
+//!   - specs/models/process/equipment_cost_estimate.toml
 //!   - specs/models/process/escalation_graph.toml
 //!   - specs/models/process/esd_response_time.toml
 //!   - specs/models/process/event_tree.toml
@@ -89,6 +91,7 @@
 //!   - specs/models/process/porous_media_self_heating.toml
 //!   - specs/models/process/prescribed_slip_release.toml
 //!   - specs/models/process/probit.toml
+//!   - specs/models/process/process_cost_estimate.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/psv_valve.toml
@@ -120,6 +123,7 @@
 //!   - specs/models/process/tank.toml
 //!   - specs/models/process/three_phase_separator.toml
 //!   - specs/models/process/throttling_valve.toml
+//!   - specs/models/process/topsides_facility_cost.toml
 //!   - specs/models/process/toxic_library.toml
 //!   - specs/models/process/tr3001_compliance.toml
 //!   - specs/models/process/trapped_inventory.toml

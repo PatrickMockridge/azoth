@@ -1,0 +1,440 @@
+"""``process.equipment_cost_estimate`` against its capture."""
+
+from __future__ import annotations
+
+import pytest
+
+from azoth.core.errors import InvalidInputError, OutOfRangeError
+from azoth.core.units import quantity
+from azoth.process.reference.equipment_cost_estimate import equipment_cost_estimate
+
+
+def close(actual: float, expected: float) -> bool:
+    return abs(actual - expected) <= 1.0e-12 * max(abs(expected), 1.0)
+
+
+def hours(value: object) -> float:
+    return float(value.to("h").magnitude)  # type: ignore[attr-defined]
+
+
+def test_a_trayed_column_matches_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "column",
+                "name": "Depropaniser",
+                "column_type": "trayed",
+                "tray_type": "sieve",
+                "diameter": quantity(2.0, "m"),
+                "height": quantity(25.0, "m"),
+                "number_of_trays": 30.0,
+                "design_pressure_barg": quantity(15.0, "bar"),
+                "include_reboiler": True,
+                "include_condenser": True,
+                "reboiler_duty": quantity(2000.0, "kW"),
+                "condenser_duty": quantity(1500.0, "kW"),
+            }
+        ]
+    )
+    row = result.equipment[0]
+    assert row.name == "Depropaniser"
+    assert row.equipment_type == "column"
+    assert close(row.purchased_equipment_cost, 186272.12543695548)
+    assert row.bare_module_cost == 0.0
+    assert row.total_cost == 0.0
+    assert hours(row.installation_man_hours) == 0.0
+    assert result.material_take_off == ()
+    assert result.quality_flags == ()
+
+
+def test_the_stainless_column_carries_the_material_factor_twice() -> None:
+    carbon = {
+        "equipment": "column",
+        "diameter": quantity(2.0, "m"),
+        "height": quantity(25.0, "m"),
+        "number_of_trays": 30.0,
+        "design_pressure_barg": quantity(15.0, "bar"),
+        "include_reboiler": True,
+        "include_condenser": True,
+        "reboiler_duty": quantity(2000.0, "kW"),
+        "condenser_duty": quantity(1500.0, "kW"),
+    }
+    stainless = dict(carbon, material="ss316")
+    result = equipment_cost_estimate([carbon, stainless])
+    assert close(result.equipment[1].purchased_equipment_cost, 391171.4634176065)
+    assert close(result.equipment[1].material_factor, 2.1)
+    assert close(
+        result.equipment[1].purchased_equipment_cost / result.equipment[0].purchased_equipment_cost,
+        2.1,
+    )
+
+
+def test_the_packed_and_zero_columns_match_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "column",
+                "column_type": "packed",
+                "packing_type": "structured",
+                "diameter": quantity(1.5, "m"),
+                "height": quantity(15.0, "m"),
+                "packing_height": quantity(10.0, "m"),
+                "design_pressure_barg": quantity(15.0, "bar"),
+                "include_reboiler": True,
+                "include_condenser": True,
+                "reboiler_duty": quantity(1000.0, "kW"),
+                "condenser_duty": quantity(800.0, "kW"),
+            },
+            {
+                "equipment": "column",
+                "diameter": quantity(0.0, "m"),
+                "height": quantity(0.0, "m"),
+                "include_reboiler": False,
+                "include_condenser": False,
+            },
+        ]
+    )
+    assert close(result.equipment[0].purchased_equipment_cost, 149981.67037473136)
+    assert result.equipment[1].purchased_equipment_cost == 0.0
+    assert len(result.quality_flags) == 1
+    assert result.quality_flags[0].equipment_index == 1.0
+
+
+def test_the_absorber_states_match_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "absorber",
+                "absorber_type": "packed",
+                "packing_type": "structured",
+                "diameter": quantity(2.0, "m"),
+                "height": quantity(15.0, "m"),
+                "packing_height": quantity(10.0, "m"),
+                "design_pressure_barg": quantity(60.0, "bar"),
+            },
+            {
+                "equipment": "absorber",
+                "absorber_type": "trayed",
+                "tray_type": "valve",
+                "diameter": quantity(2.0, "m"),
+                "height": quantity(15.0, "m"),
+                "number_of_stages": 12.0,
+                "design_pressure_barg": quantity(60.0, "bar"),
+                "include_liquid_distributor": False,
+                "include_mist_eliminator": False,
+            },
+        ]
+    )
+    assert close(result.equipment[0].purchased_equipment_cost, 155322.29397076587)
+    assert close(result.equipment[1].purchased_equipment_cost, 62090.37414978155)
+
+
+def test_the_separator_carries_its_stack_and_bill_of_materials() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "separator",
+                "name": "InletSeparator",
+                "inner_diameter": quantity(0.8361865022733448, "m"),
+                "tangent_length": quantity(1.6723730045466896, "m"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(3315.9396795551834, "kg"),
+                "include_material_take_off": True,
+                "shell_weight": quantity(2098.6959997184704, "kg"),
+                "piping_weight": quantity(839.4783998873882, "kg"),
+                "electro_instrument_weight": quantity(167.89567997747764, "kg"),
+                "structural_weight": quantity(209.86959997184704, "kg"),
+            }
+        ]
+    )
+    row = result.equipment[0]
+    assert close(row.purchased_equipment_cost, 4185.028871129008)
+    assert close(row.bare_module_cost, 17231.85637687369)
+    assert close(row.total_module_cost, 21539.820471092113)
+    assert close(row.grass_roots_cost, 32309.73070663817)
+    assert close(hours(row.installation_man_hours), 99.47819038665551)
+    assert len(result.material_take_off) == 4
+    assert close(result.material_take_off[0].cost_usd, 16789.567997747763)
+    assert result.material_take_off[3].item == "Structural Steel"
+    assert result.quality_flags == ()
+
+
+def test_the_estimate_refuses_what_it_cannot_express() -> None:
+    with pytest.raises(InvalidInputError):
+        equipment_cost_estimate([{"equipment": "reactor"}])
+    with pytest.raises(InvalidInputError):
+        equipment_cost_estimate([{"equipment": "column", "height": quantity(10.0, "m")}])
+    with pytest.raises(InvalidInputError):
+        equipment_cost_estimate([{"equipment": "separator"}])
+    with pytest.raises(InvalidInputError):
+        equipment_cost_estimate(
+            [
+                {
+                    "equipment": "column",
+                    "diameter": quantity(1.0, "m"),
+                    "height": quantity(10.0, "m"),
+                    "material": "unobtainium",
+                }
+            ]
+        )
+    with pytest.raises(InvalidInputError):
+        equipment_cost_estimate(
+            [
+                {
+                    "equipment": "column",
+                    "diameter": quantity(1.0, "m"),
+                    "height": quantity(10.0, "m"),
+                    "cepci": 0.0,
+                }
+            ]
+        )
+    with pytest.raises(InvalidInputError):
+        equipment_cost_estimate(
+            [
+                {
+                    "equipment": "column",
+                    "diameter": quantity(1.0, "m"),
+                    "height": quantity(10.0, "m"),
+                    "number_of_trays": 20.5,
+                }
+            ]
+        )
+    with pytest.raises((InvalidInputError, OutOfRangeError)):
+        equipment_cost_estimate(
+            [{"equipment": "separator", "vessel_volume": quantity(float("inf"), "m**3")}]
+        )
+
+
+def test_the_machines_and_reactor_match_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "reactor",
+                "vessel_diameter": quantity(0.5, "m"),
+                "vessel_length": quantity(2.0, "m"),
+                "design_pressure_bara": quantity(110.00000000000001, "bar"),
+                "catalyst_mass": quantity(157.0102926847301, "kg"),
+                "number_of_beds": 1.0,
+                "total_equipped_weight": quantity(839.1623792871716, "kg"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(839.1623792871716, "kg"),
+            },
+            {
+                "equipment": "compressor",
+                "power": quantity(1314.898215238133, "kW"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(702848.7190347943, "kg"),
+            },
+            {
+                "equipment": "pump",
+                "power": quantity(75.0, "kW"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(753.7347107302816, "kg"),
+            },
+            {
+                "equipment": "expander",
+                "shaft_power": quantity(2000.0, "kW"),
+                "expander_type": "radial-inflow",
+                "load_type": "generator",
+            },
+        ]
+    )
+    assert close(result.equipment[0].purchased_equipment_cost, 32507.612368330385)
+    assert close(result.equipment[0].bare_module_cost, 133850.09392660036)
+    assert close(hours(result.equipment[0].installation_man_hours), 29.370683275051004)
+    assert close(result.equipment[1].purchased_equipment_cost, 566585.9790593369)
+    assert close(hours(result.equipment[1].installation_man_hours), 42170.92314208765)
+    assert close(result.equipment[2].purchased_equipment_cost, 22458.556775479567)
+    assert close(result.equipment[3].purchased_equipment_cost, 1464123.3831943076)
+    assert result.equipment[3].bare_module_cost == 0.0
+    assert result.equipment[3].total_cost == 0.0
+
+
+def test_the_exchanger_tank_and_filter_match_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "heat_exchanger",
+                "exchanger_type": "shell-tube",
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(532.6884503426853, "kg"),
+            },
+            {
+                "equipment": "tank",
+                "tank_type": "fixed-cone-roof",
+                "volume": quantity(5000.0, "m**3"),
+                "diameter": quantity(20.0, "m"),
+                "height": quantity(16.0, "m"),
+                "include_foundation": True,
+            },
+            {
+                "equipment": "filter",
+                "inner_diameter": quantity(0.5, "m"),
+                "tangent_length": quantity(1.5, "m"),
+                "required_elements": 1.0,
+                "design_pressure_bara": quantity(55.00000000000001, "bar"),
+                "material_grade": "SA-516-70",
+                "empty_vessel_weight": quantity(323.91707924523325, "kg"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(55.00000000000001, "bar"),
+                "weight_total": quantity(431.0922030188032, "kg"),
+            },
+        ]
+    )
+    assert close(result.equipment[0].purchased_equipment_cost, 4261.5076027414825)
+    assert close(result.equipment[0].total_module_cost, 21933.446942860064)
+    assert close(result.equipment[1].purchased_equipment_cost, 179613.0916761046)
+    assert result.equipment[1].total_cost == 0.0
+    assert close(result.equipment[2].purchased_equipment_cost, 7651.934577484859)
+    assert close(hours(result.equipment[2].installation_man_hours), 15.088227105658111)
+
+
+def test_the_manifold_mercury_electrolyzer_psa_and_ejector_match_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "manifold",
+                "inlets": 2.0,
+                "outlets": 3.0,
+                "weight_total": quantity(2653.866258910617, "kg"),
+                "location": "topside",
+                "material_grade": "A106-B",
+                "manifold_type": "production",
+                "header_diameter": quantity(0.3048, "m"),
+                "branch_diameter": quantity(0.0, "m"),
+                "water_depth": quantity(0.0, "m"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+            },
+            {
+                "equipment": "mercury_removal",
+                "shell_weight": quantity(19496.039027883457, "kg"),
+                "internals_weight": quantity(383.2632545290422, "kg"),
+                "nozzle_weight": quantity(974.8019513941729, "kg"),
+                "sorbent_charge_weight": quantity(4665.265090580843, "kg"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(110.00000000000001, "bar"),
+                "weight_total": quantity(32161.80686997908, "kg"),
+            },
+            {
+                "equipment": "electrolyzer",
+                "power": quantity(3271.185, "kW"),
+                "technology": "PEM",
+                "include_balance_of_plant": True,
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(33.0, "bar"),
+                "weight_total": quantity(27805.0725, "kg"),
+            },
+            {
+                "equipment": "psa",
+                "number_of_beds": 4.0,
+                "sorbent": "activated_carbon",
+                "sorbent_mass_per_bed": quantity(20000.0, "kg"),
+                "include_balance_of_plant": True,
+            },
+            {
+                "equipment": "ejector",
+                "ejector_type": "steam",
+                "number_of_stages": 2.0,
+                "suction_pressure": 50.0,
+                "design_pressure_bara": quantity(1.013, "bar"),
+                "suction_capacity": quantity(500.0, "kg/h"),
+            },
+        ]
+    )
+    assert close(result.equipment[0].purchased_equipment_cost, 298501.3068291901)
+    assert close(result.equipment[0].total_module_cost, 1536348.9135864878)
+    assert close(result.equipment[1].purchased_equipment_cost, 283464.4611349745)
+    assert close(result.equipment[1].sorbent_replacement_cost, 145789.53408065136)
+    assert close(result.equipment[2].purchased_equipment_cost, 3594170.3093879404)
+    assert close(result.equipment[2].specific_capex_per_kw, 1250.0)
+    assert close(result.equipment[3].purchased_equipment_cost, 1638000.0)
+    assert close(result.equipment[4].purchased_equipment_cost, 150282.87211884474)
+    assert result.equipment[4].total_cost == 0.0
+
+
+def test_the_pipework_states_match_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "pipe",
+                "nominal_diameter_in": 8.0,
+                "length": quantity(500.0, "m"),
+                "schedule": "40",
+                "installation_type": "above-ground",
+                "include_fittings": True,
+                "fittings_per_hundred_m": 15.0,
+                "number_of_flanges": 4.0,
+                "include_insulation": False,
+            },
+            {
+                "equipment": "valve",
+                "valve_type": "control",
+                "nominal_size_in": 4.0,
+                "valve_cv": 150.0,
+                "pressure_class": 600.0,
+                "include_actuator": True,
+                "actuator_type": "pneumatic",
+            },
+            {
+                "equipment": "mixer",
+                "mixer_type": "static",
+                "pipe_diameter_in": 8.0,
+                "number_of_elements": 12.0,
+                "pressure_class": 300.0,
+                "flanged_connections": True,
+            },
+            {
+                "equipment": "splitter",
+                "splitter_type": "manifold",
+                "number_of_outlets": 4.0,
+                "inlet_diameter_in": 10.0,
+                "outlet_diameter_in": 6.0,
+                "pressure_class": 600.0,
+                "include_control_valves": False,
+                "include_flow_meters": False,
+            },
+            {
+                "equipment": "well",
+                "well_capex": 80000000.0,
+            },
+        ]
+    )
+    assert close(result.equipment[0].purchased_equipment_cost, 795792.2151429062)
+    assert close(result.equipment[1].purchased_equipment_cost, 82335.92259507756)
+    assert close(result.equipment[2].purchased_equipment_cost, 13180.74384039505)
+    assert close(result.equipment[3].purchased_equipment_cost, 4004.770953582229)
+    assert result.equipment[4].purchased_equipment_cost == 80000000.0
+    assert result.equipment[4].bare_module_cost == 80000000.0
+    assert result.equipment[4].total_cost == 80000000.0
+    assert hours(result.equipment[4].installation_man_hours) == 0.0
+
+
+def test_the_bahx_matches_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "bahx",
+                "core_weight": quantity(7076.159999999999, "kg"),
+                "total_weight": quantity(7277.613908961697, "kg"),
+                "area": quantity(2100.673511375631, "m**2"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(55.0, "bar"),
+                "weight_total": quantity(7277.613908961697, "kg"),
+            }
+        ]
+    )
+    row = result.equipment[0]
+    assert close(row.purchased_equipment_cost, 596625.9198089183)
+    assert close(row.bare_module_cost, 2335790.476051915)
+    assert close(row.total_module_cost, 2919738.095064894)
+    assert close(hours(row.installation_man_hours), 254.7164868136594)
+    assert close(row.equipment_cost, 596625.9198089183)
+    assert close(row.installed_cost, 2297009.7912643356)
+    assert close(row.specific_cost_per_m2, 284.01649117678284)
+    assert close(row.annual_maintenance_cost, 11932.518396178366)

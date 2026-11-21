@@ -539,6 +539,39 @@ class ConsequenceOutcomeSpec(TypedDict):
     temperature: float | None
     pressure: float | None
 
+class CostEstimationQuery(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    calculation: str
+    correlation: str | None
+    capacity: float | None
+    diameter: float | None
+    tray_count: float | None
+    packing_type: str | None
+    piping_length: float | None
+    piping_schedule: str | None
+    valve_cv: float | None
+    purchased_cost: float | None
+    design_pressure: float | None
+    pressure_factor: float | None
+    material_factor: float | None
+    weight: float | None
+    equipment_type: str | None
+    material: str | None
+    region: str | None
+    currency: str | None
+    exchange_rate: float | None
+    amount: float | None
+    currency_direction: str | None
+    shell_weight: float | None
+    heads_weight: float | None
+    nozzle_count: float | None
+    internals_weight: float | None
+    current_cepci: float | None
+    reference_cepci: float | None
+    contingency_factor: float | None
+    engineering_factor: float | None
+
 class DepressurizationAcceptancePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -546,6 +579,146 @@ class DepressurizationAcceptancePoint(TypedDict):
     pressure: float
     mass: float
     mass_flow: float
+
+class EquipmentCostSpec(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    equipment: str
+    name: str | None
+    material: str | None
+    material_factor: float | None
+    cepci: float | None
+    mechanical_design_present: bool | None
+    max_design_pressure: float | None
+    weight_total: float | None
+    design_pressure_barg: float | None
+    design_pressure_bara: float | None
+    contingency_factor: float | None
+    engineering_factor: float | None
+    include_material_take_off: bool | None
+    shell_weight: float | None
+    internals_weight: float | None
+    nozzle_weight: float | None
+    piping_weight: float | None
+    electro_instrument_weight: float | None
+    structural_weight: float | None
+    operating_hours: float | None
+    electricity_cost_per_kwh: float | None
+    steam_cost_per_tonne: float | None
+    cooling_water_cost_per_m3: float | None
+    fuel_cost_per_gj: float | None
+    inner_diameter: float | None
+    tangent_length: float | None
+    vessel_volume: float | None
+    column_type: str | None
+    tray_type: str | None
+    packing_type: str | None
+    diameter: float | None
+    height: float | None
+    number_of_trays: float | None
+    number_of_stages: float | None
+    packing_height: float | None
+    include_reboiler: bool | None
+    include_condenser: bool | None
+    include_liquid_distributor: bool | None
+    include_mist_eliminator: bool | None
+    include_reflux_system: bool | None
+    reboiler_duty: float | None
+    condenser_duty: float | None
+    absorber_type: str | None
+    vessel_diameter: float | None
+    vessel_length: float | None
+    catalyst_mass: float | None
+    number_of_beds: float | None
+    total_equipped_weight: float | None
+    catalyst_cost_per_kg: float | None
+    internals_fraction: float | None
+    bed_allowance: float | None
+    power: float | None
+    compressor_type: str | None
+    driver_type: str | None
+    include_driver: bool | None
+    include_intercoolers: bool | None
+    pump_type: str | None
+    include_motor: bool | None
+    api_rated: bool | None
+    seal_type: str | None
+    shaft_power: float | None
+    expander_type: str | None
+    load_type: str | None
+    include_load: bool | None
+    include_gearbox: bool | None
+    include_lube_oil_system: bool | None
+    include_control_system: bool | None
+    cryogenic_service: bool | None
+    area: float | None
+    duty: float | None
+    exchanger_type: str | None
+    tema_type: str | None
+    shell_passes: float | None
+    tank_type: str | None
+    volume: float | None
+    floating_roof: bool | None
+    include_foundation: bool | None
+    include_heating_coils: bool | None
+    include_insulation: bool | None
+    insulation_thickness: float | None
+    required_elements: float | None
+    material_grade: str | None
+    empty_vessel_weight: float | None
+    element_cost: float | None
+    auxiliaries_fraction: float | None
+    fallback_steel_rate: float | None
+    fallback_element_cost: float | None
+    inlets: float | None
+    outlets: float | None
+    location: str | None
+    manifold_type: str | None
+    header_diameter: float | None
+    branch_diameter: float | None
+    water_depth: float | None
+    base_cost_per_kg: float | None
+    branch_allowance: float | None
+    sorbent_charge_weight: float | None
+    sorbent_unit_price: float | None
+    steel_cost_per_kg: float | None
+    technology: str | None
+    include_balance_of_plant: bool | None
+    sorbent: str | None
+    sorbent_mass_per_bed: float | None
+    bed_diameter: float | None
+    bed_length: float | None
+    ejector_type: str | None
+    suction_pressure: float | None
+    suction_capacity: float | None
+    include_intercondensers: bool | None
+    include_aftercondenser: bool | None
+    nominal_diameter_in: float | None
+    length: float | None
+    schedule: str | None
+    installation_type: str | None
+    include_fittings: bool | None
+    fittings_per_hundred_m: float | None
+    number_of_flanges: float | None
+    valve_type: str | None
+    nominal_size_in: float | None
+    valve_cv: float | None
+    pressure_class: float | None
+    include_actuator: bool | None
+    actuator_type: str | None
+    mixer_type: str | None
+    pipe_diameter_in: float | None
+    number_of_elements: float | None
+    flanged_connections: bool | None
+    splitter_type: str | None
+    number_of_outlets: float | None
+    inlet_diameter_in: float | None
+    outlet_diameter_in: float | None
+    include_control_valves: bool | None
+    include_flow_meters: bool | None
+    well_capex: float | None
+    core_weight: float | None
+    total_weight: float | None
 
 class EscalationItem(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -727,6 +900,21 @@ class PipeFireRuptureMaterialPoint(TypedDict):
     ultimate_tensile_strength: float
     strain_effect_factor: float
     rupture_strain_limit: float
+
+class ProcessCostEquipment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    equipment_class: str
+    purchased_equipment_cost: float
+    bare_module_cost: float
+    total_module_cost: float
+    grass_roots_cost: float
+    total_cost: float
+    installation_man_hours: float
+    weight: float
+    power: float | None
+    duty: float | None
 
 class PumpCurvePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -918,6 +1106,14 @@ class Sts0131CheckRow(TypedDict):
     rupture_predicted: bool | None
     sil_compliant: bool | None
     custom_ok: bool | None
+
+class TopsidesEquipment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    equipment_type: str
+    total_module_cost: float
+    weight: float
 
 class Tr3001Scenario(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
@@ -1309,6 +1505,44 @@ class ConsequenceOutcomeResult:
     fatality_frequency_per_year: float
 
 @final
+class CostEstimationResultRow:
+    """one row per input row, in caller order."""
+
+    calculation: str
+    correlation: str
+    purchased_equipment_cost: float
+    pressure_factor: float
+    material_factor: float
+    location_factor: float
+    exchange_rate: float
+    bare_module_cost: float
+    total_module_cost: float
+    grass_roots_cost: float
+    installation_man_hours: Qty
+    converted_amount: float
+    cost_in_usd: float
+    current_cepci: float
+    reference_cepci: float
+    cepci_ratio: float
+    contingency_factor: float
+    engineering_factor: float
+    installation_factor: float
+
+@final
+class CostBomRow:
+    """the vessel bill of materials, one row per line the class adds."""
+
+    item: str
+    material: str
+    quantity: float
+    has_quantity: bool
+    unit: str
+    weight_kg: Qty
+    has_weight: bool
+    cost_usd: float
+    source: str
+
+@final
 class DepressurizationPoint:
     """one row per step, in time order."""
 
@@ -1337,6 +1571,50 @@ class DriftFluxReleaseStation:
     liquid_density: Qty | None
     gas_velocity: Qty | None
     liquid_velocity: Qty | None
+
+@final
+class EquipmentCostResultRow:
+    """one row per equipment item, in caller order."""
+
+    name: str
+    equipment_type: str
+    purchased_equipment_cost: float
+    bare_module_cost: float
+    total_module_cost: float
+    grass_roots_cost: float
+    total_cost: float
+    installation_man_hours: Qty
+    material_factor: float
+    equipment_cost: float
+    installed_cost: float
+    specific_cost_per_m2: float
+    specific_capex_per_kw: float
+    annual_maintenance_cost: float
+    sorbent_replacement_cost: float
+    annual_operating_cost: float
+    calculated_weight: Qty
+
+@final
+class EquipmentMtoRow:
+    """the weighted bill of materials, one row per line."""
+
+    equipment_index: float
+    item: str
+    material: str
+    quantity: float
+    has_quantity: bool
+    unit: str
+    weight_kg: Qty
+    has_weight: bool
+    cost_usd: float
+    source: str
+
+@final
+class EquipmentQualityFlag:
+    """the class's quality flags, one row per flag."""
+
+    equipment_index: float
+    message: str
 
 @final
 class EscalationItemResult:
@@ -1704,6 +1982,66 @@ class PrescribedSlipReleaseStation:
     liquid_velocity: Qty | None
 
 @final
+class ProcessCostEquipmentResult:
+    """one summary row per input row."""
+
+    name: str
+    equipment_class: str
+    equipment_type: str
+    purchased_equipment_cost: float
+    bare_module_cost: float
+    total_module_cost: float
+    grass_roots_cost: float
+    total_cost: float
+    installation_man_hours: Qty
+    weight: Qty
+    located_purchased_equipment_cost: float
+    location_factor: float
+
+@final
+class TypeCostLine:
+    """the located purchased cost by type, in first-appearance order."""
+
+    name: str
+    cost: float
+
+@final
+class DisciplineCostLine:
+    """the five discipline lines."""
+
+    name: str
+    cost: float
+
+@final
+class ProjectCostLine:
+    """the project cost stack, direct to total."""
+
+    name: str
+    cost: float
+
+@final
+class OperatingCostLine:
+    """the nine operating-cost lines, empty when no operating basis is stated."""
+
+    name: str
+    cost: float
+
+@final
+class ProcessCostMtoRow:
+    """the per-unit material take-off rows."""
+
+    name: str
+    equipment_type: str
+    weight_kg: Qty
+    cost_usd: float
+
+@final
+class ProcessCostFlag:
+    """the class's quality flags."""
+
+    message: str
+
+@final
 class RanzMarshallReleaseStation:
     """the delegate's stations, with the correlation-driven relaxed phase velocities. Empty on failure."""
 
@@ -1935,6 +2273,67 @@ class Sts0131FindingResult:
     severity: str
     name: str | None
     margin: float | None
+
+@final
+class TopsidesCapitalLine:
+    """the ten capital-cost lines."""
+
+    name: str
+    cost: float
+
+@final
+class TopsidesSummaryLine:
+    """the two summary lines."""
+
+    name: str
+    cost: float
+
+@final
+class TopsidesBreakdownLine:
+    """the module breakdown lines, keyed `module.<camelCase>`."""
+
+    name: str
+    cost: float
+
+@final
+class TopsidesProjectLine:
+    """the four project cost lines."""
+
+    name: str
+    cost: float
+
+@final
+class TopsidesProjectSummaryLine:
+    """the total topsides capex."""
+
+    name: str
+    cost: float
+
+@final
+class TopsidesWeightLine:
+    """the four weight lines."""
+
+    name: str
+    weight_kg: Qty
+
+@final
+class TopsidesMtoRow:
+    """the equipment and allowance MTO rows."""
+
+    item: str
+    category: str
+    quantity: float
+    unit: str
+    weight_kg: Qty
+    has_weight: bool
+    cost_usd: float
+    source: str
+
+@final
+class TopsidesFlag:
+    """the class's quality flags."""
+
+    message: str
 
 @final
 class Tr3001Finding:
@@ -4266,6 +4665,12 @@ class CoolerResult:
     warnings: list[Warning]
 
 @final
+class CostEstimationResult:
+    queries: list[CostEstimationResultRow]
+    bom: list[CostBomRow]
+    warnings: list[Warning]
+
+@final
 class DelugeNozzleLayoutResult:
     required_flow: Qty
     flow_per_nozzle: Qty
@@ -4426,6 +4831,13 @@ class EjectorResult:
     total_volume: Qty
     suction_connection_length: Qty
     discharge_connection_length: Qty
+    warnings: list[Warning]
+
+@final
+class EquipmentCostEstimateResult:
+    equipment: list[EquipmentCostResultRow]
+    material_take_off: list[EquipmentMtoRow]
+    quality_flags: list[EquipmentQualityFlag]
     warnings: list[Warning]
 
 @final
@@ -5386,6 +5798,32 @@ class ProbitResult:
     warnings: list[Warning]
 
 @final
+class ProcessCostEstimateResult:
+    total_purchased_equipment_cost: float
+    total_bare_module_cost: float
+    total_module_cost: float
+    total_grass_roots_cost: float
+    total_installation_man_hours: Qty
+    equipment: list[ProcessCostEquipmentResult]
+    cost_by_equipment_type: list[TypeCostLine]
+    cost_by_discipline: list[DisciplineCostLine]
+    project_costs: list[ProjectCostLine]
+    total_project_cost: float
+    operating_costs: list[OperatingCostLine]
+    has_operating_cost: bool
+    total_annual_operating_cost: float
+    has_economics: bool
+    payback_period_years: float
+    roi_percent: float
+    npv: float
+    summed_unit_total_cost: float
+    has_weight_based_capex: bool
+    weight_based_capex: float
+    material_take_off: list[ProcessCostMtoRow]
+    quality_flags: list[ProcessCostFlag]
+    warnings: list[Warning]
+
+@final
 class PsvFireSizingResult:
     overpressure_fraction: float
     required_area: Qty
@@ -6013,6 +6451,18 @@ class ThrottlingValveResult:
     choked: bool
     gas_valve: bool
     calculated_molar_flow: Qty
+    warnings: list[Warning]
+
+@final
+class TopsidesFacilityCostResult:
+    capital_costs: list[TopsidesCapitalLine]
+    capital_cost_summary: list[TopsidesSummaryLine]
+    capital_cost_breakdown: list[TopsidesBreakdownLine]
+    project_costs: list[TopsidesProjectLine]
+    project_cost_summary: list[TopsidesProjectSummaryLine]
+    weight_basis: list[TopsidesWeightLine]
+    material_take_off: list[TopsidesMtoRow]
+    quality_flags: list[TopsidesFlag]
     warnings: list[Warning]
 
 @final
@@ -8701,6 +9151,7 @@ def cooler(
     requested_valve_opening: float | None = None,
     dynamic_outlet_temperature: float | None = None,
 ) -> CoolerResult: ...
+def cost_estimation(queries: list[CostEstimationQuery]) -> CostEstimationResult: ...
 def deluge_nozzle_layout(
     protected_area: float,
     required_density: float,
@@ -8850,6 +9301,7 @@ def ejector(
     mixing_efficiency: float,
     diffuser_efficiency: float,
 ) -> EjectorResult: ...
+def equipment_cost_estimate(equipment: list[EquipmentCostSpec]) -> EquipmentCostEstimateResult: ...
 def escalation_graph(
     items: list[EscalationItem],
     exposures: list[EscalationExposure],
@@ -9634,6 +10086,23 @@ def probit(
     dose: float | None = None,
     probit_value: float | None = None,
 ) -> ProbitResult: ...
+def process_cost_estimate(
+    equipment: list[ProcessCostEquipment],
+    location_factor: float | None = None,
+    complexity_factor: float | None = None,
+    project_contingency: float | None = None,
+    working_capital: float | None = None,
+    system_total_weight: float | None = None,
+    capex_per_weight: float | None = None,
+    operating_hours: float | None = None,
+    electricity_cost_per_kwh: float | None = None,
+    steam_cost_per_tonne: float | None = None,
+    cooling_water_cost_per_m3: float | None = None,
+    labor_cost_per_hour: float | None = None,
+    annual_revenue: float | None = None,
+    discount_rate: float | None = None,
+    project_life_years: float | None = None,
+) -> ProcessCostEstimateResult: ...
 def psv_fire_sizing(
     initial_mass: float,
     initial_pressure: float,
@@ -10128,6 +10597,22 @@ def throttling_valve(
     is_isothermal: bool | None = None,
     sizing_standard: str | None = None,
 ) -> ThrottlingValveResult: ...
+def topsides_facility_cost(
+    equipment: list[TopsidesEquipment],
+    facility_type: str | None = None,
+    project_context: str | None = None,
+    location_factor: float | None = None,
+    piping_bulk_factor: float | None = None,
+    electrical_instrumentation_factor: float | None = None,
+    insulation_paint_fireproofing_factor: float | None = None,
+    hvac_telecom_safety_factor: float | None = None,
+    engineering_procurement_factor: float | None = None,
+    construction_management_factor: float | None = None,
+    project_contingency_factor: float | None = None,
+    owner_cost_factor: float | None = None,
+    include_utilities_and_offsites: bool | None = None,
+    estimate_class: float | None = None,
+) -> TopsidesFacilityCostResult: ...
 def toxic_library(
     chemical: str | None = None,
     concentration_ppm: float | None = None,

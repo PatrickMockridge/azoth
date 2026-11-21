@@ -536,6 +536,16 @@ NON_UNIT_MODELS = {
         "the S-001 clause 10.4.7 screen over scalars, not a unit"
     ),
     "process.s001_clause10_review": ("the Clause 10 rule review over normalized rows, not a unit"),
+    "process.cost_estimation": "the cost calculator's factor and correlation table, not a unit",
+    "process.equipment_cost_estimate": (
+        "one equipment item's cost stack over stated design values, not a unit"
+    ),
+    "process.process_cost_estimate": (
+        "a process cost roll-up over per-unit summary rows, not a unit"
+    ),
+    "process.topsides_facility_cost": (
+        "a topsides facility stack over process summary rows, not a unit"
+    ),
 }
 
 

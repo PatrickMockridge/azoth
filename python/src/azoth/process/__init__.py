@@ -41,6 +41,7 @@ from azoth.core.result import (
     ConsequenceAnalysisResult,
     ControlValveFailureReliefResult,
     CoolerResult,
+    CostEstimationResult,
     DelugeNozzleLayoutResult,
     DepressurizationAcceptanceResult,
     DepressurizationResult,
@@ -48,6 +49,7 @@ from azoth.core.result import (
     DriftFluxReleaseResult,
     DynamicPsvSizingResult,
     EjectorResult,
+    EquipmentCostEstimateResult,
     EscalationGraphResult,
     EsdResponseTimeResult,
     EventTreeResult,
@@ -107,6 +109,7 @@ from azoth.core.result import (
     PorousMediaSelfHeatingResult,
     PrescribedSlipReleaseResult,
     ProbitResult,
+    ProcessCostEstimateResult,
     PsvFireSizingResult,
     PsvSizingResult,
     PsvValveResult,
@@ -138,6 +141,7 @@ from azoth.core.result import (
     TankResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
+    TopsidesFacilityCostResult,
     ToxicLibraryResult,
     Tr3001ComplianceResult,
     TrappedInventoryResult,
@@ -290,6 +294,7 @@ _HEAT_EXCHANGER = "process.heat_exchanger"
 _COMPONENT_SPLITTER = "process.component_splitter"
 _COMPRESSOR = "process.compressor"
 _CONSEQUENCE_ANALYSIS = "process.consequence_analysis"
+_COST_ESTIMATION = "process.cost_estimation"
 _CONTROL_VALVE_FAILURE_RELIEF = "process.control_valve_failure_relief"
 _ABSORPTION_COLUMN = "process.absorption_column"
 _ACOUSTIC_INDUCED_VIBRATION_SCREENING = "process.acoustic_induced_vibration_screening"
@@ -307,6 +312,7 @@ _TURBO_EXPANDER_COMPRESSOR = "process.turbo_expander_compressor"
 _MAP_TURBO_EXPANDER_COMPRESSOR = "process.map_turbo_expander_compressor"
 _FLOW_INDUCED_PULSATION_SCREENING = "process.flow_induced_pulsation_screening"
 _ALARP_AUDIT = "process.alarp_audit"
+_EQUIPMENT_COST_ESTIMATE = "process.equipment_cost_estimate"
 _ESCALATION_GRAPH = "process.escalation_graph"
 _ESD_RESPONSE_TIME = "process.esd_response_time"
 _INHERENT_SAFETY = "process.inherent_safety"
@@ -342,6 +348,7 @@ _GAUSSIAN_PLUME = "process.gaussian_plume"
 _HAZARDOUS_AREA = "process.hazardous_area"
 _HEAVY_GAS_DISPERSION = "process.heavy_gas_dispersion"
 _PROBIT = "process.probit"
+_PROCESS_COST_ESTIMATE = "process.process_cost_estimate"
 _PSV_FIRE_SIZING = "process.psv_fire_sizing"
 _PSV_SIZING = "process.psv_sizing"
 _PSV_VALVE = "process.psv_valve"
@@ -359,6 +366,7 @@ _SETTLE_OUT_PRESSURE = "process.settle_out_pressure"
 _SHORTCUT_DISTILLATION_COLUMN = "process.shortcut_distillation_column"
 _SIL_VERIFICATION = "process.sil_verification"
 _THROTTLING_VALVE = "process.throttling_valve"
+_TOPSIDES_FACILITY_COST = "process.topsides_facility_cost"
 _TOXIC_LIBRARY = "process.toxic_library"
 _TR3001_COMPLIANCE = "process.tr3001_compliance"
 _TRAPPED_INVENTORY = "process.trapped_inventory"
@@ -2424,6 +2432,20 @@ def cooler(
     )
 
 
+def cost_estimation(queries: list[dict[str, object]]) -> CostEstimationResult:
+    """The cost-estimation calculator over a row of stated calls.
+
+    The factor tables, the Turton correlations, the module stack and the vessel bill of
+    materials, one call per row. **Costs are USD magnitudes declared dimensionless**,
+    because the vocabulary has no currency unit.
+
+    See :func:`azoth.process.reference.cost_estimation`.
+    """
+    return resolve(_COST_ESTIMATION)(  # type: ignore[no-any-return]
+        queries=queries,
+    )
+
+
 def heater(
     components: list[str],
     inlet_n: Q,
@@ -2884,6 +2906,22 @@ def ejector(
         suction_nozzle_efficiency=suction_nozzle_efficiency,
         mixing_efficiency=mixing_efficiency,
         diffuser_efficiency=diffuser_efficiency,
+    )
+
+
+def equipment_cost_estimate(
+    equipment: list[dict[str, object]],
+) -> EquipmentCostEstimateResult:
+    """One equipment item's purchased cost, module stack, labour and bill of materials.
+
+    ``equipment`` selects the kind and that kind's fields; a missing field the
+    kind needs is refused. **Costs are USD magnitudes declared dimensionless**,
+    because the vocabulary has no currency unit.
+
+    See :func:`azoth.process.reference.equipment_cost_estimate`.
+    """
+    return resolve(_EQUIPMENT_COST_ESTIMATE)(  # type: ignore[no-any-return]
+        equipment=equipment,
     )
 
 
@@ -4439,6 +4477,48 @@ def mah_bow_tie_skeleton(mah_type: str) -> MahBowTieSkeletonResult:
     )
 
 
+def topsides_facility_cost(
+    equipment: list[dict[str, object]],
+    facility_type: str | None = None,
+    project_context: str | None = None,
+    location_factor: float | None = None,
+    piping_bulk_factor: float | None = None,
+    electrical_instrumentation_factor: float | None = None,
+    insulation_paint_fireproofing_factor: float | None = None,
+    hvac_telecom_safety_factor: float | None = None,
+    engineering_procurement_factor: float | None = None,
+    construction_management_factor: float | None = None,
+    project_contingency_factor: float | None = None,
+    owner_cost_factor: float | None = None,
+    include_utilities_and_offsites: bool | None = None,
+    estimate_class: float | None = None,
+) -> TopsidesFacilityCostResult:
+    """The topsides facility estimate over the process summary rows.
+
+    The facility type's five factors and the project context's congestion factor,
+    the module and bulk stack, the project lines and the material take-off. A
+    well or reservoir row is excluded from the topsides scope with its flag.
+
+    See :func:`azoth.process.reference.topsides_facility_cost`.
+    """
+    return resolve(_TOPSIDES_FACILITY_COST)(  # type: ignore[no-any-return]
+        equipment=equipment,
+        facility_type=facility_type,
+        project_context=project_context,
+        location_factor=location_factor,
+        piping_bulk_factor=piping_bulk_factor,
+        electrical_instrumentation_factor=electrical_instrumentation_factor,
+        insulation_paint_fireproofing_factor=insulation_paint_fireproofing_factor,
+        hvac_telecom_safety_factor=hvac_telecom_safety_factor,
+        engineering_procurement_factor=engineering_procurement_factor,
+        construction_management_factor=construction_management_factor,
+        project_contingency_factor=project_contingency_factor,
+        owner_cost_factor=owner_cost_factor,
+        include_utilities_and_offsites=include_utilities_and_offsites,
+        estimate_class=estimate_class,
+    )
+
+
 def toxic_library(
     chemical: str | None = None,
     concentration_ppm: float | None = None,
@@ -4614,6 +4694,50 @@ def psv_fire_sizing(
         blowdown_percent=blowdown_percent,
         orifice_area=orifice_area,
         cv_discharge_coefficient=cv_discharge_coefficient,
+    )
+
+
+def process_cost_estimate(
+    equipment: list[dict[str, object]],
+    location_factor: float | None = None,
+    complexity_factor: float | None = None,
+    project_contingency: float | None = None,
+    working_capital: float | None = None,
+    system_total_weight: Q | None = None,
+    capex_per_weight: float | None = None,
+    operating_hours: Q | None = None,
+    electricity_cost_per_kwh: float | None = None,
+    steam_cost_per_tonne: float | None = None,
+    cooling_water_cost_per_m3: float | None = None,
+    labor_cost_per_hour: float | None = None,
+    annual_revenue: float | None = None,
+    discount_rate: float | None = None,
+    project_life_years: float | None = None,
+) -> ProcessCostEstimateResult:
+    """The process cost roll-up over per-unit summary rows.
+
+    The totals, the type and discipline splits, the project stack, the operating
+    cost and the simple economics. **The rows are the class's own per-unit
+    summaries**, so the live process walk stays beside the port.
+
+    See :func:`azoth.process.reference.process_cost_estimate`.
+    """
+    return resolve(_PROCESS_COST_ESTIMATE)(  # type: ignore[no-any-return]
+        equipment=equipment,
+        location_factor=location_factor,
+        complexity_factor=complexity_factor,
+        project_contingency=project_contingency,
+        working_capital=working_capital,
+        system_total_weight=system_total_weight,
+        capex_per_weight=capex_per_weight,
+        operating_hours=operating_hours,
+        electricity_cost_per_kwh=electricity_cost_per_kwh,
+        steam_cost_per_tonne=steam_cost_per_tonne,
+        cooling_water_cost_per_m3=cooling_water_cost_per_m3,
+        labor_cost_per_hour=labor_cost_per_hour,
+        annual_revenue=annual_revenue,
+        discount_rate=discount_rate,
+        project_life_years=project_life_years,
     )
 
 

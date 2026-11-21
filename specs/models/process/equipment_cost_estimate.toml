@@ -1,0 +1,706 @@
+id = "process.equipment_cost_estimate"
+name = "Equipment cost estimate"
+kind = "procedure"
+assumptions = [
+    "**one flat row per equipment item**, `equipment` selecting the kind and the kind's fields required; the schema cannot enforce the discriminator, so the kernel refuses a field belonging to another kind and a missing field the selected kind needs.",
+    "**the module stack is the class's**: `BMC = PEC (1.89 + 1.35 Fp Fm)`, `TMC = 1.25 BMC` and `GRC = 1.5 TMC`; without a stated design the class computes the purchased cost and no stack, so `mechanical_design_present` gates the stack and the labour.",
+    "**the material factor is carried where the class applies it**, and several kinds apply it more than once: the column, absorber and their siblings multiply it inside the purchased cost and the module stack multiplies it again.",
+    "**a zero or negative capacity answers zero**, the class's early return, while a non-finite value is refused.",
+    "**the class caches its lazy results**, so a selector changed after a first read does not recompute; the port evaluates one stated state per row.",
+    "**costs are USD magnitudes declared dimensionless** because the vocabulary has no currency unit; the installation hours are an `h` field and the weights are kg.",
+    "**the heat exchanger's design reports no area**: `HeatExchangerMechanicalDesign` leaves `getHeatTransferArea` at the base class's 0.0, so the class's estimator always falls back to its weight basis; the row can state the area the correlation takes, a port extension recorded here.",
+    "**the tank's effective geometry is an expression, not a mutation**: the class writes the design's diameter and height back into itself, so the port publishes the effective values and recomputes the volume from them.",
+    "**the ejector's pressure ratio is `discharge_bara 1000 / suction_mbar`**, the class's own unit convention, carried as the two stated fields.",
+    "**`installation_factor` is stored and read by no formula**; it is not an input and the module stack applies no Lang factor.",
+    "**`toJson`, `toMap`, the reports and object identity are session surface**, not inputs or outputs of this id.",
+]
+references = [
+    "Turton, R., Shaeiwitz, J. A., Bhattacharyya, D. & Whiting, W. B. (2018). Analysis, Synthesis and Design of Chemical Processes, 5th Ed. Pearson.",
+    "Peters, M. S., Timmerhaus, K. D. & West, R. E. Plant Design and Economics for Chemical Engineers, 5th Ed. McGraw-Hill.",
+    "Ulrich, G. D. & Vasudevan, P. T. (2004). Chemical Engineering Process Design and Economics. Process Publishing.",
+    "Seider, W. D., Seader, J. D. & Lewin, D. R. Product and Process Design Principles. Wiley.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/costestimation/UnitCostEstimateBaseClass.java` and its per-equipment subclasses are the port source.",
+    "`validation/neqsim/captures/process_cost_equipment.tsv` - the separator, column and absorber states, the zero-capacity and material-factor edges, and the bill of materials.",
+]
+[source]
+standard = "NeqSim process/costestimation/UnitCostEstimateBaseClass.java"
+edition = "Its `calculateCostEstimate`, `calcPurchasedEquipmentCost`, `getTotalCost`, `calcAnnualOperatingCost` and `generateBillOfMaterials`, over `SeparatorCostEstimate`, `ColumnCostEstimate` and `AbsorberCostEstimate`."
+[algorithm]
+scheme = "equipment_cost_dispatch"
+initialisation = "first_equipment_in_caller_order"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.equipment]
+type = "record_list"
+row_type = "EquipmentCostSpec"
+description = "one equipment item per row, in caller order; `equipment` selects the kind and the kind's fields.\n"
+[inputs.equipment.fields.equipment]
+type = "enum"
+values = ["separator", "column", "absorber", "reactor", "compressor", "pump", "expander", "heat_exchanger", "tank", "filter", "manifold", "mercury_removal", "electrolyzer", "psa", "ejector", "pipe", "valve", "mixer", "splitter", "well", "bahx"]
+description = "the equipment kind, which selects the fields the row must carry.\n"
+[inputs.equipment.fields.name]
+type = "string"
+optional = true
+description = "the item's name, echoed on the result.\n"
+[inputs.equipment.fields.material]
+type = "enum"
+values = ["carbon_steel", "ss304", "ss316", "ss316l", "monel", "hastelloy_c", "inconel", "titanium", "nickel"]
+optional = true
+description = "the material of construction, which sets the material factor; absent is carbon steel.\n"
+[inputs.equipment.fields.material_factor]
+unit = "dimensionless"
+optional = true
+description = "a stated material factor that supersedes the material name.\n"
+[inputs.equipment.fields.cepci]
+unit = "dimensionless"
+optional = true
+description = "the current cost index; absent is 840, the class's 2025 estimate.\n"
+[inputs.equipment.fields.mechanical_design_present]
+type = "boolean"
+optional = true
+description = "whether a mechanical design is stated; **absent is false**, and without one the class computes the purchased cost and no stack.\n"
+[inputs.equipment.fields.max_design_pressure]
+unit = "bar"
+optional = true
+description = "the mechanical design's maximum pressure, barg, which the module stack's pressure factor reads.\n"
+[inputs.equipment.fields.weight_total]
+unit = "kg"
+optional = true
+description = "the equipment's total weight, kg, which the labour hours and the weight fallbacks read.\n"
+[inputs.equipment.fields.design_pressure_barg]
+unit = "bar"
+optional = true
+description = "a design pressure the kind reads in barg, such as the column's own five-step pressure table.\n"
+[inputs.equipment.fields.design_pressure_bara]
+unit = "bar"
+optional = true
+description = "a design pressure the kind reads in bara, such as the reactor's and the filter's, which subtract 1.01325.\n"
+[inputs.equipment.fields.contingency_factor]
+unit = "dimensionless"
+optional = true
+description = "the module stack's contingency; absent is 0.15.\n"
+[inputs.equipment.fields.engineering_factor]
+unit = "dimensionless"
+optional = true
+description = "the module stack's engineering factor; absent is 0.10.\n"
+[inputs.equipment.fields.include_material_take_off]
+type = "boolean"
+optional = true
+description = "whether to publish the base class's weight bill of materials for this row; absent is false.\n"
+[inputs.equipment.fields.shell_weight]
+unit = "kg"
+optional = true
+description = "the vessel shell weight, for the bill of materials.\n"
+[inputs.equipment.fields.internals_weight]
+unit = "kg"
+optional = true
+description = "the internals weight, for the bill of materials.\n"
+[inputs.equipment.fields.nozzle_weight]
+unit = "kg"
+optional = true
+description = "the nozzle weight, for the bill of materials.\n"
+[inputs.equipment.fields.piping_weight]
+unit = "kg"
+optional = true
+description = "the piping weight, for the bill of materials.\n"
+[inputs.equipment.fields.electro_instrument_weight]
+unit = "kg"
+optional = true
+description = "the electrical and instrumentation weight, for the bill of materials.\n"
+[inputs.equipment.fields.structural_weight]
+unit = "kg"
+optional = true
+description = "the structural steel weight, for the bill of materials.\n"
+[inputs.equipment.fields.operating_hours]
+unit = "h"
+optional = true
+description = "annual operating hours; **absent leaves the operating-cost block at zero**.\n"
+[inputs.equipment.fields.electricity_cost_per_kwh]
+unit = "dimensionless"
+optional = true
+description = "electricity price, USD/kWh; absent is 0.08.\n"
+[inputs.equipment.fields.steam_cost_per_tonne]
+unit = "dimensionless"
+optional = true
+description = "steam price, USD/tonne; absent is 15.\n"
+[inputs.equipment.fields.cooling_water_cost_per_m3]
+unit = "dimensionless"
+optional = true
+description = "cooling-water price, USD/m3; absent is 0.05.\n"
+[inputs.equipment.fields.fuel_cost_per_gj]
+unit = "dimensionless"
+optional = true
+description = "fuel price, USD/GJ; absent is 5.\n"
+[inputs.equipment.fields.inner_diameter]
+unit = "m"
+optional = true
+description = "a vessel's inner diameter, which the separator and its volume read.\n"
+[inputs.equipment.fields.tangent_length]
+unit = "m"
+optional = true
+description = "the separator's tangent-to-tangent length.\n"
+[inputs.equipment.fields.vessel_volume]
+unit = "m**3"
+optional = true
+description = "a stated vessel volume, used where the diameter and length are not stated.\n"
+[inputs.equipment.fields.column_type]
+type = "enum"
+values = ["trayed", "packed"]
+optional = true
+description = "the column internals; absent is trayed.\n"
+[inputs.equipment.fields.tray_type]
+type = "enum"
+values = ["sieve", "valve", "bubble-cap"]
+optional = true
+description = "the tray type; absent is sieve.\n"
+[inputs.equipment.fields.packing_type]
+type = "enum"
+values = ["metal", "ceramic", "plastic", "structured"]
+optional = true
+description = "the packing material; absent is structured, which the packing correlation prices as plastic.\n"
+[inputs.equipment.fields.diameter]
+unit = "m"
+optional = true
+description = "the column's or absorber's diameter.\n"
+[inputs.equipment.fields.height]
+unit = "m"
+optional = true
+description = "the column's or absorber's height.\n"
+[inputs.equipment.fields.number_of_trays]
+unit = "dimensionless"
+optional = true
+description = "the column's whole tray count.\n"
+[inputs.equipment.fields.number_of_stages]
+unit = "dimensionless"
+optional = true
+description = "the absorber's whole stage count.\n"
+[inputs.equipment.fields.packing_height]
+unit = "m"
+optional = true
+description = "the packed section's height.\n"
+[inputs.equipment.fields.include_reboiler]
+type = "boolean"
+optional = true
+description = "whether the reboiler is costed; absent is false.\n"
+[inputs.equipment.fields.include_condenser]
+type = "boolean"
+optional = true
+description = "whether the column's condenser is costed; absent is false.\n"
+[inputs.equipment.fields.include_liquid_distributor]
+type = "boolean"
+optional = true
+description = "whether the absorber's liquid distributor is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.include_mist_eliminator]
+type = "boolean"
+optional = true
+description = "whether the absorber's mist eliminator is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.include_reflux_system]
+type = "boolean"
+optional = true
+description = "whether the absorber's reflux drum and pump are costed; absent is false.\n"
+[inputs.equipment.fields.reboiler_duty]
+unit = "kW"
+optional = true
+description = "the reboiler duty, which sizes the reboiler area at the class's assumed U and driving temperature.\n"
+[inputs.equipment.fields.condenser_duty]
+unit = "kW"
+optional = true
+description = "the column condenser's duty.\n"
+[inputs.equipment.fields.absorber_type]
+type = "enum"
+values = ["packed", "trayed", "spray"]
+optional = true
+description = "the absorber internals; absent is packed.\n"
+[inputs.equipment.fields.vessel_diameter]
+unit = "m"
+optional = true
+description = "the reactor vessel's diameter.\n"
+[inputs.equipment.fields.vessel_length]
+unit = "m"
+optional = true
+description = "the reactor vessel's length.\n"
+[inputs.equipment.fields.catalyst_mass]
+unit = "kg"
+optional = true
+description = "the loaded catalyst mass, which the reactor's purchased cost prices.\n"
+[inputs.equipment.fields.number_of_beds]
+unit = "dimensionless"
+optional = true
+description = "the reactor's catalyst-bed count, or the PSA cascade's bed count; absent is one for the reactor.\n"
+[inputs.equipment.fields.total_equipped_weight]
+unit = "kg"
+optional = true
+description = "the reactor's total equipped weight, the class's fallback cost basis.\n"
+[inputs.equipment.fields.catalyst_cost_per_kg]
+unit = "dimensionless"
+optional = true
+description = "the loaded catalyst's price, USD/kg; absent is 8.\n"
+[inputs.equipment.fields.internals_fraction]
+unit = "dimensionless"
+optional = true
+description = "the reactor internals' cost as a fraction of the vessel; absent is 0.45.\n"
+[inputs.equipment.fields.bed_allowance]
+unit = "dimensionless"
+optional = true
+description = "the distributor and support allowance per bed, USD; absent is 25000.\n"
+[inputs.equipment.fields.power]
+unit = "kW"
+optional = true
+description = "the compressor's or pump's shaft power, which the machine correlation prices.\n"
+[inputs.equipment.fields.compressor_type]
+type = "enum"
+values = ["centrifugal", "reciprocating", "screw", "axial"]
+optional = true
+description = "the compressor type; absent is centrifugal.\n"
+[inputs.equipment.fields.driver_type]
+type = "enum"
+values = ["electric-motor", "gas-turbine", "steam-turbine", "gas-engine"]
+optional = true
+description = "the compressor's driver; absent is an electric motor.\n"
+[inputs.equipment.fields.include_driver]
+type = "boolean"
+optional = true
+description = "whether the driver is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.include_intercoolers]
+type = "boolean"
+optional = true
+description = "whether the compressor's intercoolers are costed; absent is false.\n"
+[inputs.equipment.fields.pump_type]
+type = "enum"
+values = ["centrifugal", "reciprocating", "gear", "screw", "diaphragm"]
+optional = true
+description = "the pump type; absent is centrifugal.\n"
+[inputs.equipment.fields.include_motor]
+type = "boolean"
+optional = true
+description = "whether the pump's motor is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.api_rated]
+type = "boolean"
+optional = true
+description = "whether the pump is API 610 rated; absent is false.\n"
+[inputs.equipment.fields.seal_type]
+type = "enum"
+values = ["single-mechanical", "double-mechanical", "packed", "mag-drive", "canned"]
+optional = true
+description = "the pump seal; absent is a single mechanical seal.\n"
+[inputs.equipment.fields.shaft_power]
+unit = "kW"
+optional = true
+description = "the expander's shaft power, which its correlation prices.\n"
+[inputs.equipment.fields.expander_type]
+type = "enum"
+values = ["radial-inflow", "axial", "mixed-flow"]
+optional = true
+description = "the expander type; absent is radial-inflow.\n"
+[inputs.equipment.fields.load_type]
+type = "enum"
+values = ["generator", "compressor", "brake"]
+optional = true
+description = "the expander's load; absent is a generator.\n"
+[inputs.equipment.fields.include_load]
+type = "boolean"
+optional = true
+description = "whether the load is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.include_gearbox]
+type = "boolean"
+optional = true
+description = "whether a gearbox is costed; absent is false.\n"
+[inputs.equipment.fields.include_lube_oil_system]
+type = "boolean"
+optional = true
+description = "whether the lube-oil system is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.include_control_system]
+type = "boolean"
+optional = true
+description = "whether the control system is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.cryogenic_service]
+type = "boolean"
+optional = true
+description = "whether the expander is cryogenic, which adds the class's 40 per cent; absent is false.\n"
+[inputs.equipment.fields.area]
+unit = "m**2"
+optional = true
+description = "the exchanger's heat-transfer area; the correlation's capacity basis.\n"
+[inputs.equipment.fields.duty]
+unit = "kW"
+optional = true
+description = "the exchanger's duty, which estimates the area when none is stated.\n"
+[inputs.equipment.fields.exchanger_type]
+type = "enum"
+values = ["shell-tube", "plate", "air-cooler", "double-pipe"]
+optional = true
+description = "the exchanger type; absent is shell-tube.\n"
+[inputs.equipment.fields.tema_type]
+type = "string"
+optional = true
+description = "the TEMA designation whose front and rear ends scale the cost; absent is AES.\n"
+[inputs.equipment.fields.shell_passes]
+unit = "dimensionless"
+optional = true
+description = "the exchanger's shell passes; above one the class multiplies the cost by `1 + 0.1 (n - 1)`.\n"
+[inputs.equipment.fields.tank_type]
+type = "enum"
+values = ["fixed-cone-roof", "fixed-dome-roof", "floating-roof", "spherical", "horizontal"]
+optional = true
+description = "the tank type; absent is fixed-cone-roof.\n"
+[inputs.equipment.fields.volume]
+unit = "m**3"
+optional = true
+description = "the tank's volume, which the class's type-specific curve prices.\n"
+[inputs.equipment.fields.floating_roof]
+type = "boolean"
+optional = true
+description = "whether a floating roof is fitted, which selects the floating-roof curve even on a fixed type; absent is false.\n"
+[inputs.equipment.fields.include_foundation]
+type = "boolean"
+optional = true
+description = "whether the ringwall foundation is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.include_heating_coils]
+type = "boolean"
+optional = true
+description = "whether heating coils are costed; absent is false.\n"
+[inputs.equipment.fields.include_insulation]
+type = "boolean"
+optional = true
+description = "whether insulation is costed; absent is false.\n"
+[inputs.equipment.fields.insulation_thickness]
+unit = "mm"
+optional = true
+description = "the insulation thickness; absent is 100 mm, and the class scales its cost by `1 + (t - 50)/100`.\n"
+[inputs.equipment.fields.required_elements]
+unit = "dimensionless"
+optional = true
+description = "the filter's cartridge element count.\n"
+[inputs.equipment.fields.material_grade]
+type = "string"
+optional = true
+description = "the filter's material grade, whose substring sets its factor: duplex 2.2, stainless 1.8, else 1.0.\n"
+[inputs.equipment.fields.empty_vessel_weight]
+unit = "kg"
+optional = true
+description = "the filter's empty shell weight, the fallback cost's basis.\n"
+[inputs.equipment.fields.element_cost]
+unit = "dimensionless"
+optional = true
+description = "the filter element's price, USD per installed element; absent is 450.\n"
+[inputs.equipment.fields.auxiliaries_fraction]
+unit = "dimensionless"
+optional = true
+description = "the filter's nozzle, skid and instrument allowance as a fraction; absent is 0.35.\n"
+[inputs.equipment.fields.fallback_steel_rate]
+unit = "dimensionless"
+optional = true
+description = "the design's own steel rate, USD/kg, which its fallback cost uses; absent is 6.\n"
+[inputs.equipment.fields.fallback_element_cost]
+unit = "dimensionless"
+optional = true
+description = "the design's own element price, USD per element; absent is 2500.\n"
+[inputs.equipment.fields.inlets]
+unit = "dimensionless"
+optional = true
+description = "the manifold's inlet count.\n"
+[inputs.equipment.fields.outlets]
+unit = "dimensionless"
+optional = true
+description = "the manifold's outlet count.\n"
+[inputs.equipment.fields.location]
+type = "enum"
+values = ["topside", "subsea", "onshore"]
+optional = true
+description = "the manifold's location, whose factor is 2.6 subsea, 0.75 onshore and 1.0 topside.\n"
+[inputs.equipment.fields.manifold_type]
+type = "enum"
+values = ["production", "injection", "pigging", "test"]
+optional = true
+description = "the manifold service; pigging and test scale by 1.2 and injection by 1.1.\n"
+[inputs.equipment.fields.header_diameter]
+unit = "m"
+optional = true
+description = "the manifold header's diameter, which also selects the branch allowance's pressure factor.\n"
+[inputs.equipment.fields.branch_diameter]
+unit = "m"
+optional = true
+description = "the manifold branch's diameter, used where the design carries no weight.\n"
+[inputs.equipment.fields.water_depth]
+unit = "m"
+optional = true
+description = "the water depth a subsea manifold's installation allowance runs on.\n"
+[inputs.equipment.fields.base_cost_per_kg]
+unit = "dimensionless"
+optional = true
+description = "the manifold's fabricated cost per kilogram, USD/kg; absent is 65.\n"
+[inputs.equipment.fields.branch_allowance]
+unit = "dimensionless"
+optional = true
+description = "the valve, hub and instrument allowance per branch, USD; absent is 18000.\n"
+[inputs.equipment.fields.sorbent_charge_weight]
+unit = "kg"
+optional = true
+description = "the mercury bed's initial sorbent charge.\n"
+[inputs.equipment.fields.sorbent_unit_price]
+unit = "dimensionless"
+optional = true
+description = "the sorbent's price, USD/kg; absent is 25.\n"
+[inputs.equipment.fields.steel_cost_per_kg]
+unit = "dimensionless"
+optional = true
+description = "the mercury bed's fabricated steel rate, USD/kg; absent is 8.\n"
+[inputs.equipment.fields.technology]
+type = "enum"
+values = ["PEM", "ALKALINE", "SOEC", "AEM"]
+optional = true
+description = "the electrolyzer technology, whose specific capex is 1250, 800, 2500 and 1500 USD/kW.\n"
+[inputs.equipment.fields.include_balance_of_plant]
+type = "boolean"
+optional = true
+description = "whether the electrolyzer or PSA balance of plant is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.sorbent]
+type = "enum"
+values = ["activated_carbon", "zeolite_13x"]
+optional = true
+description = "the PSA sorbent, whose price is 4 or 10 USD/kg.\n"
+[inputs.equipment.fields.sorbent_mass_per_bed]
+unit = "kg"
+optional = true
+description = "the PSA sorbent mass per bed.\n"
+[inputs.equipment.fields.bed_diameter]
+unit = "m"
+optional = true
+description = "the PSA bed's diameter; with the length it sets the bed volume, else the class's 12.566 m3 reference.\n"
+[inputs.equipment.fields.bed_length]
+unit = "m"
+optional = true
+description = "the PSA bed's length.\n"
+[inputs.equipment.fields.ejector_type]
+type = "enum"
+values = ["steam", "gas", "liquid", "hybrid"]
+optional = true
+description = "the ejector type; absent is steam.\n"
+[inputs.equipment.fields.suction_pressure]
+unit = "dimensionless"
+optional = true
+description = "the ejector's suction pressure in mbar absolute, declared dimensionless for want of a vocabulary unit.\n"
+[inputs.equipment.fields.suction_capacity]
+unit = "kg/h"
+optional = true
+description = "the ejector's suction capacity.\n"
+[inputs.equipment.fields.include_intercondensers]
+type = "boolean"
+optional = true
+description = "whether the ejector's intercondensers are costed; absent is false.\n"
+[inputs.equipment.fields.include_aftercondenser]
+type = "boolean"
+optional = true
+description = "whether the ejector's aftercondenser is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.nominal_diameter_in]
+unit = "dimensionless"
+optional = true
+description = "the pipe's nominal diameter in inches.\n"
+[inputs.equipment.fields.length]
+unit = "m"
+optional = true
+description = "the pipe's length.\n"
+[inputs.equipment.fields.schedule]
+type = "enum"
+values = ["10", "40", "80", "160", "XXS"]
+optional = true
+description = "the pipe schedule; 80 scales the cost by 1.5 and 160 by 2.5, while the weight factors are 0.7, 1.4, 2.0 and 2.5.\n"
+[inputs.equipment.fields.installation_type]
+type = "enum"
+values = ["above-ground", "buried", "subsea"]
+optional = true
+description = "the pipe's installation, which multiplies the cost by 1, 1.5 or 3.\n"
+[inputs.equipment.fields.include_fittings]
+type = "boolean"
+optional = true
+description = "whether fittings are costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.fittings_per_hundred_m]
+unit = "dimensionless"
+optional = true
+description = "the fitting count per hundred metres, truncated as the class's integer does; absent is 10.\n"
+[inputs.equipment.fields.number_of_flanges]
+unit = "dimensionless"
+optional = true
+description = "the flanged connection count; absent is 2.\n"
+[inputs.equipment.fields.valve_type]
+type = "enum"
+values = ["control", "gate", "ball", "globe", "check", "butterfly"]
+optional = true
+description = "the valve type; absent is control.\n"
+[inputs.equipment.fields.nominal_size_in]
+unit = "dimensionless"
+optional = true
+description = "the valve's nominal size in inches.\n"
+[inputs.equipment.fields.valve_cv]
+unit = "dimensionless"
+optional = true
+description = "the control valve's flow coefficient.\n"
+[inputs.equipment.fields.pressure_class]
+unit = "dimensionless"
+optional = true
+description = "the ASME pressure class, or the mixer and splitter's own class factor table.\n"
+[inputs.equipment.fields.include_actuator]
+type = "boolean"
+optional = true
+description = "whether the control valve's actuator is costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.actuator_type]
+type = "enum"
+values = ["pneumatic", "electric", "hydraulic", "manual"]
+optional = true
+description = "the actuator type; absent is pneumatic.\n"
+[inputs.equipment.fields.mixer_type]
+type = "enum"
+values = ["static", "inline", "tee", "vessel"]
+optional = true
+description = "the mixer type; absent is static.\n"
+[inputs.equipment.fields.pipe_diameter_in]
+unit = "dimensionless"
+optional = true
+description = "the mixer's pipe diameter in inches.\n"
+[inputs.equipment.fields.number_of_elements]
+unit = "dimensionless"
+optional = true
+description = "the static mixer's element count; absent is 6.\n"
+[inputs.equipment.fields.flanged_connections]
+type = "boolean"
+optional = true
+description = "whether the mixer's flanged connections are costed; **absent is true**, the class's default.\n"
+[inputs.equipment.fields.splitter_type]
+type = "enum"
+values = ["manifold", "header", "tee", "vessel"]
+optional = true
+description = "the splitter type; absent is manifold.\n"
+[inputs.equipment.fields.number_of_outlets]
+unit = "dimensionless"
+optional = true
+description = "the splitter's outlet count.\n"
+[inputs.equipment.fields.inlet_diameter_in]
+unit = "dimensionless"
+optional = true
+description = "the splitter's inlet diameter in inches.\n"
+[inputs.equipment.fields.outlet_diameter_in]
+unit = "dimensionless"
+optional = true
+description = "the splitter's outlet diameter in inches.\n"
+[inputs.equipment.fields.include_control_valves]
+type = "boolean"
+optional = true
+description = "whether a control valve is costed on every splitter outlet; absent is false.\n"
+[inputs.equipment.fields.include_flow_meters]
+type = "boolean"
+optional = true
+description = "whether a flow meter is costed on every splitter outlet; absent is false.\n"
+[inputs.equipment.fields.well_capex]
+unit = "dimensionless"
+optional = true
+description = "the well's all-in drilling and completion capex, USD; absent is 75e6 and negative values clamp to zero.\n"
+[inputs.equipment.fields.core_weight]
+unit = "kg"
+optional = true
+description = "the BAHX core's weight.\n"
+[inputs.equipment.fields.total_weight]
+unit = "kg"
+optional = true
+description = "the BAHX's total weight, whose excess over the core is the header and nozzle weight.\n"
+[outputs]
+[outputs.equipment]
+type = "record_list"
+description = "one row per equipment item, in caller order.\n"
+[outputs.equipment.fields.name]
+type = "string"
+description = "the stated name, or the empty string.\n"
+[outputs.equipment.fields.equipment_type]
+type = "string"
+description = "the class's equipment-type string, which selects the labour rate.\n"
+[outputs.equipment.fields.purchased_equipment_cost]
+unit = "dimensionless"
+description = "the kind's purchased cost, USD.\n"
+[outputs.equipment.fields.bare_module_cost]
+unit = "dimensionless"
+description = "the bare module cost, USD, zero without a stated design.\n"
+[outputs.equipment.fields.total_module_cost]
+unit = "dimensionless"
+description = "the total module cost, USD, zero without a stated design.\n"
+[outputs.equipment.fields.grass_roots_cost]
+unit = "dimensionless"
+description = "the grass roots cost, USD, zero without a stated design.\n"
+[outputs.equipment.fields.total_cost]
+unit = "dimensionless"
+description = "the class's `getTotalCost` answer, USD.\n"
+[outputs.equipment.fields.installation_man_hours]
+unit = "h"
+description = "the installation labour hours.\n"
+[outputs.equipment.fields.material_factor]
+unit = "dimensionless"
+description = "the material factor the row used.\n"
+[outputs.equipment.fields.equipment_cost]
+unit = "dimensionless"
+description = "a published ex-works equipment cost, USD, zero where the kind publishes none.\n"
+[outputs.equipment.fields.installed_cost]
+unit = "dimensionless"
+description = "a published installed cost, USD, zero where the kind publishes none.\n"
+[outputs.equipment.fields.specific_cost_per_m2]
+unit = "dimensionless"
+description = "a published USD cost per square metre, zero where the kind publishes none.\n"
+[outputs.equipment.fields.specific_capex_per_kw]
+unit = "dimensionless"
+description = "a published USD cost per kilowatt, zero where the kind publishes none.\n"
+[outputs.equipment.fields.annual_maintenance_cost]
+unit = "dimensionless"
+description = "a published annual maintenance cost, USD, zero where the kind publishes none.\n"
+[outputs.equipment.fields.sorbent_replacement_cost]
+unit = "dimensionless"
+description = "a published sorbent replacement cost, USD, zero where the kind publishes none.\n"
+[outputs.equipment.fields.annual_operating_cost]
+unit = "dimensionless"
+description = "the class's annual operating cost at the stated operating basis, USD, zero where the kind does not override the base five per cent.\n"
+[outputs.equipment.fields.calculated_weight]
+unit = "kg"
+description = "a weight the class computes rather than carries, zero where the kind computes none.\n"
+[outputs.material_take_off]
+type = "record_list"
+description = "the weighted bill of materials, one row per line.\n"
+[outputs.material_take_off.fields.equipment_index]
+unit = "dimensionless"
+description = "the equipment row this line belongs to.\n"
+[outputs.material_take_off.fields.item]
+type = "string"
+description = "the line's item.\n"
+[outputs.material_take_off.fields.material]
+type = "string"
+description = "the line's material, or the empty string.\n"
+[outputs.material_take_off.fields.quantity]
+unit = "dimensionless"
+description = "the count, where the line is a count.\n"
+[outputs.material_take_off.fields.has_quantity]
+type = "boolean"
+description = "whether the line carries a count.\n"
+[outputs.material_take_off.fields.unit]
+type = "string"
+description = "the count's unit, or the empty string.\n"
+[outputs.material_take_off.fields.weight_kg]
+unit = "kg"
+description = "the line's weight.\n"
+[outputs.material_take_off.fields.has_weight]
+type = "boolean"
+description = "whether the line carries a weight.\n"
+[outputs.material_take_off.fields.cost_usd]
+unit = "dimensionless"
+description = "the line's USD cost.\n"
+[outputs.material_take_off.fields.source]
+type = "string"
+description = "the line's source, or the empty string.\n"
+[outputs.quality_flags]
+type = "record_list"
+description = "the class's quality flags, one row per flag.\n"
+[outputs.quality_flags.fields.equipment_index]
+unit = "dimensionless"
+description = "the equipment row the flag belongs to.\n"
+[outputs.quality_flags.fields.message]
+type = "string"
+description = "the flag's message.\n"
+[implementations]
+python = "azoth.process.equipment_cost_estimate"
+rust = "azoth_process::equipment_cost_estimate"

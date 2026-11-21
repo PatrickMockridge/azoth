@@ -33,6 +33,7 @@ use crate::models::compressor::CompressorResult;
 use crate::models::consequence_analysis::ConsequenceAnalysisResult;
 use crate::models::control_valve_failure_relief::ControlValveFailureReliefResult;
 use crate::models::cooler::CoolerResult;
+use crate::models::cost_estimation::CostEstimationResult;
 use crate::models::deluge_nozzle_layout::DelugeNozzleLayoutResult;
 use crate::models::depressurization::DepressurizationResult;
 use crate::models::depressurization_acceptance::DepressurizationAcceptanceResult;
@@ -40,6 +41,7 @@ use crate::models::distillation_column::DistillationColumnResult;
 use crate::models::drift_flux_release::DriftFluxReleaseResult;
 use crate::models::dynamic_psv_sizing::DynamicPsvSizingResult;
 use crate::models::ejector::EjectorResult;
+use crate::models::equipment_cost_estimate::EquipmentCostEstimateResult;
 use crate::models::escalation_graph::EscalationGraphResult;
 use crate::models::esd_response_time::EsdResponseTimeResult;
 use crate::models::event_tree::EventTreeResult;
@@ -99,6 +101,7 @@ use crate::models::pool_fire::PoolFireResult;
 use crate::models::porous_media_self_heating::PorousMediaSelfHeatingResult;
 use crate::models::prescribed_slip_release::PrescribedSlipReleaseResult;
 use crate::models::probit::ProbitResult;
+use crate::models::process_cost_estimate::ProcessCostEstimateResult;
 use crate::models::psv_fire_sizing::PsvFireSizingResult;
 use crate::models::psv_sizing::PsvSizingResult;
 use crate::models::psv_valve::PsvValveResult;
@@ -130,6 +133,7 @@ use crate::models::sts0131_gate::Sts0131GateResult;
 use crate::models::tank::TankResult;
 use crate::models::three_phase_separator::ThreePhaseSeparatorResult;
 use crate::models::throttling_valve::ThrottlingValveResult;
+use crate::models::topsides_facility_cost::TopsidesFacilityCostResult;
 use crate::models::toxic_library::ToxicLibraryResult;
 use crate::models::tr3001_compliance::Tr3001ComplianceResult;
 use crate::models::trapped_inventory::TrappedInventoryResult;
@@ -600,6 +604,15 @@ impl CalcResult for CoolerResult {
     }
 }
 
+impl CalcResult for CostEstimationResult {
+    const CALC_ID: &'static str = "process.cost_estimation";
+    const FIELDS: &'static [&'static str] = &["queries", "bom", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for DelugeNozzleLayoutResult {
     const CALC_ID: &'static str = "process.deluge_nozzle_layout";
     const FIELDS: &'static [&'static str] = &[
@@ -804,6 +817,20 @@ impl CalcResult for EjectorResult {
         "total_volume",
         "suction_connection_length",
         "discharge_connection_length",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for EquipmentCostEstimateResult {
+    const CALC_ID: &'static str = "process.equipment_cost_estimate";
+    const FIELDS: &'static [&'static str] = &[
+        "equipment",
+        "material_take_off",
+        "quality_flags",
         "warnings",
     ];
 
@@ -2156,6 +2183,39 @@ impl CalcResult for ProbitResult {
     }
 }
 
+impl CalcResult for ProcessCostEstimateResult {
+    const CALC_ID: &'static str = "process.process_cost_estimate";
+    const FIELDS: &'static [&'static str] = &[
+        "total_purchased_equipment_cost",
+        "total_bare_module_cost",
+        "total_module_cost",
+        "total_grass_roots_cost",
+        "total_installation_man_hours",
+        "equipment",
+        "cost_by_equipment_type",
+        "cost_by_discipline",
+        "project_costs",
+        "total_project_cost",
+        "operating_costs",
+        "has_operating_cost",
+        "total_annual_operating_cost",
+        "has_economics",
+        "payback_period_years",
+        "roi_percent",
+        "npv",
+        "summed_unit_total_cost",
+        "has_weight_based_capex",
+        "weight_based_capex",
+        "material_take_off",
+        "quality_flags",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
 impl CalcResult for PsvFireSizingResult {
     const CALC_ID: &'static str = "process.psv_fire_sizing";
     const FIELDS: &'static [&'static str] = &[
@@ -2973,6 +3033,25 @@ impl CalcResult for ThrottlingValveResult {
         "choked",
         "gas_valve",
         "calculated_molar_flow",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for TopsidesFacilityCostResult {
+    const CALC_ID: &'static str = "process.topsides_facility_cost";
+    const FIELDS: &'static [&'static str] = &[
+        "capital_costs",
+        "capital_cost_summary",
+        "capital_cost_breakdown",
+        "project_costs",
+        "project_cost_summary",
+        "weight_basis",
+        "material_take_off",
+        "quality_flags",
         "warnings",
     ];
 

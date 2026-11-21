@@ -83,6 +83,9 @@ from azoth.core.result import (
     CoolerResult,
     CorrosionSeverity,
     CostaldMolarVolumeResult,
+    CostBomRow,
+    CostEstimationResult,
+    CostEstimationResultRow,
     CriticalPointResult,
     DarcyWeisbachResult,
     DeadheadVerdict,
@@ -96,6 +99,7 @@ from azoth.core.result import (
     DeWaardMilliamsCorrosionResult,
     DewPressureResult,
     DewTemperatureResult,
+    DisciplineCostLine,
     DistillationColumnResult,
     DriftFluxReleaseResult,
     DriftFluxReleaseStation,
@@ -113,6 +117,10 @@ from azoth.core.result import (
     EquilibriumConstantResult,
     EquilibriumSoundSpeedResult,
     EquilibriumSoundSpeedSample,
+    EquipmentCostEstimateResult,
+    EquipmentCostResultRow,
+    EquipmentMtoRow,
+    EquipmentQualityFlag,
     ErosionPredictionResult,
     ErosionRiskLevel,
     EscalationGraphResult,
@@ -261,6 +269,7 @@ from azoth.core.result import (
     OpenDrainResult,
     OpenDrainReviewResult,
     OpenDrainVerdict,
+    OperatingCostLine,
     OrificeFlowResult,
     OverallVerdict,
     OverpressureAcceptanceResult,
@@ -312,7 +321,12 @@ from azoth.core.result import (
     PrMassDensityResult,
     PrMolarVolumeResult,
     ProbitResult,
+    ProcessCostEquipmentResult,
+    ProcessCostEstimateResult,
+    ProcessCostFlag,
+    ProcessCostMtoRow,
     ProductionChemicalScaleScenarioResult,
+    ProjectCostLine,
     PrPenelouxShiftResult,
     PrsvKappaResult,
     PrZFactorResult,
@@ -441,6 +455,15 @@ from azoth.core.result import (
     ThFlashResult,
     ThreePhaseSeparatorResult,
     ThrottlingValveResult,
+    TopsidesBreakdownLine,
+    TopsidesCapitalLine,
+    TopsidesFacilityCostResult,
+    TopsidesFlag,
+    TopsidesMtoRow,
+    TopsidesProjectLine,
+    TopsidesProjectSummaryLine,
+    TopsidesSummaryLine,
+    TopsidesWeightLine,
     ToxicLibraryResult,
     TpFlashSaftResult,
     TpMultiflashResult,
@@ -465,6 +488,7 @@ from azoth.core.result import (
     TwucoonStatoilAlphaResult,
     TwuKappaResult,
     TynCalusDiffusivityResult,
+    TypeCostLine,
     UmrCpaPhaseResult,
     UmrprAlphaResult,
     UnifacActivityCoefficientsResult,
@@ -589,6 +613,7 @@ __all__ = [
     "control_valve_cv",
     "control_valve_failure_relief",
     "cooler",
+    "cost_estimation",
     "costald_molar_volume",
     "crane_k_factors",
     "critical_point",
@@ -612,6 +637,7 @@ __all__ = [
     "eos_cg_phase",
     "equilibrium_constant",
     "equilibrium_sound_speed",
+    "equipment_cost_estimate",
     "erosion_prediction",
     "escalation_graph",
     "esd_response_time",
@@ -763,6 +789,7 @@ __all__ = [
     "pr_z_factor",
     "prescribed_slip_release",
     "probit",
+    "process_cost_estimate",
     "production_chemical_scale_scenario",
     "prsv_kappa",
     "ps_flash",
@@ -857,6 +884,7 @@ __all__ = [
     "thermal_conductivity",
     "three_phase_separator",
     "throttling_valve",
+    "topsides_facility_cost",
     "toxic_library",
     "tp_flash_saft",
     "tp_multiflash",
@@ -6396,6 +6424,19 @@ def cooler(components: list[str], inlet_n: Q, inlet_z: list[float], inlet_p: Q, 
     )
 
 
+def cost_estimation(queries: list[dict[str, object]]) -> CostEstimationResult:
+    """``process.cost_estimation``, computed in Rust."""
+    spec = _models_gen.model("process.cost_estimation")
+    result = _core.cost_estimation(
+        input_records_to_si(spec, "queries", queries),
+    )
+    return CostEstimationResult(
+        queries=tuple(CostEstimationResultRow(calculation=c.calculation, correlation=c.correlation, purchased_equipment_cost=c.purchased_equipment_cost, pressure_factor=c.pressure_factor, material_factor=c.material_factor, location_factor=c.location_factor, exchange_rate=c.exchange_rate, bare_module_cost=c.bare_module_cost, total_module_cost=c.total_module_cost, grass_roots_cost=c.grass_roots_cost, installation_man_hours=from_si(c.installation_man_hours.magnitude_si, c.installation_man_hours.unit), converted_amount=c.converted_amount, cost_in_usd=c.cost_in_usd, current_cepci=c.current_cepci, reference_cepci=c.reference_cepci, cepci_ratio=c.cepci_ratio, contingency_factor=c.contingency_factor, engineering_factor=c.engineering_factor, installation_factor=c.installation_factor) for c in result.queries),
+        bom=tuple(CostBomRow(item=c.item, material=c.material, quantity=c.quantity, has_quantity=c.has_quantity, unit=c.unit, weight_kg=from_si(c.weight_kg.magnitude_si, c.weight_kg.unit), has_weight=c.has_weight, cost_usd=c.cost_usd, source=c.source) for c in result.bom),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def deluge_nozzle_layout(protected_area: Q, required_density: float, nozzle_k: float, nozzle_min_pressure: Q, nozzle_max_spacing: Q, nozzle_clearance: Q, available_clearance: Q, operating_pressure: Q | None=None, coverage_efficiency: float | None=None) -> DelugeNozzleLayoutResult:
     """``process.deluge_nozzle_layout``, computed in Rust."""
     spec = _models_gen.model("process.deluge_nozzle_layout")
@@ -6732,6 +6773,20 @@ def ejector(motive_components: list[str], motive_n: Q, motive_z: list[float], mo
         total_volume=from_si(result.total_volume.magnitude_si, result.total_volume.unit),
         suction_connection_length=from_si(result.suction_connection_length.magnitude_si, result.suction_connection_length.unit),
         discharge_connection_length=from_si(result.discharge_connection_length.magnitude_si, result.discharge_connection_length.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def equipment_cost_estimate(equipment: list[dict[str, object]]) -> EquipmentCostEstimateResult:
+    """``process.equipment_cost_estimate``, computed in Rust."""
+    spec = _models_gen.model("process.equipment_cost_estimate")
+    result = _core.equipment_cost_estimate(
+        input_records_to_si(spec, "equipment", equipment),
+    )
+    return EquipmentCostEstimateResult(
+        equipment=tuple(EquipmentCostResultRow(name=c.name, equipment_type=c.equipment_type, purchased_equipment_cost=c.purchased_equipment_cost, bare_module_cost=c.bare_module_cost, total_module_cost=c.total_module_cost, grass_roots_cost=c.grass_roots_cost, total_cost=c.total_cost, installation_man_hours=from_si(c.installation_man_hours.magnitude_si, c.installation_man_hours.unit), material_factor=c.material_factor, equipment_cost=c.equipment_cost, installed_cost=c.installed_cost, specific_cost_per_m2=c.specific_cost_per_m2, specific_capex_per_kw=c.specific_capex_per_kw, annual_maintenance_cost=c.annual_maintenance_cost, sorbent_replacement_cost=c.sorbent_replacement_cost, annual_operating_cost=c.annual_operating_cost, calculated_weight=from_si(c.calculated_weight.magnitude_si, c.calculated_weight.unit)) for c in result.equipment),
+        material_take_off=tuple(EquipmentMtoRow(equipment_index=c.equipment_index, item=c.item, material=c.material, quantity=c.quantity, has_quantity=c.has_quantity, unit=c.unit, weight_kg=from_si(c.weight_kg.magnitude_si, c.weight_kg.unit), has_weight=c.has_weight, cost_usd=c.cost_usd, source=c.source) for c in result.material_take_off),
+        quality_flags=tuple(EquipmentQualityFlag(equipment_index=c.equipment_index, message=c.message) for c in result.quality_flags),
         warnings=_warnings(result.warnings),
     )
 
@@ -8720,6 +8775,53 @@ def probit(a: float, b: float, n: float, dose: Q | None=None, probit_value: Q | 
     )
 
 
+def process_cost_estimate(equipment: list[dict[str, object]], location_factor: float | None=None, complexity_factor: float | None=None, project_contingency: float | None=None, working_capital: float | None=None, system_total_weight: Q | None=None, capex_per_weight: float | None=None, operating_hours: Q | None=None, electricity_cost_per_kwh: float | None=None, steam_cost_per_tonne: float | None=None, cooling_water_cost_per_m3: float | None=None, labor_cost_per_hour: float | None=None, annual_revenue: float | None=None, discount_rate: float | None=None, project_life_years: float | None=None) -> ProcessCostEstimateResult:
+    """``process.process_cost_estimate``, computed in Rust."""
+    spec = _models_gen.model("process.process_cost_estimate")
+    result = _core.process_cost_estimate(
+        input_records_to_si(spec, "equipment", equipment),
+        None if location_factor is None else location_factor,
+        None if complexity_factor is None else complexity_factor,
+        None if project_contingency is None else project_contingency,
+        None if working_capital is None else working_capital,
+        None if system_total_weight is None else input_to_si(spec, "system_total_weight", system_total_weight),
+        None if capex_per_weight is None else capex_per_weight,
+        None if operating_hours is None else input_to_si(spec, "operating_hours", operating_hours),
+        None if electricity_cost_per_kwh is None else electricity_cost_per_kwh,
+        None if steam_cost_per_tonne is None else steam_cost_per_tonne,
+        None if cooling_water_cost_per_m3 is None else cooling_water_cost_per_m3,
+        None if labor_cost_per_hour is None else labor_cost_per_hour,
+        None if annual_revenue is None else annual_revenue,
+        None if discount_rate is None else discount_rate,
+        None if project_life_years is None else project_life_years,
+    )
+    return ProcessCostEstimateResult(
+        total_purchased_equipment_cost=result.total_purchased_equipment_cost,
+        total_bare_module_cost=result.total_bare_module_cost,
+        total_module_cost=result.total_module_cost,
+        total_grass_roots_cost=result.total_grass_roots_cost,
+        total_installation_man_hours=from_si(result.total_installation_man_hours.magnitude_si, result.total_installation_man_hours.unit),
+        equipment=tuple(ProcessCostEquipmentResult(name=c.name, equipment_class=c.equipment_class, equipment_type=c.equipment_type, purchased_equipment_cost=c.purchased_equipment_cost, bare_module_cost=c.bare_module_cost, total_module_cost=c.total_module_cost, grass_roots_cost=c.grass_roots_cost, total_cost=c.total_cost, installation_man_hours=from_si(c.installation_man_hours.magnitude_si, c.installation_man_hours.unit), weight=from_si(c.weight.magnitude_si, c.weight.unit), located_purchased_equipment_cost=c.located_purchased_equipment_cost, location_factor=c.location_factor) for c in result.equipment),
+        cost_by_equipment_type=tuple(TypeCostLine(name=c.name, cost=c.cost) for c in result.cost_by_equipment_type),
+        cost_by_discipline=tuple(DisciplineCostLine(name=c.name, cost=c.cost) for c in result.cost_by_discipline),
+        project_costs=tuple(ProjectCostLine(name=c.name, cost=c.cost) for c in result.project_costs),
+        total_project_cost=result.total_project_cost,
+        operating_costs=tuple(OperatingCostLine(name=c.name, cost=c.cost) for c in result.operating_costs),
+        has_operating_cost=result.has_operating_cost,
+        total_annual_operating_cost=result.total_annual_operating_cost,
+        has_economics=result.has_economics,
+        payback_period_years=result.payback_period_years,
+        roi_percent=result.roi_percent,
+        npv=result.npv,
+        summed_unit_total_cost=result.summed_unit_total_cost,
+        has_weight_based_capex=result.has_weight_based_capex,
+        weight_based_capex=result.weight_based_capex,
+        material_take_off=tuple(ProcessCostMtoRow(name=c.name, equipment_type=c.equipment_type, weight_kg=from_si(c.weight_kg.magnitude_si, c.weight_kg.unit), cost_usd=c.cost_usd) for c in result.material_take_off),
+        quality_flags=tuple(ProcessCostFlag(message=c.message) for c in result.quality_flags),
+        warnings=_warnings(result.warnings),
+    )
+
+
 def psv_fire_sizing(initial_mass: Q, initial_pressure: Q, set_pressure: Q, initial_temperature: Q, fire_heat_input: Q, vessel_volume: Q, molar_mass: Q, specific_heat_ratio: float, compressibility: float, heat_capacity: Q, blowdown_time: Q, blowdown_percent: float | None=None, orifice_area: Q | None=None, cv_discharge_coefficient: float | None=None) -> PsvFireSizingResult:
     """``process.psv_fire_sizing``, computed in Rust."""
     spec = _models_gen.model("process.psv_fire_sizing")
@@ -9964,6 +10066,38 @@ def throttling_valve(components: list[str], inlet_n: Q, inlet_z: list[float], in
         choked=result.choked,
         gas_valve=result.gas_valve,
         calculated_molar_flow=from_si(result.calculated_molar_flow.magnitude_si, result.calculated_molar_flow.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def topsides_facility_cost(equipment: list[dict[str, object]], facility_type: str | None=None, project_context: str | None=None, location_factor: float | None=None, piping_bulk_factor: float | None=None, electrical_instrumentation_factor: float | None=None, insulation_paint_fireproofing_factor: float | None=None, hvac_telecom_safety_factor: float | None=None, engineering_procurement_factor: float | None=None, construction_management_factor: float | None=None, project_contingency_factor: float | None=None, owner_cost_factor: float | None=None, include_utilities_and_offsites: bool | None=None, estimate_class: float | None=None) -> TopsidesFacilityCostResult:
+    """``process.topsides_facility_cost``, computed in Rust."""
+    spec = _models_gen.model("process.topsides_facility_cost")
+    result = _core.topsides_facility_cost(
+        input_records_to_si(spec, "equipment", equipment),
+        facility_type,
+        project_context,
+        None if location_factor is None else location_factor,
+        None if piping_bulk_factor is None else piping_bulk_factor,
+        None if electrical_instrumentation_factor is None else electrical_instrumentation_factor,
+        None if insulation_paint_fireproofing_factor is None else insulation_paint_fireproofing_factor,
+        None if hvac_telecom_safety_factor is None else hvac_telecom_safety_factor,
+        None if engineering_procurement_factor is None else engineering_procurement_factor,
+        None if construction_management_factor is None else construction_management_factor,
+        None if project_contingency_factor is None else project_contingency_factor,
+        None if owner_cost_factor is None else owner_cost_factor,
+        include_utilities_and_offsites,
+        None if estimate_class is None else estimate_class,
+    )
+    return TopsidesFacilityCostResult(
+        capital_costs=tuple(TopsidesCapitalLine(name=c.name, cost=c.cost) for c in result.capital_costs),
+        capital_cost_summary=tuple(TopsidesSummaryLine(name=c.name, cost=c.cost) for c in result.capital_cost_summary),
+        capital_cost_breakdown=tuple(TopsidesBreakdownLine(name=c.name, cost=c.cost) for c in result.capital_cost_breakdown),
+        project_costs=tuple(TopsidesProjectLine(name=c.name, cost=c.cost) for c in result.project_costs),
+        project_cost_summary=tuple(TopsidesProjectSummaryLine(name=c.name, cost=c.cost) for c in result.project_cost_summary),
+        weight_basis=tuple(TopsidesWeightLine(name=c.name, weight_kg=from_si(c.weight_kg.magnitude_si, c.weight_kg.unit)) for c in result.weight_basis),
+        material_take_off=tuple(TopsidesMtoRow(item=c.item, category=c.category, quantity=c.quantity, unit=c.unit, weight_kg=from_si(c.weight_kg.magnitude_si, c.weight_kg.unit), has_weight=c.has_weight, cost_usd=c.cost_usd, source=c.source) for c in result.material_take_off),
+        quality_flags=tuple(TopsidesFlag(message=c.message) for c in result.quality_flags),
         warnings=_warnings(result.warnings),
     )
 

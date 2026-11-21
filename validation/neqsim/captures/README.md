@@ -3305,3 +3305,72 @@ message and severity, its instrument tags and its SIF names.
 The class's `setPfd` also sets the effectiveness to `1 - PFD`, so the fire-and-gas barrier's
 `0.99972` is the setter's arithmetic rather than a stored value. The finding messages are
 presentation; the port carries one stable rule per check site in the same order.
+
+### `process_cost_calculator.tsv`
+
+`CostEstimationCalculator` at the pin: the pressure-factor steps, the nine material factors,
+the eleven location factors, the six exchange rates, every correlation at and beyond its
+validity range, the module stack and labour rates, the summary route and the vessel bill of
+materials. Costs are USD magnitudes; the class's 2025 CEPCI of 840 against the correlations'
+2019 reference of 607.5 is the ratio every correlation carries.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe cost_estimation \
+  > captures/process_cost_calculator.tsv
+```
+
+The two deprecated weight-based vessel routes are printed as the class answers them; the
+volume routes are the ones its subclasses reach. `summary_purchased` is unchanged at 50 000
+because the calculator's material and location factors are at their defaults there.
+
+### `process_cost_equipment.tsv`
+
+The equipment estimators with no `ProcessSystem`: a trayed column with its reboiler and
+condenser, the same column in SS316, a packed column, a zero-diameter column with its
+auxiliaries off, two absorbers, and the separator whose sized vessel is built from the class's
+own SRK feed. The separator block also prints the design's weight components and the base
+class's bill of materials, so the port's weighted MTO can be held to it.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe equipment_cost \
+  > captures/process_cost_equipment.tsv
+```
+
+The column and absorber estimators ignore their design object, so their states are stored
+fields and their module stacks are zero - the class's `calculateCostEstimate` returns early
+without a design. The separator's stack and labour are the class's own on the sized vessel.
+The column's reboiler and condenser default on, so a state that wants neither states both
+flags false.
+
+### `process_cost_process.tsv`
+
+`ProcessCostEstimate` on the class's own four-unit SRK flowsheet: the feed, the inlet
+separator, the export compressor, the aftercooler and the JT valve. The capture prints each
+unit's summary row, then the totals, the type and discipline splits, the project stack, the
+nine operating-cost lines and the economics.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe process_cost \
+  > captures/process_cost_process.tsv
+```
+
+The operating-cost walk reads `getDuty()` as kW although the cooler returns watts, so the
+cooling-water line is the class's own thousand-fold duty; the case states the duty the walk
+reads. The system weight and the weight-based capex are printed last.
+
+### `process_cost_topsides.tsv`
+
+`TopsidesFacilityCostEstimator` on the class's own four-unit gas train: a fixed-platform
+North Sea estimate at a 1.35 location on a Class 3 basis, with a greenfield context. The
+capture prints the process rows the estimator folds, then the ten capital lines, the two
+summary lines, the module breakdown, the four project lines, the total topsides capex, the
+weight basis, the nine MTO rows and the quality flags.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe topsides_cost \
+  > captures/process_cost_topsides.tsv
+```
+
+The electrical and HVAC allowance MTO weights are `NaN` in the class; the port publishes
+`has_weight` false with a zero weight. The facility-type and context flags are the class's
+own strings, and a Class 4 or coarser basis adds its not-detailed flag after them.

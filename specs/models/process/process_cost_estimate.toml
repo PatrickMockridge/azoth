@@ -1,0 +1,271 @@
+id = "process.process_cost_estimate"
+name = "Process cost estimate"
+kind = "procedure"
+assumptions = [
+    "**the roll-up takes the per-unit rows the class's live walk produces**, not a process object: the equipment rows are the `EquipmentCostSummary` values, and the port never builds a `ProcessSystem`.",
+    "**the type is the class's class-name chain**, `Separator`/`Scrubber` to vessels, `Compressor`, `Pump`, `Expander`, the exchangers and heaters, valves, tanks, columns and absorbers, piping, pipelines, wells, reservoirs and streams, in that order.",
+    "**the totals are the row sums with the location factor applied once**, and the grass roots cost is `TMC (1 + 0.10 + 0.05)` times the complexity factor.",
+    "**the project stack is the class's**: direct is the located total module cost, indirect is `GRC - TMC`, the project contingency is 0.10 of their sum and the owner cost 0.15.",
+    "**the discipline split is the class's fixed percentages** of the bare module cost over 0.30, beside the process equipment's own purchased cost.",
+    "**the operating cost is the class's nine lines at the stated basis**: electricity from compressor and pump rows, steam from heaters and reboilers, cooling water from coolers and condensers, maintenance at four per cent of the total module cost, labour at the class's operator rule.",
+    "**the economics are the class's**: payback is absent when the annual profit is not positive, ROI is zero at a zero grass roots cost, and NPV discounts the profit over the stated life.",
+    "**the weight-based capex is the system weight times the stated coefficient, in kNOK**, and is absent when no system weight is stated.",
+    "**costs are USD magnitudes declared dimensionless** because the vocabulary has no currency unit; the labour hour fields are `h`.",
+    "**`toJson`, `toCompactJson`, the reports and the `generatedAt` stamp are session surface**, not inputs or outputs of this id.",
+]
+references = [
+    "Turton, R., Shaeiwitz, J. A., Bhattacharyya, D. & Whiting, W. B. (2018). Analysis, Synthesis and Design of Chemical Processes, 5th Ed. Pearson.",
+    "Peters, M. S., Timmerhaus, K. D. & West, R. E. Plant Design and Economics for Chemical Engineers, 5th Ed. McGraw-Hill.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `process/costestimation/ProcessCostEstimate.java` is the port source.",
+    "`validation/neqsim/captures/process_cost_process.tsv` - the class's own four-unit SRK flowsheet, its unit summaries, the type and discipline splits, the project stack, the OPEX lines and the economics.",
+]
+[source]
+standard = "NeqSim process/costestimation/ProcessCostEstimate.java"
+edition = "Its `calculateAllCosts` roll-up over the summary rows, `classifyEquipment`, `calculateDisciplineCosts`, `getProjectCostBreakdown`, `calculateOperatingCost`, `calculatePaybackPeriod`, `calculateROI` and `calculateNPV`."
+[algorithm]
+scheme = "process_cost_roll_up"
+initialisation = "first_unit_in_caller_order"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.equipment]
+type = "record_list"
+row_type = "ProcessCostEquipment"
+description = "one unit's summary per row, in caller order.\n"
+[inputs.equipment.fields.name]
+type = "string"
+description = "the unit's name.\n"
+[inputs.equipment.fields.equipment_class]
+type = "string"
+description = "the unit's Java class simple name, which selects the type category.\n"
+[inputs.equipment.fields.purchased_equipment_cost]
+unit = "dimensionless"
+description = "the unit's purchased cost, unlocated USD.\n"
+[inputs.equipment.fields.bare_module_cost]
+unit = "dimensionless"
+description = "the unit's bare module cost, unlocated USD.\n"
+[inputs.equipment.fields.total_module_cost]
+unit = "dimensionless"
+description = "the unit's total module cost, unlocated USD.\n"
+[inputs.equipment.fields.grass_roots_cost]
+unit = "dimensionless"
+description = "the unit's grass roots cost, unlocated USD.\n"
+[inputs.equipment.fields.total_cost]
+unit = "dimensionless"
+description = "the unit's total cost, unlocated USD.\n"
+[inputs.equipment.fields.installation_man_hours]
+unit = "h"
+description = "the unit's installation labour hours.\n"
+[inputs.equipment.fields.weight]
+unit = "kg"
+description = "the unit's weight.\n"
+[inputs.equipment.fields.power]
+unit = "kW"
+optional = true
+description = "the unit's rotating power, where it has one; the operating cost sums it for compressors and pumps.\n"
+[inputs.equipment.fields.duty]
+unit = "kW"
+optional = true
+description = "the unit's thermal duty, where it has one; the operating cost sums it for heaters and reboilers and for coolers and condensers.\n"
+[inputs.location_factor]
+unit = "dimensionless"
+optional = true
+description = "the location factor applied once to the totals; absent is 1.0.\n"
+[inputs.complexity_factor]
+unit = "dimensionless"
+optional = true
+description = "the grass roots complexity factor; absent is 1.0.\n"
+[inputs.project_contingency]
+unit = "dimensionless"
+optional = true
+description = "the project contingency factor; absent is 0.10.\n"
+[inputs.working_capital]
+unit = "dimensionless"
+optional = true
+description = "the owner and working-capital factor; absent is 0.15.\n"
+[inputs.system_total_weight]
+unit = "kg"
+optional = true
+description = "the system's total weight, for the weight-based capex.\n"
+[inputs.capex_per_weight]
+unit = "dimensionless"
+optional = true
+description = "the weight-based capex coefficient, kNOK per tonne; absent is 1000.\n"
+[inputs.operating_hours]
+unit = "h"
+optional = true
+description = "annual operating hours; **absent leaves the operating-cost block at zero**.\n"
+[inputs.electricity_cost_per_kwh]
+unit = "dimensionless"
+optional = true
+description = "electricity price, USD/kWh; absent is 0.08.\n"
+[inputs.steam_cost_per_tonne]
+unit = "dimensionless"
+optional = true
+description = "steam price, USD/tonne; absent is 15.\n"
+[inputs.cooling_water_cost_per_m3]
+unit = "dimensionless"
+optional = true
+description = "cooling-water price, USD/m3; absent is 0.05.\n"
+[inputs.labor_cost_per_hour]
+unit = "dimensionless"
+optional = true
+description = "operating labour rate, USD/hour; absent is 50.\n"
+[inputs.annual_revenue]
+unit = "dimensionless"
+optional = true
+description = "annual revenue, USD, for the payback, ROI and NPV; absent leaves the economics absent.\n"
+[inputs.discount_rate]
+unit = "dimensionless"
+optional = true
+description = "the NPV discount rate; absent is 0.10.\n"
+[inputs.project_life_years]
+unit = "dimensionless"
+optional = true
+description = "the project life in years; absent is 10.\n"
+[outputs]
+[outputs.total_purchased_equipment_cost]
+unit = "dimensionless"
+description = "the located purchased equipment cost, USD.\n"
+[outputs.total_bare_module_cost]
+unit = "dimensionless"
+description = "the located bare module cost, USD.\n"
+[outputs.total_module_cost]
+unit = "dimensionless"
+description = "the located total module cost, USD.\n"
+[outputs.total_grass_roots_cost]
+unit = "dimensionless"
+description = "the grass roots cost after the complexity factor, USD.\n"
+[outputs.total_installation_man_hours]
+unit = "h"
+description = "the summed installation labour hours.\n"
+[outputs.equipment]
+type = "record_list"
+description = "one summary row per input row.\n"
+[outputs.equipment.fields.name]
+type = "string"
+description = "the unit's name.\n"
+[outputs.equipment.fields.equipment_class]
+type = "string"
+description = "the Java class simple name.\n"
+[outputs.equipment.fields.equipment_type]
+type = "string"
+description = "the type category the class-name chain gives.\n"
+[outputs.equipment.fields.purchased_equipment_cost]
+unit = "dimensionless"
+description = "the unit's purchased cost.\n"
+[outputs.equipment.fields.bare_module_cost]
+unit = "dimensionless"
+description = "the unit's bare module cost.\n"
+[outputs.equipment.fields.total_module_cost]
+unit = "dimensionless"
+description = "the unit's total module cost.\n"
+[outputs.equipment.fields.grass_roots_cost]
+unit = "dimensionless"
+description = "the unit's grass roots cost.\n"
+[outputs.equipment.fields.total_cost]
+unit = "dimensionless"
+description = "the unit's total cost.\n"
+[outputs.equipment.fields.installation_man_hours]
+unit = "h"
+description = "the unit's installation labour hours.\n"
+[outputs.equipment.fields.weight]
+unit = "kg"
+description = "the unit's weight.\n"
+[outputs.equipment.fields.located_purchased_equipment_cost]
+unit = "dimensionless"
+description = "the purchased cost times the location factor.\n"
+[outputs.equipment.fields.location_factor]
+unit = "dimensionless"
+description = "the location factor applied.\n"
+[outputs.cost_by_equipment_type]
+type = "record_list"
+description = "the located purchased cost by type, in first-appearance order.\n"
+[outputs.cost_by_equipment_type.fields.name]
+type = "string"
+description = "the type category.\n"
+[outputs.cost_by_equipment_type.fields.cost]
+unit = "dimensionless"
+description = "the located purchased cost of the type.\n"
+[outputs.cost_by_discipline]
+type = "record_list"
+description = "the five discipline lines.\n"
+[outputs.cost_by_discipline.fields.name]
+type = "string"
+description = "the discipline.\n"
+[outputs.cost_by_discipline.fields.cost]
+unit = "dimensionless"
+description = "the discipline's cost.\n"
+[outputs.project_costs]
+type = "record_list"
+description = "the project cost stack, direct to total.\n"
+[outputs.project_costs.fields.name]
+type = "string"
+description = "the line's name.\n"
+[outputs.project_costs.fields.cost]
+unit = "dimensionless"
+description = "the line's cost.\n"
+[outputs.total_project_cost]
+unit = "dimensionless"
+description = "the total project cost, USD.\n"
+[outputs.operating_costs]
+type = "record_list"
+description = "the nine operating-cost lines, empty when no operating basis is stated.\n"
+[outputs.operating_costs.fields.name]
+type = "string"
+description = "the line's name.\n"
+[outputs.operating_costs.fields.cost]
+unit = "dimensionless"
+description = "the line's annual cost, USD.\n"
+[outputs.has_operating_cost]
+type = "boolean"
+description = "whether the operating-cost block is present.\n"
+[outputs.total_annual_operating_cost]
+unit = "dimensionless"
+description = "the sum of the operating-cost lines, USD/year.\n"
+[outputs.has_economics]
+type = "boolean"
+description = "whether the payback, ROI and NPV are present.\n"
+[outputs.payback_period_years]
+unit = "dimensionless"
+description = "the payback period, years; zero where it is absent, and `has_economics` says which.\n"
+[outputs.roi_percent]
+unit = "dimensionless"
+description = "the return on investment, per cent.\n"
+[outputs.npv]
+unit = "dimensionless"
+description = "the net present value, USD.\n"
+[outputs.summed_unit_total_cost]
+unit = "dimensionless"
+description = "the sum of the rows' total costs.\n"
+[outputs.has_weight_based_capex]
+type = "boolean"
+description = "whether a system weight was stated.\n"
+[outputs.weight_based_capex]
+unit = "dimensionless"
+description = "the system weight times the coefficient, kNOK.\n"
+[outputs.material_take_off]
+type = "record_list"
+description = "the per-unit material take-off rows.\n"
+[outputs.material_take_off.fields.name]
+type = "string"
+description = "the unit's name.\n"
+[outputs.material_take_off.fields.equipment_type]
+type = "string"
+description = "the type category.\n"
+[outputs.material_take_off.fields.weight_kg]
+unit = "kg"
+description = "the unit's weight.\n"
+[outputs.material_take_off.fields.cost_usd]
+unit = "dimensionless"
+description = "the unit's located purchased cost.\n"
+[outputs.quality_flags]
+type = "record_list"
+description = "the class's quality flags.\n"
+[outputs.quality_flags.fields.message]
+type = "string"
+description = "the flag's message.\n"
+[implementations]
+python = "azoth.process.process_cost_estimate"
+rust = "azoth_process::process_cost_estimate"

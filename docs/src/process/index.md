@@ -35,6 +35,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.consequence_analysis`](./consequence_analysis.md) | `outcome_frequency_composition` | NeqSim process/safety/qra/ConsequenceAnalysisEngine.java |
 | [`process.control_valve_failure_relief`](./control_valve_failure_relief.md) | `control_valve_fail_open_nozzle` | NeqSim process/safety/overpressure/ControlValveFailureRelief.java |
 | [`process.cooler`](./cooler.md) | `direct composition` | NeqSim process/equipment/heatexchanger/Cooler.java |
+| [`process.cost_estimation`](./cost_estimation.md) | `cost_correlation_dispatch` | NeqSim process/costestimation/CostEstimationCalculator.java |
 | [`process.deluge_nozzle_layout`](./deluge_nozzle_layout.md) | `closed_form_deluge_nozzle_layout` | NeqSim process/safety/firewater/DelugeNozzleLayout.java |
 | [`process.depressurization`](./depressurization.md) | `explicit_euler_equilibrium_blowdown` | NeqSim process/safety/depressurization/DepressurizationSimulator.java |
 | [`process.depressurization_acceptance`](./depressurization_acceptance.md) | `trajectory_acceptance` | NeqSim process/safety/depressurization/STS0131AcceptanceCriteria.java |
@@ -42,6 +43,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.drift_flux_release`](./drift_flux_release.md) | `drift_flux_partition` | NeqSim process/safety/release/DriftFluxHomogeneousEquilibriumReleaseModel.java |
 | [`process.dynamic_psv_sizing`](./dynamic_psv_sizing.md) | `bisection_over_psv_area` | NeqSim process/safety/depressurization/DynamicPsvSizingStudy.java |
 | [`process.ejector`](./ejector.md) | `direct composition` | NeqSim process/equipment/ejector/Ejector.java |
+| [`process.equipment_cost_estimate`](./equipment_cost_estimate.md) | `equipment_cost_dispatch` | NeqSim process/costestimation/UnitCostEstimateBaseClass.java |
 | [`process.escalation_graph`](./escalation_graph.md) | `domino_failure_propagation` | NeqSim process/safety/escalation/EscalationGraphAnalyzer.java |
 | [`process.esd_response_time`](./esd_response_time.md) | `esd_response_time` | NeqSim process/safety/esd/EsdResponseTimeSimulator.java |
 | [`process.event_tree`](./event_tree.md) | `full_binary_enumeration` | NeqSim process/safety/risk/eta/EventTreeAnalyzer.java |
@@ -101,6 +103,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.porous_media_self_heating`](./porous_media_self_heating.md) | `frank_kamenetskii_criticality` | NeqSim process/safety/selfheating/PorousMediaSelfHeatingAnalyzer.java |
 | [`process.prescribed_slip_release`](./prescribed_slip_release.md) | `prescribed_slip_partition` | NeqSim process/safety/release/SlipCorrectedHomogeneousEquilibriumReleaseModel.java |
 | [`process.probit`](./probit.md) | `closed_form_probit` | NeqSim process/safety/dispersion/ProbitModel.java |
+| [`process.process_cost_estimate`](./process_cost_estimate.md) | `process_cost_roll_up` | NeqSim process/costestimation/ProcessCostEstimate.java |
 | [`process.psv_fire_sizing`](./psv_fire_sizing.md) | `closed_form_psv_fire_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
 | [`process.psv_sizing`](./psv_sizing.md) | `closed_form_psv_sizing` | NeqSim process/util/fire/ReliefValveSizing.java |
 | [`process.psv_valve`](./psv_valve.md) | `psv_latch_one_step` | NeqSim process/safety/depressurization/PsvValveModel.java |
@@ -132,6 +135,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`process.tank`](./tank.md) | `direct composition` | NeqSim process/equipment/tank/Tank.java |
 | [`process.three_phase_separator`](./three_phase_separator.md) | `direct composition` | NeqSim process/equipment/separator/ThreePhaseSeparator.java |
 | [`process.throttling_valve`](./throttling_valve.md) | `direct composition` | NeqSim process/equipment/valve/ThrottlingValve.java |
+| [`process.topsides_facility_cost`](./topsides_facility_cost.md) | `topsides_facility_stack` | NeqSim process/costestimation/topsides/TopsidesFacilityCostEstimator.java |
 | [`process.toxic_library`](./toxic_library.md) | `toxic_threshold_lookup_and_ppm_conversion` | NeqSim process/safety/dispersion/ToxicLibrary.java |
 | [`process.tr3001_compliance`](./tr3001_compliance.md) | `closed_form_tr3001_compliance` | NeqSim process/safety/overpressure/TR3001ComplianceChecker.java |
 | [`process.trapped_inventory`](./trapped_inventory.md) | `trapped_inventory` | NeqSim process/safety/inventory/TrappedInventoryCalculator.java |

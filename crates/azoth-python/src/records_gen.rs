@@ -242,6 +242,69 @@ pub struct ConsequenceOutcomeSpec {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct CostEstimationQuery {
+    #[pyo3(item)]
+    pub calculation: String,
+    #[pyo3(item)]
+    pub correlation: Option<String>,
+    #[pyo3(item)]
+    pub capacity: Option<f64>,
+    #[pyo3(item)]
+    pub diameter: Option<f64>,
+    #[pyo3(item)]
+    pub tray_count: Option<f64>,
+    #[pyo3(item)]
+    pub packing_type: Option<String>,
+    #[pyo3(item)]
+    pub piping_length: Option<f64>,
+    #[pyo3(item)]
+    pub piping_schedule: Option<String>,
+    #[pyo3(item)]
+    pub valve_cv: Option<f64>,
+    #[pyo3(item)]
+    pub purchased_cost: Option<f64>,
+    #[pyo3(item)]
+    pub design_pressure: Option<f64>,
+    #[pyo3(item)]
+    pub pressure_factor: Option<f64>,
+    #[pyo3(item)]
+    pub material_factor: Option<f64>,
+    #[pyo3(item)]
+    pub weight: Option<f64>,
+    #[pyo3(item)]
+    pub equipment_type: Option<String>,
+    #[pyo3(item)]
+    pub material: Option<String>,
+    #[pyo3(item)]
+    pub region: Option<String>,
+    #[pyo3(item)]
+    pub currency: Option<String>,
+    #[pyo3(item)]
+    pub exchange_rate: Option<f64>,
+    #[pyo3(item)]
+    pub amount: Option<f64>,
+    #[pyo3(item)]
+    pub currency_direction: Option<String>,
+    #[pyo3(item)]
+    pub shell_weight: Option<f64>,
+    #[pyo3(item)]
+    pub heads_weight: Option<f64>,
+    #[pyo3(item)]
+    pub nozzle_count: Option<f64>,
+    #[pyo3(item)]
+    pub internals_weight: Option<f64>,
+    #[pyo3(item)]
+    pub current_cepci: Option<f64>,
+    #[pyo3(item)]
+    pub reference_cepci: Option<f64>,
+    #[pyo3(item)]
+    pub contingency_factor: Option<f64>,
+    #[pyo3(item)]
+    pub engineering_factor: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct DepositMass {
     #[pyo3(item)]
     pub mechanism: String,
@@ -287,6 +350,283 @@ pub struct EnvelopeTracePoint {
     pub pressure: f64,
     #[pyo3(item)]
     pub temperature: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct EquipmentCostSpec {
+    #[pyo3(item)]
+    pub equipment: String,
+    #[pyo3(item)]
+    pub name: Option<String>,
+    #[pyo3(item)]
+    pub material: Option<String>,
+    #[pyo3(item)]
+    pub material_factor: Option<f64>,
+    #[pyo3(item)]
+    pub cepci: Option<f64>,
+    #[pyo3(item)]
+    pub mechanical_design_present: Option<bool>,
+    #[pyo3(item)]
+    pub max_design_pressure: Option<f64>,
+    #[pyo3(item)]
+    pub weight_total: Option<f64>,
+    #[pyo3(item)]
+    pub design_pressure_barg: Option<f64>,
+    #[pyo3(item)]
+    pub design_pressure_bara: Option<f64>,
+    #[pyo3(item)]
+    pub contingency_factor: Option<f64>,
+    #[pyo3(item)]
+    pub engineering_factor: Option<f64>,
+    #[pyo3(item)]
+    pub include_material_take_off: Option<bool>,
+    #[pyo3(item)]
+    pub shell_weight: Option<f64>,
+    #[pyo3(item)]
+    pub internals_weight: Option<f64>,
+    #[pyo3(item)]
+    pub nozzle_weight: Option<f64>,
+    #[pyo3(item)]
+    pub piping_weight: Option<f64>,
+    #[pyo3(item)]
+    pub electro_instrument_weight: Option<f64>,
+    #[pyo3(item)]
+    pub structural_weight: Option<f64>,
+    #[pyo3(item)]
+    pub operating_hours: Option<f64>,
+    #[pyo3(item)]
+    pub electricity_cost_per_kwh: Option<f64>,
+    #[pyo3(item)]
+    pub steam_cost_per_tonne: Option<f64>,
+    #[pyo3(item)]
+    pub cooling_water_cost_per_m3: Option<f64>,
+    #[pyo3(item)]
+    pub fuel_cost_per_gj: Option<f64>,
+    #[pyo3(item)]
+    pub inner_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub tangent_length: Option<f64>,
+    #[pyo3(item)]
+    pub vessel_volume: Option<f64>,
+    #[pyo3(item)]
+    pub column_type: Option<String>,
+    #[pyo3(item)]
+    pub tray_type: Option<String>,
+    #[pyo3(item)]
+    pub packing_type: Option<String>,
+    #[pyo3(item)]
+    pub diameter: Option<f64>,
+    #[pyo3(item)]
+    pub height: Option<f64>,
+    #[pyo3(item)]
+    pub number_of_trays: Option<f64>,
+    #[pyo3(item)]
+    pub number_of_stages: Option<f64>,
+    #[pyo3(item)]
+    pub packing_height: Option<f64>,
+    #[pyo3(item)]
+    pub include_reboiler: Option<bool>,
+    #[pyo3(item)]
+    pub include_condenser: Option<bool>,
+    #[pyo3(item)]
+    pub include_liquid_distributor: Option<bool>,
+    #[pyo3(item)]
+    pub include_mist_eliminator: Option<bool>,
+    #[pyo3(item)]
+    pub include_reflux_system: Option<bool>,
+    #[pyo3(item)]
+    pub reboiler_duty: Option<f64>,
+    #[pyo3(item)]
+    pub condenser_duty: Option<f64>,
+    #[pyo3(item)]
+    pub absorber_type: Option<String>,
+    #[pyo3(item)]
+    pub vessel_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub vessel_length: Option<f64>,
+    #[pyo3(item)]
+    pub catalyst_mass: Option<f64>,
+    #[pyo3(item)]
+    pub number_of_beds: Option<f64>,
+    #[pyo3(item)]
+    pub total_equipped_weight: Option<f64>,
+    #[pyo3(item)]
+    pub catalyst_cost_per_kg: Option<f64>,
+    #[pyo3(item)]
+    pub internals_fraction: Option<f64>,
+    #[pyo3(item)]
+    pub bed_allowance: Option<f64>,
+    #[pyo3(item)]
+    pub power: Option<f64>,
+    #[pyo3(item)]
+    pub compressor_type: Option<String>,
+    #[pyo3(item)]
+    pub driver_type: Option<String>,
+    #[pyo3(item)]
+    pub include_driver: Option<bool>,
+    #[pyo3(item)]
+    pub include_intercoolers: Option<bool>,
+    #[pyo3(item)]
+    pub pump_type: Option<String>,
+    #[pyo3(item)]
+    pub include_motor: Option<bool>,
+    #[pyo3(item)]
+    pub api_rated: Option<bool>,
+    #[pyo3(item)]
+    pub seal_type: Option<String>,
+    #[pyo3(item)]
+    pub shaft_power: Option<f64>,
+    #[pyo3(item)]
+    pub expander_type: Option<String>,
+    #[pyo3(item)]
+    pub load_type: Option<String>,
+    #[pyo3(item)]
+    pub include_load: Option<bool>,
+    #[pyo3(item)]
+    pub include_gearbox: Option<bool>,
+    #[pyo3(item)]
+    pub include_lube_oil_system: Option<bool>,
+    #[pyo3(item)]
+    pub include_control_system: Option<bool>,
+    #[pyo3(item)]
+    pub cryogenic_service: Option<bool>,
+    #[pyo3(item)]
+    pub area: Option<f64>,
+    #[pyo3(item)]
+    pub duty: Option<f64>,
+    #[pyo3(item)]
+    pub exchanger_type: Option<String>,
+    #[pyo3(item)]
+    pub tema_type: Option<String>,
+    #[pyo3(item)]
+    pub shell_passes: Option<f64>,
+    #[pyo3(item)]
+    pub tank_type: Option<String>,
+    #[pyo3(item)]
+    pub volume: Option<f64>,
+    #[pyo3(item)]
+    pub floating_roof: Option<bool>,
+    #[pyo3(item)]
+    pub include_foundation: Option<bool>,
+    #[pyo3(item)]
+    pub include_heating_coils: Option<bool>,
+    #[pyo3(item)]
+    pub include_insulation: Option<bool>,
+    #[pyo3(item)]
+    pub insulation_thickness: Option<f64>,
+    #[pyo3(item)]
+    pub required_elements: Option<f64>,
+    #[pyo3(item)]
+    pub material_grade: Option<String>,
+    #[pyo3(item)]
+    pub empty_vessel_weight: Option<f64>,
+    #[pyo3(item)]
+    pub element_cost: Option<f64>,
+    #[pyo3(item)]
+    pub auxiliaries_fraction: Option<f64>,
+    #[pyo3(item)]
+    pub fallback_steel_rate: Option<f64>,
+    #[pyo3(item)]
+    pub fallback_element_cost: Option<f64>,
+    #[pyo3(item)]
+    pub inlets: Option<f64>,
+    #[pyo3(item)]
+    pub outlets: Option<f64>,
+    #[pyo3(item)]
+    pub location: Option<String>,
+    #[pyo3(item)]
+    pub manifold_type: Option<String>,
+    #[pyo3(item)]
+    pub header_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub branch_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub water_depth: Option<f64>,
+    #[pyo3(item)]
+    pub base_cost_per_kg: Option<f64>,
+    #[pyo3(item)]
+    pub branch_allowance: Option<f64>,
+    #[pyo3(item)]
+    pub sorbent_charge_weight: Option<f64>,
+    #[pyo3(item)]
+    pub sorbent_unit_price: Option<f64>,
+    #[pyo3(item)]
+    pub steel_cost_per_kg: Option<f64>,
+    #[pyo3(item)]
+    pub technology: Option<String>,
+    #[pyo3(item)]
+    pub include_balance_of_plant: Option<bool>,
+    #[pyo3(item)]
+    pub sorbent: Option<String>,
+    #[pyo3(item)]
+    pub sorbent_mass_per_bed: Option<f64>,
+    #[pyo3(item)]
+    pub bed_diameter: Option<f64>,
+    #[pyo3(item)]
+    pub bed_length: Option<f64>,
+    #[pyo3(item)]
+    pub ejector_type: Option<String>,
+    #[pyo3(item)]
+    pub suction_pressure: Option<f64>,
+    #[pyo3(item)]
+    pub suction_capacity: Option<f64>,
+    #[pyo3(item)]
+    pub include_intercondensers: Option<bool>,
+    #[pyo3(item)]
+    pub include_aftercondenser: Option<bool>,
+    #[pyo3(item)]
+    pub nominal_diameter_in: Option<f64>,
+    #[pyo3(item)]
+    pub length: Option<f64>,
+    #[pyo3(item)]
+    pub schedule: Option<String>,
+    #[pyo3(item)]
+    pub installation_type: Option<String>,
+    #[pyo3(item)]
+    pub include_fittings: Option<bool>,
+    #[pyo3(item)]
+    pub fittings_per_hundred_m: Option<f64>,
+    #[pyo3(item)]
+    pub number_of_flanges: Option<f64>,
+    #[pyo3(item)]
+    pub valve_type: Option<String>,
+    #[pyo3(item)]
+    pub nominal_size_in: Option<f64>,
+    #[pyo3(item)]
+    pub valve_cv: Option<f64>,
+    #[pyo3(item)]
+    pub pressure_class: Option<f64>,
+    #[pyo3(item)]
+    pub include_actuator: Option<bool>,
+    #[pyo3(item)]
+    pub actuator_type: Option<String>,
+    #[pyo3(item)]
+    pub mixer_type: Option<String>,
+    #[pyo3(item)]
+    pub pipe_diameter_in: Option<f64>,
+    #[pyo3(item)]
+    pub number_of_elements: Option<f64>,
+    #[pyo3(item)]
+    pub flanged_connections: Option<bool>,
+    #[pyo3(item)]
+    pub splitter_type: Option<String>,
+    #[pyo3(item)]
+    pub number_of_outlets: Option<f64>,
+    #[pyo3(item)]
+    pub inlet_diameter_in: Option<f64>,
+    #[pyo3(item)]
+    pub outlet_diameter_in: Option<f64>,
+    #[pyo3(item)]
+    pub include_control_valves: Option<bool>,
+    #[pyo3(item)]
+    pub include_flow_meters: Option<bool>,
+    #[pyo3(item)]
+    pub well_capex: Option<f64>,
+    #[pyo3(item)]
+    pub core_weight: Option<f64>,
+    #[pyo3(item)]
+    pub total_weight: Option<f64>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
@@ -809,6 +1149,33 @@ pub struct PipeFitting {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct ProcessCostEquipment {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub equipment_class: String,
+    #[pyo3(item)]
+    pub purchased_equipment_cost: f64,
+    #[pyo3(item)]
+    pub bare_module_cost: f64,
+    #[pyo3(item)]
+    pub total_module_cost: f64,
+    #[pyo3(item)]
+    pub grass_roots_cost: f64,
+    #[pyo3(item)]
+    pub total_cost: f64,
+    #[pyo3(item)]
+    pub installation_man_hours: f64,
+    #[pyo3(item)]
+    pub weight: f64,
+    #[pyo3(item)]
+    pub power: Option<f64>,
+    #[pyo3(item)]
+    pub duty: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct ProductionChemicalDose {
     #[pyo3(item)]
     pub chemical_type: String,
@@ -1142,6 +1509,19 @@ pub struct Sts0131CheckRow {
     pub sil_compliant: Option<bool>,
     #[pyo3(item)]
     pub custom_ok: Option<bool>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct TopsidesEquipment {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub equipment_type: String,
+    #[pyo3(item)]
+    pub total_module_cost: f64,
+    #[pyo3(item)]
+    pub weight: f64,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

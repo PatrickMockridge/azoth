@@ -1,0 +1,310 @@
+model = "process.equipment_cost_estimate"
+[[cases]]
+id = "column_trayed"
+tolerance = 1.0e-12
+source = "`ColumnCostEstimate` with no mechanical design: a 2 m, 25 m sieve-tray column of 30 trays at 15 barg, a 2000 kW reboiler and a 1500 kW condenser, from `validation/neqsim/captures/process_cost_equipment.tsv` (`equipment_column_trayed`). The class computes the purchased cost and no stack without a design."
+[cases.inputs]
+equipment = [
+  { equipment = "column", name = "Depropaniser", column_type = "trayed", tray_type = "sieve", diameter = 2.0, height = 25.0, number_of_trays = 30.0, design_pressure_barg = 15.0, include_reboiler = true, include_condenser = true, reboiler_duty = 2000.0, condenser_duty = 1500.0, material = "carbon_steel" },
+]
+[cases.expected]
+equipment = [
+  { name = "Depropaniser", equipment_type = "column", purchased_equipment_cost = 186272.12543695548, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "column_stainless"
+tolerance = 1.0e-12
+source = "The same column in SS316 (`equipment_column_stainless`): the purchased cost is `2.1` times the carbon-steel answer, because the class applies the material factor inside the shell, the trays, the reboiler and the condenser."
+[cases.inputs]
+equipment = [
+  { equipment = "column", name = "Depropaniser", column_type = "trayed", tray_type = "sieve", diameter = 2.0, height = 25.0, number_of_trays = 30.0, design_pressure_barg = 15.0, include_reboiler = true, include_condenser = true, reboiler_duty = 2000.0, condenser_duty = 1500.0, material = "ss316" },
+]
+[cases.expected]
+equipment = [
+  { name = "Depropaniser", equipment_type = "column", purchased_equipment_cost = 391171.4634176065, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 2.1, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "column_packed"
+tolerance = 1.0e-12
+source = "A 1.5 m, 15 m column with 10 m of structured packing at 15 barg (`equipment_column_packed`); the class's reboiler and condenser defaults are on, so the case states their 1000 kW and 800 kW duties."
+[cases.inputs]
+equipment = [
+  { equipment = "column", column_type = "packed", packing_type = "structured", diameter = 1.5, height = 15.0, packing_height = 10.0, design_pressure_barg = 15.0, include_reboiler = true, include_condenser = true, reboiler_duty = 1000.0, condenser_duty = 800.0, material = "carbon_steel" },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "column", purchased_equipment_cost = 149981.67037473136, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "column_zero"
+tolerance = 1.0e-12
+source = "A zero-diameter column with the reboiler and condenser switched off (`equipment_column_zero`): the purchased cost is the class's zero and the total cost is zero."
+[cases.inputs]
+equipment = [
+  { equipment = "column", column_type = "trayed", diameter = 0.0, height = 0.0, include_reboiler = false, include_condenser = false },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "column", purchased_equipment_cost = 0.0, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+quality_flags = [
+  { equipment_index = 0.0, message = "The purchased cost is zero; check the capacity basis." },
+]
+[[cases]]
+id = "absorber_packed"
+tolerance = 1.0e-12
+source = "`AbsorberCostEstimate`'s defaults on a 2 m, 15 m absorber with 10 m of structured packing (`equipment_absorber_packed`): the shell has no pressure factor, and the distributor and mist eliminator are on by default."
+[cases.inputs]
+equipment = [
+  { equipment = "absorber", absorber_type = "packed", packing_type = "structured", diameter = 2.0, height = 15.0, packing_height = 10.0, design_pressure_barg = 60.0 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "absorber", purchased_equipment_cost = 155322.29397076587, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "absorber_trayed"
+tolerance = 1.0e-12
+source = "The same absorber trayed with 12 valve trays, the distributor and mist eliminator off (`equipment_absorber_trayed`)."
+[cases.inputs]
+equipment = [
+  { equipment = "absorber", absorber_type = "trayed", tray_type = "valve", diameter = 2.0, height = 15.0, number_of_stages = 12.0, design_pressure_barg = 60.0, include_liquid_distributor = false, include_mist_eliminator = false },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "absorber", purchased_equipment_cost = 62090.37414978155, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "separator_with_stack"
+tolerance = 1.0e-12
+source = "The class's own SRK separator state (`equipment_separator`): a 0.836 m, 1.672 m vessel at a 110 barg design pressure and 3315.94 kg, which gives the module stack and the labour hours. The bill-of-materials material labels are the calculator's canonical name where the design carries `steel`."
+[cases.inputs]
+equipment = [
+  { equipment = "separator", name = "InletSeparator", inner_diameter = 0.8361865022733448, tangent_length = 1.6723730045466896, mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 3315.9396795551834, material = "carbon_steel", include_material_take_off = true, shell_weight = 2098.6959997184704, piping_weight = 839.4783998873882, electro_instrument_weight = 167.89567997747764, structural_weight = 209.86959997184704 },
+]
+[cases.expected]
+equipment = [
+  { name = "InletSeparator", equipment_type = "vessel", purchased_equipment_cost = 4185.028871129008, bare_module_cost = 17231.85637687369, total_module_cost = 21539.820471092113, grass_roots_cost = 32309.73070663817, total_cost = 21539.820471092113, installation_man_hours = 99.47819038665551, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+material_take_off = [
+  { equipment_index = 0.0, item = "Vessel Shell", material = "Carbon Steel", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 2098.6959997184704, has_weight = true, cost_usd = 16789.567997747763, source = "" },
+  { equipment_index = 0.0, item = "Piping", material = "Carbon Steel", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 839.4783998873882, has_weight = true, cost_usd = 8058.992638918926, source = "" },
+  { equipment_index = 0.0, item = "Electrical & Instrumentation", material = "", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 167.89567997747764, has_weight = true, cost_usd = 4029.4963194594634, source = "" },
+  { equipment_index = 0.0, item = "Structural Steel", material = "Carbon Steel", quantity = 0.0, has_quantity = false, unit = "kg", weight_kg = 209.86959997184704, has_weight = true, cost_usd = 1343.1654398198211, source = "" },
+]
+[[cases]]
+id = "reactor"
+tolerance = 1.0e-12
+source = "`ReactorCostEstimate` on the class's own Gibbs-reactor design (`equipment_reactor`): a 0.5 m, 2.0 m vessel at 110 bara with 157.01 kg of catalyst in one bed, whose stack and labour are the class's."
+[cases.inputs]
+equipment = [
+  { equipment = "reactor", vessel_diameter = 0.5, vessel_length = 2.0, design_pressure_bara = 110.00000000000001, catalyst_mass = 157.0102926847301, number_of_beds = 1.0, total_equipped_weight = 839.1623792871716, mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 839.1623792871716 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "reactor", purchased_equipment_cost = 32507.612368330385, bare_module_cost = 133850.09392660036, total_module_cost = 167312.61740825046, grass_roots_cost = 250968.9261123757, total_cost = 167312.61740825046, installation_man_hours = 29.370683275051004, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "compressor"
+tolerance = 1.0e-12
+source = "`CompressorCostEstimate` on the class's 50 000 kg/hr export compressor (`equipment_compressor`): a centrifugal machine of 1314.9 kW with an electric-motor driver; **the estimator's own stage count stays at its default of one**, because the class does not read the design's three stages."
+[cases.inputs]
+equipment = [
+  { equipment = "compressor", power = 1314.898215238133, mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 702848.7190347943 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "compressor", purchased_equipment_cost = 566585.9790593369, bare_module_cost = 2332917.7687768196, total_module_cost = 2916147.2109710244, grass_roots_cost = 4374220.816456537, total_cost = 2916147.2109710244, installation_man_hours = 42170.92314208765, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "pump"
+tolerance = 1.0e-12
+source = "`PumpCostEstimate` on the class's 100 000 kg/hr water pump (`equipment_pump`): a 75 kW centrifugal machine with its motor."
+[cases.inputs]
+equipment = [
+  { equipment = "pump", power = 75.0, mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 753.7347107302816 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "pump", purchased_equipment_cost = 22458.556775479567, bare_module_cost = 92473.1075230371, total_module_cost = 115591.38440379639, grass_roots_cost = 173387.07660569457, total_cost = 115591.38440379639, installation_man_hours = 37.68673553651408, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "expander"
+tolerance = 1.0e-12
+source = "`ExpanderCostEstimate` with a manually stated 2000 kW radial-inflow expander driving a generator (`equipment_expander`): the class's radial correlation with the generator, lube-oil and control extras, and no design so no stack."
+[cases.inputs]
+equipment = [
+  { equipment = "expander", shaft_power = 2000.0, expander_type = "radial-inflow", load_type = "generator" },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "expander", purchased_equipment_cost = 1464123.3831943076, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "heat_exchanger"
+tolerance = 1.0e-12
+source = "`HeatExchangerCostEstimate` on the class's two-stream exchanger (`equipment_heat_exchanger`): **the mechanical design's `getHeatTransferArea` is the base class's 0.0 and no subclass overrides it**, so the estimator falls through to the weight basis even though the design sized 1.724 m2 of shell-and-tube. The case pins the fallback."
+[cases.inputs]
+equipment = [
+  { equipment = "heat_exchanger", exchanger_type = "shell-tube", mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 532.6884503426853 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "exchanger", purchased_equipment_cost = 4261.5076027414825, bare_module_cost = 17546.75755428805, total_module_cost = 21933.446942860064, grass_roots_cost = 32900.1704142901, total_cost = 21933.446942860064, installation_man_hours = 21.307538013707415, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "tank"
+tolerance = 1.0e-12
+source = "`TankCostEstimate` with no design: a 5000 m3 fixed cone-roof tank of 20 m diameter and 16 m height on its foundation (`equipment_tank`)."
+[cases.inputs]
+equipment = [
+  { equipment = "tank", tank_type = "fixed-cone-roof", volume = 5000.0, diameter = 20.0, height = 16.0, include_foundation = true },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "tank", purchased_equipment_cost = 179613.0916761046, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "filter"
+tolerance = 1.0e-12
+source = "`FilterCostEstimate` on the class's coalescer design (`equipment_filter`): a 0.5 m, 1.5 m vessel with one element at 55 bara, whose correlation and fallback costs are both computed and the larger taken."
+[cases.inputs]
+equipment = [
+  { equipment = "filter", inner_diameter = 0.5, tangent_length = 1.5, required_elements = 1.0, design_pressure_bara = 55.00000000000001, material_grade = "SA-516-70", empty_vessel_weight = 323.91707924523325, mechanical_design_present = true, max_design_pressure = 55.00000000000001, weight_total = 431.0922030188032 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "filter", purchased_equipment_cost = 7651.934577484859, bare_module_cost = 29957.323870853223, total_module_cost = 37446.65483856653, grass_roots_cost = 56169.9822578498, total_cost = 37446.65483856653, installation_man_hours = 15.088227105658111, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "manifold"
+tolerance = 1.0e-12
+source = "`ManifoldCostEstimate` on the class's two-inlet, three-outlet topside manifold (`equipment_manifold`): an A106-B production header of 0.3048 m and 2653.87 kg."
+[cases.inputs]
+equipment = [
+  { equipment = "manifold", inlets = 2.0, outlets = 3.0, weight_total = 2653.866258910617, location = "topside", material_grade = "A106-B", manifold_type = "production", header_diameter = 0.3048, branch_diameter = 0.0, water_depth = 0.0, mechanical_design_present = true, max_design_pressure = 110.00000000000001 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "manifold", purchased_equipment_cost = 298501.3068291901, bare_module_cost = 1229079.1308691902, total_module_cost = 1536348.9135864878, grass_roots_cost = 2304523.3703797315, total_cost = 1536348.9135864878, installation_man_hours = 92.88531906187158, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "mercury_removal"
+tolerance = 1.0e-12
+source = "`MercuryRemovalCostEstimate` on the class's 1.5 m by 4 m guard bed (`equipment_mercury`): the steel and sorbent charge costs, then the shared stack."
+[cases.inputs]
+equipment = [
+  { equipment = "mercury_removal", shell_weight = 19496.039027883457, internals_weight = 383.2632545290422, nozzle_weight = 974.8019513941729, sorbent_charge_weight = 4665.265090580843, mechanical_design_present = true, max_design_pressure = 110.00000000000001, weight_total = 32161.80686997908 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "vessel", purchased_equipment_cost = 283464.4611349745, bare_module_cost = 1167164.9187232575, total_module_cost = 1458956.1484040718, grass_roots_cost = 2188434.2226061076, total_cost = 1458956.1484040718, installation_man_hours = 964.8542060993724, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 145789.53408065136, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "electrolyzer"
+tolerance = 1.0e-12
+source = "`ElectrolyzerCostEstimate` on the class's 100 kg/hr PEM stack (`equipment_electrolyzer`): 3271.185 kW at 1250 USD/kW with the scale exponent, the balance of plant and the 2024 CEPCI basis."
+[cases.inputs]
+equipment = [
+  { equipment = "electrolyzer", power = 3271.185, technology = "PEM", include_balance_of_plant = true, mechanical_design_present = true, max_design_pressure = 33.0, weight_total = 27805.0725 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "electrolyzer", purchased_equipment_cost = 3594170.3093879404, bare_module_cost = 13100750.777719043, total_module_cost = 16375938.472148804, grass_roots_cost = 24563907.708223205, total_cost = 16375938.472148804, installation_man_hours = 973.1775375, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 1250.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "psa"
+tolerance = 1.0e-12
+source = "`PSACostEstimate`'s own test recipe (`equipment_psa`): four beds of 20 000 kg activated carbon, balance of plant included, on the class's 12.566 m3 reference bed."
+[cases.inputs]
+equipment = [
+  { equipment = "psa", number_of_beds = 4.0, sorbent = "activated_carbon", sorbent_mass_per_bed = 20000.0, include_balance_of_plant = true },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "psa-cascade", purchased_equipment_cost = 1638000.0, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "ejector"
+tolerance = 1.0e-12
+source = "`EjectorCostEstimate`'s own test recipe (`equipment_ejector`): a two-stage steam ejector lifting 500 kg/hr from 50 mbar to 1.013 bara."
+[cases.inputs]
+equipment = [
+  { equipment = "ejector", ejector_type = "steam", number_of_stages = 2.0, suction_pressure = 50.0, design_pressure_bara = 1.013, suction_capacity = 500.0 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "ejector", purchased_equipment_cost = 150282.87211884474, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "pipe"
+tolerance = 1.0e-12
+source = "`PipeCostEstimate` on the class's 8-inch schedule-40 line (`equipment_pipe`): 500 m above ground, 15 fittings per hundred metres and four flanges; **the estimator applies the material factor inside the piping correlation and again after it**."
+[cases.inputs]
+equipment = [
+  { equipment = "pipe", nominal_diameter_in = 8.0, length = 500.0, schedule = "40", installation_type = "above-ground", include_fittings = true, fittings_per_hundred_m = 15.0, number_of_flanges = 4.0, include_insulation = false },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "piping", purchased_equipment_cost = 795792.2151429062, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 22690.43175690027 },
+]
+[[cases]]
+id = "valve"
+tolerance = 1.0e-12
+source = "`ValveCostEstimate` on a Cv 150 control valve of class 600 with a pneumatic actuator (`equipment_valve`)."
+[cases.inputs]
+equipment = [
+  { equipment = "valve", valve_type = "control", nominal_size_in = 4.0, valve_cv = 150.0, pressure_class = 600.0, include_actuator = true, actuator_type = "pneumatic" },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "valve", purchased_equipment_cost = 82335.92259507756, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "mixer"
+tolerance = 1.0e-12
+source = "`MixerCostEstimate` on a 12-element static mixer in 8-inch pipe at class 300 (`equipment_mixer`)."
+[cases.inputs]
+equipment = [
+  { equipment = "mixer", mixer_type = "static", pipe_diameter_in = 8.0, number_of_elements = 12.0, pressure_class = 300.0, flanged_connections = true },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "mixer", purchased_equipment_cost = 13180.74384039505, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "splitter"
+tolerance = 1.0e-12
+source = "`SplitterCostEstimate` on a four-outlet manifold with a 10-inch inlet and 6-inch outlets at class 600, without valves or meters (`equipment_splitter`)."
+[cases.inputs]
+equipment = [
+  { equipment = "splitter", splitter_type = "manifold", number_of_outlets = 4.0, inlet_diameter_in = 10.0, outlet_diameter_in = 6.0, pressure_class = 600.0, include_control_valves = false, include_flow_meters = false },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "splitter", purchased_equipment_cost = 4004.770953582229, bare_module_cost = 0.0, total_module_cost = 0.0, grass_roots_cost = 0.0, total_cost = 0.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "well"
+tolerance = 1.0e-12
+source = "`WellFlowCostEstimate` with the 80e6 all-in capex its own test states (`equipment_well`): the purchased, module and grass-roots costs are all the capex, and the labour is zero."
+[cases.inputs]
+equipment = [
+  { equipment = "well", well_capex = 80000000.0 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "well", purchased_equipment_cost = 80000000.0, bare_module_cost = 80000000.0, total_module_cost = 80000000.0, grass_roots_cost = 80000000.0, total_cost = 80000000.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]
+[[cases]]
+id = "bahx"
+tolerance = 1.0e-12
+source = "`BAHXCostEstimator` on the class's LNG exchanger (`equipment_bahx`): a 7076.16 kg core in a 7277.61 kg assembly with 2100.67 m2 of area at a 55 barg design pressure. **The estimator has its own installed and maintenance chains beside the shared stack**."
+[cases.inputs]
+equipment = [
+  { equipment = "bahx", core_weight = 7076.159999999999, total_weight = 7277.613908961697, area = 2100.673511375631, mechanical_design_present = true, max_design_pressure = 55.0, weight_total = 7277.613908961697 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "BAHX", purchased_equipment_cost = 596625.9198089183, bare_module_cost = 2335790.476051915, total_module_cost = 2919738.095064894, grass_roots_cost = 4379607.142597341, total_cost = 2919738.095064894, installation_man_hours = 254.7164868136594, material_factor = 1.0, equipment_cost = 596625.9198089183, installed_cost = 2297009.7912643356, specific_cost_per_m2 = 284.01649117678284, specific_capex_per_kw = 0.0, annual_maintenance_cost = 11932.518396178366, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]

@@ -52,6 +52,7 @@ pub mod compressor;
 pub mod consequence_analysis;
 pub mod control_valve_failure_relief;
 pub mod cooler;
+pub mod cost_estimation;
 pub mod deluge_nozzle_layout;
 pub mod depressurization;
 pub mod depressurization_acceptance;
@@ -59,6 +60,7 @@ pub mod distillation_column;
 pub mod drift_flux_release;
 pub mod dynamic_psv_sizing;
 pub mod ejector;
+pub mod equipment_cost_estimate;
 pub mod escalation_graph;
 pub mod esd_response_time;
 pub mod event_tree;
@@ -126,6 +128,7 @@ pub mod pool_fire;
 pub mod porous_media_self_heating;
 pub mod prescribed_slip_release;
 pub mod probit;
+pub mod process_cost_estimate;
 pub mod psv_fire_sizing;
 pub mod psv_sizing;
 pub mod psv_valve;
@@ -162,6 +165,7 @@ pub mod sts0131_gate;
 pub mod tank;
 pub mod three_phase_separator;
 pub mod throttling_valve;
+pub mod topsides_facility_cost;
 pub mod toxic_library;
 pub mod tr3001_compliance;
 #[allow(dead_code)] // until the id slices consume the module
@@ -229,6 +233,9 @@ pub use control_valve_failure_relief::{
     ControlValveFailureReliefResult, control_valve_failure_relief,
 };
 pub use cooler::{CoolerResult, cooler};
+pub use cost_estimation::{
+    CostBomRow, CostEstimationQuery, CostEstimationResult, CostEstimationResultRow, cost_estimation,
+};
 pub use deluge_nozzle_layout::{
     DelugeNozzleLayoutResult, GoverningCriterion, deluge_nozzle_layout,
 };
@@ -240,6 +247,10 @@ pub use distillation_column::{DistillationColumnResult, distillation_column};
 pub use drift_flux_release::{DriftFluxReleaseResult, drift_flux_release};
 pub use dynamic_psv_sizing::{DynamicPsvSizingResult, dynamic_psv_sizing};
 pub use ejector::{EjectorResult, ejector};
+pub use equipment_cost_estimate::{
+    EquipmentCostEstimateResult, EquipmentCostResultRow, EquipmentCostSpec, EquipmentMtoRow,
+    EquipmentQualityFlag, equipment_cost_estimate,
+};
 pub use escalation_graph::{
     EscalationExposure, EscalationGraphResult, EscalationItem, EscalationItemResult,
     escalation_graph,
@@ -338,6 +349,11 @@ pub use pool_fire::{PoolFireResult, pool_fire};
 pub use porous_media_self_heating::{PorousMediaSelfHeatingResult, porous_media_self_heating};
 pub use prescribed_slip_release::{PrescribedSlipReleaseResult, prescribed_slip_release};
 pub use probit::{ProbitResult, probit};
+pub use process_cost_estimate::{
+    DisciplineCostLine, OperatingCostLine, ProcessCostEquipment, ProcessCostEquipmentResult,
+    ProcessCostEstimateResult, ProcessCostFlag, ProcessCostMtoRow, ProjectCostLine, TypeCostLine,
+    process_cost_estimate,
+};
 pub use psv_fire_sizing::{PsvFireSizingResult, psv_fire_sizing};
 pub use psv_sizing::{PsvSizingResult, psv_sizing};
 pub use psv_valve::{PsvValveResult, psv_valve};
@@ -409,6 +425,11 @@ pub use sts0131_gate::{
 pub use tank::{TankResult, tank};
 pub use three_phase_separator::{ThreePhaseSeparatorResult, three_phase_separator};
 pub use throttling_valve::{ThrottlingValveResult, throttling_valve};
+pub use topsides_facility_cost::{
+    TopsidesBreakdownLine, TopsidesCapitalLine, TopsidesEquipment, TopsidesFacilityCostResult,
+    TopsidesFlag, TopsidesMtoRow, TopsidesProjectLine, TopsidesProjectSummaryLine,
+    TopsidesSummaryLine, TopsidesWeightLine, topsides_facility_cost,
+};
 pub use toxic_library::{ToxicLibraryResult, toxic_library};
 pub use tr3001_compliance::{
     Tr3001Check, Tr3001ComplianceResult, Tr3001Finding, Tr3001Scenario, Tr3001Status,

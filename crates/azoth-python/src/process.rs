@@ -2494,3 +2494,60 @@ pub fn pipe_fire_rupture_material(
     .map(|r| crate::transport_gen::PyPipeFireRuptureMaterialResult::from(&r))
     .map_err(|e| to_pyerr(py, e))
 }
+
+/// `process.topsides_facility_cost` - the topsides facility stack.
+///
+/// The module and bulk stack, the project lines and the material take-off.
+#[pyfunction]
+#[allow(clippy::too_many_arguments)]
+#[pyo3(signature = (equipment = None, facility_type = None, project_context = None, location_factor = None, piping_bulk_factor = None, electrical_instrumentation_factor = None, insulation_paint_fireproofing_factor = None, hvac_telecom_safety_factor = None, engineering_procurement_factor = None, construction_management_factor = None, project_contingency_factor = None, owner_cost_factor = None, include_utilities_and_offsites = None, estimate_class = None))]
+#[pyo3(
+    text_signature = "(equipment=None, facility_type=None, project_context=None, location_factor=None, piping_bulk_factor=None, electrical_instrumentation_factor=None, insulation_paint_fireproofing_factor=None, hvac_telecom_safety_factor=None, engineering_procurement_factor=None, construction_management_factor=None, project_contingency_factor=None, owner_cost_factor=None, include_utilities_and_offsites=None, estimate_class=None)"
+)]
+pub fn topsides_facility_cost(
+    py: Python<'_>,
+    equipment: Option<Vec<crate::records_gen::TopsidesEquipment>>,
+    facility_type: Option<&str>,
+    project_context: Option<&str>,
+    location_factor: Option<f64>,
+    piping_bulk_factor: Option<f64>,
+    electrical_instrumentation_factor: Option<f64>,
+    insulation_paint_fireproofing_factor: Option<f64>,
+    hvac_telecom_safety_factor: Option<f64>,
+    engineering_procurement_factor: Option<f64>,
+    construction_management_factor: Option<f64>,
+    project_contingency_factor: Option<f64>,
+    owner_cost_factor: Option<f64>,
+    include_utilities_and_offsites: Option<bool>,
+    estimate_class: Option<f64>,
+) -> PyResult<crate::transport_gen::PyTopsidesFacilityCostResult> {
+    use azoth_process::models::topsides_facility_cost as facility;
+    let rows = equipment.map(|rows| {
+        rows.into_iter()
+            .map(|row| facility::TopsidesEquipment {
+                name: row.name,
+                equipment_type: row.equipment_type,
+                total_module_cost: row.total_module_cost,
+                weight: azoth_core::units::Mass::new::<azoth_core::units::kilogram>(row.weight),
+            })
+            .collect::<Vec<_>>()
+    });
+    facility::topsides_facility_cost(
+        rows.as_deref().unwrap_or(&[]),
+        facility_type.map(str::to_string),
+        project_context.map(str::to_string),
+        location_factor,
+        piping_bulk_factor,
+        electrical_instrumentation_factor,
+        insulation_paint_fireproofing_factor,
+        hvac_telecom_safety_factor,
+        engineering_procurement_factor,
+        construction_management_factor,
+        project_contingency_factor,
+        owner_cost_factor,
+        include_utilities_and_offsites,
+        estimate_class,
+    )
+    .map(|r| crate::transport_gen::PyTopsidesFacilityCostResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}

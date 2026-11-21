@@ -262,6 +262,100 @@ class ConsequenceOutcomeResult:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class CostBomRow:
+    """the vessel bill of materials, one row per line the class adds."""
+
+    #: the line's item.
+    item: str
+
+    #: the material, or the empty string where the class states none.
+    material: str
+
+    #: the count, where the line is a count.
+    quantity: float
+
+    #: whether the line carries a count rather than a weight.
+    has_quantity: bool
+
+    #: the count's unit, or the empty string.
+    unit: str
+
+    #: the line's weight.
+    weight_kg: Q
+
+    #: whether the line carries a weight.
+    has_weight: bool
+
+    #: the line's USD cost.
+    cost_usd: float
+
+    #: the line's source, or the empty string.
+    source: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class CostEstimationResultRow:
+    """one row per input row, in caller order."""
+
+    #: the call this row answered.
+    calculation: str
+
+    #: the correlation, or the empty string where the row is not a correlation call.
+    correlation: str
+
+    #: the correlation's USD answer, or the summary route's located purchased cost.
+    purchased_equipment_cost: float
+
+    #: the step table's factor at the stated pressure, or the stated override.
+    pressure_factor: float
+
+    #: the material factor the row used.
+    material_factor: float
+
+    #: the location factor the row used.
+    location_factor: float
+
+    #: the exchange rate the row used.
+    exchange_rate: float
+
+    #: the bare module cost, USD.
+    bare_module_cost: float
+
+    #: the total module cost, USD.
+    total_module_cost: float
+
+    #: the grass roots cost, USD.
+    grass_roots_cost: float
+
+    #: the installation labour hours.
+    installation_man_hours: Q
+
+    #: the currency conversion's answer.
+    converted_amount: float
+
+    #: the converted amount in USD.
+    cost_in_usd: float
+
+    #: the current cost index the row used.
+    current_cepci: float
+
+    #: the reference cost index the row used.
+    reference_cepci: float
+
+    #: current over reference.
+    cepci_ratio: float
+
+    #: the contingency factor the row used.
+    contingency_factor: float
+
+    #: the engineering factor the row used.
+    engineering_factor: float
+
+    #: the class's stored Lang factor, 3.0, read by no formula.
+    installation_factor: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DepositionSegmentRow:
     """One row per evaluated segment, in the profile's order."""
 
@@ -296,6 +390,17 @@ class DepressurizationPoint:
 
     #: the instantaneous discharge rate.
     mass_flow: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class DisciplineCostLine:
+    """the five discipline lines."""
+
+    #: the discipline.
+    name: str
+
+    #: the discipline's cost.
+    cost: float
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -429,6 +534,108 @@ class EquilibriumSoundSpeedSample:
 
     #: the vapour fraction where the sample is two-phase.
     vapour_fraction: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EquipmentCostResultRow:
+    """one row per equipment item, in caller order."""
+
+    #: the stated name, or the empty string.
+    name: str
+
+    #: the class's equipment-type string, which selects the labour rate.
+    equipment_type: str
+
+    #: the kind's purchased cost, USD.
+    purchased_equipment_cost: float
+
+    #: the bare module cost, USD, zero without a stated design.
+    bare_module_cost: float
+
+    #: the total module cost, USD, zero without a stated design.
+    total_module_cost: float
+
+    #: the grass roots cost, USD, zero without a stated design.
+    grass_roots_cost: float
+
+    #: the class's `getTotalCost` answer, USD.
+    total_cost: float
+
+    #: the installation labour hours.
+    installation_man_hours: Q
+
+    #: the material factor the row used.
+    material_factor: float
+
+    #: a published ex-works equipment cost, USD, zero where the kind publishes none.
+    equipment_cost: float
+
+    #: a published installed cost, USD, zero where the kind publishes none.
+    installed_cost: float
+
+    #: a published USD cost per square metre, zero where the kind publishes none.
+    specific_cost_per_m2: float
+
+    #: a published USD cost per kilowatt, zero where the kind publishes none.
+    specific_capex_per_kw: float
+
+    #: a published annual maintenance cost, USD, zero where the kind publishes none.
+    annual_maintenance_cost: float
+
+    #: a published sorbent replacement cost, USD, zero where the kind publishes none.
+    sorbent_replacement_cost: float
+
+    #: the class's annual operating cost at the stated operating basis, USD, zero where the kind does not override the base five per cent.
+    annual_operating_cost: float
+
+    #: a weight the class computes rather than carries, zero where the kind computes none.
+    calculated_weight: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EquipmentMtoRow:
+    """the weighted bill of materials, one row per line."""
+
+    #: the equipment row this line belongs to.
+    equipment_index: float
+
+    #: the line's item.
+    item: str
+
+    #: the line's material, or the empty string.
+    material: str
+
+    #: the count, where the line is a count.
+    quantity: float
+
+    #: whether the line carries a count.
+    has_quantity: bool
+
+    #: the count's unit, or the empty string.
+    unit: str
+
+    #: the line's weight.
+    weight_kg: Q
+
+    #: whether the line carries a weight.
+    has_weight: bool
+
+    #: the line's USD cost.
+    cost_usd: float
+
+    #: the line's source, or the empty string.
+    source: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class EquipmentQualityFlag:
+    """the class's quality flags, one row per flag."""
+
+    #: the equipment row the flag belongs to.
+    equipment_index: float
+
+    #: the flag's message.
+    message: str
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -1275,6 +1482,17 @@ class OpenDrainResult:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class OperatingCostLine:
+    """the nine operating-cost lines, empty when no operating basis is stated."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's annual cost, USD.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class P002FindingResult:
     """one row per check, in the caller's order."""
 
@@ -1544,6 +1762,83 @@ class PrescribedSlipReleaseStation:
 
     #: the partitioned liquid velocity at the opening and the two-phase ambient; absent elsewhere.
     liquid_velocity: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ProcessCostEquipmentResult:
+    """one summary row per input row."""
+
+    #: the unit's name.
+    name: str
+
+    #: the Java class simple name.
+    equipment_class: str
+
+    #: the type category the class-name chain gives.
+    equipment_type: str
+
+    #: the unit's purchased cost.
+    purchased_equipment_cost: float
+
+    #: the unit's bare module cost.
+    bare_module_cost: float
+
+    #: the unit's total module cost.
+    total_module_cost: float
+
+    #: the unit's grass roots cost.
+    grass_roots_cost: float
+
+    #: the unit's total cost.
+    total_cost: float
+
+    #: the unit's installation labour hours.
+    installation_man_hours: Q
+
+    #: the unit's weight.
+    weight: Q
+
+    #: the purchased cost times the location factor.
+    located_purchased_equipment_cost: float
+
+    #: the location factor applied.
+    location_factor: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ProcessCostFlag:
+    """the class's quality flags."""
+
+    #: the flag's message.
+    message: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ProcessCostMtoRow:
+    """the per-unit material take-off rows."""
+
+    #: the unit's name.
+    name: str
+
+    #: the type category.
+    equipment_type: str
+
+    #: the unit's weight.
+    weight_kg: Q
+
+    #: the unit's located purchased cost.
+    cost_usd: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ProjectCostLine:
+    """the project cost stack, direct to total."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's cost.
+    cost: float
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -2060,6 +2355,109 @@ class SubFraction:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class TopsidesBreakdownLine:
+    """the module breakdown lines, keyed `module.<camelCase>`."""
+
+    #: the module key.
+    name: str
+
+    #: the module's located cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesCapitalLine:
+    """the ten capital-cost lines."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesFlag:
+    """the class's quality flags."""
+
+    #: the flag's message.
+    message: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesMtoRow:
+    """the equipment and allowance MTO rows."""
+
+    #: the line's item.
+    item: str
+
+    #: the line's category.
+    category: str
+
+    #: the line's quantity.
+    quantity: float
+
+    #: the quantity's unit.
+    unit: str
+
+    #: the line's weight, zero where absent.
+    weight_kg: Q
+
+    #: whether the line carries a weight.
+    has_weight: bool
+
+    #: the line's cost.
+    cost_usd: float
+
+    #: the line's source.
+    source: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesProjectLine:
+    """the four project cost lines."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesProjectSummaryLine:
+    """the total topsides capex."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesSummaryLine:
+    """the two summary lines."""
+
+    #: the summary line's name.
+    name: str
+
+    #: the summary line's cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TopsidesWeightLine:
+    """the four weight lines."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's weight.
+    weight_kg: Q
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class Tr3001Finding:
     """one row per check the class raised, in its order."""
 
@@ -2112,6 +2510,17 @@ class TrappedInventorySegmentResult:
 
     #: the pipe's length, echoed.
     length: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TypeCostLine:
+    """the located purchased cost by type, in first-appearance order."""
+
+    #: the type category.
+    name: str
+
+    #: the located purchased cost of the type.
+    cost: float
 
 
 @dataclass(frozen=True, slots=True, eq=False)
