@@ -14,34 +14,35 @@
 //! on any difference.
 
 use crate::record_outputs_gen::{
-    PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
-    PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent, PyChemicalWarningRow,
-    PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult, PyCostBomRow,
-    PyCostEstimationResultRow, PyDepositionSegmentRow, PyDepressurizationPoint,
+    PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBlackOilResultRow,
+    PyBrineMixingPointRow, PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent,
+    PyChemicalWarningRow, PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult,
+    PyCostBomRow, PyCostEstimationResultRow, PyDepositionSegmentRow, PyDepressurizationPoint,
     PyDisciplineCostLine, PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery,
     PyEnvelopeSummary, PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
     PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
-    PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
-    PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
-    PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint,
-    PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent,
-    PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation,
-    PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
-    PyMinimalCutSet, PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
-    PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyOperatingCostLine,
-    PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument,
-    PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
-    PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
-    PyPulsationModeResult, PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation,
-    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
-    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyGasResultRow,
+    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
+    PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
+    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
+    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
+    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
+    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment,
+    PyOpenDrainResult, PyOperatingCostLine, PyP002FindingResult, PyPerformanceAssessment,
+    PyPerformanceFinding, PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint,
+    PyPrescribedSlipReleaseStation, PyProcessCostEquipmentResult, PyProcessCostFlag,
+    PyProcessCostMtoRow, PyProjectCostLine, PyPulsationModeResult, PyRanzMarshallReleaseStation,
+    PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
+    PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
+    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult,
+    PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
     PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow,
     PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
     PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
-    PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
+    PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult, PyWaterResultRow,
+    PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -30302,6 +30303,456 @@ impl From<&azoth_process::models::vessel_rupture::VesselRuptureResult> for PyVes
                 unit: "MPa".to_string(),
             },
             history: r.history.iter().map(PyVesselRuptureStep::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.black_oil_correlations`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BlackOilCorrelationsResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBlackOilCorrelationsResult {
+    /// one row per input row, in caller order; only the fields the calculation answers are present.
+    #[pyo3(get)]
+    pub queries: Vec<PyBlackOilResultRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBlackOilCorrelationsResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BlackOilCorrelationsResult(queries={:?}, {} warning(s))",
+            self.queries,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult>
+    for PyBlackOilCorrelationsResult
+{
+    fn from(r: &azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult) -> Self {
+        Self {
+            queries: r.queries.iter().map(PyBlackOilResultRow::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.decline_curve`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DeclineCurveResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDeclineCurveResult {
+    /// the forecast's times.
+    #[pyo3(get)]
+    pub time: Option<Vec<f64>>,
+    /// the forecast's rates.
+    #[pyo3(get)]
+    pub rate: Option<Vec<f64>>,
+    /// the forecast's cumulative production.
+    #[pyo3(get)]
+    pub cumulative: Option<Vec<f64>>,
+    /// the rate at the stated time.
+    #[pyo3(get)]
+    pub rate_value: Option<f64>,
+    /// the cumulative production at the stated time.
+    #[pyo3(get)]
+    pub cumulative_value: Option<f64>,
+    /// the nominal decline rate, 1/day.
+    #[pyo3(get)]
+    pub nominal: Option<f64>,
+    /// the effective annual decline.
+    #[pyo3(get)]
+    pub effective: Option<f64>,
+    /// the instantaneous decline rate at the stated time.
+    #[pyo3(get)]
+    pub instantaneous_decline_rate: Option<f64>,
+    /// the time to reach the economic limit; absent when the decline is zero.
+    #[pyo3(get)]
+    pub time_to_rate: Option<f64>,
+    /// the estimated ultimate recovery; absent when the decline is zero.
+    #[pyo3(get)]
+    pub eur: Option<f64>,
+    /// the remaining reserves to the economic limit.
+    #[pyo3(get)]
+    pub remaining: Option<f64>,
+    /// the exponential decline rate from two points, 1/day.
+    #[pyo3(get)]
+    pub exponential_decline: Option<f64>,
+    /// the fitted initial rate.
+    #[pyo3(get)]
+    pub fit_qi: Option<f64>,
+    /// the fitted nominal decline rate.
+    #[pyo3(get)]
+    pub fit_di: Option<f64>,
+    /// the fitted Arps exponent.
+    #[pyo3(get)]
+    pub fit_b: Option<f64>,
+    /// the fit's coefficient of determination.
+    #[pyo3(get)]
+    pub fit_r_squared: Option<f64>,
+    /// the fitted Duong rate at unit time.
+    #[pyo3(get)]
+    pub duong_q1: Option<f64>,
+    /// the fitted Duong intercept.
+    #[pyo3(get)]
+    pub duong_a: Option<f64>,
+    /// the fitted Duong slope.
+    #[pyo3(get)]
+    pub duong_m: Option<f64>,
+    /// the Duong time function at the stated time.
+    #[pyo3(get)]
+    pub duong_time: Option<f64>,
+    /// the summary's effective annual decline.
+    #[pyo3(get)]
+    pub summary_effective: Option<f64>,
+    /// the summary's rate at one year.
+    #[pyo3(get)]
+    pub summary_rate_1yr: Option<f64>,
+    /// the summary's rate at five years.
+    #[pyo3(get)]
+    pub summary_rate_5yr: Option<f64>,
+    /// the summary's rate at ten years.
+    #[pyo3(get)]
+    pub summary_rate_10yr: Option<f64>,
+    /// the summary's cumulative at one year.
+    #[pyo3(get)]
+    pub summary_cum_1yr: Option<f64>,
+    /// the summary's cumulative at five years.
+    #[pyo3(get)]
+    pub summary_cum_5yr: Option<f64>,
+    /// the summary's cumulative at ten years.
+    #[pyo3(get)]
+    pub summary_cum_10yr: Option<f64>,
+    /// the summary's time to the economic limit, days.
+    #[pyo3(get)]
+    pub summary_time_to_limit: Option<f64>,
+    /// the summary's time to the economic limit, years.
+    #[pyo3(get)]
+    pub summary_time_to_limit_years: Option<f64>,
+    /// the summary's EUR.
+    #[pyo3(get)]
+    pub summary_eur: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDeclineCurveResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DeclineCurveResult(time={:?}, rate={:?}, cumulative={:?}, rate_value={:?}, cumulative_value={:?}, nominal={:?}, effective={:?}, instantaneous_decline_rate={:?}, time_to_rate={:?}, eur={:?}, remaining={:?}, exponential_decline={:?}, fit_qi={:?}, fit_di={:?}, fit_b={:?}, fit_r_squared={:?}, duong_q1={:?}, duong_a={:?}, duong_m={:?}, duong_time={:?}, summary_effective={:?}, summary_rate_1yr={:?}, summary_rate_5yr={:?}, summary_rate_10yr={:?}, summary_cum_1yr={:?}, summary_cum_5yr={:?}, summary_cum_10yr={:?}, summary_time_to_limit={:?}, summary_time_to_limit_years={:?}, summary_eur={:?}, {} warning(s))",
+            self.time,
+            self.rate,
+            self.cumulative,
+            self.rate_value,
+            self.cumulative_value,
+            self.nominal,
+            self.effective,
+            self.instantaneous_decline_rate,
+            self.time_to_rate,
+            self.eur,
+            self.remaining,
+            self.exponential_decline,
+            self.fit_qi,
+            self.fit_di,
+            self.fit_b,
+            self.fit_r_squared,
+            self.duong_q1,
+            self.duong_a,
+            self.duong_m,
+            self.duong_time,
+            self.summary_effective,
+            self.summary_rate_1yr,
+            self.summary_rate_5yr,
+            self.summary_rate_10yr,
+            self.summary_cum_1yr,
+            self.summary_cum_5yr,
+            self.summary_cum_10yr,
+            self.summary_time_to_limit,
+            self.summary_time_to_limit_years,
+            self.summary_eur,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::decline_curve::DeclineCurveResult> for PyDeclineCurveResult {
+    fn from(r: &azoth_pvt::decline_curve::DeclineCurveResult) -> Self {
+        Self {
+            time: r.time.as_ref().map(|values| values.to_vec()),
+            rate: r.rate.as_ref().map(|values| values.to_vec()),
+            cumulative: r.cumulative.as_ref().map(|values| values.to_vec()),
+            rate_value: r.rate_value,
+            cumulative_value: r.cumulative_value,
+            nominal: r.nominal,
+            effective: r.effective,
+            instantaneous_decline_rate: r.instantaneous_decline_rate,
+            time_to_rate: r.time_to_rate,
+            eur: r.eur,
+            remaining: r.remaining,
+            exponential_decline: r.exponential_decline,
+            fit_qi: r.fit_qi,
+            fit_di: r.fit_di,
+            fit_b: r.fit_b,
+            fit_r_squared: r.fit_r_squared,
+            duong_q1: r.duong_q1,
+            duong_a: r.duong_a,
+            duong_m: r.duong_m,
+            duong_time: r.duong_time,
+            summary_effective: r.summary_effective,
+            summary_rate_1yr: r.summary_rate_1yr,
+            summary_rate_5yr: r.summary_rate_5yr,
+            summary_rate_10yr: r.summary_rate_10yr,
+            summary_cum_1yr: r.summary_cum_1yr,
+            summary_cum_5yr: r.summary_cum_5yr,
+            summary_cum_10yr: r.summary_cum_10yr,
+            summary_time_to_limit: r.summary_time_to_limit,
+            summary_time_to_limit_years: r.summary_time_to_limit_years,
+            summary_eur: r.summary_eur,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.gas_correlations`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GasCorrelationsResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGasCorrelationsResult {
+    /// one row per input row, in caller order; only the fields the calculation answers are present.
+    #[pyo3(get)]
+    pub queries: Vec<PyGasResultRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyGasCorrelationsResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "GasCorrelationsResult(queries={:?}, {} warning(s))",
+            self.queries,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::gas_correlations::GasCorrelationsResult> for PyGasCorrelationsResult {
+    fn from(r: &azoth_pvt::gas_correlations::GasCorrelationsResult) -> Self {
+        Self {
+            queries: r.queries.iter().map(PyGasResultRow::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.gas_material_balance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "GasMaterialBalanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyGasMaterialBalanceResult {
+    /// the gas formation volume factor, reservoir volume per surface volume.
+    #[pyo3(get)]
+    pub gas_fvf: Option<f64>,
+    /// the original gas in place, in the cumulative gas unit; absent when the line does not decline.
+    #[pyo3(get)]
+    pub ogip: Option<f64>,
+    /// the initial p/Z intercept.
+    #[pyo3(get)]
+    pub pi_over_zi: Option<PyQty>,
+    /// the p/Z line's slope in bar per cumulative-gas unit for the p/Z fit; the OGIP for Havlena-Odeh.
+    #[pyo3(get)]
+    pub slope: Option<f64>,
+    /// the fit's coefficient of determination.
+    #[pyo3(get)]
+    pub r_squared: Option<f64>,
+    /// the Cole plot's cumulative gas, from the second history point.
+    #[pyo3(get)]
+    pub cole_gp: Option<Vec<f64>>,
+    /// the Cole plot's F/Eg, from the second history point.
+    #[pyo3(get)]
+    pub cole_f_over_eg: Option<Vec<f64>>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyGasMaterialBalanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "GasMaterialBalanceResult(gas_fvf={:?}, ogip={:?}, pi_over_zi={:?}, slope={:?}, r_squared={:?}, cole_gp={:?}, cole_f_over_eg={:?}, {} warning(s))",
+            self.gas_fvf,
+            self.ogip,
+            self.pi_over_zi,
+            self.slope,
+            self.r_squared,
+            self.cole_gp,
+            self.cole_f_over_eg,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::gas_material_balance::GasMaterialBalanceResult>
+    for PyGasMaterialBalanceResult
+{
+    fn from(r: &azoth_pvt::gas_material_balance::GasMaterialBalanceResult) -> Self {
+        Self {
+            gas_fvf: r.gas_fvf,
+            ogip: r.ogip,
+            pi_over_zi: r.pi_over_zi.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "bar".to_string(),
+            }),
+            slope: r.slope,
+            r_squared: r.r_squared,
+            cole_gp: r.cole_gp.as_ref().map(|values| values.to_vec()),
+            cole_f_over_eg: r.cole_f_over_eg.as_ref().map(|values| values.to_vec()),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.oil_material_balance`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OilMaterialBalanceResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOilMaterialBalanceResult {
+    /// the reservoir withdrawal term F.
+    #[pyo3(get)]
+    pub f: Option<f64>,
+    /// the oil and dissolved-gas expansion term Eo.
+    #[pyo3(get)]
+    pub eo_value: Option<f64>,
+    /// the gas-cap expansion term Eg.
+    #[pyo3(get)]
+    pub eg_value: Option<f64>,
+    /// the connate-water and rock expansion term Efw.
+    #[pyo3(get)]
+    pub efw_value: Option<f64>,
+    /// the fitted original oil in place.
+    #[pyo3(get)]
+    pub ooip: Option<f64>,
+    /// the fitted gas-cap ratio.
+    #[pyo3(get)]
+    pub m_fit: Option<f64>,
+    /// the fit's coefficient of determination.
+    #[pyo3(get)]
+    pub r_squared: Option<f64>,
+    /// the depletion drive index.
+    #[pyo3(get)]
+    pub ddi: Option<f64>,
+    /// the segregation (gas-cap) drive index.
+    #[pyo3(get)]
+    pub sdi: Option<f64>,
+    /// the water drive index.
+    #[pyo3(get)]
+    pub wdi: Option<f64>,
+    /// the expansion drive index.
+    #[pyo3(get)]
+    pub edi: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyOilMaterialBalanceResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "OilMaterialBalanceResult(f={:?}, eo_value={:?}, eg_value={:?}, efw_value={:?}, ooip={:?}, m_fit={:?}, r_squared={:?}, ddi={:?}, sdi={:?}, wdi={:?}, edi={:?}, {} warning(s))",
+            self.f,
+            self.eo_value,
+            self.eg_value,
+            self.efw_value,
+            self.ooip,
+            self.m_fit,
+            self.r_squared,
+            self.ddi,
+            self.sdi,
+            self.wdi,
+            self.edi,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::oil_material_balance::OilMaterialBalanceResult>
+    for PyOilMaterialBalanceResult
+{
+    fn from(r: &azoth_pvt::oil_material_balance::OilMaterialBalanceResult) -> Self {
+        Self {
+            f: r.f,
+            eo_value: r.eo_value,
+            eg_value: r.eg_value,
+            efw_value: r.efw_value,
+            ooip: r.ooip,
+            m_fit: r.m_fit,
+            r_squared: r.r_squared,
+            ddi: r.ddi,
+            sdi: r.sdi,
+            wdi: r.wdi,
+            edi: r.edi,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.water_correlations`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "WaterCorrelationsResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyWaterCorrelationsResult {
+    /// one row per input row, in caller order; only the fields the calculation answers are present.
+    #[pyo3(get)]
+    pub queries: Vec<PyWaterResultRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyWaterCorrelationsResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "WaterCorrelationsResult(queries={:?}, {} warning(s))",
+            self.queries,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::water_correlations::WaterCorrelationsResult> for PyWaterCorrelationsResult {
+    fn from(r: &azoth_pvt::water_correlations::WaterCorrelationsResult) -> Self {
+        Self {
+            queries: r.queries.iter().map(PyWaterResultRow::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

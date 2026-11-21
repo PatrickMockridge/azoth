@@ -108,6 +108,41 @@ pub struct BasketTestPoint {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct BlackOilQuery {
+    #[pyo3(item)]
+    pub calculation: String,
+    #[pyo3(item)]
+    pub rs: Option<f64>,
+    #[pyo3(item)]
+    pub gamma_g: Option<f64>,
+    #[pyo3(item)]
+    pub gamma_o: Option<f64>,
+    #[pyo3(item)]
+    pub api: Option<f64>,
+    #[pyo3(item)]
+    pub temperature: Option<f64>,
+    #[pyo3(item)]
+    pub pressure: Option<f64>,
+    #[pyo3(item)]
+    pub bob: Option<f64>,
+    #[pyo3(item)]
+    pub compressibility: Option<f64>,
+    #[pyo3(item)]
+    pub pb: Option<f64>,
+    #[pyo3(item)]
+    pub mu_od: Option<f64>,
+    #[pyo3(item)]
+    pub mu_ob: Option<f64>,
+    #[pyo3(item)]
+    pub rho_g: Option<f64>,
+    #[pyo3(item)]
+    pub molar_mass: Option<f64>,
+    #[pyo3(item)]
+    pub z: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct BlowdownProfilePoint {
     #[pyo3(item)]
     pub time: f64,
@@ -803,6 +838,37 @@ pub struct FmeaEntry {
     pub detection: f64,
     #[pyo3(item)]
     pub mitigation: Option<String>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct GasQuery {
+    #[pyo3(item)]
+    pub calculation: String,
+    #[pyo3(item)]
+    pub gamma_g: Option<f64>,
+    #[pyo3(item)]
+    pub y_h2s: Option<f64>,
+    #[pyo3(item)]
+    pub y_co2: Option<f64>,
+    #[pyo3(item)]
+    pub y_n2: Option<f64>,
+    #[pyo3(item)]
+    pub temperature: Option<f64>,
+    #[pyo3(item)]
+    pub pressure: Option<f64>,
+    #[pyo3(item)]
+    pub reference_pressure: Option<f64>,
+    #[pyo3(item)]
+    pub tpc: Option<f64>,
+    #[pyo3(item)]
+    pub ppc: Option<f64>,
+    #[pyo3(item)]
+    pub tpr: Option<f64>,
+    #[pyo3(item)]
+    pub ppr: Option<f64>,
+    #[pyo3(item)]
+    pub molar_mass: Option<f64>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
@@ -1632,6 +1698,23 @@ pub struct WaterAnalysis {
     pub pressure: f64,
     #[pyo3(item)]
     pub co2_partial_pressure: f64,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
+pub struct WaterQuery {
+    #[pyo3(item)]
+    pub calculation: String,
+    #[pyo3(item)]
+    pub temperature: Option<f64>,
+    #[pyo3(item)]
+    pub pressure: Option<f64>,
+    #[pyo3(item)]
+    pub salinity_ppm: Option<f64>,
+    #[pyo3(item)]
+    pub salinity_wt_fraction: Option<f64>,
+    #[pyo3(item)]
+    pub salinity_molality: Option<f64>,
 }
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.

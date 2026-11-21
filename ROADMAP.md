@@ -172,10 +172,13 @@ process model needs.
   (`eos.surf_cooldown`). **One class is left**: `CO2CorrosionAnalyzer`, whose pH comes from an
   electrolyte-CPA flash this tree does not carry the system route for; it is Tier 4's alone.
   The six asphaltene screens stay carried on NeqSim defect `#3913`, and the one wax
-  (`WaxCurveCalculator`) belongs to Tier 3's wax bullet. **The rest of `pvtsimulation/` is not
-  here**: the simulation suite,
-  the model tuning and the reservoir properties are engineering deliverables, and
-  [the specification](docs/src/architecture/specification.md) puts them beyond the port.
+  (`WaxCurveCalculator`) belongs to Tier 3's wax bullet. **The correlation and reservoir half
+  of `pvtsimulation/` is here, as six `pvt.*` ids**: `pvt.black_oil_correlations`,
+  `pvt.gas_correlations` and `pvt.water_correlations` are the three scalar tables,
+  `pvt.decline_curve` the Arps and Duong arithmetic, and `pvt.gas_material_balance` and
+  `pvt.oil_material_balance` the two material balances. **The laboratory experiments, the
+  evidence/history layer and the regression/tuning are owed**, with their classes named in the
+  specs and in the paragraph below.
 
 ### Tier 2 — water and gas-water
 
@@ -670,6 +673,30 @@ a claim nothing holds.
   are USD magnitudes declared dimensionless, the `total_pressure_drop_mbar` precedent, so no
   currency dimension is added; the JSON adapters, the reports and the serialization remain
   session surface. Held to four captures and the class's own tests.
+
+- **The PVT simulation package's correlation and reservoir half is ported, as six ids.**
+  `pvt.black_oil_correlations` is the `BlackOilCorrelations`/`SaturationPressureCorrelation`
+  table with the two classes' conversion literals kept apart and the `_p_sat` clamp carried;
+  `pvt.gas_correlations` is the Z-factor, pseudo-critical and pseudo-pressure set with both
+  Hall-Yarborough forms; `pvt.water_correlations` is the water and brine table with its three
+  salinity conventions; `pvt.decline_curve` is the Arps and Duong arithmetic with its two fits;
+  and the two material balances are the p/Z, Cole, Havlena-Odeh and drive-index routes. The
+  classes' own contradictions travel with the arithmetic rather than being repaired: the
+  `_p_sat` Vasquez-Beggs exponent's opposite sign, the BlackOil Glaso's specific-gravity divisor
+  against the p_sat API one, and the gas-FVF standard state's 288.71 K. **The laboratory
+  experiments are the next tranche**: `SaturationPressure`, `SaturationTemperature`,
+  `ConstantMassExpansion`, `DifferentialLiberation`, `ConstantVolumeDepletion`,
+  `SeparatorTest`, `MultiStageSeparatorTest`, `GOR`, `SwellingTest`, `MMPCalculator`,
+  `DensitySim`, `ViscositySim`, `WaxFractionSim` and `ViscosityWaxOilSim`. **Owed with the
+  class**: the evidence/history/calibration layer (`DepletionSnapshot`, `CvdMaterialBalance`,
+  `PvtGasDensityConsistency`, `PvtSeparatorPath`, `PVTFluidStudy`, `CalibratedPvtModel`,
+  `CompositionalReservoirHistory`, `DepletionPvtHistoryGenerator`, `MaterialBalancePvtHistory`,
+  `ReservoirHistoryEnsemble`), the regression and tuning (`PVTRegression`, `TuneToSaturation`,
+  `util/parameterfitting/`), the reservoir properties (`VanEverdingenHurstAquifer`,
+  `FetkovichAquifer`, `GeneralizedMaterialBalance`, `RadialInfiniteInfluence`,
+  `RelativePermeabilityGenerator`), `BlackOilTableValidator.validate`, `SlimTubeSim`, and the
+  reports (`PVTReportGenerator`, `generateQCReport`, `toEclipseKeyword`, `toJson`/`toMap`).
+  The laboratory half is the next tranche; the rest is named rather than left implicit.
 
 - **The mechanical-design tree** — `process/mechanicaldesign/` and the `*MechanicalDesign`
   class beside each equipment class — is where most of them are. **The entries that carry a

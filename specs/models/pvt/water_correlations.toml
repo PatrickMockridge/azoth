@@ -1,0 +1,104 @@
+id = "pvt.water_correlations"
+name = "Water and brine correlation table"
+kind = "procedure"
+assumptions = [
+    "**the classes' own units**: FVF and Rsw are dimensionless, viscosity answers Pa*s from the class's cP, compressibility 1/Pa from its 1/bara, and surface tension N/m from its mN/m.",
+    "**two salinity conventions are kept apart**: `WaterPropertyCorrelations` takes ppm (mg/L) and divides by 1e6, while `SolutionGasWaterRatio` takes molality (mol/kg) and converts to weight percent with 58.44 g/mol NaCl.",
+    "**the McCain water viscosity clamps its Fahrenheit temperature to [100, 400]** and the surface tension clamps its 74-bara value to at least 1 mN/m and its pressure factor to at least 0.2.",
+    "**the Culberson Rsw and the McCain Rsw are different correlations**, not two spellings: the McCain one adds the C p^2 term and a Cs salinity coefficient. Its class default is the electrolyte CPA, owed with `SystemElectrolyteCPAstatoil`.",
+    "**the summary map is the union of the rows**; the class's `printResults` and the EoS Rsw paths are session surface or owed.",
+    "**a required field, a non-positive temperature or pressure, a negative salinity and a weight fraction outside [0, 0.3] are refused.**",
+]
+references = [
+    "McCain, W. D. (1991). \"Reservoir-Fluid Property Correlations - State of the Art.\" SPE Reservoir Engineering 6(2), 266-272. DOI 10.2118/18571-PA.",
+    "Osif, T. L. (1988). \"The Effects of Salt, Gas, Temperature, and Pressure on the Compressibility of Water.\" SPE Reservoir Engineering 3(1), 175-181. DOI 10.2118/13174-PA.",
+    "Meehan, D. N. (1980). \"A Correlation for Water Viscosity.\" Pet. Eng. Int. 52(7), 108-109.",
+    "Batzle, M. & Wang, Z. (1992). \"Seismic Properties of Pore Fluids.\" Geophysics 57(11), 1396-1408. DOI 10.1190/1.1443207.",
+    "Culberson, O. L. & McKetta, J. J. (1951). \"Phase Equilibria in Hydrocarbon-Water Systems III.\" Journal of Petroleum Technology 3(4), 223-226. DOI 10.2118/951223-G.",
+    "Jennings, H. Y. & Newman, G. H. (1971). \"The Effect of Temperature and Pressure on the Interfacial Tension of Water against Methane-Normal Decane Mixtures.\" SPE Journal 11(2), 171-175. DOI 10.2118/3071-PA.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/util/WaterPropertyCorrelations.java` and the McCain path of `SolutionGasWaterRatio.java` are the port source.",
+    "`validation/neqsim/captures/pvt_water.tsv` - the water-property state, the surface-tension pressure correction and both McCain Rsw salinities.",
+]
+[source]
+standard = "NeqSim pvtsimulation/util/WaterPropertyCorrelations.java and SolutionGasWaterRatio.java"
+edition = "Every water-property correlation and the McCain Rsw; the Søreide-Whitson and electrolyte-CPA Rsw paths are named in the assumptions rather than ported."
+[algorithm]
+scheme = "water_correlation_dispatch"
+initialisation = "first_query_in_caller_order"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.queries]
+type = "record_list"
+row_type = "WaterQuery"
+description = "one water correlation call per row, in caller order; `calculation` selects the fields the row must carry.\n"
+[inputs.queries.fields.calculation]
+type = "enum"
+values = [
+    "water_fvf_mccain",
+    "water_fvf_osif",
+    "dead_water_viscosity_mccain",
+    "water_viscosity_mccain",
+    "water_compressibility_mccain",
+    "brine_density_batzle_wang",
+    "water_density",
+    "solution_gas_water_ratio_culberson",
+    "water_gas_surface_tension",
+    "rsw_mccain",
+]
+description = "the correlation this row asks for.\n"
+[inputs.queries.fields.temperature]
+unit = "K"
+optional = true
+description = "absolute temperature.\n"
+[inputs.queries.fields.pressure]
+unit = "Pa"
+optional = true
+description = "absolute pressure.\n"
+[inputs.queries.fields.salinity_ppm]
+unit = "dimensionless"
+optional = true
+description = "salinity in ppm (mg/L), the water-property convention.\n"
+[inputs.queries.fields.salinity_wt_fraction]
+unit = "dimensionless"
+optional = true
+description = "salinity as a mass fraction, the Batzle-Wang convention; in [0, 0.3].\n"
+[inputs.queries.fields.salinity_molality]
+unit = "mol/kg"
+optional = true
+description = "salinity in mol NaCl per kg water, the McCain Rsw convention.\n"
+[outputs]
+[outputs.queries]
+type = "record_list"
+description = "one row per input row, in caller order; only the fields the calculation answers are present.\n"
+[outputs.queries.fields.calculation]
+type = "string"
+description = "the call this row answered.\n"
+[outputs.queries.fields.fvf]
+unit = "dimensionless"
+optional = true
+description = "the water formation volume factor.\n"
+[outputs.queries.fields.viscosity]
+unit = "Pa*s"
+optional = true
+description = "the water or brine viscosity.\n"
+[outputs.queries.fields.compressibility]
+unit = "dimensionless"
+optional = true
+description = "the water compressibility in 1/Pa.\n"
+[outputs.queries.fields.density]
+unit = "kg/m**3"
+optional = true
+description = "the water or brine density.\n"
+[outputs.queries.fields.rsw]
+unit = "dimensionless"
+optional = true
+description = "the solution gas-water ratio in Sm3/Sm3.\n"
+[outputs.queries.fields.surface_tension]
+unit = "N/m"
+optional = true
+description = "the water-gas surface tension.\n"
+[implementations]
+python = "azoth.pvt.water_correlations"
+rust = "azoth_pvt::water_correlations"

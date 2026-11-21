@@ -61,13 +61,37 @@ def test_no_model_file_hand_writes_its_calc_result_block() -> None:
 
 
 def test_every_model_module_has_a_generated_block() -> None:
-    """A new model file with no block would be a silent hole in the registry."""
-    modules = MODULE_DECL.findall((MODELS / "mod.rs").read_text())
-    assert modules, "no `pub mod` lines found in models/mod.rs - the reader is wrong"
+    """A model spec with no result struct would be a silent hole in the registry."""
+    from azoth import _models_gen
+
     gen = _tools_module("gen_rust_model_records")
-    covered = {result.calc_id for result in gen.process_results()[0]}
-    missing = sorted(name for name in modules if f"process.{name}" not in covered)
+    covered = {result.calc_id for result in gen.crate_results("azoth-process")[0]}
+    wanted = {entry["id"] for entry in _models_gen.MODELS if entry["id"].startswith("process.")}
+    missing = sorted(wanted - covered)
     assert missing == [], f"no generated record for: {', '.join(missing)}"
+
+
+def test_every_pvt_model_has_a_generated_block() -> None:
+    """The pvt crate's generated records, held to its specs."""
+    from azoth import _models_gen
+
+    gen = _tools_module("gen_rust_model_records")
+    covered = {result.calc_id for result in gen.crate_results("azoth-pvt")[0]}
+    wanted = {entry["id"] for entry in _models_gen.MODELS if entry["id"].startswith("pvt.")}
+    assert wanted <= covered, f"no generated record for: {', '.join(sorted(wanted - covered))}"
+
+
+def test_no_pvt_model_file_hand_writes_its_calc_result_block() -> None:
+    """The same ratchet in the pvt crate; `model_records_gen.rs` is the generator's file."""
+    pvt = REPO_ROOT / "crates" / "azoth-pvt" / "src"
+    offenders = sorted(
+        path.name
+        for path in pvt.glob("*.rs")
+        if path.name != "model_records_gen.rs" and "impl CalcResult for" in path.read_text()
+    )
+    assert offenders == [], "these pvt files hand-write a block the generator emits: " + ", ".join(
+        offenders
+    )
 
 
 def test_the_emitter_renders_a_result_the_tree_does_not_have() -> None:

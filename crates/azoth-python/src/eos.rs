@@ -1872,8 +1872,8 @@ pub fn saturate_with_water(
 /// Every model in the workspace, across every namespace that has one.
 ///
 /// The table is generated into the crate that owns its namespace, so a second
-/// namespace means a second table chained in here. There are three: `eos` and
-/// `reactions`, and `process`, which is the unit-operation tier and is what P11 builds.
+/// namespace means a second table chained in here: `eos`, `characterization`,
+/// `reactions`, `standards`, `process` and `pvt`.
 ///
 /// **This is the function that has to change when a namespace is added**, and a missing
 /// chain is not self-announcing: `process.pump` landed without one, and the contract test
@@ -1886,6 +1886,7 @@ fn all_models() -> impl Iterator<Item = &'static azoth_core::ModelSpec> {
         .chain(azoth_reactions::model_gen::models().iter())
         .chain(azoth_standards::model_gen::models().iter())
         .chain(azoth_process::model_gen::models().iter())
+        .chain(azoth_pvt::model_gen::models().iter())
         .copied()
 }
 

@@ -1,0 +1,112 @@
+model = "pvt.oil_material_balance"
+[[cases]]
+id = "withdrawal_f"
+tolerance = 1.0e-9
+source = "The class's withdrawal term, from `validation/neqsim/captures/pvt_oil_material_balance.tsv`."
+[cases.inputs]
+calculation = "withdrawal_f"
+np = 1000000.0
+rp = 500.0
+bo = 1.2
+rs = 300.0
+bg = 0.005
+wp = 100000.0
+bw = 1.01
+[cases.expected]
+f = 2301000.0
+[[cases]]
+id = "eo"
+tolerance = 1.0e-9
+source = "The oil and dissolved-gas expansion term."
+[cases.inputs]
+calculation = "eo"
+bo = 1.2
+boi = 1.3
+rsi = 400.0
+rs = 300.0
+bg = 0.005
+[cases.expected]
+eo_value = 0.3999999999999999
+[[cases]]
+id = "eg"
+tolerance = 1.0e-9
+source = "The gas-cap expansion term."
+[cases.inputs]
+calculation = "eg"
+boi = 1.3
+bg = 0.005
+bgi = 0.004
+[cases.expected]
+eg_value = 0.325
+[[cases]]
+id = "efw"
+tolerance = 1.0e-9
+source = "The connate-water and rock expansion term."
+[cases.inputs]
+calculation = "efw"
+boi = 1.3
+m = 0.2
+cw = 4.0e-5
+swi = 0.2
+cf = 3.0e-5
+delta_p = 50.0
+[cases.expected]
+efw_value = 0.003705000000000001
+[[cases]]
+id = "fit_depletion_drive"
+tolerance = 1.0e-9
+source = "The depletion-drive fit through the origin."
+[cases.inputs]
+calculation = "fit_depletion_drive"
+f_history = [1000000.0, 2000000.0, 3000000.0]
+eo_history = [0.1, 0.2, 0.3]
+[cases.expected]
+ooip = 9999999.999999998
+m_fit = 0.0
+r_squared = 1.0
+[[cases]]
+id = "fit_gas_cap_drive"
+tolerance = 1.0e-9
+source = "The two-predictor gas-cap fit on non-collinear predictors."
+[cases.inputs]
+calculation = "fit_gas_cap_drive"
+f_history = [1030000.0, 2036000.0, 3060000.0]
+eo_history = [0.1, 0.2, 0.3]
+eg_history = [0.015, 0.018, 0.03]
+[cases.expected]
+ooip = 9999999.999999957
+m_fit = 0.20000000000005388
+r_squared = 1.0
+[[cases]]
+id = "fit_water_drive"
+tolerance = 1.0e-9
+source = "The water-drive plot with a known influx."
+[cases.inputs]
+calculation = "fit_water_drive"
+f_history = [1000000.0, 2101000.0, 3202000.0]
+eo_history = [0.1, 0.2, 0.3]
+we_history = [0.0, 100000.0, 200000.0]
+bw = 1.01
+[cases.expected]
+ooip = 10000000.0
+m_fit = 0.0
+r_squared = 1.0
+[[cases]]
+id = "drive_indices"
+tolerance = 1.0e-9
+source = "The four drive indices at one history point."
+[cases.inputs]
+calculation = "drive_indices"
+n = 10000000.0
+m = 0.2
+eo_term = 0.2
+eg_term = 0.02
+efw_term = 0.001
+we_value = 100000.0
+bw = 1.01
+f_value = 3000000.0
+[cases.expected]
+ddi = 0.6666666666666666
+sdi = 0.013333333333333334
+wdi = 0.033666666666666664
+edi = 0.0033333333333333335

@@ -22,6 +22,7 @@ azoth-eos.workspace = true
 azoth-reactions.workspace = true
 azoth-standards.workspace = true
 azoth-characterization.workspace = true
+azoth-pvt.workspace = true
 azoth-process.workspace = true
 azoth-safety.workspace = true
 azoth-dexpi.workspace = true

@@ -461,6 +461,18 @@ Five sections, and the difference between them is the point:
 - [`process.vessel_filling`](./process/vessel_filling.md) — Vessel filling
 - [`process.vessel_rupture`](./process/vessel_rupture.md) — Vessel rupture
 
+**PVT simulation** - [`pvt/index.md`](./pvt/index.md):
+
+
+*Models* — whose specs fix a procedure rather than an equation:
+
+- [`pvt.black_oil_correlations`](./pvt/black_oil_correlations.md) — Black-oil correlation table
+- [`pvt.decline_curve`](./pvt/decline_curve.md) — Decline-curve analysis
+- [`pvt.gas_correlations`](./pvt/gas_correlations.md) — Gas correlation table
+- [`pvt.gas_material_balance`](./pvt/gas_material_balance.md) — Gas material balance
+- [`pvt.oil_material_balance`](./pvt/oil_material_balance.md) — Oil material balance
+- [`pvt.water_correlations`](./pvt/water_correlations.md) — Water and brine correlation table
+
 **Reactions** - [`reactions/index.md`](./reactions/index.md):
 
 - [`reactions.equilibrium_constant`](./reactions/equilibrium_constant.md)

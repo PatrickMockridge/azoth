@@ -36,6 +36,8 @@ from azoth.core.result import (
     BasketTestRegressionResult,
     BeggsBrillRegime,
     BeggsBrillSegmentResult,
+    BlackOilCorrelationsResult,
+    BlackOilResultRow,
     BleveResult,
     BlockedOutletOverpressureResult,
     BlockedOutletReliefResult,
@@ -89,6 +91,7 @@ from azoth.core.result import (
     CriticalPointResult,
     DarcyWeisbachResult,
     DeadheadVerdict,
+    DeclineCurveResult,
     DelugeNozzleLayoutResult,
     DelumpingResult,
     DepositionSegmentRow,
@@ -158,7 +161,10 @@ from azoth.core.result import (
     FurstElectrolyteMod2004PhaseResult,
     FurstElectrolytePhaseResult,
     GasBlowbyResult,
+    GasCorrelationsResult,
     GasDispersionResult,
+    GasMaterialBalanceResult,
+    GasResultRow,
     GasScrubberResult,
     GaussianPlumeResult,
     GeFlashResult,
@@ -265,6 +271,7 @@ from azoth.core.result import (
     NorsokP002ComplianceResult,
     NrtlActivityCoefficientsResult,
     OilAssayDerivationResult,
+    OilMaterialBalanceResult,
     OpenDrainAssessment,
     OpenDrainResult,
     OpenDrainReviewResult,
@@ -511,11 +518,13 @@ from azoth.core.result import (
     VuFlashResult,
     VuFlashSingleCompResult,
     WaterCompatibilityResult,
+    WaterCorrelationsResult,
     WaterDewPointLineResult,
     WaterDewPointMultiphaseResult,
     WaterDewPointTemperatureResult,
     WaterMixingResult,
     WaterPhaseResult,
+    WaterResultRow,
     WaxSolidFugacityResult,
     WhitsonGammaSplitResult,
     WilkeChangDiffusivityResult,
@@ -577,6 +586,7 @@ __all__ = [
     "barrier_register_validation",
     "basket_test_regression",
     "beggs_brill_segment",
+    "black_oil_correlations",
     "bleve",
     "blocked_outlet_overpressure",
     "blocked_outlet_relief",
@@ -619,6 +629,7 @@ __all__ = [
     "critical_point",
     "darcy_weisbach",
     "de_waard_milliams_corrosion",
+    "decline_curve",
     "deluge_nozzle_layout",
     "delumping",
     "depressurization",
@@ -667,7 +678,9 @@ __all__ = [
     "furst_electrolyte_mod2004_phase",
     "furst_electrolyte_phase",
     "gas_blowby",
+    "gas_correlations",
     "gas_dispersion",
+    "gas_material_balance",
     "gas_scrubber",
     "gaussian_plume",
     "ge_flash",
@@ -744,6 +757,7 @@ __all__ = [
     "norsok_p002_compliance",
     "nrtl_activity_coefficients",
     "oil_assay_derivation",
+    "oil_material_balance",
     "open_drain_review",
     "orifice_flow",
     "overpressure_acceptance",
@@ -926,6 +940,7 @@ __all__ = [
     "vu_flash",
     "vu_flash_single_comp",
     "water_compatibility",
+    "water_correlations",
     "water_dew_point_line",
     "water_dew_point_multiphase",
     "water_dew_point_temperature",
@@ -10428,6 +10443,177 @@ def vessel_rupture(inner_radius: Q, wall_thickness: Q, material: str, history: l
         ambient_yield_strength=from_si(result.ambient_yield_strength.magnitude_si, result.ambient_yield_strength.unit),
         ambient_tensile_strength=from_si(result.ambient_tensile_strength.magnitude_si, result.ambient_tensile_strength.unit),
         history=tuple(VesselRuptureStep(time=from_si(c.time.magnitude_si, c.time.unit), von_mises_stress=from_si(c.von_mises_stress.magnitude_si, c.von_mises_stress.unit), allowable_stress=from_si(c.allowable_stress.magnitude_si, c.allowable_stress.unit), margin=from_si(c.margin.magnitude_si, c.margin.unit)) for c in result.history),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def black_oil_correlations(queries: Sequence[Mapping[str, Any]]) -> BlackOilCorrelationsResult:
+    """``pvt.black_oil_correlations``, computed in Rust."""
+    spec = _models_gen.model("pvt.black_oil_correlations")
+    result = _core.black_oil_correlations(
+        input_records_to_si(spec, "queries", queries),
+    )
+    return BlackOilCorrelationsResult(
+        queries=tuple(BlackOilResultRow(calculation=c.calculation, pressure=None if c.pressure is None else from_si(c.pressure.magnitude_si, c.pressure.unit), solution_gor=c.solution_gor, oil_fvf=c.oil_fvf, compressibility=c.compressibility, viscosity=None if c.viscosity is None else from_si(c.viscosity.magnitude_si, c.viscosity.unit), gas_fvf=c.gas_fvf, factor=c.factor, average=None if c.average is None else from_si(c.average.magnitude_si, c.average.unit), minimum=None if c.minimum is None else from_si(c.minimum.magnitude_si, c.minimum.unit), maximum=None if c.maximum is None else from_si(c.maximum.magnitude_si, c.maximum.unit), std_dev=None if c.std_dev is None else from_si(c.std_dev.magnitude_si, c.std_dev.unit), standing=None if c.standing is None else from_si(c.standing.magnitude_si, c.standing.unit), vasquez_beggs=None if c.vasquez_beggs is None else from_si(c.vasquez_beggs.magnitude_si, c.vasquez_beggs.unit), glaso=None if c.glaso is None else from_si(c.glaso.magnitude_si, c.glaso.unit), petrosky_farshad=None if c.petrosky_farshad is None else from_si(c.petrosky_farshad.magnitude_si, c.petrosky_farshad.unit)) for c in result.queries),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def decline_curve(calculation: str, *, qi: float | None=None, di: float | None=None, b: float | None=None, t: float | None=None, q_limit: float | None=None, d_nominal: float | None=None, d_effective: float | None=None, q1: float | None=None, t1: float | None=None, q2: float | None=None, t2: float | None=None, q3: float | None=None, t3: float | None=None, t_start: float | None=None, t_end: float | None=None, t_step: float | None=None, t_current: float | None=None, a: float | None=None, m: float | None=None, start_index: float | None=None, end_index: float | None=None, history_time: Sequence[float] | None=None, history_rate: Sequence[float] | None=None) -> DeclineCurveResult:
+    """``pvt.decline_curve``, computed in Rust."""
+    result = _core.decline_curve(
+        calculation,
+        None if qi is None else qi,
+        None if di is None else di,
+        None if b is None else b,
+        None if t is None else t,
+        None if q_limit is None else q_limit,
+        None if d_nominal is None else d_nominal,
+        None if d_effective is None else d_effective,
+        None if q1 is None else q1,
+        None if t1 is None else t1,
+        None if q2 is None else q2,
+        None if t2 is None else t2,
+        None if q3 is None else q3,
+        None if t3 is None else t3,
+        None if t_start is None else t_start,
+        None if t_end is None else t_end,
+        None if t_step is None else t_step,
+        None if t_current is None else t_current,
+        None if a is None else a,
+        None if m is None else m,
+        None if start_index is None else start_index,
+        None if end_index is None else end_index,
+        None if history_time is None else list(history_time),
+        None if history_rate is None else list(history_rate),
+    )
+    return DeclineCurveResult(
+        time=None if result.time is None else tuple(result.time),
+        rate=None if result.rate is None else tuple(result.rate),
+        cumulative=None if result.cumulative is None else tuple(result.cumulative),
+        rate_value=result.rate_value,
+        cumulative_value=result.cumulative_value,
+        nominal=result.nominal,
+        effective=result.effective,
+        instantaneous_decline_rate=result.instantaneous_decline_rate,
+        time_to_rate=result.time_to_rate,
+        eur=result.eur,
+        remaining=result.remaining,
+        exponential_decline=result.exponential_decline,
+        fit_qi=result.fit_qi,
+        fit_di=result.fit_di,
+        fit_b=result.fit_b,
+        fit_r_squared=result.fit_r_squared,
+        duong_q1=result.duong_q1,
+        duong_a=result.duong_a,
+        duong_m=result.duong_m,
+        duong_time=result.duong_time,
+        summary_effective=result.summary_effective,
+        summary_rate_1yr=result.summary_rate_1yr,
+        summary_rate_5yr=result.summary_rate_5yr,
+        summary_rate_10yr=result.summary_rate_10yr,
+        summary_cum_1yr=result.summary_cum_1yr,
+        summary_cum_5yr=result.summary_cum_5yr,
+        summary_cum_10yr=result.summary_cum_10yr,
+        summary_time_to_limit=result.summary_time_to_limit,
+        summary_time_to_limit_years=result.summary_time_to_limit_years,
+        summary_eur=result.summary_eur,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def gas_correlations(queries: Sequence[Mapping[str, Any]]) -> GasCorrelationsResult:
+    """``pvt.gas_correlations``, computed in Rust."""
+    spec = _models_gen.model("pvt.gas_correlations")
+    result = _core.gas_correlations(
+        input_records_to_si(spec, "queries", queries),
+    )
+    return GasCorrelationsResult(
+        queries=tuple(GasResultRow(calculation=c.calculation, temperature=None if c.temperature is None else from_si(c.temperature.magnitude_si, c.temperature.unit), pressure=None if c.pressure is None else from_si(c.pressure.magnitude_si, c.pressure.unit), factor=c.factor, density=None if c.density is None else from_si(c.density.magnitude_si, c.density.unit), gas_fvf=c.gas_fvf, pseudo_pressure=c.pseudo_pressure, h2s_fraction=c.h2s_fraction) for c in result.queries),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def gas_material_balance(calculation: str, *, pressure: Sequence[Any] | None=None, z: Sequence[float] | None=None, gp: Sequence[float] | None=None, we: Sequence[float] | None=None, pressure_value: Any=None, z_value: float | None=None, temperature: Any=None, gas_gravity: float | None=None) -> GasMaterialBalanceResult:
+    """``pvt.gas_material_balance``, computed in Rust."""
+    spec = _models_gen.model("pvt.gas_material_balance")
+    result = _core.gas_material_balance(
+        calculation,
+        None if pressure is None else [_si(spec, "pressure", v) for v in pressure],
+        None if z is None else list(z),
+        None if gp is None else list(gp),
+        None if we is None else list(we),
+        None if pressure_value is None else _si(spec, "pressure_value", pressure_value),
+        None if z_value is None else z_value,
+        None if temperature is None else _si(spec, "temperature", temperature),
+        None if gas_gravity is None else gas_gravity,
+    )
+    return GasMaterialBalanceResult(
+        gas_fvf=result.gas_fvf,
+        ogip=result.ogip,
+        pi_over_zi=None if result.pi_over_zi is None else from_si(result.pi_over_zi.magnitude_si, result.pi_over_zi.unit),
+        slope=result.slope,
+        r_squared=result.r_squared,
+        cole_gp=None if result.cole_gp is None else tuple(result.cole_gp),
+        cole_f_over_eg=None if result.cole_f_over_eg is None else tuple(result.cole_f_over_eg),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def oil_material_balance(calculation: str, *, np: float | None=None, rp: float | None=None, bo: float | None=None, rs: float | None=None, bg: float | None=None, wp: float | None=None, bw: float | None=None, boi: float | None=None, rsi: float | None=None, bgi: float | None=None, cw: float | None=None, swi: float | None=None, cf: float | None=None, delta_p: float | None=None, m: float | None=None, n: float | None=None, eo_term: float | None=None, eg_term: float | None=None, efw_term: float | None=None, we_value: float | None=None, f_value: float | None=None, f_history: Sequence[float] | None=None, eo_history: Sequence[float] | None=None, eg_history: Sequence[float] | None=None, we_history: Sequence[float] | None=None) -> OilMaterialBalanceResult:
+    """``pvt.oil_material_balance``, computed in Rust."""
+    result = _core.oil_material_balance(
+        calculation,
+        None if np is None else np,
+        None if rp is None else rp,
+        None if bo is None else bo,
+        None if rs is None else rs,
+        None if bg is None else bg,
+        None if wp is None else wp,
+        None if bw is None else bw,
+        None if boi is None else boi,
+        None if rsi is None else rsi,
+        None if bgi is None else bgi,
+        None if cw is None else cw,
+        None if swi is None else swi,
+        None if cf is None else cf,
+        None if delta_p is None else delta_p,
+        None if m is None else m,
+        None if n is None else n,
+        None if eo_term is None else eo_term,
+        None if eg_term is None else eg_term,
+        None if efw_term is None else efw_term,
+        None if we_value is None else we_value,
+        None if f_value is None else f_value,
+        None if f_history is None else list(f_history),
+        None if eo_history is None else list(eo_history),
+        None if eg_history is None else list(eg_history),
+        None if we_history is None else list(we_history),
+    )
+    return OilMaterialBalanceResult(
+        f=result.f,
+        eo_value=result.eo_value,
+        eg_value=result.eg_value,
+        efw_value=result.efw_value,
+        ooip=result.ooip,
+        m_fit=result.m_fit,
+        r_squared=result.r_squared,
+        ddi=result.ddi,
+        sdi=result.sdi,
+        wdi=result.wdi,
+        edi=result.edi,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def water_correlations(queries: Sequence[Mapping[str, Any]]) -> WaterCorrelationsResult:
+    """``pvt.water_correlations``, computed in Rust."""
+    spec = _models_gen.model("pvt.water_correlations")
+    result = _core.water_correlations(
+        input_records_to_si(spec, "queries", queries),
+    )
+    return WaterCorrelationsResult(
+        queries=tuple(WaterResultRow(calculation=c.calculation, fvf=c.fvf, viscosity=None if c.viscosity is None else from_si(c.viscosity.magnitude_si, c.viscosity.unit), compressibility=c.compressibility, density=None if c.density is None else from_si(c.density.magnitude_si, c.density.unit), rsw=c.rsw, surface_tension=None if c.surface_tension is None else from_si(c.surface_tension.magnitude_si, c.surface_tension.unit)) for c in result.queries),
         warnings=_warnings(result.warnings),
     )
 

@@ -9996,6 +9996,272 @@ pub fn vessel_rupture(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Black-oil correlation table.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (queries))]
+#[pyo3(text_signature = "(queries)")]
+pub fn black_oil_correlations(
+    py: Python<'_>,
+    queries: Vec<crate::records_gen::BlackOilQuery>,
+) -> PyResult<crate::transport_gen::PyBlackOilCorrelationsResult> {
+    let queries_records: Vec<azoth_pvt::black_oil_correlations::BlackOilQuery> = queries
+        .into_iter()
+        .map(|row| azoth_pvt::black_oil_correlations::BlackOilQuery {
+            calculation: row.calculation,
+            rs: row.rs,
+            gamma_g: row.gamma_g,
+            gamma_o: row.gamma_o,
+            api: row.api,
+            temperature: row.temperature.map(kelvins),
+            pressure: row.pressure.map(pascals),
+            bob: row.bob,
+            compressibility: row.compressibility,
+            pb: row.pb.map(pascals),
+            mu_od: row.mu_od.map(pascal_seconds),
+            mu_ob: row.mu_ob.map(pascal_seconds),
+            rho_g: row.rho_g.map(kilograms_per_cubic_meter),
+            molar_mass: row.molar_mass.map(kilograms_per_mole),
+            z: row.z,
+        })
+        .collect();
+    azoth_pvt::black_oil_correlations::black_oil_correlations(&queries_records)
+        .map(|r| crate::transport_gen::PyBlackOilCorrelationsResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
+/// Decline-curve analysis.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (calculation, qi, di, b, t, q_limit, d_nominal, d_effective, q1, t1, q2, t2, q3, t3, t_start, t_end, t_step, t_current, a, m, start_index, end_index, history_time, history_rate))]
+#[pyo3(
+    text_signature = "(calculation, qi, di, b, t, q_limit, d_nominal, d_effective, q1, t1, q2, t2, q3, t3, t_start, t_end, t_step, t_current, a, m, start_index, end_index, history_time, history_rate)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn decline_curve(
+    py: Python<'_>,
+    calculation: &str,
+    qi: Option<f64>,
+    di: Option<f64>,
+    b: Option<f64>,
+    t: Option<f64>,
+    q_limit: Option<f64>,
+    d_nominal: Option<f64>,
+    d_effective: Option<f64>,
+    q1: Option<f64>,
+    t1: Option<f64>,
+    q2: Option<f64>,
+    t2: Option<f64>,
+    q3: Option<f64>,
+    t3: Option<f64>,
+    t_start: Option<f64>,
+    t_end: Option<f64>,
+    t_step: Option<f64>,
+    t_current: Option<f64>,
+    a: Option<f64>,
+    m: Option<f64>,
+    start_index: Option<f64>,
+    end_index: Option<f64>,
+    history_time: Option<Vec<f64>>,
+    history_rate: Option<Vec<f64>>,
+) -> PyResult<crate::transport_gen::PyDeclineCurveResult> {
+    azoth_pvt::decline_curve::decline_curve(
+        calculation,
+        qi,
+        di,
+        b,
+        t,
+        q_limit,
+        d_nominal,
+        d_effective,
+        q1,
+        t1,
+        q2,
+        t2,
+        q3,
+        t3,
+        t_start,
+        t_end,
+        t_step,
+        t_current,
+        a,
+        m,
+        start_index,
+        end_index,
+        history_time.as_deref(),
+        history_rate.as_deref(),
+    )
+    .map(|r| crate::transport_gen::PyDeclineCurveResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Gas correlation table.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (queries))]
+#[pyo3(text_signature = "(queries)")]
+pub fn gas_correlations(
+    py: Python<'_>,
+    queries: Vec<crate::records_gen::GasQuery>,
+) -> PyResult<crate::transport_gen::PyGasCorrelationsResult> {
+    let queries_records: Vec<azoth_pvt::gas_correlations::GasQuery> = queries
+        .into_iter()
+        .map(|row| azoth_pvt::gas_correlations::GasQuery {
+            calculation: row.calculation,
+            gamma_g: row.gamma_g,
+            y_h2s: row.y_h2s,
+            y_co2: row.y_co2,
+            y_n2: row.y_n2,
+            temperature: row.temperature.map(kelvins),
+            pressure: row.pressure.map(pascals),
+            reference_pressure: row.reference_pressure.map(pascals),
+            tpc: row.tpc.map(kelvins),
+            ppc: row.ppc.map(pascals),
+            tpr: row.tpr,
+            ppr: row.ppr,
+            molar_mass: row.molar_mass.map(kilograms_per_mole),
+        })
+        .collect();
+    azoth_pvt::gas_correlations::gas_correlations(&queries_records)
+        .map(|r| crate::transport_gen::PyGasCorrelationsResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
+/// Gas material balance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (calculation, pressure, z, gp, we, pressure_value, z_value, temperature, gas_gravity))]
+#[pyo3(
+    text_signature = "(calculation, pressure, z, gp, we, pressure_value, z_value, temperature, gas_gravity)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn gas_material_balance(
+    py: Python<'_>,
+    calculation: &str,
+    pressure: Option<Vec<f64>>,
+    z: Option<Vec<f64>>,
+    gp: Option<Vec<f64>>,
+    we: Option<Vec<f64>>,
+    pressure_value: Option<f64>,
+    z_value: Option<f64>,
+    temperature: Option<f64>,
+    gas_gravity: Option<f64>,
+) -> PyResult<crate::transport_gen::PyGasMaterialBalanceResult> {
+    azoth_pvt::gas_material_balance::gas_material_balance(
+        calculation,
+        pressure.as_deref(),
+        z.as_deref(),
+        gp.as_deref(),
+        we.as_deref(),
+        pressure_value,
+        z_value,
+        temperature.map(kelvins),
+        gas_gravity,
+    )
+    .map(|r| crate::transport_gen::PyGasMaterialBalanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Oil material balance.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (calculation, np, rp, bo, rs, bg, wp, bw, boi, rsi, bgi, cw, swi, cf, delta_p, m, n, eo_term, eg_term, efw_term, we_value, f_value, f_history, eo_history, eg_history, we_history))]
+#[pyo3(
+    text_signature = "(calculation, np, rp, bo, rs, bg, wp, bw, boi, rsi, bgi, cw, swi, cf, delta_p, m, n, eo_term, eg_term, efw_term, we_value, f_value, f_history, eo_history, eg_history, we_history)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn oil_material_balance(
+    py: Python<'_>,
+    calculation: &str,
+    np: Option<f64>,
+    rp: Option<f64>,
+    bo: Option<f64>,
+    rs: Option<f64>,
+    bg: Option<f64>,
+    wp: Option<f64>,
+    bw: Option<f64>,
+    boi: Option<f64>,
+    rsi: Option<f64>,
+    bgi: Option<f64>,
+    cw: Option<f64>,
+    swi: Option<f64>,
+    cf: Option<f64>,
+    delta_p: Option<f64>,
+    m: Option<f64>,
+    n: Option<f64>,
+    eo_term: Option<f64>,
+    eg_term: Option<f64>,
+    efw_term: Option<f64>,
+    we_value: Option<f64>,
+    f_value: Option<f64>,
+    f_history: Option<Vec<f64>>,
+    eo_history: Option<Vec<f64>>,
+    eg_history: Option<Vec<f64>>,
+    we_history: Option<Vec<f64>>,
+) -> PyResult<crate::transport_gen::PyOilMaterialBalanceResult> {
+    azoth_pvt::oil_material_balance::oil_material_balance(
+        calculation,
+        np,
+        rp,
+        bo,
+        rs,
+        bg,
+        wp,
+        bw,
+        boi,
+        rsi,
+        bgi,
+        cw,
+        swi,
+        cf,
+        delta_p,
+        m,
+        n,
+        eo_term,
+        eg_term,
+        efw_term,
+        we_value,
+        f_value,
+        f_history.as_deref(),
+        eo_history.as_deref(),
+        eg_history.as_deref(),
+        we_history.as_deref(),
+    )
+    .map(|r| crate::transport_gen::PyOilMaterialBalanceResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
+/// Water and brine correlation table.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (queries))]
+#[pyo3(text_signature = "(queries)")]
+pub fn water_correlations(
+    py: Python<'_>,
+    queries: Vec<crate::records_gen::WaterQuery>,
+) -> PyResult<crate::transport_gen::PyWaterCorrelationsResult> {
+    let queries_records: Vec<azoth_pvt::water_correlations::WaterQuery> = queries
+        .into_iter()
+        .map(|row| azoth_pvt::water_correlations::WaterQuery {
+            calculation: row.calculation,
+            temperature: row.temperature.map(kelvins),
+            pressure: row.pressure.map(pascals),
+            salinity_ppm: row.salinity_ppm,
+            salinity_wt_fraction: row.salinity_wt_fraction,
+            salinity_molality: row.salinity_molality,
+        })
+        .collect();
+    azoth_pvt::water_correlations::water_correlations(&queries_records)
+        .map(|r| crate::transport_gen::PyWaterCorrelationsResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Reactive chemical equilibrium by the Smith-Missen method.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

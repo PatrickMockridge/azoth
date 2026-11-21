@@ -1,0 +1,186 @@
+id = "pvt.oil_material_balance"
+name = "Oil material balance"
+kind = "direct"
+assumptions = [
+    "**unit-consistent, not SI**: every term is a reservoir or surface volume in the caller's unit, and no conversion is applied.",
+    "**the four regression routes are the class's**: depletion and water drive through the origin/linear fit, gas cap with the two-predictor normal equations through the origin; the water-drive OOIP is the intercept.",
+    "**the gas-cap ratio is (N m)/N**, and a zero N answers m = 0 as the class does; collinear predictors are refused where the class's determinant guard fires.",
+    "**the drive indices sum to about one**, a zero withdrawal answering four zeros.",
+    "**Eo must be non-zero for the water-drive plot**, and a water saturation at or above one is refused for Efw.",
+    "**a missing scalar, arrays of different lengths or fewer than two points, a singular regression and a non-finite answer are refused.**",
+]
+references = [
+    "Havlena, D. & Odeh, A. S. (1963). \"The Material Balance as an Equation of a Straight Line.\" Journal of Petroleum Technology 15(8), 896-900. DOI 10.2118/559-PA.",
+    "Muskat, M. (1949). Physical Principles of Oil Production. McGraw-Hill.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/reservoirproperties/materialbalance/OilMaterialBalance.java` is the port source.",
+    "`validation/neqsim/captures/pvt_oil_material_balance.tsv` - the four terms, the three fits and the drive indices.",
+]
+[source]
+standard = "NeqSim reservoirproperties/materialbalance/OilMaterialBalance.java"
+edition = "The four material-balance terms, the three fits and the drive indices; the result struct's getters are the published fields."
+[inputs]
+[inputs.calculation]
+type = "enum"
+values = [
+    "withdrawal_f",
+    "eo",
+    "eg",
+    "efw",
+    "fit_depletion_drive",
+    "fit_gas_cap_drive",
+    "fit_water_drive",
+    "drive_indices",
+]
+description = "the oil material-balance calculation this call asks for.\n"
+[inputs.np]
+unit = "dimensionless"
+optional = true
+description = "cumulative oil produced.\n"
+[inputs.rp]
+unit = "dimensionless"
+optional = true
+description = "cumulative producing gas-oil ratio.\n"
+[inputs.bo]
+unit = "dimensionless"
+optional = true
+description = "the oil formation volume factor at the current pressure.\n"
+[inputs.rs]
+unit = "dimensionless"
+optional = true
+description = "the solution gas-oil ratio at the current pressure.\n"
+[inputs.bg]
+unit = "dimensionless"
+optional = true
+description = "the gas formation volume factor at the current pressure.\n"
+[inputs.wp]
+unit = "dimensionless"
+optional = true
+description = "cumulative water produced.\n"
+[inputs.bw]
+unit = "dimensionless"
+optional = true
+description = "the water formation volume factor.\n"
+[inputs.boi]
+unit = "dimensionless"
+optional = true
+description = "the initial oil formation volume factor.\n"
+[inputs.rsi]
+unit = "dimensionless"
+optional = true
+description = "the initial solution gas-oil ratio.\n"
+[inputs.bgi]
+unit = "dimensionless"
+optional = true
+description = "the initial gas formation volume factor.\n"
+[inputs.cw]
+unit = "dimensionless"
+optional = true
+description = "the water compressibility.\n"
+[inputs.swi]
+unit = "dimensionless"
+optional = true
+description = "the initial water saturation, a fraction below one.\n"
+[inputs.cf]
+unit = "dimensionless"
+optional = true
+description = "the formation compressibility.\n"
+[inputs.delta_p]
+unit = "dimensionless"
+optional = true
+description = "the pressure drop from the initial state.\n"
+[inputs.m]
+unit = "dimensionless"
+optional = true
+description = "the gas-cap ratio, for Efw and the drive indices.\n"
+[inputs.n]
+unit = "dimensionless"
+optional = true
+description = "the OOIP, for the drive indices.\n"
+[inputs.eo_term]
+unit = "dimensionless"
+optional = true
+description = "Eo at the drive-index state.\n"
+[inputs.eg_term]
+unit = "dimensionless"
+optional = true
+description = "Eg at the drive-index state.\n"
+[inputs.efw_term]
+unit = "dimensionless"
+optional = true
+description = "Efw at the drive-index state.\n"
+[inputs.we_value]
+unit = "dimensionless"
+optional = true
+description = "the cumulative water influx at the drive-index state.\n"
+[inputs.f_value]
+unit = "dimensionless"
+optional = true
+description = "the reservoir withdrawal at the drive-index state.\n"
+[inputs.f_history]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the reservoir withdrawal F at each history point.\n"
+[inputs.eo_history]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "Eo at each history point.\n"
+[inputs.eg_history]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "Eg at each history point, for the gas-cap fit.\n"
+[inputs.we_history]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the cumulative water influx at each history point, for the water-drive fit.\n"
+[outputs]
+[outputs.f]
+unit = "dimensionless"
+optional = true
+description = "the reservoir withdrawal term F.\n"
+[outputs.eo_value]
+unit = "dimensionless"
+optional = true
+description = "the oil and dissolved-gas expansion term Eo.\n"
+[outputs.eg_value]
+unit = "dimensionless"
+optional = true
+description = "the gas-cap expansion term Eg.\n"
+[outputs.efw_value]
+unit = "dimensionless"
+optional = true
+description = "the connate-water and rock expansion term Efw.\n"
+[outputs.ooip]
+unit = "dimensionless"
+optional = true
+description = "the fitted original oil in place.\n"
+[outputs.m_fit]
+unit = "dimensionless"
+optional = true
+description = "the fitted gas-cap ratio.\n"
+[outputs.r_squared]
+unit = "dimensionless"
+optional = true
+description = "the fit's coefficient of determination.\n"
+[outputs.ddi]
+unit = "dimensionless"
+optional = true
+description = "the depletion drive index.\n"
+[outputs.sdi]
+unit = "dimensionless"
+optional = true
+description = "the segregation (gas-cap) drive index.\n"
+[outputs.wdi]
+unit = "dimensionless"
+optional = true
+description = "the water drive index.\n"
+[outputs.edi]
+unit = "dimensionless"
+optional = true
+description = "the expansion drive index.\n"
+[implementations]
+python = "azoth.pvt.oil_material_balance"
+rust = "azoth_pvt::oil_material_balance"

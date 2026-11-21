@@ -67,6 +67,7 @@ NAMESPACES = (
     "eos",
     "hydraulics",
     "process",
+    "pvt",
     "reactions",
     "standards",
     "thermal",
@@ -307,6 +308,7 @@ def wrapper_types() -> dict[str, dict[str, str]]:
         "wrappers_gen",
         "characterization",
         "process",
+        "pvt",
         "eos",
         "hydraulics",
         "thermal",
@@ -562,6 +564,8 @@ def return_expr(field: str, transport: str, rust: str | None, declared: str | No
         return f"tuple({row}({parts}) for c in {src})"
     if transport in ("Vec<f64>", "Vec<String>", "Vec<u32>"):
         return f"tuple({src})"
+    if transport == "Option<Vec<f64>>":
+        return f"None if {src} is None else tuple({src})"
     if transport == "Vec<Vec<f64>>":
         return f"tuple(tuple(row) for row in {src})"
     if transport in (

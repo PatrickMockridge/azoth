@@ -463,6 +463,17 @@ NAMESPACE_TESTS: dict[str, tuple[str, ...]] = {
         f"{TESTS}/test_characterize_to_reference.py",
         f"{TESTS}/test_delumping.py",
     ),
+    "pvt": (
+        f"{TESTS}/test_pvt.py",
+        f"{TESTS}/test_pvt_layer_diff.py",
+        f"{TESTS}/test_pvt_standard.py",
+        f"{TESTS}/test_black_oil_correlations.py",
+        f"{TESTS}/test_gas_correlations.py",
+        f"{TESTS}/test_water_correlations.py",
+        f"{TESTS}/test_decline_curve.py",
+        f"{TESTS}/test_gas_material_balance.py",
+        f"{TESTS}/test_oil_material_balance.py",
+    ),
     # Nothing imports `azoth.standards` by name: its ids reach their tests through the
     # registration sweeps, which is what a standards change is verified by.
     "standards": (),

@@ -9,6 +9,7 @@ members = [
   "crates/azoth-reactions",
   "crates/azoth-standards",
   "crates/azoth-characterization",
+  "crates/azoth-pvt",
   "crates/azoth-sheets",
   "crates/azoth-dexpi",
   "crates/azoth-process",
@@ -36,6 +37,7 @@ azoth-eos = { path = "crates/azoth-eos" }
 azoth-reactions = { path = "crates/azoth-reactions" }
 azoth-standards = { path = "crates/azoth-standards" }
 azoth-characterization = { path = "crates/azoth-characterization" }
+azoth-pvt = { path = "crates/azoth-pvt" }
 azoth-sheets = { path = "crates/azoth-sheets" }
 azoth-dexpi = { path = "crates/azoth-dexpi" }
 azoth-process = { path = "crates/azoth-process" }

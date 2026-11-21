@@ -1,0 +1,18 @@
+[package]
+name = "azoth-pvt"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "PVT simulation: the correlation table, the laboratory experiments and the material balance over a fluid"
+
+[dependencies]
+azoth-core.workspace = true
+
+[dev-dependencies]
+azoth-core.workspace = true
+azoth-test-support.workspace = true
+
+[lints]
+workspace = true

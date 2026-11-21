@@ -1,0 +1,13 @@
+water_correlations
+water_fvf_mccain=1.0339360723713957
+water_fvf_osif=0.9991415308911262
+dead_water_viscosity_mccain=3.354601229917465E-4
+water_viscosity_mccain=3.8518832767548723E-4
+water_compressibility_mccain=4.0555083882631894E-10
+brine_density_batzle_wang=994.5440241141248
+water_density=973.9070128483688
+solution_gas_water_ratio_culberson=2.671882062636093
+water_gas_surface_tension=0.0404929164508038
+rsw_mccain_pure=1.5791188803621292
+rsw_mccain_3_5_wt_molality=0.6206267976011888
+rsw_mccain_3_5_wt=1.5757157300172224

@@ -25,6 +25,7 @@ from azoth.core.record_outputs_gen import (
     ActivityCoefficientRow,
     AlarpEvaluationResult,
     AppliedStandardRow,
+    BlackOilResultRow,
     BrineMixingPointRow,
     BubbleTransferZoneReleaseStation,
     CharacterizationComponent,
@@ -50,6 +51,7 @@ from azoth.core.record_outputs_gen import (
     FiniteRateReleaseStation,
     FlowlineScaleSegment,
     FmeaRankedEntry,
+    GasResultRow,
     HazopPopulationRow,
     HazopTemplateDeviation,
     HeaterInstrument,
@@ -127,6 +129,7 @@ from azoth.core.record_outputs_gen import (
     VesselFillingPoint,
     VesselRuptureStep,
     WaterMixingResult,
+    WaterResultRow,
     ZoneRatingRow,
 )
 from azoth.core.result_base import (
@@ -12240,6 +12243,219 @@ class VesselRuptureResult(_HasWarnings):
 
     #: one row per input state, in the caller's order.
     history: tuple[VesselRuptureStep, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class BlackOilCorrelationsResult(_HasWarnings):
+    """Result of ``pvt.black_oil_correlations``."""
+
+    CALC_ID: ClassVar[str] = "pvt.black_oil_correlations"
+
+    #: one row per input row, in caller order; only the fields the calculation answers are present.
+    queries: tuple[BlackOilResultRow, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class DeclineCurveResult(_HasWarnings):
+    """Result of ``pvt.decline_curve``."""
+
+    CALC_ID: ClassVar[str] = "pvt.decline_curve"
+
+    #: the forecast's times.
+    time: tuple[float, ...] | None
+
+    #: the forecast's rates.
+    rate: tuple[float, ...] | None
+
+    #: the forecast's cumulative production.
+    cumulative: tuple[float, ...] | None
+
+    #: the rate at the stated time.
+    rate_value: float | None
+
+    #: the cumulative production at the stated time.
+    cumulative_value: float | None
+
+    #: the nominal decline rate, 1/day.
+    nominal: float | None
+
+    #: the effective annual decline.
+    effective: float | None
+
+    #: the instantaneous decline rate at the stated time.
+    instantaneous_decline_rate: float | None
+
+    #: the time to reach the economic limit; absent when the decline is zero.
+    time_to_rate: float | None
+
+    #: the estimated ultimate recovery; absent when the decline is zero.
+    eur: float | None
+
+    #: the remaining reserves to the economic limit.
+    remaining: float | None
+
+    #: the exponential decline rate from two points, 1/day.
+    exponential_decline: float | None
+
+    #: the fitted initial rate.
+    fit_qi: float | None
+
+    #: the fitted nominal decline rate.
+    fit_di: float | None
+
+    #: the fitted Arps exponent.
+    fit_b: float | None
+
+    #: the fit's coefficient of determination.
+    fit_r_squared: float | None
+
+    #: the fitted Duong rate at unit time.
+    duong_q1: float | None
+
+    #: the fitted Duong intercept.
+    duong_a: float | None
+
+    #: the fitted Duong slope.
+    duong_m: float | None
+
+    #: the Duong time function at the stated time.
+    duong_time: float | None
+
+    #: the summary's effective annual decline.
+    summary_effective: float | None
+
+    #: the summary's rate at one year.
+    summary_rate_1yr: float | None
+
+    #: the summary's rate at five years.
+    summary_rate_5yr: float | None
+
+    #: the summary's rate at ten years.
+    summary_rate_10yr: float | None
+
+    #: the summary's cumulative at one year.
+    summary_cum_1yr: float | None
+
+    #: the summary's cumulative at five years.
+    summary_cum_5yr: float | None
+
+    #: the summary's cumulative at ten years.
+    summary_cum_10yr: float | None
+
+    #: the summary's time to the economic limit, days.
+    summary_time_to_limit: float | None
+
+    #: the summary's time to the economic limit, years.
+    summary_time_to_limit_years: float | None
+
+    #: the summary's EUR.
+    summary_eur: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class GasCorrelationsResult(_HasWarnings):
+    """Result of ``pvt.gas_correlations``."""
+
+    CALC_ID: ClassVar[str] = "pvt.gas_correlations"
+
+    #: one row per input row, in caller order; only the fields the calculation answers are present.
+    queries: tuple[GasResultRow, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class GasMaterialBalanceResult(_HasWarnings):
+    """Result of ``pvt.gas_material_balance``."""
+
+    CALC_ID: ClassVar[str] = "pvt.gas_material_balance"
+
+    #: the gas formation volume factor, reservoir volume per surface volume.
+    gas_fvf: float | None
+
+    #: the original gas in place, in the cumulative gas unit; absent when the line does not decline.
+    ogip: float | None
+
+    #: the initial p/Z intercept.
+    pi_over_zi: Q | None
+
+    #: the p/Z line's slope in bar per cumulative-gas unit for the p/Z fit; the OGIP for Havlena-Odeh.
+    slope: float | None
+
+    #: the fit's coefficient of determination.
+    r_squared: float | None
+
+    #: the Cole plot's cumulative gas, from the second history point.
+    cole_gp: tuple[float, ...] | None
+
+    #: the Cole plot's F/Eg, from the second history point.
+    cole_f_over_eg: tuple[float, ...] | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class OilMaterialBalanceResult(_HasWarnings):
+    """Result of ``pvt.oil_material_balance``."""
+
+    CALC_ID: ClassVar[str] = "pvt.oil_material_balance"
+
+    #: the reservoir withdrawal term F.
+    f: float | None
+
+    #: the oil and dissolved-gas expansion term Eo.
+    eo_value: float | None
+
+    #: the gas-cap expansion term Eg.
+    eg_value: float | None
+
+    #: the connate-water and rock expansion term Efw.
+    efw_value: float | None
+
+    #: the fitted original oil in place.
+    ooip: float | None
+
+    #: the fitted gas-cap ratio.
+    m_fit: float | None
+
+    #: the fit's coefficient of determination.
+    r_squared: float | None
+
+    #: the depletion drive index.
+    ddi: float | None
+
+    #: the segregation (gas-cap) drive index.
+    sdi: float | None
+
+    #: the water drive index.
+    wdi: float | None
+
+    #: the expansion drive index.
+    edi: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class WaterCorrelationsResult(_HasWarnings):
+    """Result of ``pvt.water_correlations``."""
+
+    CALC_ID: ClassVar[str] = "pvt.water_correlations"
+
+    #: one row per input row, in caller order; only the fields the calculation answers are present.
+    queries: tuple[WaterResultRow, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

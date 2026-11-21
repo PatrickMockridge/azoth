@@ -1173,6 +1173,52 @@ class VesselRuptureState(TypedDict):
     internal_pressure: float
     metal_temperature: float
 
+class BlackOilQuery(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    calculation: str
+    rs: float | None
+    gamma_g: float | None
+    gamma_o: float | None
+    api: float | None
+    temperature: float | None
+    pressure: float | None
+    bob: float | None
+    compressibility: float | None
+    pb: float | None
+    mu_od: float | None
+    mu_ob: float | None
+    rho_g: float | None
+    molar_mass: float | None
+    z: float | None
+
+class GasQuery(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    calculation: str
+    gamma_g: float | None
+    y_h2s: float | None
+    y_co2: float | None
+    y_n2: float | None
+    temperature: float | None
+    pressure: float | None
+    reference_pressure: float | None
+    tpc: float | None
+    ppc: float | None
+    tpr: float | None
+    ppr: float | None
+    molar_mass: float | None
+
+class WaterQuery(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    calculation: str
+    temperature: float | None
+    pressure: float | None
+    salinity_ppm: float | None
+    salinity_wt_fraction: float | None
+    salinity_molality: float | None
+
 @final
 class KComponent:
     """one row per fitting supplied, in the order they were listed"""
@@ -2391,6 +2437,52 @@ class VesselRuptureStep:
     von_mises_stress: Qty
     allowable_stress: Qty
     margin: Qty
+
+@final
+class BlackOilResultRow:
+    """one row per input row, in caller order; only the fields the calculation answers are present."""
+
+    calculation: str
+    pressure: Qty | None
+    solution_gor: float | None
+    oil_fvf: float | None
+    compressibility: float | None
+    viscosity: Qty | None
+    gas_fvf: float | None
+    factor: float | None
+    average: Qty | None
+    minimum: Qty | None
+    maximum: Qty | None
+    std_dev: Qty | None
+    standing: Qty | None
+    vasquez_beggs: Qty | None
+    glaso: Qty | None
+    petrosky_farshad: Qty | None
+
+@final
+class GasResultRow:
+    """one row per input row, in caller order; only the fields the calculation answers are present."""
+
+    calculation: str
+    temperature: Qty | None
+    pressure: Qty | None
+    factor: float | None
+    density: Qty | None
+    gas_fvf: float | None
+    pseudo_pressure: float | None
+    h2s_fraction: float | None
+
+@final
+class WaterResultRow:
+    """one row per input row, in caller order; only the fields the calculation answers are present."""
+
+    calculation: str
+    fvf: float | None
+    viscosity: Qty | None
+    compressibility: float | None
+    density: Qty | None
+    rsw: float | None
+    surface_tension: Qty | None
 
 # --- results --------------------------------------------------------------
 # Generated from the result dataclasses, so the stub and `azoth.core.result`
@@ -6658,6 +6750,81 @@ class VesselRuptureResult:
     warnings: list[Warning]
 
 @final
+class BlackOilCorrelationsResult:
+    queries: list[BlackOilResultRow]
+    warnings: list[Warning]
+
+@final
+class DeclineCurveResult:
+    time: list[float] | None
+    rate: list[float] | None
+    cumulative: list[float] | None
+    rate_value: float | None
+    cumulative_value: float | None
+    nominal: float | None
+    effective: float | None
+    instantaneous_decline_rate: float | None
+    time_to_rate: float | None
+    eur: float | None
+    remaining: float | None
+    exponential_decline: float | None
+    fit_qi: float | None
+    fit_di: float | None
+    fit_b: float | None
+    fit_r_squared: float | None
+    duong_q1: float | None
+    duong_a: float | None
+    duong_m: float | None
+    duong_time: float | None
+    summary_effective: float | None
+    summary_rate_1yr: float | None
+    summary_rate_5yr: float | None
+    summary_rate_10yr: float | None
+    summary_cum_1yr: float | None
+    summary_cum_5yr: float | None
+    summary_cum_10yr: float | None
+    summary_time_to_limit: float | None
+    summary_time_to_limit_years: float | None
+    summary_eur: float | None
+    warnings: list[Warning]
+
+@final
+class GasCorrelationsResult:
+    queries: list[GasResultRow]
+    warnings: list[Warning]
+
+@final
+class GasMaterialBalanceResult:
+    gas_fvf: float | None
+    ogip: float | None
+    pi_over_zi: Qty | None
+    slope: float | None
+    r_squared: float | None
+    cole_gp: list[float] | None
+    cole_f_over_eg: list[float] | None
+    warnings: list[Warning]
+
+@final
+class OilMaterialBalanceResult:
+    f: float | None
+    eo_value: float | None
+    eg_value: float | None
+    efw_value: float | None
+    ooip: float | None
+    m_fit: float | None
+    r_squared: float | None
+    ddi: float | None
+    sdi: float | None
+    wdi: float | None
+    edi: float | None
+    warnings: list[Warning]
+
+@final
+class WaterCorrelationsResult:
+    queries: list[WaterResultRow]
+    warnings: list[Warning]
+
+@final
 class ChemicalEquilibriumResult:
     moles: list[Qty]
     iterations: int
@@ -10775,6 +10942,74 @@ def vessel_rupture(
     grade: str | None = None,
     tensile_strength_factor: float | None = None,
 ) -> VesselRuptureResult: ...
+def black_oil_correlations(queries: list[BlackOilQuery]) -> BlackOilCorrelationsResult: ...
+def decline_curve(
+    calculation: str,
+    qi: float | None = None,
+    di: float | None = None,
+    b: float | None = None,
+    t: float | None = None,
+    q_limit: float | None = None,
+    d_nominal: float | None = None,
+    d_effective: float | None = None,
+    q1: float | None = None,
+    t1: float | None = None,
+    q2: float | None = None,
+    t2: float | None = None,
+    q3: float | None = None,
+    t3: float | None = None,
+    t_start: float | None = None,
+    t_end: float | None = None,
+    t_step: float | None = None,
+    t_current: float | None = None,
+    a: float | None = None,
+    m: float | None = None,
+    start_index: float | None = None,
+    end_index: float | None = None,
+    history_time: list[float] | None = None,
+    history_rate: list[float] | None = None,
+) -> DeclineCurveResult: ...
+def gas_correlations(queries: list[GasQuery]) -> GasCorrelationsResult: ...
+def gas_material_balance(
+    calculation: str,
+    pressure: list[float] | None = None,
+    z: list[float] | None = None,
+    gp: list[float] | None = None,
+    we: list[float] | None = None,
+    pressure_value: float | None = None,
+    z_value: float | None = None,
+    temperature: float | None = None,
+    gas_gravity: float | None = None,
+) -> GasMaterialBalanceResult: ...
+def oil_material_balance(
+    calculation: str,
+    np: float | None = None,
+    rp: float | None = None,
+    bo: float | None = None,
+    rs: float | None = None,
+    bg: float | None = None,
+    wp: float | None = None,
+    bw: float | None = None,
+    boi: float | None = None,
+    rsi: float | None = None,
+    bgi: float | None = None,
+    cw: float | None = None,
+    swi: float | None = None,
+    cf: float | None = None,
+    delta_p: float | None = None,
+    m: float | None = None,
+    n: float | None = None,
+    eo_term: float | None = None,
+    eg_term: float | None = None,
+    efw_term: float | None = None,
+    we_value: float | None = None,
+    f_value: float | None = None,
+    f_history: list[float] | None = None,
+    eo_history: list[float] | None = None,
+    eg_history: list[float] | None = None,
+    we_history: list[float] | None = None,
+) -> OilMaterialBalanceResult: ...
+def water_correlations(queries: list[WaterQuery]) -> WaterCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],
     b: list[float],
