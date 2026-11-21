@@ -375,6 +375,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyVesselRuptureResult>()?;
     m.add_class::<crate::transport_gen::PyBlackOilCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyConstantMassExpansionResult>()?;
+    m.add_class::<crate::transport_gen::PyConstantVolumeDepletionResult>()?;
     m.add_class::<crate::transport_gen::PyDeclineCurveResult>()?;
     m.add_class::<crate::transport_gen::PyDifferentialLiberationResult>()?;
     m.add_class::<crate::transport_gen::PyGasCorrelationsResult>()?;
@@ -419,6 +420,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyConsequenceOutcomeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyCostBomRow>()?;
     m.add_class::<crate::record_outputs_gen::PyCostEstimationResultRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyCvdPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepressurizationPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyDisciplineCostLine>()?;
@@ -1368,6 +1370,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::constant_mass_expansion,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::constant_volume_depletion,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::decline_curve, m)?)?;

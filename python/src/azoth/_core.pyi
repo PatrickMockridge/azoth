@@ -2479,6 +2479,20 @@ class CcePoint:
     isothermal_compressibility: float | None
 
 @final
+class CvdPoint:
+    """one row per pressure."""
+
+    pressure: Qty
+    total_volume: Qty
+    relative_volume: float
+    cumulative_mole_fraction_depleted: float
+    material_balance_relative_error: float
+    zmix: float
+    z_gas: float | None
+    liquid_volume: Qty | None
+    liquid_volume_relative_to_vsat: float | None
+
+@final
 class DlePoint:
     """one row per pressure."""
 
@@ -6801,6 +6815,17 @@ class ConstantMassExpansionResult:
     warnings: list[Warning]
 
 @final
+class ConstantVolumeDepletionResult:
+    saturation_pressure: Qty
+    saturation_volume: Qty
+    z_saturation: float
+    initial_moles: Qty
+    cumulative_moles_removed: Qty
+    k_values: list[list[float]]
+    points: list[CvdPoint]
+    warnings: list[Warning]
+
+@final
 class DeclineCurveResult:
     time: list[float] | None
     rate: list[float] | None
@@ -11011,6 +11036,14 @@ def constant_mass_expansion(
     mixing_rule: str | None = None,
     volume_correction: bool | None = None,
 ) -> ConstantMassExpansionResult: ...
+def constant_volume_depletion(
+    components: list[FluidComponent],
+    temperature: float,
+    pressures: list[float],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+) -> ConstantVolumeDepletionResult: ...
 def decline_curve(
     calculation: str,
     qi: float | None = None,

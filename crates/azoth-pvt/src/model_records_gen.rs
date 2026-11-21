@@ -13,6 +13,7 @@ use azoth_core::{CalcResult, Warning};
 
 use crate::black_oil_correlations::BlackOilCorrelationsResult;
 use crate::constant_mass_expansion::ConstantMassExpansionResult;
+use crate::constant_volume_depletion::ConstantVolumeDepletionResult;
 use crate::decline_curve::DeclineCurveResult;
 use crate::differential_liberation::DifferentialLiberationResult;
 use crate::gas_correlations::GasCorrelationsResult;
@@ -37,6 +38,24 @@ impl CalcResult for ConstantMassExpansionResult {
         "saturation_volume",
         "z_saturation",
         "saturation_isothermal_compressibility",
+        "points",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ConstantVolumeDepletionResult {
+    const CALC_ID: &'static str = "pvt.constant_volume_depletion";
+    const FIELDS: &'static [&'static str] = &[
+        "saturation_pressure",
+        "saturation_volume",
+        "z_saturation",
+        "initial_moles",
+        "cumulative_moles_removed",
+        "k_values",
         "points",
         "warnings",
     ];

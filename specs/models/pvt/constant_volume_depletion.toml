@@ -1,0 +1,194 @@
+id = "pvt.constant_volume_depletion"
+name = "Constant volume depletion"
+kind = "direct"
+assumptions = [
+    "**the saturation state is the class's**: an upward 10-bar scan on the feed with a flash at every step, then a bisection to 1e-5, left at the last midpoint; the saturation volume and Zmix are volume-corrected.",
+    "**the restore loop removes gas until the corrected volume is back to saturation**: 1e-8 relative tolerance, 100 iterations, and a per-iteration removal capped at 0.95 of the gas phase's moles.",
+    "**overshoot and a gas-less cell are hard failures**, as the class throws; a loop that cannot converge in 100 iterations is refused rather than returning a half-restored cell.",
+    "**the restore condition is the class's**: a two-phase flash, or a schedule that has shown a gas/oil split at a pressure below saturation, and a volume above the saturation volume by more than 1e-8.",
+    "**the liquid dropout curve is the liquid volume over the saturation volume**, which is what `getLiquidDropoutCurve()` returns; it is published per point as `liquid_volume_relative_to_vsat` and not as a second vector.",
+    "**the K-values are the per-step equilibrium after restoration**, gas `y` over oil `x` and zero where the oil holds none; the class's `calculateKValues()` reflashes the final inventory at every pressure and is not this experiment.",
+    "**a single-phase point leaves its gas and oil fields absent**, not Java's uninitialised zeros.",
+    "**inputs are SI** and the fluid is the characterization row list; SRK and the databank kij are the defaults.",
+    "**the two-phase flash's boundary differs from NeqSim's `TPflash` by about `5e-6` relative**, measured; the saturation-dependent fields are held at `1e-4`, the restored-cell fields at `1e-6`.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/ConstantVolumeDepletion.java` at commit 118d9af is the port source.",
+    "`validation/neqsim/captures/pvt_constant_volume_depletion.tsv` - an eight-point schedule through the restoration, the same fluid at 350 K, and a richer 0.60/0.40 fluid.",
+]
+[source]
+standard = "NeqSim pvtsimulation/simulation/ConstantVolumeDepletion.java"
+edition = "The upward saturation scan, the restore loop, the cumulative mole accounting, the material-balance residual, Zmix and Zgas, the liquid volume and the per-step K-values."
+[inputs]
+[inputs.components]
+type = "record_list"
+row_type = "FluidComponent"
+description = "The fluids' components, one record each, in the order the fluids carry them. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips.\n"
+[inputs.components.fields.fluid]
+unit = "dimensionless"
+description = "Which fluid the row belongs to, 0-based. Fluids are ordered by first appearance, and a whole number from zero is required: a fractional or negative index is not a fluid.\n"
+[inputs.components.fields.name]
+type = "string"
+description = "The component's name. A base component merges by it across the fluids; a pseudo-component's is its own fluid's name and does not survive into the answer.\n"
+[inputs.components.fields.pseudo_component]
+type = "boolean"
+description = "Whether the row is a TBP or plus fraction rather than a base component. A base row's properties are absent and are the databank's at assembly.\n"
+[inputs.components.fields.moles]
+unit = "mol"
+description = "The component's mole amount. Only a positive one is read; a zero or negative amount is a row that is not on the grid.\n"
+[inputs.components.fields.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "The pseudo-component's molar mass, which is what the row's mass is and what its sorting key falls back to. Required on a pseudo row and ignored on a base row.\n"
+[inputs.components.fields.density]
+unit = "kg/m**3"
+optional = true
+description = "The pseudo-component's normal liquid density, which a group's volume is the mass over. Required on a pseudo row and ignored on a base row.\n"
+[inputs.components.fields.normal_boiling_point]
+unit = "K"
+optional = true
+description = "The pseudo-component's normal boiling point, its sorting key where it states a finite positive one. A row without one sorts by its molar mass.\n"
+[inputs.components.fields.critical_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's critical temperature, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.critical_pressure]
+unit = "Pa"
+optional = true
+description = "The pseudo-component's critical pressure, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.acentric_factor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's acentric factor, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.critical_volume]
+unit = "m**3/mol"
+optional = true
+description = "The pseudo-component's critical molar volume, mass-weighted into the group's.\n"
+[inputs.components.fields.racket_z]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's Rackett compressibility, mass-weighted into the group's and read again when the row becomes a component.\n"
+[inputs.components.fields.racket_z_cpa]
+unit = "dimensionless"
+optional = true
+description = "The same compressibility on the CPA basis, mass-weighted into the group's.\n"
+[inputs.components.fields.parachor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's parachor, in NeqSim's mixed `(mN/m)**(1/4) * cm**3/mol`, mass-weighted into the group's.\n"
+[inputs.components.fields.critical_viscosity]
+unit = "Pa*s"
+optional = true
+description = "The pseudo-component's critical viscosity, mass-weighted into the group's.\n"
+[inputs.components.fields.triple_point_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's triple-point temperature, mass-weighted into the group's.\n"
+[inputs.components.fields.heat_of_fusion]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's heat of fusion, mass-weighted into the group's.\n"
+[inputs.components.fields.ideal_gas_enthalpy_of_formation]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's ideal-gas enthalpy of formation, mass-weighted into the group's. It has no home on a `Component` and is dropped when a mixture is assembled.\n"
+[inputs.components.fields.cp_a]
+unit = "J/(mol*K)"
+optional = true
+description = "The constant term of the pseudo-component's ideal-gas heat capacity, mass-weighted into the group's.\n"
+[inputs.components.fields.cp_b]
+unit = "J/(mol*K**2)"
+optional = true
+description = "The coefficient of `T` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.components.fields.cp_c]
+unit = "J/(mol*K**3)"
+optional = true
+description = "The coefficient of `T**2` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.components.fields.cp_d]
+unit = "J/(mol*K**4)"
+optional = true
+description = "The coefficient of `T**3` in the pseudo-component's ideal-gas heat capacity, as `getCpD()` states it: the stored coefficient plus `1e-10`.\n"
+[inputs.components.fields.attractive_m]
+unit = "dimensionless"
+optional = true
+description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
+
+[inputs.eos]
+type = "enum"
+values = ["srk", "pr"]
+optional = true
+description = "the cubic the fluid is built for; absent is srk, the classes' `SystemSrkEos`.\n"
+[inputs.mixing_rule]
+type = "enum"
+values = ["classic", "zero"]
+optional = true
+description = "the interaction matrix; absent is classic, NeqSim's `setMixingRule(2)`.\n"
+[inputs.temperature]
+unit = "K"
+description = "the experiment temperature.\n"
+[inputs.pressures]
+type = "vector"
+unit = "Pa"
+description = "the schedule's absolute pressures, in the order they are reported.\n"
+[inputs.volume_correction]
+type = "boolean"
+optional = true
+description = "whether the Peneloux translation is applied; absent is true, NeqSim's default.\n"
+[outputs]
+[outputs.saturation_pressure]
+unit = "Pa"
+description = "the saturation pressure on the feed.\n"
+[outputs.saturation_volume]
+unit = "m**3"
+description = "the volume-corrected saturation volume.\n"
+[outputs.z_saturation]
+unit = "dimensionless"
+description = "the volume-corrected compressibility at saturation.\n"
+[outputs.initial_moles]
+unit = "mol"
+description = "the feed's total amount.\n"
+[outputs.cumulative_moles_removed]
+unit = "mol"
+description = "the total moles the restore loop removed.\n"
+[outputs.k_values]
+type = "matrix"
+unit = "dimensionless"
+shape = "one row per pressure, one column per component"
+description = "the per-step equilibrium K-values after restoration.\n"
+[outputs.points]
+type = "record_list"
+description = "one row per pressure.\n"
+
+[outputs.points.fields.pressure]
+unit = "Pa"
+description = "the absolute pressure.\n"
+[outputs.points.fields.total_volume]
+unit = "m**3"
+description = "the restored cell's volume-corrected volume.\n"
+[outputs.points.fields.relative_volume]
+unit = "dimensionless"
+description = "the total volume over the saturation volume.\n"
+[outputs.points.fields.cumulative_mole_fraction_depleted]
+unit = "dimensionless"
+description = "the fraction of the feed's moles removed through this point.\n"
+[outputs.points.fields.material_balance_relative_error]
+unit = "dimensionless"
+description = "the absolute residual of initial = remaining + removed, over the initial amount.\n"
+[outputs.points.fields.zmix]
+unit = "dimensionless"
+description = "the mixture's volume-corrected compressibility.\n"
+[outputs.points.fields.z_gas]
+unit = "dimensionless"
+optional = true
+description = "the gas phase's volume-corrected compressibility; absent without a gas phase.\n"
+[outputs.points.fields.liquid_volume]
+unit = "m**3"
+optional = true
+description = "the oil phase's volume-corrected volume; absent without an oil phase.\n"
+[outputs.points.fields.liquid_volume_relative_to_vsat]
+unit = "dimensionless"
+optional = true
+description = "the oil volume over the saturation volume, which is the class's liquid dropout curve; absent without an oil phase.\n"
+[implementations]
+python = "azoth.pvt.constant_volume_depletion"
+rust = "azoth_pvt::constant_volume_depletion"

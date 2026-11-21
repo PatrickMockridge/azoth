@@ -81,6 +81,7 @@ from azoth.core.result import (
     ConsequenceAnalysisResult,
     ConsequenceOutcomeResult,
     ConstantMassExpansionResult,
+    ConstantVolumeDepletionResult,
     ControlValveCvResult,
     ControlValveFailureReliefResult,
     CooldownVerdict,
@@ -91,6 +92,7 @@ from azoth.core.result import (
     CostEstimationResult,
     CostEstimationResultRow,
     CriticalPointResult,
+    CvdPoint,
     DarcyWeisbachResult,
     DeadheadVerdict,
     DeclineCurveResult,
@@ -626,6 +628,7 @@ __all__ = [
     "conduction_plane_wall",
     "consequence_analysis",
     "constant_mass_expansion",
+    "constant_volume_depletion",
     "control_valve_cv",
     "control_valve_failure_relief",
     "cooler",
@@ -10484,6 +10487,29 @@ def constant_mass_expansion(components: Sequence[Mapping[str, Any]], *, pressure
         z_saturation=result.z_saturation,
         saturation_isothermal_compressibility=result.saturation_isothermal_compressibility,
         points=tuple(CcePoint(pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), total_volume=from_si(c.total_volume.magnitude_si, c.total_volume.unit), relative_volume=c.relative_volume, density=from_si(c.density.magnitude_si, c.density.unit), gas_volume=from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), gas_standard_volume=from_si(c.gas_standard_volume.magnitude_si, c.gas_standard_volume.unit), bg=c.bg, z_gas=c.z_gas, oil_density=None if c.oil_density is None else from_si(c.oil_density.magnitude_si, c.oil_density.unit), oil_viscosity=None if c.oil_viscosity is None else from_si(c.oil_viscosity.magnitude_si, c.oil_viscosity.unit), liquid_relative_volume=c.liquid_relative_volume, y_factor=c.y_factor, viscosity=None if c.viscosity is None else from_si(c.viscosity.magnitude_si, c.viscosity.unit), isothermal_compressibility=c.isothermal_compressibility) for c in result.points),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def constant_volume_depletion(components: Sequence[Mapping[str, Any]], *, pressures: Sequence[Any], eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, volume_correction: bool | None=None) -> ConstantVolumeDepletionResult:
+    """``pvt.constant_volume_depletion``, computed in Rust."""
+    spec = _models_gen.model("pvt.constant_volume_depletion")
+    result = _core.constant_volume_depletion(
+        input_records_to_si(spec, "components", components),
+        eos,
+        mixing_rule,
+        _si(spec, "temperature", temperature),
+        [_si(spec, "pressures", v) for v in pressures],
+        volume_correction,
+    )
+    return ConstantVolumeDepletionResult(
+        saturation_pressure=from_si(result.saturation_pressure.magnitude_si, result.saturation_pressure.unit),
+        saturation_volume=from_si(result.saturation_volume.magnitude_si, result.saturation_volume.unit),
+        z_saturation=result.z_saturation,
+        initial_moles=from_si(result.initial_moles.magnitude_si, result.initial_moles.unit),
+        cumulative_moles_removed=from_si(result.cumulative_moles_removed.magnitude_si, result.cumulative_moles_removed.unit),
+        k_values=tuple(tuple(row) for row in result.k_values),
+        points=tuple(CvdPoint(pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), total_volume=from_si(c.total_volume.magnitude_si, c.total_volume.unit), relative_volume=c.relative_volume, cumulative_mole_fraction_depleted=c.cumulative_mole_fraction_depleted, material_balance_relative_error=c.material_balance_relative_error, zmix=c.zmix, z_gas=c.z_gas, liquid_volume=None if c.liquid_volume is None else from_si(c.liquid_volume.magnitude_si, c.liquid_volume.unit), liquid_volume_relative_to_vsat=c.liquid_volume_relative_to_vsat) for c in result.points),
         warnings=_warnings(result.warnings),
     )
 

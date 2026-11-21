@@ -12,6 +12,7 @@ import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.GasMaterialBalance;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.OilMaterialBalance;
 import neqsim.pvtsimulation.simulation.ConstantMassExpansion;
+import neqsim.pvtsimulation.simulation.ConstantVolumeDepletion;
 import neqsim.pvtsimulation.simulation.DifferentialLiberation;
 import neqsim.pvtsimulation.simulation.SaturationPressure;
 import neqsim.pvtsimulation.simulation.SaturationTemperature;
@@ -564,6 +565,59 @@ public final class PvtProbe {
         new double[] {250.0, 200.0, 150.0, 100.0, 50.0, 20.0, 5.0});
   }
 
+  private static void cvdBlock(String block, String first, double firstMoles, String second,
+      double secondMoles, double temperatureK, double[] pressuresBar) {
+    System.out.println("[" + block + "]");
+    ConstantVolumeDepletion depletion = new ConstantVolumeDepletion(
+        binary(first, firstMoles, second, secondMoles, temperatureK, pressuresBar[0]));
+    depletion.setTemperature(temperatureK);
+    depletion.setPressures(pressuresBar);
+    depletion.runCalc();
+
+    line("saturation_pressure_pa", depletion.getSaturationPressure() * 1.0e5);
+    line("saturation_volume_m3", scalar(depletion, "saturationVolume"));
+    line("z_saturation", scalar(depletion, "Zsaturation"));
+    line("initial_moles", scalar(depletion, "initialMoles"));
+    line("cumulative_moles_removed", scalar(depletion, "cumulativeMolesRemoved"));
+
+    double[] total = array(depletion, "totalVolume");
+    double[] liquid = array(depletion, "liquidVolume");
+    double[] liquidRelative = array(depletion, "liquidVolumeRelativeToVsat");
+    double[] balance = array(depletion, "materialBalanceRelativeError");
+    double[] relative = depletion.getRelativeVolume();
+    double[] zmix = depletion.getZmix();
+    double[] zGas = depletion.getZgas();
+    double[] depleted = depletion.getCummulativeMolePercDepleted();
+    double[] dropout = depletion.getLiquidDropoutCurve();
+    for (int i = 0; i < pressuresBar.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "pressure_pa", pressuresBar[i] * 1.0e5);
+      line(at + "total_volume_m3", total[i]);
+      line(at + "relative_volume", relative[i]);
+      line(at + "cumulative_mole_fraction_depleted", depleted[i] / 100.0);
+      line(at + "material_balance_relative_error", balance[i]);
+      line(at + "zmix", zmix[i]);
+      if (zGas[i] > 1.0e-10) {
+        line(at + "z_gas", zGas[i]);
+      }
+      if (liquid[i] > 0.0) {
+        line(at + "liquid_volume_m3", liquid[i]);
+        line(at + "liquid_volume_relative_to_vsat", liquidRelative[i]);
+        line(at + "liquid_dropout", dropout[i] / 100.0);
+      }
+    }
+  }
+
+  private static void cvd() {
+    System.out.println("cvd");
+    cvdBlock("cvd_methane_nc10_323", "methane", 0.70, "nC10", 0.30, 323.15,
+        new double[] {400.0, 350.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0});
+    cvdBlock("cvd_methane_nc10_350", "methane", 0.70, "nC10", 0.30, 350.0,
+        new double[] {350.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0});
+    cvdBlock("cvd_rich_323", "methane", 0.60, "nC10", 0.40, 323.15,
+        new double[] {300.0, 250.0, 200.0, 150.0, 100.0, 50.0});
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -593,6 +647,9 @@ public final class PvtProbe {
         break;
       case "dle":
         dle();
+        break;
+      case "cvd":
+        cvd();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

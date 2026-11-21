@@ -1160,6 +1160,82 @@ impl From<&azoth_process::models::cost_estimation::CostEstimationResultRow>
     }
 }
 
+/// one row per pressure.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "CvdPoint")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyCvdPoint {
+    /// the absolute pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the restored cell's volume-corrected volume.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the total volume over the saturation volume.
+    #[pyo3(get)]
+    pub relative_volume: f64,
+    /// the fraction of the feed's moles removed through this point.
+    #[pyo3(get)]
+    pub cumulative_mole_fraction_depleted: f64,
+    /// the absolute residual of initial = remaining + removed, over the initial amount.
+    #[pyo3(get)]
+    pub material_balance_relative_error: f64,
+    /// the mixture's volume-corrected compressibility.
+    #[pyo3(get)]
+    pub zmix: f64,
+    /// the gas phase's volume-corrected compressibility; absent without a gas phase.
+    #[pyo3(get)]
+    pub z_gas: Option<f64>,
+    /// the oil phase's volume-corrected volume; absent without an oil phase.
+    #[pyo3(get)]
+    pub liquid_volume: Option<PyQty>,
+    /// the oil volume over the saturation volume, which is the class's liquid dropout curve; absent without an oil phase.
+    #[pyo3(get)]
+    pub liquid_volume_relative_to_vsat: Option<f64>,
+}
+
+#[pymethods]
+impl PyCvdPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "CvdPoint(pressure={:?}, total_volume={:?}, relative_volume={}, cumulative_mole_fraction_depleted={}, material_balance_relative_error={}, zmix={}, z_gas={:?}, liquid_volume={:?}, liquid_volume_relative_to_vsat={:?})",
+            self.pressure,
+            self.total_volume,
+            self.relative_volume,
+            self.cumulative_mole_fraction_depleted,
+            self.material_balance_relative_error,
+            self.zmix,
+            self.z_gas,
+            self.liquid_volume,
+            self.liquid_volume_relative_to_vsat
+        )
+    }
+}
+
+impl From<&azoth_pvt::constant_volume_depletion::CvdPoint> for PyCvdPoint {
+    fn from(row: &azoth_pvt::constant_volume_depletion::CvdPoint) -> Self {
+        Self {
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            total_volume: PyQty {
+                magnitude_si: row.total_volume,
+                unit: "m**3".to_string(),
+            },
+            relative_volume: row.relative_volume,
+            cumulative_mole_fraction_depleted: row.cumulative_mole_fraction_depleted,
+            material_balance_relative_error: row.material_balance_relative_error,
+            zmix: row.zmix,
+            z_gas: row.z_gas,
+            liquid_volume: row.liquid_volume.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "m**3".to_string(),
+            }),
+            liquid_volume_relative_to_vsat: row.liquid_volume_relative_to_vsat,
+        }
+    }
+}
+
 /// One row per evaluated segment, in the profile's order.
 #[pyclass(
     frozen,

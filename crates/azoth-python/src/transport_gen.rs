@@ -17,28 +17,28 @@ use crate::record_outputs_gen::{
     PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBlackOilResultRow,
     PyBrineMixingPointRow, PyBubbleTransferZoneReleaseStation, PyCcePoint,
     PyCharacterizationComponent, PyChemicalWarningRow, PyComponentSelectiveReleaseStation,
-    PyConsequenceOutcomeResult, PyCostBomRow, PyCostEstimationResultRow, PyDepositionSegmentRow,
-    PyDepressurizationPoint, PyDisciplineCostLine, PyDlePoint, PyDriftFluxReleaseStation,
-    PyEnvelopePoint, PyEnvelopeQuery, PyEnvelopeSummary, PyEquilibriumSoundSpeedSample,
-    PyEquipmentCostResultRow, PyEquipmentMtoRow, PyEquipmentQualityFlag, PyEscalationItemResult,
-    PyEsdContribution, PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment,
-    PyFmeaRankedEntry, PyGasResultRow, PyHazopPopulationRow, PyHazopTemplateDeviation,
-    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
-    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasFannoReleaseStation,
-    PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
-    PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier,
-    PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
-    PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
-    PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyOperatingCostLine,
-    PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument,
-    PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
-    PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
-    PyPulsationModeResult, PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation,
-    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
-    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
-    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyConsequenceOutcomeResult, PyCostBomRow, PyCostEstimationResultRow, PyCvdPoint,
+    PyDepositionSegmentRow, PyDepressurizationPoint, PyDisciplineCostLine, PyDlePoint,
+    PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery, PyEnvelopeSummary,
+    PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
+    PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
+    PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyGasResultRow,
+    PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
+    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
+    PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
+    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
+    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
+    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
+    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment,
+    PyOpenDrainResult, PyOperatingCostLine, PyP002FindingResult, PyPerformanceAssessment,
+    PyPerformanceFinding, PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint,
+    PyPrescribedSlipReleaseStation, PyProcessCostEquipmentResult, PyProcessCostFlag,
+    PyProcessCostMtoRow, PyProjectCostLine, PyPulsationModeResult, PyRanzMarshallReleaseStation,
+    PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
+    PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
+    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult,
+    PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
     PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow,
     PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
     PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
@@ -30406,6 +30406,86 @@ impl From<&azoth_pvt::constant_mass_expansion::ConstantMassExpansionResult>
             z_saturation: r.z_saturation,
             saturation_isothermal_compressibility: r.saturation_isothermal_compressibility,
             points: r.points.iter().map(PyCcePoint::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.constant_volume_depletion`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ConstantVolumeDepletionResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyConstantVolumeDepletionResult {
+    /// the saturation pressure on the feed.
+    #[pyo3(get)]
+    pub saturation_pressure: PyQty,
+    /// the volume-corrected saturation volume.
+    #[pyo3(get)]
+    pub saturation_volume: PyQty,
+    /// the volume-corrected compressibility at saturation.
+    #[pyo3(get)]
+    pub z_saturation: f64,
+    /// the feed's total amount.
+    #[pyo3(get)]
+    pub initial_moles: PyQty,
+    /// the total moles the restore loop removed.
+    #[pyo3(get)]
+    pub cumulative_moles_removed: PyQty,
+    /// the per-step equilibrium K-values after restoration.
+    #[pyo3(get)]
+    pub k_values: Vec<Vec<f64>>,
+    /// one row per pressure.
+    #[pyo3(get)]
+    pub points: Vec<PyCvdPoint>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyConstantVolumeDepletionResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "ConstantVolumeDepletionResult(saturation_pressure={:?}, saturation_volume={:?}, z_saturation={:?}, initial_moles={:?}, cumulative_moles_removed={:?}, k_values={:?}, points={:?}, {} warning(s))",
+            self.saturation_pressure,
+            self.saturation_volume,
+            self.z_saturation,
+            self.initial_moles,
+            self.cumulative_moles_removed,
+            self.k_values,
+            self.points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::constant_volume_depletion::ConstantVolumeDepletionResult>
+    for PyConstantVolumeDepletionResult
+{
+    fn from(r: &azoth_pvt::constant_volume_depletion::ConstantVolumeDepletionResult) -> Self {
+        Self {
+            saturation_pressure: PyQty {
+                magnitude_si: r.saturation_pressure,
+                unit: "Pa".to_string(),
+            },
+            saturation_volume: PyQty {
+                magnitude_si: r.saturation_volume,
+                unit: "m**3".to_string(),
+            },
+            z_saturation: r.z_saturation,
+            initial_moles: PyQty {
+                magnitude_si: r.initial_moles,
+                unit: "mol".to_string(),
+            },
+            cumulative_moles_removed: PyQty {
+                magnitude_si: r.cumulative_moles_removed,
+                unit: "mol".to_string(),
+            },
+            k_values: r.k_values.clone(),
+            points: r.points.iter().map(PyCvdPoint::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

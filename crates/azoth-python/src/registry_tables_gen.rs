@@ -376,6 +376,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "process.vessel_rupture" => azoth_process::models::vessel_rupture::VesselRuptureResult::FIELDS.to_vec(),
         "pvt.black_oil_correlations" => azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult::FIELDS.to_vec(),
         "pvt.constant_mass_expansion" => azoth_pvt::constant_mass_expansion::ConstantMassExpansionResult::FIELDS.to_vec(),
+        "pvt.constant_volume_depletion" => azoth_pvt::constant_volume_depletion::ConstantVolumeDepletionResult::FIELDS.to_vec(),
         "pvt.decline_curve" => azoth_pvt::decline_curve::DeclineCurveResult::FIELDS.to_vec(),
         "pvt.differential_liberation" => azoth_pvt::differential_liberation::DifferentialLiberationResult::FIELDS.to_vec(),
         "pvt.gas_correlations" => azoth_pvt::gas_correlations::GasCorrelationsResult::FIELDS.to_vec(),

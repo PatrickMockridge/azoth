@@ -35,6 +35,7 @@ from azoth.core.record_outputs_gen import (
     ConsequenceOutcomeResult,
     CostBomRow,
     CostEstimationResultRow,
+    CvdPoint,
     DepositionSegmentRow,
     DepressurizationPoint,
     DisciplineCostLine,
@@ -12283,6 +12284,37 @@ class ConstantMassExpansionResult(_HasWarnings):
 
     #: one row per pressure.
     points: tuple[CcePoint, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ConstantVolumeDepletionResult(_HasWarnings):
+    """Result of ``pvt.constant_volume_depletion``."""
+
+    CALC_ID: ClassVar[str] = "pvt.constant_volume_depletion"
+
+    #: the saturation pressure on the feed.
+    saturation_pressure: Q
+
+    #: the volume-corrected saturation volume.
+    saturation_volume: Q
+
+    #: the volume-corrected compressibility at saturation.
+    z_saturation: float
+
+    #: the feed's total amount.
+    initial_moles: Q
+
+    #: the total moles the restore loop removed.
+    cumulative_moles_removed: Q
+
+    #: the per-step equilibrium K-values after restoration.
+    k_values: tuple[tuple[float, ...], ...]
+
+    #: one row per pressure.
+    points: tuple[CvdPoint, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

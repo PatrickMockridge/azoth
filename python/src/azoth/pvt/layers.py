@@ -124,10 +124,50 @@ def _dle(inputs: Mapping[str, Any]) -> dict[str, float]:
     return rows_out
 
 
+def _cvd(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`pvt.constant_volume_depletion`'s captured quantities, keyed as the capture spells them."""
+    from azoth.core.units import quantity
+
+    from .reference.constant_volume_depletion import constant_volume_depletion
+
+    rows = [{**row, "moles": quantity(row["moles"], "mol")} for row in inputs["components"]]
+    result = constant_volume_depletion(
+        rows,
+        eos=inputs.get("eos"),
+        mixing_rule=inputs.get("mixing_rule"),
+        temperature=quantity(inputs["temperature"], "K"),
+        pressures=[quantity(value, "Pa") for value in inputs["pressures"]],
+        volume_correction=inputs.get("volume_correction"),
+    )
+    rows_out: dict[str, float] = {
+        "saturation_pressure_pa": result.saturation_pressure.to("Pa").magnitude,
+        "saturation_volume_m3": result.saturation_volume.to("m**3").magnitude,
+        "z_saturation": result.z_saturation,
+        "initial_moles": result.initial_moles.to("mol").magnitude,
+        "cumulative_moles_removed": result.cumulative_moles_removed.to("mol").magnitude,
+    }
+    for index, point in enumerate(result.points):
+        at = f"point_{index}_"
+        rows_out[at + "pressure_pa"] = point.pressure.to("Pa").magnitude
+        rows_out[at + "total_volume_m3"] = point.total_volume.to("m**3").magnitude
+        rows_out[at + "relative_volume"] = point.relative_volume
+        rows_out[at + "cumulative_mole_fraction_depleted"] = point.cumulative_mole_fraction_depleted
+        rows_out[at + "material_balance_relative_error"] = point.material_balance_relative_error
+        rows_out[at + "zmix"] = point.zmix
+        if point.z_gas is not None:
+            rows_out[at + "z_gas"] = point.z_gas
+        if point.liquid_volume is not None:
+            rows_out[at + "liquid_volume_m3"] = point.liquid_volume.to("m**3").magnitude
+        if point.liquid_volume_relative_to_vsat is not None:
+            rows_out[at + "liquid_volume_relative_to_vsat"] = point.liquid_volume_relative_to_vsat
+    return rows_out
+
+
 #: Models whose per-step arithmetic is dumped by a function here.
 DUMPERS: dict[str, Dumper] = {
     "pvt.constant_mass_expansion": _cce,
     "pvt.differential_liberation": _dle,
+    "pvt.constant_volume_depletion": _cvd,
 }
 
 #: Record-list models with no interior to dump: every published row is the answer. The value

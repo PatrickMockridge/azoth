@@ -371,6 +371,7 @@
 - [PVT simulation](./pvt/index.md)
   - [Black-oil correlation table](./pvt/black_oil_correlations.md)
   - [Constant mass expansion](./pvt/constant_mass_expansion.md)
+  - [Constant volume depletion](./pvt/constant_volume_depletion.md)
   - [Decline-curve analysis](./pvt/decline_curve.md)
   - [Differential liberation](./pvt/differential_liberation.md)
   - [Gas correlation table](./pvt/gas_correlations.md)

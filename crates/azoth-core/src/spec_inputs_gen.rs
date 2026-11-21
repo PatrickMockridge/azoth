@@ -357,6 +357,7 @@
 //!   - specs/models/process/vessel_rupture.toml
 //!   - specs/models/pvt/black_oil_correlations.toml
 //!   - specs/models/pvt/constant_mass_expansion.toml
+//!   - specs/models/pvt/constant_volume_depletion.toml
 //!   - specs/models/pvt/decline_curve.toml
 //!   - specs/models/pvt/differential_liberation.toml
 //!   - specs/models/pvt/gas_correlations.toml
@@ -6834,6 +6835,12 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.constant_mass_expansion", "pressures", "pressure"),
+    (
+        "pvt.constant_volume_depletion",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.constant_volume_depletion", "pressures", "pressure"),
     ("pvt.decline_curve", "qi", "dimensionless"),
     ("pvt.decline_curve", "di", "dimensionless"),
     ("pvt.decline_curve", "b", "dimensionless"),

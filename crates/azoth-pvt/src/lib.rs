@@ -11,6 +11,7 @@
 
 pub mod black_oil_correlations;
 pub mod constant_mass_expansion;
+pub mod constant_volume_depletion;
 pub mod decline_curve;
 pub mod differential_liberation;
 pub mod flash;
@@ -32,6 +33,9 @@ pub use black_oil_correlations::{
     BlackOilCorrelationsResult, BlackOilQuery, BlackOilResultRow, black_oil_correlations,
 };
 pub use constant_mass_expansion::{CcePoint, ConstantMassExpansionResult, constant_mass_expansion};
+pub use constant_volume_depletion::{
+    ConstantVolumeDepletionResult, CvdPoint, constant_volume_depletion,
+};
 pub use decline_curve::{DeclineCurveResult, decline_curve};
 pub use differential_liberation::{
     DifferentialLiberationResult, DlePoint, differential_liberation,

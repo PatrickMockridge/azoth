@@ -23,6 +23,7 @@ from azoth._dispatch import resolve
 from azoth.core.result import (
     BlackOilCorrelationsResult,
     ConstantMassExpansionResult,
+    ConstantVolumeDepletionResult,
     DeclineCurveResult,
     DifferentialLiberationResult,
     GasCorrelationsResult,
@@ -35,6 +36,7 @@ from azoth.pvt import layers as layers
 
 _BLACK_OIL_CORRELATIONS = "pvt.black_oil_correlations"
 _CONSTANT_MASS_EXPANSION = "pvt.constant_mass_expansion"
+_CONSTANT_VOLUME_DEPLETION = "pvt.constant_volume_depletion"
 _DECLINE_CURVE = "pvt.decline_curve"
 _DIFFERENTIAL_LIBERATION = "pvt.differential_liberation"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
@@ -46,6 +48,7 @@ _WATER_CORRELATIONS = "pvt.water_correlations"
 __all__ = [
     "black_oil_correlations",
     "constant_mass_expansion",
+    "constant_volume_depletion",
     "decline_curve",
     "differential_liberation",
     "gas_correlations",
@@ -112,6 +115,42 @@ def differential_liberation(
     See :func:`azoth.pvt.reference.differential_liberation.differential_liberation`.
     """
     return resolve(_DIFFERENTIAL_LIBERATION)(  # type: ignore[no-any-return]
+        components=components,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        temperature=temperature,
+        pressures=pressures,
+        volume_correction=volume_correction,
+    )
+
+
+def constant_volume_depletion(
+    components: Sequence[Mapping[str, Any]],
+    *,
+    pressures: Sequence[Any],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: Any = None,
+    volume_correction: bool | None = None,
+) -> ConstantVolumeDepletionResult:
+    """The constant-volume depletion of a fluid over a pressure schedule.
+
+    ``components`` is the characterization row list; the temperature and pressures are
+    absolute. The saturation state is an upward scan on the feed. Each point whose volume
+    exceeds the saturation volume has gas removed until it is restored, and the cumulative
+    removed moles, the material-balance residual, Zmix, Zgas and the liquid dropout are
+    reported per point. The K-values are the per-step equilibrium, not the class's QC method.
+
+    Returns:
+        The saturation scalars and one ``points`` row per pressure.
+
+    Raises:
+        InvalidInputError: for an unknown ``eos`` or ``mixing_rule``, no pressures, or a
+            restore loop that overshoots, finds no gas, or fails to converge.
+
+    See :func:`azoth.pvt.reference.constant_volume_depletion.constant_volume_depletion`.
+    """
+    return resolve(_CONSTANT_VOLUME_DEPLETION)(  # type: ignore[no-any-return]
         components=components,
         eos=eos,
         mixing_rule=mixing_rule,

@@ -456,6 +456,38 @@ class CostEstimationResultRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class CvdPoint:
+    """one row per pressure."""
+
+    #: the absolute pressure.
+    pressure: Q
+
+    #: the restored cell's volume-corrected volume.
+    total_volume: Q
+
+    #: the total volume over the saturation volume.
+    relative_volume: float
+
+    #: the fraction of the feed's moles removed through this point.
+    cumulative_mole_fraction_depleted: float
+
+    #: the absolute residual of initial = remaining + removed, over the initial amount.
+    material_balance_relative_error: float
+
+    #: the mixture's volume-corrected compressibility.
+    zmix: float
+
+    #: the gas phase's volume-corrected compressibility; absent without a gas phase.
+    z_gas: float | None
+
+    #: the oil phase's volume-corrected volume; absent without an oil phase.
+    liquid_volume: Q | None
+
+    #: the oil volume over the saturation volume, which is the class's liquid dropout curve; absent without an oil phase.
+    liquid_volume_relative_to_vsat: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DepositionSegmentRow:
     """One row per evaluated segment, in the profile's order."""
 
