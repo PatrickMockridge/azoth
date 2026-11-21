@@ -12,6 +12,7 @@ import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.GasMaterialBalance;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.OilMaterialBalance;
 import neqsim.pvtsimulation.simulation.ConstantMassExpansion;
+import neqsim.pvtsimulation.simulation.DifferentialLiberation;
 import neqsim.pvtsimulation.simulation.SaturationPressure;
 import neqsim.pvtsimulation.simulation.SaturationTemperature;
 import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
@@ -506,6 +507,63 @@ public final class PvtProbe {
         new double[] {100.0, 50.0, 20.0, 10.0, 5.0});
   }
 
+  private static void dleBlock(String block, String first, double firstMoles, String second,
+      double secondMoles, double temperatureK, double[] pressuresBar) {
+    System.out.println("[" + block + "]");
+    DifferentialLiberation liberation = new DifferentialLiberation(
+        binary(first, firstMoles, second, secondMoles, temperatureK, pressuresBar[0]));
+    liberation.setTemperature(temperatureK);
+    liberation.setPressures(pressuresBar);
+    liberation.runCalc();
+
+    line("saturation_pressure_pa", liberation.getSaturationPressure() * 1.0e5);
+    line("saturation_volume_m3", scalar(liberation, "saturationVolume"));
+    line("voil_std_m3", scalar(liberation, "VoilStd"));
+
+    double[] total = array(liberation, "totalVolume");
+    double[] liquid = array(liberation, "liquidVolume");
+    double[] liquidRelative = array(liberation, "liquidVolumeRelativeToVsat");
+    double[] gas = array(liberation, "gasVolume");
+    double[] relative = liberation.getRelativeVolume();
+    double[] bo = liberation.getBo();
+    double[] bg = liberation.getBg();
+    double[] rs = liberation.getRs();
+    double[] zGas = liberation.getZgas();
+    double[] gasGravity = liberation.getRelGasGravity();
+    double[] gasStandard = liberation.getGasStandardVolume();
+    double[] oilDensity = liberation.getOilDensity();
+    for (int i = 0; i < pressuresBar.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "pressure_pa", pressuresBar[i] * 1.0e5);
+      line(at + "total_volume_m3", total[i]);
+      line(at + "relative_volume", relative[i]);
+      line(at + "liquid_volume_m3", liquid[i]);
+      line(at + "oil_density", oilDensity[i]);
+      if (gasStandard[i] > 1.0e-30) {
+        line(at + "liquid_volume_relative_to_vsat", liquidRelative[i]);
+        line(at + "gas_volume_m3", gas[i]);
+        line(at + "gas_standard_volume_m3", gasStandard[i]);
+        line(at + "z_gas", zGas[i]);
+        line(at + "relative_gas_gravity", gasGravity[i]);
+      }
+      line(at + "bo", bo[i]);
+      if (zGas[i] > 1.0e-10) {
+        line(at + "bg", bg[i]);
+      }
+      line(at + "rs", rs[i]);
+    }
+  }
+
+  private static void dle() {
+    System.out.println("dle");
+    dleBlock("dle_methane_nc10_323", "methane", 0.70, "nC10", 0.30, 323.15,
+        new double[] {250.0, 200.0, 150.0, 100.0, 70.0, 50.0, 30.0, 20.0, 10.0, 1.0});
+    dleBlock("dle_methane_nc10_350", "methane", 0.70, "nC10", 0.30, 350.0,
+        new double[] {300.0, 250.0, 200.0, 150.0, 100.0, 50.0, 20.0, 5.0});
+    dleBlock("dle_methane_nc10_323_rich", "methane", 0.60, "nC10", 0.40, 323.15,
+        new double[] {250.0, 200.0, 150.0, 100.0, 50.0, 20.0, 5.0});
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -532,6 +590,9 @@ public final class PvtProbe {
         break;
       case "cce":
         cce();
+        break;
+      case "dle":
+        dle();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

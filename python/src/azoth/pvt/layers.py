@@ -77,9 +77,57 @@ def _cce(inputs: Mapping[str, Any]) -> dict[str, float]:
     return rows_out
 
 
+def _dle(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`pvt.differential_liberation`'s captured quantities, keyed as the capture spells them."""
+    from azoth.core.units import quantity
+
+    from .reference.differential_liberation import differential_liberation
+
+    rows = [{**row, "moles": quantity(row["moles"], "mol")} for row in inputs["components"]]
+    result = differential_liberation(
+        rows,
+        eos=inputs.get("eos"),
+        mixing_rule=inputs.get("mixing_rule"),
+        temperature=quantity(inputs["temperature"], "K"),
+        pressures=[quantity(value, "Pa") for value in inputs["pressures"]],
+        volume_correction=inputs.get("volume_correction"),
+    )
+    rows_out: dict[str, float] = {}
+    if result.saturation_pressure is not None:
+        rows_out["saturation_pressure_pa"] = result.saturation_pressure.to("Pa").magnitude
+    if result.saturation_volume is not None:
+        rows_out["saturation_volume_m3"] = result.saturation_volume.to("m**3").magnitude
+    if result.voil_std is not None:
+        rows_out["voil_std_m3"] = result.voil_std.to("m**3").magnitude
+    for index, point in enumerate(result.points):
+        at = f"point_{index}_"
+        rows_out[at + "pressure_pa"] = point.pressure.to("Pa").magnitude
+        rows_out[at + "total_volume_m3"] = point.total_volume.to("m**3").magnitude
+        rows_out[at + "liquid_volume_m3"] = point.liquid_volume.to("m**3").magnitude
+        rows_out[at + "oil_density"] = point.oil_density.to("kg/m**3").magnitude
+        for name in (
+            "relative_volume",
+            "liquid_volume_relative_to_vsat",
+            "z_gas",
+            "relative_gas_gravity",
+            "bo",
+            "bg",
+            "rs",
+        ):
+            value = getattr(point, name)
+            if value is not None:
+                rows_out[at + name] = float(value)
+        for name, unit in (("gas_volume", "m**3"), ("gas_standard_volume", "m**3")):
+            value = getattr(point, name)
+            if value is not None:
+                rows_out[at + name + "_m3"] = value.to(unit).magnitude
+    return rows_out
+
+
 #: Models whose per-step arithmetic is dumped by a function here.
 DUMPERS: dict[str, Dumper] = {
     "pvt.constant_mass_expansion": _cce,
+    "pvt.differential_liberation": _dle,
 }
 
 #: Record-list models with no interior to dump: every published row is the answer. The value
@@ -112,7 +160,12 @@ NO_INTERIOR: dict[str, str] = {
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the
 #: id cannot express - and the count of rows in each. A block is not excused by widening a
 #: tolerance; it is a measured row this id does not publish.
-UNCASED_ROWS: dict[str, int] = {}
+UNCASED_ROWS: dict[str, int] = {
+    # The 350 K block: NeqSim's phase 0 at its saturation midpoint is a trace phase whose
+    # volume is 7e-10 m3, so the class's relative volumes are 2e5. The id publishes the
+    # material phase's volume and does not claim the class's arithmetic here.
+    "pvt.differential_liberation": 8,
+}
 
 
 def rows(model_id: str, inputs: Mapping[str, Any]) -> dict[str, float]:

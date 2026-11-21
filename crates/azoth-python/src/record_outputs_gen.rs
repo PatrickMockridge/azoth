@@ -1318,6 +1318,111 @@ impl From<&azoth_process::models::process_cost_estimate::DisciplineCostLine>
     }
 }
 
+/// one row per pressure.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "DlePoint")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDlePoint {
+    /// the absolute pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the retained cell's translated volume.
+    #[pyo3(get)]
+    pub total_volume: PyQty,
+    /// the total volume over the saturation volume; absent without a saturation state.
+    #[pyo3(get)]
+    pub relative_volume: Option<f64>,
+    /// the oil phase's translated volume.
+    #[pyo3(get)]
+    pub liquid_volume: PyQty,
+    /// the liquid volume over the saturation volume; absent in a single phase.
+    #[pyo3(get)]
+    pub liquid_volume_relative_to_vsat: Option<f64>,
+    /// the oil phase's density.
+    #[pyo3(get)]
+    pub oil_density: PyQty,
+    /// the removed gas's translated volume; absent in a single phase.
+    #[pyo3(get)]
+    pub gas_volume: Option<PyQty>,
+    /// the removed gas at 288.15 K and 1.01325 bar; absent in a single phase.
+    #[pyo3(get)]
+    pub gas_standard_volume: Option<PyQty>,
+    /// the gas phase's cubic compressibility.
+    #[pyo3(get)]
+    pub z_gas: Option<f64>,
+    /// the gas molar mass over the class's 0.028 kg/mol air constant.
+    #[pyo3(get)]
+    pub relative_gas_gravity: Option<f64>,
+    /// the oil formation volume factor; absent without a stock-tank oil volume.
+    #[pyo3(get)]
+    pub bo: Option<f64>,
+    /// the gas formation volume factor; absent in a single phase.
+    #[pyo3(get)]
+    pub bg: Option<f64>,
+    /// the remaining solution gas per stock-tank oil volume; absent without one.
+    #[pyo3(get)]
+    pub rs: Option<f64>,
+}
+
+#[pymethods]
+impl PyDlePoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "DlePoint(pressure={:?}, total_volume={:?}, relative_volume={:?}, liquid_volume={:?}, liquid_volume_relative_to_vsat={:?}, oil_density={:?}, gas_volume={:?}, gas_standard_volume={:?}, z_gas={:?}, relative_gas_gravity={:?}, bo={:?}, bg={:?}, rs={:?})",
+            self.pressure,
+            self.total_volume,
+            self.relative_volume,
+            self.liquid_volume,
+            self.liquid_volume_relative_to_vsat,
+            self.oil_density,
+            self.gas_volume,
+            self.gas_standard_volume,
+            self.z_gas,
+            self.relative_gas_gravity,
+            self.bo,
+            self.bg,
+            self.rs
+        )
+    }
+}
+
+impl From<&azoth_pvt::differential_liberation::DlePoint> for PyDlePoint {
+    fn from(row: &azoth_pvt::differential_liberation::DlePoint) -> Self {
+        Self {
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            total_volume: PyQty {
+                magnitude_si: row.total_volume,
+                unit: "m**3".to_string(),
+            },
+            relative_volume: row.relative_volume,
+            liquid_volume: PyQty {
+                magnitude_si: row.liquid_volume,
+                unit: "m**3".to_string(),
+            },
+            liquid_volume_relative_to_vsat: row.liquid_volume_relative_to_vsat,
+            oil_density: PyQty {
+                magnitude_si: row.oil_density,
+                unit: "kg/m**3".to_string(),
+            },
+            gas_volume: row.gas_volume.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "m**3".to_string(),
+            }),
+            gas_standard_volume: row.gas_standard_volume.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "m**3".to_string(),
+            }),
+            z_gas: row.z_gas,
+            relative_gas_gravity: row.relative_gas_gravity,
+            bo: row.bo,
+            bg: row.bg,
+            rs: row.rs,
+        }
+    }
+}
+
 /// the base stations, with the opening's phase velocities solved. Empty on failure.
 #[pyclass(
     frozen,

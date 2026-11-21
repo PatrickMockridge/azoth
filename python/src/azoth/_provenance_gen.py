@@ -3942,6 +3942,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 23,
         "tests_skipped": 0,
     },
+    'pvt.differential_liberation': {
+        "calc_id": 'pvt.differential_liberation',
+        "name": 'Differential liberation',
+        "spec": {'path': 'specs/models/pvt/differential_liberation.toml', 'sha256': '50557d749ae8b6d22f166bbd487eed1bf535c3e45da55d378b180a50b94a5f81'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/differential_liberation.py', 'sha256': '887802fbe24e85bb2a5dcb3992f508625bcb9b6f7edb321e42e98f1e8c736e2b'}, {'path': 'crates/azoth-pvt/src/differential_liberation.rs', 'sha256': '63f5015ade4676f8f1bda0a4d06d7d4a4b7e352d9fc9631a8e26ac146a9f8996'}],
+        "source": 'NeqSim pvtsimulation/simulation/DifferentialLiberation.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 2,
+        "tests_skipped": 0,
+    },
     'pvt.gas_correlations': {
         "calc_id": 'pvt.gas_correlations',
         "name": 'Gas correlation table',

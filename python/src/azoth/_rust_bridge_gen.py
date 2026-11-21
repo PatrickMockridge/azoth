@@ -104,8 +104,10 @@ from azoth.core.result import (
     DeWaardMilliamsCorrosionResult,
     DewPressureResult,
     DewTemperatureResult,
+    DifferentialLiberationResult,
     DisciplineCostLine,
     DistillationColumnResult,
+    DlePoint,
     DriftFluxReleaseResult,
     DriftFluxReleaseStation,
     DynamicPsvSizingResult,
@@ -641,6 +643,7 @@ __all__ = [
     "desmukh_mather_phase",
     "dew_pressure",
     "dew_temperature",
+    "differential_liberation",
     "distillation_column",
     "drift_flux_release",
     "dynamic_psv_sizing",
@@ -10544,6 +10547,26 @@ def decline_curve(calculation: str, *, qi: float | None=None, di: float | None=N
         summary_time_to_limit=result.summary_time_to_limit,
         summary_time_to_limit_years=result.summary_time_to_limit_years,
         summary_eur=result.summary_eur,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def differential_liberation(components: Sequence[Mapping[str, Any]], *, pressures: Sequence[Any], eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, volume_correction: bool | None=None) -> DifferentialLiberationResult:
+    """``pvt.differential_liberation``, computed in Rust."""
+    spec = _models_gen.model("pvt.differential_liberation")
+    result = _core.differential_liberation(
+        input_records_to_si(spec, "components", components),
+        eos,
+        mixing_rule,
+        _si(spec, "temperature", temperature),
+        [_si(spec, "pressures", v) for v in pressures],
+        volume_correction,
+    )
+    return DifferentialLiberationResult(
+        saturation_pressure=None if result.saturation_pressure is None else from_si(result.saturation_pressure.magnitude_si, result.saturation_pressure.unit),
+        saturation_volume=None if result.saturation_volume is None else from_si(result.saturation_volume.magnitude_si, result.saturation_volume.unit),
+        voil_std=None if result.voil_std is None else from_si(result.voil_std.magnitude_si, result.voil_std.unit),
+        points=tuple(DlePoint(pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), total_volume=from_si(c.total_volume.magnitude_si, c.total_volume.unit), relative_volume=c.relative_volume, liquid_volume=from_si(c.liquid_volume.magnitude_si, c.liquid_volume.unit), liquid_volume_relative_to_vsat=c.liquid_volume_relative_to_vsat, oil_density=from_si(c.oil_density.magnitude_si, c.oil_density.unit), gas_volume=None if c.gas_volume is None else from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), gas_standard_volume=None if c.gas_standard_volume is None else from_si(c.gas_standard_volume.magnitude_si, c.gas_standard_volume.unit), z_gas=c.z_gas, relative_gas_gravity=c.relative_gas_gravity, bo=c.bo, bg=c.bg, rs=c.rs) for c in result.points),
         warnings=_warnings(result.warnings),
     )
 

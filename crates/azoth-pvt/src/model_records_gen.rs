@@ -14,6 +14,7 @@ use azoth_core::{CalcResult, Warning};
 use crate::black_oil_correlations::BlackOilCorrelationsResult;
 use crate::constant_mass_expansion::ConstantMassExpansionResult;
 use crate::decline_curve::DeclineCurveResult;
+use crate::differential_liberation::DifferentialLiberationResult;
 use crate::gas_correlations::GasCorrelationsResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
@@ -78,6 +79,21 @@ impl CalcResult for DeclineCurveResult {
         "summary_time_to_limit",
         "summary_time_to_limit_years",
         "summary_eur",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for DifferentialLiberationResult {
+    const CALC_ID: &'static str = "pvt.differential_liberation";
+    const FIELDS: &'static [&'static str] = &[
+        "saturation_pressure",
+        "saturation_volume",
+        "voil_std",
+        "points",
         "warnings",
     ];
 

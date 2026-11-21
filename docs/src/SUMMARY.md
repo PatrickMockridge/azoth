@@ -372,6 +372,7 @@
   - [Black-oil correlation table](./pvt/black_oil_correlations.md)
   - [Constant mass expansion](./pvt/constant_mass_expansion.md)
   - [Decline-curve analysis](./pvt/decline_curve.md)
+  - [Differential liberation](./pvt/differential_liberation.md)
   - [Gas correlation table](./pvt/gas_correlations.md)
   - [Gas material balance](./pvt/gas_material_balance.md)
   - [Oil material balance](./pvt/oil_material_balance.md)

@@ -24,6 +24,7 @@ from azoth.core.result import (
     BlackOilCorrelationsResult,
     ConstantMassExpansionResult,
     DeclineCurveResult,
+    DifferentialLiberationResult,
     GasCorrelationsResult,
     GasMaterialBalanceResult,
     OilMaterialBalanceResult,
@@ -35,6 +36,7 @@ from azoth.pvt import layers as layers
 _BLACK_OIL_CORRELATIONS = "pvt.black_oil_correlations"
 _CONSTANT_MASS_EXPANSION = "pvt.constant_mass_expansion"
 _DECLINE_CURVE = "pvt.decline_curve"
+_DIFFERENTIAL_LIBERATION = "pvt.differential_liberation"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
@@ -45,6 +47,7 @@ __all__ = [
     "black_oil_correlations",
     "constant_mass_expansion",
     "decline_curve",
+    "differential_liberation",
     "gas_correlations",
     "gas_material_balance",
     "layers",
@@ -79,6 +82,42 @@ def black_oil_correlations(
     """
     return resolve(_BLACK_OIL_CORRELATIONS)(  # type: ignore[no-any-return]
         queries=queries,
+    )
+
+
+def differential_liberation(
+    components: Sequence[Mapping[str, Any]],
+    *,
+    pressures: Sequence[Any],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: Any = None,
+    volume_correction: bool | None = None,
+) -> DifferentialLiberationResult:
+    """The differential liberation of a fluid over a pressure schedule.
+
+    ``components`` is the characterization row list; the temperature and pressures are
+    absolute. The gas phase is removed after every two-phase step, and the retained liquid's
+    final 288.15 K / 1.01325 bar flash gives the stock-tank oil volume every Bo and Rs is
+    measured against. A single-phase point leaves its gas fields and its liquid relative
+    volume absent.
+
+    Returns:
+        The saturation scalars, the stock-tank volume and one ``points`` row per pressure.
+
+    Raises:
+        InvalidInputError: for an unknown ``eos`` or ``mixing_rule``, no pressures, or a
+            non-positive temperature or pressure.
+
+    See :func:`azoth.pvt.reference.differential_liberation.differential_liberation`.
+    """
+    return resolve(_DIFFERENTIAL_LIBERATION)(  # type: ignore[no-any-return]
+        components=components,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        temperature=temperature,
+        pressures=pressures,
+        volume_correction=volume_correction,
     )
 
 

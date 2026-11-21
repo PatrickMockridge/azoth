@@ -358,6 +358,7 @@
 //!   - specs/models/pvt/black_oil_correlations.toml
 //!   - specs/models/pvt/constant_mass_expansion.toml
 //!   - specs/models/pvt/decline_curve.toml
+//!   - specs/models/pvt/differential_liberation.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
 //!   - specs/models/pvt/oil_material_balance.toml
@@ -6856,6 +6857,12 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("pvt.decline_curve", "end_index", "dimensionless"),
     ("pvt.decline_curve", "history_time", "dimensionless"),
     ("pvt.decline_curve", "history_rate", "dimensionless"),
+    (
+        "pvt.differential_liberation",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.differential_liberation", "pressures", "pressure"),
     ("pvt.gas_material_balance", "pressure", "pressure"),
     ("pvt.gas_material_balance", "z", "dimensionless"),
     ("pvt.gas_material_balance", "gp", "dimensionless"),

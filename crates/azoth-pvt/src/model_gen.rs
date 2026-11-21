@@ -4,6 +4,7 @@
 //!   - specs/models/pvt/black_oil_correlations.toml
 //!   - specs/models/pvt/constant_mass_expansion.toml
 //!   - specs/models/pvt/decline_curve.toml
+//!   - specs/models/pvt/differential_liberation.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
 //!   - specs/models/pvt/oil_material_balance.toml
@@ -2726,6 +2727,1059 @@ pub static DECLINE_CURVE_SPEC: ModelSpec = ModelSpec {
     cases: DECLINE_CURVE_CASES,
 };
 
+static DIFFERENTIAL_LIBERATION_CHECKS: &[SpecCheck] = &[];
+
+static DIFFERENTIAL_LIBERATION_CASES: &[TestCase] = &[
+    TestCase {
+        id: "dle_methane_nc10_323",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.0001,
+        numbers: &[("temperature", 323.15)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[(
+            "pressures",
+            &[
+                25000000.0, 20000000.0, 15000000.0, 10000000.0, 7000000.0, 5000000.0, 3000000.0,
+                2000000.0, 1000000.0, 100000.0,
+            ],
+        )],
+        matrices: &[],
+        expected: &[
+            ("saturation_pressure", 28955063.438415527),
+            ("saturation_volume", 9.813810850855022e-05),
+            ("voil_std", 5.609020215003901e-05),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.7),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.3),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(25000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(0.00010480255418898668),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(1.0679088458267547),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(8.857643562217553e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(576.4180638703791),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.9025692156524329),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(1.6226118566811178e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0038523253568971297),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9266794787321436),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.6193422645294755),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.5791783988447246),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.0042120322308083985),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(225.43729834885008),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(20000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(9.850662082214286e-05),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(1.0037550378664628),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(7.957156454108622e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(608.4614341168913),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.8108120866641075),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(1.8935056281056635e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.003700576655317602),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9005856911213473),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5979579992118204),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.4186357240830674),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.0051167853134044955),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(159.4618425033049),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(15000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(9.224771419805589e-05),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(0.9399785221050889),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(7.255757294707278e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(639.3536387099149),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.7393414653060206),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(1.969014125098238e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0029089334278921183),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.8935197565199742),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5852562214626231),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.2935872962800923),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.0067688524811825345),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(107.60013909722981),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(10000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(9.143608431338244e-05),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(0.9317082395715435),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(6.681113239970713e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(669.8005126093241),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.6807868361747186),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(2.462495191367408e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.00238572197150561),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9083504006837094),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.578673688093728),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.1911373080986598),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.010321802878871703),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(65.06647225245896),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(7000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(8.249362827249108e-05),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(0.8405871024639106),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(6.381557743391263e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(687.9459355257311),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.6502629651594797),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(1.86780508385358e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0012398570733530747),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9280167615818097),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5767134969591805),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.1377312790424352),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.015064680631310834),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(42.961772575383335),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(7.826368308261728e-05),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(0.7974851387705175),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(6.197994380139631e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(699.9662528190518),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.6315583695603462),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(1.628373928101689e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0007580353114958128),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9452192528498541),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5760212810483708),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.1050048212627668),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.021481504930007257),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(29.447196367080526),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(3000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(8.613286262454122e-05),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(0.8776698871981718),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(6.0263508677245835e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(711.8893278533485),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.6140683735716733),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(2.5869353946974793e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0007075408878927927),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9652796414031344),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5758960023266332),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.0744034852297981),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.03656234486182026),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(16.832856236871145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(7.806850928383342e-05),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(0.7954963721053555),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(5.944776624105459e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(717.8019561337294),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.6057561852832658),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(1.8620743042778817e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.00033570910474259644),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.976251544846045),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5762901582863171),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.0598600818380763),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.05546689910914449),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(10.847691415311253),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(1000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(9.504989048408933e-05),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(0.9685319182181727),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(5.865861731164707e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(723.6746065694425),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.5977149774242538),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(3.639127317244225e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.00032421645095536046),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9877796022997254),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5779888000465708),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.0457907988054251),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.11224375896167206),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(5.0674225175794145),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(100000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(0.0003804759519342824),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(3.8769440099931582),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(5.795382544867234e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(728.9210268055746),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.5905333445837011),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(0.00032252212648560996),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0002842327533906884),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9985808739978925),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.6119731249753971),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.0332254694616398),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(1.1347113330119678),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(0.0),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "dle_methane_nc10_323_rich",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.0001,
+        numbers: &[("temperature", 323.15)],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[(
+            "pressures",
+            &[
+                25000000.0, 20000000.0, 15000000.0, 10000000.0, 5000000.0, 2000000.0, 500000.0,
+            ],
+        )],
+        matrices: &[],
+        expected: &[
+            ("saturation_pressure", 22287733.65020752),
+            ("saturation_volume", 0.00011201877603719564),
+            ("voil_std", 7.53821767367599e-05),
+        ],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.6),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.4),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(25000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(0.00011093549011298783),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(0.9903294254541032),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(0.00011093549011298783),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(599.8062471462396),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.471640842906178),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(187.26689117464326),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(20000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(0.00011769344921004896),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(1.0506582322500029),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(0.0001068785388820126),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(608.4614341169121),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.9541127180904365),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(1.0814910328036378e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0021136142451989256),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9005856911213463),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5979579992118221),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.4178224019086143),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.005116785313404489),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(159.22824415361308),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(15000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(0.0001239048266243697),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(1.1061076634440936),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(9.745752048653584e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(639.3536387099151),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.8700105815669262),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(2.6447306137832853e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0039072067549642394),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.8935197565199743),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5852562214626233),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.2928456659836802),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.006768852481182535),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(107.39627373163265),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(10000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(0.00012281466562670632),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(1.0963757146027548),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(8.97390450108185e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(669.8005126093245),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.8011071731494441),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(3.3075620615886154e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0032044421894154317),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9083504006837094),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5786736880937282),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.1904544137030406),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.010321802878871706),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(64.88699198714842),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(0.00014091355515545887),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(1.2579458564041868),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(8.325217696799242e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(699.9662528172425),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.743198416490006),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(5.7661378187463756e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0026842336407685847),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9452192528498881),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.5760212810482258),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.1044013395728163),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.02148150493000803),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(29.27865912960669),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(2000000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(0.00015759597680340822),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(1.4068710833894378),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(7.985022200759729e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(717.8019561338915),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.7128289098702807),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(7.77457547956503e-05),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0014016603784297922),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.9762515448460417),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.576290158286353),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.0592719056978166),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.05546689910914429),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(10.68460362329659),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "total_volume",
+                        value: FieldValue::Number(0.00022463238429159028),
+                    },
+                    RecordField {
+                        name: "relative_volume",
+                        value: FieldValue::Number(2.00531011173521),
+                    },
+                    RecordField {
+                        name: "liquid_volume",
+                        value: FieldValue::Number(7.82694990412392e-05),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(726.5941347934073),
+                    },
+                    RecordField {
+                        name: "liquid_volume_relative_to_vsat",
+                        value: FieldValue::Number(0.6987176776083498),
+                    },
+                    RecordField {
+                        name: "gas_volume",
+                        value: FieldValue::Number(0.000146362885250351),
+                    },
+                    RecordField {
+                        name: "gas_standard_volume",
+                        value: FieldValue::Number(0.0006480792867537922),
+                    },
+                    RecordField {
+                        name: "z_gas",
+                        value: FieldValue::Number(0.993735206614313),
+                    },
+                    RecordField {
+                        name: "relative_gas_gravity",
+                        value: FieldValue::Number(0.581695480691377),
+                    },
+                    RecordField {
+                        name: "bo",
+                        value: FieldValue::Number(1.0383024533048713),
+                    },
+                    RecordField {
+                        name: "bg",
+                        value: FieldValue::Number(0.22584101705128992),
+                    },
+                    RecordField {
+                        name: "rs",
+                        value: FieldValue::Number(2.0873553769779356),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+/// Registry entry for `pvt.differential_liberation`.
+pub static DIFFERENTIAL_LIBERATION_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.differential_liberation",
+    kind: "direct",
+    algorithm: None,
+    checks: DIFFERENTIAL_LIBERATION_CHECKS,
+    cases: DIFFERENTIAL_LIBERATION_CASES,
+};
+
 static GAS_CORRELATIONS_CHECKS: &[SpecCheck] = &[];
 
 static GAS_CORRELATIONS_CASES: &[TestCase] = &[TestCase {
@@ -4417,6 +5471,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &BLACK_OIL_CORRELATIONS_SPEC,
     &CONSTANT_MASS_EXPANSION_SPEC,
     &DECLINE_CURVE_SPEC,
+    &DIFFERENTIAL_LIBERATION_SPEC,
     &GAS_CORRELATIONS_SPEC,
     &GAS_MATERIAL_BALANCE_SPEC,
     &OIL_MATERIAL_BALANCE_SPEC,

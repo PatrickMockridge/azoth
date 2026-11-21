@@ -38,6 +38,7 @@ from azoth.core.record_outputs_gen import (
     DepositionSegmentRow,
     DepressurizationPoint,
     DisciplineCostLine,
+    DlePoint,
     DriftFluxReleaseStation,
     EnvelopePoint,
     EnvelopeQuery,
@@ -12382,6 +12383,28 @@ class DeclineCurveResult(_HasWarnings):
 
     #: the summary's EUR.
     summary_eur: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class DifferentialLiberationResult(_HasWarnings):
+    """Result of ``pvt.differential_liberation``."""
+
+    CALC_ID: ClassVar[str] = "pvt.differential_liberation"
+
+    #: the saturation pressure on the partially depleted cell; absent when no point is two-phase.
+    saturation_pressure: Q | None
+
+    #: the translated saturation volume at that state.
+    saturation_volume: Q | None
+
+    #: the stock-tank oil volume from the final standard flash; absent when it leaves no oil.
+    voil_std: Q | None
+
+    #: one row per pressure.
+    points: tuple[DlePoint, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

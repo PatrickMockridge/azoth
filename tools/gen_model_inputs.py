@@ -437,6 +437,7 @@ NON_UNIT_MODELS = {
     "pvt.oil_material_balance": "a material balance over scalars and histories, not a unit",
     "pvt.saturation_test": "the upper saturation boundary of a fluid, not a unit",
     "pvt.constant_mass_expansion": "a laboratory CCE over a fluid, not a unit",
+    "pvt.differential_liberation": "a laboratory DLE over a fluid, not a unit",
     "process.bleve": "the fireball radiation over scalars, not a unit",
     "process.consequence_analysis": "the QRA composition over scalars and records, not a unit",
     "process.event_tree": "the event-tree enumeration over scalars, not a unit",

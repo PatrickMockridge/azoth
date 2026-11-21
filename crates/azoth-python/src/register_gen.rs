@@ -376,6 +376,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyBlackOilCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyConstantMassExpansionResult>()?;
     m.add_class::<crate::transport_gen::PyDeclineCurveResult>()?;
+    m.add_class::<crate::transport_gen::PyDifferentialLiberationResult>()?;
     m.add_class::<crate::transport_gen::PyGasCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyGasMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyOilMaterialBalanceResult>()?;
@@ -421,6 +422,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepressurizationPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyDisciplineCostLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyDlePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyDriftFluxReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyEnvelopePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyEnvelopeQuery>()?;
@@ -1369,6 +1371,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::decline_curve, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::differential_liberation,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::gas_correlations, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::gas_material_balance,

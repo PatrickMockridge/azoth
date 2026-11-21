@@ -2479,6 +2479,24 @@ class CcePoint:
     isothermal_compressibility: float | None
 
 @final
+class DlePoint:
+    """one row per pressure."""
+
+    pressure: Qty
+    total_volume: Qty
+    relative_volume: float | None
+    liquid_volume: Qty
+    liquid_volume_relative_to_vsat: float | None
+    oil_density: Qty
+    gas_volume: Qty | None
+    gas_standard_volume: Qty | None
+    z_gas: float | None
+    relative_gas_gravity: float | None
+    bo: float | None
+    bg: float | None
+    rs: float | None
+
+@final
 class GasResultRow:
     """one row per input row, in caller order; only the fields the calculation answers are present."""
 
@@ -6817,6 +6835,14 @@ class DeclineCurveResult:
     warnings: list[Warning]
 
 @final
+class DifferentialLiberationResult:
+    saturation_pressure: Qty | None
+    saturation_volume: Qty | None
+    voil_std: Qty | None
+    points: list[DlePoint]
+    warnings: list[Warning]
+
+@final
 class GasCorrelationsResult:
     queries: list[GasResultRow]
     warnings: list[Warning]
@@ -11011,6 +11037,14 @@ def decline_curve(
     history_time: list[float] | None = None,
     history_rate: list[float] | None = None,
 ) -> DeclineCurveResult: ...
+def differential_liberation(
+    components: list[FluidComponent],
+    temperature: float,
+    pressures: list[float],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+) -> DifferentialLiberationResult: ...
 def gas_correlations(queries: list[GasQuery]) -> GasCorrelationsResult: ...
 def gas_material_balance(
     calculation: str,

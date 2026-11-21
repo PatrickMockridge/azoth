@@ -12,6 +12,7 @@
 pub mod black_oil_correlations;
 pub mod constant_mass_expansion;
 pub mod decline_curve;
+pub mod differential_liberation;
 pub mod flash;
 pub mod fluid;
 pub mod gas_correlations;
@@ -32,6 +33,9 @@ pub use black_oil_correlations::{
 };
 pub use constant_mass_expansion::{CcePoint, ConstantMassExpansionResult, constant_mass_expansion};
 pub use decline_curve::{DeclineCurveResult, decline_curve};
+pub use differential_liberation::{
+    DifferentialLiberationResult, DlePoint, differential_liberation,
+};
 pub use flash::{Flash, FlashMode, Phase};
 pub use fluid::{Fluid, GasTemplate};
 pub use gas_correlations::{GasCorrelationsResult, GasQuery, GasResultRow, gas_correlations};

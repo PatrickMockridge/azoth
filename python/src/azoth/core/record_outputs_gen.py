@@ -504,6 +504,50 @@ class DisciplineCostLine:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class DlePoint:
+    """one row per pressure."""
+
+    #: the absolute pressure.
+    pressure: Q
+
+    #: the retained cell's translated volume.
+    total_volume: Q
+
+    #: the total volume over the saturation volume; absent without a saturation state.
+    relative_volume: float | None
+
+    #: the oil phase's translated volume.
+    liquid_volume: Q
+
+    #: the liquid volume over the saturation volume; absent in a single phase.
+    liquid_volume_relative_to_vsat: float | None
+
+    #: the oil phase's density.
+    oil_density: Q
+
+    #: the removed gas's translated volume; absent in a single phase.
+    gas_volume: Q | None
+
+    #: the removed gas at 288.15 K and 1.01325 bar; absent in a single phase.
+    gas_standard_volume: Q | None
+
+    #: the gas phase's cubic compressibility.
+    z_gas: float | None
+
+    #: the gas molar mass over the class's 0.028 kg/mol air constant.
+    relative_gas_gravity: float | None
+
+    #: the oil formation volume factor; absent without a stock-tank oil volume.
+    bo: float | None
+
+    #: the gas formation volume factor; absent in a single phase.
+    bg: float | None
+
+    #: the remaining solution gas per stock-tank oil volume; absent without one.
+    rs: float | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DriftFluxReleaseStation:
     """the base stations, with the opening's phase velocities solved. Empty on failure."""
 

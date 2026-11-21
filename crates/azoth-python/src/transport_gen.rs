@@ -18,26 +18,27 @@ use crate::record_outputs_gen::{
     PyBrineMixingPointRow, PyBubbleTransferZoneReleaseStation, PyCcePoint,
     PyCharacterizationComponent, PyChemicalWarningRow, PyComponentSelectiveReleaseStation,
     PyConsequenceOutcomeResult, PyCostBomRow, PyCostEstimationResultRow, PyDepositionSegmentRow,
-    PyDepressurizationPoint, PyDisciplineCostLine, PyDriftFluxReleaseStation, PyEnvelopePoint,
-    PyEnvelopeQuery, PyEnvelopeSummary, PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow,
-    PyEquipmentMtoRow, PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution,
-    PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry,
-    PyGasResultRow, PyHazopPopulationRow, PyHazopTemplateDeviation, PyHeatExchangerMechanicalType,
-    PyHeaterInstrument, PyHeaterMechanicalType, PyHemReleaseDiagnostic, PyHemReleaseStation,
-    PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
-    PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
-    PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
-    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
-    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment,
-    PyOpenDrainResult, PyOperatingCostLine, PyP002FindingResult, PyPerformanceAssessment,
-    PyPerformanceFinding, PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint,
-    PyPrescribedSlipReleaseStation, PyProcessCostEquipmentResult, PyProcessCostFlag,
-    PyProcessCostMtoRow, PyProjectCostLine, PyPulsationModeResult, PyRanzMarshallReleaseStation,
-    PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
-    PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
-    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult,
-    PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
+    PyDepressurizationPoint, PyDisciplineCostLine, PyDlePoint, PyDriftFluxReleaseStation,
+    PyEnvelopePoint, PyEnvelopeQuery, PyEnvelopeSummary, PyEquilibriumSoundSpeedSample,
+    PyEquipmentCostResultRow, PyEquipmentMtoRow, PyEquipmentQualityFlag, PyEscalationItemResult,
+    PyEsdContribution, PyEventTreeOutcome, PyFiniteRateReleaseStation, PyFlowlineScaleSegment,
+    PyFmeaRankedEntry, PyGasResultRow, PyHazopPopulationRow, PyHazopTemplateDeviation,
+    PyHeatExchangerMechanicalType, PyHeaterInstrument, PyHeaterMechanicalType,
+    PyHemReleaseDiagnostic, PyHemReleaseStation, PyHydrateRiskPoint, PyIdealGasFannoReleaseStation,
+    PyIdealGasReleaseStation, PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic,
+    PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier,
+    PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet,
+    PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
+    PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyOperatingCostLine,
+    PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument,
+    PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
+    PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
+    PyPulsationModeResult, PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation,
+    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
+    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
+    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
+    PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
     PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow,
     PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
     PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
@@ -30586,6 +30587,68 @@ impl From<&azoth_pvt::decline_curve::DeclineCurveResult> for PyDeclineCurveResul
             summary_time_to_limit: r.summary_time_to_limit,
             summary_time_to_limit_years: r.summary_time_to_limit_years,
             summary_eur: r.summary_eur,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.differential_liberation`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DifferentialLiberationResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDifferentialLiberationResult {
+    /// the saturation pressure on the partially depleted cell; absent when no point is two-phase.
+    #[pyo3(get)]
+    pub saturation_pressure: Option<PyQty>,
+    /// the translated saturation volume at that state.
+    #[pyo3(get)]
+    pub saturation_volume: Option<PyQty>,
+    /// the stock-tank oil volume from the final standard flash; absent when it leaves no oil.
+    #[pyo3(get)]
+    pub voil_std: Option<PyQty>,
+    /// one row per pressure.
+    #[pyo3(get)]
+    pub points: Vec<PyDlePoint>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDifferentialLiberationResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DifferentialLiberationResult(saturation_pressure={:?}, saturation_volume={:?}, voil_std={:?}, points={:?}, {} warning(s))",
+            self.saturation_pressure,
+            self.saturation_volume,
+            self.voil_std,
+            self.points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::differential_liberation::DifferentialLiberationResult>
+    for PyDifferentialLiberationResult
+{
+    fn from(r: &azoth_pvt::differential_liberation::DifferentialLiberationResult) -> Self {
+        Self {
+            saturation_pressure: r.saturation_pressure.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            saturation_volume: r.saturation_volume.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "m**3".to_string(),
+            }),
+            voil_std: r.voil_std.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "m**3".to_string(),
+            }),
+            points: r.points.iter().map(PyDlePoint::from).collect(),
             warnings: transport(&r.warnings),
         }
     }
