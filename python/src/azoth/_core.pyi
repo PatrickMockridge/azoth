@@ -1173,6 +1173,25 @@ class VesselRuptureState(TypedDict):
     internal_pressure: float
     metal_temperature: float
 
+class BlackOilQuery(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    calculation: str
+    rs: float | None
+    gamma_g: float | None
+    gamma_o: float | None
+    api: float | None
+    temperature: float | None
+    pressure: float | None
+    bob: float | None
+    compressibility: float | None
+    pb: float | None
+    mu_od: float | None
+    mu_ob: float | None
+    rho_g: float | None
+    molar_mass: float | None
+    z: float | None
+
 @final
 class KComponent:
     """one row per fitting supplied, in the order they were listed"""
@@ -2391,6 +2410,27 @@ class VesselRuptureStep:
     von_mises_stress: Qty
     allowable_stress: Qty
     margin: Qty
+
+@final
+class BlackOilResultRow:
+    """one row per input row, in caller order; only the fields the calculation answers are present."""
+
+    calculation: str
+    pressure: Qty | None
+    solution_gor: float | None
+    oil_fvf: float | None
+    compressibility: float | None
+    viscosity: Qty | None
+    gas_fvf: float | None
+    factor: float | None
+    average: Qty | None
+    minimum: Qty | None
+    maximum: Qty | None
+    std_dev: Qty | None
+    standing: Qty | None
+    vasquez_beggs: Qty | None
+    glaso: Qty | None
+    petrosky_farshad: Qty | None
 
 # --- results --------------------------------------------------------------
 # Generated from the result dataclasses, so the stub and `azoth.core.result`
@@ -6658,6 +6698,11 @@ class VesselRuptureResult:
     warnings: list[Warning]
 
 @final
+class BlackOilCorrelationsResult:
+    queries: list[BlackOilResultRow]
+    warnings: list[Warning]
+
+@final
 class ChemicalEquilibriumResult:
     moles: list[Qty]
     iterations: int
@@ -10775,6 +10820,7 @@ def vessel_rupture(
     grade: str | None = None,
     tensile_strength_factor: float | None = None,
 ) -> VesselRuptureResult: ...
+def black_oil_correlations(queries: list[BlackOilQuery]) -> BlackOilCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],
     b: list[float],

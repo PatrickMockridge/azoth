@@ -373,6 +373,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyVceResult>()?;
     m.add_class::<crate::transport_gen::PyVesselFillingResult>()?;
     m.add_class::<crate::transport_gen::PyVesselRuptureResult>()?;
+    m.add_class::<crate::transport_gen::PyBlackOilCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
     m.add_class::<crate::transport_gen::PyEquilibriumConstantResult>()?;
     m.add_class::<crate::transport_gen::PyKineticRateLawResult>()?;
@@ -400,6 +401,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyActivityCoefficientRow>()?;
     m.add_class::<crate::record_outputs_gen::PyAlarpEvaluationResult>()?;
     m.add_class::<crate::record_outputs_gen::PyAppliedStandardRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyBlackOilResultRow>()?;
     m.add_class::<crate::record_outputs_gen::PyBrineMixingPointRow>()?;
     m.add_class::<crate::record_outputs_gen::PyBubbleTransferZoneReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyCharacterizationComponent>()?;
@@ -1348,6 +1350,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vce, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vessel_filling, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::vessel_rupture, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::black_oil_correlations,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::chemical_equilibrium,
         m

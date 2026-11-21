@@ -25,6 +25,7 @@ from azoth.core.record_outputs_gen import (
     ActivityCoefficientRow,
     AlarpEvaluationResult,
     AppliedStandardRow,
+    BlackOilResultRow,
     BrineMixingPointRow,
     BubbleTransferZoneReleaseStation,
     CharacterizationComponent,
@@ -12240,6 +12241,19 @@ class VesselRuptureResult(_HasWarnings):
 
     #: one row per input state, in the caller's order.
     history: tuple[VesselRuptureStep, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class BlackOilCorrelationsResult(_HasWarnings):
+    """Result of ``pvt.black_oil_correlations``."""
+
+    CALC_ID: ClassVar[str] = "pvt.black_oil_correlations"
+
+    #: one row per input row, in caller order; only the fields the calculation answers are present.
+    queries: tuple[BlackOilResultRow, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

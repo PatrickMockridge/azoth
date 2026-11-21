@@ -1,0 +1,87 @@
+model = "pvt.black_oil_correlations"
+[[cases]]
+id = "class_test_state"
+tolerance = 1.0e-9
+source = "The classes' own test state - Rs 500 scf/STB, gamma_g 0.8, gamma_o 0.85, API 35, 200 F - converted to the id's SI boundary, from `validation/neqsim/captures/pvt_black_oil.tsv` (`black_oil`)."
+[cases.inputs]
+queries = [
+  { calculation = "api_from_specific_gravity", gamma_o = 0.85 },
+  { calculation = "specific_gravity_from_api", api = 35.0 },
+  { calculation = "bubble_point_standing", rs = 89.05399999999999, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_standing_by_specific_gravity", rs = 89.05399999999999, gamma_g = 0.8, gamma_o = 0.85, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_vasquez_beggs", rs = 89.05399999999999, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_glaso_by_specific_gravity", rs = 89.05399999999999, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_standing_p_sat", rs = 89.053803339515, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_vasquez_beggs_p_sat", rs = 89.053803339515, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_glaso_p_sat", rs = 89.053803339515, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_petrosky_farshad", rs = 89.053803339515, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_al_marhoun", rs = 89.053803339515, gamma_g = 0.8, gamma_o = 0.85, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_statistics", rs = 89.053803339515, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "solution_gor_standing", pressure = 13789489.650988016, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "solution_gor_vasquez_beggs", pressure = 13789489.650988016, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "oil_fvf_standing", rs = 89.05399999999999, gamma_g = 0.8, gamma_o = 0.85, temperature = 366.4833333333333 },
+  { calculation = "oil_fvf_vasquez_beggs", rs = 89.05399999999999, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "oil_fvf_undersaturated", bob = 1.35, compressibility = 2.17557e-9, pressure = 27578979.301976033, pb = 17236862.06373502 },
+  { calculation = "oil_compressibility_vasquez_beggs", rs = 89.05399999999999, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333, pressure = 20684234.476482026 },
+  { calculation = "dead_oil_viscosity_beggs_robinson", api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "dead_oil_viscosity_glaso", api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "dead_oil_viscosity_kartoatmodjo", api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "saturated_oil_viscosity_beggs_robinson", mu_od = 0.005, rs = 89.05399999999999 },
+  { calculation = "saturated_oil_viscosity_kartoatmodjo", mu_od = 0.005, rs = 89.05399999999999 },
+  { calculation = "undersaturated_oil_viscosity_vasquez_beggs", mu_ob = 0.005, pressure = 27578979.301976033, pb = 17236862.06373502 },
+  { calculation = "undersaturated_oil_viscosity_bergman_sutton", mu_ob = 0.005, pressure = 27578979.301976033, pb = 17236862.06373502 },
+  { calculation = "gas_fvf", pressure = 13789489.650988016, temperature = 366.4833333333333, z = 0.85 },
+  { calculation = "gas_fvf_rb_per_mscf", pressure = 13789489.650988016, temperature = 366.4833333333333, z = 0.85 },
+  { calculation = "gas_viscosity_lee_gonzalez_eakin", temperature = 366.4833333333333, rho_g = 80.09230000000001, molar_mass = 0.02 },
+]
+[cases.expected]
+queries = [
+  { calculation = "api_from_specific_gravity", factor = 34.970588235294116 },
+  { calculation = "specific_gravity_from_api", factor = 0.8498498498498499 },
+  { calculation = "bubble_point_standing", pressure = 14401383.868223343 },
+  { calculation = "bubble_point_standing_by_specific_gravity", pressure = 14413729.139030835 },
+  { calculation = "bubble_point_vasquez_beggs", pressure = 15979571.454459261 },
+  { calculation = "bubble_point_glaso_by_specific_gravity", pressure = 131178963.1285186 },
+  { calculation = "bubble_point_standing_p_sat", pressure = 14401415.563941069 },
+  { calculation = "bubble_point_vasquez_beggs_p_sat", pressure = 135656570.946718 },
+  { calculation = "bubble_point_glaso_p_sat", pressure = 16305330.724722197 },
+  { calculation = "bubble_point_petrosky_farshad", pressure = 42306890.897675835 },
+  { calculation = "bubble_point_al_marhoun", pressure = 15830235.291930916 },
+  { calculation = "bubble_point_statistics", average = 52167552.03326428, minimum = 14401415.563941069, maximum = 135656570.946718, std_dev = 49447014.31371851, standing = 14401415.563941069, vasquez_beggs = 135656570.946718, glaso = 16305330.724722197, petrosky_farshad = 42306890.897675835 },
+  { calculation = "solution_gor_standing", solution_gor = 84.56111307601915 },
+  { calculation = "solution_gor_vasquez_beggs", solution_gor = 74.75931778811145 },
+  { calculation = "oil_fvf_standing", oil_fvf = 1.3060996210562956 },
+  { calculation = "oil_fvf_vasquez_beggs", oil_fvf = 1.3049695625 },
+  { calculation = "oil_fvf_undersaturated", oil_fvf = 1.319964170211004 },
+  { calculation = "oil_compressibility_vasquez_beggs", compressibility = 1.935943051e-9 },
+  { calculation = "dead_oil_viscosity_beggs_robinson", viscosity = 0.0017854121016403774 },
+  { calculation = "dead_oil_viscosity_glaso", viscosity = 0.001489869145841706 },
+  { calculation = "dead_oil_viscosity_kartoatmodjo", viscosity = 0.001346462051543013 },
+  { calculation = "saturated_oil_viscosity_beggs_robinson", viscosity = 0.0010595700009963913 },
+  { calculation = "saturated_oil_viscosity_kartoatmodjo", viscosity = 0.0009564410867263277 },
+  { calculation = "undersaturated_oil_viscosity_vasquez_beggs", viscosity = 0.005873126478884313 },
+  { calculation = "undersaturated_oil_viscosity_bergman_sutton", viscosity = 0.005861876108114865 },
+  { calculation = "gas_fvf", gas_fvf = 0.007925770132500001 },
+  { calculation = "gas_fvf_rb_per_mscf", gas_fvf = 1.41301314 },
+  { calculation = "gas_viscosity_lee_gonzalez_eakin", viscosity = 1.5719320816666276e-5 },
+]
+[[cases]]
+id = "the_clamp_and_the_api_switch"
+tolerance = 1.0e-9
+source = "The p_sat clamp at 14.7 psia, the Vasquez-Beggs 30-API switch on both sides, and the BlackOil Glaso on both sides, from the capture's `black_oil_boundaries`."
+[cases.inputs]
+queries = [
+  { calculation = "bubble_point_standing_p_sat", rs = 0.17810760667903, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_vasquez_beggs", rs = 89.05399999999999, gamma_g = 0.8, api = 30.0, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_vasquez_beggs", rs = 89.05399999999999, gamma_g = 0.8, api = 30.1, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_glaso_by_specific_gravity", rs = 89.05399999999999, gamma_g = 0.8, api = 35.0, temperature = 366.4833333333333 },
+  { calculation = "bubble_point_glaso_by_specific_gravity", rs = 89.05399999999999, gamma_g = 0.8, api = 30.0, temperature = 366.4833333333333 },
+]
+[cases.expected]
+queries = [
+  { calculation = "bubble_point_standing_p_sat", pressure = 101352.972 },
+  { calculation = "bubble_point_vasquez_beggs", pressure = 17716468.88261058 },
+  { calculation = "bubble_point_vasquez_beggs", pressure = 18559663.64521993 },
+  { calculation = "bubble_point_glaso_by_specific_gravity", pressure = 131178963.1285186 },
+  { calculation = "bubble_point_glaso_by_specific_gravity", pressure = 130829658.45459461 },
+]

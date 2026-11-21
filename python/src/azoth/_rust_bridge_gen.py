@@ -36,6 +36,8 @@ from azoth.core.result import (
     BasketTestRegressionResult,
     BeggsBrillRegime,
     BeggsBrillSegmentResult,
+    BlackOilCorrelationsResult,
+    BlackOilResultRow,
     BleveResult,
     BlockedOutletOverpressureResult,
     BlockedOutletReliefResult,
@@ -577,6 +579,7 @@ __all__ = [
     "barrier_register_validation",
     "basket_test_regression",
     "beggs_brill_segment",
+    "black_oil_correlations",
     "bleve",
     "blocked_outlet_overpressure",
     "blocked_outlet_relief",
@@ -10428,6 +10431,18 @@ def vessel_rupture(inner_radius: Q, wall_thickness: Q, material: str, history: l
         ambient_yield_strength=from_si(result.ambient_yield_strength.magnitude_si, result.ambient_yield_strength.unit),
         ambient_tensile_strength=from_si(result.ambient_tensile_strength.magnitude_si, result.ambient_tensile_strength.unit),
         history=tuple(VesselRuptureStep(time=from_si(c.time.magnitude_si, c.time.unit), von_mises_stress=from_si(c.von_mises_stress.magnitude_si, c.von_mises_stress.unit), allowable_stress=from_si(c.allowable_stress.magnitude_si, c.allowable_stress.unit), margin=from_si(c.margin.magnitude_si, c.margin.unit)) for c in result.history),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def black_oil_correlations(queries: Sequence[Mapping[str, Any]]) -> BlackOilCorrelationsResult:
+    """``pvt.black_oil_correlations``, computed in Rust."""
+    spec = _models_gen.model("pvt.black_oil_correlations")
+    result = _core.black_oil_correlations(
+        input_records_to_si(spec, "queries", queries),
+    )
+    return BlackOilCorrelationsResult(
+        queries=tuple(BlackOilResultRow(calculation=c.calculation, pressure=None if c.pressure is None else from_si(c.pressure.magnitude_si, c.pressure.unit), solution_gor=c.solution_gor, oil_fvf=c.oil_fvf, compressibility=c.compressibility, viscosity=None if c.viscosity is None else from_si(c.viscosity.magnitude_si, c.viscosity.unit), gas_fvf=c.gas_fvf, factor=c.factor, average=None if c.average is None else from_si(c.average.magnitude_si, c.average.unit), minimum=None if c.minimum is None else from_si(c.minimum.magnitude_si, c.minimum.unit), maximum=None if c.maximum is None else from_si(c.maximum.magnitude_si, c.maximum.unit), std_dev=None if c.std_dev is None else from_si(c.std_dev.magnitude_si, c.std_dev.unit), standing=None if c.standing is None else from_si(c.standing.magnitude_si, c.standing.unit), vasquez_beggs=None if c.vasquez_beggs is None else from_si(c.vasquez_beggs.magnitude_si, c.vasquez_beggs.unit), glaso=None if c.glaso is None else from_si(c.glaso.magnitude_si, c.glaso.unit), petrosky_farshad=None if c.petrosky_farshad is None else from_si(c.petrosky_farshad.magnitude_si, c.petrosky_farshad.unit)) for c in result.queries),
         warnings=_warnings(result.warnings),
     )
 

@@ -9,4 +9,11 @@
 //! * [`standard`] — the standard state and the class conversion literals every id here states
 //!   its inputs against.
 
+pub mod black_oil_correlations;
+pub mod model_gen;
+pub mod model_records_gen;
 pub mod standard;
+
+pub use black_oil_correlations::{
+    BlackOilCorrelationsResult, BlackOilQuery, BlackOilResultRow, black_oil_correlations,
+};

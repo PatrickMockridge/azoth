@@ -429,6 +429,7 @@ def format_rust(text: str, generator: str) -> str:
 #: term is a calculation over a fluid with no ports and no place in a flowsheet, so it is
 #: reached by its case and its Python wrapper and by no palette entry - a fact, not a defect.
 NON_UNIT_MODELS = {
+    "pvt.black_oil_correlations": "the black-oil correlation table over scalars, not a unit",
     "process.bleve": "the fireball radiation over scalars, not a unit",
     "process.consequence_analysis": "the QRA composition over scalars and records, not a unit",
     "process.event_tree": "the event-tree enumeration over scalars, not a unit",

@@ -16,6 +16,41 @@ the same way an assay cut does.
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
+from typing import Any
+
+from azoth._dispatch import resolve
+from azoth.core.result import BlackOilCorrelationsResult
 from azoth.pvt import layers as layers
 
-__all__ = ["layers"]
+_BLACK_OIL_CORRELATIONS = "pvt.black_oil_correlations"
+
+__all__ = ["black_oil_correlations", "layers"]
+
+
+def black_oil_correlations(
+    queries: Sequence[Mapping[str, Any]],
+) -> BlackOilCorrelationsResult:
+    """The black-oil correlation table over the stated calls.
+
+    ``queries`` is one record per correlation call, keyed by the field names the spec
+    declares: ``calculation`` selects the answer, and the row states only the inputs that
+    call reads. A missing required field, a non-positive value where the correlation
+    divides by it or takes its logarithm, and a non-finite answer are refused.
+
+    The SI boundary is the id's: a solution gas-oil ratio in m3/m3, a temperature in K, a
+    pressure in Pa and a viscosity in Pa*s. The two classes convert with different
+    literals; the ``_p_sat`` calculations use ``SaturationPressureCorrelation``'s and the
+    others ``BlackOilCorrelations``'.
+
+    Returns:
+        One row per input row, with only the fields the calculation answers.
+
+    Raises:
+        InvalidInputError: for a missing field, a non-positive input or a non-finite answer.
+
+    See :func:`azoth.pvt.reference.black_oil_correlations.black_oil_correlations`.
+    """
+    return resolve(_BLACK_OIL_CORRELATIONS)(  # type: ignore[no-any-return]
+        queries=queries,
+    )

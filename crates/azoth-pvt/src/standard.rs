@@ -34,6 +34,12 @@ pub const PSIA_PER_BAR: f64 = 14.5038;
 /// `BlackOilUnits`' Sm³/Sm³ per scf/STB.
 pub const SM3_PER_SCF_STB: f64 = 0.178_108;
 
+/// `SaturationPressureCorrelation.psiaToBar`'s bar per psia.
+pub const SATURATION_BAR_PER_PSIA: f64 = 0.068_947_6;
+
+/// `SaturationPressureCorrelation.scfStbToSm3Sm3`'s Sm³/Sm³ per scf/STB.
+pub const SATURATION_SM3_PER_SCF_STB: f64 = 0.178_107_606_679_03;
+
 /// `BlackOilUnits`' kg/m³ per lb/ft³.
 pub const KG_PER_M3_PER_LB_FT3: f64 = 16.018_46;
 
@@ -169,6 +175,30 @@ pub fn sm3_sm3_to_scf_stb(sm3_per_sm3: f64) -> f64 {
     sm3_per_sm3 / SM3_PER_SCF_STB
 }
 
+/// Psia to bar, with `SaturationPressureCorrelation`'s literal.
+#[must_use]
+pub fn saturation_psia_to_bar(psia: f64) -> f64 {
+    psia * SATURATION_BAR_PER_PSIA
+}
+
+/// Bar to psia, with `SaturationPressureCorrelation`'s literal.
+#[must_use]
+pub fn saturation_bar_to_psia(bar: f64) -> f64 {
+    bar / SATURATION_BAR_PER_PSIA
+}
+
+/// scf/STB to Sm³/Sm³, with `SaturationPressureCorrelation`'s literal.
+#[must_use]
+pub fn saturation_scf_stb_to_sm3_sm3(scf_per_stb: f64) -> f64 {
+    scf_per_stb * SATURATION_SM3_PER_SCF_STB
+}
+
+/// Sm³/Sm³ to scf/STB, with `SaturationPressureCorrelation`'s literal.
+#[must_use]
+pub fn saturation_sm3_sm3_to_scf_stb(sm3_per_sm3: f64) -> f64 {
+    sm3_per_sm3 / SATURATION_SM3_PER_SCF_STB
+}
+
 /// Pa·s to centipoise.
 #[must_use]
 pub fn pa_s_to_centipoise(pa_s: f64) -> f64 {
@@ -213,9 +243,21 @@ mod tests {
     fn the_conversion_literals_are_the_class_ones() {
         assert_eq!(bar_to_psia(1.0), 14.5038);
         assert_eq!(scf_stb_to_sm3_sm3(1.0), 0.178_108);
+        assert_eq!(saturation_psia_to_bar(1.0), 0.068_947_6);
+        assert_eq!(saturation_bar_to_psia(1.0), 1.0 / 0.068_947_6);
+        assert_eq!(saturation_scf_stb_to_sm3_sm3(1.0), 0.178_107_606_679_03);
         assert_eq!(kg_m3_to_lb_ft3(16.018_46), 1.0);
         assert_eq!(pa_s_to_centipoise(0.001), 1.0);
         assert_eq!(celsius_to_rankine(0.0), 491.67);
+    }
+
+    #[test]
+    fn the_two_class_literals_are_not_the_same_number() {
+        // `BlackOilCorrelations` and `SaturationPressureCorrelation` each convert the same
+        // quantities with their own literal; a port that picked one for both would miss the
+        // capture in the fifth significant figure.
+        assert_ne!(SM3_PER_SCF_STB, SATURATION_SM3_PER_SCF_STB);
+        assert_ne!(psia_to_bar(1.0), saturation_psia_to_bar(1.0));
     }
 
     #[test]

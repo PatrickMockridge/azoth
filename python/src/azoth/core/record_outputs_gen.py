@@ -46,6 +46,59 @@ class AppliedStandardRow:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class BlackOilResultRow:
+    """one row per input row, in caller order; only the fields the calculation answers are present."""
+
+    #: the call this row answered.
+    calculation: str
+
+    #: the bubble point.
+    pressure: Q | None
+
+    #: the solution gas-oil ratio, in Sm3/Sm3.
+    solution_gor: float | None
+
+    #: the oil formation volume factor, a volume ratio.
+    oil_fvf: float | None
+
+    #: the oil compressibility in 1/Pa.
+    compressibility: float | None
+
+    #: the oil or gas viscosity.
+    viscosity: Q | None
+
+    #: the gas formation volume factor, the class's rcf/scf or RB/Mscf volume ratio.
+    gas_fvf: float | None
+
+    #: the API gravity, the specific gravity or another dimensionless conversion.
+    factor: float | None
+
+    #: the arithmetic mean of the four saturation-pressure correlations.
+    average: Q | None
+
+    #: the smallest of the four saturation-pressure answers.
+    minimum: Q | None
+
+    #: the largest of the four saturation-pressure answers.
+    maximum: Q | None
+
+    #: the population standard deviation over the four answers, divided by the count.
+    std_dev: Q | None
+
+    #: Standing's answer, beside the statistics.
+    standing: Q | None
+
+    #: Vasquez-Beggs's answer, beside the statistics.
+    vasquez_beggs: Q | None
+
+    #: Glaso's answer, beside the statistics.
+    glaso: Q | None
+
+    #: Petrosky-Farshad's answer, beside the statistics.
+    petrosky_farshad: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class BrineMixingPointRow:
     """One row per mixing fraction, from all brine A to all brine B."""
 

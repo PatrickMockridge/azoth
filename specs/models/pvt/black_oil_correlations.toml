@@ -1,0 +1,201 @@
+id = "pvt.black_oil_correlations"
+name = "Black-oil correlation table"
+kind = "procedure"
+assumptions = [
+    "**evaluated in US oilfield units, at an SI boundary.** Pressure uses 14.5038 psia/bar, temperature the Celsius offset, GOR 0.178108 Sm3/Sm3 per scf/STB and viscosity 1000 cP/Pa*s - `BlackOilUnits`' literals, not exact SI definitions.",
+    "**the two classes convert with different literals**: `BlackOilCorrelations` uses 14.5038 psia/bar and 0.178108, `SaturationPressureCorrelation` 0.0689476 bar/psia and 0.17810760667903. The `_p_sat` calculations use the second family.",
+    "**the SaturationPressureCorrelation methods clamp the bubble point at 14.7 psia and answer NaN for a non-positive input.** This id carries the clamp and refuses the non-positive input, because a NaN is not a number the library publishes.",
+    "**the `_p_sat` Vasquez-Beggs writes the exponent with the opposite sign and uses T+459.67, and its Glaso divides by API^0.989 where BlackOil divides by the oil specific gravity^0.989.** Both are the classes' own; both are separate calculations.",
+    "**oil compressibility is published in 1/Pa and declared dimensionless**, because the vocabulary has no inverse-pressure dimension, the `total_pressure_drop_mbar` precedent. The class's SI overload answers 1/bara; the id multiplies by 1e-5.",
+    "**the gas formation volume factor is a volume ratio**, the class's rcf/scf; `gas_fvf_rb_per_mscf` is the class's RB/Mscf convenience and states its own basis.",
+    "**the gas viscosity correlation's molar mass is g/mol**, and the id takes kg/mol and multiplies by 1000.",
+    "**the statistics are `estimateWithStatistics`'s average, minimum, maximum and population standard deviation over the four `SaturationPressureCorrelation` methods**, with the four values published beside them.",
+    "**`BlackOilTableValidator` and its interpolator are not here**: their input is a table, not a scalar row, so the validator is owed with its report and the interpolator moves with it.",
+    "**`generateComparisonReport`, `compareAll`, `setDefaultUnits` and the unit-conversion methods are session surface**, not rows; the conversions are the boundary arithmetic this id states once.",
+    "**a required field is refused when absent, and a non-positive value wherever the correlation divides by it or takes its logarithm.** The class answers NaN or infinity; this id publishes neither.",
+]
+references = [
+    "Standing, M. B. (1947). \"A Pressure-Volume-Temperature Correlation for Mixtures of California Oils and Gases.\" API Drill. Prod. Pract., 275-287.",
+    "Vasquez, M. & Beggs, H. D. (1980). \"Correlations for Fluid Physical Property Prediction.\" Journal of Petroleum Technology 32(6), 968-970. DOI 10.2118/6719-PA.",
+    "Glaso, O. (1980). \"Generalized Pressure-Volume-Temperature Correlations.\" Journal of Petroleum Technology 32(5), 785-795. DOI 10.2118/8016-PA.",
+    "Petrosky, G. E. & Farshad, F. F. (1993). \"Pressure-Volume-Temperature Correlations for Gulf of Mexico Crude Oils.\" SPE 26644.",
+    "Al-Marhoun, M. A. (1988). \"PVT Correlations for Middle East Crude Oils.\" Journal of Petroleum Technology 40(5), 650-666. DOI 10.2118/13718-PA.",
+    "Beggs, H. D. & Robinson, J. R. (1975). \"Estimating the Viscosity of Crude Oil Systems.\" Journal of Petroleum Technology 27(9), 1140-1141. DOI 10.2118/5434-PA.",
+    "Kartoatmodjo, T. & Schmidt, Z. (1994). \"Large Data Bank Improves Crude Physical Property Correlation.\" Oil & Gas Journal 92(27), 51-56.",
+    "Lee, A. L., Gonzalez, M. H. & Eakin, B. E. (1966). \"The Viscosity of Natural Gases.\" Journal of Petroleum Technology 18(8), 997-1000. DOI 10.2118/1340-PA.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/util/BlackOilCorrelations.java` and `pvtsimulation/util/SaturationPressureCorrelation.java` are the port source.",
+    "`validation/neqsim/captures/pvt_black_oil.tsv` - every calculation at the class's own test states and at the clamp, the 30-API switch and the specific-gravity branch.",
+]
+[source]
+standard = "NeqSim pvtsimulation/util/BlackOilCorrelations.java and SaturationPressureCorrelation.java"
+edition = "Every public correlation and the two classes' unit-aware overloads; the table validator, the reports and the convenience maps are named in the assumptions rather than ported."
+[algorithm]
+scheme = "black_oil_correlation_dispatch"
+initialisation = "first_query_in_caller_order"
+convergence = "absolute"
+tolerance = 1.0e-12
+max_iterations = 1
+[inputs]
+[inputs.queries]
+type = "record_list"
+row_type = "BlackOilQuery"
+description = "one correlation call per row, in caller order; `calculation` selects the fields the row must carry.\n"
+[inputs.queries.fields.calculation]
+type = "enum"
+values = [
+    "api_from_specific_gravity",
+    "specific_gravity_from_api",
+    "bubble_point_standing",
+    "bubble_point_standing_by_specific_gravity",
+    "bubble_point_vasquez_beggs",
+    "bubble_point_glaso_by_specific_gravity",
+    "bubble_point_standing_p_sat",
+    "bubble_point_vasquez_beggs_p_sat",
+    "bubble_point_glaso_p_sat",
+    "bubble_point_petrosky_farshad",
+    "bubble_point_al_marhoun",
+    "bubble_point_statistics",
+    "solution_gor_standing",
+    "solution_gor_vasquez_beggs",
+    "oil_fvf_standing",
+    "oil_fvf_vasquez_beggs",
+    "oil_fvf_undersaturated",
+    "oil_compressibility_vasquez_beggs",
+    "dead_oil_viscosity_beggs_robinson",
+    "dead_oil_viscosity_glaso",
+    "dead_oil_viscosity_kartoatmodjo",
+    "saturated_oil_viscosity_beggs_robinson",
+    "saturated_oil_viscosity_kartoatmodjo",
+    "undersaturated_oil_viscosity_vasquez_beggs",
+    "undersaturated_oil_viscosity_bergman_sutton",
+    "gas_fvf",
+    "gas_fvf_rb_per_mscf",
+    "gas_viscosity_lee_gonzalez_eakin",
+]
+description = "the correlation this row asks for.\n"
+[inputs.queries.fields.rs]
+unit = "dimensionless"
+optional = true
+description = "solution gas-oil ratio, in Sm3/Sm3 at the boundary and scf/STB inside the correlation.\n"
+[inputs.queries.fields.gamma_g]
+unit = "dimensionless"
+optional = true
+description = "gas specific gravity, air = 1.\n"
+[inputs.queries.fields.gamma_o]
+unit = "dimensionless"
+optional = true
+description = "oil specific gravity, water = 1.\n"
+[inputs.queries.fields.api]
+unit = "dimensionless"
+optional = true
+description = "oil API gravity.\n"
+[inputs.queries.fields.temperature]
+unit = "K"
+optional = true
+description = "absolute temperature.\n"
+[inputs.queries.fields.pressure]
+unit = "Pa"
+optional = true
+description = "absolute pressure.\n"
+[inputs.queries.fields.bob]
+unit = "dimensionless"
+optional = true
+description = "the oil formation volume factor at the bubble point, for the undersaturated route.\n"
+[inputs.queries.fields.compressibility]
+unit = "dimensionless"
+optional = true
+description = "oil compressibility in 1/Pa, for the undersaturated FVF route.\n"
+[inputs.queries.fields.pb]
+unit = "Pa"
+optional = true
+description = "bubble point pressure, for the undersaturated routes.\n"
+[inputs.queries.fields.mu_od]
+unit = "Pa*s"
+optional = true
+description = "dead-oil viscosity, for the saturated-oil route.\n"
+[inputs.queries.fields.mu_ob]
+unit = "Pa*s"
+optional = true
+description = "saturated-oil viscosity at the bubble point, for the undersaturated route.\n"
+[inputs.queries.fields.rho_g]
+unit = "kg/m**3"
+optional = true
+description = "gas density, for the Lee-Gonzalez-Eakin viscosity.\n"
+[inputs.queries.fields.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "gas molar mass, for the Lee-Gonzalez-Eakin viscosity; the correlation takes g/mol and the id multiplies by 1000.\n"
+[inputs.queries.fields.z]
+unit = "dimensionless"
+optional = true
+description = "the gas compressibility factor, for the gas formation volume factor.\n"
+[outputs]
+[outputs.queries]
+type = "record_list"
+description = "one row per input row, in caller order; only the fields the calculation answers are present.\n"
+[outputs.queries.fields.calculation]
+type = "string"
+description = "the call this row answered.\n"
+[outputs.queries.fields.pressure]
+unit = "Pa"
+optional = true
+description = "the bubble point.\n"
+[outputs.queries.fields.solution_gor]
+unit = "dimensionless"
+optional = true
+description = "the solution gas-oil ratio, in Sm3/Sm3.\n"
+[outputs.queries.fields.oil_fvf]
+unit = "dimensionless"
+optional = true
+description = "the oil formation volume factor, a volume ratio.\n"
+[outputs.queries.fields.compressibility]
+unit = "dimensionless"
+optional = true
+description = "the oil compressibility in 1/Pa.\n"
+[outputs.queries.fields.viscosity]
+unit = "Pa*s"
+optional = true
+description = "the oil or gas viscosity.\n"
+[outputs.queries.fields.gas_fvf]
+unit = "dimensionless"
+optional = true
+description = "the gas formation volume factor, the class's rcf/scf or RB/Mscf volume ratio.\n"
+[outputs.queries.fields.factor]
+unit = "dimensionless"
+optional = true
+description = "the API gravity, the specific gravity or another dimensionless conversion.\n"
+[outputs.queries.fields.average]
+unit = "Pa"
+optional = true
+description = "the arithmetic mean of the four saturation-pressure correlations.\n"
+[outputs.queries.fields.minimum]
+unit = "Pa"
+optional = true
+description = "the smallest of the four saturation-pressure answers.\n"
+[outputs.queries.fields.maximum]
+unit = "Pa"
+optional = true
+description = "the largest of the four saturation-pressure answers.\n"
+[outputs.queries.fields.std_dev]
+unit = "Pa"
+optional = true
+description = "the population standard deviation over the four answers, divided by the count.\n"
+[outputs.queries.fields.standing]
+unit = "Pa"
+optional = true
+description = "Standing's answer, beside the statistics.\n"
+[outputs.queries.fields.vasquez_beggs]
+unit = "Pa"
+optional = true
+description = "Vasquez-Beggs's answer, beside the statistics.\n"
+[outputs.queries.fields.glaso]
+unit = "Pa"
+optional = true
+description = "Glaso's answer, beside the statistics.\n"
+[outputs.queries.fields.petrosky_farshad]
+unit = "Pa"
+optional = true
+description = "Petrosky-Farshad's answer, beside the statistics.\n"
+[implementations]
+python = "azoth.pvt.black_oil_correlations"
+rust = "azoth_pvt::black_oil_correlations"

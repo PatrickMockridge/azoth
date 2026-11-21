@@ -31,7 +31,11 @@ DUMPERS: dict[str, Dumper] = {}
 
 #: Record-list models with no interior to dump: every published row is the answer. The value
 #: says why, and the layer-diff test counts each as evidence rather than silently skipping it.
-NO_INTERIOR: dict[str, str] = {}
+NO_INTERIOR: dict[str, str] = {
+    "pvt.black_oil_correlations": (
+        "each row is one correlation's answer; no state lies between inputs and value"
+    ),
+}
 
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the
 #: id cannot express - and the count of rows in each. A block is not excused by widening a

@@ -9996,6 +9996,41 @@ pub fn vessel_rupture(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Black-oil correlation table.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (queries))]
+#[pyo3(text_signature = "(queries)")]
+pub fn black_oil_correlations(
+    py: Python<'_>,
+    queries: Vec<crate::records_gen::BlackOilQuery>,
+) -> PyResult<crate::transport_gen::PyBlackOilCorrelationsResult> {
+    let queries_records: Vec<azoth_pvt::black_oil_correlations::BlackOilQuery> = queries
+        .into_iter()
+        .map(|row| azoth_pvt::black_oil_correlations::BlackOilQuery {
+            calculation: row.calculation,
+            rs: row.rs,
+            gamma_g: row.gamma_g,
+            gamma_o: row.gamma_o,
+            api: row.api,
+            temperature: row.temperature.map(kelvins),
+            pressure: row.pressure.map(pascals),
+            bob: row.bob,
+            compressibility: row.compressibility,
+            pb: row.pb.map(pascals),
+            mu_od: row.mu_od.map(pascal_seconds),
+            mu_ob: row.mu_ob.map(pascal_seconds),
+            rho_g: row.rho_g.map(kilograms_per_cubic_meter),
+            molar_mass: row.molar_mass.map(kilograms_per_mole),
+            z: row.z,
+        })
+        .collect();
+    azoth_pvt::black_oil_correlations::black_oil_correlations(&queries_records)
+        .map(|r| crate::transport_gen::PyBlackOilCorrelationsResult::from(&r))
+        .map_err(|e| to_pyerr(py, e))
+}
+
 /// Reactive chemical equilibrium by the Smith-Missen method.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

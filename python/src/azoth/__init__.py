@@ -84,7 +84,6 @@ from azoth import (
     hydraulics,
     keycard,
     properties,
-    pvt,
     reactions,
     thermal,
 )
@@ -128,9 +127,13 @@ __all__ = [
 
 
 def __getattr__(name: str) -> Any:
-    """Import `azoth.process` on first use: it needs the compiled extension, and
-    `import azoth` must not (the docs generator imports azoth from source)."""
-    if name in ("process", "dexpi"):
+    """Import `azoth.process` and `azoth.pvt` on first use.
+
+    `process` needs the compiled extension, and `import azoth` must not. `pvt`'s public
+    wrappers import the result dataclasses, which the generators emit after they have
+    imported this package; an eager import would make the first generation of a `pvt` id a
+    bootstrap cycle rather than a file write."""
+    if name in ("process", "dexpi", "pvt"):
         module = importlib.import_module(f"azoth.{name}")
         globals()[name] = module
         return module

@@ -14,10 +14,10 @@
 //! on any difference.
 
 use crate::record_outputs_gen::{
-    PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBrineMixingPointRow,
-    PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent, PyChemicalWarningRow,
-    PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult, PyCostBomRow,
-    PyCostEstimationResultRow, PyDepositionSegmentRow, PyDepressurizationPoint,
+    PyActivityCoefficientRow, PyAlarpEvaluationResult, PyAppliedStandardRow, PyBlackOilResultRow,
+    PyBrineMixingPointRow, PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent,
+    PyChemicalWarningRow, PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult,
+    PyCostBomRow, PyCostEstimationResultRow, PyDepositionSegmentRow, PyDepressurizationPoint,
     PyDisciplineCostLine, PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery,
     PyEnvelopeSummary, PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
     PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
@@ -30302,6 +30302,44 @@ impl From<&azoth_process::models::vessel_rupture::VesselRuptureResult> for PyVes
                 unit: "MPa".to_string(),
             },
             history: r.history.iter().map(PyVesselRuptureStep::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.black_oil_correlations`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BlackOilCorrelationsResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBlackOilCorrelationsResult {
+    /// one row per input row, in caller order; only the fields the calculation answers are present.
+    #[pyo3(get)]
+    pub queries: Vec<PyBlackOilResultRow>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyBlackOilCorrelationsResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "BlackOilCorrelationsResult(queries={:?}, {} warning(s))",
+            self.queries,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult>
+    for PyBlackOilCorrelationsResult
+{
+    fn from(r: &azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult) -> Self {
+        Self {
+            queries: r.queries.iter().map(PyBlackOilResultRow::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

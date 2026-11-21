@@ -3909,6 +3909,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 6,
         "tests_skipped": 0,
     },
+    'pvt.black_oil_correlations': {
+        "calc_id": 'pvt.black_oil_correlations',
+        "name": 'Black-oil correlation table',
+        "spec": {'path': 'specs/models/pvt/black_oil_correlations.toml', 'sha256': '4b92f5946a1caa682854942259952839fc7db1a024d00320c7444d01f2cf98be'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/black_oil_correlations.py', 'sha256': 'de0328867aa8a9604826588ee1755ce2c6c11f9e2eb4a98b898f9d4253958cb7'}, {'path': 'crates/azoth-pvt/src/black_oil_correlations.rs', 'sha256': '5a61ee5caddf47f4816386f10a69407277b63039fbacddd81b4ff681ad780ced'}],
+        "source": 'NeqSim pvtsimulation/util/BlackOilCorrelations.java and SaturationPressureCorrelation.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 2,
+        "tests_skipped": 0,
+    },
     'reactions.chemical_equilibrium': {
         "calc_id": 'reactions.chemical_equilibrium',
         "name": 'Reactive chemical equilibrium by the Smith-Missen method',

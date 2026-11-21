@@ -115,6 +115,143 @@ impl From<&azoth_thermal::results::AppliedStandardRow> for PyAppliedStandardRow 
     }
 }
 
+/// one row per input row, in caller order; only the fields the calculation answers are present.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "BlackOilResultRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyBlackOilResultRow {
+    /// the call this row answered.
+    #[pyo3(get)]
+    pub calculation: String,
+    /// the bubble point.
+    #[pyo3(get)]
+    pub pressure: Option<PyQty>,
+    /// the solution gas-oil ratio, in Sm3/Sm3.
+    #[pyo3(get)]
+    pub solution_gor: Option<f64>,
+    /// the oil formation volume factor, a volume ratio.
+    #[pyo3(get)]
+    pub oil_fvf: Option<f64>,
+    /// the oil compressibility in 1/Pa.
+    #[pyo3(get)]
+    pub compressibility: Option<f64>,
+    /// the oil or gas viscosity.
+    #[pyo3(get)]
+    pub viscosity: Option<PyQty>,
+    /// the gas formation volume factor, the class's rcf/scf or RB/Mscf volume ratio.
+    #[pyo3(get)]
+    pub gas_fvf: Option<f64>,
+    /// the API gravity, the specific gravity or another dimensionless conversion.
+    #[pyo3(get)]
+    pub factor: Option<f64>,
+    /// the arithmetic mean of the four saturation-pressure correlations.
+    #[pyo3(get)]
+    pub average: Option<PyQty>,
+    /// the smallest of the four saturation-pressure answers.
+    #[pyo3(get)]
+    pub minimum: Option<PyQty>,
+    /// the largest of the four saturation-pressure answers.
+    #[pyo3(get)]
+    pub maximum: Option<PyQty>,
+    /// the population standard deviation over the four answers, divided by the count.
+    #[pyo3(get)]
+    pub std_dev: Option<PyQty>,
+    /// Standing's answer, beside the statistics.
+    #[pyo3(get)]
+    pub standing: Option<PyQty>,
+    /// Vasquez-Beggs's answer, beside the statistics.
+    #[pyo3(get)]
+    pub vasquez_beggs: Option<PyQty>,
+    /// Glaso's answer, beside the statistics.
+    #[pyo3(get)]
+    pub glaso: Option<PyQty>,
+    /// Petrosky-Farshad's answer, beside the statistics.
+    #[pyo3(get)]
+    pub petrosky_farshad: Option<PyQty>,
+}
+
+#[pymethods]
+impl PyBlackOilResultRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "BlackOilResultRow(calculation={}, pressure={:?}, solution_gor={:?}, oil_fvf={:?}, compressibility={:?}, viscosity={:?}, gas_fvf={:?}, factor={:?}, average={:?}, minimum={:?}, maximum={:?}, std_dev={:?}, standing={:?}, vasquez_beggs={:?}, glaso={:?}, petrosky_farshad={:?})",
+            self.calculation,
+            self.pressure,
+            self.solution_gor,
+            self.oil_fvf,
+            self.compressibility,
+            self.viscosity,
+            self.gas_fvf,
+            self.factor,
+            self.average,
+            self.minimum,
+            self.maximum,
+            self.std_dev,
+            self.standing,
+            self.vasquez_beggs,
+            self.glaso,
+            self.petrosky_farshad
+        )
+    }
+}
+
+impl From<&azoth_pvt::black_oil_correlations::BlackOilResultRow> for PyBlackOilResultRow {
+    fn from(row: &azoth_pvt::black_oil_correlations::BlackOilResultRow) -> Self {
+        Self {
+            calculation: row.calculation.clone(),
+            pressure: row.pressure.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            solution_gor: row.solution_gor,
+            oil_fvf: row.oil_fvf,
+            compressibility: row.compressibility,
+            viscosity: row.viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            gas_fvf: row.gas_fvf,
+            factor: row.factor,
+            average: row.average.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            minimum: row.minimum.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            maximum: row.maximum.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            std_dev: row.std_dev.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            standing: row.standing.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            vasquez_beggs: row.vasquez_beggs.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            glaso: row.glaso.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            petrosky_farshad: row.petrosky_farshad.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+        }
+    }
+}
+
 /// One row per mixing fraction, from all brine A to all brine B.
 #[pyclass(
     frozen,
