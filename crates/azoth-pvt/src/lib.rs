@@ -11,21 +11,31 @@
 
 pub mod black_oil_correlations;
 pub mod decline_curve;
+pub mod flash;
+pub mod fluid;
 pub mod gas_correlations;
 pub mod gas_material_balance;
+pub mod ledger;
 pub mod model_gen;
 pub mod model_records_gen;
 pub mod oil_material_balance;
+pub mod saturation;
+pub mod saturation_test;
 pub mod standard;
+pub mod transport;
+pub mod volume;
 pub mod water_correlations;
 
 pub use black_oil_correlations::{
     BlackOilCorrelationsResult, BlackOilQuery, BlackOilResultRow, black_oil_correlations,
 };
 pub use decline_curve::{DeclineCurveResult, decline_curve};
+pub use flash::{Flash, FlashMode, Phase};
+pub use fluid::{Fluid, GasTemplate};
 pub use gas_correlations::{GasCorrelationsResult, GasQuery, GasResultRow, gas_correlations};
 pub use gas_material_balance::{GasMaterialBalanceResult, gas_material_balance};
 pub use oil_material_balance::{OilMaterialBalanceResult, oil_material_balance};
+pub use saturation_test::{SaturationTestResult, saturation_test};
 pub use water_correlations::{
     WaterCorrelationsResult, WaterQuery, WaterResultRow, water_correlations,
 };

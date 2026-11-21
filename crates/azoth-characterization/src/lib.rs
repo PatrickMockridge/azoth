@@ -42,7 +42,7 @@ pub mod whitson_gamma_split;
 
 pub use assay_mass_fractions::{AssayBasis, AssayCut, assay_mass_fractions};
 pub use assay_to_mixture::oil_assay_to_mixture;
-pub use assembly::mixture_from_characterization;
+pub use assembly::{KijSource, mixture_from_characterization, mixture_from_characterization_with};
 pub use characterise_plus_fraction::{PlusModel, characterise_plus_fraction};
 pub use characterize_to_common_slate::characterize_to_common_slate;
 pub use characterize_to_reference::{ReferenceRow, SourceRow, characterize_to_reference};

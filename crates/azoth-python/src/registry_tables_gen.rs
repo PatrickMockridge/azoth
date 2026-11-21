@@ -379,6 +379,7 @@ pub fn result_fields(calc_id: &str) -> Vec<String> {
         "pvt.gas_correlations" => azoth_pvt::gas_correlations::GasCorrelationsResult::FIELDS.to_vec(),
         "pvt.gas_material_balance" => azoth_pvt::gas_material_balance::GasMaterialBalanceResult::FIELDS.to_vec(),
         "pvt.oil_material_balance" => azoth_pvt::oil_material_balance::OilMaterialBalanceResult::FIELDS.to_vec(),
+        "pvt.saturation_test" => azoth_pvt::saturation_test::SaturationTestResult::FIELDS.to_vec(),
         "pvt.water_correlations" => azoth_pvt::water_correlations::WaterCorrelationsResult::FIELDS.to_vec(),
         "reactions.chemical_equilibrium" => azoth_reactions::chemical_equilibrium::ChemicalEquilibriumResult::FIELDS.to_vec(),
         "reactions.equilibrium_constant" => azoth_reactions::equilibrium_constant::EquilibriumConstantResult::FIELDS.to_vec(),

@@ -6820,6 +6820,12 @@ class OilMaterialBalanceResult:
     warnings: list[Warning]
 
 @final
+class SaturationTestResult:
+    saturation_pressure: Qty | None
+    saturation_temperature: Qty | None
+    warnings: list[Warning]
+
+@final
 class WaterCorrelationsResult:
     queries: list[WaterResultRow]
     warnings: list[Warning]
@@ -11009,6 +11015,16 @@ def oil_material_balance(
     eg_history: list[float] | None = None,
     we_history: list[float] | None = None,
 ) -> OilMaterialBalanceResult: ...
+def saturation_test(
+    components: list[FluidComponent],
+    mode: str,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: float | None = None,
+    pressure: float | None = None,
+    temperature_search_min: float | None = None,
+    temperature_search_max: float | None = None,
+) -> SaturationTestResult: ...
 def water_correlations(queries: list[WaterQuery]) -> WaterCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],

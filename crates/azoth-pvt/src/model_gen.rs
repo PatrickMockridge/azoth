@@ -6,6 +6,7 @@
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
 //!   - specs/models/pvt/oil_material_balance.toml
+//!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!
 //! Regenerate with `python tools/gen_models.py`; CI runs `--check` and fails
@@ -2793,6 +2794,275 @@ pub static OIL_MATERIAL_BALANCE_SPEC: ModelSpec = ModelSpec {
     cases: OIL_MATERIAL_BALANCE_CASES,
 };
 
+static SATURATION_TEST_CHECKS: &[SpecCheck] = &[];
+
+static SATURATION_TEST_CASES: &[TestCase] = &[
+    TestCase {
+        id: "pressure_methane_nc10_323",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("temperature", 323.15)],
+        flags: &[],
+        lists: &[],
+        strings: &[("mode", "pressure")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("saturation_pressure", 28955195.999145508)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.7),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.3),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pressure_methane_nbutane_275",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("temperature", 275.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("mode", "pressure")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("saturation_pressure", 7495956.039428711)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.95),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("n-butane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.05),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "pressure_fallback_methane_300",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("temperature", 300.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("mode", "pressure")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("saturation_pressure", 100000000.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[&[
+                RecordField {
+                    name: "fluid",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("methane"),
+                },
+                RecordField {
+                    name: "pseudo_component",
+                    value: FieldValue::Flag(false),
+                },
+                RecordField {
+                    name: "moles",
+                    value: FieldValue::Number(1.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "temperature_methane_nc10_52bara",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("pressure", 5210000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("mode", "temperature")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("saturation_temperature", 557.1245384216309)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.7),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.3),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "temperature_fallback_methane_100bara",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[("pressure", 10000000.0)],
+        flags: &[],
+        lists: &[],
+        strings: &[("mode", "temperature")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("saturation_temperature", 1200.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[&[
+                RecordField {
+                    name: "fluid",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("methane"),
+                },
+                RecordField {
+                    name: "pseudo_component",
+                    value: FieldValue::Flag(false),
+                },
+                RecordField {
+                    name: "moles",
+                    value: FieldValue::Number(1.0),
+                },
+            ]],
+        )],
+        expected_records: &[],
+    },
+];
+
+/// Registry entry for `pvt.saturation_test`.
+pub static SATURATION_TEST_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.saturation_test",
+    kind: "direct",
+    algorithm: None,
+    checks: SATURATION_TEST_CHECKS,
+    cases: SATURATION_TEST_CASES,
+};
+
 static WATER_CORRELATIONS_CHECKS: &[SpecCheck] = &[];
 
 static WATER_CORRELATIONS_CASES: &[TestCase] = &[TestCase {
@@ -3142,6 +3412,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &GAS_CORRELATIONS_SPEC,
     &GAS_MATERIAL_BALANCE_SPEC,
     &OIL_MATERIAL_BALANCE_SPEC,
+    &SATURATION_TEST_SPEC,
     &WATER_CORRELATIONS_SPEC,
 ];
 

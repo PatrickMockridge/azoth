@@ -159,7 +159,7 @@ def _pseudo_cp(row: Any, index: int) -> tuple[float, float, float, float, float]
 
 
 def mixture_from_characterization(
-    components: Iterable[Any], *, eos: str = "srk"
+    components: Iterable[Any], *, eos: str = "srk", kij: str = "database"
 ) -> tuple[Any, IdealGasModel]:
     """A mixture and its ideal-gas model, from a characterization table.
 
@@ -169,17 +169,23 @@ def mixture_from_characterization(
     declares for that field; a ``pint`` quantity is converted from whatever unit it carries.
 
     ``eos`` is ``"srk"``, the class's own fluid, or ``"pr"``; Peng-Robinson has no fitted ``m``
-    and ignores a row's ``attractive_m``.
+    and ignores a row's ``attractive_m``. ``kij`` is ``"database"`` - NeqSim's
+    ``setMixingRule(2)`` - or ``"zero"``, its ``setMixingRule(1)``; the swelling experiment's
+    pinned state is the second.
 
     Raises:
         PropertyUnavailableError: if a base row's name is not in the databank, or its substance
             has no heat-capacity polynomial.
         InvalidInputError: if a pseudo row omits a critical constant, molar mass or
-            heat-capacity coefficient, or ``eos`` is not a cubic this builds.
+            heat-capacity coefficient, or ``eos``/``kij`` is not one this builds.
     """
     if eos not in ("pr", "srk"):
         raise InvalidInputError(
             "eos", f"{eos!r} is not a cubic a characterized fluid is built for; use 'pr' or 'srk'"
+        )
+    if kij not in ("database", "zero"):
+        raise InvalidInputError(
+            "kij", f"{kij!r} is not a mixing rule; use 'database' (rule 2) or 'zero' (rule 1)"
         )
 
     rows = list(components)
@@ -223,10 +229,14 @@ def mixture_from_characterization(
     # the mixture's own order - a pseudo row between two base rows moves every index after it.
     known = [name for name in base_names if name is not None]
     at = {name: index for index, name in enumerate(base_names) if name is not None}
-    pairs = {
-        (at[known[first]], at[known[second]]): value
-        for (first, second), value in kij_for(tuple(known), eos=eos).items()
-    }
+    pairs = (
+        {
+            (at[known[first]], at[known[second]]): value
+            for (first, second), value in kij_for(tuple(known), eos=eos).items()
+        }
+        if kij == "database"
+        else {}
+    )
     fluid = mixture(
         built,
         kij=pairs,

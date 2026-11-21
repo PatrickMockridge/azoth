@@ -50,6 +50,10 @@ NO_INTERIOR: dict[str, str] = {
     "pvt.oil_material_balance": (
         "each call is one regression's answer; the fit is the output, not an interior"
     ),
+    "pvt.saturation_test": (
+        "the answer is the boundary itself; the scan's trial flashes are the search, not a "
+        "state the capture records"
+    ),
 }
 
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the

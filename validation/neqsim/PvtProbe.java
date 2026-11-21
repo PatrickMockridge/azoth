@@ -6,6 +6,8 @@ import java.util.Map;
 import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.GasMaterialBalance;
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.OilMaterialBalance;
+import neqsim.pvtsimulation.simulation.SaturationPressure;
+import neqsim.pvtsimulation.simulation.SaturationTemperature;
 import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
 import neqsim.pvtsimulation.util.BlackOilCorrelations;
 import neqsim.pvtsimulation.util.DeclineCurveAnalysis;
@@ -358,6 +360,58 @@ public final class PvtProbe {
     line("edi", indices[3]);
   }
 
+  // A databank binary at a stated state. The laboratory ids' cases are databank fluids
+  // because a FluidComponent row cannot carry a TBP cut; the upstream TBP states are
+  // recorded as owed, not retyped here.
+  private static SystemInterface binary(String first, double firstMoles, String second,
+      double secondMoles, double temperatureK, double pressureBara) {
+    SystemInterface system = new SystemSrkEos(temperatureK, pressureBara);
+    system.addComponent(first, firstMoles);
+    system.addComponent(second, secondMoles);
+    system.setMixingRule(2);
+    return system;
+  }
+
+  private static SystemInterface pure(String name, double moles, double temperatureK,
+      double pressureBara) {
+    SystemInterface system = new SystemSrkEos(temperatureK, pressureBara);
+    system.addComponent(name, moles);
+    system.setMixingRule(2);
+    return system;
+  }
+
+  private static void saturation() {
+    System.out.println("saturation");
+
+    System.out.println("[pressure_methane_nc10_323]");
+    SaturationPressure pressure = new SaturationPressure(
+        binary("methane", 0.70, "nC10", 0.30, 323.15, 50.0));
+    pressure.setTemperature(323.15);
+    line("saturation_pressure_pa", pressure.calcSaturationPressure() * 1.0e5);
+
+    System.out.println("[pressure_methane_nbutane_275]");
+    pressure = new SaturationPressure(
+        binary("methane", 0.95, "n-butane", 0.05, 275.0, 50.0));
+    pressure.setTemperature(275.0);
+    line("saturation_pressure_pa", pressure.calcSaturationPressure() * 1.0e5);
+
+    // Above methane's critical temperature no pressure brackets a two-phase region, so the
+    // class answers the top of its grid.
+    System.out.println("[pressure_fallback_methane_300]");
+    pressure = new SaturationPressure(pure("methane", 1.0, 300.0, 50.0));
+    pressure.setTemperature(300.0);
+    line("saturation_pressure_pa", pressure.calcSaturationPressure() * 1.0e5);
+
+    System.out.println("[temperature_methane_nc10_52bara]");
+    SaturationTemperature temperature = new SaturationTemperature(
+        binary("methane", 0.70, "nC10", 0.30, 300.0, 52.1));
+    line("saturation_temperature_k", temperature.calcSaturationTemperature());
+
+    System.out.println("[temperature_fallback_methane_100bara]");
+    temperature = new SaturationTemperature(pure("methane", 1.0, 300.0, 100.0));
+    line("saturation_temperature_k", temperature.calcSaturationTemperature());
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -378,6 +432,9 @@ public final class PvtProbe {
         break;
       case "oil_mb":
         oilMaterialBalance();
+        break;
+      case "saturation":
+        saturation();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

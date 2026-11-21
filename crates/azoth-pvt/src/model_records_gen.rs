@@ -16,6 +16,7 @@ use crate::decline_curve::DeclineCurveResult;
 use crate::gas_correlations::GasCorrelationsResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
+use crate::saturation_test::SaturationTestResult;
 use crate::water_correlations::WaterCorrelationsResult;
 
 impl CalcResult for BlackOilCorrelationsResult {
@@ -111,6 +112,16 @@ impl CalcResult for OilMaterialBalanceResult {
         "edi",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SaturationTestResult {
+    const CALC_ID: &'static str = "pvt.saturation_test";
+    const FIELDS: &'static [&'static str] =
+        &["saturation_pressure", "saturation_temperature", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

@@ -1,0 +1,11 @@
+saturation
+[pressure_methane_nc10_323]
+saturation_pressure_pa=2.8955195999145508E7
+[pressure_methane_nbutane_275]
+saturation_pressure_pa=7495956.039428711
+[pressure_fallback_methane_300]
+saturation_pressure_pa=1.0E8
+[temperature_methane_nc10_52bara]
+saturation_temperature_k=557.1245384216309
+[temperature_fallback_methane_100bara]
+saturation_temperature_k=1200.0

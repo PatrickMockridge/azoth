@@ -18,4 +18,5 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`pvt.gas_correlations`](./gas_correlations.md) | `gas_correlation_dispatch` | NeqSim pvtsimulation/util/ZFactorCorrelations.java, GasPseudoCriticalProperties.java, GasPseudoPressure.java and reservoirproperties/CompositionEstimation.java |
 | [`pvt.gas_material_balance`](./gas_material_balance.md) | `direct composition` | NeqSim reservoirproperties/materialbalance/GasMaterialBalance.java |
 | [`pvt.oil_material_balance`](./oil_material_balance.md) | `direct composition` | NeqSim reservoirproperties/materialbalance/OilMaterialBalance.java |
+| [`pvt.saturation_test`](./saturation_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/SaturationPressure.java and SaturationTemperature.java |
 | [`pvt.water_correlations`](./water_correlations.md) | `water_correlation_dispatch` | NeqSim pvtsimulation/util/WaterPropertyCorrelations.java and SolutionGasWaterRatio.java |

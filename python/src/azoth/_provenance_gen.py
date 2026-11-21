@@ -3964,6 +3964,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 8,
         "tests_skipped": 0,
     },
+    'pvt.saturation_test': {
+        "calc_id": 'pvt.saturation_test',
+        "name": 'Saturation test',
+        "spec": {'path': 'specs/models/pvt/saturation_test.toml', 'sha256': 'f0e8c6ff8a77580ab92c94898d7a2246fa7f8f57520b9e65a4b6a68f7b1fa7a2'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/saturation_test.py', 'sha256': '76c7b5b5b7c914699f803c4b7b569d69e1f9b696a631ff50f638657d47bf9ad6'}, {'path': 'crates/azoth-pvt/src/saturation_test.rs', 'sha256': '80e79ec24d5981bdff74f7601bdaef2eed4c2876782bb552b0d596e0a80b1ec1'}],
+        "source": 'NeqSim pvtsimulation/simulation/SaturationPressure.java and SaturationTemperature.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 5,
+        "tests_skipped": 0,
+    },
     'pvt.water_correlations': {
         "calc_id": 'pvt.water_correlations',
         "name": 'Water and brine correlation table',

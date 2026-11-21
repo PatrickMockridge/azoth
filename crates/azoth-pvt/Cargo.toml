@@ -8,10 +8,13 @@ repository.workspace = true
 description = "PVT simulation: the correlation table, the laboratory experiments and the material balance over a fluid"
 
 [dependencies]
+azoth-characterization.workspace = true
 azoth-core.workspace = true
+azoth-eos.workspace = true
 
 [dev-dependencies]
 azoth-core.workspace = true
+azoth-eos.workspace = true
 azoth-test-support.workspace = true
 
 [lints]

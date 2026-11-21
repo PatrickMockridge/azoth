@@ -26,6 +26,7 @@ from azoth.core.result import (
     GasCorrelationsResult,
     GasMaterialBalanceResult,
     OilMaterialBalanceResult,
+    SaturationTestResult,
     WaterCorrelationsResult,
 )
 from azoth.pvt import layers as layers
@@ -35,6 +36,7 @@ _DECLINE_CURVE = "pvt.decline_curve"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
+_SATURATION_TEST = "pvt.saturation_test"
 _WATER_CORRELATIONS = "pvt.water_correlations"
 
 __all__ = [
@@ -44,6 +46,7 @@ __all__ = [
     "gas_material_balance",
     "layers",
     "oil_material_balance",
+    "saturation_test",
     "water_correlations",
 ]
 
@@ -236,6 +239,49 @@ def gas_material_balance(
         z_value=z_value,
         temperature=temperature,
         gas_gravity=gas_gravity,
+    )
+
+
+def saturation_test(
+    components: Sequence[Mapping[str, Any]],
+    mode: str,
+    *,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: Any = None,
+    pressure: Any = None,
+    temperature_search_min: Any = None,
+    temperature_search_max: Any = None,
+) -> SaturationTestResult:
+    """The upper saturation boundary of a fluid.
+
+    ``components`` is the characterization row list the fluid is built from, the same rows
+    :func:`azoth.characterization.mixture_from_characterization` takes. ``mode`` is
+    ``"pressure"``, which needs ``temperature``, or ``"temperature"``, which needs
+    ``pressure`` and accepts a pair of ``temperature_search_*`` bounds inside ``[30, 1200]``
+    K. The search is the classes' descending grid for the uppermost two-phase crossing; an
+    interval that brackets none returns the grid top with an ``OUT_OF_VALID_RANGE`` warning
+    rather than refusing.
+
+    Returns:
+        ``saturation_pressure`` in pressure mode or ``saturation_temperature`` in temperature
+        mode; the other is absent.
+
+    Raises:
+        InvalidInputError: for an unknown mode, ``eos`` or ``mixing_rule``, a missing fixed
+            state, one bound without the other, or bounds outside the class grid.
+
+    See :func:`azoth.pvt.reference.saturation_test.saturation_test`.
+    """
+    return resolve(_SATURATION_TEST)(  # type: ignore[no-any-return]
+        components=components,
+        mode=mode,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        temperature=temperature,
+        pressure=pressure,
+        temperature_search_min=temperature_search_min,
+        temperature_search_max=temperature_search_max,
     )
 
 

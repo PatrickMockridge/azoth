@@ -30721,6 +30721,53 @@ impl From<&azoth_pvt::oil_material_balance::OilMaterialBalanceResult>
         }
     }
 }
+/// Result of `pvt.saturation_test`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SaturationTestResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySaturationTestResult {
+    /// the upper saturation pressure in pressure mode.
+    #[pyo3(get)]
+    pub saturation_pressure: Option<PyQty>,
+    /// the upper saturation temperature in temperature mode.
+    #[pyo3(get)]
+    pub saturation_temperature: Option<PyQty>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySaturationTestResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SaturationTestResult(saturation_pressure={:?}, saturation_temperature={:?}, {} warning(s))",
+            self.saturation_pressure,
+            self.saturation_temperature,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::saturation_test::SaturationTestResult> for PySaturationTestResult {
+    fn from(r: &azoth_pvt::saturation_test::SaturationTestResult) -> Self {
+        Self {
+            saturation_pressure: r.saturation_pressure.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            saturation_temperature: r.saturation_temperature.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "K".to_string(),
+            }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `pvt.water_correlations`, transported.
 #[pyclass(
     frozen,

@@ -188,8 +188,8 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # 375: the cost-estimation calculator; 376: the equipment cost estimate; 377: the process
     # cost estimate; 378: the topsides facility cost; 379: the black-oil correlation table;
     # 380: the gas correlation table; 381: the water correlation table; 382: the decline curve;
-    # 383: the gas material balance; 384: the oil material balance.
-    assert len(registered) == 384
+    # 383: the gas material balance; 384: the oil material balance; 385: the saturation test.
+    assert len(registered) == 385
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:

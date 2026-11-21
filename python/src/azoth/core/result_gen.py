@@ -12449,6 +12449,22 @@ class OilMaterialBalanceResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SaturationTestResult(_HasWarnings):
+    """Result of ``pvt.saturation_test``."""
+
+    CALC_ID: ClassVar[str] = "pvt.saturation_test"
+
+    #: the upper saturation pressure in pressure mode.
+    saturation_pressure: Q | None
+
+    #: the upper saturation temperature in temperature mode.
+    saturation_temperature: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class WaterCorrelationsResult(_HasWarnings):
     """Result of ``pvt.water_correlations``."""
 

@@ -360,6 +360,7 @@
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
 //!   - specs/models/pvt/oil_material_balance.toml
+//!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
@@ -6885,6 +6886,22 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("pvt.oil_material_balance", "eo_history", "dimensionless"),
     ("pvt.oil_material_balance", "eg_history", "dimensionless"),
     ("pvt.oil_material_balance", "we_history", "dimensionless"),
+    (
+        "pvt.saturation_test",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.saturation_test", "pressure", "pressure"),
+    (
+        "pvt.saturation_test",
+        "temperature_search_min",
+        "thermodynamic_temperature",
+    ),
+    (
+        "pvt.saturation_test",
+        "temperature_search_max",
+        "thermodynamic_temperature",
+    ),
     (
         "reactions.chemical_equilibrium",
         "a_matrix",

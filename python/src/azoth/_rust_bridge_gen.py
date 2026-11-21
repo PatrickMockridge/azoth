@@ -392,6 +392,7 @@ from azoth.core.result import (
     SaftVrMiePhaseResult,
     SaltPrecipitationResult,
     SaturateWithWaterResult,
+    SaturationTestResult,
     ScaleControlAssessorResult,
     ScaleControlRiskRow,
     ScaleControlRow,
@@ -845,6 +846,7 @@ __all__ = [
     "saft_vr_mie_phase",
     "salt_precipitation",
     "saturate_with_water",
+    "saturation_test",
     "scale_control_assessor",
     "scale_deposition_accumulator",
     "scale_inhibitor_performance",
@@ -10602,6 +10604,26 @@ def oil_material_balance(calculation: str, *, np: float | None=None, rp: float |
         sdi=result.sdi,
         wdi=result.wdi,
         edi=result.edi,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def saturation_test(components: Sequence[Mapping[str, Any]], mode: str, *, eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, pressure: Any=None, temperature_search_min: Any=None, temperature_search_max: Any=None) -> SaturationTestResult:
+    """``pvt.saturation_test``, computed in Rust."""
+    spec = _models_gen.model("pvt.saturation_test")
+    result = _core.saturation_test(
+        input_records_to_si(spec, "components", components),
+        mode,
+        eos,
+        mixing_rule,
+        None if temperature is None else _si(spec, "temperature", temperature),
+        None if pressure is None else _si(spec, "pressure", pressure),
+        None if temperature_search_min is None else _si(spec, "temperature_search_min", temperature_search_min),
+        None if temperature_search_max is None else _si(spec, "temperature_search_max", temperature_search_max),
+    )
+    return SaturationTestResult(
+        saturation_pressure=None if result.saturation_pressure is None else from_si(result.saturation_pressure.magnitude_si, result.saturation_pressure.unit),
+        saturation_temperature=None if result.saturation_temperature is None else from_si(result.saturation_temperature.magnitude_si, result.saturation_temperature.unit),
         warnings=_warnings(result.warnings),
     )
 
