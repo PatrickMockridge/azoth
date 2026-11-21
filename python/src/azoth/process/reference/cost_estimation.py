@@ -176,7 +176,10 @@ def _correlation_answer(
             f"queries[{index}].valve_cv", float(_require(index, row, "valve_cv", "correlation"))
         )
         return float(_costing.control_valve(cv, material_factor, ratio))
-    raise AssertionError("the correlation list was checked above")
+    raise InvalidInputError(
+        f"queries[{index}].correlation",
+        "the correlation is not one this kernel dispatches",
+    )
 
 
 def _bom_rows(rows: list[dict[str, Any]]) -> list[CostBomRow]:

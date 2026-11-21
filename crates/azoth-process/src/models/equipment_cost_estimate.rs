@@ -1143,7 +1143,12 @@ pub fn equipment_cost_estimate(
                 )?
                 .max(0.0),
             }),
-            _ => unreachable!("the kind list was checked above"),
+            _ => {
+                return Err(AzothError::invalid_input(
+                    format!("equipment[{index}].equipment"),
+                    "the kind is not one this kernel dispatches",
+                ));
+            }
         };
 
         let evaluated = costing::evaluate(&spec, &common);

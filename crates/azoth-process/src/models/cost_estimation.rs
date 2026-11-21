@@ -520,7 +520,12 @@ pub fn cost_estimation(queries: &[CostEstimationQuery]) -> Result<CostEstimation
                 );
                 bom.extend(bom_rows(&rows));
             }
-            _ => unreachable!("the calculation list was checked above"),
+            _ => {
+                return Err(AzothError::invalid_input(
+                    format!("queries[{index}].calculation"),
+                    "the calculation is not one this kernel dispatches",
+                ));
+            }
         }
 
         rows.push(row);
@@ -634,6 +639,11 @@ fn correlation_answer(
             )?;
             Ok(correlations::control_valve(cv, material_factor, ratio))
         }
-        _ => unreachable!("the correlation list was checked above"),
+        _ => {
+            return Err(AzothError::invalid_input(
+                format!("queries[{index}].correlation"),
+                "the correlation is not one this kernel dispatches",
+            ));
+        }
     }
 }
