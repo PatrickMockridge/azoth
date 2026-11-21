@@ -6627,6 +6627,122 @@ impl From<&azoth_process::models::self_heating_induction::SelfHeatingTimePoint>
     }
 }
 
+/// one row per stage.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SeparatorStageResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySeparatorStageResult {
+    /// the stage's 1-based position.
+    #[pyo3(get)]
+    pub stage_number: usize,
+    /// the stage pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the stage temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// the gas volume at the standard state, in the train.
+    #[pyo3(get)]
+    pub gas_volume: Option<PyQty>,
+    /// the stage gas-oil ratio.
+    #[pyo3(get)]
+    pub stage_gor: Option<f64>,
+    /// the gas-oil ratio through this stage, in the train.
+    #[pyo3(get)]
+    pub cumulative_gor: Option<f64>,
+    /// the stage oil formation factor, in the continuous and staged modes.
+    #[pyo3(get)]
+    pub oil_fvf: Option<f64>,
+    /// the gas phase's density, in the train.
+    #[pyo3(get)]
+    pub gas_density: Option<PyQty>,
+    /// the oil phase's density at the stage.
+    #[pyo3(get)]
+    pub oil_density: Option<PyQty>,
+    /// the gas phase's molar mass, in the train.
+    #[pyo3(get)]
+    pub gas_molar_mass: Option<PyQty>,
+    /// the oil phase's molar mass, in the train.
+    #[pyo3(get)]
+    pub oil_molar_mass: Option<PyQty>,
+    /// the gas phase's compressibility, in the train.
+    #[pyo3(get)]
+    pub gas_z_factor: Option<f64>,
+    /// the oil phase's viscosity, in the train.
+    #[pyo3(get)]
+    pub oil_viscosity: Option<PyQty>,
+}
+
+#[pymethods]
+impl PySeparatorStageResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SeparatorStageResult(stage_number={:?}, pressure={:?}, temperature={:?}, gas_volume={:?}, stage_gor={:?}, cumulative_gor={:?}, oil_fvf={:?}, gas_density={:?}, oil_density={:?}, gas_molar_mass={:?}, oil_molar_mass={:?}, gas_z_factor={:?}, oil_viscosity={:?})",
+            self.stage_number,
+            self.pressure,
+            self.temperature,
+            self.gas_volume,
+            self.stage_gor,
+            self.cumulative_gor,
+            self.oil_fvf,
+            self.gas_density,
+            self.oil_density,
+            self.gas_molar_mass,
+            self.oil_molar_mass,
+            self.gas_z_factor,
+            self.oil_viscosity
+        )
+    }
+}
+
+impl From<&azoth_pvt::separator_test::SeparatorStageResult> for PySeparatorStageResult {
+    fn from(row: &azoth_pvt::separator_test::SeparatorStageResult) -> Self {
+        Self {
+            stage_number: row.stage_number,
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            temperature: PyQty {
+                magnitude_si: row.temperature,
+                unit: "K".to_string(),
+            },
+            gas_volume: row.gas_volume.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "m**3".to_string(),
+            }),
+            stage_gor: row.stage_gor,
+            cumulative_gor: row.cumulative_gor,
+            oil_fvf: row.oil_fvf,
+            gas_density: row.gas_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            oil_density: row.oil_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            gas_molar_mass: row.gas_molar_mass.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/mol".to_string(),
+            }),
+            oil_molar_mass: row.oil_molar_mass.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/mol".to_string(),
+            }),
+            gas_z_factor: row.gas_z_factor,
+            oil_viscosity: row.oil_viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+        }
+    }
+}
+
 /// one row per compartment, in the caller's order, with its Z and moles.
 #[pyclass(
     frozen,

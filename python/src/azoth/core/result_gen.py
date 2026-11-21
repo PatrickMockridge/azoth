@@ -112,6 +112,7 @@ from azoth.core.record_outputs_gen import (
     ScenarioChangeRow,
     ScenarioIndexRow,
     SelfHeatingTimePoint,
+    SeparatorStageResult,
     SettleOutCompartmentResult,
     SilIssue,
     SterileRadius,
@@ -12540,6 +12541,52 @@ class SaturationTestResult(_HasWarnings):
 
     #: the upper saturation temperature in temperature mode.
     saturation_temperature: Q | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SeparatorTestResult(_HasWarnings):
+    """Result of ``pvt.separator_test``."""
+
+    CALC_ID: ClassVar[str] = "pvt.separator_test"
+
+    #: the train's total gas-oil ratio.
+    total_gor: float | None
+
+    #: the train's oil formation volume factor against the reservoir fluid.
+    bo: float | None
+
+    #: the train's Rs, which the class sets to the total GOR.
+    rs: float | None
+
+    #: the train's stock-tank oil density.
+    stock_tank_oil_density: Q | None
+
+    #: the train's stock-tank API gravity, inside the class's density band.
+    stock_tank_api: float | None
+
+    #: the optimal first-stage pressure.
+    optimal_stage_pressure: Q | None
+
+    #: the optimal first-stage temperature.
+    optimal_stage_temperature: Q | None
+
+    #: `1/Bo` at the optimum.
+    maximum_oil_recovery: float | None
+
+    #: the GOR at the optimum.
+    gor_at_optimum: float | None
+
+    #: the Bo at the optimum.
+    bo_at_optimum: float | None
+
+    #: the API at the optimum.
+    api_at_optimum: float | None
+
+    #: one row per stage.
+    stages: tuple[SeparatorStageResult, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

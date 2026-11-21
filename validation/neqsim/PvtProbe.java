@@ -13,9 +13,12 @@ import neqsim.pvtsimulation.reservoirproperties.materialbalance.GasMaterialBalan
 import neqsim.pvtsimulation.reservoirproperties.materialbalance.OilMaterialBalance;
 import neqsim.pvtsimulation.simulation.ConstantMassExpansion;
 import neqsim.pvtsimulation.simulation.ConstantVolumeDepletion;
+import neqsim.pvtsimulation.simulation.GOR;
+import neqsim.pvtsimulation.simulation.MultiStageSeparatorTest;
 import neqsim.pvtsimulation.simulation.DifferentialLiberation;
 import neqsim.pvtsimulation.simulation.SaturationPressure;
 import neqsim.pvtsimulation.simulation.SaturationTemperature;
+import neqsim.pvtsimulation.simulation.SeparatorTest;
 import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
 import neqsim.pvtsimulation.util.BlackOilCorrelations;
 import neqsim.pvtsimulation.util.DeclineCurveAnalysis;
@@ -618,6 +621,103 @@ public final class PvtProbe {
         new double[] {300.0, 250.0, 200.0, 150.0, 100.0, 50.0});
   }
 
+
+  private static SystemInterface multiStage() {
+    SystemInterface system = new SystemSrkEos(373.15, 300.0);
+    system.addComponent("nitrogen", 0.5);
+    system.addComponent("CO2", 2.0);
+    system.addComponent("methane", 45.0);
+    system.addComponent("ethane", 8.0);
+    system.addComponent("propane", 5.0);
+    system.addComponent("i-butane", 1.5);
+    system.addComponent("n-butane", 2.5);
+    system.addComponent("i-pentane", 1.0);
+    system.addComponent("n-pentane", 1.5);
+    system.addComponent("n-hexane", 3.0);
+    system.addComponent("n-heptane", 30.0);
+    system.setMixingRule(2);
+    system.setMultiPhaseCheck(true);
+    return system;
+  }
+
+  private static MultiStageSeparatorTest train() {
+    MultiStageSeparatorTest run = new MultiStageSeparatorTest(multiStage());
+    run.setReservoirConditions(300.0, 100.0);
+    run.addSeparatorStage(50.0, 40.0);
+    run.addSeparatorStage(10.0, 30.0);
+    run.addStockTankStage();
+    return run;
+  }
+
+  private static void stageRows(MultiStageSeparatorTest run) {
+    for (MultiStageSeparatorTest.SeparatorStageResult stage : run.getStageResults()) {
+      String at = "stage_" + stage.getStageNumber() + "_";
+      line(at + "pressure_pa", stage.getPressure() * 1.0e5);
+      line(at + "temperature_k", stage.getTemperature() + 273.15);
+      line(at + "stage_gor", stage.getStageGOR());
+      line(at + "cumulative_gor", stage.getCumulativeGOR());
+      value(at + "gas_volume_m3", stage.getGasRate() / 1.0e5);
+      value(at + "gas_density", stage.getGasDensity());
+      value(at + "oil_density", stage.getOilDensity());
+      value(at + "gas_molar_mass", stage.getGasMW() / 1000.0);
+      value(at + "oil_molar_mass", stage.getOilMW() / 1000.0);
+      value(at + "gas_z_factor", stage.getGasZFactor());
+      value(at + "oil_viscosity", stage.getOilViscosity() / 1000.0);
+    }
+  }
+
+  private static void separator() {
+    System.out.println("separator");
+    double[] temperatures = {323.15, 313.15, 303.15, 288.15};
+    double[] pressures = {50.0, 20.0, 5.0, 1.01325};
+
+    System.out.println("[continuous_binary]");
+    GOR gor = new GOR(binary("methane", 0.70, "nC10", 0.30, 323.15, 50.0));
+    gor.setTemperaturesAndPressures(temperatures, pressures);
+    gor.runCalc();
+    for (int i = 0; i < pressures.length; i++) {
+      String at = "stage_" + (i + 1) + "_";
+      line(at + "pressure_pa", pressures[i] * 1.0e5);
+      line(at + "temperature_k", temperatures[i]);
+      line(at + "stage_gor", gor.getGOR()[i]);
+      line(at + "oil_fvf", gor.getBofactor()[i]);
+    }
+
+    System.out.println("[staged_binary]");
+    SeparatorTest staged = new SeparatorTest(binary("methane", 0.70, "nC10", 0.30, 323.15, 50.0));
+    staged.setSeparatorConditions(temperatures, pressures);
+    staged.runCalc();
+    for (int i = 0; i < pressures.length; i++) {
+      String at = "stage_" + (i + 1) + "_";
+      line(at + "pressure_pa", pressures[i] * 1.0e5);
+      line(at + "temperature_k", temperatures[i]);
+      line(at + "stage_gor", staged.getGOR()[i]);
+      line(at + "oil_fvf", staged.getBofactor()[i]);
+    }
+
+    System.out.println("[train_upstream]");
+    MultiStageSeparatorTest run = train();
+    run.run();
+    line("total_gor", run.getTotalGOR());
+    line("bo", run.getBo());
+    line("rs", run.getRs());
+    line("stock_tank_oil_density", run.getStockTankOilDensity());
+    value("stock_tank_api", run.getStockTankAPIGravity());
+    stageRows(run);
+
+    System.out.println("[train_optimize]");
+    MultiStageSeparatorTest optimized = train();
+    optimized.run();
+    MultiStageSeparatorTest.OptimizationResult best =
+        optimized.optimizeFirstStageSeparator(5.0, 20.0, 3, 20.0, 40.0, 2);
+    line("optimal_stage_pressure_pa", best.getOptimalPressure() * 1.0e5);
+    line("optimal_stage_temperature_k", best.getOptimalTemperature() + 273.15);
+    line("maximum_oil_recovery", best.getMaximumOilRecovery());
+    line("gor_at_optimum", best.getGorAtOptimum());
+    line("bo_at_optimum", best.getBoAtOptimum());
+    value("api_at_optimum", best.getApiAtOptimum());
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -650,6 +750,9 @@ public final class PvtProbe {
         break;
       case "cvd":
         cvd();
+        break;
+      case "separator":
+        separator();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

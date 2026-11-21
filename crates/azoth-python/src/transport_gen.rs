@@ -37,13 +37,13 @@ use crate::record_outputs_gen::{
     PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
     PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
     PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
-    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult,
-    PySilIssue, PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PyTopsidesBreakdownLine, PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow,
-    PyTopsidesProjectLine, PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine,
-    PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine,
-    PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult, PyWaterResultRow,
-    PyZoneRatingRow,
+    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySeparatorStageResult,
+    PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
+    PySts0131FindingResult, PySubFraction, PyTopsidesBreakdownLine, PyTopsidesCapitalLine,
+    PyTopsidesFlag, PyTopsidesMtoRow, PyTopsidesProjectLine, PyTopsidesProjectSummaryLine,
+    PyTopsidesSummaryLine, PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult,
+    PyTypeCostLine, PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult,
+    PyWaterResultRow, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -30971,6 +30971,106 @@ impl From<&azoth_pvt::saturation_test::SaturationTestResult> for PySaturationTes
                 magnitude_si: v,
                 unit: "K".to_string(),
             }),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.separator_test`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SeparatorTestResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySeparatorTestResult {
+    /// the train's total gas-oil ratio.
+    #[pyo3(get)]
+    pub total_gor: Option<f64>,
+    /// the train's oil formation volume factor against the reservoir fluid.
+    #[pyo3(get)]
+    pub bo: Option<f64>,
+    /// the train's Rs, which the class sets to the total GOR.
+    #[pyo3(get)]
+    pub rs: Option<f64>,
+    /// the train's stock-tank oil density.
+    #[pyo3(get)]
+    pub stock_tank_oil_density: Option<PyQty>,
+    /// the train's stock-tank API gravity, inside the class's density band.
+    #[pyo3(get)]
+    pub stock_tank_api: Option<f64>,
+    /// the optimal first-stage pressure.
+    #[pyo3(get)]
+    pub optimal_stage_pressure: Option<PyQty>,
+    /// the optimal first-stage temperature.
+    #[pyo3(get)]
+    pub optimal_stage_temperature: Option<PyQty>,
+    /// `1/Bo` at the optimum.
+    #[pyo3(get)]
+    pub maximum_oil_recovery: Option<f64>,
+    /// the GOR at the optimum.
+    #[pyo3(get)]
+    pub gor_at_optimum: Option<f64>,
+    /// the Bo at the optimum.
+    #[pyo3(get)]
+    pub bo_at_optimum: Option<f64>,
+    /// the API at the optimum.
+    #[pyo3(get)]
+    pub api_at_optimum: Option<f64>,
+    /// one row per stage.
+    #[pyo3(get)]
+    pub stages: Vec<PySeparatorStageResult>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySeparatorTestResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SeparatorTestResult(total_gor={:?}, bo={:?}, rs={:?}, stock_tank_oil_density={:?}, stock_tank_api={:?}, optimal_stage_pressure={:?}, optimal_stage_temperature={:?}, maximum_oil_recovery={:?}, gor_at_optimum={:?}, bo_at_optimum={:?}, api_at_optimum={:?}, stages={:?}, {} warning(s))",
+            self.total_gor,
+            self.bo,
+            self.rs,
+            self.stock_tank_oil_density,
+            self.stock_tank_api,
+            self.optimal_stage_pressure,
+            self.optimal_stage_temperature,
+            self.maximum_oil_recovery,
+            self.gor_at_optimum,
+            self.bo_at_optimum,
+            self.api_at_optimum,
+            self.stages,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::separator_test::SeparatorTestResult> for PySeparatorTestResult {
+    fn from(r: &azoth_pvt::separator_test::SeparatorTestResult) -> Self {
+        Self {
+            total_gor: r.total_gor,
+            bo: r.bo,
+            rs: r.rs,
+            stock_tank_oil_density: r.stock_tank_oil_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            stock_tank_api: r.stock_tank_api,
+            optimal_stage_pressure: r.optimal_stage_pressure.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            optimal_stage_temperature: r.optimal_stage_temperature.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "K".to_string(),
+            }),
+            maximum_oil_recovery: r.maximum_oil_recovery,
+            gor_at_optimum: r.gor_at_optimum,
+            bo_at_optimum: r.bo_at_optimum,
+            api_at_optimum: r.api_at_optimum,
+            stages: r.stages.iter().map(PySeparatorStageResult::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

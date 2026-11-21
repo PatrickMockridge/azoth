@@ -2458,6 +2458,50 @@ class SelfHeatingTimePoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SeparatorStageResult:
+    """one row per stage."""
+
+    #: the stage's 1-based position.
+    stage_number: float
+
+    #: the stage pressure.
+    pressure: Q
+
+    #: the stage temperature.
+    temperature: Q
+
+    #: the gas volume at the standard state, in the train.
+    gas_volume: Q | None
+
+    #: the stage gas-oil ratio.
+    stage_gor: float | None
+
+    #: the gas-oil ratio through this stage, in the train.
+    cumulative_gor: float | None
+
+    #: the stage oil formation factor, in the continuous and staged modes.
+    oil_fvf: float | None
+
+    #: the gas phase's density, in the train.
+    gas_density: Q | None
+
+    #: the oil phase's density at the stage.
+    oil_density: Q | None
+
+    #: the gas phase's molar mass, in the train.
+    gas_molar_mass: Q | None
+
+    #: the oil phase's molar mass, in the train.
+    oil_molar_mass: Q | None
+
+    #: the gas phase's compressibility, in the train.
+    gas_z_factor: float | None
+
+    #: the oil phase's viscosity, in the train.
+    oil_viscosity: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class SettleOutCompartmentResult:
     """one row per compartment, in the caller's order, with its Z and moles."""
 

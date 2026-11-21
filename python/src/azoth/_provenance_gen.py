@@ -4008,6 +4008,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'pvt.separator_test': {
+        "calc_id": 'pvt.separator_test',
+        "name": 'Separator test',
+        "spec": {'path': 'specs/models/pvt/separator_test.toml', 'sha256': '1f684232d24fbe82a9f69b8a1d378f02091b0f2e1336c44aa6bc61123e4c03d3'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/separator_test.py', 'sha256': '8f082dda2363f5978c16ba055051d9e2b83d667c8518fcaa6b6cd500100a7a0c'}, {'path': 'crates/azoth-pvt/src/separator_test.rs', 'sha256': 'cf936369744b757dc973e72071605d651817b542115d09f2ec5cbfbcb66a13a0'}],
+        "source": 'NeqSim pvtsimulation/simulation/{GOR,SeparatorTest,MultiStageSeparatorTest}.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 4,
+        "tests_skipped": 0,
+    },
     'pvt.water_correlations': {
         "calc_id": 'pvt.water_correlations',
         "name": 'Water and brine correlation table',

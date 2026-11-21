@@ -163,11 +163,94 @@ def _cvd(inputs: Mapping[str, Any]) -> dict[str, float]:
     return rows_out
 
 
+def _q(value: Any, unit: str) -> Any:
+    from azoth.core.units import quantity
+
+    return None if value is None else quantity(value, unit)
+
+
+def _separator(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`pvt.separator_test`'s captured quantities, keyed as the capture spells them."""
+    from azoth.core.units import quantity
+
+    from .reference.separator_test import separator_test
+
+    components = [{**row, "moles": quantity(row["moles"], "mol")} for row in inputs["components"]]
+    stages = [
+        {
+            "pressure": quantity(row["pressure"], "Pa"),
+            "temperature": quantity(row["temperature"], "K"),
+        }
+        for row in inputs["stages"]
+    ]
+    result = separator_test(
+        components,
+        inputs["mode"],
+        stages=stages,
+        eos=inputs.get("eos"),
+        mixing_rule=inputs.get("mixing_rule"),
+        reservoir_pressure=_q(inputs.get("reservoir_pressure"), "Pa"),
+        reservoir_temperature=_q(inputs.get("reservoir_temperature"), "K"),
+        optimize_first_stage=inputs.get("optimize_first_stage"),
+        first_stage_pressure_min=_q(inputs.get("first_stage_pressure_min"), "Pa"),
+        first_stage_pressure_max=_q(inputs.get("first_stage_pressure_max"), "Pa"),
+        first_stage_pressure_steps=inputs.get("first_stage_pressure_steps"),
+        first_stage_temperature_min=_q(inputs.get("first_stage_temperature_min"), "K"),
+        first_stage_temperature_max=_q(inputs.get("first_stage_temperature_max"), "K"),
+        first_stage_temperature_steps=inputs.get("first_stage_temperature_steps"),
+    )
+    rows_out: dict[str, float] = {}
+    if result.total_gor is not None:
+        rows_out["total_gor"] = result.total_gor
+    if result.bo is not None:
+        rows_out["bo"] = result.bo
+    if result.rs is not None:
+        rows_out["rs"] = result.rs
+    if result.stock_tank_oil_density is not None:
+        rows_out["stock_tank_oil_density"] = result.stock_tank_oil_density.to("kg/m**3").magnitude
+    if result.stock_tank_api is not None:
+        rows_out["stock_tank_api"] = result.stock_tank_api
+    if result.optimal_stage_pressure is not None:
+        rows_out["optimal_stage_pressure_pa"] = result.optimal_stage_pressure.to("Pa").magnitude
+    if result.optimal_stage_temperature is not None:
+        rows_out["optimal_stage_temperature_k"] = result.optimal_stage_temperature.to("K").magnitude
+    for name in (
+        "maximum_oil_recovery",
+        "gor_at_optimum",
+        "bo_at_optimum",
+        "api_at_optimum",
+    ):
+        value = getattr(result, name)
+        if value is not None:
+            rows_out[name] = float(value)
+    for stage in result.stages:
+        at = f"stage_{stage.stage_number}_"
+        rows_out[at + "pressure_pa"] = stage.pressure.to("Pa").magnitude
+        rows_out[at + "temperature_k"] = stage.temperature.to("K").magnitude
+        for name in ("stage_gor", "cumulative_gor", "oil_fvf", "gas_z_factor"):
+            value = getattr(stage, name)
+            if value is not None:
+                rows_out[at + name] = float(value)
+        for name, unit, suffix in (
+            ("gas_volume", "m**3", "_m3"),
+            ("gas_density", "kg/m**3", ""),
+            ("oil_density", "kg/m**3", ""),
+            ("gas_molar_mass", "kg/mol", ""),
+            ("oil_molar_mass", "kg/mol", ""),
+            ("oil_viscosity", "Pa*s", ""),
+        ):
+            value = getattr(stage, name)
+            if value is not None:
+                rows_out[at + name + suffix] = value.to(unit).magnitude
+    return rows_out
+
+
 #: Models whose per-step arithmetic is dumped by a function here.
 DUMPERS: dict[str, Dumper] = {
     "pvt.constant_mass_expansion": _cce,
     "pvt.differential_liberation": _dle,
     "pvt.constant_volume_depletion": _cvd,
+    "pvt.separator_test": _separator,
 }
 
 #: Record-list models with no interior to dump: every published row is the answer. The value

@@ -20,6 +20,7 @@ use crate::gas_correlations::GasCorrelationsResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
 use crate::saturation_test::SaturationTestResult;
+use crate::separator_test::SeparatorTestResult;
 use crate::water_correlations::WaterCorrelationsResult;
 
 impl CalcResult for BlackOilCorrelationsResult {
@@ -174,6 +175,29 @@ impl CalcResult for SaturationTestResult {
     const CALC_ID: &'static str = "pvt.saturation_test";
     const FIELDS: &'static [&'static str] =
         &["saturation_pressure", "saturation_temperature", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SeparatorTestResult {
+    const CALC_ID: &'static str = "pvt.separator_test";
+    const FIELDS: &'static [&'static str] = &[
+        "total_gor",
+        "bo",
+        "rs",
+        "stock_tank_oil_density",
+        "stock_tank_api",
+        "optimal_stage_pressure",
+        "optimal_stage_temperature",
+        "maximum_oil_recovery",
+        "gor_at_optimum",
+        "bo_at_optimum",
+        "api_at_optimum",
+        "stages",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

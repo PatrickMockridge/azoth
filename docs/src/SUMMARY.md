@@ -378,6 +378,7 @@
   - [Gas material balance](./pvt/gas_material_balance.md)
   - [Oil material balance](./pvt/oil_material_balance.md)
   - [Saturation test](./pvt/saturation_test.md)
+  - [Separator test](./pvt/separator_test.md)
   - [Water and brine correlation table](./pvt/water_correlations.md)
 - [Reactions](./reactions/index.md)
   - [Equilibrium constant of one reaction](./reactions/equilibrium_constant.md)

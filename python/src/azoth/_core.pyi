@@ -1209,6 +1209,12 @@ class GasQuery(TypedDict):
     ppr: float | None
     molar_mass: float | None
 
+class SeparatorStageInput(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    pressure: float
+    temperature: float
+
 class WaterQuery(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -2522,6 +2528,24 @@ class GasResultRow:
     gas_fvf: float | None
     pseudo_pressure: float | None
     h2s_fraction: float | None
+
+@final
+class SeparatorStageResult:
+    """one row per stage."""
+
+    stage_number: float
+    pressure: Qty
+    temperature: Qty
+    gas_volume: Qty | None
+    stage_gor: float | None
+    cumulative_gor: float | None
+    oil_fvf: float | None
+    gas_density: Qty | None
+    oil_density: Qty | None
+    gas_molar_mass: Qty | None
+    oil_molar_mass: Qty | None
+    gas_z_factor: float | None
+    oil_viscosity: Qty | None
 
 @final
 class WaterResultRow:
@@ -6905,6 +6929,22 @@ class SaturationTestResult:
     warnings: list[Warning]
 
 @final
+class SeparatorTestResult:
+    total_gor: float | None
+    bo: float | None
+    rs: float | None
+    stock_tank_oil_density: Qty | None
+    stock_tank_api: float | None
+    optimal_stage_pressure: Qty | None
+    optimal_stage_temperature: Qty | None
+    maximum_oil_recovery: float | None
+    gor_at_optimum: float | None
+    bo_at_optimum: float | None
+    api_at_optimum: float | None
+    stages: list[SeparatorStageResult]
+    warnings: list[Warning]
+
+@final
 class WaterCorrelationsResult:
     queries: list[WaterResultRow]
     warnings: list[Warning]
@@ -11128,6 +11168,23 @@ def saturation_test(
     temperature_search_min: float | None = None,
     temperature_search_max: float | None = None,
 ) -> SaturationTestResult: ...
+def separator_test(
+    components: list[FluidComponent],
+    mode: str,
+    stages: list[SeparatorStageInput],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    reservoir_pressure: float | None = None,
+    reservoir_temperature: float | None = None,
+    optimize_first_stage: bool | None = None,
+    first_stage_pressure_min: float | None = None,
+    first_stage_pressure_max: float | None = None,
+    first_stage_pressure_steps: float | None = None,
+    first_stage_temperature_min: float | None = None,
+    first_stage_temperature_max: float | None = None,
+    first_stage_temperature_steps: float | None = None,
+) -> SeparatorTestResult: ...
 def water_correlations(queries: list[WaterQuery]) -> WaterCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],

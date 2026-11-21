@@ -382,6 +382,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyGasMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyOilMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PySaturationTestResult>()?;
+    m.add_class::<crate::transport_gen::PySeparatorTestResult>()?;
     m.add_class::<crate::transport_gen::PyWaterCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
     m.add_class::<crate::transport_gen::PyEquilibriumConstantResult>()?;
@@ -497,6 +498,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyScenarioChangeRow>()?;
     m.add_class::<crate::record_outputs_gen::PyScenarioIndexRow>()?;
     m.add_class::<crate::record_outputs_gen::PySelfHeatingTimePoint>()?;
+    m.add_class::<crate::record_outputs_gen::PySeparatorStageResult>()?;
     m.add_class::<crate::record_outputs_gen::PySettleOutCompartmentResult>()?;
     m.add_class::<crate::record_outputs_gen::PySilIssue>()?;
     m.add_class::<crate::record_outputs_gen::PySterileRadius>()?;
@@ -1391,6 +1393,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::saturation_test, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator_test, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::water_correlations,
         m

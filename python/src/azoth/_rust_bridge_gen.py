@@ -420,6 +420,8 @@ from azoth.core.result import (
     SeparatorCapacityAssessmentResult,
     SeparatorPerformanceResult,
     SeparatorResult,
+    SeparatorStageResult,
+    SeparatorTestResult,
     SetHeavyTbpToPlusResult,
     SettleOutCompartmentResult,
     SettleOutPressureResult,
@@ -870,6 +872,7 @@ __all__ = [
     "separator",
     "separator_capacity_assessment",
     "separator_performance",
+    "separator_test",
     "set_heavy_tbp_to_plus",
     "settle_out_pressure",
     "shah_condensation",
@@ -10697,6 +10700,43 @@ def saturation_test(components: Sequence[Mapping[str, Any]], mode: str, *, eos: 
     return SaturationTestResult(
         saturation_pressure=None if result.saturation_pressure is None else from_si(result.saturation_pressure.magnitude_si, result.saturation_pressure.unit),
         saturation_temperature=None if result.saturation_temperature is None else from_si(result.saturation_temperature.magnitude_si, result.saturation_temperature.unit),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def separator_test(components: Sequence[Mapping[str, Any]], mode: str, *, stages: Sequence[Mapping[str, Any]], eos: str | None=None, mixing_rule: str | None=None, volume_correction: bool | None=None, reservoir_pressure: Any=None, reservoir_temperature: Any=None, optimize_first_stage: bool | None=None, first_stage_pressure_min: Any=None, first_stage_pressure_max: Any=None, first_stage_pressure_steps: Any=None, first_stage_temperature_min: Any=None, first_stage_temperature_max: Any=None, first_stage_temperature_steps: Any=None) -> SeparatorTestResult:
+    """``pvt.separator_test``, computed in Rust."""
+    spec = _models_gen.model("pvt.separator_test")
+    result = _core.separator_test(
+        input_records_to_si(spec, "components", components),
+        mode,
+        input_records_to_si(spec, "stages", stages),
+        eos,
+        mixing_rule,
+        volume_correction,
+        None if reservoir_pressure is None else _si(spec, "reservoir_pressure", reservoir_pressure),
+        None if reservoir_temperature is None else _si(spec, "reservoir_temperature", reservoir_temperature),
+        optimize_first_stage,
+        None if first_stage_pressure_min is None else _si(spec, "first_stage_pressure_min", first_stage_pressure_min),
+        None if first_stage_pressure_max is None else _si(spec, "first_stage_pressure_max", first_stage_pressure_max),
+        None if first_stage_pressure_steps is None else _count("first_stage_pressure_steps", first_stage_pressure_steps),
+        None if first_stage_temperature_min is None else _si(spec, "first_stage_temperature_min", first_stage_temperature_min),
+        None if first_stage_temperature_max is None else _si(spec, "first_stage_temperature_max", first_stage_temperature_max),
+        None if first_stage_temperature_steps is None else _count("first_stage_temperature_steps", first_stage_temperature_steps),
+    )
+    return SeparatorTestResult(
+        total_gor=result.total_gor,
+        bo=result.bo,
+        rs=result.rs,
+        stock_tank_oil_density=None if result.stock_tank_oil_density is None else from_si(result.stock_tank_oil_density.magnitude_si, result.stock_tank_oil_density.unit),
+        stock_tank_api=result.stock_tank_api,
+        optimal_stage_pressure=None if result.optimal_stage_pressure is None else from_si(result.optimal_stage_pressure.magnitude_si, result.optimal_stage_pressure.unit),
+        optimal_stage_temperature=None if result.optimal_stage_temperature is None else from_si(result.optimal_stage_temperature.magnitude_si, result.optimal_stage_temperature.unit),
+        maximum_oil_recovery=result.maximum_oil_recovery,
+        gor_at_optimum=result.gor_at_optimum,
+        bo_at_optimum=result.bo_at_optimum,
+        api_at_optimum=result.api_at_optimum,
+        stages=tuple(SeparatorStageResult(stage_number=c.stage_number, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), gas_volume=None if c.gas_volume is None else from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), stage_gor=c.stage_gor, cumulative_gor=c.cumulative_gor, oil_fvf=c.oil_fvf, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), oil_density=None if c.oil_density is None else from_si(c.oil_density.magnitude_si, c.oil_density.unit), gas_molar_mass=None if c.gas_molar_mass is None else from_si(c.gas_molar_mass.magnitude_si, c.gas_molar_mass.unit), oil_molar_mass=None if c.oil_molar_mass is None else from_si(c.oil_molar_mass.magnitude_si, c.oil_molar_mass.unit), gas_z_factor=c.gas_z_factor, oil_viscosity=None if c.oil_viscosity is None else from_si(c.oil_viscosity.magnitude_si, c.oil_viscosity.unit)) for c in result.stages),
         warnings=_warnings(result.warnings),
     )
 

@@ -364,6 +364,7 @@
 //!   - specs/models/pvt/gas_material_balance.toml
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/saturation_test.toml
+//!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
@@ -6922,6 +6923,34 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "pvt.saturation_test",
         "temperature_search_max",
         "thermodynamic_temperature",
+    ),
+    ("pvt.separator_test", "reservoir_pressure", "pressure"),
+    (
+        "pvt.separator_test",
+        "reservoir_temperature",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.separator_test", "first_stage_pressure_min", "pressure"),
+    ("pvt.separator_test", "first_stage_pressure_max", "pressure"),
+    (
+        "pvt.separator_test",
+        "first_stage_pressure_steps",
+        "dimensionless",
+    ),
+    (
+        "pvt.separator_test",
+        "first_stage_temperature_min",
+        "thermodynamic_temperature",
+    ),
+    (
+        "pvt.separator_test",
+        "first_stage_temperature_max",
+        "thermodynamic_temperature",
+    ),
+    (
+        "pvt.separator_test",
+        "first_stage_temperature_steps",
+        "dimensionless",
     ),
     (
         "reactions.chemical_equilibrium",

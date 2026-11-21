@@ -30,6 +30,7 @@ from azoth.core.result import (
     GasMaterialBalanceResult,
     OilMaterialBalanceResult,
     SaturationTestResult,
+    SeparatorTestResult,
     WaterCorrelationsResult,
 )
 from azoth.pvt import layers as layers
@@ -43,6 +44,7 @@ _GAS_CORRELATIONS = "pvt.gas_correlations"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
 _SATURATION_TEST = "pvt.saturation_test"
+_SEPARATOR_TEST = "pvt.separator_test"
 _WATER_CORRELATIONS = "pvt.water_correlations"
 
 __all__ = [
@@ -56,6 +58,7 @@ __all__ = [
     "layers",
     "oil_material_balance",
     "saturation_test",
+    "separator_test",
     "water_correlations",
 ]
 
@@ -157,6 +160,61 @@ def constant_volume_depletion(
         temperature=temperature,
         pressures=pressures,
         volume_correction=volume_correction,
+    )
+
+
+def separator_test(
+    components: Sequence[Mapping[str, Any]],
+    mode: str,
+    *,
+    stages: Sequence[Mapping[str, Any]],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+    reservoir_pressure: Any = None,
+    reservoir_temperature: Any = None,
+    optimize_first_stage: bool | None = None,
+    first_stage_pressure_min: Any = None,
+    first_stage_pressure_max: Any = None,
+    first_stage_pressure_steps: Any = None,
+    first_stage_temperature_min: Any = None,
+    first_stage_temperature_max: Any = None,
+    first_stage_temperature_steps: Any = None,
+) -> SeparatorTestResult:
+    """The separator experiment over the stated stages.
+
+    ``mode`` is ``"continuous"`` (the GOR class, every stage reflashing the full feed),
+    ``"staged"`` (the gas leaves and the liquid cascades) or ``"train"`` (the multi-stage
+    train, which needs the reservoir conditions and may optimise its first stage over a
+    pressure/temperature grid). ``stages`` is the stage record list, each with a pressure in
+    Pa and a temperature in K.
+
+    Returns:
+        One ``stages`` row per stage, and in the train the total GOR, Bo, Rs, stock-tank
+        density and API - plus the optimum's fields when the optimisation ran.
+
+    Raises:
+        InvalidInputError: for an unknown ``mode``, no stages, a non-positive pressure or
+            temperature, a missing reservoir condition, or a bad optimisation grid.
+
+    See :func:`azoth.pvt.reference.separator_test.separator_test`.
+    """
+    return resolve(_SEPARATOR_TEST)(  # type: ignore[no-any-return]
+        components=components,
+        mode=mode,
+        stages=stages,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        volume_correction=volume_correction,
+        reservoir_pressure=reservoir_pressure,
+        reservoir_temperature=reservoir_temperature,
+        optimize_first_stage=optimize_first_stage,
+        first_stage_pressure_min=first_stage_pressure_min,
+        first_stage_pressure_max=first_stage_pressure_max,
+        first_stage_pressure_steps=first_stage_pressure_steps,
+        first_stage_temperature_min=first_stage_temperature_min,
+        first_stage_temperature_max=first_stage_temperature_max,
+        first_stage_temperature_steps=first_stage_temperature_steps,
     )
 
 

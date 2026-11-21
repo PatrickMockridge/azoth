@@ -10477,6 +10477,91 @@ pub fn saturation_test(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Separator test.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (components, mode, stages, eos, mixing_rule, volume_correction, reservoir_pressure, reservoir_temperature, optimize_first_stage, first_stage_pressure_min, first_stage_pressure_max, first_stage_pressure_steps, first_stage_temperature_min, first_stage_temperature_max, first_stage_temperature_steps))]
+#[pyo3(
+    text_signature = "(components, mode, stages, eos, mixing_rule, volume_correction, reservoir_pressure, reservoir_temperature, optimize_first_stage, first_stage_pressure_min, first_stage_pressure_max, first_stage_pressure_steps, first_stage_temperature_min, first_stage_temperature_max, first_stage_temperature_steps)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn separator_test(
+    py: Python<'_>,
+    components: Vec<crate::records_gen::FluidComponent>,
+    mode: &str,
+    stages: Vec<crate::records_gen::SeparatorStageInput>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    volume_correction: Option<bool>,
+    reservoir_pressure: Option<f64>,
+    reservoir_temperature: Option<f64>,
+    optimize_first_stage: Option<bool>,
+    first_stage_pressure_min: Option<f64>,
+    first_stage_pressure_max: Option<f64>,
+    first_stage_pressure_steps: Option<usize>,
+    first_stage_temperature_min: Option<f64>,
+    first_stage_temperature_max: Option<f64>,
+    first_stage_temperature_steps: Option<usize>,
+) -> PyResult<crate::transport_gen::PySeparatorTestResult> {
+    let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
+        .into_iter()
+        .map(
+            |row| azoth_characterization::component_row::FluidComponent {
+                fluid: row.fluid,
+                name: row.name,
+                pseudo_component: row.pseudo_component,
+                moles: row.moles,
+                molar_mass: row.molar_mass,
+                density: row.density,
+                normal_boiling_point: row.normal_boiling_point,
+                critical_temperature: row.critical_temperature,
+                critical_pressure: row.critical_pressure,
+                acentric_factor: row.acentric_factor,
+                critical_volume: row.critical_volume,
+                racket_z: row.racket_z,
+                racket_z_cpa: row.racket_z_cpa,
+                parachor: row.parachor,
+                critical_viscosity: row.critical_viscosity,
+                triple_point_temperature: row.triple_point_temperature,
+                heat_of_fusion: row.heat_of_fusion,
+                ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                cp_a: row.cp_a,
+                cp_b: row.cp_b,
+                cp_c: row.cp_c,
+                cp_d: row.cp_d,
+                attractive_m: row.attractive_m,
+            },
+        )
+        .collect();
+    let stages_records: Vec<azoth_pvt::separator_test::SeparatorStageInput> = stages
+        .into_iter()
+        .map(|row| azoth_pvt::separator_test::SeparatorStageInput {
+            pressure: row.pressure,
+            temperature: row.temperature,
+        })
+        .collect();
+    azoth_pvt::separator_test::separator_test(
+        &components_records,
+        mode,
+        &stages_records,
+        eos,
+        mixing_rule,
+        volume_correction,
+        reservoir_pressure.map(pascals),
+        reservoir_temperature.map(kelvins),
+        optimize_first_stage,
+        first_stage_pressure_min.map(pascals),
+        first_stage_pressure_max.map(pascals),
+        first_stage_pressure_steps,
+        first_stage_temperature_min.map(kelvins),
+        first_stage_temperature_max.map(kelvins),
+        first_stage_temperature_steps,
+    )
+    .map(|r| crate::transport_gen::PySeparatorTestResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Water and brine correlation table.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

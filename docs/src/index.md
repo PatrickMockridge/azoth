@@ -475,6 +475,7 @@ Five sections, and the difference between them is the point:
 - [`pvt.gas_material_balance`](./pvt/gas_material_balance.md) — Gas material balance
 - [`pvt.oil_material_balance`](./pvt/oil_material_balance.md) — Oil material balance
 - [`pvt.saturation_test`](./pvt/saturation_test.md) — Saturation test
+- [`pvt.separator_test`](./pvt/separator_test.md) — Separator test
 - [`pvt.water_correlations`](./pvt/water_correlations.md) — Water and brine correlation table
 
 **Reactions** - [`reactions/index.md`](./reactions/index.md):
