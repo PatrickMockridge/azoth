@@ -3436,6 +3436,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 9,
         "tests_skipped": 0,
     },
+    'process.process_cost_estimate': {
+        "calc_id": 'process.process_cost_estimate',
+        "name": 'Process cost estimate',
+        "spec": {'path': 'specs/models/process/process_cost_estimate.toml', 'sha256': '1b055f456b6b9ead7c42571a321cc5a75d5d99779accc5cebb2a1831674eafcc'},
+        "code": [{'path': 'python/src/azoth/process/reference/process_cost_estimate.py', 'sha256': '56a096553e09912cc5afc74d76d9f23051b03dfab16d5fa28de0806360bc98a6'}, {'path': 'crates/azoth-process/src/models/process_cost_estimate.rs', 'sha256': 'e37ebb71a6b38964aabd09f6c00cd5569f2a36db8183348c0c05d90bd67d6bda'}],
+        "source": 'NeqSim process/costestimation/ProcessCostEstimate.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 1,
+        "tests_skipped": 0,
+    },
     'process.psv_fire_sizing': {
         "calc_id": 'process.psv_fire_sizing',
         "name": 'PSV fire sizing',

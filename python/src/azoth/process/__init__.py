@@ -109,6 +109,7 @@ from azoth.core.result import (
     PorousMediaSelfHeatingResult,
     PrescribedSlipReleaseResult,
     ProbitResult,
+    ProcessCostEstimateResult,
     PsvFireSizingResult,
     PsvSizingResult,
     PsvValveResult,
@@ -346,6 +347,7 @@ _GAUSSIAN_PLUME = "process.gaussian_plume"
 _HAZARDOUS_AREA = "process.hazardous_area"
 _HEAVY_GAS_DISPERSION = "process.heavy_gas_dispersion"
 _PROBIT = "process.probit"
+_PROCESS_COST_ESTIMATE = "process.process_cost_estimate"
 _PSV_FIRE_SIZING = "process.psv_fire_sizing"
 _PSV_SIZING = "process.psv_sizing"
 _PSV_VALVE = "process.psv_valve"
@@ -4648,6 +4650,50 @@ def psv_fire_sizing(
         blowdown_percent=blowdown_percent,
         orifice_area=orifice_area,
         cv_discharge_coefficient=cv_discharge_coefficient,
+    )
+
+
+def process_cost_estimate(
+    equipment: list[dict[str, object]],
+    location_factor: float | None = None,
+    complexity_factor: float | None = None,
+    project_contingency: float | None = None,
+    working_capital: float | None = None,
+    system_total_weight: Q | None = None,
+    capex_per_weight: float | None = None,
+    operating_hours: Q | None = None,
+    electricity_cost_per_kwh: float | None = None,
+    steam_cost_per_tonne: float | None = None,
+    cooling_water_cost_per_m3: float | None = None,
+    labor_cost_per_hour: float | None = None,
+    annual_revenue: float | None = None,
+    discount_rate: float | None = None,
+    project_life_years: float | None = None,
+) -> ProcessCostEstimateResult:
+    """The process cost roll-up over per-unit summary rows.
+
+    The totals, the type and discipline splits, the project stack, the operating
+    cost and the simple economics. **The rows are the class's own per-unit
+    summaries**, so the live process walk stays beside the port.
+
+    See :func:`azoth.process.reference.process_cost_estimate`.
+    """
+    return resolve(_PROCESS_COST_ESTIMATE)(  # type: ignore[no-any-return]
+        equipment=equipment,
+        location_factor=location_factor,
+        complexity_factor=complexity_factor,
+        project_contingency=project_contingency,
+        working_capital=working_capital,
+        system_total_weight=system_total_weight,
+        capex_per_weight=capex_per_weight,
+        operating_hours=operating_hours,
+        electricity_cost_per_kwh=electricity_cost_per_kwh,
+        steam_cost_per_tonne=steam_cost_per_tonne,
+        cooling_water_cost_per_m3=cooling_water_cost_per_m3,
+        labor_cost_per_hour=labor_cost_per_hour,
+        annual_revenue=annual_revenue,
+        discount_rate=discount_rate,
+        project_life_years=project_life_years,
     )
 
 

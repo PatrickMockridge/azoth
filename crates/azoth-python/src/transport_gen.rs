@@ -18,8 +18,8 @@ use crate::record_outputs_gen::{
     PyBubbleTransferZoneReleaseStation, PyCharacterizationComponent, PyChemicalWarningRow,
     PyComponentSelectiveReleaseStation, PyConsequenceOutcomeResult, PyCostBomRow,
     PyCostEstimationResultRow, PyDepositionSegmentRow, PyDepressurizationPoint,
-    PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery, PyEnvelopeSummary,
-    PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
+    PyDisciplineCostLine, PyDriftFluxReleaseStation, PyEnvelopePoint, PyEnvelopeQuery,
+    PyEnvelopeSummary, PyEquilibriumSoundSpeedSample, PyEquipmentCostResultRow, PyEquipmentMtoRow,
     PyEquipmentQualityFlag, PyEscalationItemResult, PyEsdContribution, PyEventTreeOutcome,
     PyFiniteRateReleaseStation, PyFlowlineScaleSegment, PyFmeaRankedEntry, PyHazopPopulationRow,
     PyHazopTemplateDeviation, PyHeatExchangerMechanicalType, PyHeaterInstrument,
@@ -28,17 +28,18 @@ use crate::record_outputs_gen::{
     PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint, PyLegacyScreeningReleaseStation,
     PyLopaLayerContribution, PyMahBarrier, PyMahConsequence, PyMahThreat, PyMineralEquilibriumRow,
     PyMinimalCutSet, PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
-    PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyP002FindingResult,
-    PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument, PyPerformanceSif,
-    PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation, PyPulsationModeResult,
-    PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation, PyRegisterFinding,
-    PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment, PyReviewCoverage,
-    PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
+    PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyOperatingCostLine,
+    PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument,
+    PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
+    PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
+    PyPulsationModeResult, PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation,
+    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
+    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
     PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
     PyScenarioIndexRow, PySelfHeatingTimePoint, PySettleOutCompartmentResult, PySilIssue,
     PySterileRadius, PyStreamScaleMineralRow, PySts0131FindingResult, PySubFraction,
-    PyTr3001Finding, PyTrappedInventorySegmentResult, PyVesselFillingPoint, PyVesselRuptureStep,
-    PyWaterMixingResult, PyZoneRatingRow,
+    PyTr3001Finding, PyTrappedInventorySegmentResult, PyTypeCostLine, PyVesselFillingPoint,
+    PyVesselRuptureStep, PyWaterMixingResult, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -24112,6 +24113,180 @@ impl From<&azoth_process::models::probit::ProbitResult> for PyProbitResult {
         Self {
             probit: r.probit,
             probability: r.probability,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `process.process_cost_estimate`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ProcessCostEstimateResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyProcessCostEstimateResult {
+    /// the located purchased equipment cost, USD.
+    #[pyo3(get)]
+    pub total_purchased_equipment_cost: f64,
+    /// the located bare module cost, USD.
+    #[pyo3(get)]
+    pub total_bare_module_cost: f64,
+    /// the located total module cost, USD.
+    #[pyo3(get)]
+    pub total_module_cost: f64,
+    /// the grass roots cost after the complexity factor, USD.
+    #[pyo3(get)]
+    pub total_grass_roots_cost: f64,
+    /// the summed installation labour hours.
+    #[pyo3(get)]
+    pub total_installation_man_hours: PyQty,
+    /// one summary row per input row.
+    #[pyo3(get)]
+    pub equipment: Vec<PyProcessCostEquipmentResult>,
+    /// the located purchased cost by type, in first-appearance order.
+    #[pyo3(get)]
+    pub cost_by_equipment_type: Vec<PyTypeCostLine>,
+    /// the five discipline lines.
+    #[pyo3(get)]
+    pub cost_by_discipline: Vec<PyDisciplineCostLine>,
+    /// the project cost stack, direct to total.
+    #[pyo3(get)]
+    pub project_costs: Vec<PyProjectCostLine>,
+    /// the total project cost, USD.
+    #[pyo3(get)]
+    pub total_project_cost: f64,
+    /// the nine operating-cost lines, empty when no operating basis is stated.
+    #[pyo3(get)]
+    pub operating_costs: Vec<PyOperatingCostLine>,
+    /// whether the operating-cost block is present.
+    #[pyo3(get)]
+    pub has_operating_cost: bool,
+    /// the sum of the operating-cost lines, USD/year.
+    #[pyo3(get)]
+    pub total_annual_operating_cost: f64,
+    /// whether the payback, ROI and NPV are present.
+    #[pyo3(get)]
+    pub has_economics: bool,
+    /// the payback period, years; zero where it is absent, and `has_economics` says which.
+    #[pyo3(get)]
+    pub payback_period_years: f64,
+    /// the return on investment, per cent.
+    #[pyo3(get)]
+    pub roi_percent: f64,
+    /// the net present value, USD.
+    #[pyo3(get)]
+    pub npv: f64,
+    /// the sum of the rows' total costs.
+    #[pyo3(get)]
+    pub summed_unit_total_cost: f64,
+    /// whether a system weight was stated.
+    #[pyo3(get)]
+    pub has_weight_based_capex: bool,
+    /// the system weight times the coefficient, kNOK.
+    #[pyo3(get)]
+    pub weight_based_capex: f64,
+    /// the per-unit material take-off rows.
+    #[pyo3(get)]
+    pub material_take_off: Vec<PyProcessCostMtoRow>,
+    /// the class's quality flags.
+    #[pyo3(get)]
+    pub quality_flags: Vec<PyProcessCostFlag>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyProcessCostEstimateResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "ProcessCostEstimateResult(total_purchased_equipment_cost={:?}, total_bare_module_cost={:?}, total_module_cost={:?}, total_grass_roots_cost={:?}, total_installation_man_hours={:?}, equipment={:?}, cost_by_equipment_type={:?}, cost_by_discipline={:?}, project_costs={:?}, total_project_cost={:?}, operating_costs={:?}, has_operating_cost={:?}, total_annual_operating_cost={:?}, has_economics={:?}, payback_period_years={:?}, roi_percent={:?}, npv={:?}, summed_unit_total_cost={:?}, has_weight_based_capex={:?}, weight_based_capex={:?}, material_take_off={:?}, quality_flags={:?}, {} warning(s))",
+            self.total_purchased_equipment_cost,
+            self.total_bare_module_cost,
+            self.total_module_cost,
+            self.total_grass_roots_cost,
+            self.total_installation_man_hours,
+            self.equipment,
+            self.cost_by_equipment_type,
+            self.cost_by_discipline,
+            self.project_costs,
+            self.total_project_cost,
+            self.operating_costs,
+            self.has_operating_cost,
+            self.total_annual_operating_cost,
+            self.has_economics,
+            self.payback_period_years,
+            self.roi_percent,
+            self.npv,
+            self.summed_unit_total_cost,
+            self.has_weight_based_capex,
+            self.weight_based_capex,
+            self.material_take_off,
+            self.quality_flags,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_process::models::process_cost_estimate::ProcessCostEstimateResult>
+    for PyProcessCostEstimateResult
+{
+    fn from(r: &azoth_process::models::process_cost_estimate::ProcessCostEstimateResult) -> Self {
+        Self {
+            total_purchased_equipment_cost: r.total_purchased_equipment_cost,
+            total_bare_module_cost: r.total_bare_module_cost,
+            total_module_cost: r.total_module_cost,
+            total_grass_roots_cost: r.total_grass_roots_cost,
+            total_installation_man_hours: PyQty {
+                magnitude_si: r.total_installation_man_hours,
+                unit: "h".to_string(),
+            },
+            equipment: r
+                .equipment
+                .iter()
+                .map(PyProcessCostEquipmentResult::from)
+                .collect(),
+            cost_by_equipment_type: r
+                .cost_by_equipment_type
+                .iter()
+                .map(PyTypeCostLine::from)
+                .collect(),
+            cost_by_discipline: r
+                .cost_by_discipline
+                .iter()
+                .map(PyDisciplineCostLine::from)
+                .collect(),
+            project_costs: r
+                .project_costs
+                .iter()
+                .map(PyProjectCostLine::from)
+                .collect(),
+            total_project_cost: r.total_project_cost,
+            operating_costs: r
+                .operating_costs
+                .iter()
+                .map(PyOperatingCostLine::from)
+                .collect(),
+            has_operating_cost: r.has_operating_cost,
+            total_annual_operating_cost: r.total_annual_operating_cost,
+            has_economics: r.has_economics,
+            payback_period_years: r.payback_period_years,
+            roi_percent: r.roi_percent,
+            npv: r.npv,
+            summed_unit_total_cost: r.summed_unit_total_cost,
+            has_weight_based_capex: r.has_weight_based_capex,
+            weight_based_capex: r.weight_based_capex,
+            material_take_off: r
+                .material_take_off
+                .iter()
+                .map(PyProcessCostMtoRow::from)
+                .collect(),
+            quality_flags: r
+                .quality_flags
+                .iter()
+                .map(PyProcessCostFlag::from)
+                .collect(),
             warnings: transport(&r.warnings),
         }
     }

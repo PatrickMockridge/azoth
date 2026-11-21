@@ -91,6 +91,7 @@
 //!   - specs/models/process/porous_media_self_heating.toml
 //!   - specs/models/process/prescribed_slip_release.toml
 //!   - specs/models/process/probit.toml
+//!   - specs/models/process/process_cost_estimate.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/psv_valve.toml

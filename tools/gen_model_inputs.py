@@ -540,6 +540,9 @@ NON_UNIT_MODELS = {
     "process.equipment_cost_estimate": (
         "one equipment item's cost stack over stated design values, not a unit"
     ),
+    "process.process_cost_estimate": (
+        "a process cost roll-up over per-unit summary rows, not a unit"
+    ),
 }
 
 

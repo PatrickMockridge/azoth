@@ -1149,6 +1149,33 @@ pub struct PipeFitting {
 
 /// One row of a `record_list` input, extracted from the mapping a caller passes.
 #[derive(Debug, Clone, Default, FromPyObject)]
+pub struct ProcessCostEquipment {
+    #[pyo3(item)]
+    pub name: String,
+    #[pyo3(item)]
+    pub equipment_class: String,
+    #[pyo3(item)]
+    pub purchased_equipment_cost: f64,
+    #[pyo3(item)]
+    pub bare_module_cost: f64,
+    #[pyo3(item)]
+    pub total_module_cost: f64,
+    #[pyo3(item)]
+    pub grass_roots_cost: f64,
+    #[pyo3(item)]
+    pub total_cost: f64,
+    #[pyo3(item)]
+    pub installation_man_hours: f64,
+    #[pyo3(item)]
+    pub weight: f64,
+    #[pyo3(item)]
+    pub power: Option<f64>,
+    #[pyo3(item)]
+    pub duty: Option<f64>,
+}
+
+/// One row of a `record_list` input, extracted from the mapping a caller passes.
+#[derive(Debug, Clone, Default, FromPyObject)]
 pub struct ProductionChemicalDose {
     #[pyo3(item)]
     pub chemical_type: String,

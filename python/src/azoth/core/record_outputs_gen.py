@@ -393,6 +393,17 @@ class DepressurizationPoint:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class DisciplineCostLine:
+    """the five discipline lines."""
+
+    #: the discipline.
+    name: str
+
+    #: the discipline's cost.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DriftFluxReleaseStation:
     """the base stations, with the opening's phase velocities solved. Empty on failure."""
 
@@ -1471,6 +1482,17 @@ class OpenDrainResult:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class OperatingCostLine:
+    """the nine operating-cost lines, empty when no operating basis is stated."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's annual cost, USD.
+    cost: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class P002FindingResult:
     """one row per check, in the caller's order."""
 
@@ -1740,6 +1762,83 @@ class PrescribedSlipReleaseStation:
 
     #: the partitioned liquid velocity at the opening and the two-phase ambient; absent elsewhere.
     liquid_velocity: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ProcessCostEquipmentResult:
+    """one summary row per input row."""
+
+    #: the unit's name.
+    name: str
+
+    #: the Java class simple name.
+    equipment_class: str
+
+    #: the type category the class-name chain gives.
+    equipment_type: str
+
+    #: the unit's purchased cost.
+    purchased_equipment_cost: float
+
+    #: the unit's bare module cost.
+    bare_module_cost: float
+
+    #: the unit's total module cost.
+    total_module_cost: float
+
+    #: the unit's grass roots cost.
+    grass_roots_cost: float
+
+    #: the unit's total cost.
+    total_cost: float
+
+    #: the unit's installation labour hours.
+    installation_man_hours: Q
+
+    #: the unit's weight.
+    weight: Q
+
+    #: the purchased cost times the location factor.
+    located_purchased_equipment_cost: float
+
+    #: the location factor applied.
+    location_factor: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ProcessCostFlag:
+    """the class's quality flags."""
+
+    #: the flag's message.
+    message: str
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ProcessCostMtoRow:
+    """the per-unit material take-off rows."""
+
+    #: the unit's name.
+    name: str
+
+    #: the type category.
+    equipment_type: str
+
+    #: the unit's weight.
+    weight_kg: Q
+
+    #: the unit's located purchased cost.
+    cost_usd: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ProjectCostLine:
+    """the project cost stack, direct to total."""
+
+    #: the line's name.
+    name: str
+
+    #: the line's cost.
+    cost: float
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -2308,6 +2407,17 @@ class TrappedInventorySegmentResult:
 
     #: the pipe's length, echoed.
     length: Q | None
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class TypeCostLine:
+    """the located purchased cost by type, in first-appearance order."""
+
+    #: the type category.
+    name: str
+
+    #: the located purchased cost of the type.
+    cost: float
 
 
 @dataclass(frozen=True, slots=True, eq=False)

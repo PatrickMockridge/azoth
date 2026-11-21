@@ -330,6 +330,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyPorousMediaSelfHeatingResult>()?;
     m.add_class::<crate::transport_gen::PyPrescribedSlipReleaseResult>()?;
     m.add_class::<crate::transport_gen::PyProbitResult>()?;
+    m.add_class::<crate::transport_gen::PyProcessCostEstimateResult>()?;
     m.add_class::<crate::transport_gen::PyPsvFireSizingResult>()?;
     m.add_class::<crate::transport_gen::PyPsvSizingResult>()?;
     m.add_class::<crate::transport_gen::PyPsvValveResult>()?;
@@ -408,6 +409,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyCostEstimationResultRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepositionSegmentRow>()?;
     m.add_class::<crate::record_outputs_gen::PyDepressurizationPoint>()?;
+    m.add_class::<crate::record_outputs_gen::PyDisciplineCostLine>()?;
     m.add_class::<crate::record_outputs_gen::PyDriftFluxReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyEnvelopePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyEnvelopeQuery>()?;
@@ -449,6 +451,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyNonEquilibriumBlowdownPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyOpenDrainAssessment>()?;
     m.add_class::<crate::record_outputs_gen::PyOpenDrainResult>()?;
+    m.add_class::<crate::record_outputs_gen::PyOperatingCostLine>()?;
     m.add_class::<crate::record_outputs_gen::PyP002FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PyPerformanceAssessment>()?;
     m.add_class::<crate::record_outputs_gen::PyPerformanceFinding>()?;
@@ -456,6 +459,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyPerformanceSif>()?;
     m.add_class::<crate::record_outputs_gen::PyPipeFireRupturePoint>()?;
     m.add_class::<crate::record_outputs_gen::PyPrescribedSlipReleaseStation>()?;
+    m.add_class::<crate::record_outputs_gen::PyProcessCostEquipmentResult>()?;
+    m.add_class::<crate::record_outputs_gen::PyProcessCostFlag>()?;
+    m.add_class::<crate::record_outputs_gen::PyProcessCostMtoRow>()?;
+    m.add_class::<crate::record_outputs_gen::PyProjectCostLine>()?;
     m.add_class::<crate::record_outputs_gen::PyPulsationModeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyRanzMarshallReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyRealGasFannoReleaseStation>()?;
@@ -482,6 +489,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
     m.add_class::<crate::record_outputs_gen::PyTr3001Finding>()?;
     m.add_class::<crate::record_outputs_gen::PyTrappedInventorySegmentResult>()?;
+    m.add_class::<crate::record_outputs_gen::PyTypeCostLine>()?;
     m.add_class::<crate::record_outputs_gen::PyVesselFillingPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyVesselRuptureStep>()?;
     m.add_class::<crate::record_outputs_gen::PyWaterMixingResult>()?;
@@ -1237,6 +1245,10 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::probit, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        crate::wrappers_gen::process_cost_estimate,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::psv_fire_sizing, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::psv_sizing, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::psv_valve, m)?)?;

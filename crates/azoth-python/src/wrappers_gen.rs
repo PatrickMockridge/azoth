@@ -8629,6 +8629,73 @@ pub fn probit(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Process cost estimate.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (equipment, location_factor, complexity_factor, project_contingency, working_capital, system_total_weight, capex_per_weight, operating_hours, electricity_cost_per_kwh, steam_cost_per_tonne, cooling_water_cost_per_m3, labor_cost_per_hour, annual_revenue, discount_rate, project_life_years))]
+#[pyo3(
+    text_signature = "(equipment, location_factor, complexity_factor, project_contingency, working_capital, system_total_weight, capex_per_weight, operating_hours, electricity_cost_per_kwh, steam_cost_per_tonne, cooling_water_cost_per_m3, labor_cost_per_hour, annual_revenue, discount_rate, project_life_years)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn process_cost_estimate(
+    py: Python<'_>,
+    equipment: Vec<crate::records_gen::ProcessCostEquipment>,
+    location_factor: Option<f64>,
+    complexity_factor: Option<f64>,
+    project_contingency: Option<f64>,
+    working_capital: Option<f64>,
+    system_total_weight: Option<f64>,
+    capex_per_weight: Option<f64>,
+    operating_hours: Option<f64>,
+    electricity_cost_per_kwh: Option<f64>,
+    steam_cost_per_tonne: Option<f64>,
+    cooling_water_cost_per_m3: Option<f64>,
+    labor_cost_per_hour: Option<f64>,
+    annual_revenue: Option<f64>,
+    discount_rate: Option<f64>,
+    project_life_years: Option<f64>,
+) -> PyResult<crate::transport_gen::PyProcessCostEstimateResult> {
+    let equipment_records: Vec<azoth_process::models::process_cost_estimate::ProcessCostEquipment> =
+        equipment
+            .into_iter()
+            .map(
+                |row| azoth_process::models::process_cost_estimate::ProcessCostEquipment {
+                    name: row.name,
+                    equipment_class: row.equipment_class,
+                    purchased_equipment_cost: row.purchased_equipment_cost,
+                    bare_module_cost: row.bare_module_cost,
+                    total_module_cost: row.total_module_cost,
+                    grass_roots_cost: row.grass_roots_cost,
+                    total_cost: row.total_cost,
+                    installation_man_hours: seconds(row.installation_man_hours),
+                    weight: kilograms(row.weight),
+                    power: row.power.map(watts),
+                    duty: row.duty.map(watts),
+                },
+            )
+            .collect();
+    azoth_process::models::process_cost_estimate::process_cost_estimate(
+        &equipment_records,
+        location_factor,
+        complexity_factor,
+        project_contingency,
+        working_capital,
+        system_total_weight.map(kilograms),
+        capex_per_weight,
+        operating_hours.map(seconds),
+        electricity_cost_per_kwh,
+        steam_cost_per_tonne,
+        cooling_water_cost_per_m3,
+        labor_cost_per_hour,
+        annual_revenue,
+        discount_rate,
+        project_life_years,
+    )
+    .map(|r| crate::transport_gen::PyProcessCostEstimateResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// PSV fire sizing.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

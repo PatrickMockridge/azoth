@@ -35,6 +35,7 @@ from azoth.core.record_outputs_gen import (
     CostEstimationResultRow,
     DepositionSegmentRow,
     DepressurizationPoint,
+    DisciplineCostLine,
     DriftFluxReleaseStation,
     EnvelopePoint,
     EnvelopeQuery,
@@ -76,6 +77,7 @@ from azoth.core.record_outputs_gen import (
     NonEquilibriumBlowdownPoint,
     OpenDrainAssessment,
     OpenDrainResult,
+    OperatingCostLine,
     P002FindingResult,
     PerformanceAssessment,
     PerformanceFinding,
@@ -83,6 +85,10 @@ from azoth.core.record_outputs_gen import (
     PerformanceSif,
     PipeFireRupturePoint,
     PrescribedSlipReleaseStation,
+    ProcessCostEquipmentResult,
+    ProcessCostFlag,
+    ProcessCostMtoRow,
+    ProjectCostLine,
     PulsationModeResult,
     RanzMarshallReleaseStation,
     RealGasFannoReleaseStation,
@@ -109,6 +115,7 @@ from azoth.core.record_outputs_gen import (
     SubFraction,
     Tr3001Finding,
     TrappedInventorySegmentResult,
+    TypeCostLine,
     VesselFillingPoint,
     VesselRuptureStep,
     WaterMixingResult,
@@ -9731,6 +9738,82 @@ class ProbitResult(_HasWarnings):
 
     #: `0.5 (1 + erf((Y - 5) / sqrt(2)))` at the stated `probit_value` or the computed probit.
     probability: float
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class ProcessCostEstimateResult(_HasWarnings):
+    """Result of ``process.process_cost_estimate``."""
+
+    CALC_ID: ClassVar[str] = "process.process_cost_estimate"
+
+    #: the located purchased equipment cost, USD.
+    total_purchased_equipment_cost: float
+
+    #: the located bare module cost, USD.
+    total_bare_module_cost: float
+
+    #: the located total module cost, USD.
+    total_module_cost: float
+
+    #: the grass roots cost after the complexity factor, USD.
+    total_grass_roots_cost: float
+
+    #: the summed installation labour hours.
+    total_installation_man_hours: Q
+
+    #: one summary row per input row.
+    equipment: tuple[ProcessCostEquipmentResult, ...]
+
+    #: the located purchased cost by type, in first-appearance order.
+    cost_by_equipment_type: tuple[TypeCostLine, ...]
+
+    #: the five discipline lines.
+    cost_by_discipline: tuple[DisciplineCostLine, ...]
+
+    #: the project cost stack, direct to total.
+    project_costs: tuple[ProjectCostLine, ...]
+
+    #: the total project cost, USD.
+    total_project_cost: float
+
+    #: the nine operating-cost lines, empty when no operating basis is stated.
+    operating_costs: tuple[OperatingCostLine, ...]
+
+    #: whether the operating-cost block is present.
+    has_operating_cost: bool
+
+    #: the sum of the operating-cost lines, USD/year.
+    total_annual_operating_cost: float
+
+    #: whether the payback, ROI and NPV are present.
+    has_economics: bool
+
+    #: the payback period, years; zero where it is absent, and `has_economics` says which.
+    payback_period_years: float
+
+    #: the return on investment, per cent.
+    roi_percent: float
+
+    #: the net present value, USD.
+    npv: float
+
+    #: the sum of the rows' total costs.
+    summed_unit_total_cost: float
+
+    #: whether a system weight was stated.
+    has_weight_based_capex: bool
+
+    #: the system weight times the coefficient, kNOK.
+    weight_based_capex: float
+
+    #: the per-unit material take-off rows.
+    material_take_off: tuple[ProcessCostMtoRow, ...]
+
+    #: the class's quality flags.
+    quality_flags: tuple[ProcessCostFlag, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

@@ -101,6 +101,7 @@ use crate::models::pool_fire::PoolFireResult;
 use crate::models::porous_media_self_heating::PorousMediaSelfHeatingResult;
 use crate::models::prescribed_slip_release::PrescribedSlipReleaseResult;
 use crate::models::probit::ProbitResult;
+use crate::models::process_cost_estimate::ProcessCostEstimateResult;
 use crate::models::psv_fire_sizing::PsvFireSizingResult;
 use crate::models::psv_sizing::PsvSizingResult;
 use crate::models::psv_valve::PsvValveResult;
@@ -2175,6 +2176,39 @@ impl CalcResult for PrescribedSlipReleaseResult {
 impl CalcResult for ProbitResult {
     const CALC_ID: &'static str = "process.probit";
     const FIELDS: &'static [&'static str] = &["probit", "probability", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for ProcessCostEstimateResult {
+    const CALC_ID: &'static str = "process.process_cost_estimate";
+    const FIELDS: &'static [&'static str] = &[
+        "total_purchased_equipment_cost",
+        "total_bare_module_cost",
+        "total_module_cost",
+        "total_grass_roots_cost",
+        "total_installation_man_hours",
+        "equipment",
+        "cost_by_equipment_type",
+        "cost_by_discipline",
+        "project_costs",
+        "total_project_cost",
+        "operating_costs",
+        "has_operating_cost",
+        "total_annual_operating_cost",
+        "has_economics",
+        "payback_period_years",
+        "roi_percent",
+        "npv",
+        "summed_unit_total_cost",
+        "has_weight_based_capex",
+        "weight_based_capex",
+        "material_take_off",
+        "quality_flags",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

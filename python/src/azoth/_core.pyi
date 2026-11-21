@@ -901,6 +901,21 @@ class PipeFireRuptureMaterialPoint(TypedDict):
     strain_effect_factor: float
     rupture_strain_limit: float
 
+class ProcessCostEquipment(TypedDict):
+    """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
+
+    name: str
+    equipment_class: str
+    purchased_equipment_cost: float
+    bare_module_cost: float
+    total_module_cost: float
+    grass_roots_cost: float
+    total_cost: float
+    installation_man_hours: float
+    weight: float
+    power: float | None
+    duty: float | None
+
 class PumpCurvePoint(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""
 
@@ -1957,6 +1972,66 @@ class PrescribedSlipReleaseStation:
     liquid_density: Qty | None
     gas_velocity: Qty | None
     liquid_velocity: Qty | None
+
+@final
+class ProcessCostEquipmentResult:
+    """one summary row per input row."""
+
+    name: str
+    equipment_class: str
+    equipment_type: str
+    purchased_equipment_cost: float
+    bare_module_cost: float
+    total_module_cost: float
+    grass_roots_cost: float
+    total_cost: float
+    installation_man_hours: Qty
+    weight: Qty
+    located_purchased_equipment_cost: float
+    location_factor: float
+
+@final
+class TypeCostLine:
+    """the located purchased cost by type, in first-appearance order."""
+
+    name: str
+    cost: float
+
+@final
+class DisciplineCostLine:
+    """the five discipline lines."""
+
+    name: str
+    cost: float
+
+@final
+class ProjectCostLine:
+    """the project cost stack, direct to total."""
+
+    name: str
+    cost: float
+
+@final
+class OperatingCostLine:
+    """the nine operating-cost lines, empty when no operating basis is stated."""
+
+    name: str
+    cost: float
+
+@final
+class ProcessCostMtoRow:
+    """the per-unit material take-off rows."""
+
+    name: str
+    equipment_type: str
+    weight_kg: Qty
+    cost_usd: float
+
+@final
+class ProcessCostFlag:
+    """the class's quality flags."""
+
+    message: str
 
 @final
 class RanzMarshallReleaseStation:
@@ -5651,6 +5726,32 @@ class PrescribedSlipReleaseResult:
 class ProbitResult:
     probit: float | None
     probability: float
+    warnings: list[Warning]
+
+@final
+class ProcessCostEstimateResult:
+    total_purchased_equipment_cost: float
+    total_bare_module_cost: float
+    total_module_cost: float
+    total_grass_roots_cost: float
+    total_installation_man_hours: Qty
+    equipment: list[ProcessCostEquipmentResult]
+    cost_by_equipment_type: list[TypeCostLine]
+    cost_by_discipline: list[DisciplineCostLine]
+    project_costs: list[ProjectCostLine]
+    total_project_cost: float
+    operating_costs: list[OperatingCostLine]
+    has_operating_cost: bool
+    total_annual_operating_cost: float
+    has_economics: bool
+    payback_period_years: float
+    roi_percent: float
+    npv: float
+    summed_unit_total_cost: float
+    has_weight_based_capex: bool
+    weight_based_capex: float
+    material_take_off: list[ProcessCostMtoRow]
+    quality_flags: list[ProcessCostFlag]
     warnings: list[Warning]
 
 @final
@@ -9904,6 +10005,23 @@ def probit(
     dose: float | None = None,
     probit_value: float | None = None,
 ) -> ProbitResult: ...
+def process_cost_estimate(
+    equipment: list[ProcessCostEquipment],
+    location_factor: float | None = None,
+    complexity_factor: float | None = None,
+    project_contingency: float | None = None,
+    working_capital: float | None = None,
+    system_total_weight: float | None = None,
+    capex_per_weight: float | None = None,
+    operating_hours: float | None = None,
+    electricity_cost_per_kwh: float | None = None,
+    steam_cost_per_tonne: float | None = None,
+    cooling_water_cost_per_m3: float | None = None,
+    labor_cost_per_hour: float | None = None,
+    annual_revenue: float | None = None,
+    discount_rate: float | None = None,
+    project_life_years: float | None = None,
+) -> ProcessCostEstimateResult: ...
 def psv_fire_sizing(
     initial_mass: float,
     initial_pressure: float,

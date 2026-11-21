@@ -128,6 +128,7 @@ pub mod pool_fire;
 pub mod porous_media_self_heating;
 pub mod prescribed_slip_release;
 pub mod probit;
+pub mod process_cost_estimate;
 pub mod psv_fire_sizing;
 pub mod psv_sizing;
 pub mod psv_valve;
@@ -347,6 +348,11 @@ pub use pool_fire::{PoolFireResult, pool_fire};
 pub use porous_media_self_heating::{PorousMediaSelfHeatingResult, porous_media_self_heating};
 pub use prescribed_slip_release::{PrescribedSlipReleaseResult, prescribed_slip_release};
 pub use probit::{ProbitResult, probit};
+pub use process_cost_estimate::{
+    DisciplineCostLine, OperatingCostLine, ProcessCostEquipment, ProcessCostEquipmentResult,
+    ProcessCostEstimateResult, ProcessCostFlag, ProcessCostMtoRow, ProjectCostLine, TypeCostLine,
+    process_cost_estimate,
+};
 pub use psv_fire_sizing::{PsvFireSizingResult, psv_fire_sizing};
 pub use psv_sizing::{PsvSizingResult, psv_sizing};
 pub use psv_valve::{PsvValveResult, psv_valve};

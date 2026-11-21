@@ -417,6 +417,7 @@ Five sections, and the difference between them is the point:
 - [`process.porous_media_self_heating`](./process/porous_media_self_heating.md) — Porous media self-heating
 - [`process.prescribed_slip_release`](./process/prescribed_slip_release.md) — Prescribed-slip orifice release
 - [`process.probit`](./process/probit.md) — Probit dose-response
+- [`process.process_cost_estimate`](./process/process_cost_estimate.md) — Process cost estimate
 - [`process.psv_fire_sizing`](./process/psv_fire_sizing.md) — PSV fire sizing
 - [`process.psv_sizing`](./process/psv_sizing.md) — PSV sizing
 - [`process.psv_valve`](./process/psv_valve.md) — PSV latch and relief flow

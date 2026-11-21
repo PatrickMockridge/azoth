@@ -312,6 +312,7 @@
 //!   - specs/models/process/porous_media_self_heating.toml
 //!   - specs/models/process/prescribed_slip_release.toml
 //!   - specs/models/process/probit.toml
+//!   - specs/models/process/process_cost_estimate.toml
 //!   - specs/models/process/psv_fire_sizing.toml
 //!   - specs/models/process/psv_sizing.toml
 //!   - specs/models/process/psv_valve.toml
@@ -5190,6 +5191,72 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("process.probit", "n", "dimensionless"),
     ("process.probit", "dose", "dimensionless"),
     ("process.probit", "probit_value", "dimensionless"),
+    (
+        "process.process_cost_estimate",
+        "location_factor",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "complexity_factor",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "project_contingency",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "working_capital",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "system_total_weight",
+        "mass",
+    ),
+    (
+        "process.process_cost_estimate",
+        "capex_per_weight",
+        "dimensionless",
+    ),
+    ("process.process_cost_estimate", "operating_hours", "time"),
+    (
+        "process.process_cost_estimate",
+        "electricity_cost_per_kwh",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "steam_cost_per_tonne",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "cooling_water_cost_per_m3",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "labor_cost_per_hour",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "annual_revenue",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "discount_rate",
+        "dimensionless",
+    ),
+    (
+        "process.process_cost_estimate",
+        "project_life_years",
+        "dimensionless",
+    ),
     ("process.psv_fire_sizing", "initial_mass", "mass"),
     ("process.psv_fire_sizing", "initial_pressure", "pressure"),
     ("process.psv_fire_sizing", "set_pressure", "pressure"),

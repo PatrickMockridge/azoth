@@ -703,6 +703,9 @@ public class ProcessProbe {
       case "equipment_cost":
         equipmentCostRows();
         break;
+      case "process_cost":
+        processCostRows();
+        break;
       case "mass_balance_leak_detection":
         massBalanceLeakRows();
         break;
@@ -20305,6 +20308,28 @@ public class ProcessProbe {
     System.out.println();
   }
 
+  static double unitPowerKw(String name, neqsim.process.processmodel.ProcessSystem process) {
+    try {
+      neqsim.process.equipment.ProcessEquipmentInterface unit = process.getUnit(name);
+      java.lang.reflect.Method getPower = unit.getClass().getMethod("getPower", String.class);
+      Object value = getPower.invoke(unit, "kW");
+      return value instanceof Number ? ((Number) value).doubleValue() : 0.0;
+    } catch (Exception ignored) {
+      return 0.0;
+    }
+  }
+
+  static double unitDutyKw(String name, neqsim.process.processmodel.ProcessSystem process) {
+    try {
+      neqsim.process.equipment.ProcessEquipmentInterface unit = process.getUnit(name);
+      java.lang.reflect.Method getDuty = unit.getClass().getMethod("getDuty");
+      Object value = getDuty.invoke(unit);
+      return value instanceof Number ? ((Number) value).doubleValue() : 0.0;
+    } catch (Exception ignored) {
+      return 0.0;
+    }
+  }
+
   static void printCostItem(String label, UnitCostEstimateBaseClass estimate) {
     System.out.println(label);
     System.out.println("purchased_equipment_cost=" + estimate.getPurchasedEquipmentCost());
@@ -20848,6 +20873,105 @@ public class ProcessProbe {
     System.out.println("grass_roots_cost=" + bahxCost.getGrassRootsCost());
     System.out.println("installation_man_hours=" + bahxCost.getInstallationManHours());
     System.out.println("total_cost=" + bahxCost.getTotalCost());
+    System.out.println();
+  }
+
+  static void processCostRows() {
+    SystemSrkEos gas = new SystemSrkEos(288.15, 50.0);
+    gas.addComponent("methane", 0.85);
+    gas.addComponent("ethane", 0.10);
+    gas.addComponent("propane", 0.05);
+    gas.setMixingRule("classic");
+    neqsim.process.processmodel.ProcessSystem process =
+        new neqsim.process.processmodel.ProcessSystem();
+    process.setName("Test Gas Process");
+    Stream feed = new Stream("Feed", gas);
+    feed.setFlowRate(10000.0, "kg/hr");
+    feed.setTemperature(25.0, "C");
+    feed.setPressure(50.0, "bara");
+    process.add(feed);
+    neqsim.process.equipment.separator.Separator inletSep =
+        new neqsim.process.equipment.separator.Separator("InletSeparator", feed);
+    process.add(inletSep);
+    neqsim.process.equipment.compressor.Compressor compressor =
+        new neqsim.process.equipment.compressor.Compressor("MainCompressor", inletSep.getGasOutStream());
+    compressor.setOutletPressure(100.0);
+    process.add(compressor);
+    neqsim.process.equipment.heatexchanger.Cooler cooler =
+        new neqsim.process.equipment.heatexchanger.Cooler("AfterCooler", compressor.getOutletStream());
+    cooler.setOutTemperature(35.0, "C");
+    process.add(cooler);
+    neqsim.process.equipment.valve.ThrottlingValve valve =
+        new neqsim.process.equipment.valve.ThrottlingValve("JTValve", cooler.getOutletStream());
+    valve.setOutletPressure(30.0);
+    process.add(valve);
+    process.run();
+
+    neqsim.process.costestimation.ProcessCostEstimate estimate =
+        new neqsim.process.costestimation.ProcessCostEstimate(process);
+    estimate.calculateAllCosts();
+    System.out.println("process_cost_summary");
+    System.out.println("total_purchased_equipment_cost=" + estimate.getTotalPurchasedEquipmentCost());
+    System.out.println("total_bare_module_cost=" + estimate.getTotalBareModuleCost());
+    System.out.println("total_module_cost=" + estimate.getTotalModuleCost());
+    System.out.println("total_grass_roots_cost=" + estimate.getTotalGrassRootsCost());
+    System.out.println("total_installation_man_hours=" + estimate.getTotalInstallationManHours());
+    System.out.println("unit_count=" + estimate.getEquipmentCosts().size());
+    for (int i = 0; i < estimate.getEquipmentCosts().size(); i++) {
+      neqsim.process.costestimation.ProcessCostEstimate.EquipmentCostSummary summary =
+          estimate.getEquipmentCosts().get(i);
+      System.out.println("unit_" + i + "_name=" + summary.getName());
+      System.out.println("unit_" + i + "_type=" + summary.getType());
+      System.out.println("unit_" + i + "_purchased_equipment_cost=" + summary.getPurchasedEquipmentCost());
+      System.out.println("unit_" + i + "_bare_module_cost=" + summary.getBareModuleCost());
+      System.out.println("unit_" + i + "_total_module_cost=" + summary.getTotalModuleCost());
+      System.out.println("unit_" + i + "_grass_roots_cost=" + summary.getGrassRootsCost());
+      System.out.println("unit_" + i + "_installation_man_hours=" + summary.getInstallationManHours());
+      System.out.println("unit_" + i + "_weight_kg=" + summary.getWeight());
+      System.out.println(
+          "unit_" + i + "_located_purchased_equipment_cost=" + summary.getLocatedPurchasedEquipmentCost());
+      System.out.println("unit_" + i + "_power_kw=" + unitPowerKw(summary.getName(), process));
+      System.out.println("unit_" + i + "_duty_kw=" + unitDutyKw(summary.getName(), process));
+    }
+    System.out.println();
+
+    System.out.println("cost_by_equipment_type");
+    for (Map.Entry<String, Double> entry : estimate.getCostByEquipmentType().entrySet()) {
+      System.out.println("type_" + entry.getKey() + "=" + entry.getValue());
+    }
+    System.out.println();
+
+    System.out.println("cost_by_discipline");
+    for (Map.Entry<String, Double> entry : estimate.getCostByDiscipline().entrySet()) {
+      System.out.println("discipline_" + entry.getKey() + "=" + entry.getValue());
+    }
+    System.out.println();
+
+    System.out.println("project_costs");
+    for (Map.Entry<String, Double> entry : estimate.getProjectCostBreakdown().entrySet()) {
+      System.out.println("project_" + entry.getKey() + "=" + entry.getValue());
+    }
+    System.out.println("total_project_cost=" + estimate.getTotalProjectCost());
+    System.out.println();
+
+    System.out.println("operating_costs");
+    double operating = estimate.calculateOperatingCost(8000);
+    for (Map.Entry<String, Double> entry : estimate.getOperatingCostBreakdown().entrySet()) {
+      System.out.println("opex_" + entry.getKey() + "=" + entry.getValue());
+    }
+    System.out.println("total_annual_operating_cost=" + operating);
+    System.out.println();
+
+    System.out.println("economics");
+    System.out.println("payback_period_years=" + estimate.calculatePaybackPeriod(5000000.0));
+    System.out.println("roi_percent=" + estimate.calculateROI(5000000.0));
+    System.out.println("npv=" + estimate.calculateNPV(5000000.0, 0.10, 10));
+    neqsim.process.mechanicaldesign.SystemMechanicalDesign systemDesign =
+        process.getSystemMechanicalDesign();
+    systemDesign.runDesignCalculation();
+    System.out.println("system_total_weight_kg=" + systemDesign.getTotalWeight());
+    System.out.println("weight_based_capex=" + new neqsim.process.costestimation.CostEstimateBaseClass(
+        systemDesign).getWeightBasedCAPEXEstimate());
     System.out.println();
   }
 }

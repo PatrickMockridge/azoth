@@ -1030,6 +1030,41 @@ impl From<&azoth_process::models::depressurization::DepressurizationPoint>
     }
 }
 
+/// the five discipline lines.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DisciplineCostLine"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDisciplineCostLine {
+    /// the discipline.
+    #[pyo3(get)]
+    pub name: String,
+    /// the discipline's cost.
+    #[pyo3(get)]
+    pub cost: f64,
+}
+
+#[pymethods]
+impl PyDisciplineCostLine {
+    fn __repr__(&self) -> String {
+        format!("DisciplineCostLine(name={}, cost={})", self.name, self.cost)
+    }
+}
+
+impl From<&azoth_process::models::process_cost_estimate::DisciplineCostLine>
+    for PyDisciplineCostLine
+{
+    fn from(row: &azoth_process::models::process_cost_estimate::DisciplineCostLine) -> Self {
+        Self {
+            name: row.name.clone(),
+            cost: row.cost,
+        }
+    }
+}
+
 /// the base stations, with the opening's phase velocities solved. Empty on failure.
 #[pyclass(
     frozen,
@@ -4026,6 +4061,41 @@ impl From<&azoth_process::models::open_drain_review::OpenDrainResult> for PyOpen
     }
 }
 
+/// the nine operating-cost lines, empty when no operating basis is stated.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "OperatingCostLine"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyOperatingCostLine {
+    /// the line's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the line's annual cost, USD.
+    #[pyo3(get)]
+    pub cost: f64,
+}
+
+#[pymethods]
+impl PyOperatingCostLine {
+    fn __repr__(&self) -> String {
+        format!("OperatingCostLine(name={}, cost={})", self.name, self.cost)
+    }
+}
+
+impl From<&azoth_process::models::process_cost_estimate::OperatingCostLine>
+    for PyOperatingCostLine
+{
+    fn from(row: &azoth_process::models::process_cost_estimate::OperatingCostLine) -> Self {
+        Self {
+            name: row.name.clone(),
+            cost: row.cost,
+        }
+    }
+}
+
 /// one row per check, in the caller's order.
 #[pyclass(
     frozen,
@@ -4678,6 +4748,214 @@ impl From<&azoth_process::models::prescribed_slip_release::PrescribedSlipRelease
                 magnitude_si: v.value,
                 unit: "m/s".to_string(),
             }),
+        }
+    }
+}
+
+/// one summary row per input row.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ProcessCostEquipmentResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyProcessCostEquipmentResult {
+    /// the unit's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the Java class simple name.
+    #[pyo3(get)]
+    pub equipment_class: String,
+    /// the type category the class-name chain gives.
+    #[pyo3(get)]
+    pub equipment_type: String,
+    /// the unit's purchased cost.
+    #[pyo3(get)]
+    pub purchased_equipment_cost: f64,
+    /// the unit's bare module cost.
+    #[pyo3(get)]
+    pub bare_module_cost: f64,
+    /// the unit's total module cost.
+    #[pyo3(get)]
+    pub total_module_cost: f64,
+    /// the unit's grass roots cost.
+    #[pyo3(get)]
+    pub grass_roots_cost: f64,
+    /// the unit's total cost.
+    #[pyo3(get)]
+    pub total_cost: f64,
+    /// the unit's installation labour hours.
+    #[pyo3(get)]
+    pub installation_man_hours: PyQty,
+    /// the unit's weight.
+    #[pyo3(get)]
+    pub weight: PyQty,
+    /// the purchased cost times the location factor.
+    #[pyo3(get)]
+    pub located_purchased_equipment_cost: f64,
+    /// the location factor applied.
+    #[pyo3(get)]
+    pub location_factor: f64,
+}
+
+#[pymethods]
+impl PyProcessCostEquipmentResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "ProcessCostEquipmentResult(name={}, equipment_class={}, equipment_type={}, purchased_equipment_cost={}, bare_module_cost={}, total_module_cost={}, grass_roots_cost={}, total_cost={}, installation_man_hours={:?}, weight={:?}, located_purchased_equipment_cost={}, location_factor={})",
+            self.name,
+            self.equipment_class,
+            self.equipment_type,
+            self.purchased_equipment_cost,
+            self.bare_module_cost,
+            self.total_module_cost,
+            self.grass_roots_cost,
+            self.total_cost,
+            self.installation_man_hours,
+            self.weight,
+            self.located_purchased_equipment_cost,
+            self.location_factor
+        )
+    }
+}
+
+impl From<&azoth_process::models::process_cost_estimate::ProcessCostEquipmentResult>
+    for PyProcessCostEquipmentResult
+{
+    fn from(
+        row: &azoth_process::models::process_cost_estimate::ProcessCostEquipmentResult,
+    ) -> Self {
+        Self {
+            name: row.name.clone(),
+            equipment_class: row.equipment_class.clone(),
+            equipment_type: row.equipment_type.clone(),
+            purchased_equipment_cost: row.purchased_equipment_cost,
+            bare_module_cost: row.bare_module_cost,
+            total_module_cost: row.total_module_cost,
+            grass_roots_cost: row.grass_roots_cost,
+            total_cost: row.total_cost,
+            installation_man_hours: PyQty {
+                magnitude_si: row.installation_man_hours,
+                unit: "h".to_string(),
+            },
+            weight: PyQty {
+                magnitude_si: row.weight,
+                unit: "kg".to_string(),
+            },
+            located_purchased_equipment_cost: row.located_purchased_equipment_cost,
+            location_factor: row.location_factor,
+        }
+    }
+}
+
+/// the class's quality flags.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ProcessCostFlag"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyProcessCostFlag {
+    /// the flag's message.
+    #[pyo3(get)]
+    pub message: String,
+}
+
+#[pymethods]
+impl PyProcessCostFlag {
+    fn __repr__(&self) -> String {
+        format!("ProcessCostFlag(message={})", self.message)
+    }
+}
+
+impl From<&azoth_process::models::process_cost_estimate::ProcessCostFlag> for PyProcessCostFlag {
+    fn from(row: &azoth_process::models::process_cost_estimate::ProcessCostFlag) -> Self {
+        Self {
+            message: row.message.clone(),
+        }
+    }
+}
+
+/// the per-unit material take-off rows.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ProcessCostMtoRow"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyProcessCostMtoRow {
+    /// the unit's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the type category.
+    #[pyo3(get)]
+    pub equipment_type: String,
+    /// the unit's weight.
+    #[pyo3(get)]
+    pub weight_kg: PyQty,
+    /// the unit's located purchased cost.
+    #[pyo3(get)]
+    pub cost_usd: f64,
+}
+
+#[pymethods]
+impl PyProcessCostMtoRow {
+    fn __repr__(&self) -> String {
+        format!(
+            "ProcessCostMtoRow(name={}, equipment_type={}, weight_kg={:?}, cost_usd={})",
+            self.name, self.equipment_type, self.weight_kg, self.cost_usd
+        )
+    }
+}
+
+impl From<&azoth_process::models::process_cost_estimate::ProcessCostMtoRow>
+    for PyProcessCostMtoRow
+{
+    fn from(row: &azoth_process::models::process_cost_estimate::ProcessCostMtoRow) -> Self {
+        Self {
+            name: row.name.clone(),
+            equipment_type: row.equipment_type.clone(),
+            weight_kg: PyQty {
+                magnitude_si: row.weight_kg,
+                unit: "kg".to_string(),
+            },
+            cost_usd: row.cost_usd,
+        }
+    }
+}
+
+/// the project cost stack, direct to total.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "ProjectCostLine"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyProjectCostLine {
+    /// the line's name.
+    #[pyo3(get)]
+    pub name: String,
+    /// the line's cost.
+    #[pyo3(get)]
+    pub cost: f64,
+}
+
+#[pymethods]
+impl PyProjectCostLine {
+    fn __repr__(&self) -> String {
+        format!("ProjectCostLine(name={}, cost={})", self.name, self.cost)
+    }
+}
+
+impl From<&azoth_process::models::process_cost_estimate::ProjectCostLine> for PyProjectCostLine {
+    fn from(row: &azoth_process::models::process_cost_estimate::ProjectCostLine) -> Self {
+        Self {
+            name: row.name.clone(),
+            cost: row.cost,
         }
     }
 }
@@ -6292,6 +6570,39 @@ impl From<&azoth_process::models::trapped_inventory::TrappedInventorySegmentResu
                 magnitude_si: v.value,
                 unit: "m".to_string(),
             }),
+        }
+    }
+}
+
+/// the located purchased cost by type, in first-appearance order.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "TypeCostLine"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyTypeCostLine {
+    /// the type category.
+    #[pyo3(get)]
+    pub name: String,
+    /// the located purchased cost of the type.
+    #[pyo3(get)]
+    pub cost: f64,
+}
+
+#[pymethods]
+impl PyTypeCostLine {
+    fn __repr__(&self) -> String {
+        format!("TypeCostLine(name={}, cost={})", self.name, self.cost)
+    }
+}
+
+impl From<&azoth_process::models::process_cost_estimate::TypeCostLine> for PyTypeCostLine {
+    fn from(row: &azoth_process::models::process_cost_estimate::TypeCostLine) -> Self {
+        Self {
+            name: row.name.clone(),
+            cost: row.cost,
         }
     }
 }

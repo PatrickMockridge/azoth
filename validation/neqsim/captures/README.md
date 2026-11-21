@@ -3341,3 +3341,19 @@ fields and their module stacks are zero - the class's `calculateCostEstimate` re
 without a design. The separator's stack and labour are the class's own on the sized vessel.
 The column's reboiler and condenser default on, so a state that wants neither states both
 flags false.
+
+### `process_cost_process.tsv`
+
+`ProcessCostEstimate` on the class's own four-unit SRK flowsheet: the feed, the inlet
+separator, the export compressor, the aftercooler and the JT valve. The capture prints each
+unit's summary row, then the totals, the type and discipline splits, the project stack, the
+nine operating-cost lines and the economics.
+
+```bash
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar ProcessProbe process_cost \
+  > captures/process_cost_process.tsv
+```
+
+The operating-cost walk reads `getDuty()` as kW although the cooler returns watts, so the
+cooling-water line is the class's own thousand-fold duty; the case states the duty the walk
+reads. The system weight and the weight-based capex are printed last.
