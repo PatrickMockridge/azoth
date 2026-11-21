@@ -6755,6 +6755,40 @@ class BlackOilCorrelationsResult:
     warnings: list[Warning]
 
 @final
+class DeclineCurveResult:
+    time: list[float] | None
+    rate: list[float] | None
+    cumulative: list[float] | None
+    rate_value: float | None
+    cumulative_value: float | None
+    nominal: float | None
+    effective: float | None
+    instantaneous_decline_rate: float | None
+    time_to_rate: float | None
+    eur: float | None
+    remaining: float | None
+    exponential_decline: float | None
+    fit_qi: float | None
+    fit_di: float | None
+    fit_b: float | None
+    fit_r_squared: float | None
+    duong_q1: float | None
+    duong_a: float | None
+    duong_m: float | None
+    duong_time: float | None
+    summary_effective: float | None
+    summary_rate_1yr: float | None
+    summary_rate_5yr: float | None
+    summary_rate_10yr: float | None
+    summary_cum_1yr: float | None
+    summary_cum_5yr: float | None
+    summary_cum_10yr: float | None
+    summary_time_to_limit: float | None
+    summary_time_to_limit_years: float | None
+    summary_eur: float | None
+    warnings: list[Warning]
+
+@final
 class GasCorrelationsResult:
     queries: list[GasResultRow]
     warnings: list[Warning]
@@ -10883,6 +10917,32 @@ def vessel_rupture(
     tensile_strength_factor: float | None = None,
 ) -> VesselRuptureResult: ...
 def black_oil_correlations(queries: list[BlackOilQuery]) -> BlackOilCorrelationsResult: ...
+def decline_curve(
+    calculation: str,
+    qi: float | None = None,
+    di: float | None = None,
+    b: float | None = None,
+    t: float | None = None,
+    q_limit: float | None = None,
+    d_nominal: float | None = None,
+    d_effective: float | None = None,
+    q1: float | None = None,
+    t1: float | None = None,
+    q2: float | None = None,
+    t2: float | None = None,
+    q3: float | None = None,
+    t3: float | None = None,
+    t_start: float | None = None,
+    t_end: float | None = None,
+    t_step: float | None = None,
+    t_current: float | None = None,
+    a: float | None = None,
+    m: float | None = None,
+    start_index: float | None = None,
+    end_index: float | None = None,
+    history_time: list[float] | None = None,
+    history_rate: list[float] | None = None,
+) -> DeclineCurveResult: ...
 def gas_correlations(queries: list[GasQuery]) -> GasCorrelationsResult: ...
 def water_correlations(queries: list[WaterQuery]) -> WaterCorrelationsResult: ...
 def chemical_equilibrium(

@@ -10031,6 +10031,72 @@ pub fn black_oil_correlations(
         .map_err(|e| to_pyerr(py, e))
 }
 
+/// Decline-curve analysis.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (calculation, qi, di, b, t, q_limit, d_nominal, d_effective, q1, t1, q2, t2, q3, t3, t_start, t_end, t_step, t_current, a, m, start_index, end_index, history_time, history_rate))]
+#[pyo3(
+    text_signature = "(calculation, qi, di, b, t, q_limit, d_nominal, d_effective, q1, t1, q2, t2, q3, t3, t_start, t_end, t_step, t_current, a, m, start_index, end_index, history_time, history_rate)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn decline_curve(
+    py: Python<'_>,
+    calculation: &str,
+    qi: Option<f64>,
+    di: Option<f64>,
+    b: Option<f64>,
+    t: Option<f64>,
+    q_limit: Option<f64>,
+    d_nominal: Option<f64>,
+    d_effective: Option<f64>,
+    q1: Option<f64>,
+    t1: Option<f64>,
+    q2: Option<f64>,
+    t2: Option<f64>,
+    q3: Option<f64>,
+    t3: Option<f64>,
+    t_start: Option<f64>,
+    t_end: Option<f64>,
+    t_step: Option<f64>,
+    t_current: Option<f64>,
+    a: Option<f64>,
+    m: Option<f64>,
+    start_index: Option<f64>,
+    end_index: Option<f64>,
+    history_time: Option<Vec<f64>>,
+    history_rate: Option<Vec<f64>>,
+) -> PyResult<crate::transport_gen::PyDeclineCurveResult> {
+    azoth_pvt::decline_curve::decline_curve(
+        calculation,
+        qi,
+        di,
+        b,
+        t,
+        q_limit,
+        d_nominal,
+        d_effective,
+        q1,
+        t1,
+        q2,
+        t2,
+        q3,
+        t3,
+        t_start,
+        t_end,
+        t_step,
+        t_current,
+        a,
+        m,
+        start_index,
+        end_index,
+        history_time.as_deref(),
+        history_rate.as_deref(),
+    )
+    .map(|r| crate::transport_gen::PyDeclineCurveResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Gas correlation table.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

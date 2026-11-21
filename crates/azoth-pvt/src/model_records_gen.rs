@@ -12,12 +12,54 @@
 use azoth_core::{CalcResult, Warning};
 
 use crate::black_oil_correlations::BlackOilCorrelationsResult;
+use crate::decline_curve::DeclineCurveResult;
 use crate::gas_correlations::GasCorrelationsResult;
 use crate::water_correlations::WaterCorrelationsResult;
 
 impl CalcResult for BlackOilCorrelationsResult {
     const CALC_ID: &'static str = "pvt.black_oil_correlations";
     const FIELDS: &'static [&'static str] = &["queries", "warnings"];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for DeclineCurveResult {
+    const CALC_ID: &'static str = "pvt.decline_curve";
+    const FIELDS: &'static [&'static str] = &[
+        "time",
+        "rate",
+        "cumulative",
+        "rate_value",
+        "cumulative_value",
+        "nominal",
+        "effective",
+        "instantaneous_decline_rate",
+        "time_to_rate",
+        "eur",
+        "remaining",
+        "exponential_decline",
+        "fit_qi",
+        "fit_di",
+        "fit_b",
+        "fit_r_squared",
+        "duong_q1",
+        "duong_a",
+        "duong_m",
+        "duong_time",
+        "summary_effective",
+        "summary_rate_1yr",
+        "summary_rate_5yr",
+        "summary_rate_10yr",
+        "summary_cum_1yr",
+        "summary_cum_5yr",
+        "summary_cum_10yr",
+        "summary_time_to_limit",
+        "summary_time_to_limit_years",
+        "summary_eur",
+        "warnings",
+    ];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

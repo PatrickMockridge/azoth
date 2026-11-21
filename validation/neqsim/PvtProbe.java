@@ -2,9 +2,11 @@
 // class is expressible in the id's boundary units, and each answer is printed as the id
 // publishes it.
 
+import java.util.Map;
 import neqsim.pvtsimulation.reservoirproperties.CompositionEstimation;
 import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
 import neqsim.pvtsimulation.util.BlackOilCorrelations;
+import neqsim.pvtsimulation.util.DeclineCurveAnalysis;
 import neqsim.pvtsimulation.util.BlackOilUnits;
 import neqsim.pvtsimulation.util.GasPseudoCriticalProperties;
 import neqsim.pvtsimulation.util.GasPseudoPressure;
@@ -201,6 +203,91 @@ public final class PvtProbe {
     line("rsw_mccain_3_5_wt", rsw.getRsw(0));
   }
 
+  private static void decline() {
+    double qi = 1000.0;
+    double di = 0.001;
+    System.out.println("decline_curve");
+
+    line("rate_b0", DeclineCurveAnalysis.rate(qi, di, 0.0, 365.25));
+    line("rate_b0.5", DeclineCurveAnalysis.rate(qi, di, 0.5, 365.25));
+    line("rate_b1", DeclineCurveAnalysis.rate(qi, di, 1.0, 365.25));
+    line("rate_exponential", DeclineCurveAnalysis.rateExponential(qi, di, 365.25));
+    line("rate_hyperbolic", DeclineCurveAnalysis.rateHyperbolic(qi, di, 0.5, 365.25));
+    line("rate_harmonic", DeclineCurveAnalysis.rateHarmonic(qi, di, 365.25));
+    line("cumulative_b0", DeclineCurveAnalysis.cumulativeProduction(qi, di, 0.0, 3650.0));
+    line("cumulative_b0.5", DeclineCurveAnalysis.cumulativeProduction(qi, di, 0.5, 3650.0));
+    line("cumulative_b1", DeclineCurveAnalysis.cumulativeProduction(qi, di, 1.0, 3650.0));
+    line("cumulative_exponential", DeclineCurveAnalysis.cumulativeExponential(qi, di, 3650.0));
+    line("cumulative_harmonic", DeclineCurveAnalysis.cumulativeHarmonic(qi, di, 3650.0));
+    line("nominal_to_effective", DeclineCurveAnalysis.nominalToEffectiveAnnual(di));
+    line("effective_to_nominal",
+        DeclineCurveAnalysis.effectiveAnnualToNominal(DeclineCurveAnalysis.nominalToEffectiveAnnual(di)));
+    line("instantaneous_decline_rate", DeclineCurveAnalysis.instantaneousDeclineRate(di, 0.5, 1000.0));
+    line("time_to_rate", DeclineCurveAnalysis.timeToRate(qi, di, 0.5, 50.0));
+    line("eur", DeclineCurveAnalysis.eur(qi, di, 0.5, 50.0));
+    line("remaining", DeclineCurveAnalysis.remainingReserves(qi, di, 0.5, 1000.0, 50.0));
+
+    double[][] profile = DeclineCurveAnalysis.forecast(qi, di, 0.5, 0.0, 3650.0, 365.0);
+    for (int i = 0; i < profile[0].length; i++) {
+      line("forecast_time_" + i, profile[0][i]);
+      line("forecast_rate_" + i, profile[1][i]);
+      line("forecast_cumulative_" + i, profile[2][i]);
+    }
+
+    line("exponential_decline", DeclineCurveAnalysis.estimateExponentialDecline(1000.0, 0.0, 800.0, 365.0));
+    Map<String, Double> hyperbolic =
+        DeclineCurveAnalysis.estimateHyperbolicParameters(1000.0, 0.0, 700.0, 365.0, 500.0, 730.0);
+    line("hyperbolic_qi", hyperbolic.get("qi"));
+    line("hyperbolic_di", hyperbolic.get("di"));
+    line("hyperbolic_b", hyperbolic.get("b"));
+
+    double[] times = new double[11];
+    double[] rates = new double[11];
+    for (int i = 0; i < 11; i++) {
+      times[i] = i * 365.0;
+      rates[i] = qi * Math.exp(-di * times[i]);
+    }
+    Map<String, Double> fit = DeclineCurveAnalysis.fitArps(times, rates);
+    line("fit_qi", fit.get("qi"));
+    line("fit_di", fit.get("di"));
+    line("fit_b", fit.get("b"));
+    line("fit_r_squared", fit.get("rSquared"));
+    line("eur_from_fit", DeclineCurveAnalysis.eurFromFit(fit, 50.0));
+
+    Map<String, Double> window = DeclineCurveAnalysis.fitArps(times, rates, 2, 10);
+    line("window_qi", window.get("qi"));
+    line("window_di", window.get("di"));
+    line("window_b", window.get("b"));
+    line("window_r_squared", window.get("rSquared"));
+
+    line("duong_time", DeclineCurveAnalysis.duongTimeFunction(0.5, 1.2, 365.0));
+    line("duong_rate", DeclineCurveAnalysis.rateDuong(1000.0, 0.5, 1.2, 365.0));
+    line("duong_cumulative", DeclineCurveAnalysis.cumulativeDuong(1000.0, 0.5, 1.2, 365.0));
+    double[] duongTimes = new double[10];
+    double[] duongRates = new double[10];
+    for (int i = 0; i < 10; i++) {
+      duongTimes[i] = (i + 1) * 365.0;
+      duongRates[i] = DeclineCurveAnalysis.rateDuong(1000.0, 0.5, 1.2, duongTimes[i]);
+    }
+    Map<String, Double> duongFit = DeclineCurveAnalysis.fitDuong(duongTimes, duongRates);
+    line("duong_fit_q1", duongFit.get("q1"));
+    line("duong_fit_a", duongFit.get("a"));
+    line("duong_fit_m", duongFit.get("m"));
+    line("duong_fit_r_squared", duongFit.get("rSquared"));
+
+    Map<String, Double> summary = DeclineCurveAnalysis.summary(qi, di, 0.5, 50.0);
+    line("summary_effective", summary.get("effectiveAnnualDecline"));
+    line("summary_rate_1yr", summary.get("rate_1yr"));
+    line("summary_rate_5yr", summary.get("rate_5yr"));
+    line("summary_rate_10yr", summary.get("rate_10yr"));
+    line("summary_cum_1yr", summary.get("cumProd_1yr"));
+    line("summary_cum_5yr", summary.get("cumProd_5yr"));
+    line("summary_cum_10yr", summary.get("cumProd_10yr"));
+    line("summary_time_to_limit", summary.get("timeToEconomicLimit_days"));
+    line("summary_time_to_limit_years", summary.get("timeToEconomicLimit_years"));
+    line("summary_eur", summary.get("EUR"));
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -212,6 +299,9 @@ public final class PvtProbe {
         break;
       case "water":
         water();
+        break;
+      case "decline":
+        decline();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

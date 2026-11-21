@@ -1,0 +1,292 @@
+model = "pvt.decline_curve"
+[[cases]]
+id = "rate_b0"
+tolerance = 1.0e-9
+source = "The class's own test state, qi 1000, di 0.001/day, at 365.25 days, from `validation/neqsim/captures/pvt_decline.tsv`."
+[cases.inputs]
+calculation = "rate"
+qi = 1000.0
+di = 0.001
+b = 0.0
+t = 365.25
+[cases.expected]
+rate_value = 694.0231234070969
+[[cases]]
+id = "rate_b0_5"
+tolerance = 1.0e-9
+source = "The hyperbolic rate at the same state."
+[cases.inputs]
+calculation = "rate"
+qi = 1000.0
+di = 0.001
+b = 0.5
+t = 365.25
+[cases.expected]
+rate_value = 714.9997484653228
+[[cases]]
+id = "rate_b1"
+tolerance = 1.0e-9
+source = "The harmonic rate at the same state."
+[cases.inputs]
+calculation = "rate"
+qi = 1000.0
+di = 0.001
+b = 1.0
+t = 365.25
+[cases.expected]
+rate_value = 732.4665812122322
+[[cases]]
+id = "cumulative_b0"
+tolerance = 1.0e-9
+source = "The exponential cumulative at 3650 days."
+[cases.inputs]
+calculation = "cumulative_production"
+qi = 1000.0
+di = 0.001
+b = 0.0
+t = 3650.0
+[cases.expected]
+cumulative_value = 974008.8712212447
+[[cases]]
+id = "cumulative_b0_5"
+tolerance = 1.0e-9
+source = "The hyperbolic cumulative at 3650 days."
+[cases.inputs]
+calculation = "cumulative_production"
+qi = 1000.0
+di = 0.001
+b = 0.5
+t = 3650.0
+[cases.expected]
+cumulative_value = 1292035.3982300884
+[[cases]]
+id = "cumulative_b1"
+tolerance = 1.0e-9
+source = "The harmonic cumulative at 3650 days."
+[cases.inputs]
+calculation = "cumulative_production"
+qi = 1000.0
+di = 0.001
+b = 1.0
+t = 3650.0
+[cases.expected]
+cumulative_value = 1536867.219599265
+[[cases]]
+id = "nominal_to_effective"
+tolerance = 1.0e-9
+source = "The daily-to-annual conversion."
+[cases.inputs]
+calculation = "nominal_to_effective_annual"
+d_nominal = 0.001
+[cases.expected]
+effective = 0.30597687659290307
+[[cases]]
+id = "effective_to_nominal"
+tolerance = 1.0e-9
+source = "The inverse conversion."
+[cases.inputs]
+calculation = "effective_to_nominal_annual"
+d_effective = 0.30597687659290307
+[cases.expected]
+nominal = 0.0010000000000000002
+[[cases]]
+id = "instantaneous_decline"
+tolerance = 1.0e-9
+source = "The instantaneous rate at 1000 days."
+[cases.inputs]
+calculation = "instantaneous_decline_rate"
+di = 0.001
+b = 0.5
+t = 1000.0
+[cases.expected]
+instantaneous_decline_rate = 0.0006666666666666666
+[[cases]]
+id = "time_to_rate"
+tolerance = 1.0e-9
+source = "The time to the 50/day economic limit."
+[cases.inputs]
+calculation = "time_to_rate"
+qi = 1000.0
+di = 0.001
+b = 0.5
+q_limit = 50.0
+[cases.expected]
+time_to_rate = 6944.271909999159
+[[cases]]
+id = "eur"
+tolerance = 1.0e-9
+source = "The EUR to the same limit."
+[cases.inputs]
+calculation = "eur"
+qi = 1000.0
+di = 0.001
+b = 0.5
+q_limit = 50.0
+[cases.expected]
+eur = 1552786.404500042
+[[cases]]
+id = "remaining"
+tolerance = 1.0e-9
+source = "The remaining reserves from 1000 days."
+[cases.inputs]
+calculation = "remaining_reserves"
+qi = 1000.0
+di = 0.001
+b = 0.5
+t_current = 1000.0
+q_limit = 50.0
+[cases.expected]
+remaining = 886119.7378333753
+[[cases]]
+id = "forecast"
+tolerance = 1.0e-9
+source = "The 11-point forecast from 0 to 3650 days at a 365-day step."
+[cases.inputs]
+calculation = "forecast"
+qi = 1000.0
+di = 0.001
+b = 0.5
+t_start = 0.0
+t_end = 3650.0
+t_step = 365.0
+[cases.expected]
+time = [0.0, 365.0, 730.0, 1095.0, 1460.0, 1825.0, 2190.0, 2555.0, 2920.0, 3285.0, 3650.0]
+rate = [1000.0, 715.1509191924157, 536.7038334071301, 417.57903335673524, 334.1240936883959, 273.3991199965825, 227.8410353096645, 192.78943417506005, 165.24555489457336, 143.2088997170729, 125.30346933980732]
+cumulative = [0.0, 308668.07610993675, 534798.5347985349, 707592.8917609047, 843930.6358381502, 954248.3660130718, 1045346.0620525057, 1121844.1273326017, 1186991.8699186991, 1243140.9649952697, 1292035.3982300884]
+[[cases]]
+id = "exponential_decline"
+tolerance = 1.0e-9
+source = "The decline between (1000, 0) and (800, 365)."
+[cases.inputs]
+calculation = "estimate_exponential_decline"
+q1 = 1000.0
+t1 = 0.0
+q2 = 800.0
+t2 = 365.0
+[cases.expected]
+exponential_decline = 0.0006113521953813966
+[[cases]]
+id = "hyperbolic_parameters"
+tolerance = 1.0e-9
+source = "Three rate-time points, (1000, 0), (700, 365) and (500, 730)."
+[cases.inputs]
+calculation = "estimate_hyperbolic_parameters"
+q1 = 1000.0
+t1 = 0.0
+q2 = 700.0
+t2 = 365.0
+q3 = 500.0
+t3 = 730.0
+[cases.expected]
+fit_qi = 1000.0
+fit_di = 0.0010077234866140968
+fit_b = 0.17
+[[cases]]
+id = "fit_arps"
+tolerance = 1.0e-9
+source = "The exponential history at 365-day spacing."
+[cases.inputs]
+calculation = "fit_arps"
+history_time = [0.0, 365.0, 730.0, 1095.0, 1460.0, 1825.0, 2190.0, 2555.0, 2920.0, 3285.0, 3650.0]
+history_rate = [1000.0, 694.1966508779789, 481.90899009020245, 334.5396069486076, 232.23627472975883, 161.21764412977677, 111.91674861732888, 77.69223206730236, 53.93368730035602, 37.44058509340732, 25.991128778755346]
+[cases.expected]
+fit_qi = 1000.0000000000024
+fit_di = 0.0010000000000000007
+fit_b = 0.0
+fit_r_squared = 1.0
+[[cases]]
+id = "fit_arps_window"
+tolerance = 1.0e-9
+source = "The same history fitted over samples 2 to 10; its qi is the rate at the window's start."
+[cases.inputs]
+calculation = "fit_arps_window"
+start_index = 2.0
+end_index = 10.0
+history_time = [0.0, 365.0, 730.0, 1095.0, 1460.0, 1825.0, 2190.0, 2555.0, 2920.0, 3285.0, 3650.0]
+history_rate = [1000.0, 694.1966508779789, 481.90899009020245, 334.5396069486076, 232.23627472975883, 161.21764412977677, 111.91674861732888, 77.69223206730236, 53.93368730035602, 37.44058509340732, 25.991128778755346]
+[cases.expected]
+fit_qi = 481.9089900902025
+fit_di = 0.001
+fit_b = 0.0
+fit_r_squared = 1.0
+[[cases]]
+id = "eur_from_fit"
+tolerance = 1.0e-9
+source = "The fitted exponential parameters to a 50/day limit."
+[cases.inputs]
+calculation = "eur_from_fit"
+qi = 1000.0000000000024
+di = 0.0010000000000000007
+b = 0.0
+q_limit = 50.0
+[cases.expected]
+eur = 950000.0000000019
+[[cases]]
+id = "duong_time"
+tolerance = 1.0e-9
+source = "The Duong time function at 365 days."
+[cases.inputs]
+calculation = "duong_time_function"
+a = 0.5
+m = 1.2
+t = 365.0
+[cases.expected]
+duong_time = 0.004757231291140787
+[[cases]]
+id = "rate_duong"
+tolerance = 1.0e-9
+source = "The Duong rate at 365 days."
+[cases.inputs]
+calculation = "rate_duong"
+q1 = 1000.0
+a = 0.5
+m = 1.2
+t = 365.0
+[cases.expected]
+rate_value = 4.757231291140787
+[[cases]]
+id = "cumulative_duong"
+tolerance = 1.0e-9
+source = "The Duong cumulative at 365 days."
+[cases.inputs]
+calculation = "cumulative_duong"
+q1 = 1000.0
+a = 0.5
+m = 1.2
+t = 365.0
+[cases.expected]
+cumulative_value = 11301.489863608776
+[[cases]]
+id = "fit_duong"
+tolerance = 1.0e-9
+source = "A synthetic Duong history at 365-day spacing."
+[cases.inputs]
+calculation = "fit_duong"
+history_time = [365.0, 730.0, 1095.0, 1460.0, 1825.0, 2190.0, 2555.0, 2920.0, 3285.0, 3650.0]
+history_rate = [4.757231291140787, 2.287212692518757, 1.4812221324521913, 1.0855957624315808, 0.8519461805115277, 0.698317982057682, 0.5899231661618876, 0.5095217653950007, 0.4476146151275377, 0.398545722886623]
+[cases.expected]
+duong_q1 = 1.4277584255381969e-13
+duong_a = 23.25369314007713
+duong_m = 1.5558599183309476
+fit_r_squared = 0.9883428581589933
+[[cases]]
+id = "summary"
+tolerance = 1.0e-9
+source = "The class's DCA summary at the hyperbolic test state."
+[cases.inputs]
+calculation = "summary"
+qi = 1000.0
+di = 0.001
+b = 0.5
+q_limit = 50.0
+[cases.expected]
+summary_effective = 0.30597687659290307
+summary_rate_1yr = 714.9997484653228
+summary_rate_5yr = 273.2205153173718
+summary_rate_10yr = 125.19265486869344
+summary_cum_1yr = 308846.8449423951
+summary_cum_5yr = 954590.0032669061
+summary_cum_10yr = 1292348.5183547104
+summary_time_to_limit = 6944.271909999159
+summary_time_to_limit_years = 19.01238031485054
+summary_eur = 1552786.404500042

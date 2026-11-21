@@ -12262,6 +12262,106 @@ class BlackOilCorrelationsResult(_HasWarnings):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class DeclineCurveResult(_HasWarnings):
+    """Result of ``pvt.decline_curve``."""
+
+    CALC_ID: ClassVar[str] = "pvt.decline_curve"
+
+    #: the forecast's times.
+    time: tuple[float, ...] | None
+
+    #: the forecast's rates.
+    rate: tuple[float, ...] | None
+
+    #: the forecast's cumulative production.
+    cumulative: tuple[float, ...] | None
+
+    #: the rate at the stated time.
+    rate_value: float | None
+
+    #: the cumulative production at the stated time.
+    cumulative_value: float | None
+
+    #: the nominal decline rate, 1/day.
+    nominal: float | None
+
+    #: the effective annual decline.
+    effective: float | None
+
+    #: the instantaneous decline rate at the stated time.
+    instantaneous_decline_rate: float | None
+
+    #: the time to reach the economic limit; absent when the decline is zero.
+    time_to_rate: float | None
+
+    #: the estimated ultimate recovery; absent when the decline is zero.
+    eur: float | None
+
+    #: the remaining reserves to the economic limit.
+    remaining: float | None
+
+    #: the exponential decline rate from two points, 1/day.
+    exponential_decline: float | None
+
+    #: the fitted initial rate.
+    fit_qi: float | None
+
+    #: the fitted nominal decline rate.
+    fit_di: float | None
+
+    #: the fitted Arps exponent.
+    fit_b: float | None
+
+    #: the fit's coefficient of determination.
+    fit_r_squared: float | None
+
+    #: the fitted Duong rate at unit time.
+    duong_q1: float | None
+
+    #: the fitted Duong intercept.
+    duong_a: float | None
+
+    #: the fitted Duong slope.
+    duong_m: float | None
+
+    #: the Duong time function at the stated time.
+    duong_time: float | None
+
+    #: the summary's effective annual decline.
+    summary_effective: float | None
+
+    #: the summary's rate at one year.
+    summary_rate_1yr: float | None
+
+    #: the summary's rate at five years.
+    summary_rate_5yr: float | None
+
+    #: the summary's rate at ten years.
+    summary_rate_10yr: float | None
+
+    #: the summary's cumulative at one year.
+    summary_cum_1yr: float | None
+
+    #: the summary's cumulative at five years.
+    summary_cum_5yr: float | None
+
+    #: the summary's cumulative at ten years.
+    summary_cum_10yr: float | None
+
+    #: the summary's time to the economic limit, days.
+    summary_time_to_limit: float | None
+
+    #: the summary's time to the economic limit, years.
+    summary_time_to_limit_years: float | None
+
+    #: the summary's EUR.
+    summary_eur: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class GasCorrelationsResult(_HasWarnings):
     """Result of ``pvt.gas_correlations``."""
 

@@ -10,6 +10,7 @@
 //!   its inputs against.
 
 pub mod black_oil_correlations;
+pub mod decline_curve;
 pub mod gas_correlations;
 pub mod model_gen;
 pub mod model_records_gen;
@@ -19,6 +20,7 @@ pub mod water_correlations;
 pub use black_oil_correlations::{
     BlackOilCorrelationsResult, BlackOilQuery, BlackOilResultRow, black_oil_correlations,
 };
+pub use decline_curve::{DeclineCurveResult, decline_curve};
 pub use gas_correlations::{GasCorrelationsResult, GasQuery, GasResultRow, gas_correlations};
 pub use water_correlations::{
     WaterCorrelationsResult, WaterQuery, WaterResultRow, water_correlations,

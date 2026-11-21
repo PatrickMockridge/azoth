@@ -470,6 +470,7 @@ NAMESPACE_TESTS: dict[str, tuple[str, ...]] = {
         f"{TESTS}/test_black_oil_correlations.py",
         f"{TESTS}/test_gas_correlations.py",
         f"{TESTS}/test_water_correlations.py",
+        f"{TESTS}/test_decline_curve.py",
     ),
     # Nothing imports `azoth.standards` by name: its ids reach their tests through the
     # registration sweeps, which is what a standards change is verified by.

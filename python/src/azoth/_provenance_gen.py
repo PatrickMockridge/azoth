@@ -3920,6 +3920,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 2,
         "tests_skipped": 0,
     },
+    'pvt.decline_curve': {
+        "calc_id": 'pvt.decline_curve',
+        "name": 'Decline-curve analysis',
+        "spec": {'path': 'specs/models/pvt/decline_curve.toml', 'sha256': '0b6ffe946f8b1a5a152c97c54e359afc8f92d17b3a7c90f83084f251bb0d06b2'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/decline_curve.py', 'sha256': '60e7ce997188e0ca145b859de01a0af31e6f7a9cddc706b1c0bd2898f1a12248'}, {'path': 'crates/azoth-pvt/src/decline_curve.rs', 'sha256': '844286c6bf81fc87374bcda73af859837182a0961ef5c8f534a0beffa4d4dbc8'}],
+        "source": 'NeqSim pvtsimulation/util/DeclineCurveAnalysis.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 23,
+        "tests_skipped": 0,
+    },
     'pvt.gas_correlations': {
         "calc_id": 'pvt.gas_correlations',
         "name": 'Gas correlation table',

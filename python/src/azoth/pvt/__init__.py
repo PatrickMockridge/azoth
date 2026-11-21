@@ -22,16 +22,24 @@ from typing import Any
 from azoth._dispatch import resolve
 from azoth.core.result import (
     BlackOilCorrelationsResult,
+    DeclineCurveResult,
     GasCorrelationsResult,
     WaterCorrelationsResult,
 )
 from azoth.pvt import layers as layers
 
 _BLACK_OIL_CORRELATIONS = "pvt.black_oil_correlations"
+_DECLINE_CURVE = "pvt.decline_curve"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
 _WATER_CORRELATIONS = "pvt.water_correlations"
 
-__all__ = ["black_oil_correlations", "gas_correlations", "layers", "water_correlations"]
+__all__ = [
+    "black_oil_correlations",
+    "decline_curve",
+    "gas_correlations",
+    "layers",
+    "water_correlations",
+]
 
 
 def black_oil_correlations(
@@ -108,4 +116,76 @@ def water_correlations(
     """
     return resolve(_WATER_CORRELATIONS)(  # type: ignore[no-any-return]
         queries=queries,
+    )
+
+
+def decline_curve(
+    calculation: str,
+    *,
+    qi: float | None = None,
+    di: float | None = None,
+    b: float | None = None,
+    t: float | None = None,
+    q_limit: float | None = None,
+    d_nominal: float | None = None,
+    d_effective: float | None = None,
+    q1: float | None = None,
+    t1: float | None = None,
+    q2: float | None = None,
+    t2: float | None = None,
+    q3: float | None = None,
+    t3: float | None = None,
+    t_start: float | None = None,
+    t_end: float | None = None,
+    t_step: float | None = None,
+    t_current: float | None = None,
+    a: float | None = None,
+    m: float | None = None,
+    start_index: float | None = None,
+    end_index: float | None = None,
+    history_time: Sequence[float] | None = None,
+    history_rate: Sequence[float] | None = None,
+) -> DeclineCurveResult:
+    """The decline-curve calculation over the stated inputs.
+
+    Rates, times and cumulative volumes are unit-agnostic, the class's own statement; the
+    day is the time unit and 365.25 days the year. ``calculation`` selects the answer, and
+    only the inputs it reads are required. A zero decline leaves the time to the economic
+    limit and the EUR absent, with a warning, rather than publishing an infinity.
+
+    Returns:
+        One result with the fields the calculation answers; the others are absent.
+
+    Raises:
+        InvalidInputError: for an unknown calculation, a missing required scalar, a
+            non-positive rate where a fit needs one, a bad window, fewer than three
+            history points, ``t2 <= t1``, a non-positive time step, or a non-finite answer.
+
+    See :func:`azoth.pvt.reference.decline_curve.decline_curve`.
+    """
+    return resolve(_DECLINE_CURVE)(  # type: ignore[no-any-return]
+        calculation=calculation,
+        qi=qi,
+        di=di,
+        b=b,
+        t=t,
+        q_limit=q_limit,
+        d_nominal=d_nominal,
+        d_effective=d_effective,
+        q1=q1,
+        t1=t1,
+        q2=q2,
+        t2=t2,
+        q3=q3,
+        t3=t3,
+        t_start=t_start,
+        t_end=t_end,
+        t_step=t_step,
+        t_current=t_current,
+        a=a,
+        m=m,
+        start_index=start_index,
+        end_index=end_index,
+        history_time=history_time,
+        history_rate=history_rate,
     )

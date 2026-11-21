@@ -41,6 +41,9 @@ NO_INTERIOR: dict[str, str] = {
     "pvt.water_correlations": (
         "each row is one correlation's answer; no state lies between inputs and value"
     ),
+    "pvt.decline_curve": (
+        "each call is one closed-form answer; the fits' grid search is the answer, not an interior"
+    ),
 }
 
 #: Capture blocks that are evidence rather than a case - a refusal, a fallback or a fluid the

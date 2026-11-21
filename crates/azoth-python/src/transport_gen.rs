@@ -30345,6 +30345,196 @@ impl From<&azoth_pvt::black_oil_correlations::BlackOilCorrelationsResult>
         }
     }
 }
+/// Result of `pvt.decline_curve`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "DeclineCurveResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyDeclineCurveResult {
+    /// the forecast's times.
+    #[pyo3(get)]
+    pub time: Option<Vec<f64>>,
+    /// the forecast's rates.
+    #[pyo3(get)]
+    pub rate: Option<Vec<f64>>,
+    /// the forecast's cumulative production.
+    #[pyo3(get)]
+    pub cumulative: Option<Vec<f64>>,
+    /// the rate at the stated time.
+    #[pyo3(get)]
+    pub rate_value: Option<f64>,
+    /// the cumulative production at the stated time.
+    #[pyo3(get)]
+    pub cumulative_value: Option<f64>,
+    /// the nominal decline rate, 1/day.
+    #[pyo3(get)]
+    pub nominal: Option<f64>,
+    /// the effective annual decline.
+    #[pyo3(get)]
+    pub effective: Option<f64>,
+    /// the instantaneous decline rate at the stated time.
+    #[pyo3(get)]
+    pub instantaneous_decline_rate: Option<f64>,
+    /// the time to reach the economic limit; absent when the decline is zero.
+    #[pyo3(get)]
+    pub time_to_rate: Option<f64>,
+    /// the estimated ultimate recovery; absent when the decline is zero.
+    #[pyo3(get)]
+    pub eur: Option<f64>,
+    /// the remaining reserves to the economic limit.
+    #[pyo3(get)]
+    pub remaining: Option<f64>,
+    /// the exponential decline rate from two points, 1/day.
+    #[pyo3(get)]
+    pub exponential_decline: Option<f64>,
+    /// the fitted initial rate.
+    #[pyo3(get)]
+    pub fit_qi: Option<f64>,
+    /// the fitted nominal decline rate.
+    #[pyo3(get)]
+    pub fit_di: Option<f64>,
+    /// the fitted Arps exponent.
+    #[pyo3(get)]
+    pub fit_b: Option<f64>,
+    /// the fit's coefficient of determination.
+    #[pyo3(get)]
+    pub fit_r_squared: Option<f64>,
+    /// the fitted Duong rate at unit time.
+    #[pyo3(get)]
+    pub duong_q1: Option<f64>,
+    /// the fitted Duong intercept.
+    #[pyo3(get)]
+    pub duong_a: Option<f64>,
+    /// the fitted Duong slope.
+    #[pyo3(get)]
+    pub duong_m: Option<f64>,
+    /// the Duong time function at the stated time.
+    #[pyo3(get)]
+    pub duong_time: Option<f64>,
+    /// the summary's effective annual decline.
+    #[pyo3(get)]
+    pub summary_effective: Option<f64>,
+    /// the summary's rate at one year.
+    #[pyo3(get)]
+    pub summary_rate_1yr: Option<f64>,
+    /// the summary's rate at five years.
+    #[pyo3(get)]
+    pub summary_rate_5yr: Option<f64>,
+    /// the summary's rate at ten years.
+    #[pyo3(get)]
+    pub summary_rate_10yr: Option<f64>,
+    /// the summary's cumulative at one year.
+    #[pyo3(get)]
+    pub summary_cum_1yr: Option<f64>,
+    /// the summary's cumulative at five years.
+    #[pyo3(get)]
+    pub summary_cum_5yr: Option<f64>,
+    /// the summary's cumulative at ten years.
+    #[pyo3(get)]
+    pub summary_cum_10yr: Option<f64>,
+    /// the summary's time to the economic limit, days.
+    #[pyo3(get)]
+    pub summary_time_to_limit: Option<f64>,
+    /// the summary's time to the economic limit, years.
+    #[pyo3(get)]
+    pub summary_time_to_limit_years: Option<f64>,
+    /// the summary's EUR.
+    #[pyo3(get)]
+    pub summary_eur: Option<f64>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyDeclineCurveResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "DeclineCurveResult(time={:?}, rate={:?}, cumulative={:?}, rate_value={:?}, cumulative_value={:?}, nominal={:?}, effective={:?}, instantaneous_decline_rate={:?}, time_to_rate={:?}, eur={:?}, remaining={:?}, exponential_decline={:?}, fit_qi={:?}, fit_di={:?}, fit_b={:?}, fit_r_squared={:?}, duong_q1={:?}, duong_a={:?}, duong_m={:?}, duong_time={:?}, summary_effective={:?}, summary_rate_1yr={:?}, summary_rate_5yr={:?}, summary_rate_10yr={:?}, summary_cum_1yr={:?}, summary_cum_5yr={:?}, summary_cum_10yr={:?}, summary_time_to_limit={:?}, summary_time_to_limit_years={:?}, summary_eur={:?}, {} warning(s))",
+            self.time,
+            self.rate,
+            self.cumulative,
+            self.rate_value,
+            self.cumulative_value,
+            self.nominal,
+            self.effective,
+            self.instantaneous_decline_rate,
+            self.time_to_rate,
+            self.eur,
+            self.remaining,
+            self.exponential_decline,
+            self.fit_qi,
+            self.fit_di,
+            self.fit_b,
+            self.fit_r_squared,
+            self.duong_q1,
+            self.duong_a,
+            self.duong_m,
+            self.duong_time,
+            self.summary_effective,
+            self.summary_rate_1yr,
+            self.summary_rate_5yr,
+            self.summary_rate_10yr,
+            self.summary_cum_1yr,
+            self.summary_cum_5yr,
+            self.summary_cum_10yr,
+            self.summary_time_to_limit,
+            self.summary_time_to_limit_years,
+            self.summary_eur,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::decline_curve::DeclineCurveResult> for PyDeclineCurveResult {
+    fn from(r: &azoth_pvt::decline_curve::DeclineCurveResult) -> Self {
+        Self {
+            time: r
+                .time
+                .as_ref()
+                .map(|values| values.iter().map(|v| *v).collect()),
+            rate: r
+                .rate
+                .as_ref()
+                .map(|values| values.iter().map(|v| *v).collect()),
+            cumulative: r
+                .cumulative
+                .as_ref()
+                .map(|values| values.iter().map(|v| *v).collect()),
+            rate_value: r.rate_value,
+            cumulative_value: r.cumulative_value,
+            nominal: r.nominal,
+            effective: r.effective,
+            instantaneous_decline_rate: r.instantaneous_decline_rate,
+            time_to_rate: r.time_to_rate,
+            eur: r.eur,
+            remaining: r.remaining,
+            exponential_decline: r.exponential_decline,
+            fit_qi: r.fit_qi,
+            fit_di: r.fit_di,
+            fit_b: r.fit_b,
+            fit_r_squared: r.fit_r_squared,
+            duong_q1: r.duong_q1,
+            duong_a: r.duong_a,
+            duong_m: r.duong_m,
+            duong_time: r.duong_time,
+            summary_effective: r.summary_effective,
+            summary_rate_1yr: r.summary_rate_1yr,
+            summary_rate_5yr: r.summary_rate_5yr,
+            summary_rate_10yr: r.summary_rate_10yr,
+            summary_cum_1yr: r.summary_cum_1yr,
+            summary_cum_5yr: r.summary_cum_5yr,
+            summary_cum_10yr: r.summary_cum_10yr,
+            summary_time_to_limit: r.summary_time_to_limit,
+            summary_time_to_limit_years: r.summary_time_to_limit_years,
+            summary_eur: r.summary_eur,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
 /// Result of `pvt.gas_correlations`, transported.
 #[pyclass(
     frozen,

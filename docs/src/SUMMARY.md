@@ -370,6 +370,7 @@
   - [Vessel rupture](./process/vessel_rupture.md)
 - [PVT simulation](./pvt/index.md)
   - [Black-oil correlation table](./pvt/black_oil_correlations.md)
+  - [Decline-curve analysis](./pvt/decline_curve.md)
   - [Gas correlation table](./pvt/gas_correlations.md)
   - [Water and brine correlation table](./pvt/water_correlations.md)
 - [Reactions](./reactions/index.md)

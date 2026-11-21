@@ -1,0 +1,272 @@
+id = "pvt.decline_curve"
+name = "Decline-curve analysis"
+kind = "direct"
+assumptions = [
+    "**unit-agnostic by the class's own statement**: rates, times and cumulative volumes carry whatever consistent unit the caller uses, declared dimensionless. The day is the time unit and 365.25 days the year.",
+    "**the Arps rate at t <= 0 is qi, and the cumulative at t <= 0 is zero**; only `rate_exponential` refuses a negative input.",
+    "**time to a rate and the EUR are absent rather than infinite when the decline is zero**, with a warning; the class answers `+Infinity`.",
+    "**`fit_arps` is a two-pass grid search over b in [0, 1] with an analytic linearisation for qi and di**; `fit_arps_window` runs the same fit over [start_index, end_index].",
+    "**`fit_duong` integrates cumulative production by trapezoid and fits ln(q/Gp) against ln t**, then q1 through the origin; the Duong time function at t <= 0 answers 1 and its cumulative answers 0.",
+    "**`summary` is the union of its rows**: the class's map keys become the named scalars `summary_*`.",
+    "**a missing required scalar, a non-positive rate where a fit needs one, a bad window, fewer than three points and t2 <= t1 are refused.**",
+]
+references = [
+    "Arps, J. J. (1945). \"Analysis of Decline Curves.\" Transactions of the AIME 160(1), 228-247. DOI 10.2118/945228-G.",
+    "Duong, A. N. (2011). \"Rate-Decline Analysis for Fracture-Dominated Shale Reservoirs.\" SPE Reservoir Evaluation & Engineering 14(3), 377-387. DOI 10.2118/137748-PA.",
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/util/DeclineCurveAnalysis.java` is the port source.",
+    "`validation/neqsim/captures/pvt_decline.tsv` - the three Arps forms, the fits on synthetic histories and the Duong round trip.",
+]
+[source]
+standard = "NeqSim pvtsimulation/util/DeclineCurveAnalysis.java"
+edition = "Every rate, cumulative, conversion, forecast, fit and summary method; the class has no other surface."
+[inputs]
+[inputs.calculation]
+type = "enum"
+values = [
+    "rate",
+    "rate_exponential",
+    "rate_hyperbolic",
+    "rate_harmonic",
+    "cumulative_production",
+    "cumulative_exponential",
+    "cumulative_harmonic",
+    "nominal_to_effective_annual",
+    "effective_to_nominal_annual",
+    "instantaneous_decline_rate",
+    "time_to_rate",
+    "eur",
+    "remaining_reserves",
+    "forecast",
+    "estimate_exponential_decline",
+    "estimate_hyperbolic_parameters",
+    "fit_arps",
+    "fit_arps_window",
+    "eur_from_fit",
+    "duong_time_function",
+    "rate_duong",
+    "cumulative_duong",
+    "fit_duong",
+    "summary",
+]
+description = "the decline calculation this call asks for.\n"
+[inputs.qi]
+unit = "dimensionless"
+optional = true
+description = "initial production rate.\n"
+[inputs.di]
+unit = "dimensionless"
+optional = true
+description = "initial nominal decline rate, 1/day.\n"
+[inputs.b]
+unit = "dimensionless"
+optional = true
+description = "the Arps exponent, 0 <= b <= 1.\n"
+[inputs.t]
+unit = "dimensionless"
+optional = true
+description = "elapsed time, days.\n"
+[inputs.q_limit]
+unit = "dimensionless"
+optional = true
+description = "the economic-limit rate.\n"
+[inputs.d_nominal]
+unit = "dimensionless"
+optional = true
+description = "the nominal decline rate, 1/day, for the annual conversion.\n"
+[inputs.d_effective]
+unit = "dimensionless"
+optional = true
+description = "the effective annual decline, a fraction in (0, 1).\n"
+[inputs.q1]
+unit = "dimensionless"
+optional = true
+description = "the first rate-time point, or the Duong rate at unit time.\n"
+[inputs.t1]
+unit = "dimensionless"
+optional = true
+description = "the first point's time, days.\n"
+[inputs.q2]
+unit = "dimensionless"
+optional = true
+description = "the second rate-time point.\n"
+[inputs.t2]
+unit = "dimensionless"
+optional = true
+description = "the second point's time, days.\n"
+[inputs.q3]
+unit = "dimensionless"
+optional = true
+description = "the third rate-time point.\n"
+[inputs.t3]
+unit = "dimensionless"
+optional = true
+description = "the third point's time, days.\n"
+[inputs.t_start]
+unit = "dimensionless"
+optional = true
+description = "the forecast's first time, days.\n"
+[inputs.t_end]
+unit = "dimensionless"
+optional = true
+description = "the forecast's last time, days.\n"
+[inputs.t_step]
+unit = "dimensionless"
+optional = true
+description = "the forecast's time step, days.\n"
+[inputs.t_current]
+unit = "dimensionless"
+optional = true
+description = "the current time for the remaining reserves, days.\n"
+[inputs.a]
+unit = "dimensionless"
+optional = true
+description = "the Duong intercept parameter, 1/day.\n"
+[inputs.m]
+unit = "dimensionless"
+optional = true
+description = "the Duong slope parameter.\n"
+[inputs.start_index]
+unit = "dimensionless"
+optional = true
+description = "the windowed fit's first sample index.\n"
+[inputs.end_index]
+unit = "dimensionless"
+optional = true
+description = "the windowed fit's last sample index.\n"
+[inputs.history_time]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the rate-time history's times, days, strictly increasing for the Duong fit.\n"
+[inputs.history_rate]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the rate-time history's rates, all positive.\n"
+[outputs]
+[outputs.time]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the forecast's times.\n"
+[outputs.rate]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the forecast's rates.\n"
+[outputs.cumulative]
+type = "vector"
+unit = "dimensionless"
+optional = true
+description = "the forecast's cumulative production.\n"
+[outputs.rate_value]
+unit = "dimensionless"
+optional = true
+description = "the rate at the stated time.\n"
+[outputs.cumulative_value]
+unit = "dimensionless"
+optional = true
+description = "the cumulative production at the stated time.\n"
+[outputs.nominal]
+unit = "dimensionless"
+optional = true
+description = "the nominal decline rate, 1/day.\n"
+[outputs.effective]
+unit = "dimensionless"
+optional = true
+description = "the effective annual decline.\n"
+[outputs.instantaneous_decline_rate]
+unit = "dimensionless"
+optional = true
+description = "the instantaneous decline rate at the stated time.\n"
+[outputs.time_to_rate]
+unit = "dimensionless"
+optional = true
+description = "the time to reach the economic limit; absent when the decline is zero.\n"
+[outputs.eur]
+unit = "dimensionless"
+optional = true
+description = "the estimated ultimate recovery; absent when the decline is zero.\n"
+[outputs.remaining]
+unit = "dimensionless"
+optional = true
+description = "the remaining reserves to the economic limit.\n"
+[outputs.exponential_decline]
+unit = "dimensionless"
+optional = true
+description = "the exponential decline rate from two points, 1/day.\n"
+[outputs.fit_qi]
+unit = "dimensionless"
+optional = true
+description = "the fitted initial rate.\n"
+[outputs.fit_di]
+unit = "dimensionless"
+optional = true
+description = "the fitted nominal decline rate.\n"
+[outputs.fit_b]
+unit = "dimensionless"
+optional = true
+description = "the fitted Arps exponent.\n"
+[outputs.fit_r_squared]
+unit = "dimensionless"
+optional = true
+description = "the fit's coefficient of determination.\n"
+[outputs.duong_q1]
+unit = "dimensionless"
+optional = true
+description = "the fitted Duong rate at unit time.\n"
+[outputs.duong_a]
+unit = "dimensionless"
+optional = true
+description = "the fitted Duong intercept.\n"
+[outputs.duong_m]
+unit = "dimensionless"
+optional = true
+description = "the fitted Duong slope.\n"
+[outputs.duong_time]
+unit = "dimensionless"
+optional = true
+description = "the Duong time function at the stated time.\n"
+[outputs.summary_effective]
+unit = "dimensionless"
+optional = true
+description = "the summary's effective annual decline.\n"
+[outputs.summary_rate_1yr]
+unit = "dimensionless"
+optional = true
+description = "the summary's rate at one year.\n"
+[outputs.summary_rate_5yr]
+unit = "dimensionless"
+optional = true
+description = "the summary's rate at five years.\n"
+[outputs.summary_rate_10yr]
+unit = "dimensionless"
+optional = true
+description = "the summary's rate at ten years.\n"
+[outputs.summary_cum_1yr]
+unit = "dimensionless"
+optional = true
+description = "the summary's cumulative at one year.\n"
+[outputs.summary_cum_5yr]
+unit = "dimensionless"
+optional = true
+description = "the summary's cumulative at five years.\n"
+[outputs.summary_cum_10yr]
+unit = "dimensionless"
+optional = true
+description = "the summary's cumulative at ten years.\n"
+[outputs.summary_time_to_limit]
+unit = "dimensionless"
+optional = true
+description = "the summary's time to the economic limit, days.\n"
+[outputs.summary_time_to_limit_years]
+unit = "dimensionless"
+optional = true
+description = "the summary's time to the economic limit, years.\n"
+[outputs.summary_eur]
+unit = "dimensionless"
+optional = true
+description = "the summary's EUR.\n"
+[implementations]
+python = "azoth.pvt.decline_curve"
+rust = "azoth_pvt::decline_curve"

@@ -356,6 +356,7 @@
 //!   - specs/models/process/vessel_filling.toml
 //!   - specs/models/process/vessel_rupture.toml
 //!   - specs/models/pvt/black_oil_correlations.toml
+//!   - specs/models/pvt/decline_curve.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
@@ -6822,6 +6823,29 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "tensile_strength_factor",
         "dimensionless",
     ),
+    ("pvt.decline_curve", "qi", "dimensionless"),
+    ("pvt.decline_curve", "di", "dimensionless"),
+    ("pvt.decline_curve", "b", "dimensionless"),
+    ("pvt.decline_curve", "t", "dimensionless"),
+    ("pvt.decline_curve", "q_limit", "dimensionless"),
+    ("pvt.decline_curve", "d_nominal", "dimensionless"),
+    ("pvt.decline_curve", "d_effective", "dimensionless"),
+    ("pvt.decline_curve", "q1", "dimensionless"),
+    ("pvt.decline_curve", "t1", "dimensionless"),
+    ("pvt.decline_curve", "q2", "dimensionless"),
+    ("pvt.decline_curve", "t2", "dimensionless"),
+    ("pvt.decline_curve", "q3", "dimensionless"),
+    ("pvt.decline_curve", "t3", "dimensionless"),
+    ("pvt.decline_curve", "t_start", "dimensionless"),
+    ("pvt.decline_curve", "t_end", "dimensionless"),
+    ("pvt.decline_curve", "t_step", "dimensionless"),
+    ("pvt.decline_curve", "t_current", "dimensionless"),
+    ("pvt.decline_curve", "a", "dimensionless"),
+    ("pvt.decline_curve", "m", "dimensionless"),
+    ("pvt.decline_curve", "start_index", "dimensionless"),
+    ("pvt.decline_curve", "end_index", "dimensionless"),
+    ("pvt.decline_curve", "history_time", "dimensionless"),
+    ("pvt.decline_curve", "history_rate", "dimensionless"),
     (
         "reactions.chemical_equilibrium",
         "a_matrix",

@@ -187,8 +187,8 @@ def test_the_block_exists_for_every_registered_id() -> None:
     # fire rupture; 373: the open-drain review; 374: the safety-system performance;
     # 375: the cost-estimation calculator; 376: the equipment cost estimate; 377: the process
     # cost estimate; 378: the topsides facility cost; 379: the black-oil correlation table;
-    # 380: the gas correlation table; 381: the water correlation table.
-    assert len(registered) == 381
+    # 380: the gas correlation table; 381: the water correlation table; 382: the decline curve.
+    assert len(registered) == 382
 
 
 def test_the_rust_table_carries_exactly_the_same_ids() -> None:
