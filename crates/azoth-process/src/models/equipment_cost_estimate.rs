@@ -284,6 +284,10 @@ pub struct EquipmentCostSpec {
     pub include_flow_meters: Option<bool>,
     /// The well's all-in capex.
     pub well_capex: Option<f64>,
+    /// The BAHX core's weight.
+    pub core_weight: Option<Mass>,
+    /// The BAHX's total weight.
+    pub total_weight: Option<Mass>,
 }
 
 /// One equipment row of the result.
@@ -451,6 +455,7 @@ pub fn equipment_cost_estimate(
                 | "mixer"
                 | "splitter"
                 | "well"
+                | "bahx"
         ) {
             return Err(AzothError::invalid_input(
                 format!("equipment[{index}].equipment"),
@@ -1122,6 +1127,14 @@ pub fn equipment_cost_estimate(
                 include_control_valves: row.include_control_valves.unwrap_or(false),
                 include_flow_meters: row.include_flow_meters.unwrap_or(false),
                 header_cost_usd: None,
+            }),
+            "bahx" => costing::EquipmentSpec::Bahx(costing::BahxSpec {
+                core_weight_kg: mass(row.core_weight),
+                total_weight_kg: mass(row.total_weight),
+                area_m2: match row.area {
+                    Some(value) => finite(format!("equipment[{index}].area"), value.value)?,
+                    None => 0.0,
+                },
             }),
             "well" => costing::EquipmentSpec::Well(costing::WellSpec {
                 well_capex_usd: finite(

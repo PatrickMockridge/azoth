@@ -36640,6 +36640,129 @@ static EQUIPMENT_COST_ESTIMATE_CASES: &[TestCase] = &[
             ]],
         )],
     },
+    TestCase {
+        id: "bahx",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-12,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "equipment",
+                    value: FieldValue::Name("bahx"),
+                },
+                RecordField {
+                    name: "core_weight",
+                    value: FieldValue::Number(7076.159999999999),
+                },
+                RecordField {
+                    name: "total_weight",
+                    value: FieldValue::Number(7277.613908961697),
+                },
+                RecordField {
+                    name: "area",
+                    value: FieldValue::Number(2100.673511375631),
+                },
+                RecordField {
+                    name: "mechanical_design_present",
+                    value: FieldValue::Flag(true),
+                },
+                RecordField {
+                    name: "max_design_pressure",
+                    value: FieldValue::Number(55.0),
+                },
+                RecordField {
+                    name: "weight_total",
+                    value: FieldValue::Number(7277.613908961697),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "equipment",
+            &[&[
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name(""),
+                },
+                RecordField {
+                    name: "equipment_type",
+                    value: FieldValue::Name("BAHX"),
+                },
+                RecordField {
+                    name: "purchased_equipment_cost",
+                    value: FieldValue::Number(596625.9198089183),
+                },
+                RecordField {
+                    name: "bare_module_cost",
+                    value: FieldValue::Number(2335790.476051915),
+                },
+                RecordField {
+                    name: "total_module_cost",
+                    value: FieldValue::Number(2919738.095064894),
+                },
+                RecordField {
+                    name: "grass_roots_cost",
+                    value: FieldValue::Number(4379607.142597341),
+                },
+                RecordField {
+                    name: "total_cost",
+                    value: FieldValue::Number(2919738.095064894),
+                },
+                RecordField {
+                    name: "installation_man_hours",
+                    value: FieldValue::Number(254.7164868136594),
+                },
+                RecordField {
+                    name: "material_factor",
+                    value: FieldValue::Number(1.0),
+                },
+                RecordField {
+                    name: "equipment_cost",
+                    value: FieldValue::Number(596625.9198089183),
+                },
+                RecordField {
+                    name: "installed_cost",
+                    value: FieldValue::Number(2297009.7912643356),
+                },
+                RecordField {
+                    name: "specific_cost_per_m2",
+                    value: FieldValue::Number(284.01649117678284),
+                },
+                RecordField {
+                    name: "specific_capex_per_kw",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annual_maintenance_cost",
+                    value: FieldValue::Number(11932.518396178366),
+                },
+                RecordField {
+                    name: "sorbent_replacement_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "annual_operating_cost",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "calculated_weight",
+                    value: FieldValue::Number(0.0),
+                },
+            ]],
+        )],
+    },
 ];
 
 static EQUIPMENT_COST_ESTIMATE_ALGORITHM: ModelAlgorithm = ModelAlgorithm {

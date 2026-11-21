@@ -296,3 +296,15 @@ equipment = [
 equipment = [
   { name = "", equipment_type = "well", purchased_equipment_cost = 80000000.0, bare_module_cost = 80000000.0, total_module_cost = 80000000.0, grass_roots_cost = 80000000.0, total_cost = 80000000.0, installation_man_hours = 0.0, material_factor = 1.0, equipment_cost = 0.0, installed_cost = 0.0, specific_cost_per_m2 = 0.0, specific_capex_per_kw = 0.0, annual_maintenance_cost = 0.0, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
 ]
+[[cases]]
+id = "bahx"
+tolerance = 1.0e-12
+source = "`BAHXCostEstimator` on the class's LNG exchanger (`equipment_bahx`): a 7076.16 kg core in a 7277.61 kg assembly with 2100.67 m2 of area at a 55 barg design pressure. **The estimator has its own installed and maintenance chains beside the shared stack**."
+[cases.inputs]
+equipment = [
+  { equipment = "bahx", core_weight = 7076.159999999999, total_weight = 7277.613908961697, area = 2100.673511375631, mechanical_design_present = true, max_design_pressure = 55.0, weight_total = 7277.613908961697 },
+]
+[cases.expected]
+equipment = [
+  { name = "", equipment_type = "BAHX", purchased_equipment_cost = 596625.9198089183, bare_module_cost = 2335790.476051915, total_module_cost = 2919738.095064894, grass_roots_cost = 4379607.142597341, total_cost = 2919738.095064894, installation_man_hours = 254.7164868136594, material_factor = 1.0, equipment_cost = 596625.9198089183, installed_cost = 2297009.7912643356, specific_cost_per_m2 = 284.01649117678284, specific_capex_per_kw = 0.0, annual_maintenance_cost = 11932.518396178366, sorbent_replacement_cost = 0.0, annual_operating_cost = 0.0, calculated_weight = 0.0 },
+]

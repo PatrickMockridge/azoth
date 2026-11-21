@@ -263,3 +263,18 @@ grass_roots_cost=8.0E7
 installation_man_hours=0.0
 total_cost=8.0E7
 
+equipment_bahx
+core_weight_kg=7076.159999999999
+total_weight_kg=7277.613908961697
+area_m2=2100.673511375631
+equipment_cost=596625.9198089183
+installed_cost=2297009.7912643356
+specific_cost_per_m2=284.01649117678284
+annual_maintenance_cost=11932.518396178366
+purchased_equipment_cost=596625.9198089183
+bare_module_cost=2335790.476051915
+total_module_cost=2919738.095064894
+grass_roots_cost=4379607.142597341
+installation_man_hours=254.7164868136594
+total_cost=2919738.095064894
+

@@ -20786,5 +20786,68 @@ public class ProcessProbe {
         new neqsim.process.costestimation.well.WellFlowCostEstimate(null);
     well.setWellCapexUsd(80.0e6);
     printCostItem("equipment_well", well);
+
+    SystemSrkEos bahxHotFluid = new SystemSrkEos(303.15, 50.0);
+    bahxHotFluid.addComponent("methane", 0.90);
+    bahxHotFluid.addComponent("ethane", 0.05);
+    bahxHotFluid.addComponent("propane", 0.03);
+    bahxHotFluid.addComponent("nitrogen", 0.02);
+    bahxHotFluid.setMixingRule("classic");
+    Stream bahxHot = new Stream("hot_feed", bahxHotFluid);
+    bahxHot.setFlowRate(100000.0, "kg/hr");
+    bahxHot.setTemperature(30.0, "C");
+    bahxHot.setPressure(50.0, "bara");
+
+    SystemSrkEos bahxColdFluid = new SystemSrkEos(113.15, 3.0);
+    bahxColdFluid.addComponent("methane", 0.40);
+    bahxColdFluid.addComponent("ethane", 0.30);
+    bahxColdFluid.addComponent("propane", 0.30);
+    bahxColdFluid.setMixingRule("classic");
+    Stream bahxCold = new Stream("cold_ref", bahxColdFluid);
+    bahxCold.setFlowRate(150000.0, "kg/hr");
+    bahxCold.setTemperature(-33.0, "C");
+    bahxCold.setPressure(3.0, "bara");
+
+    neqsim.process.equipment.heatexchanger.LNGHeatExchanger bahx =
+        new neqsim.process.equipment.heatexchanger.LNGHeatExchanger("MCHE-cost");
+    bahx.addInStream(bahxHot);
+    bahx.addInStream(bahxCold);
+    bahx.setNumberOfZones(10);
+    bahx.setExchangerType("BAHX");
+    neqsim.process.equipment.heatexchanger.LNGHeatExchanger.CoreGeometry bahxCore =
+        new neqsim.process.equipment.heatexchanger.LNGHeatExchanger.CoreGeometry();
+    bahxCore.setLength(6.0);
+    bahxCore.setWidth(1.2);
+    bahxCore.setHeight(1.2);
+    bahx.setCoreGeometry(bahxCore);
+    neqsim.process.processmodel.ProcessSystem bahxProcess =
+        new neqsim.process.processmodel.ProcessSystem();
+    bahxProcess.add(bahxHot);
+    bahxProcess.add(bahxCold);
+    bahxProcess.add(bahx);
+    bahxProcess.run();
+    neqsim.process.mechanicaldesign.heatexchanger.BAHXMechanicalDesign bahxDesign =
+        new neqsim.process.mechanicaldesign.heatexchanger.BAHXMechanicalDesign(bahx);
+    bahxDesign.setMaxOperationPressure(50.0);
+    bahxDesign.setMaxOperationTemperature(273.15 + 30.0);
+    bahxDesign.calcDesign();
+    neqsim.process.costestimation.heatexchanger.BAHXCostEstimator bahxCost =
+        new neqsim.process.costestimation.heatexchanger.BAHXCostEstimator(bahxDesign);
+    bahxCost.calculateCostEstimate();
+    System.out.println("equipment_bahx");
+    System.out.println("core_weight_kg=" + bahxDesign.getCoreWeightKg());
+    System.out.println("total_weight_kg=" + bahxDesign.getWeightTotal());
+    System.out.println("area_m2=" + bahxDesign.getHeatTransferAreaM2());
+    System.out.println("equipment_cost=" + bahxCost.getEquipmentCostUSD());
+    System.out.println("installed_cost=" + bahxCost.getInstalledCostUSD());
+    System.out.println("specific_cost_per_m2=" + bahxCost.getSpecificCostPerM2());
+    System.out.println("annual_maintenance_cost=" + bahxCost.getAnnualMaintenanceCostUSD());
+    System.out.println("purchased_equipment_cost=" + bahxCost.getPurchasedEquipmentCost());
+    System.out.println("bare_module_cost=" + bahxCost.getBareModuleCost());
+    System.out.println("total_module_cost=" + bahxCost.getTotalModuleCost());
+    System.out.println("grass_roots_cost=" + bahxCost.getGrassRootsCost());
+    System.out.println("installation_man_hours=" + bahxCost.getInstallationManHours());
+    System.out.println("total_cost=" + bahxCost.getTotalCost());
+    System.out.println();
   }
 }

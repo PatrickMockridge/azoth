@@ -38,7 +38,7 @@ row_type = "EquipmentCostSpec"
 description = "one equipment item per row, in caller order; `equipment` selects the kind and the kind's fields.\n"
 [inputs.equipment.fields.equipment]
 type = "enum"
-values = ["separator", "column", "absorber", "reactor", "compressor", "pump", "expander", "heat_exchanger", "tank", "filter", "manifold", "mercury_removal", "electrolyzer", "psa", "ejector", "pipe", "valve", "mixer", "splitter", "well"]
+values = ["separator", "column", "absorber", "reactor", "compressor", "pump", "expander", "heat_exchanger", "tank", "filter", "manifold", "mercury_removal", "electrolyzer", "psa", "ejector", "pipe", "valve", "mixer", "splitter", "well", "bahx"]
 description = "the equipment kind, which selects the fields the row must carry.\n"
 [inputs.equipment.fields.name]
 type = "string"
@@ -596,6 +596,14 @@ description = "whether a flow meter is costed on every splitter outlet; absent i
 unit = "dimensionless"
 optional = true
 description = "the well's all-in drilling and completion capex, USD; absent is 75e6 and negative values clamp to zero.\n"
+[inputs.equipment.fields.core_weight]
+unit = "kg"
+optional = true
+description = "the BAHX core's weight.\n"
+[inputs.equipment.fields.total_weight]
+unit = "kg"
+optional = true
+description = "the BAHX's total weight, whose excess over the core is the header and nozzle weight.\n"
 [outputs]
 [outputs.equipment]
 type = "record_list"

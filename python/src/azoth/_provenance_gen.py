@@ -2779,12 +2779,12 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
     'process.equipment_cost_estimate': {
         "calc_id": 'process.equipment_cost_estimate',
         "name": 'Equipment cost estimate',
-        "spec": {'path': 'specs/models/process/equipment_cost_estimate.toml', 'sha256': '54e21e6551049bbc7a2d47dc7652429a7b79f552015e16b199d79f09272d30ea'},
-        "code": [{'path': 'python/src/azoth/process/reference/equipment_cost_estimate.py', 'sha256': '7d132c11d61c4e566b06bbd08e830b5c5d41da590aedfaf04a29529c100fa40f'}, {'path': 'crates/azoth-process/src/models/equipment_cost_estimate.rs', 'sha256': '519811c88d0589ed0215ed1d44fec559a7f554c4c366dc8872094278e66faf1a'}],
+        "spec": {'path': 'specs/models/process/equipment_cost_estimate.toml', 'sha256': '0fa76a97e7b21610aa28408a499238f88b5c85aa1af13eab0ef8422c7001e528'},
+        "code": [{'path': 'python/src/azoth/process/reference/equipment_cost_estimate.py', 'sha256': '561eba527b4ff87f47790880b6107da0531b76d619f800498ccf3e328f7784ab'}, {'path': 'crates/azoth-process/src/models/equipment_cost_estimate.rs', 'sha256': 'bd0e15fe365326542eb0e8717d8baa6974bc1947251381656c97f9d354e2a86a'}],
         "source": 'NeqSim process/costestimation/UnitCostEstimateBaseClass.java',
         "verification": 'partially_verified',
         "validation_cases": 0,
-        "tests_active": 24,
+        "tests_active": 25,
         "tests_skipped": 0,
     },
     'process.escalation_graph': {

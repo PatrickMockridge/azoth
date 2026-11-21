@@ -9392,7 +9392,7 @@ UNCASED_ROWS: dict[str, int] = {
     "process_cost_calculator.tsv": 5,
     # The equipment estimate's seven states: three columns, two absorbers and the separator
     # with its bill of materials. The id is a `NO_INTERIOR` model.
-    "process_cost_equipment.tsv": 7,
+    "process_cost_equipment.tsv": 25,
     # The dispersion capture's five: four SRK rows, the class's own tests' cubic kept as
     # evidence beside the PR oracle, and the zero-rate refusal the port raises rather than
     # reproduces.

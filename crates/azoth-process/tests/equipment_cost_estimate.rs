@@ -142,6 +142,8 @@ fn row(equipment: &str) -> EquipmentCostSpec {
         include_control_valves: None,
         include_flow_meters: None,
         well_capex: None,
+        core_weight: None,
+        total_weight: None,
     }
 }
 
@@ -595,4 +597,31 @@ fn the_pipework_states_match_the_capture() {
     assert_eq!(result.equipment[4].bare_module_cost, 80.0e6);
     assert_eq!(result.equipment[4].total_cost, 80.0e6);
     assert_eq!(result.equipment[4].installation_man_hours, 0.0);
+}
+
+#[test]
+fn the_bahx_matches_the_capture() {
+    let mut bahx = row("bahx");
+    bahx.core_weight = Some(Mass::new::<kilogram>(7076.159999999999));
+    bahx.total_weight = Some(Mass::new::<kilogram>(7277.613908961697));
+    bahx.area = Some(azoth_core::units::Area::new::<
+        azoth_core::units::square_meter,
+    >(2100.673511375631));
+    bahx.mechanical_design_present = Some(true);
+    bahx.max_design_pressure = Some(Pressure::new::<bar>(55.0));
+    bahx.weight_total = Some(Mass::new::<kilogram>(7277.613908961697));
+
+    let result = run(vec![bahx]);
+    let row = &result.equipment[0];
+    assert!(close(row.purchased_equipment_cost, 596625.9198089183));
+    assert!(close(row.bare_module_cost, 2335790.476051915));
+    assert!(close(row.total_module_cost, 2919738.095064894));
+    assert!(close(
+        row.installation_man_hours,
+        254.7164868136594 * 3600.0
+    ));
+    assert!(close(row.equipment_cost, 596625.9198089183));
+    assert!(close(row.installed_cost, 2297009.7912643356));
+    assert!(close(row.specific_cost_per_m2, 284.01649117678284));
+    assert!(close(row.annual_maintenance_cost, 11932.518396178366));
 }

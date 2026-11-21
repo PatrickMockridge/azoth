@@ -44,6 +44,7 @@ _KINDS = (
     "mixer",
     "splitter",
     "well",
+    "bahx",
 )
 
 _MATERIALS = {
@@ -367,6 +368,13 @@ def _machine_spec(index: int, row: dict[str, Any], kind: str) -> dict[str, Any]:
         return {
             "kind": "well",
             "well_capex_usd": max(_number(row, "well_capex", 75.0e6), 0.0),
+        }
+    if kind == "bahx":
+        return {
+            "kind": "bahx",
+            "core_weight_kg": _number(row, "core_weight"),
+            "total_weight_kg": _number(row, "total_weight"),
+            "area_m2": _number(row, "area"),
         }
     return {
         "kind": "expander",

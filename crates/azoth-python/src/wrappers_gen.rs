@@ -6690,6 +6690,8 @@ pub fn equipment_cost_estimate(
                     include_control_valves: row.include_control_valves,
                     include_flow_meters: row.include_flow_meters,
                     well_capex: row.well_capex,
+                    core_weight: row.core_weight.map(kilograms),
+                    total_weight: row.total_weight.map(kilograms),
                 },
             )
             .collect();

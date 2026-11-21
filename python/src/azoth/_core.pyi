@@ -717,6 +717,8 @@ class EquipmentCostSpec(TypedDict):
     include_control_valves: bool | None
     include_flow_meters: bool | None
     well_capex: float | None
+    core_weight: float | None
+    total_weight: float | None
 
 class EscalationItem(TypedDict):
     """One row of a `record_list` input, as the extension takes it: the named fields the spec declares, each as the SI magnitude it crosses as."""

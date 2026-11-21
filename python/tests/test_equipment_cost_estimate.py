@@ -413,3 +413,28 @@ def test_the_pipework_states_match_the_capture() -> None:
     assert result.equipment[4].bare_module_cost == 80000000.0
     assert result.equipment[4].total_cost == 80000000.0
     assert hours(result.equipment[4].installation_man_hours) == 0.0
+
+
+def test_the_bahx_matches_the_capture() -> None:
+    result = equipment_cost_estimate(
+        [
+            {
+                "equipment": "bahx",
+                "core_weight": quantity(7076.159999999999, "kg"),
+                "total_weight": quantity(7277.613908961697, "kg"),
+                "area": quantity(2100.673511375631, "m**2"),
+                "mechanical_design_present": True,
+                "max_design_pressure": quantity(55.0, "bar"),
+                "weight_total": quantity(7277.613908961697, "kg"),
+            }
+        ]
+    )
+    row = result.equipment[0]
+    assert close(row.purchased_equipment_cost, 596625.9198089183)
+    assert close(row.bare_module_cost, 2335790.476051915)
+    assert close(row.total_module_cost, 2919738.095064894)
+    assert close(hours(row.installation_man_hours), 254.7164868136594)
+    assert close(row.equipment_cost, 596625.9198089183)
+    assert close(row.installed_cost, 2297009.7912643356)
+    assert close(row.specific_cost_per_m2, 284.01649117678284)
+    assert close(row.annual_maintenance_cost, 11932.518396178366)
