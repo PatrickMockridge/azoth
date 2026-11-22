@@ -30,7 +30,6 @@ use crate::kernels::absorption_column::absorption_column as kernel;
 use crate::kernels::distillation_column::{SolverType, tray_streams};
 use crate::models::distillation_column::{build_pumparound_returns, build_side_draw_flow};
 use crate::stream::Stream;
-use crate::unported;
 
 /// Result of `process.absorption_column`.
 ///
