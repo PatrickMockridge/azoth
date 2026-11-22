@@ -30,7 +30,6 @@ use crate::kernels::absorption_column::absorption_column as kernel;
 use crate::kernels::distillation_column::{SolverType, tray_streams};
 use crate::models::distillation_column::{build_pumparound_returns, build_side_draw_flow};
 use crate::stream::Stream;
-use crate::unported;
 
 /// Result of `process.absorption_column`.
 ///
@@ -275,18 +274,18 @@ pub fn absorption_column(
             .clone(),
         )
     };
-    // The same eight `process.distillation_column` refuses, from this id's own declaration.
+    // The same strategies `process.distillation_column` refuses, from this id's own declaration.
     let solver = match solver_type.unwrap_or("direct_substitution") {
         "direct_substitution" => SolverType::DirectSubstitution,
         "naphtali_sandholm" => SolverType::NaphtaliSandholm,
-        "damped_substitution" => return Err(unported::refuse("solver_type=damped_substitution")),
-        "inside_out" => return Err(unported::refuse("solver_type=inside_out")),
-        "matrix_inside_out" => return Err(unported::refuse("solver_type=matrix_inside_out")),
-        "wegstein" => return Err(unported::refuse("solver_type=wegstein")),
-        "sum_rates" => return Err(unported::refuse("solver_type=sum_rates")),
-        "newton" => return Err(unported::refuse("solver_type=newton")),
-        "mesh_residual" => return Err(unported::refuse("solver_type=mesh_residual")),
-        "auto" => return Err(unported::refuse("solver_type=auto")),
+        "damped_substitution" => SolverType::DampedSubstitution,
+        "inside_out" => SolverType::InsideOut,
+        "matrix_inside_out" => SolverType::MatrixInsideOut,
+        "wegstein" => SolverType::Wegstein,
+        "sum_rates" => SolverType::SumRates,
+        "newton" => SolverType::Newton,
+        "mesh_residual" => SolverType::MeshResidual,
+        "auto" => SolverType::Auto,
         other => {
             return Err(AzothError::invalid_input(
                 "solver_type",

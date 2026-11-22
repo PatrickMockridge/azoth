@@ -127,14 +127,6 @@ holds the declaration and the two languages to each other.
 
 | Value | NeqSim | Measured by |
 |---|---|---|
-| `solver_type` = `damped_substitution` | `DampedSubstitutionSolver` | `validation/neqsim/captures/process_column_solvers.tsv` |
-| `solver_type` = `inside_out` | `InsideOutSolver` | `validation/neqsim/captures/process_column_solvers.tsv` |
-| `solver_type` = `matrix_inside_out` | `MatrixInsideOutSolver` | `validation/neqsim/captures/process_column_solvers.tsv` |
-| `solver_type` = `wegstein` | `WegsteinSolver` | `validation/neqsim/captures/process_column_solvers.tsv` |
-| `solver_type` = `sum_rates` | `SumRatesSolver` | `validation/neqsim/captures/process_column_solvers.tsv` |
-| `solver_type` = `newton` | `TemperatureNewtonSolver` | `validation/neqsim/captures/process_column_solvers.tsv` |
-| `solver_type` = `mesh_residual` | `MeshResidualSolver` | `validation/neqsim/captures/process_column_solvers.tsv` |
-| `solver_type` = `auto` | `AutoSolver` | `validation/neqsim/captures/process_column_solvers.tsv` |
 | `contactor_internals_type` = `packed` | `PackedColumnMechanicalDesign` | `validation/neqsim/captures/process_column_mechanical_design.tsv` |
 
 
@@ -147,7 +139,7 @@ holds the declaration and the two languages to each other.
 - **the products are the class's own getters**: `getGasOutStream` is the treated gas leaving the top stage and `getLiquidOutStream` the loaded solvent leaving the bottom, which is what the terminal trays publish when there are no ends.
 - **both inlets carry the same substances in the same order.** The class indexes every tray's components by one list built from its first feed, so a solvent naming different substances is a different fluid rather than an inlet, and this refuses it.
 - **the fluid is PR with the classic mixing rule**, because `Stream::mixture()` resolves `databank::mixture_of(names, Cubic::Pr, None)` and has no other route.
-- **`murphree_efficiency` and `component_murphree_efficiency` are declared and refused**, as are the eight strategies of `solver_type` this port does not carry. Each refusal names the class that would close it. What is owed here is the override, which corrects both phases.
+- **`murphree_efficiency` and `component_murphree_efficiency` are declared and refused**, as are the two strategies of `solver_type` this port does not carry. Each refusal names the class that would close it. What is owed here is the override, which corrects both phases.
 - **`reactive` is measured rather than assumed**: no sibling test calls `setReactive`. On a fluid with no independent reaction the reactive route *is* the equilibrium one - bit-identical across all sixty-nine captured keys of the packed column's oracle.
 - **On a reacting fluid the class does not converge it**: the hydrocarbon absorber at this port's own gate ends `FALLBACK_PRODUCTS`, mass residual `6.4e5` - its own log calls that not a rigorous result. The states neither library converges are refused.
 

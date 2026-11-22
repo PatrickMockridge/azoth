@@ -855,6 +855,7 @@ def _outcome(mesh: Mesh, iterations: int, residual: float) -> _States:
         condenser_duty=condenser_duty,
         reboiler_duty=reboiler_duty,
         iterations=iterations,
+        solver_used="naphtali_sandholm",
         # **The temperature residual is the scaled MESH norm here**, which is this solver's own
         # convergence measure; NeqSim's column reports a `NaN` in that field under this strategy.
         temperature_residual=residual,
