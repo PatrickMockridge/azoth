@@ -3374,3 +3374,29 @@ weight basis, the nine MTO rows and the quality flags.
 The electrical and HVAC allowance MTO weights are `NaN` in the class; the port publishes
 `has_weight` false with a zero weight. The facility-type and context flags are the class's
 own strings, and a Class 4 or coarser basis adds its not-detailed flag after them.
+
+### The PVT laboratory captures
+
+`PvtProbe` against the pin: eight subcommands, one capture each, in the id's SI units and
+with absent fields omitted. Compile once, then run each:
+
+```bash
+../../tools/gated.sh javac -proc:none -cp neqsim-118d9af.jar -d . PvtProbe.java
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe saturation > captures/pvt_saturation.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe cce > captures/pvt_constant_mass_expansion.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe dle > captures/pvt_differential_liberation.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe cvd > captures/pvt_constant_volume_depletion.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe separator > captures/pvt_separator.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe swelling > captures/pvt_swelling.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe mmp > captures/pvt_mmp.tsv
+../../tools/gated.sh java -cp .:neqsim-118d9af.jar PvtProbe property_sweep > captures/pvt_property_sweep.tsv
+```
+
+The probe reads a few private arrays by reflection, walking the superclass chain: that is
+probe surface, not the class surface, and a field rename at a later pin breaks this file
+rather than an id. Three blocks are evidence rather than expectations. The DLE capture's
+350 K block records the class's phase-0 trace volume of 7e-10 m3, which makes its relative
+volumes 2e5. The separator train's stage oil density is read before the carried phase's
+physical properties are re-initialised, so it is the previous stage's density. The property
+sweep has no wax block: the class's wax model refuses a databank n-alkane wax former, and
+the TBP fluid the upstream wax tests use cannot be built from characterization rows.
