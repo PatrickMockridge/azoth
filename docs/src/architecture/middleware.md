@@ -24,7 +24,9 @@ answer. **Their dispatch is the library's own kernels**, not a second executor: 
 dispatcher is generated from `specs/calcs` and the safety study's native ids are the
 thirty-one scalar safety models plus `process.bow_tie`, called as the typed model kernels they
 are. The safety catalogue is attached to the one catalogue call by the
-bindings that own it, because `azoth-process` cannot depend on a crate that depends on it.
+bindings that own it, because `azoth-process` cannot depend on a crate that depends on it. The
+same projection carries the 23-family registry and each deck's copy, so a front end draws its
+tabs and its catalogue from the library's answer rather than a second list.
 
 ## The gap
 
