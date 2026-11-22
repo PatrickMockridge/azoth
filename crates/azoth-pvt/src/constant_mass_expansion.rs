@@ -84,10 +84,10 @@ pub struct ConstantMassExpansionResult {
 ///   propagates the flash's refusals.
 pub fn constant_mass_expansion(
     components: &[FluidComponent],
-    eos: Option<&str>,
-    mixing_rule: Option<&str>,
     temperature: ThermodynamicTemperature,
     pressures: &[f64],
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
     volume_correction: Option<bool>,
 ) -> Result<ConstantMassExpansionResult> {
     let fluid = Fluid::from_rows(

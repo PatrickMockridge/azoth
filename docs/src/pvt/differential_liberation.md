@@ -20,10 +20,10 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 | Name | Unit | Description |
 |---|---|---|
 | `components` | - | The fluids' components, one record each, in the order the fluids carry them. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips. |
-| `eos` | srk / pr | *Optional.* the cubic the fluid is built for; absent is srk, the classes' `SystemSrkEos`. |
-| `mixing_rule` | classic / zero | *Optional.* the interaction matrix; absent is classic, NeqSim's `setMixingRule(2)`. |
 | `temperature` | K | the experiment temperature. |
 | `pressures` | Pa | the schedule's absolute pressures, in the order they are reported. |
+| `eos` | srk / pr | *Optional.* the cubic the fluid is built for; absent is srk, the classes' `SystemSrkEos`. |
+| `mixing_rule` | classic / zero | *Optional.* the interaction matrix; absent is classic, NeqSim's `setMixingRule(2)`. |
 | `volume_correction` | - | *Optional.* whether the Peneloux translation is applied; absent is true, NeqSim's default. |
 
 
@@ -72,3 +72,5 @@ declared checks *that call* could not evaluate.
 
 - NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/DifferentialLiberation.java` at commit 118d9af is the port source.
 - `validation/neqsim/captures/pvt_differential_liberation.tsv` - a ten-point schedule, a 350 K evidence block, and a seven-point schedule whose first point is single phase.
+- NeqSim #5209 - the saturation volume is phase 0 at the last bisection midpoint; at 350 K that is a trace gas and the relative volumes reach 2e5.
+- NeqSim #5195 (closed) - the relative gas gravity divides by 28.0 g/mol rather than air's, and the gas Z is not volume-corrected; the pin predates the fix.

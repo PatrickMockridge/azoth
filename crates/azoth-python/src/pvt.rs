@@ -47,19 +47,19 @@ fn component(row: crate::records_gen::FluidComponent) -> FluidComponent {
 /// All arguments are SI magnitudes. See the module documentation for why the injection gas's
 /// optional `record_list` makes this binding hand-written.
 #[pyfunction]
-#[pyo3(signature = (components, injection_gas, eos, mixing_rule, temperature, cumulative_gas_injected, volume_correction))]
+#[pyo3(signature = (components, cumulative_gas_injected, injection_gas, eos, mixing_rule, temperature, volume_correction))]
 #[pyo3(
-    text_signature = "(components, injection_gas, eos, mixing_rule, temperature, cumulative_gas_injected, volume_correction)"
+    text_signature = "(components, cumulative_gas_injected, injection_gas, eos, mixing_rule, temperature, volume_correction)"
 )]
 #[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
 pub fn swelling_test(
     py: Python<'_>,
     components: Vec<crate::records_gen::FluidComponent>,
+    cumulative_gas_injected: Vec<f64>,
     injection_gas: Option<Vec<crate::records_gen::FluidComponent>>,
     eos: Option<&str>,
     mixing_rule: Option<&str>,
     temperature: Option<f64>,
-    cumulative_gas_injected: Vec<f64>,
     volume_correction: Option<bool>,
 ) -> PyResult<crate::transport_gen::PySwellingTestResult> {
     let oil: Vec<FluidComponent> = components.into_iter().map(component).collect();

@@ -20,10 +20,10 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 | Name | Unit | Description |
 |---|---|---|
 | `components` | - | The fluids' components, one record each, in the order the fluids carry them. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips. |
-| `eos` | srk / pr | *Optional.* the cubic the fluid is built for; absent is srk, the classes' `SystemSrkEos`. |
-| `mixing_rule` | classic / zero | *Optional.* the interaction matrix; absent is classic, NeqSim's `setMixingRule(2)`. |
 | `temperature` | K | the experiment temperature. |
 | `pressures` | Pa | the schedule's absolute pressures, in the order they are reported. |
+| `eos` | srk / pr | *Optional.* the cubic the fluid is built for; absent is srk, the classes' `SystemSrkEos`. |
+| `mixing_rule` | classic / zero | *Optional.* the interaction matrix; absent is classic, NeqSim's `setMixingRule(2)`. |
 | `volume_correction` | - | *Optional.* whether the Peneloux translation is applied; absent is true, NeqSim's default. |
 
 
@@ -73,3 +73,5 @@ declared checks *that call* could not evaluate.
 
 - NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/ConstantMassExpansion.java` at commit 118d9af is the port source.
 - `validation/neqsim/captures/pvt_constant_mass_expansion.tsv` - two seven-point CCEs and a single-phase schedule.
+- NeqSim #5209 - the class takes phase 0's volume as the saturation volume, which is a trace phase when the midpoint flash is two-phase.
+- NeqSim #5195 (closed) - the relative volume ignores the Peneloux shift; the pin predates the fix.

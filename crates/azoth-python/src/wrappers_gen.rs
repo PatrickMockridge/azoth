@@ -10035,17 +10035,17 @@ pub fn black_oil_correlations(
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
 #[pyfunction]
-#[pyo3(signature = (components, eos, mixing_rule, temperature, pressures, volume_correction))]
+#[pyo3(signature = (components, temperature, pressures, eos, mixing_rule, volume_correction))]
 #[pyo3(
-    text_signature = "(components, eos, mixing_rule, temperature, pressures, volume_correction)"
+    text_signature = "(components, temperature, pressures, eos, mixing_rule, volume_correction)"
 )]
 pub fn constant_mass_expansion(
     py: Python<'_>,
     components: Vec<crate::records_gen::FluidComponent>,
-    eos: Option<&str>,
-    mixing_rule: Option<&str>,
     temperature: f64,
     pressures: Vec<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
     volume_correction: Option<bool>,
 ) -> PyResult<crate::transport_gen::PyConstantMassExpansionResult> {
     let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
@@ -10080,10 +10080,10 @@ pub fn constant_mass_expansion(
         .collect();
     azoth_pvt::constant_mass_expansion::constant_mass_expansion(
         &components_records,
-        eos,
-        mixing_rule,
         kelvins(temperature),
         &pressures,
+        eos,
+        mixing_rule,
         volume_correction,
     )
     .map(|r| crate::transport_gen::PyConstantMassExpansionResult::from(&r))
@@ -10094,17 +10094,17 @@ pub fn constant_mass_expansion(
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
 #[pyfunction]
-#[pyo3(signature = (components, eos, mixing_rule, temperature, pressures, volume_correction))]
+#[pyo3(signature = (components, temperature, pressures, eos, mixing_rule, volume_correction))]
 #[pyo3(
-    text_signature = "(components, eos, mixing_rule, temperature, pressures, volume_correction)"
+    text_signature = "(components, temperature, pressures, eos, mixing_rule, volume_correction)"
 )]
 pub fn constant_volume_depletion(
     py: Python<'_>,
     components: Vec<crate::records_gen::FluidComponent>,
-    eos: Option<&str>,
-    mixing_rule: Option<&str>,
     temperature: f64,
     pressures: Vec<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
     volume_correction: Option<bool>,
 ) -> PyResult<crate::transport_gen::PyConstantVolumeDepletionResult> {
     let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
@@ -10139,10 +10139,10 @@ pub fn constant_volume_depletion(
         .collect();
     azoth_pvt::constant_volume_depletion::constant_volume_depletion(
         &components_records,
-        eos,
-        mixing_rule,
         kelvins(temperature),
         &pressures,
+        eos,
+        mixing_rule,
         volume_correction,
     )
     .map(|r| crate::transport_gen::PyConstantVolumeDepletionResult::from(&r))
@@ -10219,17 +10219,17 @@ pub fn decline_curve(
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
 #[pyfunction]
-#[pyo3(signature = (components, eos, mixing_rule, temperature, pressures, volume_correction))]
+#[pyo3(signature = (components, temperature, pressures, eos, mixing_rule, volume_correction))]
 #[pyo3(
-    text_signature = "(components, eos, mixing_rule, temperature, pressures, volume_correction)"
+    text_signature = "(components, temperature, pressures, eos, mixing_rule, volume_correction)"
 )]
 pub fn differential_liberation(
     py: Python<'_>,
     components: Vec<crate::records_gen::FluidComponent>,
-    eos: Option<&str>,
-    mixing_rule: Option<&str>,
     temperature: f64,
     pressures: Vec<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
     volume_correction: Option<bool>,
 ) -> PyResult<crate::transport_gen::PyDifferentialLiberationResult> {
     let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
@@ -10264,10 +10264,10 @@ pub fn differential_liberation(
         .collect();
     azoth_pvt::differential_liberation::differential_liberation(
         &components_records,
-        eos,
-        mixing_rule,
         kelvins(temperature),
         &pressures,
+        eos,
+        mixing_rule,
         volume_correction,
     )
     .map(|r| crate::transport_gen::PyDifferentialLiberationResult::from(&r))
@@ -10347,18 +10347,18 @@ pub fn gas_material_balance(
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
 #[pyfunction]
-#[pyo3(signature = (oil_components, gas_components, eos, mixing_rule, temperature, method, recovery_threshold, number_of_pressure_points, min_pressure, max_pressure, slim_tube_nodes, pv_injected))]
+#[pyo3(signature = (oil_components, gas_components, temperature, eos, mixing_rule, method, recovery_threshold, number_of_pressure_points, min_pressure, max_pressure, slim_tube_nodes, pv_injected))]
 #[pyo3(
-    text_signature = "(oil_components, gas_components, eos, mixing_rule, temperature, method, recovery_threshold, number_of_pressure_points, min_pressure, max_pressure, slim_tube_nodes, pv_injected)"
+    text_signature = "(oil_components, gas_components, temperature, eos, mixing_rule, method, recovery_threshold, number_of_pressure_points, min_pressure, max_pressure, slim_tube_nodes, pv_injected)"
 )]
 #[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
 pub fn mmp(
     py: Python<'_>,
     oil_components: Vec<crate::records_gen::FluidComponent>,
     gas_components: Vec<crate::records_gen::FluidComponent>,
+    temperature: f64,
     eos: Option<&str>,
     mixing_rule: Option<&str>,
-    temperature: f64,
     method: Option<&str>,
     recovery_threshold: Option<f64>,
     number_of_pressure_points: Option<usize>,
@@ -10432,9 +10432,9 @@ pub fn mmp(
     azoth_pvt::mmp::mmp(
         &oil_components_records,
         &gas_components_records,
+        kelvins(temperature),
         eos,
         mixing_rule,
-        kelvins(temperature),
         method,
         recovery_threshold,
         number_of_pressure_points,
@@ -10521,19 +10521,19 @@ pub fn oil_material_balance(
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.
 #[pyfunction]
-#[pyo3(signature = (components, mode, eos, mixing_rule, temperatures, pressures, volume_correction))]
+#[pyo3(signature = (components, mode, temperatures, pressures, eos, mixing_rule, volume_correction))]
 #[pyo3(
-    text_signature = "(components, mode, eos, mixing_rule, temperatures, pressures, volume_correction)"
+    text_signature = "(components, mode, temperatures, pressures, eos, mixing_rule, volume_correction)"
 )]
 #[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
 pub fn property_sweep(
     py: Python<'_>,
     components: Vec<crate::records_gen::FluidComponent>,
     mode: &str,
-    eos: Option<&str>,
-    mixing_rule: Option<&str>,
     temperatures: Vec<f64>,
     pressures: Vec<f64>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
     volume_correction: Option<bool>,
 ) -> PyResult<crate::transport_gen::PyPropertySweepResult> {
     let components_records: Vec<azoth_characterization::component_row::FluidComponent> = components
@@ -10569,10 +10569,10 @@ pub fn property_sweep(
     azoth_pvt::property_sweep::property_sweep(
         &components_records,
         mode,
-        eos,
-        mixing_rule,
         &temperatures,
         &pressures,
+        eos,
+        mixing_rule,
         volume_correction,
     )
     .map(|r| crate::transport_gen::PyPropertySweepResult::from(&r))

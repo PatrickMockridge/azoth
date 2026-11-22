@@ -63,10 +63,10 @@ pub struct PropertySweepResult {
 pub fn property_sweep(
     components: &[FluidComponent],
     mode: &str,
-    eos: Option<&str>,
-    mixing_rule: Option<&str>,
     temperatures: &[f64],
     pressures: &[f64],
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
     volume_correction: Option<bool>,
 ) -> Result<PropertySweepResult> {
     let fluid = Fluid::from_rows(

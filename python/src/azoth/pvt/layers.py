@@ -152,7 +152,10 @@ def _cvd(inputs: Mapping[str, Any]) -> dict[str, float]:
         rows_out[at + "total_volume_m3"] = point.total_volume.to("m**3").magnitude
         rows_out[at + "relative_volume"] = point.relative_volume
         rows_out[at + "cumulative_mole_fraction_depleted"] = point.cumulative_mole_fraction_depleted
-        rows_out[at + "material_balance_relative_error"] = point.material_balance_relative_error
+        if point.material_balance_relative_error is not None:
+            rows_out[at + "material_balance_relative_error"] = (
+                point.material_balance_relative_error
+            )
         rows_out[at + "zmix"] = point.zmix
         if point.z_gas is not None:
             rows_out[at + "z_gas"] = point.z_gas

@@ -78,10 +78,10 @@ pub struct DifferentialLiberationResult {
 ///   propagates the flashes' refusals.
 pub fn differential_liberation(
     components: &[FluidComponent],
-    eos: Option<&str>,
-    mixing_rule: Option<&str>,
     temperature: ThermodynamicTemperature,
     pressures: &[f64],
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
     volume_correction: Option<bool>,
 ) -> Result<DifferentialLiberationResult> {
     let feed = Fluid::from_rows(

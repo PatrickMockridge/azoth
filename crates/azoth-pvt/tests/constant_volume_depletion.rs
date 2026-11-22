@@ -12,7 +12,7 @@ fn binary(first: &str, first_moles: f64, second: &str, second_moles: f64) -> Vec
 }
 
 fn call(components: &[FluidComponent], t: f64, pressures: &[f64]) -> ConstantVolumeDepletionResult {
-    constant_volume_depletion(components, None, None, kelvins(t), pressures, None).unwrap()
+    constant_volume_depletion(components, kelvins(t), pressures, None, None, None).unwrap()
 }
 
 fn close(actual: f64, expected: f64) -> bool {
@@ -94,10 +94,10 @@ fn the_k_values_are_one_row_per_pressure_and_never_negative() {
 fn a_schedule_is_required() {
     let err = constant_volume_depletion(
         &binary("methane", 1.0, "nC10", 1.0),
-        None,
-        None,
         kelvins(300.0),
         &[],
+        None,
+        None,
         None,
     )
     .expect_err("a CVD needs pressures");

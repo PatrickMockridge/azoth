@@ -14,6 +14,7 @@ assumptions = [
 references = [
     "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/MMPCalculator.java` at commit 118d9af is the port source.",
     "`validation/neqsim/captures/pvt_mmp.tsv` - a three-point immiscible slim tube, its rising-bubble twin, the key tie line, a ten-point grid and a wide slim tube that reaches the threshold.",
+    "NeqSim #4566 - the rising-bubble delegation, the single-proportion first-contact test and the silent omission of an injection component the oil does not carry.",
 ]
 [source]
 standard = "NeqSim pvtsimulation/simulation/MMPCalculator.java"
@@ -204,6 +205,9 @@ unit = "dimensionless"
 optional = true
 description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
 
+[inputs.temperature]
+unit = "K"
+description = "the experiment temperature.\n"
 [inputs.eos]
 type = "enum"
 values = ["srk", "pr"]
@@ -214,9 +218,6 @@ type = "enum"
 values = ["classic", "zero"]
 optional = true
 description = "the interaction matrix; absent is classic.\n"
-[inputs.temperature]
-unit = "K"
-description = "the experiment temperature.\n"
 [inputs.method]
 type = "enum"
 values = ["slim_tube", "key_tie_line", "rising_bubble"]

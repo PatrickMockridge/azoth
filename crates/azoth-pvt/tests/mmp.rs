@@ -32,9 +32,9 @@ fn call(
     mmp(
         &oil(),
         &gas(),
-        None,
-        None,
         kelvins(323.15),
+        None,
+        None,
         Some(method),
         Some(threshold),
         Some(points),
@@ -97,9 +97,9 @@ fn a_gas_without_a_shared_component_is_refused() {
     let err = mmp(
         &oil(),
         &rows(&[("CO2", 1.0)]),
-        None,
-        None,
         kelvins(323.15),
+        None,
+        None,
         None,
         None,
         None,

@@ -14,6 +14,8 @@ assumptions = [
 references = [
     "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/ConstantMassExpansion.java` at commit 118d9af is the port source.",
     "`validation/neqsim/captures/pvt_constant_mass_expansion.tsv` - two seven-point CCEs and a single-phase schedule.",
+    "NeqSim #5209 - the class takes phase 0's volume as the saturation volume, which is a trace phase when the midpoint flash is two-phase.",
+    "NeqSim #5195 (closed) - the relative volume ignores the Peneloux shift; the pin predates the fix.",
 ]
 [source]
 standard = "NeqSim pvtsimulation/simulation/ConstantMassExpansion.java"
@@ -112,6 +114,13 @@ unit = "dimensionless"
 optional = true
 description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
 
+[inputs.temperature]
+unit = "K"
+description = "the experiment temperature.\n"
+[inputs.pressures]
+type = "vector"
+unit = "Pa"
+description = "the schedule's absolute pressures, in the order they are reported.\n"
 [inputs.eos]
 type = "enum"
 values = ["srk", "pr"]
@@ -122,13 +131,6 @@ type = "enum"
 values = ["classic", "zero"]
 optional = true
 description = "the interaction matrix; absent is classic, NeqSim's `setMixingRule(2)`.\n"
-[inputs.temperature]
-unit = "K"
-description = "the experiment temperature.\n"
-[inputs.pressures]
-type = "vector"
-unit = "Pa"
-description = "the schedule's absolute pressures, in the order they are reported.\n"
 [inputs.volume_correction]
 type = "boolean"
 optional = true

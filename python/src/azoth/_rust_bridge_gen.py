@@ -10487,10 +10487,10 @@ def constant_mass_expansion(components: Sequence[Mapping[str, Any]], *, pressure
     spec = _models_gen.model("pvt.constant_mass_expansion")
     result = _core.constant_mass_expansion(
         input_records_to_si(spec, "components", components),
-        eos,
-        mixing_rule,
         _si(spec, "temperature", temperature),
         [_si(spec, "pressures", v) for v in pressures],
+        eos,
+        mixing_rule,
         volume_correction,
     )
     return ConstantMassExpansionResult(
@@ -10508,10 +10508,10 @@ def constant_volume_depletion(components: Sequence[Mapping[str, Any]], *, pressu
     spec = _models_gen.model("pvt.constant_volume_depletion")
     result = _core.constant_volume_depletion(
         input_records_to_si(spec, "components", components),
-        eos,
-        mixing_rule,
         _si(spec, "temperature", temperature),
         [_si(spec, "pressures", v) for v in pressures],
+        eos,
+        mixing_rule,
         volume_correction,
     )
     return ConstantVolumeDepletionResult(
@@ -10594,10 +10594,10 @@ def differential_liberation(components: Sequence[Mapping[str, Any]], *, pressure
     spec = _models_gen.model("pvt.differential_liberation")
     result = _core.differential_liberation(
         input_records_to_si(spec, "components", components),
-        eos,
-        mixing_rule,
         _si(spec, "temperature", temperature),
         [_si(spec, "pressures", v) for v in pressures],
+        eos,
+        mixing_rule,
         volume_correction,
     )
     return DifferentialLiberationResult(
@@ -10653,9 +10653,9 @@ def mmp(oil_components: Sequence[Mapping[str, Any]], gas_components: Sequence[Ma
     result = _core.mmp(
         input_records_to_si(spec, "oil_components", oil_components),
         input_records_to_si(spec, "gas_components", gas_components),
+        _si(spec, "temperature", temperature),
         eos,
         mixing_rule,
-        _si(spec, "temperature", temperature),
         method,
         None if recovery_threshold is None else recovery_threshold,
         None if number_of_pressure_points is None else _count("number_of_pressure_points", number_of_pressure_points),
@@ -10724,10 +10724,10 @@ def property_sweep(components: Sequence[Mapping[str, Any]], mode: str, *, temper
     result = _core.property_sweep(
         input_records_to_si(spec, "components", components),
         mode,
-        eos,
-        mixing_rule,
         [_si(spec, "temperatures", v) for v in temperatures],
         [_si(spec, "pressures", v) for v in pressures],
+        eos,
+        mixing_rule,
         volume_correction,
     )
     return PropertySweepResult(
@@ -10798,11 +10798,11 @@ def swelling_test(components: Sequence[Mapping[str, Any]], *, cumulative_gas_inj
     spec = _models_gen.model("pvt.swelling_test")
     result = _core.swelling_test(
         input_records_to_si(spec, "components", components),
+        list(cumulative_gas_injected),
         None if injection_gas is None else input_records_to_si(spec, "injection_gas", injection_gas),
         eos,
         mixing_rule,
         None if temperature is None else _si(spec, "temperature", temperature),
-        list(cumulative_gas_injected),
         volume_correction,
     )
     return SwellingTestResult(

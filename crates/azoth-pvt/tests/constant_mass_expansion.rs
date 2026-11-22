@@ -12,7 +12,7 @@ fn binary(first: &str, first_moles: f64, second: &str, second_moles: f64) -> Vec
 }
 
 fn call(components: &[FluidComponent], t: f64, pressures: &[f64]) -> ConstantMassExpansionResult {
-    constant_mass_expansion(components, None, None, kelvins(t), pressures, None).unwrap()
+    constant_mass_expansion(components, kelvins(t), pressures, None, None, None).unwrap()
 }
 
 fn close(actual: f64, expected: f64) -> bool {
@@ -165,10 +165,10 @@ fn the_other_fluids_match_their_capture_blocks() {
 fn a_pressure_schedule_is_required() {
     let err = constant_mass_expansion(
         &binary("methane", 1.0, "nC10", 1.0),
-        None,
-        None,
         kelvins(300.0),
         &[],
+        None,
+        None,
         None,
     )
     .expect_err("a CCE needs pressures");

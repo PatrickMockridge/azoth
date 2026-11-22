@@ -12,6 +12,7 @@ assumptions = [
 references = [
     "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/DensitySim.java` and `ViscositySim.java` at commit 118d9af are the port source.",
     "`validation/neqsim/captures/pvt_property_sweep.tsv` - a two-phase binary and a pure-gas sweep, in both modes.",
+    "NeqSim #5210 - `WaxFractionSim` throws on a named-component wax feed built with `addTBPWax()`.",
 ]
 [source]
 standard = "NeqSim pvtsimulation/simulation/DensitySim.java and ViscositySim.java"
@@ -114,6 +115,14 @@ description = "The fitted coefficient of the pseudo-component's Soave alpha func
 type = "enum"
 values = ["density", "viscosity"]
 description = "which property the sweep reports.\n"
+[inputs.temperatures]
+type = "vector"
+unit = "K"
+description = "the states' temperatures.\n"
+[inputs.pressures]
+type = "vector"
+unit = "Pa"
+description = "the states' pressures, parallel to the temperatures.\n"
 [inputs.eos]
 type = "enum"
 values = ["srk", "pr"]
@@ -124,14 +133,6 @@ type = "enum"
 values = ["classic", "zero"]
 optional = true
 description = "the interaction matrix; absent is classic.\n"
-[inputs.temperatures]
-type = "vector"
-unit = "K"
-description = "the states' temperatures.\n"
-[inputs.pressures]
-type = "vector"
-unit = "Pa"
-description = "the states' pressures, parallel to the temperatures.\n"
 [inputs.volume_correction]
 type = "boolean"
 optional = true

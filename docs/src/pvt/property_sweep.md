@@ -21,10 +21,10 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 |---|---|---|
 | `components` | - | The fluids' components, one record each, in the order the fluids carry them. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips. |
 | `mode` | density / viscosity | which property the sweep reports. |
-| `eos` | srk / pr | *Optional.* the cubic; absent is srk. |
-| `mixing_rule` | classic / zero | *Optional.* the interaction matrix; absent is classic. |
 | `temperatures` | K | the states' temperatures. |
 | `pressures` | Pa | the states' pressures, parallel to the temperatures. |
+| `eos` | srk / pr | *Optional.* the cubic; absent is srk. |
+| `mixing_rule` | classic / zero | *Optional.* the interaction matrix; absent is classic. |
 | `volume_correction` | - | *Optional.* whether the Peneloux translation is applied; absent is true. |
 
 
@@ -69,3 +69,4 @@ declared checks *that call* could not evaluate.
 
 - NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/DensitySim.java` and `ViscositySim.java` at commit 118d9af are the port source.
 - `validation/neqsim/captures/pvt_property_sweep.tsv` - a two-phase binary and a pure-gas sweep, in both modes.
+- NeqSim #5210 - `WaxFractionSim` throws on a named-component wax feed built with `addTBPWax()`.

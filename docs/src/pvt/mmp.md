@@ -21,9 +21,9 @@ A **direct** model: a computation over vectors, with no iteration and therefore 
 |---|---|---|
 | `oil_components` | - | The oil's components, one record each. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips. |
 | `gas_components` | - | The injection gas's components, one record each. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips. |
+| `temperature` | K | the experiment temperature. |
 | `eos` | srk / pr | *Optional.* the cubic; absent is srk. |
 | `mixing_rule` | classic / zero | *Optional.* the interaction matrix; absent is classic. |
-| `temperature` | K | the experiment temperature. |
 | `method` | slim_tube / key_tie_line / rising_bubble | *Optional.* the MMP method; absent is slim_tube. |
 | `recovery_threshold` | dimensionless | *Optional.* the recovery fraction defining the MMP; absent is 0.90. |
 | `number_of_pressure_points` | dimensionless | *Optional.* the slim tube's pressure grid points; absent is 10. |
@@ -79,3 +79,4 @@ declared checks *that call* could not evaluate.
 
 - NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/MMPCalculator.java` at commit 118d9af is the port source.
 - `validation/neqsim/captures/pvt_mmp.tsv` - a three-point immiscible slim tube, its rising-bubble twin, the key tie line, a ten-point grid and a wide slim tube that reaches the threshold.
+- NeqSim #4566 - the rising-bubble delegation, the single-proportion first-contact test and the silent omission of an injection component the oil does not carry.

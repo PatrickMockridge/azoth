@@ -128,10 +128,10 @@ def differential_liberation(
     """
     return resolve(_DIFFERENTIAL_LIBERATION)(  # type: ignore[no-any-return]
         components=components,
-        eos=eos,
-        mixing_rule=mixing_rule,
         temperature=temperature,
         pressures=pressures,
+        eos=eos,
+        mixing_rule=mixing_rule,
         volume_correction=volume_correction,
     )
 
@@ -164,10 +164,10 @@ def constant_volume_depletion(
     """
     return resolve(_CONSTANT_VOLUME_DEPLETION)(  # type: ignore[no-any-return]
         components=components,
-        eos=eos,
-        mixing_rule=mixing_rule,
         temperature=temperature,
         pressures=pressures,
+        eos=eos,
+        mixing_rule=mixing_rule,
         volume_correction=volume_correction,
     )
 
@@ -298,9 +298,9 @@ def mmp(
     return resolve(_MMP)(  # type: ignore[no-any-return]
         oil_components=oil_components,
         gas_components=gas_components,
+        temperature=temperature,
         eos=eos,
         mixing_rule=mixing_rule,
-        temperature=temperature,
         method=method,
         recovery_threshold=recovery_threshold,
         number_of_pressure_points=number_of_pressure_points,
@@ -340,10 +340,10 @@ def property_sweep(
     return resolve(_PROPERTY_SWEEP)(  # type: ignore[no-any-return]
         components=components,
         mode=mode,
-        eos=eos,
-        mixing_rule=mixing_rule,
         temperatures=temperatures,
         pressures=pressures,
+        eos=eos,
+        mixing_rule=mixing_rule,
         volume_correction=volume_correction,
     )
 
@@ -427,10 +427,10 @@ def constant_mass_expansion(
     """
     return resolve(_CONSTANT_MASS_EXPANSION)(  # type: ignore[no-any-return]
         components=components,
-        eos=eos,
-        mixing_rule=mixing_rule,
         temperature=temperature,
         pressures=pressures,
+        eos=eos,
+        mixing_rule=mixing_rule,
         volume_correction=volume_correction,
     )
 

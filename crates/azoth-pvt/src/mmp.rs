@@ -57,9 +57,9 @@ pub struct MmpResult {
 pub fn mmp(
     oil_components: &[FluidComponent],
     gas_components: &[FluidComponent],
+    temperature: ThermodynamicTemperature,
     eos: Option<&str>,
     mixing_rule: Option<&str>,
-    temperature: ThermodynamicTemperature,
     method: Option<&str>,
     recovery_threshold: Option<f64>,
     number_of_pressure_points: Option<usize>,

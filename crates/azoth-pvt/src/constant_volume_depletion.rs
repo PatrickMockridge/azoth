@@ -78,10 +78,10 @@ pub struct ConstantVolumeDepletionResult {
 ///   the flashes' refusals.
 pub fn constant_volume_depletion(
     components: &[FluidComponent],
-    eos: Option<&str>,
-    mixing_rule: Option<&str>,
     temperature: ThermodynamicTemperature,
     pressures: &[f64],
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
     volume_correction: Option<bool>,
 ) -> Result<ConstantVolumeDepletionResult> {
     let feed = Fluid::from_rows(

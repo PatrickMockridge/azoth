@@ -24,7 +24,7 @@ fn call(
     temperatures: &[f64],
     pressures: &[f64],
 ) -> PropertySweepResult {
-    property_sweep(components, mode, None, None, temperatures, pressures, None).unwrap()
+    property_sweep(components, mode, temperatures, pressures, None, None, None).unwrap()
 }
 
 #[test]
@@ -99,10 +99,10 @@ fn the_wax_modes_are_owed_and_the_grid_is_checked() {
     let err = property_sweep(
         &binary(),
         "wax_fraction",
-        None,
-        None,
         &[300.0],
         &[5.0e5],
+        None,
+        None,
         None,
     )
     .expect_err("the wax modes are owed with the TBP wax model");
@@ -111,10 +111,10 @@ fn the_wax_modes_are_owed_and_the_grid_is_checked() {
     let err = property_sweep(
         &binary(),
         "density",
-        None,
-        None,
         &[300.0, 290.0],
         &[5.0e5],
+        None,
+        None,
         None,
     )
     .expect_err("the schedule's arrays are parallel");

@@ -90,3 +90,4 @@ declared checks *that call* could not evaluate.
 
 - NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/GOR.java`, `SeparatorTest.java` and `MultiStageSeparatorTest.java` at commit 118d9af are the port source.
 - `validation/neqsim/captures/pvt_separator.tsv` - the continuous and staged cascades on a binary, the upstream 11-component train, and its first-stage optimisation.
+- NeqSim #5208 - the train reads the carried phase's density before re-initialising it, so the stage row is the previous stage's density.

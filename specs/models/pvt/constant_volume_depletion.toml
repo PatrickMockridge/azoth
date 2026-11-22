@@ -15,6 +15,7 @@ assumptions = [
 references = [
     "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/ConstantVolumeDepletion.java` at commit 118d9af is the port source.",
     "`validation/neqsim/captures/pvt_constant_volume_depletion.tsv` - an eight-point schedule through the restoration, the same fluid at 350 K, and a richer 0.60/0.40 fluid.",
+    "NeqSim #5209 - the same phase-0 indexing the saturation classes use.",
 ]
 [source]
 standard = "NeqSim pvtsimulation/simulation/ConstantVolumeDepletion.java"
@@ -113,6 +114,13 @@ unit = "dimensionless"
 optional = true
 description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
 
+[inputs.temperature]
+unit = "K"
+description = "the experiment temperature.\n"
+[inputs.pressures]
+type = "vector"
+unit = "Pa"
+description = "the schedule's absolute pressures, in the order they are reported.\n"
 [inputs.eos]
 type = "enum"
 values = ["srk", "pr"]
@@ -123,13 +131,6 @@ type = "enum"
 values = ["classic", "zero"]
 optional = true
 description = "the interaction matrix; absent is classic, NeqSim's `setMixingRule(2)`.\n"
-[inputs.temperature]
-unit = "K"
-description = "the experiment temperature.\n"
-[inputs.pressures]
-type = "vector"
-unit = "Pa"
-description = "the schedule's absolute pressures, in the order they are reported.\n"
 [inputs.volume_correction]
 type = "boolean"
 optional = true

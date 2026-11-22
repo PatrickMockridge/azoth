@@ -15,6 +15,8 @@ assumptions = [
 references = [
     "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/DifferentialLiberation.java` at commit 118d9af is the port source.",
     "`validation/neqsim/captures/pvt_differential_liberation.tsv` - a ten-point schedule, a 350 K evidence block, and a seven-point schedule whose first point is single phase.",
+    "NeqSim #5209 - the saturation volume is phase 0 at the last bisection midpoint; at 350 K that is a trace gas and the relative volumes reach 2e5.",
+    "NeqSim #5195 (closed) - the relative gas gravity divides by 28.0 g/mol rather than air's, and the gas Z is not volume-corrected; the pin predates the fix.",
 ]
 [source]
 standard = "NeqSim pvtsimulation/simulation/DifferentialLiberation.java"
@@ -113,6 +115,13 @@ unit = "dimensionless"
 optional = true
 description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
 
+[inputs.temperature]
+unit = "K"
+description = "the experiment temperature.\n"
+[inputs.pressures]
+type = "vector"
+unit = "Pa"
+description = "the schedule's absolute pressures, in the order they are reported.\n"
 [inputs.eos]
 type = "enum"
 values = ["srk", "pr"]
@@ -123,13 +132,6 @@ type = "enum"
 values = ["classic", "zero"]
 optional = true
 description = "the interaction matrix; absent is classic, NeqSim's `setMixingRule(2)`.\n"
-[inputs.temperature]
-unit = "K"
-description = "the experiment temperature.\n"
-[inputs.pressures]
-type = "vector"
-unit = "Pa"
-description = "the schedule's absolute pressures, in the order they are reported.\n"
 [inputs.volume_correction]
 type = "boolean"
 optional = true
