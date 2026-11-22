@@ -192,12 +192,10 @@ def absorption_column(
     if solver_type is not None and solver_type not in (
         "direct_substitution",
         "damped_substitution",
+        "inside_out",
+        "matrix_inside_out",
         "naphtali_sandholm",
     ):
-        if solver_type == "inside_out":
-            raise _unported.refuse("solver_type=inside_out")
-        if solver_type == "matrix_inside_out":
-            raise _unported.refuse("solver_type=matrix_inside_out")
         if solver_type == "wegstein":
             raise _unported.refuse("solver_type=wegstein")
         if solver_type == "sum_rates":

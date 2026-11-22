@@ -46,6 +46,8 @@ from azoth.core.range import apply_checks, checks_for
 from azoth.core.result import DistillationColumnResult
 from azoth.core.units import Q, from_si, input_to_si, quantity
 from azoth.core.warnings import Warning
+from azoth.eos import components as _components
+from azoth.eos.reference._entropy_state import molar_mass_of
 from azoth.eos.reference.pt_flash import check_composition
 from azoth.process.kernels import Stream
 from azoth.process.reference import _column_stage as _stage
@@ -384,8 +386,9 @@ def _distillation_column_states(
             different correction.
         tray_murphree_efficiency: one override per stage, ``NaN`` where a stage falls through
             to ``murphree_efficiency``; a length that is not ``number_of_stages`` is refused.
-        solver_type: **``direct_substitution``, ``damped_substitution`` and
-            ``naphtali_sandholm`` are ported**; the class's default is the first.
+        solver_type: **``direct_substitution``, ``damped_substitution``, ``inside_out``,
+            ``matrix_inside_out`` and ``naphtali_sandholm`` are ported**; the class's default
+            is the first.
         top_specification_type: the top product's degree of freedom, one of
             :data:`SPECIFICATION_KINDS`; omitted, the top is pinned by temperature instead.
         top_specification_target: its target, in the unit its type implies: dimensionless for a
@@ -841,8 +844,8 @@ def distillation_column(
         condenser_temperature: the condenser's temperature, which pins the top tray.
         murphree_efficiency: the column-wide Murphree tray efficiency.
         tray_murphree_efficiency: one override per stage, ``NaN`` where a stage falls through.
-        solver_type: **``direct_substitution``, ``damped_substitution`` and
-            ``naphtali_sandholm`` are ported**.
+        solver_type: **``direct_substitution``, ``damped_substitution``, ``inside_out``,
+            ``matrix_inside_out`` and ``naphtali_sandholm`` are ported**.
         top_specification_type: the top product's degree of freedom.
         top_specification_target: its target value.
         top_specification_component: the component a purity or a recovery constrains.
@@ -1531,6 +1534,13 @@ def _states(
     gas_link = list(gas)
     liquid_link = list(liquid)
 
+    def mass_flow(stream: StreamRecord | None) -> float:
+        """A stream's mass flow in kg/s, which is the stripping factor's V and L."""
+        if stream is None:
+            return 0.0
+        mixture, _ = _components.mixture_of(list(stream["components"]), eos="pr")
+        return stream["n"] * molar_mass_of(mixture, list(stream["z"]))
+
     def sweep(temperatures: list[float], initial_relaxation: float = 1.0) -> tuple[int, float]:
         """`solveSequential`: the sweeps, once, to the temperature gate.
 
@@ -1605,6 +1615,81 @@ def _states(
 
         return took, temperature_residual
 
+    def inside_out_sweep(temperatures: list[float]) -> tuple[int, float]:
+        """`solveInsideOut`: three relaxed sweeps, a stripping correction and the faster ramp.
+
+        **The surrogate inner loop and the Newton handoff are not carried**: the inner loop
+        writes tray temperatures the next outer flash overwrites, so it cannot move the fixed
+        point, and the handoff needs eight trays where the captured binary has six.
+        """
+        relaxation = min(max(0.8, MIN_SEQUENTIAL_RELAXATION), MAX_ADAPTIVE_RELAXATION)
+        previous_combined = float("inf")
+        temperature_residual = float("inf")
+        took = 0
+        previous_gas: list[StreamRecord | None] = [None] * tray_count
+        previous_liquid: list[StreamRecord | None] = [None] * tray_count
+        for iteration in range(1, max_iterations + 1):
+            took = iteration
+            old = [temperature(i) for i in range(tray_count)]
+            current_gas: list[StreamRecord | None] = [None] * tray_count
+            current_liquid: list[StreamRecord | None] = [None] * tray_count
+
+            for i in range(feed_stage, 0, -1):
+                relaxed = relax_link(previous_liquid[i], liquid[i], relaxation)
+                liquid_link[i] = relaxed
+                current_liquid[i] = relaxed
+                tray = i - 1
+                lower = gas_link[tray - 1] if tray > 0 else None
+                run_with(tray, linked_inlets(tray, lower, liquid_link[i]))
+            for i in range(1, tray_count):
+                relaxed = relax_link(previous_gas[i - 1], gas[i - 1], relaxation)
+                gas_link[i - 1] = relaxed
+                current_gas[i - 1] = relaxed
+                upper = liquid_link[i + 1] if i + 1 < tray_count else None
+                run_with(i, linked_inlets(i, gas_link[i - 1], upper))
+            for i in range(tray_count - 2, feed_stage - 1, -1):
+                relaxed = relax_link(previous_liquid[i + 1], liquid[i + 1], relaxation)
+                liquid_link[i + 1] = relaxed
+                current_liquid[i + 1] = relaxed
+                lower = gas_link[i - 1] if i > 0 else None
+                run_with(i, linked_inlets(i, lower, liquid_link[i + 1]))
+
+            effective = min(max(relaxation, MIN_TEMPERATURE_RELAXATION), 1.0)
+            total = 0.0
+            for i in range(tray_count):
+                updated = temperature(i)
+                if not math.isfinite(updated):
+                    updated = old[i]
+                vapor_flow = mass_flow(gas[i])
+                liquid_flow = mass_flow(liquid[i])
+                correction = (
+                    1.0 + 0.05 * min(max(math.log(vapor_flow / liquid_flow), -1.0), 1.0)
+                    if liquid_flow > 1.0e-12 and vapor_flow > 1.0e-12
+                    else 1.0
+                )
+                new_temperature = old[i] + effective * correction * (updated - old[i])
+                total += abs(new_temperature - old[i])
+                temperatures[i] = new_temperature
+            temperature_residual = total / tray_count
+
+            combined = temperature_residual / temperature_tolerance
+            if combined > previous_combined * 1.05:
+                relaxation = max(MIN_SEQUENTIAL_RELAXATION, relaxation * RELAXATION_DECREASE_FACTOR)
+            elif combined < previous_combined * 0.95:
+                relaxation = min(MAX_ADAPTIVE_RELAXATION, relaxation * 1.3)
+            previous_combined = combined
+
+            for i in range(tray_count):
+                if current_gas[i] is not None:
+                    previous_gas[i] = current_gas[i]
+                if current_liquid[i] is not None:
+                    previous_liquid[i] = current_liquid[i]
+
+            if temperature_residual <= temperature_tolerance:
+                break
+
+        return took, temperature_residual
+
     def product_of(level: int) -> StreamRecord:
         """The product an end publishes: the top's vapour, the bottom's liquid.
 
@@ -1630,6 +1715,12 @@ def _states(
         )
 
     initial_relaxation = 0.5 if solver_type == "damped_substitution" else 1.0
+
+    def inner(temperatures: list[float]) -> tuple[int, float]:
+        if solver_type in ("inside_out", "matrix_inside_out"):
+            return inside_out_sweep(temperatures)
+        return sweep(temperatures, initial_relaxation)
+
     if adjustable():
         # `solveWithSpecificationTargets`: the outer secant on the ends' temperatures.
         #
@@ -1655,7 +1746,7 @@ def _states(
             if adjust_bottom:
                 modes[0] = ("temperature", bottom_pair[0] if outer == 0 else bottom_pair[1])
 
-            iterations, temperature_residual = sweep(temperatures, initial_relaxation)
+            iterations, temperature_residual = inner(temperatures)
 
             top_error = 0.0
             bottom_error = 0.0
@@ -1693,7 +1784,7 @@ def _states(
 
             raise SolverNotConvergedError(iterations, temperature_residual, SPECIFICATION_TOLERANCE)
     else:
-        iterations, temperature_residual = sweep(temperatures, initial_relaxation)
+        iterations, temperature_residual = inner(temperatures)
 
     def outlet_enthalpy(i: int) -> float:
         total = 0.0
@@ -2239,13 +2330,11 @@ def _refuse_unported(solver_type: str | None, murphree_efficiency: _Murphree | N
     if solver_type is None or solver_type in (
         "direct_substitution",
         "damped_substitution",
+        "inside_out",
+        "matrix_inside_out",
         "naphtali_sandholm",
     ):
         return
-    if solver_type == "inside_out":
-        raise _unported.refuse("solver_type=inside_out")
-    if solver_type == "matrix_inside_out":
-        raise _unported.refuse("solver_type=matrix_inside_out")
     if solver_type == "wegstein":
         raise _unported.refuse("solver_type=wegstein")
     if solver_type == "sum_rates":

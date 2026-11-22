@@ -411,17 +411,37 @@ fn the_damped_substitution_relaxes_the_links() {
     .expect("the model accepts the declared strategy");
 }
 
+/// **Inside-out is the class's three-sweep map with a stripping correction**, and on the
+/// captured binary it reaches the substitution core's state exactly. Matrix inside-out below
+/// twelve trays is that same solve, and reports its own strategy.
+#[test]
+fn the_inside_out_strategies_reach_the_substitution_state() {
+    let direct = distillation_column(&binary(SolverType::DirectSubstitution))
+        .expect("the direct solve converges");
+    for strategy in [SolverType::InsideOut, SolverType::MatrixInsideOut] {
+        let out = distillation_column(&binary(strategy)).expect("the strategy converges");
+        assert_eq!(out.solver_used, strategy);
+        let spread = direct
+            .trays
+            .iter()
+            .zip(&out.trays)
+            .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+            .fold(0.0_f64, f64::max);
+        assert!(spread < 2.0e-5, "{strategy:?} moved {spread} K");
+        model(binary(strategy), Some(strategy.name()), None)
+            .expect("the model accepts the declared strategy");
+    }
+}
+
 /// **Every strategy this port does not carry is refused with the class that would close it.**
 ///
-/// The seven are `ColumnSolverFactory`'s own nested solvers, and the refusal names the one the
+/// The five are `ColumnSolverFactory`'s own nested solvers, and the refusal names the one the
 /// caller asked for rather than the family: a caller who states `wegstein` is owed
 /// `WegsteinSolver`, not "the inside-out family". The boundary is the model layer, so this
 /// calls it rather than the kernel - the strategy never reaches the kernel at all.
 #[test]
 fn an_unported_strategy_is_refused_by_its_class() {
     for (strategy, class) in [
-        ("inside_out", "InsideOutSolver"),
-        ("matrix_inside_out", "MatrixInsideOutSolver"),
         ("wegstein", "WegsteinSolver"),
         ("sum_rates", "SumRatesSolver"),
         ("newton", "TemperatureNewtonSolver"),

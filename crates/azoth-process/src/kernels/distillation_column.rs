@@ -1242,16 +1242,24 @@ fn solve_once(setup: &ColumnSetup) -> Result<ColumnOutcome> {
         Some(state) => install_state(&mut net, state)?,
         None => seed_network(&mut net, setup)?,
     };
-    let options = SequentialOptions::for_strategy(setup.solver_type);
+    let solve =
+        |net: &mut Network, setup: &ColumnSetup, temperatures: &mut [f64]| -> Result<(u32, f64)> {
+            match setup.solver_type {
+                SolverType::InsideOut | SolverType::MatrixInsideOut => {
+                    inside_out_sweep(net, setup, temperatures)
+                }
+                _ => sequential_sweep(
+                    net,
+                    setup,
+                    temperatures,
+                    SequentialOptions::for_strategy(setup.solver_type),
+                ),
+            }
+        };
     let (iterations, temperature_residual) = if adjustable_specification(setup) {
-        specification_loop(
-            &mut net,
-            setup,
-            &mut temperatures,
-            |net, setup, temperatures| sequential_sweep(net, setup, temperatures, options),
-        )?
+        specification_loop(&mut net, setup, &mut temperatures, solve)?
     } else {
-        sequential_sweep(&mut net, setup, &mut temperatures, options)?
+        solve(&mut net, setup, &mut temperatures)?
     };
 
     // ---- The products, the duties and the closure ----
@@ -2080,6 +2088,140 @@ fn sequential_sweep(
         // fixed point, because a Murphree efficiency moves components between a stage's vapour
         // and its liquid without moving its moles. Gating on it would iterate forever. So the
         // gate stays the class's effective one, the temperature, and the closure is reported.
+        if temperature_residual <= setup.temperature_tolerance {
+            break;
+        }
+    }
+    Ok((iterations, temperature_residual))
+}
+
+/// `DistillationColumn.solveInsideOut`: three relaxed sweeps, a stripping-factor temperature
+/// correction and the class's faster relaxation ramp.
+///
+/// **The surrogate inner loop and the Newton handoff are not carried**, and the capture is why.
+/// `SimplifiedKvalueModel`/`innerLoopIteration` write tray temperatures that the next outer
+/// flash overwrites, so they cannot move the fixed point - the captured inside-out state is
+/// bit-identical to direct's - and `shouldSwitchInsideOutToNewton` needs eight trays where the
+/// captured binary has six.
+fn inside_out_sweep(
+    net: &mut Network,
+    setup: &ColumnSetup,
+    temperatures: &mut [f64],
+) -> Result<(u32, f64)> {
+    let first_feed = setup.feed_stage;
+    let tray_count = net.tray_count;
+    let mut relaxation = 0.8_f64.clamp(MIN_SEQUENTIAL_RELAXATION, MAX_ADAPTIVE_RELAXATION);
+    let mut previous_combined = f64::INFINITY;
+    let mut temperature_residual = f64::INFINITY;
+    let mut iterations = 0_u32;
+
+    let mut gas_link: Vec<Option<Stream>> = net.gas.clone();
+    let mut liquid_link: Vec<Option<Stream>> = net.liquid.clone();
+    let mut previous_gas: Vec<Option<Stream>> = vec![None; tray_count];
+    let mut previous_liquid: Vec<Option<Stream>> = vec![None; tray_count];
+
+    for iter in 1..=setup.max_iterations {
+        iterations = iter as u32;
+        let old: Vec<f64> = temperatures.to_vec();
+        let mut current_gas: Vec<Option<Stream>> = vec![None; tray_count];
+        let mut current_liquid: Vec<Option<Stream>> = vec![None; tray_count];
+
+        // Phase 1: the liquid sweep, the feed stage down to the bottom tray.
+        for i in (1..=first_feed).rev() {
+            let relaxed = relax_link(
+                previous_liquid[i].as_ref(),
+                net.liquid[i].as_ref(),
+                relaxation,
+            )?;
+            liquid_link[i] = relaxed.clone();
+            current_liquid[i] = relaxed;
+            let tray = i - 1;
+            let gas = if tray > 0 {
+                gas_link[tray - 1].as_ref()
+            } else {
+                None
+            };
+            let inlets = linked_inlets(net, tray, gas, liquid_link[i].as_ref());
+            net.run_with(tray, &inlets)?;
+        }
+        // Phase 2: the vapour sweep, the bottom tray up to the top.
+        for i in 1..tray_count {
+            let relaxed = relax_link(
+                previous_gas[i - 1].as_ref(),
+                net.gas[i - 1].as_ref(),
+                relaxation,
+            )?;
+            gas_link[i - 1] = relaxed.clone();
+            current_gas[i - 1] = relaxed;
+            let liquid = if i + 1 < tray_count {
+                liquid_link[i + 1].as_ref()
+            } else {
+                None
+            };
+            let inlets = linked_inlets(net, i, gas_link[i - 1].as_ref(), liquid);
+            net.run_with(i, &inlets)?;
+        }
+        // Phase 3: the liquid polish, below the condenser down to the feed stage.
+        for i in (first_feed..tray_count.saturating_sub(1)).rev() {
+            let relaxed = relax_link(
+                previous_liquid[i + 1].as_ref(),
+                net.liquid[i + 1].as_ref(),
+                relaxation,
+            )?;
+            liquid_link[i + 1] = relaxed.clone();
+            current_liquid[i + 1] = relaxed;
+            let gas = if i > 0 {
+                gas_link[i - 1].as_ref()
+            } else {
+                None
+            };
+            let inlets = linked_inlets(net, i, gas, liquid_link[i + 1].as_ref());
+            net.run_with(i, &inlets)?;
+        }
+
+        // The stripping-factor correction: a tray far from V/L = 1 biases its temperature step.
+        let effective = relaxation.clamp(MIN_TEMPERATURE_RELAXATION, 1.0);
+        let mut sum = 0.0;
+        for i in 0..tray_count {
+            let updated = net.temperature(i);
+            let updated = if updated.is_finite() { updated } else { old[i] };
+            let gas_flow = match net.gas[i].as_ref() {
+                Some(gas) => gas.mass_flow()?,
+                None => 0.0,
+            };
+            let liquid_flow = match net.liquid[i].as_ref() {
+                Some(liquid) => liquid.mass_flow()?,
+                None => 0.0,
+            };
+            let correction = if liquid_flow > 1.0e-12 && gas_flow > 1.0e-12 {
+                1.0 + 0.05 * (gas_flow / liquid_flow).ln().clamp(-1.0, 1.0)
+            } else {
+                1.0
+            };
+            let new_temperature = old[i] + effective * correction * (updated - old[i]);
+            sum += (new_temperature - old[i]).abs();
+            temperatures[i] = new_temperature;
+        }
+        temperature_residual = sum / tray_count as f64;
+
+        // The class's faster ramp: the increase threshold is 0.95 and the factor 1.3.
+        let combined = temperature_residual / setup.temperature_tolerance;
+        if combined > previous_combined * 1.05 {
+            relaxation = (relaxation * RELAXATION_DECREASE_FACTOR).max(MIN_SEQUENTIAL_RELAXATION);
+        } else if combined < previous_combined * 0.95 {
+            relaxation = (relaxation * 1.3).min(MAX_ADAPTIVE_RELAXATION);
+        }
+        previous_combined = combined;
+
+        for i in 0..tray_count {
+            if current_gas[i].is_some() {
+                previous_gas[i] = current_gas[i].clone();
+            }
+            if current_liquid[i].is_some() {
+                previous_liquid[i] = current_liquid[i].clone();
+            }
+        }
+
         if temperature_residual <= setup.temperature_tolerance {
             break;
         }

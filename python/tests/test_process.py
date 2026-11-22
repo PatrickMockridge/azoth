@@ -472,6 +472,20 @@ def test_the_damped_strategy_lands_on_the_captured_state() -> None:
     assert worst < 2.0e-5, f"the damped and direct states differ by {worst} K"
 
 
+def test_the_inside_out_strategies_land_on_the_captured_state() -> None:
+    """**Inside-out is the class's three-sweep map with a stripping correction**, and on the
+    captured binary it reaches the substitution core's state exactly; matrix inside-out below
+    twelve trays is that same solve."""
+    direct = process.distillation_column(**_binary_args())
+    for strategy in ("inside_out", "matrix_inside_out"):
+        out = process.distillation_column(**_binary_args(), solver_type=strategy)
+        worst = max(
+            abs(float(a.to("K").magnitude) - float(b.to("K").magnitude))
+            for a, b in zip(direct.tray_temperature, out.tray_temperature, strict=True)
+        )
+        assert worst < 2.0e-5, f"{strategy} moved the state by {worst} K"
+
+
 def test_a_swapped_pair_of_draw_vectors_is_a_different_column() -> None:
     """**Two of the three swapped, and the answer moves.** The gas and liquid vectors are both
     `dimensionless` vectors of the same length, so a transposition between them is exactly the
