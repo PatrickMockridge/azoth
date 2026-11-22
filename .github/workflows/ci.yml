@@ -207,7 +207,11 @@ jobs:
   rust-test:
     name: rust-test
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # **90, and the reason is measured.** The scoped set finishes in about twelve minutes, but
+    # `mode: full` runs every crate's targets: on 2026-11-22 the release's full surface was
+    # cancelled at the old 20-minute ceiling (run 45077368337). 90 gives the full suite the same
+    # headroom `python-test` now has.
+    timeout-minutes: 90
     needs: scope
     if: needs.scope.outputs.rust-test == 'true'
     steps:
