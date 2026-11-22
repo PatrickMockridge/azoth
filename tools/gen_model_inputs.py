@@ -442,6 +442,7 @@ NON_UNIT_MODELS = {
     "pvt.separator_test": "a separator train over a fluid, not a unit",
     "pvt.swelling_test": "a gas-injection swelling experiment over a fluid, not a unit",
     "pvt.mmp": "a minimum-miscibility-pressure calculation over two fluids, not a unit",
+    "pvt.property_sweep": "a property sweep over a fluid, not a unit",
     "process.bleve": "the fireball radiation over scalars, not a unit",
     "process.consequence_analysis": "the QRA composition over scalars and records, not a unit",
     "process.event_tree": "the event-tree enumeration over scalars, not a unit",

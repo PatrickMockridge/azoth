@@ -5504,6 +5504,112 @@ impl From<&azoth_process::models::process_cost_estimate::ProjectCostLine> for Py
     }
 }
 
+/// one row per state.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PropertyPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPropertyPoint {
+    /// the state's temperature.
+    #[pyo3(get)]
+    pub temperature: PyQty,
+    /// the state's pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the gas phase's density, in the density mode.
+    #[pyo3(get)]
+    pub gas_density: Option<PyQty>,
+    /// the oil phase's density, in the density mode.
+    #[pyo3(get)]
+    pub oil_density: Option<PyQty>,
+    /// the aqueous phase's density, in the density mode.
+    #[pyo3(get)]
+    pub aqueous_density: Option<PyQty>,
+    /// the gas phase's viscosity, in the viscosity mode.
+    #[pyo3(get)]
+    pub gas_viscosity: Option<PyQty>,
+    /// the oil phase's viscosity, in the viscosity mode.
+    #[pyo3(get)]
+    pub oil_viscosity: Option<PyQty>,
+    /// the aqueous phase's viscosity, in the viscosity mode.
+    #[pyo3(get)]
+    pub aqueous_viscosity: Option<PyQty>,
+    /// whether a gas phase is present.
+    #[pyo3(get)]
+    pub gas_phase_available: bool,
+    /// whether an oil phase is present.
+    #[pyo3(get)]
+    pub oil_phase_available: bool,
+    /// whether an aqueous phase is present.
+    #[pyo3(get)]
+    pub aqueous_phase_available: bool,
+}
+
+#[pymethods]
+impl PyPropertyPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "PropertyPoint(temperature={:?}, pressure={:?}, gas_density={:?}, oil_density={:?}, aqueous_density={:?}, gas_viscosity={:?}, oil_viscosity={:?}, aqueous_viscosity={:?}, gas_phase_available={:?}, oil_phase_available={:?}, aqueous_phase_available={:?})",
+            self.temperature,
+            self.pressure,
+            self.gas_density,
+            self.oil_density,
+            self.aqueous_density,
+            self.gas_viscosity,
+            self.oil_viscosity,
+            self.aqueous_viscosity,
+            self.gas_phase_available,
+            self.oil_phase_available,
+            self.aqueous_phase_available
+        )
+    }
+}
+
+impl From<&azoth_pvt::property_sweep::PropertyPoint> for PyPropertyPoint {
+    fn from(row: &azoth_pvt::property_sweep::PropertyPoint) -> Self {
+        Self {
+            temperature: PyQty {
+                magnitude_si: row.temperature,
+                unit: "K".to_string(),
+            },
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            gas_density: row.gas_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            oil_density: row.oil_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            aqueous_density: row.aqueous_density.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "kg/m**3".to_string(),
+            }),
+            gas_viscosity: row.gas_viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            oil_viscosity: row.oil_viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            aqueous_viscosity: row.aqueous_viscosity.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa*s".to_string(),
+            }),
+            gas_phase_available: row.gas_phase_available,
+            oil_phase_available: row.oil_phase_available,
+            aqueous_phase_available: row.aqueous_phase_available,
+        }
+    }
+}
+
 /// one row per evaluated acoustic mode, in mode order.
 #[pyclass(
     frozen,

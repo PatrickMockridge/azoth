@@ -1,0 +1,184 @@
+id = "pvt.property_sweep"
+name = "Property sweep"
+kind = "direct"
+assumptions = [
+    "**two of the four class sweeps are here**: `density` is `DensitySim` and `viscosity` is `ViscositySim`, one flash per temperature/pressure pair.",
+    "**the phase densities are the volume-corrected ones** and the viscosities the phase correlations NeqSim's phase type selects; a negative viscosity is floored at `1e-5 Pa s` as `PhysicalProperties` does.",
+    "**the availability flags are `ViscositySim`'s three**, published for both modes so a caller can tell an absent phase from a zero property.",
+    "**the wax half is owed**: `WaxFractionSim` and `ViscosityWaxOilSim` need NeqSim's TBP wax model, whose fluid cannot cross as characterization rows, and the class's own wax model refuses a databank n-alkane wax former (`Invalid reference-liquid fugacity coefficient for nC20`).",
+    "**`WaxFractionSim`'s GOR and Bo outputs are vestigial zeros** and are not published; `DensitySim`'s wax fraction, which it hardcodes to zero, is not a field here.",
+    "**inputs are SI** and the fluid is the characterization row list; SRK and the databank kij are the defaults.",
+]
+references = [
+    "NeqSim - https://github.com/equinor/neqsim - Apache-2.0. `pvtsimulation/simulation/DensitySim.java` and `ViscositySim.java` at commit 118d9af are the port source.",
+    "`validation/neqsim/captures/pvt_property_sweep.tsv` - a two-phase binary and a pure-gas sweep, in both modes.",
+]
+[source]
+standard = "NeqSim pvtsimulation/simulation/DensitySim.java and ViscositySim.java"
+edition = "The density and viscosity sweeps: one flash per state, the present phases' properties and their availability flags."
+[inputs]
+[inputs.components]
+type = "record_list"
+row_type = "FluidComponent"
+description = "The fluids' components, one record each, in the order the fluids carry them. A record with a positive mole amount in the same fluid twice is one component at the summed amount; a non-positive amount is a row the class skips.\n"
+[inputs.components.fields.fluid]
+unit = "dimensionless"
+description = "Which fluid the row belongs to, 0-based. Fluids are ordered by first appearance, and a whole number from zero is required: a fractional or negative index is not a fluid.\n"
+[inputs.components.fields.name]
+type = "string"
+description = "The component's name. A base component merges by it across the fluids; a pseudo-component's is its own fluid's name and does not survive into the answer.\n"
+[inputs.components.fields.pseudo_component]
+type = "boolean"
+description = "Whether the row is a TBP or plus fraction rather than a base component. A base row's properties are absent and are the databank's at assembly.\n"
+[inputs.components.fields.moles]
+unit = "mol"
+description = "The component's mole amount. Only a positive one is read; a zero or negative amount is a row that is not on the grid.\n"
+[inputs.components.fields.molar_mass]
+unit = "kg/mol"
+optional = true
+description = "The pseudo-component's molar mass, which is what the row's mass is and what its sorting key falls back to. Required on a pseudo row and ignored on a base row.\n"
+[inputs.components.fields.density]
+unit = "kg/m**3"
+optional = true
+description = "The pseudo-component's normal liquid density, which a group's volume is the mass over. Required on a pseudo row and ignored on a base row.\n"
+[inputs.components.fields.normal_boiling_point]
+unit = "K"
+optional = true
+description = "The pseudo-component's normal boiling point, its sorting key where it states a finite positive one. A row without one sorts by its molar mass.\n"
+[inputs.components.fields.critical_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's critical temperature, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.critical_pressure]
+unit = "Pa"
+optional = true
+description = "The pseudo-component's critical pressure, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.acentric_factor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's acentric factor, part of the blend's mole-fraction-weighted override.\n"
+[inputs.components.fields.critical_volume]
+unit = "m**3/mol"
+optional = true
+description = "The pseudo-component's critical molar volume, mass-weighted into the group's.\n"
+[inputs.components.fields.racket_z]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's Rackett compressibility, mass-weighted into the group's and read again when the row becomes a component.\n"
+[inputs.components.fields.racket_z_cpa]
+unit = "dimensionless"
+optional = true
+description = "The same compressibility on the CPA basis, mass-weighted into the group's.\n"
+[inputs.components.fields.parachor]
+unit = "dimensionless"
+optional = true
+description = "The pseudo-component's parachor, in NeqSim's mixed `(mN/m)**(1/4) * cm**3/mol`, mass-weighted into the group's.\n"
+[inputs.components.fields.critical_viscosity]
+unit = "Pa*s"
+optional = true
+description = "The pseudo-component's critical viscosity, mass-weighted into the group's.\n"
+[inputs.components.fields.triple_point_temperature]
+unit = "K"
+optional = true
+description = "The pseudo-component's triple-point temperature, mass-weighted into the group's.\n"
+[inputs.components.fields.heat_of_fusion]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's heat of fusion, mass-weighted into the group's.\n"
+[inputs.components.fields.ideal_gas_enthalpy_of_formation]
+unit = "J/mol"
+optional = true
+description = "The pseudo-component's ideal-gas enthalpy of formation, mass-weighted into the group's. It has no home on a `Component` and is dropped when a mixture is assembled.\n"
+[inputs.components.fields.cp_a]
+unit = "J/(mol*K)"
+optional = true
+description = "The constant term of the pseudo-component's ideal-gas heat capacity, mass-weighted into the group's.\n"
+[inputs.components.fields.cp_b]
+unit = "J/(mol*K**2)"
+optional = true
+description = "The coefficient of `T` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.components.fields.cp_c]
+unit = "J/(mol*K**3)"
+optional = true
+description = "The coefficient of `T**2` in the pseudo-component's ideal-gas heat capacity.\n"
+[inputs.components.fields.cp_d]
+unit = "J/(mol*K**4)"
+optional = true
+description = "The coefficient of `T**3` in the pseudo-component's ideal-gas heat capacity, as `getCpD()` states it: the stored coefficient plus `1e-10`.\n"
+[inputs.components.fields.attractive_m]
+unit = "dimensionless"
+optional = true
+description = "The fitted coefficient of the pseudo-component's Soave alpha function, which NeqSim's `addTBPfraction` installs in place of the acentric factor's correlation.\n"
+
+[inputs.mode]
+type = "enum"
+values = ["density", "viscosity"]
+description = "which property the sweep reports.\n"
+[inputs.eos]
+type = "enum"
+values = ["srk", "pr"]
+optional = true
+description = "the cubic; absent is srk.\n"
+[inputs.mixing_rule]
+type = "enum"
+values = ["classic", "zero"]
+optional = true
+description = "the interaction matrix; absent is classic.\n"
+[inputs.temperatures]
+type = "vector"
+unit = "K"
+description = "the states' temperatures.\n"
+[inputs.pressures]
+type = "vector"
+unit = "Pa"
+description = "the states' pressures, parallel to the temperatures.\n"
+[inputs.volume_correction]
+type = "boolean"
+optional = true
+description = "whether the Peneloux translation is applied; absent is true.\n"
+[outputs]
+[outputs.points]
+type = "record_list"
+description = "one row per state.\n"
+[outputs.points.fields.temperature]
+unit = "K"
+description = "the state's temperature.\n"
+[outputs.points.fields.pressure]
+unit = "Pa"
+description = "the state's pressure.\n"
+[outputs.points.fields.gas_density]
+unit = "kg/m**3"
+optional = true
+description = "the gas phase's density, in the density mode.\n"
+[outputs.points.fields.oil_density]
+unit = "kg/m**3"
+optional = true
+description = "the oil phase's density, in the density mode.\n"
+[outputs.points.fields.aqueous_density]
+unit = "kg/m**3"
+optional = true
+description = "the aqueous phase's density, in the density mode.\n"
+[outputs.points.fields.gas_viscosity]
+unit = "Pa*s"
+optional = true
+description = "the gas phase's viscosity, in the viscosity mode.\n"
+[outputs.points.fields.oil_viscosity]
+unit = "Pa*s"
+optional = true
+description = "the oil phase's viscosity, in the viscosity mode.\n"
+[outputs.points.fields.aqueous_viscosity]
+unit = "Pa*s"
+optional = true
+description = "the aqueous phase's viscosity, in the viscosity mode.\n"
+[outputs.points.fields.gas_phase_available]
+type = "boolean"
+description = "whether a gas phase is present.\n"
+[outputs.points.fields.oil_phase_available]
+type = "boolean"
+description = "whether an oil phase is present.\n"
+[outputs.points.fields.aqueous_phase_available]
+type = "boolean"
+description = "whether an aqueous phase is present.\n"
+[implementations]
+python = "azoth.pvt.property_sweep"
+rust = "azoth_pvt::property_sweep"

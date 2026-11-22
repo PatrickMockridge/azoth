@@ -22,6 +22,7 @@ The calculations above are equations; these are *procedures*. A model's spec fix
 | [`pvt.gas_material_balance`](./gas_material_balance.md) | `direct composition` | NeqSim reservoirproperties/materialbalance/GasMaterialBalance.java |
 | [`pvt.mmp`](./mmp.md) | `direct composition` | NeqSim pvtsimulation/simulation/MMPCalculator.java |
 | [`pvt.oil_material_balance`](./oil_material_balance.md) | `direct composition` | NeqSim reservoirproperties/materialbalance/OilMaterialBalance.java |
+| [`pvt.property_sweep`](./property_sweep.md) | `direct composition` | NeqSim pvtsimulation/simulation/DensitySim.java and ViscositySim.java |
 | [`pvt.saturation_test`](./saturation_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/SaturationPressure.java and SaturationTemperature.java |
 | [`pvt.separator_test`](./separator_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/{GOR,SeparatorTest,MultiStageSeparatorTest}.java |
 | [`pvt.swelling_test`](./swelling_test.md) | `direct composition` | NeqSim pvtsimulation/simulation/SwellingTest.java |

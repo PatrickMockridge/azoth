@@ -30,6 +30,7 @@ from azoth.core.result import (
     GasMaterialBalanceResult,
     MmpResult,
     OilMaterialBalanceResult,
+    PropertySweepResult,
     SaturationTestResult,
     SeparatorTestResult,
     SwellingTestResult,
@@ -46,6 +47,7 @@ _GAS_CORRELATIONS = "pvt.gas_correlations"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
 _MMP = "pvt.mmp"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
+_PROPERTY_SWEEP = "pvt.property_sweep"
 _SATURATION_TEST = "pvt.saturation_test"
 _SEPARATOR_TEST = "pvt.separator_test"
 _SWELLING_TEST = "pvt.swelling_test"
@@ -62,6 +64,7 @@ __all__ = [
     "layers",
     "mmp",
     "oil_material_balance",
+    "property_sweep",
     "saturation_test",
     "separator_test",
     "swelling_test",
@@ -305,6 +308,43 @@ def mmp(
         max_pressure=max_pressure,
         slim_tube_nodes=slim_tube_nodes,
         pv_injected=pv_injected,
+    )
+
+
+def property_sweep(
+    components: Sequence[Mapping[str, Any]],
+    mode: str,
+    *,
+    temperatures: Sequence[Any],
+    pressures: Sequence[Any],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+) -> PropertySweepResult:
+    """A density or viscosity sweep over a grid of states.
+
+    ``mode`` is ``"density"`` (the phase densities) or ``"viscosity"`` (the phase viscosities
+    and the availability flags). ``temperatures`` and ``pressures`` are parallel arrays of
+    absolute states. **The wax sweeps are owed** with NeqSim's TBP wax model, which a
+    characterization row cannot express.
+
+    Returns:
+        One ``points`` row per state.
+
+    Raises:
+        InvalidInputError: for an unknown mode, ``eos`` or ``mixing_rule``, empty or unequal
+            arrays, a non-positive temperature or pressure, or a wax mode.
+
+    See :func:`azoth.pvt.reference.property_sweep.property_sweep`.
+    """
+    return resolve(_PROPERTY_SWEEP)(  # type: ignore[no-any-return]
+        components=components,
+        mode=mode,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        temperatures=temperatures,
+        pressures=pressures,
+        volume_correction=volume_correction,
     )
 
 

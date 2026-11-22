@@ -95,6 +95,7 @@ from azoth.core.record_outputs_gen import (
     ProcessCostFlag,
     ProcessCostMtoRow,
     ProjectCostLine,
+    PropertyPoint,
     PulsationModeResult,
     RanzMarshallReleaseStation,
     RealGasFannoReleaseStation,
@@ -12546,6 +12547,19 @@ class OilMaterialBalanceResult(_HasWarnings):
 
     #: the expansion drive index.
     edi: float | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class PropertySweepResult(_HasWarnings):
+    """Result of ``pvt.property_sweep``."""
+
+    CALC_ID: ClassVar[str] = "pvt.property_sweep"
+
+    #: one row per state.
+    points: tuple[PropertyPoint, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

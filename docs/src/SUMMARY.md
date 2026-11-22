@@ -378,6 +378,7 @@
   - [Gas material balance](./pvt/gas_material_balance.md)
   - [Minimum miscibility pressure](./pvt/mmp.md)
   - [Oil material balance](./pvt/oil_material_balance.md)
+  - [Property sweep](./pvt/property_sweep.md)
   - [Saturation test](./pvt/saturation_test.md)
   - [Separator test](./pvt/separator_test.md)
   - [Swelling test](./pvt/swelling_test.md)

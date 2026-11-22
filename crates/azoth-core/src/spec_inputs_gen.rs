@@ -364,6 +364,7 @@
 //!   - specs/models/pvt/gas_material_balance.toml
 //!   - specs/models/pvt/mmp.toml
 //!   - specs/models/pvt/oil_material_balance.toml
+//!   - specs/models/pvt/property_sweep.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/swelling_test.toml
@@ -6917,6 +6918,12 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     ("pvt.oil_material_balance", "eo_history", "dimensionless"),
     ("pvt.oil_material_balance", "eg_history", "dimensionless"),
     ("pvt.oil_material_balance", "we_history", "dimensionless"),
+    (
+        "pvt.property_sweep",
+        "temperatures",
+        "thermodynamic_temperature",
+    ),
+    ("pvt.property_sweep", "pressures", "pressure"),
     (
         "pvt.saturation_test",
         "temperature",

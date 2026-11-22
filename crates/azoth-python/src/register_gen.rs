@@ -382,6 +382,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyGasMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PyMmpResult>()?;
     m.add_class::<crate::transport_gen::PyOilMaterialBalanceResult>()?;
+    m.add_class::<crate::transport_gen::PyPropertySweepResult>()?;
     m.add_class::<crate::transport_gen::PySaturationTestResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorTestResult>()?;
     m.add_class::<crate::transport_gen::PySwellingTestResult>()?;
@@ -483,6 +484,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyProcessCostFlag>()?;
     m.add_class::<crate::record_outputs_gen::PyProcessCostMtoRow>()?;
     m.add_class::<crate::record_outputs_gen::PyProjectCostLine>()?;
+    m.add_class::<crate::record_outputs_gen::PyPropertyPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyPulsationModeResult>()?;
     m.add_class::<crate::record_outputs_gen::PyRanzMarshallReleaseStation>()?;
     m.add_class::<crate::record_outputs_gen::PyRealGasFannoReleaseStation>()?;
@@ -1397,6 +1399,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
         crate::wrappers_gen::oil_material_balance,
         m
     )?)?;
+    m.add_function(wrap_pyfunction!(crate::wrappers_gen::property_sweep, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::saturation_test, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator_test, m)?)?;
     m.add_function(wrap_pyfunction!(crate::pvt::swelling_test, m)?)?;

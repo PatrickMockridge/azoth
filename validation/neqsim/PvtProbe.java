@@ -16,11 +16,14 @@ import neqsim.pvtsimulation.simulation.ConstantVolumeDepletion;
 import neqsim.pvtsimulation.simulation.GOR;
 import neqsim.pvtsimulation.simulation.MMPCalculator;
 import neqsim.pvtsimulation.simulation.MultiStageSeparatorTest;
+import neqsim.pvtsimulation.simulation.DensitySim;
 import neqsim.pvtsimulation.simulation.DifferentialLiberation;
 import neqsim.pvtsimulation.simulation.SaturationPressure;
 import neqsim.pvtsimulation.simulation.SaturationTemperature;
 import neqsim.pvtsimulation.simulation.SeparatorTest;
 import neqsim.pvtsimulation.simulation.SwellingTest;
+import neqsim.pvtsimulation.simulation.ViscositySim;
+import neqsim.pvtsimulation.simulation.WaxFractionSim;
 import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
 import neqsim.pvtsimulation.util.BlackOilCorrelations;
 import neqsim.pvtsimulation.util.DeclineCurveAnalysis;
@@ -804,6 +807,88 @@ public final class PvtProbe {
     mmpBlock("mmp_slim_tube_wide", "methane", 50.0, "SLIM_TUBE", 100.0, 1000.0, 5, 6, 0.4, 0.50);
   }
 
+  private static void propertySweep() {
+    System.out.println("property_sweep");
+    double[] temperatures = {323.15, 313.15, 303.15};
+    double[] pressures = {5.0, 5.0, 5.0};
+
+    System.out.println("[density_binary]");
+    DensitySim density = new DensitySim(binary("methane", 0.70, "nC10", 0.30, 323.15, 5.0));
+    density.setTemperaturesAndPressures(temperatures, pressures);
+    density.runCalc();
+    for (int i = 0; i < temperatures.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "temperature_k", temperatures[i]);
+      line(at + "pressure_pa", pressures[i] * 1.0e5);
+      if (density.getGasDensity()[i] > 0.0) {
+        line(at + "gas_density", density.getGasDensity()[i]);
+      }
+      if (density.getOilDensity()[i] > 0.0) {
+        line(at + "oil_density", density.getOilDensity()[i]);
+      }
+      if (density.getAqueousDensity()[i] > 0.0) {
+        line(at + "aqueous_density", density.getAqueousDensity()[i]);
+      }
+    }
+
+    System.out.println("[density_gas_binary]");
+    DensitySim gasDensity = new DensitySim(pure("methane", 1.0, 300.0, 5.0));
+    double[] gasTemperatures = {300.0, 290.0, 280.0};
+    double[] gasPressures = {5.0, 5.0, 5.0};
+    gasDensity.setTemperaturesAndPressures(gasTemperatures, gasPressures);
+    gasDensity.runCalc();
+    for (int i = 0; i < gasTemperatures.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "temperature_k", gasTemperatures[i]);
+      line(at + "pressure_pa", gasPressures[i] * 1.0e5);
+      if (gasDensity.getGasDensity()[i] > 0.0) {
+        line(at + "gas_density", gasDensity.getGasDensity()[i]);
+      }
+      if (gasDensity.getOilDensity()[i] > 0.0) {
+        line(at + "oil_density", gasDensity.getOilDensity()[i]);
+      }
+      if (gasDensity.getAqueousDensity()[i] > 0.0) {
+        line(at + "aqueous_density", gasDensity.getAqueousDensity()[i]);
+      }
+    }
+
+    System.out.println("[viscosity_binary]");
+    ViscositySim viscosity = new ViscositySim(binary("methane", 0.70, "nC10", 0.30, 323.15, 5.0));
+    viscosity.setTemperaturesAndPressures(temperatures, pressures);
+    viscosity.runCalc();
+    for (int i = 0; i < temperatures.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "temperature_k", temperatures[i]);
+      line(at + "pressure_pa", pressures[i] * 1.0e5);
+      if (viscosity.getGasViscosity()[i] > 0.0) {
+        line(at + "gas_viscosity", viscosity.getGasViscosity()[i]);
+      }
+      if (viscosity.getOilViscosity()[i] > 0.0) {
+        line(at + "oil_viscosity", viscosity.getOilViscosity()[i]);
+      }
+      line(at + "gas_phase_available", viscosity.getGasPhaseAvailable()[i] ? 1.0 : 0.0);
+      line(at + "oil_phase_available", viscosity.getOilPhaseAvailable()[i] ? 1.0 : 0.0);
+    }
+
+    System.out.println("[viscosity_gas_binary]");
+    ViscositySim gasViscosity = new ViscositySim(pure("methane", 1.0, 300.0, 5.0));
+    gasViscosity.setTemperaturesAndPressures(gasTemperatures, gasPressures);
+    gasViscosity.runCalc();
+    for (int i = 0; i < gasTemperatures.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "temperature_k", gasTemperatures[i]);
+      line(at + "pressure_pa", gasPressures[i] * 1.0e5);
+      if (gasViscosity.getGasViscosity()[i] > 0.0) {
+        line(at + "gas_viscosity", gasViscosity.getGasViscosity()[i]);
+      }
+      if (gasViscosity.getOilViscosity()[i] > 0.0) {
+        line(at + "oil_viscosity", gasViscosity.getOilViscosity()[i]);
+      }
+      line(at + "gas_phase_available", gasViscosity.getGasPhaseAvailable()[i] ? 1.0 : 0.0);
+      line(at + "oil_phase_available", gasViscosity.getOilPhaseAvailable()[i] ? 1.0 : 0.0);
+    }
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -845,6 +930,9 @@ public final class PvtProbe {
         break;
       case "mmp":
         mmp();
+        break;
+      case "property_sweep":
+        propertySweep();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

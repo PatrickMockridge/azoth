@@ -2058,6 +2058,44 @@ class ProjectCostLine:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class PropertyPoint:
+    """one row per state."""
+
+    #: the state's temperature.
+    temperature: Q
+
+    #: the state's pressure.
+    pressure: Q
+
+    #: the gas phase's density, in the density mode.
+    gas_density: Q | None
+
+    #: the oil phase's density, in the density mode.
+    oil_density: Q | None
+
+    #: the aqueous phase's density, in the density mode.
+    aqueous_density: Q | None
+
+    #: the gas phase's viscosity, in the viscosity mode.
+    gas_viscosity: Q | None
+
+    #: the oil phase's viscosity, in the viscosity mode.
+    oil_viscosity: Q | None
+
+    #: the aqueous phase's viscosity, in the viscosity mode.
+    aqueous_viscosity: Q | None
+
+    #: whether a gas phase is present.
+    gas_phase_available: bool
+
+    #: whether an oil phase is present.
+    oil_phase_available: bool
+
+    #: whether an aqueous phase is present.
+    aqueous_phase_available: bool
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class PulsationModeResult:
     """one row per evaluated acoustic mode, in mode order."""
 

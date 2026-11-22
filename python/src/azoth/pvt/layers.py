@@ -314,6 +314,47 @@ def _mmp(inputs: Mapping[str, Any]) -> dict[str, float]:
     return rows_out
 
 
+def _property(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`pvt.property_sweep`'s captured quantities, keyed as the capture spells them."""
+    from azoth.core.units import quantity
+
+    from .reference.property_sweep import property_sweep
+
+    components = [{**row, "moles": quantity(row["moles"], "mol")} for row in inputs["components"]]
+    result = property_sweep(
+        components,
+        inputs["mode"],
+        eos=inputs.get("eos"),
+        mixing_rule=inputs.get("mixing_rule"),
+        temperatures=[quantity(value, "K") for value in inputs["temperatures"]],
+        pressures=[quantity(value, "Pa") for value in inputs["pressures"]],
+        volume_correction=inputs.get("volume_correction"),
+    )
+    rows_out: dict[str, float] = {}
+    for index, point in enumerate(result.points):
+        at = f"point_{index}_"
+        rows_out[at + "temperature_k"] = point.temperature.to("K").magnitude
+        rows_out[at + "pressure_pa"] = point.pressure.to("Pa").magnitude
+        for name, unit, suffix in (
+            ("gas_density", "kg/m**3", ""),
+            ("oil_density", "kg/m**3", ""),
+            ("aqueous_density", "kg/m**3", ""),
+            ("gas_viscosity", "Pa*s", ""),
+            ("oil_viscosity", "Pa*s", ""),
+            ("aqueous_viscosity", "Pa*s", ""),
+        ):
+            value = getattr(point, name)
+            if value is not None:
+                rows_out[at + name + suffix] = value.to(unit).magnitude
+        for name in (
+            "gas_phase_available",
+            "oil_phase_available",
+            "aqueous_phase_available",
+        ):
+            rows_out[at + name] = 1.0 if getattr(point, name) else 0.0
+    return rows_out
+
+
 #: Models whose per-step arithmetic is dumped by a function here.
 DUMPERS: dict[str, Dumper] = {
     "pvt.constant_mass_expansion": _cce,
@@ -322,6 +363,7 @@ DUMPERS: dict[str, Dumper] = {
     "pvt.separator_test": _separator,
     "pvt.swelling_test": _swelling,
     "pvt.mmp": _mmp,
+    "pvt.property_sweep": _property,
 }
 
 #: Record-list models with no interior to dump: every published row is the answer. The value

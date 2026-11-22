@@ -10,6 +10,7 @@
 //!   - specs/models/pvt/gas_material_balance.toml
 //!   - specs/models/pvt/mmp.toml
 //!   - specs/models/pvt/oil_material_balance.toml
+//!   - specs/models/pvt/property_sweep.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
 //!   - specs/models/pvt/swelling_test.toml
@@ -6640,6 +6641,580 @@ pub static OIL_MATERIAL_BALANCE_SPEC: ModelSpec = ModelSpec {
     cases: OIL_MATERIAL_BALANCE_CASES,
 };
 
+static PROPERTY_SWEEP_CHECKS: &[SpecCheck] = &[];
+
+static PROPERTY_SWEEP_CASES: &[TestCase] = &[
+    TestCase {
+        id: "density_binary",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("mode", "density")],
+        vectors: &[
+            ("temperatures", &[323.15, 313.15, 303.15]),
+            ("pressures", &[500000.0, 500000.0, 500000.0]),
+        ],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.7),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.3),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(323.15),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_density",
+                        value: FieldValue::Number(3.050545344825013),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(726.5941347934073),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(313.15),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_density",
+                        value: FieldValue::Number(3.1296049183564243),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(733.7252998896703),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(303.15),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_density",
+                        value: FieldValue::Number(3.2231580078607283),
+                    },
+                    RecordField {
+                        name: "oil_density",
+                        value: FieldValue::Number(740.5801176791438),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "density_gas_binary",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("mode", "density")],
+        vectors: &[
+            ("temperatures", &[300.0, 290.0, 280.0]),
+            ("pressures", &[500000.0, 500000.0, 500000.0]),
+        ],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[&[
+                RecordField {
+                    name: "fluid",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("methane"),
+                },
+                RecordField {
+                    name: "pseudo_component",
+                    value: FieldValue::Flag(false),
+                },
+                RecordField {
+                    name: "moles",
+                    value: FieldValue::Number(1.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_density",
+                        value: FieldValue::Number(3.243109601824315),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(290.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_density",
+                        value: FieldValue::Number(3.3589319590620375),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(280.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_density",
+                        value: FieldValue::Number(3.483616741007469),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "viscosity_binary",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("mode", "viscosity")],
+        vectors: &[
+            ("temperatures", &[323.15, 313.15, 303.15]),
+            ("pressures", &[500000.0, 500000.0, 500000.0]),
+        ],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.7),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.3),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(323.15),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_viscosity",
+                        value: FieldValue::Number(1.2037860833403275e-05),
+                    },
+                    RecordField {
+                        name: "oil_viscosity",
+                        value: FieldValue::Number(0.0006239054659190214),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(313.15),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_viscosity",
+                        value: FieldValue::Number(1.1730911430677686e-05),
+                    },
+                    RecordField {
+                        name: "oil_viscosity",
+                        value: FieldValue::Number(0.0007550967845809141),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(303.15),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_viscosity",
+                        value: FieldValue::Number(1.1417780881106157e-05),
+                    },
+                    RecordField {
+                        name: "oil_viscosity",
+                        value: FieldValue::Number(0.0009237717476328613),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "viscosity_gas_binary",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[],
+        flags: &[],
+        lists: &[],
+        strings: &[("mode", "viscosity")],
+        vectors: &[
+            ("temperatures", &[300.0, 290.0, 280.0]),
+            ("pressures", &[500000.0, 500000.0, 500000.0]),
+        ],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[&[
+                RecordField {
+                    name: "fluid",
+                    value: FieldValue::Number(0.0),
+                },
+                RecordField {
+                    name: "name",
+                    value: FieldValue::Name("methane"),
+                },
+                RecordField {
+                    name: "pseudo_component",
+                    value: FieldValue::Flag(false),
+                },
+                RecordField {
+                    name: "moles",
+                    value: FieldValue::Number(1.0),
+                },
+            ]],
+        )],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(300.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_viscosity",
+                        value: FieldValue::Number(1.1321237494687992e-05),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(290.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_viscosity",
+                        value: FieldValue::Number(1.099941336695426e-05),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "temperature",
+                        value: FieldValue::Number(280.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(500000.0),
+                    },
+                    RecordField {
+                        name: "gas_viscosity",
+                        value: FieldValue::Number(1.0673421694482577e-05),
+                    },
+                    RecordField {
+                        name: "gas_phase_available",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "oil_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "aqueous_phase_available",
+                        value: FieldValue::Flag(false),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+/// Registry entry for `pvt.property_sweep`.
+pub static PROPERTY_SWEEP_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.property_sweep",
+    kind: "direct",
+    algorithm: None,
+    checks: PROPERTY_SWEEP_CHECKS,
+    cases: PROPERTY_SWEEP_CASES,
+};
+
 static SATURATION_TEST_CHECKS: &[SpecCheck] = &[];
 
 static SATURATION_TEST_CASES: &[TestCase] = &[
@@ -8762,6 +9337,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &GAS_MATERIAL_BALANCE_SPEC,
     &MMP_SPEC,
     &OIL_MATERIAL_BALANCE_SPEC,
+    &PROPERTY_SWEEP_SPEC,
     &SATURATION_TEST_SPEC,
     &SEPARATOR_TEST_SPEC,
     &SWELLING_TEST_SPEC,

@@ -23,6 +23,7 @@ pub mod mmp;
 pub mod model_gen;
 pub mod model_records_gen;
 pub mod oil_material_balance;
+pub mod property_sweep;
 pub mod saturation;
 pub mod saturation_test;
 pub mod separator_test;
@@ -49,6 +50,7 @@ pub use gas_correlations::{GasCorrelationsResult, GasQuery, GasResultRow, gas_co
 pub use gas_material_balance::{GasMaterialBalanceResult, gas_material_balance};
 pub use mmp::{MmpPoint, MmpResult, mmp};
 pub use oil_material_balance::{OilMaterialBalanceResult, oil_material_balance};
+pub use property_sweep::{PropertyPoint, PropertySweepResult, property_sweep};
 pub use saturation_test::{SaturationTestResult, saturation_test};
 pub use separator_test::{
     SeparatorStageInput, SeparatorStageResult, SeparatorTestResult, separator_test,

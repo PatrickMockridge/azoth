@@ -34,11 +34,11 @@ use crate::record_outputs_gen::{
     PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument,
     PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
     PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
-    PyPulsationModeResult, PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation,
-    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
-    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
-    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
-    PyScenarioIndexRow, PySelfHeatingTimePoint, PySeparatorStageResult,
+    PyPropertyPoint, PyPulsationModeResult, PyRanzMarshallReleaseStation,
+    PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
+    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
+    PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
+    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySeparatorStageResult,
     PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
     PySts0131FindingResult, PySubFraction, PySwellingPoint, PyTopsidesBreakdownLine,
     PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow, PyTopsidesProjectLine,
@@ -30974,6 +30974,42 @@ impl From<&azoth_pvt::oil_material_balance::OilMaterialBalanceResult>
             sdi: r.sdi,
             wdi: r.wdi,
             edi: r.edi,
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.property_sweep`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "PropertySweepResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyPropertySweepResult {
+    /// one row per state.
+    #[pyo3(get)]
+    pub points: Vec<PyPropertyPoint>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyPropertySweepResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "PropertySweepResult(points={:?}, {} warning(s))",
+            self.points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::property_sweep::PropertySweepResult> for PyPropertySweepResult {
+    fn from(r: &azoth_pvt::property_sweep::PropertySweepResult) -> Self {
+        Self {
+            points: r.points.iter().map(PyPropertyPoint::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

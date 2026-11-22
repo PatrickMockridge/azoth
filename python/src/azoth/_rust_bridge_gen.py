@@ -342,6 +342,8 @@ from azoth.core.result import (
     ProcessCostMtoRow,
     ProductionChemicalScaleScenarioResult,
     ProjectCostLine,
+    PropertyPoint,
+    PropertySweepResult,
     PrPenelouxShiftResult,
     PrsvKappaResult,
     PrZFactorResult,
@@ -822,6 +824,7 @@ __all__ = [
     "probit",
     "process_cost_estimate",
     "production_chemical_scale_scenario",
+    "property_sweep",
     "prsv_kappa",
     "ps_flash",
     "psv_fire_sizing",
@@ -10711,6 +10714,24 @@ def oil_material_balance(calculation: str, *, np: float | None=None, rp: float |
         sdi=result.sdi,
         wdi=result.wdi,
         edi=result.edi,
+        warnings=_warnings(result.warnings),
+    )
+
+
+def property_sweep(components: Sequence[Mapping[str, Any]], mode: str, *, temperatures: Sequence[Any], pressures: Sequence[Any], eos: str | None=None, mixing_rule: str | None=None, volume_correction: bool | None=None) -> PropertySweepResult:
+    """``pvt.property_sweep``, computed in Rust."""
+    spec = _models_gen.model("pvt.property_sweep")
+    result = _core.property_sweep(
+        input_records_to_si(spec, "components", components),
+        mode,
+        eos,
+        mixing_rule,
+        [_si(spec, "temperatures", v) for v in temperatures],
+        [_si(spec, "pressures", v) for v in pressures],
+        volume_correction,
+    )
+    return PropertySweepResult(
+        points=tuple(PropertyPoint(temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), oil_density=None if c.oil_density is None else from_si(c.oil_density.magnitude_si, c.oil_density.unit), aqueous_density=None if c.aqueous_density is None else from_si(c.aqueous_density.magnitude_si, c.aqueous_density.unit), gas_viscosity=None if c.gas_viscosity is None else from_si(c.gas_viscosity.magnitude_si, c.gas_viscosity.unit), oil_viscosity=None if c.oil_viscosity is None else from_si(c.oil_viscosity.magnitude_si, c.oil_viscosity.unit), aqueous_viscosity=None if c.aqueous_viscosity is None else from_si(c.aqueous_viscosity.magnitude_si, c.aqueous_viscosity.unit), gas_phase_available=c.gas_phase_available, oil_phase_available=c.oil_phase_available, aqueous_phase_available=c.aqueous_phase_available) for c in result.points),
         warnings=_warnings(result.warnings),
     )
 

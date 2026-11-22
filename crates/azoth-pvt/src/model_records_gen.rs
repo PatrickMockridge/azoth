@@ -20,6 +20,7 @@ use crate::gas_correlations::GasCorrelationsResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
 use crate::mmp::MmpResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
+use crate::property_sweep::PropertySweepResult;
 use crate::saturation_test::SaturationTestResult;
 use crate::separator_test::SeparatorTestResult;
 use crate::swelling_test::SwellingTestResult;
@@ -176,6 +177,15 @@ impl CalcResult for OilMaterialBalanceResult {
         "edi",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for PropertySweepResult {
+    const CALC_ID: &'static str = "pvt.property_sweep";
+    const FIELDS: &'static [&'static str] = &["points", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

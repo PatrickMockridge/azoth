@@ -4008,6 +4008,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 8,
         "tests_skipped": 0,
     },
+    'pvt.property_sweep': {
+        "calc_id": 'pvt.property_sweep',
+        "name": 'Property sweep',
+        "spec": {'path': 'specs/models/pvt/property_sweep.toml', 'sha256': 'fa10d1e16568087dad0d0bfff795ce83ac4d11e131d98c5f361942c52149c93d'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/property_sweep.py', 'sha256': '1e0bb26cc60722e3a6c4bc89dcdde3345b580d311c8705ab3e96157861cf17f3'}, {'path': 'crates/azoth-pvt/src/property_sweep.rs', 'sha256': '5a71499b6e459a783b7b2bb7f1101c40bf118468482f6b9837a17deef3747d1a'}],
+        "source": 'NeqSim pvtsimulation/simulation/DensitySim.java and ViscositySim.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 4,
+        "tests_skipped": 0,
+    },
     'pvt.saturation_test': {
         "calc_id": 'pvt.saturation_test',
         "name": 'Saturation test',

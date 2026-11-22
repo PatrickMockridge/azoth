@@ -2537,6 +2537,22 @@ class MmpPoint:
     recovery: float
 
 @final
+class PropertyPoint:
+    """one row per state."""
+
+    temperature: Qty
+    pressure: Qty
+    gas_density: Qty | None
+    oil_density: Qty | None
+    aqueous_density: Qty | None
+    gas_viscosity: Qty | None
+    oil_viscosity: Qty | None
+    aqueous_viscosity: Qty | None
+    gas_phase_available: bool
+    oil_phase_available: bool
+    aqueous_phase_available: bool
+
+@final
 class SeparatorStageResult:
     """one row per stage."""
 
@@ -6945,6 +6961,11 @@ class OilMaterialBalanceResult:
     warnings: list[Warning]
 
 @final
+class PropertySweepResult:
+    points: list[PropertyPoint]
+    warnings: list[Warning]
+
+@final
 class SaturationTestResult:
     saturation_pressure: Qty | None
     saturation_temperature: Qty | None
@@ -11201,6 +11222,15 @@ def oil_material_balance(
     eg_history: list[float] | None = None,
     we_history: list[float] | None = None,
 ) -> OilMaterialBalanceResult: ...
+def property_sweep(
+    components: list[FluidComponent],
+    mode: str,
+    temperatures: list[float],
+    pressures: list[float],
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    volume_correction: bool | None = None,
+) -> PropertySweepResult: ...
 def saturation_test(
     components: list[FluidComponent],
     mode: str,
