@@ -3986,6 +3986,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 5,
         "tests_skipped": 0,
     },
+    'pvt.mmp': {
+        "calc_id": 'pvt.mmp',
+        "name": 'Minimum miscibility pressure',
+        "spec": {'path': 'specs/models/pvt/mmp.toml', 'sha256': '1101c6c49a2c063e4df2f74f510642b321fc1f40b1dacb22767db1f59d7671d5'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/mmp.py', 'sha256': 'f5ec188f7bf2922d42330b53d04c38cf06abbc47a10b7409085e4833f07ff013'}, {'path': 'crates/azoth-pvt/src/mmp.rs', 'sha256': 'b744efb23b5ada7488069156fca2db44f3f17dc81de47ca3a41897dc57d71880'}],
+        "source": 'NeqSim pvtsimulation/simulation/MMPCalculator.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 5,
+        "tests_skipped": 0,
+    },
     'pvt.oil_material_balance': {
         "calc_id": 'pvt.oil_material_balance',
         "name": 'Oil material balance',

@@ -28,6 +28,7 @@ from azoth.core.result import (
     DifferentialLiberationResult,
     GasCorrelationsResult,
     GasMaterialBalanceResult,
+    MmpResult,
     OilMaterialBalanceResult,
     SaturationTestResult,
     SeparatorTestResult,
@@ -43,6 +44,7 @@ _DECLINE_CURVE = "pvt.decline_curve"
 _DIFFERENTIAL_LIBERATION = "pvt.differential_liberation"
 _GAS_CORRELATIONS = "pvt.gas_correlations"
 _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
+_MMP = "pvt.mmp"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
 _SATURATION_TEST = "pvt.saturation_test"
 _SEPARATOR_TEST = "pvt.separator_test"
@@ -58,6 +60,7 @@ __all__ = [
     "gas_correlations",
     "gas_material_balance",
     "layers",
+    "mmp",
     "oil_material_balance",
     "saturation_test",
     "separator_test",
@@ -254,6 +257,54 @@ def swelling_test(
         temperature=temperature,
         cumulative_gas_injected=cumulative_gas_injected,
         volume_correction=volume_correction,
+    )
+
+
+def mmp(
+    oil_components: Sequence[Mapping[str, Any]],
+    gas_components: Sequence[Mapping[str, Any]],
+    *,
+    temperature: Any,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    method: str | None = None,
+    recovery_threshold: float | None = None,
+    number_of_pressure_points: int | None = None,
+    min_pressure: Any = None,
+    max_pressure: Any = None,
+    slim_tube_nodes: int | None = None,
+    pv_injected: float | None = None,
+) -> MmpResult:
+    """The minimum miscibility pressure of an oil and an injection gas.
+
+    ``oil_components`` and ``gas_components`` are the characterization row lists; every gas
+    component must be one the oil carries, because the class injects only the components a
+    cell already has. ``method`` is ``"slim_tube"`` (the default), ``"key_tie_line"`` or
+    ``"rising_bubble"``, which the class delegates to the slim tube.
+
+    Returns:
+        The MMP (absent where the range never reaches the threshold), the mechanism, and the
+        slim tube's ``points`` recovery curve.
+
+    Raises:
+        InvalidInputError: for a gas component the oil does not carry, an unknown method,
+            fewer than three pressure points, a bad grid, or a non-positive temperature.
+
+    See :func:`azoth.pvt.reference.mmp.mmp`.
+    """
+    return resolve(_MMP)(  # type: ignore[no-any-return]
+        oil_components=oil_components,
+        gas_components=gas_components,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        temperature=temperature,
+        method=method,
+        recovery_threshold=recovery_threshold,
+        number_of_pressure_points=number_of_pressure_points,
+        min_pressure=min_pressure,
+        max_pressure=max_pressure,
+        slim_tube_nodes=slim_tube_nodes,
+        pv_injected=pv_injected,
     )
 
 

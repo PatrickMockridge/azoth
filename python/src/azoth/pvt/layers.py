@@ -281,6 +281,39 @@ def _swelling(inputs: Mapping[str, Any]) -> dict[str, float]:
     return rows_out
 
 
+def _mmp(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`pvt.mmp`'s captured quantities, keyed as the capture spells them."""
+    from azoth.core.units import quantity
+
+    from .reference.mmp import mmp
+
+    def rows(source: list[Mapping[str, Any]]) -> list[dict[str, Any]]:
+        return [{**row, "moles": quantity(row["moles"], "mol")} for row in source]
+
+    result = mmp(
+        rows(inputs["oil_components"]),
+        rows(inputs["gas_components"]),
+        eos=inputs.get("eos"),
+        mixing_rule=inputs.get("mixing_rule"),
+        temperature=quantity(inputs["temperature"], "K"),
+        method=inputs.get("method"),
+        recovery_threshold=inputs.get("recovery_threshold"),
+        number_of_pressure_points=inputs.get("number_of_pressure_points"),
+        min_pressure=_q(inputs.get("min_pressure"), "Pa"),
+        max_pressure=_q(inputs.get("max_pressure"), "Pa"),
+        slim_tube_nodes=inputs.get("slim_tube_nodes"),
+        pv_injected=inputs.get("pv_injected"),
+    )
+    rows_out: dict[str, float] = {}
+    if result.mmp is not None:
+        rows_out["mmp_pa"] = result.mmp.to("Pa").magnitude
+    for index, point in enumerate(result.points):
+        at = f"point_{index}_"
+        rows_out[at + "pressure_pa"] = point.pressure.to("Pa").magnitude
+        rows_out[at + "recovery"] = point.recovery
+    return rows_out
+
+
 #: Models whose per-step arithmetic is dumped by a function here.
 DUMPERS: dict[str, Dumper] = {
     "pvt.constant_mass_expansion": _cce,
@@ -288,6 +321,7 @@ DUMPERS: dict[str, Dumper] = {
     "pvt.constant_volume_depletion": _cvd,
     "pvt.separator_test": _separator,
     "pvt.swelling_test": _swelling,
+    "pvt.mmp": _mmp,
 }
 
 #: Record-list models with no interior to dump: every published row is the answer. The value

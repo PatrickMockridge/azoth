@@ -14,6 +14,7 @@ import neqsim.pvtsimulation.reservoirproperties.materialbalance.OilMaterialBalan
 import neqsim.pvtsimulation.simulation.ConstantMassExpansion;
 import neqsim.pvtsimulation.simulation.ConstantVolumeDepletion;
 import neqsim.pvtsimulation.simulation.GOR;
+import neqsim.pvtsimulation.simulation.MMPCalculator;
 import neqsim.pvtsimulation.simulation.MultiStageSeparatorTest;
 import neqsim.pvtsimulation.simulation.DifferentialLiberation;
 import neqsim.pvtsimulation.simulation.SaturationPressure;
@@ -758,6 +759,51 @@ public final class PvtProbe {
         new double[] {0.0, 0.0});
   }
 
+  private static void mmpBlock(String block, double temperatureCelsius, String method,
+      double minBar, double maxBar, int points, int nodes, double pv, double threshold) {
+    mmpBlock(block, "methane", temperatureCelsius, method, minBar, maxBar, points, nodes, pv, threshold);
+  }
+
+  private static void mmpBlock(String block, String gasName, double temperatureCelsius,
+      String method, double minBar, double maxBar, int points, int nodes, double pv,
+      double threshold) {
+    System.out.println("[" + block + "]");
+    SystemInterface oil = new SystemSrkEos(temperatureCelsius + 273.15, minBar);
+    oil.addComponent("methane", 0.70);
+    oil.addComponent("nC10", 0.30);
+    oil.setMixingRule(2);
+    SystemInterface gas = new SystemSrkEos(temperatureCelsius + 273.15, minBar);
+    gas.addComponent(gasName, 1.0);
+    gas.setMixingRule(2);
+    MMPCalculator calculator = new MMPCalculator(oil, gas);
+    calculator.setTemperature(temperatureCelsius);
+    calculator.setMethod(MMPCalculator.CalculationMethod.valueOf(method));
+    calculator.setPressureRange(minBar, maxBar);
+    calculator.setNumberOfPressurePoints(points);
+    calculator.setSlimTubeParameters(nodes, pv);
+    calculator.setRecoveryThreshold(threshold);
+    calculator.run();
+    line("mmp_pa", calculator.getMMP() * 1.0e5);
+    System.out.println("mechanism=" + calculator.getMiscibilityMechanism().name());
+    double[] pressures = calculator.getPressures();
+    double[] recoveries = calculator.getRecoveries();
+    if (pressures != null) {
+      for (int i = 0; i < pressures.length; i++) {
+        line("point_" + i + "_pressure_pa", pressures[i] * 1.0e5);
+        line("point_" + i + "_recovery", recoveries[i]);
+      }
+    }
+  }
+
+  private static void mmp() {
+    System.out.println("mmp");
+    mmpBlock("mmp_slim_tube_small", 50.0, "SLIM_TUBE", 100.0, 300.0, 3, 6, 0.4, 0.90);
+    mmpBlock("mmp_key_tie_line", 50.0, "KEY_TIE_LINE", 100.0, 500.0, 3, 6, 0.4, 0.90);
+    mmpBlock("mmp_rising_bubble", 50.0, "RISING_BUBBLE", 100.0, 300.0, 3, 6, 0.4, 0.90);
+    mmpBlock("mmp_default_grid", 50.0, "SLIM_TUBE", 100.0, 300.0, 10, 8, 0.5, 0.90);
+    mmpBlock("mmp_slim_tube_wide", "methane", 50.0, "SLIM_TUBE", 100.0, 1000.0, 5, 6, 0.4, 0.50);
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -796,6 +842,9 @@ public final class PvtProbe {
         break;
       case "swelling":
         swelling();
+        break;
+      case "mmp":
+        mmp();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

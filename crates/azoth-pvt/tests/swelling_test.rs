@@ -33,9 +33,15 @@ fn the_upstream_pinned_case_matches_the_capture() {
     assert!(close(row.points[0].pressure, 5_128_370.972_140_508));
     assert!(close(row.points[0].relative_oil_volume, 1.0));
     assert!(close(row.points[1].pressure, 7_320_109.921_488_98));
-    assert!(close(row.points[1].relative_oil_volume, 1.030_102_097_142_687_7));
+    assert!(close(
+        row.points[1].relative_oil_volume,
+        1.030_102_097_142_687_7
+    ));
     assert!(close(row.points[2].pressure, 9_314_150.739_597_373));
-    assert!(close(row.points[2].relative_oil_volume, 1.060_231_741_573_248_5));
+    assert!(close(
+        row.points[2].relative_oil_volume,
+        1.060_231_741_573_248_5
+    ));
 }
 
 #[test]
@@ -54,7 +60,10 @@ fn the_mixed_gas_and_zero_injection_match_their_capture_blocks() {
     .unwrap();
     assert!(close(row.points[0].pressure, 1.441_124_803_534_498_3e7));
     assert!(close(row.points[1].pressure, 1.497_556_075_131_841_2e7));
-    assert!(close(row.points[3].relative_oil_volume, 1.111_512_321_716_036_3));
+    assert!(close(
+        row.points[3].relative_oil_volume,
+        1.111_512_321_716_036_3
+    ));
 
     let zero = swelling_test(
         &oil,

@@ -1597,6 +1597,17 @@ class MinimalCutSet:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class MmpPoint:
+    """the slim tube's recovery curve; empty for the key tie line."""
+
+    #: the grid pressure.
+    pressure: Q
+
+    #: the recovery at that pressure, 0 to 1.
+    recovery: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class MultiVesselContributionRow:
     """each source's contribution at the peak, in first-appearance order."""
 

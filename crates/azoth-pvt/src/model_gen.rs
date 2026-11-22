@@ -8,6 +8,7 @@
 //!   - specs/models/pvt/differential_liberation.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
+//!   - specs/models/pvt/mmp.toml
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
@@ -5729,6 +5730,696 @@ pub static GAS_MATERIAL_BALANCE_SPEC: ModelSpec = ModelSpec {
     cases: GAS_MATERIAL_BALANCE_CASES,
 };
 
+static MMP_CHECKS: &[SpecCheck] = &[];
+
+static MMP_CASES: &[TestCase] = &[
+    TestCase {
+        id: "mmp_slim_tube_small",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[
+            ("temperature", 323.15),
+            ("recovery_threshold", 0.9),
+            ("number_of_pressure_points", 3.0),
+            ("min_pressure", 10000000.0),
+            ("max_pressure", 30000000.0),
+            ("slim_tube_nodes", 6.0),
+            ("pv_injected", 0.4),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("method", "slim_tube")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("mechanism", "immiscible")],
+        records: &[
+            (
+                "oil_components",
+                &[
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("methane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.7),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("nC10"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.3),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "gas_components",
+                &[&[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(10000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.0912307824495534),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(20000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.13584739431169818),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(30000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "mmp_key_tie_line",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 0.03,
+        numbers: &[
+            ("temperature", 323.15),
+            ("recovery_threshold", 0.9),
+            ("number_of_pressure_points", 3.0),
+            ("min_pressure", 10000000.0),
+            ("max_pressure", 50000000.0),
+            ("slim_tube_nodes", 6.0),
+            ("pv_injected", 0.4),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("method", "key_tie_line")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("mmp", 40019531.25)],
+        expected_vectors: &[],
+        expected_strings: &[("mechanism", "combined")],
+        records: &[
+            (
+                "oil_components",
+                &[
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("methane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.7),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("nC10"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.3),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "gas_components",
+                &[&[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[],
+    },
+    TestCase {
+        id: "mmp_rising_bubble",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[
+            ("temperature", 323.15),
+            ("recovery_threshold", 0.9),
+            ("number_of_pressure_points", 3.0),
+            ("min_pressure", 10000000.0),
+            ("max_pressure", 30000000.0),
+            ("slim_tube_nodes", 6.0),
+            ("pv_injected", 0.4),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("method", "rising_bubble")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("mechanism", "immiscible")],
+        records: &[
+            (
+                "oil_components",
+                &[
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("methane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.7),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("nC10"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.3),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "gas_components",
+                &[&[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(10000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.0912307824495534),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(20000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.13584739431169818),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(30000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "mmp_default_grid",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[
+            ("temperature", 323.15),
+            ("recovery_threshold", 0.9),
+            ("number_of_pressure_points", 10.0),
+            ("min_pressure", 10000000.0),
+            ("max_pressure", 30000000.0),
+            ("slim_tube_nodes", 8.0),
+            ("pv_injected", 0.5),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("method", "slim_tube")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[],
+        expected_vectors: &[],
+        expected_strings: &[("mechanism", "immiscible")],
+        records: &[
+            (
+                "oil_components",
+                &[
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("methane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.7),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("nC10"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.3),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "gas_components",
+                &[&[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(10000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.18246156489913284),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(12222222.222222222),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.1995014165972221),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(14444444.444444446),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.21793215523326237),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(16666666.666666666),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.23796434982960396),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(18888888.888888888),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.2598941151185444),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(21111111.111111112),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.2841381722056466),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(23333333.333333332),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.3112892026074105),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(25555555.555555556),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.34221018718791324),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(27777777.777777776),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.3782061820360592),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(30000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.4),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "mmp_slim_tube_wide",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[
+            ("temperature", 323.15),
+            ("recovery_threshold", 0.5),
+            ("number_of_pressure_points", 5.0),
+            ("min_pressure", 10000000.0),
+            ("max_pressure", 100000000.0),
+            ("slim_tube_nodes", 6.0),
+            ("pv_injected", 0.4),
+        ],
+        flags: &[],
+        lists: &[],
+        strings: &[("method", "slim_tube")],
+        vectors: &[],
+        matrices: &[],
+        expected: &[("mmp", 40937500.0)],
+        expected_vectors: &[],
+        expected_strings: &[("mechanism", "combined")],
+        records: &[
+            (
+                "oil_components",
+                &[
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("methane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.7),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("nC10"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.3),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "gas_components",
+                &[&[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(10000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.0912307824495534),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(32500000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(0.2),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(55000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(77500000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(100000000.0),
+                    },
+                    RecordField {
+                        name: "recovery",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+/// Registry entry for `pvt.mmp`.
+pub static MMP_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.mmp",
+    kind: "direct",
+    algorithm: None,
+    checks: MMP_CHECKS,
+    cases: MMP_CASES,
+};
+
 static OIL_MATERIAL_BALANCE_CHECKS: &[SpecCheck] = &[];
 
 static OIL_MATERIAL_BALANCE_CASES: &[TestCase] = &[
@@ -8069,6 +8760,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &DIFFERENTIAL_LIBERATION_SPEC,
     &GAS_CORRELATIONS_SPEC,
     &GAS_MATERIAL_BALANCE_SPEC,
+    &MMP_SPEC,
     &OIL_MATERIAL_BALANCE_SPEC,
     &SATURATION_TEST_SPEC,
     &SEPARATOR_TEST_SPEC,

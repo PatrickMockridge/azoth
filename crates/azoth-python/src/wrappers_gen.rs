@@ -10343,6 +10343,110 @@ pub fn gas_material_balance(
     .map_err(|e| to_pyerr(py, e))
 }
 
+/// Minimum miscibility pressure.
+///
+/// All arguments are SI magnitudes. See the module documentation for why.
+#[pyfunction]
+#[pyo3(signature = (oil_components, gas_components, eos, mixing_rule, temperature, method, recovery_threshold, number_of_pressure_points, min_pressure, max_pressure, slim_tube_nodes, pv_injected))]
+#[pyo3(
+    text_signature = "(oil_components, gas_components, eos, mixing_rule, temperature, method, recovery_threshold, number_of_pressure_points, min_pressure, max_pressure, slim_tube_nodes, pv_injected)"
+)]
+#[allow(clippy::too_many_arguments)] // The signature is the spec's declared inputs.
+pub fn mmp(
+    py: Python<'_>,
+    oil_components: Vec<crate::records_gen::FluidComponent>,
+    gas_components: Vec<crate::records_gen::FluidComponent>,
+    eos: Option<&str>,
+    mixing_rule: Option<&str>,
+    temperature: f64,
+    method: Option<&str>,
+    recovery_threshold: Option<f64>,
+    number_of_pressure_points: Option<usize>,
+    min_pressure: Option<f64>,
+    max_pressure: Option<f64>,
+    slim_tube_nodes: Option<usize>,
+    pv_injected: Option<f64>,
+) -> PyResult<crate::transport_gen::PyMmpResult> {
+    let oil_components_records: Vec<azoth_characterization::component_row::FluidComponent> =
+        oil_components
+            .into_iter()
+            .map(
+                |row| azoth_characterization::component_row::FluidComponent {
+                    fluid: row.fluid,
+                    name: row.name,
+                    pseudo_component: row.pseudo_component,
+                    moles: row.moles,
+                    molar_mass: row.molar_mass,
+                    density: row.density,
+                    normal_boiling_point: row.normal_boiling_point,
+                    critical_temperature: row.critical_temperature,
+                    critical_pressure: row.critical_pressure,
+                    acentric_factor: row.acentric_factor,
+                    critical_volume: row.critical_volume,
+                    racket_z: row.racket_z,
+                    racket_z_cpa: row.racket_z_cpa,
+                    parachor: row.parachor,
+                    critical_viscosity: row.critical_viscosity,
+                    triple_point_temperature: row.triple_point_temperature,
+                    heat_of_fusion: row.heat_of_fusion,
+                    ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                    cp_a: row.cp_a,
+                    cp_b: row.cp_b,
+                    cp_c: row.cp_c,
+                    cp_d: row.cp_d,
+                    attractive_m: row.attractive_m,
+                },
+            )
+            .collect();
+    let gas_components_records: Vec<azoth_characterization::component_row::FluidComponent> =
+        gas_components
+            .into_iter()
+            .map(
+                |row| azoth_characterization::component_row::FluidComponent {
+                    fluid: row.fluid,
+                    name: row.name,
+                    pseudo_component: row.pseudo_component,
+                    moles: row.moles,
+                    molar_mass: row.molar_mass,
+                    density: row.density,
+                    normal_boiling_point: row.normal_boiling_point,
+                    critical_temperature: row.critical_temperature,
+                    critical_pressure: row.critical_pressure,
+                    acentric_factor: row.acentric_factor,
+                    critical_volume: row.critical_volume,
+                    racket_z: row.racket_z,
+                    racket_z_cpa: row.racket_z_cpa,
+                    parachor: row.parachor,
+                    critical_viscosity: row.critical_viscosity,
+                    triple_point_temperature: row.triple_point_temperature,
+                    heat_of_fusion: row.heat_of_fusion,
+                    ideal_gas_enthalpy_of_formation: row.ideal_gas_enthalpy_of_formation,
+                    cp_a: row.cp_a,
+                    cp_b: row.cp_b,
+                    cp_c: row.cp_c,
+                    cp_d: row.cp_d,
+                    attractive_m: row.attractive_m,
+                },
+            )
+            .collect();
+    azoth_pvt::mmp::mmp(
+        &oil_components_records,
+        &gas_components_records,
+        eos,
+        mixing_rule,
+        kelvins(temperature),
+        method,
+        recovery_threshold,
+        number_of_pressure_points,
+        min_pressure.map(pascals),
+        max_pressure.map(pascals),
+        slim_tube_nodes,
+        pv_injected,
+    )
+    .map(|r| crate::transport_gen::PyMmpResult::from(&r))
+    .map_err(|e| to_pyerr(py, e))
+}
+
 /// Oil material balance.
 ///
 /// All arguments are SI magnitudes. See the module documentation for why.

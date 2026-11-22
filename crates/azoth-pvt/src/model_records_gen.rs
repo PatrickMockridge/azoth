@@ -18,6 +18,7 @@ use crate::decline_curve::DeclineCurveResult;
 use crate::differential_liberation::DifferentialLiberationResult;
 use crate::gas_correlations::GasCorrelationsResult;
 use crate::gas_material_balance::GasMaterialBalanceResult;
+use crate::mmp::MmpResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
 use crate::saturation_test::SaturationTestResult;
 use crate::separator_test::SeparatorTestResult;
@@ -144,6 +145,15 @@ impl CalcResult for GasMaterialBalanceResult {
         "cole_f_over_eg",
         "warnings",
     ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for MmpResult {
+    const CALC_ID: &'static str = "pvt.mmp";
+    const FIELDS: &'static [&'static str] = &["mmp", "mechanism", "points", "warnings"];
 
     fn warnings(&self) -> &[Warning] {
         &self.warnings

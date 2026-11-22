@@ -262,6 +262,8 @@ from azoth.core.result import (
     MineralEquilibriumRow,
     MinimalCutSet,
     MixerResult,
+    MmpPoint,
+    MmpResult,
     MolarEnthalpyEntropyResult,
     MollerupAlphaResult,
     MultiflashStabilityTestResult,
@@ -760,6 +762,7 @@ __all__ = [
     "matcop_prumr_new_alpha",
     "mdmt",
     "mixer",
+    "mmp",
     "molar_enthalpy_entropy",
     "mollerup_alpha",
     "multi_mineral_scale_equilibrium",
@@ -10637,6 +10640,31 @@ def gas_material_balance(calculation: str, *, pressure: Sequence[Any] | None=Non
         r_squared=result.r_squared,
         cole_gp=None if result.cole_gp is None else tuple(result.cole_gp),
         cole_f_over_eg=None if result.cole_f_over_eg is None else tuple(result.cole_f_over_eg),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def mmp(oil_components: Sequence[Mapping[str, Any]], gas_components: Sequence[Mapping[str, Any]], *, temperature: Any, eos: str | None=None, mixing_rule: str | None=None, method: str | None=None, recovery_threshold: float | None=None, number_of_pressure_points: int | None=None, min_pressure: Any=None, max_pressure: Any=None, slim_tube_nodes: int | None=None, pv_injected: float | None=None) -> MmpResult:
+    """``pvt.mmp``, computed in Rust."""
+    spec = _models_gen.model("pvt.mmp")
+    result = _core.mmp(
+        input_records_to_si(spec, "oil_components", oil_components),
+        input_records_to_si(spec, "gas_components", gas_components),
+        eos,
+        mixing_rule,
+        _si(spec, "temperature", temperature),
+        method,
+        None if recovery_threshold is None else recovery_threshold,
+        None if number_of_pressure_points is None else _count("number_of_pressure_points", number_of_pressure_points),
+        None if min_pressure is None else _si(spec, "min_pressure", min_pressure),
+        None if max_pressure is None else _si(spec, "max_pressure", max_pressure),
+        None if slim_tube_nodes is None else _count("slim_tube_nodes", slim_tube_nodes),
+        None if pv_injected is None else pv_injected,
+    )
+    return MmpResult(
+        mmp=None if result.mmp is None else from_si(result.mmp.magnitude_si, result.mmp.unit),
+        mechanism=result.mechanism,
+        points=tuple(MmpPoint(pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), recovery=c.recovery) for c in result.points),
         warnings=_warnings(result.warnings),
     )
 

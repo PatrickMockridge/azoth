@@ -28,16 +28,17 @@ use crate::record_outputs_gen::{
     PyHydrateRiskPoint, PyIdealGasFannoReleaseStation, PyIdealGasReleaseStation,
     PyIncrementalZoneRow, PyKComponent, PyLeakBlowdownDiagnostic, PyLeakBlowdownPoint,
     PyLegacyScreeningReleaseStation, PyLopaLayerContribution, PyMahBarrier, PyMahConsequence,
-    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMultiVesselContributionRow,
-    PyMultiVesselProfileRow, PyNaceIssueRow, PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment,
-    PyOpenDrainResult, PyOperatingCostLine, PyP002FindingResult, PyPerformanceAssessment,
-    PyPerformanceFinding, PyPerformanceInstrument, PyPerformanceSif, PyPipeFireRupturePoint,
-    PyPrescribedSlipReleaseStation, PyProcessCostEquipmentResult, PyProcessCostFlag,
-    PyProcessCostMtoRow, PyProjectCostLine, PyPulsationModeResult, PyRanzMarshallReleaseStation,
-    PyRealGasFannoReleaseStation, PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow,
-    PyReviewAssessment, PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint,
-    PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
-    PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySeparatorStageResult,
+    PyMahThreat, PyMineralEquilibriumRow, PyMinimalCutSet, PyMmpPoint,
+    PyMultiVesselContributionRow, PyMultiVesselProfileRow, PyNaceIssueRow,
+    PyNonEquilibriumBlowdownPoint, PyOpenDrainAssessment, PyOpenDrainResult, PyOperatingCostLine,
+    PyP002FindingResult, PyPerformanceAssessment, PyPerformanceFinding, PyPerformanceInstrument,
+    PyPerformanceSif, PyPipeFireRupturePoint, PyPrescribedSlipReleaseStation,
+    PyProcessCostEquipmentResult, PyProcessCostFlag, PyProcessCostMtoRow, PyProjectCostLine,
+    PyPulsationModeResult, PyRanzMarshallReleaseStation, PyRealGasFannoReleaseStation,
+    PyRegisterFinding, PyReliefDisposalRow, PyRemediationOptionRow, PyReviewAssessment,
+    PyReviewCoverage, PyReviewVerdict, PyRiskAssessmentRow, PyRupturePoint, PySafeChartItem,
+    PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow, PyScenarioChangeRow,
+    PyScenarioIndexRow, PySelfHeatingTimePoint, PySeparatorStageResult,
     PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
     PySts0131FindingResult, PySubFraction, PySwellingPoint, PyTopsidesBreakdownLine,
     PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow, PyTopsidesProjectLine,
@@ -30836,6 +30837,55 @@ impl From<&azoth_pvt::gas_material_balance::GasMaterialBalanceResult>
             r_squared: r.r_squared,
             cole_gp: r.cole_gp.as_ref().map(|values| values.to_vec()),
             cole_f_over_eg: r.cole_f_over_eg.as_ref().map(|values| values.to_vec()),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.mmp`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "MmpResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMmpResult {
+    /// the minimum miscibility pressure; absent where the range never reaches the threshold.
+    #[pyo3(get)]
+    pub mmp: Option<PyQty>,
+    /// one of first_contact, vaporizing, condensing, combined, immiscible, unknown.
+    #[pyo3(get)]
+    pub mechanism: String,
+    /// the slim tube's recovery curve; empty for the key tie line.
+    #[pyo3(get)]
+    pub points: Vec<PyMmpPoint>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PyMmpResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "MmpResult(mmp={:?}, mechanism={:?}, points={:?}, {} warning(s))",
+            self.mmp,
+            self.mechanism,
+            self.points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::mmp::MmpResult> for PyMmpResult {
+    fn from(r: &azoth_pvt::mmp::MmpResult) -> Self {
+        Self {
+            mmp: r.mmp.map(|v| PyQty {
+                magnitude_si: v,
+                unit: "Pa".to_string(),
+            }),
+            mechanism: r.mechanism.clone(),
+            points: r.points.iter().map(PyMmpPoint::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

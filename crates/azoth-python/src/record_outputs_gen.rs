@@ -4276,6 +4276,40 @@ impl From<&azoth_process::models::fault_tree::MinimalCutSet> for PyMinimalCutSet
     }
 }
 
+/// the slim tube's recovery curve; empty for the key tie line.
+#[pyclass(frozen, skip_from_py_object, module = "azoth._core", name = "MmpPoint")]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PyMmpPoint {
+    /// the grid pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the recovery at that pressure, 0 to 1.
+    #[pyo3(get)]
+    pub recovery: f64,
+}
+
+#[pymethods]
+impl PyMmpPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "MmpPoint(pressure={:?}, recovery={})",
+            self.pressure, self.recovery
+        )
+    }
+}
+
+impl From<&azoth_pvt::mmp::MmpPoint> for PyMmpPoint {
+    fn from(row: &azoth_pvt::mmp::MmpPoint) -> Self {
+        Self {
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            recovery: row.recovery,
+        }
+    }
+}
+
 /// each source's contribution at the peak, in first-appearance order.
 #[pyclass(
     frozen,

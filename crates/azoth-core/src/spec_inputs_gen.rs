@@ -362,6 +362,7 @@
 //!   - specs/models/pvt/differential_liberation.toml
 //!   - specs/models/pvt/gas_correlations.toml
 //!   - specs/models/pvt/gas_material_balance.toml
+//!   - specs/models/pvt/mmp.toml
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
@@ -6884,6 +6885,13 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
         "thermodynamic_temperature",
     ),
     ("pvt.gas_material_balance", "gas_gravity", "dimensionless"),
+    ("pvt.mmp", "temperature", "thermodynamic_temperature"),
+    ("pvt.mmp", "recovery_threshold", "dimensionless"),
+    ("pvt.mmp", "number_of_pressure_points", "dimensionless"),
+    ("pvt.mmp", "min_pressure", "pressure"),
+    ("pvt.mmp", "max_pressure", "pressure"),
+    ("pvt.mmp", "slim_tube_nodes", "dimensionless"),
+    ("pvt.mmp", "pv_injected", "dimensionless"),
     ("pvt.oil_material_balance", "np", "dimensionless"),
     ("pvt.oil_material_balance", "rp", "dimensionless"),
     ("pvt.oil_material_balance", "bo", "dimensionless"),

@@ -2530,6 +2530,13 @@ class GasResultRow:
     h2s_fraction: float | None
 
 @final
+class MmpPoint:
+    """the slim tube's recovery curve; empty for the key tie line."""
+
+    pressure: Qty
+    recovery: float
+
+@final
 class SeparatorStageResult:
     """one row per stage."""
 
@@ -6916,6 +6923,13 @@ class GasMaterialBalanceResult:
     warnings: list[Warning]
 
 @final
+class MmpResult:
+    mmp: Qty | None
+    mechanism: str
+    points: list[MmpPoint]
+    warnings: list[Warning]
+
+@final
 class OilMaterialBalanceResult:
     f: float | None
     eo_value: float | None
@@ -11145,6 +11159,20 @@ def gas_material_balance(
     temperature: float | None = None,
     gas_gravity: float | None = None,
 ) -> GasMaterialBalanceResult: ...
+def mmp(
+    oil_components: list[FluidComponent],
+    gas_components: list[FluidComponent],
+    temperature: float,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    method: str | None = None,
+    recovery_threshold: float | None = None,
+    number_of_pressure_points: float | None = None,
+    min_pressure: float | None = None,
+    max_pressure: float | None = None,
+    slim_tube_nodes: float | None = None,
+    pv_injected: float | None = None,
+) -> MmpResult: ...
 def oil_material_balance(
     calculation: str,
     np: float | None = None,

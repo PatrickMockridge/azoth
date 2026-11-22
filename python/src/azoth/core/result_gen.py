@@ -76,6 +76,7 @@ from azoth.core.record_outputs_gen import (
     MahThreat,
     MineralEquilibriumRow,
     MinimalCutSet,
+    MmpPoint,
     MultiVesselContributionRow,
     MultiVesselProfileRow,
     NaceIssueRow,
@@ -12483,6 +12484,25 @@ class GasMaterialBalanceResult(_HasWarnings):
 
     #: the Cole plot's F/Eg, from the second history point.
     cole_f_over_eg: tuple[float, ...] | None
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class MmpResult(_HasWarnings):
+    """Result of ``pvt.mmp``."""
+
+    CALC_ID: ClassVar[str] = "pvt.mmp"
+
+    #: the minimum miscibility pressure; absent where the range never reaches the threshold.
+    mmp: Q | None
+
+    #: one of first_contact, vaporizing, condensing, combined, immiscible, unknown.
+    mechanism: str
+
+    #: the slim tube's recovery curve; empty for the key tie line.
+    points: tuple[MmpPoint, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

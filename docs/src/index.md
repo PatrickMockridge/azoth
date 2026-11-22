@@ -473,6 +473,7 @@ Five sections, and the difference between them is the point:
 - [`pvt.differential_liberation`](./pvt/differential_liberation.md) — Differential liberation
 - [`pvt.gas_correlations`](./pvt/gas_correlations.md) — Gas correlation table
 - [`pvt.gas_material_balance`](./pvt/gas_material_balance.md) — Gas material balance
+- [`pvt.mmp`](./pvt/mmp.md) — Minimum miscibility pressure
 - [`pvt.oil_material_balance`](./pvt/oil_material_balance.md) — Oil material balance
 - [`pvt.saturation_test`](./pvt/saturation_test.md) — Saturation test
 - [`pvt.separator_test`](./pvt/separator_test.md) — Separator test
