@@ -505,6 +505,18 @@ def test_the_guarded_accelerators_report_the_solve_they_run() -> None:
         assert worst < 1.0e-6, f"{name} moved the state by {worst} K"
 
 
+def test_the_newton_route_lands_on_the_captured_state() -> None:
+    """**Newton's perturbation is inert** (`SimpleTray.setTemperature` is overwritten by
+    `run`), so the reachable solve is the unrelaxed sweep below and the state is direct's."""
+    direct = process.distillation_column(**_binary_args())
+    out = process.distillation_column(**_binary_args(), solver_type="newton")
+    worst = max(
+        abs(float(a.to("K").magnitude) - float(b.to("K").magnitude))
+        for a, b in zip(direct.tray_temperature, out.tray_temperature, strict=True)
+    )
+    assert worst < 2.0e-5, f"newton moved the state by {worst} K"
+
+
 def test_a_swapped_pair_of_draw_vectors_is_a_different_column() -> None:
     """**Two of the three swapped, and the answer moves.** The gas and liquid vectors are both
     `dimensionless` vectors of the same length, so a transposition between them is exactly the

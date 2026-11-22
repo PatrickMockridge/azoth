@@ -196,10 +196,9 @@ def absorption_column(
         "matrix_inside_out",
         "wegstein",
         "sum_rates",
+        "newton",
         "naphtali_sandholm",
     ):
-        if solver_type == "newton":
-            raise _unported.refuse("solver_type=newton")
         if solver_type == "mesh_residual":
             raise _unported.refuse("solver_type=mesh_residual")
         if solver_type == "auto":

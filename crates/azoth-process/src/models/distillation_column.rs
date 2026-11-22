@@ -441,7 +441,7 @@ pub(crate) fn distillation_column_outcome(
         "matrix_inside_out" => kernel::SolverType::MatrixInsideOut,
         "wegstein" => kernel::SolverType::Wegstein,
         "sum_rates" => kernel::SolverType::SumRates,
-        "newton" => return Err(unported::refuse("solver_type=newton")),
+        "newton" => kernel::SolverType::Newton,
         "mesh_residual" => return Err(unported::refuse("solver_type=mesh_residual")),
         "auto" => return Err(unported::refuse("solver_type=auto")),
         other => {

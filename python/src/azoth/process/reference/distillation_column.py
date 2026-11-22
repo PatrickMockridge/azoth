@@ -1738,6 +1738,44 @@ def _states(
 
         return took, temperature_residual
 
+    def full_sweep() -> None:
+        """One unrelaxed sequential pass, which is `performFullTraySweep`."""
+        for i in range(feed_stage, 1, -1):
+            run_with(i - 1, inlets_of(i - 1, None))
+        if has_reboiler:
+            run_with(0, inlets_of(0, None))
+        for i in range(1, tray_count):
+            run_with(i, inlets_of(i, None))
+        for i in range(tray_count - 2, feed_stage - 1, -1):
+            run_with(i, inlets_of(i, None))
+
+    def newton_sweep() -> tuple[int, float]:
+        """`solveNewton`'s reachable arithmetic: one unrelaxed sweep per iteration.
+
+        The class's finite-difference Jacobian is identically `-I`: `SimpleTray.setTemperature`
+        writes the field `run` overwrites from the mixed inlet, so a perturbed tray flashes the
+        same state and every off-diagonal column is zero. The line search's applied step is
+        inert for the same reason, and each trial's residual is `(1 - step) r`, whose minimum
+        is the full step.
+        """
+        took = 0
+        residual = float("inf")
+        for _ in range(3):
+            took += 1
+            old = [temperature(i) for i in range(tray_count)]
+            full_sweep()
+            residual = sum(abs(temperature(i) - old[i]) for i in range(tray_count)) / tray_count
+            if residual <= temperature_tolerance:
+                return took, residual
+        for iteration in range(took + 1, max_iterations + 1):
+            took = iteration
+            old = [temperature(i) for i in range(tray_count)]
+            full_sweep()
+            residual = sum(abs(temperature(i) - old[i]) for i in range(tray_count)) / tray_count
+            if residual <= temperature_tolerance:
+                break
+        return took, residual
+
     def product_of(level: int) -> StreamRecord:
         """The product an end publishes: the top's vapour, the bottom's liquid.
 
@@ -1769,14 +1807,29 @@ def _states(
     elif reported == "sum_rates" and has_condenser:
         reported = "damped_substitution"
 
-    def inner(temperatures: list[float]) -> tuple[int, float]:
+    seeded_gas = list(gas)
+    seeded_liquid = list(liquid)
+
+    def inner(temperatures: list[float]) -> tuple[int, float, str]:
+        if solver_type == "newton":
+            taken, residual = newton_sweep()
+            if residual <= temperature_tolerance:
+                return taken, residual, "newton"
+            gas[:] = seeded_gas
+            liquid[:] = seeded_liquid
+            taken, residual = sweep(temperatures, 0.5)
+            return taken, residual, "damped_substitution"
         if solver_type in ("inside_out", "matrix_inside_out"):
-            return inside_out_sweep(temperatures)
-        if solver_type == "wegstein":
-            return sweep(temperatures, 1.0)
-        if solver_type == "sum_rates":
-            return sweep(temperatures, 0.5) if has_condenser else sum_rates_sweep(temperatures)
-        return sweep(temperatures, initial_relaxation)
+            taken, residual = inside_out_sweep(temperatures)
+        elif solver_type == "wegstein":
+            taken, residual = sweep(temperatures, 1.0)
+        elif solver_type == "sum_rates":
+            taken, residual = (
+                sweep(temperatures, 0.5) if has_condenser else sum_rates_sweep(temperatures)
+            )
+        else:
+            taken, residual = sweep(temperatures, initial_relaxation)
+        return taken, residual, reported
 
     if adjustable():
         # `solveWithSpecificationTargets`: the outer secant on the ends' temperatures.
@@ -1803,7 +1856,7 @@ def _states(
             if adjust_bottom:
                 modes[0] = ("temperature", bottom_pair[0] if outer == 0 else bottom_pair[1])
 
-            iterations, temperature_residual = inner(temperatures)
+            iterations, temperature_residual, solver_used = inner(temperatures)
 
             top_error = 0.0
             bottom_error = 0.0
@@ -1841,7 +1894,7 @@ def _states(
 
             raise SolverNotConvergedError(iterations, temperature_residual, SPECIFICATION_TOLERANCE)
     else:
-        iterations, temperature_residual = inner(temperatures)
+        iterations, temperature_residual, solver_used = inner(temperatures)
 
     def outlet_enthalpy(i: int) -> float:
         total = 0.0
@@ -2043,7 +2096,7 @@ def _states(
             tuple(stream["z"]) if (stream := liquid[i]) is not None else ()
             for i in range(tray_count)
         ),
-        solver_used=reported,
+        solver_used=solver_used,
         distillate_n=distillate["n"],
         distillate_z=tuple(distillate["z"]),
         distillate_h=distillate["h"],
@@ -2391,11 +2444,10 @@ def _refuse_unported(solver_type: str | None, murphree_efficiency: _Murphree | N
         "matrix_inside_out",
         "wegstein",
         "sum_rates",
+        "newton",
         "naphtali_sandholm",
     ):
         return
-    if solver_type == "newton":
-        raise _unported.refuse("solver_type=newton")
     if solver_type == "mesh_residual":
         raise _unported.refuse("solver_type=mesh_residual")
     if solver_type == "auto":

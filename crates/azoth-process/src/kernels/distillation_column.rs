@@ -786,6 +786,7 @@ enum EndMode {
 }
 
 /// The network a solve carries between its steps.
+#[derive(Clone)]
 struct Network {
     /// Each tray's vapour outlet.
     gas: Vec<Option<Stream>>,
@@ -1242,32 +1243,56 @@ fn solve_once(setup: &ColumnSetup) -> Result<ColumnOutcome> {
         Some(state) => install_state(&mut net, state)?,
         None => seed_network(&mut net, setup)?,
     };
-    let solve =
-        |net: &mut Network, setup: &ColumnSetup, temperatures: &mut [f64]| -> Result<(u32, f64)> {
-            match setup.solver_type {
-                SolverType::InsideOut | SolverType::MatrixInsideOut => {
-                    inside_out_sweep(net, setup, temperatures)
+    let seeded = net.clone();
+    let mut solve = |net: &mut Network,
+                     setup: &ColumnSetup,
+                     temperatures: &mut [f64]|
+     -> Result<(u32, f64, SolverType)> {
+        if setup.solver_type == SolverType::Newton {
+            return match newton_sweep(net, setup) {
+                Ok((iterations, residual)) if residual <= setup.temperature_tolerance => {
+                    Ok((iterations, residual, SolverType::Newton))
                 }
-                SolverType::Wegstein => direct_sweep(net, setup, temperatures),
-                SolverType::SumRates if setup.has_condenser => sequential_sweep(
-                    net,
-                    setup,
-                    temperatures,
-                    SequentialOptions {
-                        initial_relaxation: 0.5,
-                    },
-                ),
-                SolverType::SumRates => sum_rates_sweep(net, setup, temperatures),
-                _ => sequential_sweep(
-                    net,
-                    setup,
-                    temperatures,
-                    SequentialOptions::for_strategy(setup.solver_type),
-                ),
+                _ => {
+                    *net = seeded.clone();
+                    let (iterations, residual) = sequential_sweep(
+                        net,
+                        setup,
+                        temperatures,
+                        SequentialOptions {
+                            initial_relaxation: 0.5,
+                        },
+                    )?;
+                    Ok((iterations, residual, SolverType::DampedSubstitution))
+                }
+            };
+        }
+        let used = reported_strategy(setup);
+        let (iterations, residual) = match setup.solver_type {
+            SolverType::InsideOut | SolverType::MatrixInsideOut => {
+                inside_out_sweep(net, setup, temperatures)
             }
-        };
-    let (iterations, temperature_residual) = if adjustable_specification(setup) {
-        specification_loop(&mut net, setup, &mut temperatures, solve)?
+            SolverType::Wegstein => direct_sweep(net, setup, temperatures),
+            SolverType::SumRates if setup.has_condenser => sequential_sweep(
+                net,
+                setup,
+                temperatures,
+                SequentialOptions {
+                    initial_relaxation: 0.5,
+                },
+            ),
+            SolverType::SumRates => sum_rates_sweep(net, setup, temperatures),
+            _ => sequential_sweep(
+                net,
+                setup,
+                temperatures,
+                SequentialOptions::for_strategy(setup.solver_type),
+            ),
+        }?;
+        Ok((iterations, residual, used))
+    };
+    let (iterations, temperature_residual, solver_used) = if adjustable_specification(setup) {
+        specification_loop(&mut net, setup, &mut temperatures, &mut solve)?
     } else {
         solve(&mut net, setup, &mut temperatures)?
     };
@@ -1459,7 +1484,7 @@ fn solve_once(setup: &ColumnSetup) -> Result<ColumnOutcome> {
         condenser_duty: watts(condenser_duty),
         reboiler_duty: watts(reboiler_duty),
         iterations,
-        solver_used: reported_strategy(setup),
+        solver_used,
         temperature_residual,
         mass_residual,
         energy_residual,
@@ -2322,6 +2347,69 @@ fn sum_rates_sweep(
     Ok((iterations, temperature_residual))
 }
 
+/// One unrelaxed sequential pass, which is `performFullTraySweep`.
+fn full_sweep(net: &mut Network, setup: &ColumnSetup) -> Result<()> {
+    let first_feed = setup.feed_stage;
+    let tray_count = net.tray_count;
+    for i in (2..=first_feed).rev() {
+        let inlets = net.inlets_of(i - 1);
+        net.run_with(i - 1, &inlets)?;
+    }
+    if setup.has_reboiler {
+        let inlets = net.inlets_of(0);
+        net.run_with(0, &inlets)?;
+    }
+    for i in 1..tray_count {
+        let inlets = net.inlets_of(i);
+        net.run_with(i, &inlets)?;
+    }
+    for i in (first_feed..tray_count.saturating_sub(1)).rev() {
+        let inlets = net.inlets_of(i);
+        net.run_with(i, &inlets)?;
+    }
+    Ok(())
+}
+
+/// `DistillationColumn.solveNewton`'s reachable arithmetic.
+///
+/// **The finite-difference Jacobian is identically `-I`.** `SimpleTray.setTemperature` writes
+/// the field `run` then overwrites from its mixed inlet, so a perturbed tray flashes the same
+/// state: every off-diagonal column is zero, the diagonal is `-1`, and the line search's
+/// applied step is equally inert - each trial's residual is `(1 - step) r`, whose minimum is
+/// the full step. What the class actually iterates is one unrelaxed sweep at a time, gated on
+/// the fixed-point residual, which is what this runs. The factory's damped fallback belongs to
+/// the caller, on the gate.
+fn newton_sweep(net: &mut Network, setup: &ColumnSetup) -> Result<(u32, f64)> {
+    let tray_count = net.tray_count;
+    let mut iterations = 0_u32;
+    let mut residual = f64::INFINITY;
+    for _ in 0..3 {
+        iterations += 1;
+        let old: Vec<f64> = (0..tray_count).map(|i| net.temperature(i)).collect();
+        full_sweep(net, setup)?;
+        residual = (0..tray_count)
+            .map(|i| (net.temperature(i) - old[i]).abs())
+            .sum::<f64>()
+            / tray_count as f64;
+        if residual <= setup.temperature_tolerance {
+            return Ok((iterations, residual));
+        }
+    }
+    for iter in (iterations as usize + 1)..=setup.max_iterations {
+        iterations = iter as u32;
+        let old: Vec<f64> = (0..tray_count).map(|i| net.temperature(i)).collect();
+        full_sweep(net, setup)?;
+        residual = (0..tray_count)
+            .map(|i| (net.temperature(i) - old[i]).abs())
+            .sum::<f64>()
+            / tray_count as f64;
+        if residual <= setup.temperature_tolerance {
+            break;
+        }
+    }
+    Ok((iterations, residual))
+}
+
 /// The strategy the state reports, which the class's guards can route elsewhere.
 fn reported_strategy(setup: &ColumnSetup) -> SolverType {
     match setup.solver_type {
@@ -2364,10 +2452,11 @@ fn specification_loop<F>(
     setup: &ColumnSetup,
     temperatures: &mut [f64],
     mut inner: F,
-) -> Result<(u32, f64)>
+) -> Result<(u32, f64, SolverType)>
 where
-    F: FnMut(&mut Network, &ColumnSetup, &mut [f64]) -> Result<(u32, f64)>,
+    F: FnMut(&mut Network, &ColumnSetup, &mut [f64]) -> Result<(u32, f64, SolverType)>,
 {
+    let mut solver_used;
     let tray_count = net.tray_count;
     let top = setup.top_specification.clone();
     let bottom = setup.bottom_specification.clone();
@@ -2403,12 +2492,13 @@ where
             };
             net.modes[0] = EndMode::Temperature(guess);
         }
-        let (taken, residual) = inner(net, setup, temperatures)?;
+        let (taken, residual, used) = inner(net, setup, temperatures)?;
         // **The *last* inner solve's count, which is the class's own `lastIterationCount`** -
         // it is overwritten by every `solveSequential` call and the outer loop makes twenty of
         // them. Summing them here would report a number the capture has no counterpart for.
         iterations = taken;
         temperature_residual = residual;
+        solver_used = used;
 
         let top_error = match (&top, adjust_top) {
             (Some(spec), true) => {
@@ -2428,7 +2518,7 @@ where
         let converged = (!adjust_top || top_error.abs() < SPECIFICATION_TOLERANCE)
             && (!adjust_bottom || bottom_error.abs() < SPECIFICATION_TOLERANCE);
         if converged {
-            return Ok((iterations, temperature_residual));
+            return Ok((iterations, temperature_residual, solver_used));
         }
 
         if adjust_top {

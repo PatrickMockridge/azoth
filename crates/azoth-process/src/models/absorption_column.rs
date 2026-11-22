@@ -284,7 +284,7 @@ pub fn absorption_column(
         "matrix_inside_out" => SolverType::MatrixInsideOut,
         "wegstein" => SolverType::Wegstein,
         "sum_rates" => SolverType::SumRates,
-        "newton" => return Err(unported::refuse("solver_type=newton")),
+        "newton" => SolverType::Newton,
         "mesh_residual" => return Err(unported::refuse("solver_type=mesh_residual")),
         "auto" => return Err(unported::refuse("solver_type=auto")),
         other => {

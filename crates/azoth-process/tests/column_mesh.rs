@@ -473,15 +473,36 @@ fn the_guarded_accelerators_report_the_solve_they_run() {
     assert!(out.mass_residual < 1.0e-6, "mass {}", out.mass_residual);
 }
 
+/// **Newton's perturbation is inert**, so the reachable solve is the unrelaxed sweep below; the
+/// state is the captured damped row's, and the reported strategy is whichever gate accepted.
+#[test]
+fn the_newton_strategy_runs_its_reachable_sweep_and_falls_back_on_the_gate() {
+    let direct = distillation_column(&binary(SolverType::DirectSubstitution))
+        .expect("the direct solve converges");
+    let out = distillation_column(&binary(SolverType::Newton)).expect("the Newton route solves");
+    assert!(matches!(
+        out.solver_used,
+        SolverType::Newton | SolverType::DampedSubstitution
+    ));
+    let spread = direct
+        .trays
+        .iter()
+        .zip(&out.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(spread < 2.0e-5, "Newton moved the state by {spread} K");
+    model(binary(SolverType::Newton), Some("newton"), None)
+        .expect("the model accepts the declared strategy");
+}
+
 /// **Every strategy this port does not carry is refused with the class that would close it.**
 ///
-/// The three are `ColumnSolverFactory`'s own nested solvers, and the refusal names the one the
+/// The two are `ColumnSolverFactory`'s own nested solvers, and the refusal names the one the
 /// caller asked for rather than the family. The boundary is the model layer, so this calls it
 /// rather than the kernel - the strategy never reaches the kernel at all.
 #[test]
 fn an_unported_strategy_is_refused_by_its_class() {
     for (strategy, class) in [
-        ("newton", "TemperatureNewtonSolver"),
         ("mesh_residual", "MeshResidualSolver"),
         ("auto", "AutoSolver"),
     ] {
