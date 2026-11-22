@@ -493,10 +493,12 @@ def test_the_guarded_accelerators_report_the_solve_they_run() -> None:
     wegstein = process.distillation_column(**_binary_args(), solver_type="wegstein")
     damped = process.distillation_column(**_binary_args(), solver_type="damped_substitution")
     sum_rates = process.distillation_column(**_binary_args(), solver_type="sum_rates")
+    auto = process.distillation_column(**_binary_args(), solver_type="auto")
 
     for expected, actual, name in (
         (direct, wegstein, "wegstein"),
         (damped, sum_rates, "sum_rates"),
+        (damped, auto, "auto"),
     ):
         worst = max(
             abs(float(a.to("K").magnitude) - float(b.to("K").magnitude))

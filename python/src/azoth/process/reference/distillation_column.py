@@ -386,9 +386,9 @@ def _distillation_column_states(
             different correction.
         tray_murphree_efficiency: one override per stage, ``NaN`` where a stage falls through
             to ``murphree_efficiency``; a length that is not ``number_of_stages`` is refused.
-        solver_type: **every strategy but ``newton``, ``mesh_residual`` and ``auto`` is
-            ported**; ``wegstein`` runs direct substitution and ``sum_rates`` runs damped
-            substitution wherever a condenser is present, as the class's guards do.
+        solver_type: **every strategy is ported**; ``wegstein`` runs direct substitution and
+            ``sum_rates`` runs damped substitution wherever a condenser is present, as the
+            class's guards do.
         top_specification_type: the top product's degree of freedom, one of
             :data:`SPECIFICATION_KINDS`; omitted, the top is pinned by temperature instead.
         top_specification_target: its target, in the unit its type implies: dimensionless for a
@@ -844,8 +844,7 @@ def distillation_column(
         condenser_temperature: the condenser's temperature, which pins the top tray.
         murphree_efficiency: the column-wide Murphree tray efficiency.
         tray_murphree_efficiency: one override per stage, ``NaN`` where a stage falls through.
-        solver_type: **every strategy but ``newton``, ``mesh_residual`` and ``auto`` is
-            ported**.
+        solver_type: **every strategy is ported**.
         top_specification_type: the top product's degree of freedom.
         top_specification_target: its target value.
         top_specification_component: the component a purity or a recovery constrains.
@@ -1800,6 +1799,77 @@ def _states(
             for spec in (top_specification, bottom_specification)
         )
 
+    def auto_candidates() -> list[str]:
+        """`selectCandidateSolvers`, in the class's order."""
+        if reactive is not None:
+            return ["naphtali_sandholm", "mesh_residual", "damped_substitution"]
+        if adjustable():
+            if tray_count >= 12:
+                return [
+                    "matrix_inside_out",
+                    "naphtali_sandholm",
+                    "mesh_residual",
+                    "damped_substitution",
+                ]
+            return ["inside_out", "naphtali_sandholm", "mesh_residual", "damped_substitution"]
+        if has_condenser and has_reboiler:
+            if tray_count >= 12:
+                return ["matrix_inside_out", "inside_out", "mesh_residual", "damped_substitution"]
+            if tray_count >= 6:
+                return ["inside_out", "mesh_residual", "damped_substitution"]
+        if not has_condenser or not has_reboiler:
+            return ["damped_substitution", "sum_rates", "direct_substitution"]
+        return ["damped_substitution", "direct_substitution"]
+
+    def auto_sweep(temperatures: list[float]) -> tuple[int, float, str]:
+        """`AutoSolver`: the relaxed warm base, then the candidate ladder.
+
+        **The captured binary accepts the warm base** - both ends, six trays, fixed
+        specifications - which is why its row reports damped substitution. The feasibility
+        pre-screen, the shortcut seed and the adjustable-specification homotopy sit outside
+        this port; the probes start from the seeded state, and a Naphtali-Sandholm probe is
+        skipped because that solve is a separate kernel with its own warm start.
+        """
+        seeded_gas = list(gas)
+        seeded_liquid = list(liquid)
+        seed_temperatures = list(temperatures)
+        try:
+            iterations, residual = sweep(temperatures, 0.5)
+        except Exception:
+            iterations, residual = 0, float("inf")
+        if (
+            has_condenser
+            and has_reboiler
+            and tray_count <= 8
+            and not adjustable()
+            and residual <= temperature_tolerance
+        ):
+            return iterations, residual, "damped_substitution"
+        for candidate in auto_candidates():
+            if candidate == "naphtali_sandholm":
+                continue
+            gas[:] = seeded_gas
+            liquid[:] = seeded_liquid
+            temperatures[:] = seed_temperatures
+            try:
+                if candidate in ("inside_out", "matrix_inside_out", "mesh_residual"):
+                    taken, value = inside_out_sweep(temperatures)
+                elif candidate == "sum_rates":
+                    taken, value = sum_rates_sweep(temperatures)
+                elif candidate in ("direct_substitution", "wegstein"):
+                    taken, value = sweep(temperatures, 1.0)
+                else:
+                    taken, value = sweep(temperatures, 0.5)
+            except Exception:
+                continue
+            if value <= temperature_tolerance:
+                return taken, value, candidate
+        gas[:] = seeded_gas
+        liquid[:] = seeded_liquid
+        temperatures[:] = seed_temperatures
+        taken, value = sweep(temperatures, 0.5)
+        return taken, value, "damped_substitution"
+
     initial_relaxation = 0.5 if solver_type == "damped_substitution" else 1.0
     reported = solver_type or "direct_substitution"
     if reported == "wegstein":
@@ -1811,6 +1881,8 @@ def _states(
     seeded_liquid = list(liquid)
 
     def inner(temperatures: list[float]) -> tuple[int, float, str]:
+        if solver_type == "auto":
+            return auto_sweep(temperatures)
         if solver_type == "newton":
             taken, residual = newton_sweep()
             if residual <= temperature_tolerance:
@@ -2447,10 +2519,9 @@ def _refuse_unported(solver_type: str | None, murphree_efficiency: _Murphree | N
         "newton",
         "naphtali_sandholm",
         "mesh_residual",
+        "auto",
     ):
         return
-    if solver_type == "auto":
-        raise _unported.refuse("solver_type=auto")
     raise InvalidInputError(
         "solver_type",
         f"`{solver_type}` is not one of `ColumnSolverFactory`'s ten strategies, which are "

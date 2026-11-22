@@ -286,7 +286,7 @@ pub fn absorption_column(
         "sum_rates" => SolverType::SumRates,
         "newton" => SolverType::Newton,
         "mesh_residual" => SolverType::MeshResidual,
-        "auto" => return Err(unported::refuse("solver_type=auto")),
+        "auto" => SolverType::Auto,
         other => {
             return Err(AzothError::invalid_input(
                 "solver_type",

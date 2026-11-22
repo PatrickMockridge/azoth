@@ -15,7 +15,7 @@ assumptions = [
     "**the product specifications are `ColumnSpecification`'s five types**, and the class splits them in two: a **reflux ratio** and a **duty** are written straight onto the end, and the other three by an **outer secant on the end's temperature**.",
     "**a specification's location follows its slot.** `validateColumnSpecification` refuses a `TOP` spec handed to `setBottomSpecification`, so the location is a spelling of the slot; both ends are reachable, the top's secant on the condenser and the bottom's on the reboiler.",
     "**that secant takes two guesses five kelvin apart**, then steps capped at 50 K and clamped to `[100, 1000]` K, and it converges when the product's value is within `1e-4` of the target.",
-    "**there is no specification homotopy here, and that is a measurement.** `getEffectiveSpecificationHomotopySteps` returns three staged targets only when the solver is `AUTO`, and the field it otherwise reads is one - so the continuation the class carries belongs to the solver this port refuses.",
+    "**there is no specification homotopy here, and that is a measurement.** `getEffectiveSpecificationHomotopySteps` returns three staged targets only when the solver is `AUTO`, and the field it otherwise reads is one - so this port's `AUTO` runs the same secant as every other strategy, unstaged, and no captured row exercises the pair.",
     "**a pin wins over a directly-applied duty.** The tray tests its stated outlet temperature first and takes a `TPflash` there, so a heat input a `DUTY` wrote is never read: the capture's inert row reports `-21323.04` W for a target of `-20000`.",
     "**every specification's residual is measured on the published state** (upstream PR #4127): `L/D` or `V/B` less its target, a duty actual less target, and a dry terminal unavailable rather than zero. A direct specification that misses `1e-4` is refused (`0ec1d63f`).\n",
     "**a reflux-ratio specification is not reproduced, and the reason is measured.** The end's `PVrefluxflash` searches for the state whose vapour fraction is `1/(1 + ratio)`; NeqSim lands on `402.24` K, past the dew point of the captured mixture.",
@@ -27,12 +27,12 @@ assumptions = [
     "**the relaxation and the seed are excluded by argument, not experiment.** A damped map has the same fixed points as the undamped one, and the instrument starts from a stated state rather than a seed. The inert relaxation write-back is fixed regardless.",
     "**`tray_murphree_efficiency` is the per-stage override, and the resolution is exact.** `getEffectiveMurphreeEfficiency` reads the stage's own entry when it is present and not `NaN`, and the column-wide value otherwise - so an all-`NaN` vector is that value to the last digit.",
     "**the override's own endpoint is the `0_85` divergence again.** `process_column_efficiency.tsv` puts `0.6` everywhere with stage 3 at `0.85`: NeqSim lands `321.44` K on tray 3 and this port `302.19`, the column-wide state to `1.3e-3` K.",
-    "**every strategy but `auto` is ported**, each with the class's own guard: `direct_substitution` is the default, `damped_substitution` relaxes the link streams, `inside_out` and `matrix_inside_out` run the three-sweep map, `wegstein` is guarded to direct substitution, `sum_rates` to damped substitution wherever a condenser is present, `newton` is the unrelaxed sweep below, and `naphtali_sandholm` is the simultaneous MESH correction.",
-    "**the strategy this spec's row refuses is a measured non-port.** On the captured binary column all ten land within `6.062e-6` K of each other on tray 3 and within `5.194e-8` relative on the distillate, on three bit-identical states - each one where a solve stopped.",
+    "**every strategy is ported**, each with the class's own guard: `direct_substitution` is the default, `damped_substitution` relaxes the link streams, `inside_out` and `matrix_inside_out` run the three-sweep map, `wegstein` is guarded to direct substitution, `sum_rates` to damped substitution wherever a condenser is present, `newton` is the unrelaxed sweep below, and `naphtali_sandholm` is the simultaneous MESH correction.",
+    "**the ten strategies are a measured ladder, not ten physics.** On the captured binary column all ten land within `6.062e-6` K of each other on tray 3 and within `5.194e-8` relative on the distillate, on three bit-identical states - each one where a solve stopped.",
     "**inside-out and its matrix form land on the substitution core's own state exactly**; `wegstein` reports `direct_substitution` because the class's guard routes it there, and the guard sends `sum_rates` to damped substitution wherever a condenser is present.",
     "**`newton`'s perturbation is inert**: `SimpleTray.setTemperature` writes the field `run` overwrites from the mixed inlet, so the finite-difference Jacobian is `-I` and the reachable solve is one unrelaxed sweep at a time. The captured row is the factory's damped fallback because its own gate did not pass; this port runs the reachable sweep and falls back on the same gate.",
     "**`mesh_residual` is inside-out followed by a residual monitor and a guard-only Newton polish**: `solveMeshResidual` calls `solveInsideOut`, and the captured row is the inside-out state. `ColumnMeshResidualEvaluator` and `tryGuardedMeshNewtonPolish` sit outside this port, because the monitor's own test is disabled upstream and no captured row reaches the polish.",
-    "**`auto` reports `damped_substitution`** on the captured binary column although `candidateSolvers` lists the mesh solve first: it is a ladder over the others rather than a method.",
+    "**`auto` reports `damped_substitution`** on the captured binary column although `candidateSolvers` lists the mesh solve first: it is a ladder over the others rather than a method, and the warm base is accepted when both ends are present, the column has at most eight trays and no specification is adjusted.",
     "**the second solve linearises the whole column at once**: `N` tray blocks of `C + 2` variables, `C` component balances, the energy equation and `sum(K x) = 1`, with a finite-difference Jacobian and a block-tridiagonal solve.",
     "**its seed is the class's warm start**: the substitution core's converged trays, which `initializeTrayStateFromColumn` maps onto the MESH variables.",
     "**the class's cold seed is owed, and `ROADMAP.md` names it**: `runBostonSullivanRefinement`, declined on a measurement - without it the class's first Newton step moves the variables by `1e11` times their own size.",
@@ -56,7 +56,7 @@ references = [
 ]
 [source]
 standard = "NeqSim process/equipment/distillation/DistillationColumn.java"
-edition = "Its `init` and its `solveSequential` under the default `DIRECT_SUBSTITUTION`: the feed-stage flash, the linear temperature seed, the two links, and the sweeps. The other solving strategy is refused by name."
+edition = "Its `init` and its `solveSequential` under the default `DIRECT_SUBSTITUTION` - the feed-stage flash, the linear temperature seed, the two links, and the sweeps - and all ten of `ColumnSolverFactory`'s strategies, each with its own guard."
 [algorithm]
 scheme = "sequential_substitution_sweeps"
 initialisation = "linear_temperature_profile"
@@ -128,7 +128,7 @@ description = "one override per stage, `NaN` where a stage falls through to `mur
 type = "enum"
 values = ["direct_substitution", "damped_substitution", "inside_out", "matrix_inside_out", "wegstein", "sum_rates", "newton", "naphtali_sandholm", "mesh_residual", "auto"]
 optional = true
-description = "**every strategy but `auto` is ported**; `auto` is refused by name, each with the `ColumnSolverFactory` solver behind it, and the capture measures that they are path variants rather than different physics.\n"
+description = "**every strategy is ported**, each with the `ColumnSolverFactory` solver behind it, and the capture measures that they are path variants rather than different physics.\n"
 [inputs.top_specification_type]
 type = "enum"
 values = ["product_purity", "reflux_ratio", "component_recovery", "product_flow_rate", "duty"]
@@ -531,11 +531,6 @@ rationale = "`calcDesign` divides the tray count by it with no guard, so a non-p
 python = "azoth.process.distillation_column"
 rust = "azoth_process::distillation_column"
 
-[[unported]]
-parameter = "solver_type"
-value = "auto"
-class = "AutoSolver"
-capture = "validation/neqsim/captures/process_column_solvers.tsv"
 [[unported]]
 parameter = "reactive"
 class = "NaphtaliSandholmSolver"

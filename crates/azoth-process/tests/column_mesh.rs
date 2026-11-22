@@ -522,32 +522,23 @@ fn the_mesh_residual_strategy_is_inside_out() {
     .expect("the model accepts the declared strategy");
 }
 
-/// **Every strategy this port does not carry is refused with the class that would close it.**
-///
-/// `auto` is the last one, and the refusal names the factory's own nested solver rather than
-/// the family. The boundary is the model layer, so this calls it rather than the kernel - the
-/// strategy never reaches the kernel at all.
+/// **AUTO accepts its damped warm base on the captured binary**, which is why the capture's
+/// row reports damped substitution: both ends, six trays and no adjustable specification.
 #[test]
-fn an_unported_strategy_is_refused_by_its_class() {
-    for (strategy, class) in [("auto", "AutoSolver")] {
-        let error = model(binary(SolverType::DirectSubstitution), Some(strategy), None)
-            .expect_err("the boundary refuses it");
-        let message = error.to_string();
-        assert!(
-            message.contains(class),
-            "{strategy} must name {class}: {message}"
-        );
-        // **And the pair is countable rather than merely informative.** The class comes from
-        // the row the spec declares for this strategy, so the message this boundary produces
-        // and the message the Python half produces are the same two facts in the same order.
-        let row = azoth_process::unported::row(&format!("solver_type={strategy}"))
-            .unwrap_or_else(|| panic!("{strategy} has no declared row"));
-        assert_eq!(row.class, class);
-        assert!(
-            message.contains(row.capture),
-            "the refusal points at the capture that measures it: {message}"
-        );
-    }
+fn the_auto_strategy_accepts_its_damped_warm_base() {
+    let damped = distillation_column(&binary(SolverType::DampedSubstitution))
+        .expect("the damped solve converges");
+    let auto = distillation_column(&binary(SolverType::Auto)).expect("the ladder solves");
+    assert_eq!(auto.solver_used, SolverType::DampedSubstitution);
+    let spread = damped
+        .trays
+        .iter()
+        .zip(&auto.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(spread < 1.0e-9, "AUTO moved the state by {spread} K");
+    model(binary(SolverType::Auto), Some("auto"), None)
+        .expect("the model accepts the declared strategy");
 }
 
 /// **The Murphree efficiency is ported on the sequential solve and refused on the mesh one.**

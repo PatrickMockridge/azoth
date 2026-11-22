@@ -1248,6 +1248,9 @@ fn solve_once(setup: &ColumnSetup) -> Result<ColumnOutcome> {
                      setup: &ColumnSetup,
                      temperatures: &mut [f64]|
      -> Result<(u32, f64, SolverType)> {
+        if setup.solver_type == SolverType::Auto {
+            return auto_sweep(net, setup, temperatures);
+        }
         if setup.solver_type == SolverType::Newton {
             return match newton_sweep(net, setup) {
                 Ok((iterations, residual)) if residual <= setup.temperature_tolerance => {
@@ -2408,6 +2411,139 @@ fn newton_sweep(net: &mut Network, setup: &ColumnSetup) -> Result<(u32, f64)> {
         }
     }
     Ok((iterations, residual))
+}
+
+/// The candidate ladder, in `ColumnSolverFactory.selectCandidateSolvers`' order.
+fn auto_candidates(setup: &ColumnSetup, tray_count: usize) -> Vec<SolverType> {
+    if !matches!(setup.reactive, crate::kernels::ReactiveSection::None) {
+        return vec![
+            SolverType::NaphtaliSandholm,
+            SolverType::MeshResidual,
+            SolverType::DampedSubstitution,
+        ];
+    }
+    if adjustable_specification(setup) {
+        return if tray_count >= 12 {
+            vec![
+                SolverType::MatrixInsideOut,
+                SolverType::NaphtaliSandholm,
+                SolverType::MeshResidual,
+                SolverType::DampedSubstitution,
+            ]
+        } else {
+            vec![
+                SolverType::InsideOut,
+                SolverType::NaphtaliSandholm,
+                SolverType::MeshResidual,
+                SolverType::DampedSubstitution,
+            ]
+        };
+    }
+    if setup.has_condenser && setup.has_reboiler {
+        if tray_count >= 12 {
+            return vec![
+                SolverType::MatrixInsideOut,
+                SolverType::InsideOut,
+                SolverType::MeshResidual,
+                SolverType::DampedSubstitution,
+            ];
+        }
+        if tray_count >= 6 {
+            return vec![
+                SolverType::InsideOut,
+                SolverType::MeshResidual,
+                SolverType::DampedSubstitution,
+            ];
+        }
+    }
+    if !setup.has_condenser || !setup.has_reboiler {
+        return vec![
+            SolverType::DampedSubstitution,
+            SolverType::SumRates,
+            SolverType::DirectSubstitution,
+        ];
+    }
+    vec![
+        SolverType::DampedSubstitution,
+        SolverType::DirectSubstitution,
+    ]
+}
+
+/// `ColumnSolverFactory.AutoSolver`: the relaxed warm base, then the candidate ladder.
+///
+/// **The captured binary accepts the warm base** - both ends, six trays, fixed specifications -
+/// which is why its row reports damped substitution. The class's feasibility pre-screen (a
+/// diagnostic that gates nothing), its shortcut seed (`initializeFromShortcut`) and the
+/// adjustable-specification homotopy (`getEffectiveSpecificationHomotopySteps`) sit outside
+/// this port; the probes start from the seeded state rather than from the warm base's answer,
+/// and a Naphtali-Sandholm probe is skipped because that solve is a separate kernel with its
+/// own warm start.
+fn auto_sweep(
+    net: &mut Network,
+    setup: &ColumnSetup,
+    temperatures: &mut [f64],
+) -> Result<(u32, f64, SolverType)> {
+    let seeded = net.clone();
+    let seed_temperatures = temperatures.to_vec();
+    if let Ok((iterations, residual)) = sequential_sweep(
+        net,
+        setup,
+        temperatures,
+        SequentialOptions {
+            initial_relaxation: 0.5,
+        },
+    ) {
+        if setup.has_condenser
+            && setup.has_reboiler
+            && net.tray_count <= 8
+            && !adjustable_specification(setup)
+            && residual <= setup.temperature_tolerance
+        {
+            return Ok((iterations, residual, SolverType::DampedSubstitution));
+        }
+    }
+    for candidate in auto_candidates(setup, net.tray_count) {
+        if candidate == SolverType::NaphtaliSandholm {
+            continue;
+        }
+        let mut probe = seeded.clone();
+        let mut probe_temperatures = seed_temperatures.clone();
+        let outcome = match candidate {
+            SolverType::InsideOut | SolverType::MatrixInsideOut | SolverType::MeshResidual => {
+                inside_out_sweep(&mut probe, setup, &mut probe_temperatures)
+            }
+            SolverType::SumRates => sum_rates_sweep(&mut probe, setup, &mut probe_temperatures),
+            SolverType::DirectSubstitution | SolverType::Wegstein => {
+                direct_sweep(&mut probe, setup, &mut probe_temperatures)
+            }
+            _ => sequential_sweep(
+                &mut probe,
+                setup,
+                &mut probe_temperatures,
+                SequentialOptions {
+                    initial_relaxation: 0.5,
+                },
+            ),
+        };
+        if let Ok((iterations, residual)) = outcome {
+            if residual <= setup.temperature_tolerance {
+                *net = probe;
+                temperatures.copy_from_slice(&probe_temperatures);
+                return Ok((iterations, residual, candidate));
+            }
+        }
+    }
+    *net = seeded;
+    temperatures.copy_from_slice(&seed_temperatures);
+    let (iterations, residual) = sequential_sweep(
+        net,
+        setup,
+        temperatures,
+        SequentialOptions {
+            initial_relaxation: 0.5,
+        },
+    )?;
+    Ok((iterations, residual, SolverType::DampedSubstitution))
 }
 
 /// The strategy the state reports, which the class's guards can route elsewhere.

@@ -443,7 +443,7 @@ pub(crate) fn distillation_column_outcome(
         "sum_rates" => kernel::SolverType::SumRates,
         "newton" => kernel::SolverType::Newton,
         "mesh_residual" => kernel::SolverType::MeshResidual,
-        "auto" => return Err(unported::refuse("solver_type=auto")),
+        "auto" => kernel::SolverType::Auto,
         other => {
             return Err(AzothError::invalid_input(
                 "solver_type",

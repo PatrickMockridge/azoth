@@ -199,9 +199,8 @@ def absorption_column(
         "newton",
         "naphtali_sandholm",
         "mesh_residual",
+        "auto",
     ):
-        if solver_type == "auto":
-            raise _unported.refuse("solver_type=auto")
         raise InvalidInputError(
             "solver_type",
             f"`{solver_type}` is not one of `ColumnSolverFactory`'s ten strategies, which are "

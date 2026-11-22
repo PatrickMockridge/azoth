@@ -143,12 +143,6 @@ use crate::unported::Unported;
 /// Every value this namespace's models declare as not carried.
 pub static UNPORTED: &[Unported] = &[
     Unported {
-        key: "solver_type=auto",
-        model: "process.absorption_column",
-        class: "AutoSolver",
-        capture: "validation/neqsim/captures/process_column_solvers.tsv",
-    },
-    Unported {
         key: "contactor_internals_type=packed",
         model: "process.absorption_column",
         class: "PackedColumnMechanicalDesign",
@@ -171,12 +165,6 @@ pub static UNPORTED: &[Unported] = &[
         model: "process.distillation_column",
         class: "PackedColumnMechanicalDesign",
         capture: "validation/neqsim/captures/process_column_mechanical_design.tsv",
-    },
-    Unported {
-        key: "solver_type=auto",
-        model: "process.distillation_column",
-        class: "AutoSolver",
-        capture: "validation/neqsim/captures/process_column_solvers.tsv",
     },
     Unported {
         key: "reactive@solver_type=naphtali_sandholm",

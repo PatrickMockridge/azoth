@@ -387,11 +387,6 @@ python = "azoth.process.absorption_column"
 rust = "azoth_process::absorption_column"
 
 [[unported]]
-parameter = "solver_type"
-value = "auto"
-class = "AutoSolver"
-capture = "validation/neqsim/captures/process_column_solvers.tsv"
-[[unported]]
 parameter = "contactor_internals_type"
 value = "packed"
 class = "PackedColumnMechanicalDesign"
