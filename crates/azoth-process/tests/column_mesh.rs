@@ -495,17 +495,41 @@ fn the_newton_strategy_runs_its_reachable_sweep_and_falls_back_on_the_gate() {
         .expect("the model accepts the declared strategy");
 }
 
+/// **The mesh-residual strategy is the class's inside-out solve**, whose monitor and polish
+/// no captured row reaches.
+#[test]
+fn the_mesh_residual_strategy_is_inside_out() {
+    let direct = distillation_column(&binary(SolverType::DirectSubstitution))
+        .expect("the direct solve converges");
+    let out = distillation_column(&binary(SolverType::MeshResidual))
+        .expect("the mesh-residual route solves");
+    assert_eq!(out.solver_used, SolverType::MeshResidual);
+    let spread = direct
+        .trays
+        .iter()
+        .zip(&out.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(
+        spread < 2.0e-5,
+        "the mesh route moved the state by {spread} K"
+    );
+    model(
+        binary(SolverType::MeshResidual),
+        Some("mesh_residual"),
+        None,
+    )
+    .expect("the model accepts the declared strategy");
+}
+
 /// **Every strategy this port does not carry is refused with the class that would close it.**
 ///
-/// The two are `ColumnSolverFactory`'s own nested solvers, and the refusal names the one the
-/// caller asked for rather than the family. The boundary is the model layer, so this calls it
-/// rather than the kernel - the strategy never reaches the kernel at all.
+/// `auto` is the last one, and the refusal names the factory's own nested solver rather than
+/// the family. The boundary is the model layer, so this calls it rather than the kernel - the
+/// strategy never reaches the kernel at all.
 #[test]
 fn an_unported_strategy_is_refused_by_its_class() {
-    for (strategy, class) in [
-        ("mesh_residual", "MeshResidualSolver"),
-        ("auto", "AutoSolver"),
-    ] {
+    for (strategy, class) in [("auto", "AutoSolver")] {
         let error = model(binary(SolverType::DirectSubstitution), Some(strategy), None)
             .expect_err("the boundary refuses it");
         let message = error.to_string();

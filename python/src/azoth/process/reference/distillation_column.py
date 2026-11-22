@@ -1819,7 +1819,7 @@ def _states(
             liquid[:] = seeded_liquid
             taken, residual = sweep(temperatures, 0.5)
             return taken, residual, "damped_substitution"
-        if solver_type in ("inside_out", "matrix_inside_out"):
+        if solver_type in ("inside_out", "matrix_inside_out", "mesh_residual"):
             taken, residual = inside_out_sweep(temperatures)
         elif solver_type == "wegstein":
             taken, residual = sweep(temperatures, 1.0)
@@ -2446,10 +2446,9 @@ def _refuse_unported(solver_type: str | None, murphree_efficiency: _Murphree | N
         "sum_rates",
         "newton",
         "naphtali_sandholm",
+        "mesh_residual",
     ):
         return
-    if solver_type == "mesh_residual":
-        raise _unported.refuse("solver_type=mesh_residual")
     if solver_type == "auto":
         raise _unported.refuse("solver_type=auto")
     raise InvalidInputError(

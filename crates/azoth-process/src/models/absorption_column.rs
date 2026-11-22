@@ -285,7 +285,7 @@ pub fn absorption_column(
         "wegstein" => SolverType::Wegstein,
         "sum_rates" => SolverType::SumRates,
         "newton" => SolverType::Newton,
-        "mesh_residual" => return Err(unported::refuse("solver_type=mesh_residual")),
+        "mesh_residual" => SolverType::MeshResidual,
         "auto" => return Err(unported::refuse("solver_type=auto")),
         other => {
             return Err(AzothError::invalid_input(

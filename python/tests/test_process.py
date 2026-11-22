@@ -477,7 +477,7 @@ def test_the_inside_out_strategies_land_on_the_captured_state() -> None:
     captured binary it reaches the substitution core's state exactly; matrix inside-out below
     twelve trays is that same solve."""
     direct = process.distillation_column(**_binary_args())
-    for strategy in ("inside_out", "matrix_inside_out"):
+    for strategy in ("inside_out", "matrix_inside_out", "mesh_residual"):
         out = process.distillation_column(**_binary_args(), solver_type=strategy)
         worst = max(
             abs(float(a.to("K").magnitude) - float(b.to("K").magnitude))

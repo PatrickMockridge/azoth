@@ -198,9 +198,8 @@ def absorption_column(
         "sum_rates",
         "newton",
         "naphtali_sandholm",
+        "mesh_residual",
     ):
-        if solver_type == "mesh_residual":
-            raise _unported.refuse("solver_type=mesh_residual")
         if solver_type == "auto":
             raise _unported.refuse("solver_type=auto")
         raise InvalidInputError(

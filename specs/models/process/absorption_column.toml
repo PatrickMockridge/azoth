@@ -388,11 +388,6 @@ rust = "azoth_process::absorption_column"
 
 [[unported]]
 parameter = "solver_type"
-value = "mesh_residual"
-class = "MeshResidualSolver"
-capture = "validation/neqsim/captures/process_column_solvers.tsv"
-[[unported]]
-parameter = "solver_type"
 value = "auto"
 class = "AutoSolver"
 capture = "validation/neqsim/captures/process_column_solvers.tsv"

@@ -442,7 +442,7 @@ pub(crate) fn distillation_column_outcome(
         "wegstein" => kernel::SolverType::Wegstein,
         "sum_rates" => kernel::SolverType::SumRates,
         "newton" => kernel::SolverType::Newton,
-        "mesh_residual" => return Err(unported::refuse("solver_type=mesh_residual")),
+        "mesh_residual" => kernel::SolverType::MeshResidual,
         "auto" => return Err(unported::refuse("solver_type=auto")),
         other => {
             return Err(AzothError::invalid_input(

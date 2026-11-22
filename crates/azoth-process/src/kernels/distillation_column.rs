@@ -1269,7 +1269,7 @@ fn solve_once(setup: &ColumnSetup) -> Result<ColumnOutcome> {
         }
         let used = reported_strategy(setup);
         let (iterations, residual) = match setup.solver_type {
-            SolverType::InsideOut | SolverType::MatrixInsideOut => {
+            SolverType::InsideOut | SolverType::MatrixInsideOut | SolverType::MeshResidual => {
                 inside_out_sweep(net, setup, temperatures)
             }
             SolverType::Wegstein => direct_sweep(net, setup, temperatures),
