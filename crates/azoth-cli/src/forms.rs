@@ -20,5 +20,8 @@ use azoth_process::middleware::catalogue_with;
 pub fn forms_json(palette_dir: &Path, with_tools: bool) -> Result<String, String> {
     let palette = load_palette(palette_dir)?;
     let safety = azoth_safety::catalogue::to_value().map_err(|error| error.to_string())?;
-    catalogue_with(&palette, with_tools, Some(safety)).map_err(|error| error.to_string())
+    let families =
+        azoth_safety::catalogue::families_to_value().map_err(|error| error.to_string())?;
+    catalogue_with(&palette, with_tools, Some(safety), Some(families))
+        .map_err(|error| error.to_string())
 }

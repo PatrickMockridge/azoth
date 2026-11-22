@@ -187,6 +187,62 @@ def test_the_two_relief_ids_are_named_outside_the_safety_source() -> None:
 def test_the_catalogue_never_names_the_upstream_implementation() -> None:
     module: Any = tool()
     # The module header says where the entries come from; the entries themselves are what a
-    # browser can show, so that is what is held to the sanitising rule.
+    # browser can show, so that is what is held to the sanitising rule. The family registry
+    # follows the calculations, so the same partition covers both.
     body = module.render().partition("pub static CALCULATIONS")[2]
     assert "neqsim" not in body.lower()
+
+
+def test_the_family_registry_is_every_family_the_models_name() -> None:
+    module: Any = tool()
+    named = {module.family_of(spec) for _, spec in module.documents()}
+    declared = [entry["id"] for entry in module.FAMILIES]
+    assert len(declared) == len(set(declared)) == 23
+    assert set(declared) == named
+
+
+def test_ten_decks_carry_their_own_copy() -> None:
+    module: Any = tool()
+    decks = [entry for entry in module.FAMILIES if entry["deck"] is not None]
+    assert [entry["id"] for entry in decks] == list(module.SCENARIO_FAMILIES)
+    assert len(decks) == 10
+    for entry in module.FAMILIES:
+        assert entry["label"].strip(), entry["id"]
+        assert entry["blurb"].strip(), entry["id"]
+        if entry["deck"] is None:
+            continue
+        for field in ("tab", "title", "heading", "search", "step"):
+            assert entry["deck"][field].strip(), (entry["id"], field)
+
+
+def test_every_native_scenario_runs_in_a_family_with_a_deck() -> None:
+    module: Any = tool()
+    decks = set(module.SCENARIO_FAMILIES)
+    for _, spec in module.documents():
+        if module.native_of(spec) and spec["id"] != module.BOWTIE:
+            assert module.family_of(spec) in decks, spec["id"]
+
+
+def test_a_family_the_models_do_not_name_is_refused() -> None:
+    module: Any = tool()
+    saved = module.FAMILIES
+    module.FAMILIES = (*saved, {"id": "dead", "label": "Dead", "blurb": "…", "deck": None})
+    try:
+        with pytest.raises(SystemExit):
+            module.render()
+    finally:
+        module.FAMILIES = saved
+
+
+def test_a_deck_with_no_native_scenario_is_refused() -> None:
+    module: Any = tool()
+    saved = tuple(module.NATIVE_SCENARIOS)
+    module.NATIVE_SCENARIOS = tuple(
+        wanted for wanted in saved if not wanted.startswith("process.piping_fiv")
+        and not wanted.startswith("process.acoustic_")
+    )
+    try:
+        with pytest.raises(SystemExit):
+            module.check_families([spec for _, spec in module.documents()])
+    finally:
+        module.NATIVE_SCENARIOS = saved

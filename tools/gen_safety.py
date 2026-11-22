@@ -99,20 +99,218 @@ NATIVE_SCENARIOS = (
 #: The one native id that is a sub-interface rather than a scenario.
 BOWTIE = "process.bow_tie"
 
-#: The families with a deck of scenario cards. A family here gets a tab and a picker; the
-#: families without one are listed on the overview and linked to their manual pages.
-SCENARIO_FAMILIES = (
-    "depressurization",
-    "dispersion",
-    "equipmentsafety",
-    "fire",
-    "firewater",
-    "overpressure",
-    "processsafetysystem",
-    "risk",
-    "safetyassessment",
-    "vibration",
+#: The family registry: the one place a family's label, its deck copy and its blurb are
+#: written. The order is the tab order, then the listed families alphabetically. A deck is
+#: the copy the workspace draws; the families without one are listed in the catalogue and
+#: linked to their manual pages.
+#:
+#: **The family set is the specs', and this table must cover it exactly.** A family the
+#: specs name and this table omits would be a model with nowhere to appear; one this table
+#: names and the specs do not is dead copy. `render` refuses either rather than drawing a
+#: partial surface.
+FAMILIES = (
+    {
+        "id": "depressurization",
+        "label": "Depressurization",
+        "blurb": "Depressurization and blowdown, the vessel filling and blocked-outlet overpressure screens.",
+        "deck": {
+            "tab": "Depressurization",
+            "title": "Depressurization models",
+            "heading": "Depressurization scenarios",
+            "search": "Search depressurization models",
+            "step": "Add a pressure-safety-valve step, a vessel filling or a blocked-outlet overpressure screen.",
+        },
+    },
+    {
+        "id": "dispersion",
+        "label": "Dispersion",
+        "blurb": "Gaussian plume, hazardous area, dense gas, probit and toxic thresholds.",
+        "deck": {
+            "tab": "Dispersion",
+            "title": "Dispersion models",
+            "heading": "Dispersion scenarios",
+            "search": "Search dispersion models",
+            "step": "Add a plume, a hazardous-area screen, a dense-gas distance, a probit or a toxic-threshold lookup.",
+        },
+    },
+    {
+        "id": "equipmentsafety",
+        "label": "Equipment and system safety",
+        "blurb": "Gas blowby, pump deadhead, runaway reaction and minimum design metal temperature.",
+        "deck": {
+            "tab": "Equipment safety",
+            "title": "Equipment safety models",
+            "heading": "Equipment safety scenarios",
+            "search": "Search equipment safety models",
+            "step": "Add a gas blowby, a pump deadhead, a runaway reaction or a minimum design metal temperature.",
+        },
+    },
+    {
+        "id": "fire",
+        "label": "Fire and explosion",
+        "blurb": "Jet fire, pool fire, BLEVE, vapour-cloud explosion and passive fire protection.",
+        "deck": {
+            "tab": "Fire",
+            "title": "Fire models",
+            "heading": "Fire scenarios",
+            "search": "Search fire models",
+            "step": "Add a jet fire, a pool fire, a BLEVE, a vapour-cloud explosion or a protection demand.",
+        },
+    },
+    {
+        "id": "firewater",
+        "label": "Firewater",
+        "blurb": "Protection screening, deluge layout, monitor coverage and supply gates.",
+        "deck": {
+            "tab": "Firewater",
+            "title": "Firewater models",
+            "heading": "Firewater scenarios",
+            "search": "Search firewater models",
+            "step": "Add a protection screen, a deluge layout, a monitor coverage or a supply assessment.",
+        },
+    },
+    {
+        "id": "overpressure",
+        "label": "Overpressure and relief",
+        "blurb": "Fire-case relief, relief-valve sizing, acceptance and pipeline protection.",
+        "deck": {
+            "tab": "Relief",
+            "title": "Relief models",
+            "heading": "Relief scenarios",
+            "search": "Search relief models",
+            "step": "Add a fire-case relief, a relief-valve sizing, an acceptance check or a pipeline protection screen.",
+        },
+    },
+    {
+        "id": "processsafetysystem",
+        "label": "Process safety systems",
+        "blurb": "The NORSOK S-001 secondary-pressure protection screen.",
+        "deck": {
+            "tab": "Process safety",
+            "title": "Process safety system models",
+            "heading": "Process safety system scenarios",
+            "search": "Search process safety system models",
+            "step": "Add a NORSOK S-001 secondary-pressure protection screen.",
+        },
+    },
+    {
+        "id": "risk",
+        "label": "Risk and SIL",
+        "blurb": "NOG 070 minimum SIL and the instrumented function's PFD arithmetic.",
+        "deck": {
+            "tab": "Risk",
+            "title": "Risk and SIL models",
+            "heading": "Risk scenarios",
+            "search": "Search risk models",
+            "step": "Add a NOG 070 determination or an instrumented-function assessment.",
+        },
+    },
+    {
+        "id": "safetyassessment",
+        "label": "Safety assessment",
+        "blurb": "The Kletz inherent-safety index.",
+        "deck": {
+            "tab": "Assessment",
+            "title": "Safety assessment models",
+            "heading": "Safety assessment scenarios",
+            "search": "Search safety assessment models",
+            "step": "Add an inherent-safety evaluation.",
+        },
+    },
+    {
+        "id": "vibration",
+        "label": "Vibration",
+        "blurb": "Gas and liquid flow-induced vibration and acoustic-induced vibration.",
+        "deck": {
+            "tab": "Vibration",
+            "title": "Vibration models",
+            "heading": "Vibration scenarios",
+            "search": "Search vibration models",
+            "step": "Add a gas or liquid flow-induced vibration screen or an acoustic-induced vibration screen.",
+        },
+    },
+    {
+        "id": "api14c",
+        "label": "API 14C",
+        "blurb": "The SAFE chart's device rows and its missing-device findings.",
+        "deck": None,
+    },
+    {
+        "id": "barrier",
+        "label": "Barriers",
+        "blurb": "The barrier register's findings and the safety system's performance.",
+        "deck": None,
+    },
+    {
+        "id": "compliance",
+        "label": "Compliance",
+        "blurb": "The NORSOK P-002 and STS-0131 compliance gates.",
+        "deck": None,
+    },
+    {
+        "id": "envelope",
+        "label": "Safety envelope",
+        "blurb": "The process safety envelope and the deviations it reports.",
+        "deck": None,
+    },
+    {
+        "id": "esd",
+        "label": "Emergency shutdown",
+        "blurb": "The emergency shutdown response time against its target.",
+        "deck": None,
+    },
+    {
+        "id": "hazid",
+        "label": "Hazard identification",
+        "blurb": "The HAZOP, FMEA and MAH worksheets.",
+        "deck": None,
+    },
+    {
+        "id": "inventory",
+        "label": "Inventory",
+        "blurb": "The trapped inventory in isolated sections.",
+        "deck": None,
+    },
+    {
+        "id": "leakdetection",
+        "label": "Leak detection",
+        "blurb": "The mass-balance leak detection and its threshold.",
+        "deck": None,
+    },
+    {
+        "id": "opendrain",
+        "label": "Open drain",
+        "blurb": "The open-drain review's rows and findings.",
+        "deck": None,
+    },
+    {
+        "id": "qra",
+        "label": "Quantitative risk",
+        "blurb": "Consequence analysis for a quantitative risk assessment.",
+        "deck": None,
+    },
+    {
+        "id": "release",
+        "label": "Release",
+        "blurb": "Release-rate models from the ideal-gas forms to the finite-rate and drift-flux forms.",
+        "deck": None,
+    },
+    {
+        "id": "rupture",
+        "label": "Rupture",
+        "blurb": "Vessel and pipe rupture, and the trapped-liquid fire rupture.",
+        "deck": None,
+    },
+    {
+        "id": "selfheating",
+        "label": "Self-heating",
+        "blurb": "The Semenov, porous-media and basket-test self-heating screens.",
+        "deck": None,
+    },
 )
+
+#: The families with a deck of scenario cards, in tab order.
+SCENARIO_FAMILIES = tuple(entry["id"] for entry in FAMILIES if entry["deck"] is not None)
 
 #: The purpose line a native entry's card and form show. Model specs have no summary, so this
 #: is the only copy and a native id without one is a generator error.
@@ -280,6 +478,76 @@ def emit_entry(spec: dict) -> str:
     )
 
 
+def emit_family(entry: dict) -> str:
+    deck = entry["deck"]
+    deck_text = (
+        "None"
+        if deck is None
+        else (
+            "Some(SafetyDeck { "
+            f"tab: {gen_sheets.rust_str(deck['tab'])}, "
+            f"title: {gen_sheets.rust_str(deck['title'])}, "
+            f"heading: {gen_sheets.rust_str(deck['heading'])}, "
+            f"search: {gen_sheets.rust_str(deck['search'])}, "
+            f"step: {gen_sheets.rust_str(deck['step'])}, "
+            "})"
+        )
+    )
+    return (
+        "    SafetyFamily { "
+        f"id: {gen_sheets.rust_str(entry['id'])}, "
+        f"label: {gen_sheets.rust_str(entry['label'])}, "
+        f"blurb: {gen_sheets.rust_str(entry['blurb'])}, "
+        f"deck: {deck_text} "
+        "},"
+    )
+
+
+def check_families(specs: list[dict]) -> None:
+    """The registry covers the spec tree exactly, and its copy is showable."""
+    named = [family_of(spec) for spec in specs]
+    declared = [entry["id"] for entry in FAMILIES]
+    if len(declared) != len(set(declared)):
+        raise SystemExit("gen_safety: a family id appears twice in FAMILIES")
+    missing = sorted(set(named) - set(declared))
+    unknown = sorted(set(declared) - set(named))
+    if missing or unknown:
+        raise SystemExit(
+            f"gen_safety: family registry mismatch: missing {missing}, unknown {unknown}"
+        )
+    for entry in FAMILIES:
+        for field in ("id", "label", "blurb"):
+            if not str(entry[field]).strip():
+                raise SystemExit(f"gen_safety: the family {entry['id']} has an empty {field}")
+        deck = entry["deck"]
+        if deck is not None:
+            for field in ("tab", "title", "heading", "search", "step"):
+                if not str(deck[field]).strip():
+                    raise SystemExit(
+                        f"gen_safety: the deck {entry['id']} has an empty {field}"
+                    )
+        text = " ".join(
+            str(value)
+            for value in (
+                entry["label"],
+                entry["blurb"],
+                *((deck or {}).values()),
+            )
+        )
+        if "neqsim" in text.lower():
+            raise SystemExit(f"gen_safety: the family {entry['id']} names the upstream")
+    deck_families = set(SCENARIO_FAMILIES)
+    for spec in specs:
+        family = family_of(spec)
+        if native_of(spec) and spec["id"] != BOWTIE and family not in deck_families:
+            raise SystemExit(
+                f"gen_safety: the native id {spec['id']} is in {family}, which has no deck"
+            )
+    for family in deck_families:
+        if not any(native_of(spec) and family_of(spec) == family for spec in specs):
+            raise SystemExit(f"gen_safety: the deck {family} has no native scenario")
+
+
 def render() -> str:
     docs = documents()
     if not docs:
@@ -288,13 +556,16 @@ def render() -> str:
     for wanted in (*NATIVE_SCENARIOS, BOWTIE):
         if wanted not in present:
             raise SystemExit(f"gen_safety: the native id {wanted} has no model spec")
+    check_families([spec for _, spec in docs])
     body = "\n".join(emit_entry(spec) for _, spec in docs)
+    families = "\n".join(emit_family(entry) for entry in FAMILIES)
     names = ("CalcForm", "CalcInput", "CalcOutput", "CalcRange", "ExampleValue")
     used = ", ".join(name for name in names if f"{name} {{" in body)
     return f"""//! GENERATED FILE - DO NOT EDIT BY HAND.
 //!
 //! Generated by `tools/gen_safety.py` from `specs/models/process/`: every model whose
-//! `[source] standard` is under `NeqSim process/safety/`, its family taken from that path.
+//! `[source] standard` is under `NeqSim process/safety/`, its family taken from that path,
+//! and the family registry the workspace draws its tabs and catalogue from.
 //! Regenerate with `python tools/gen_safety.py`; CI runs `--check` and fails on a difference.
 //!
 //! **A UI projection, not a second spec.** The scenario forms reuse the calculation book's
@@ -304,12 +575,17 @@ def render() -> str:
 // that meant a constant rather than a value a spec pinned.
 #![allow(clippy::approx_constant)]
 
-use crate::catalogue::SafetyCalculation;
+use crate::catalogue::{{SafetyCalculation, SafetyDeck, SafetyFamily}};
 use azoth_sheets::form::{{{used}}};
 
 /// Every safety calculation, in id order.
 pub static CALCULATIONS: &[SafetyCalculation] = &[
 {body}
+];
+
+/// Every safety family, in registry order: the deck families in tab order, then the listed.
+pub static FAMILIES: &[SafetyFamily] = &[
+{families}
 ];
 """
 

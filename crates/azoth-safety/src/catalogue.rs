@@ -11,7 +11,28 @@ use azoth_sheets::form::CalcForm;
 use serde::Serialize;
 use serde_json::{Map, Value};
 
-use crate::forms_gen::CALCULATIONS;
+use crate::forms_gen::{CALCULATIONS, FAMILIES};
+
+/// The copy a scenario deck needs: its tab, picker title, starter heading, search label and
+/// the first step it suggests.
+#[derive(Debug, Clone, Copy, Serialize)]
+pub struct SafetyDeck {
+    pub tab: &'static str,
+    pub title: &'static str,
+    pub heading: &'static str,
+    pub search: &'static str,
+    pub step: &'static str,
+}
+
+/// One safety family: its display copy and, where it has one, its deck.
+#[derive(Debug, Clone, Copy, Serialize)]
+pub struct SafetyFamily {
+    pub id: &'static str,
+    pub label: &'static str,
+    pub blurb: &'static str,
+    /// `None` for a family the catalogue lists without a scenario deck.
+    pub deck: Option<SafetyDeck>,
+}
 
 /// One safety calculation.
 #[derive(Debug, Clone, Copy, Serialize)]
@@ -44,6 +65,31 @@ pub fn calculations() -> &'static [SafetyCalculation] {
 #[must_use]
 pub fn calculation_of(id: &str) -> Option<&'static SafetyCalculation> {
     CALCULATIONS.iter().find(|entry| entry.id == id)
+}
+
+/// Every safety family, in registry order.
+#[must_use]
+pub fn families() -> &'static [SafetyFamily] {
+    FAMILIES
+}
+
+/// One family by id.
+#[must_use]
+pub fn family_of(id: &str) -> Option<&'static SafetyFamily> {
+    FAMILIES.iter().find(|entry| entry.id == id)
+}
+
+/// The family registry as a front end reads it.
+///
+/// # Errors
+/// A projection that cannot be written, which for this shape it cannot.
+pub fn families_to_value() -> Result<Value> {
+    serde_json::to_value(FAMILIES).map_err(|error| {
+        AzothError::invalid_input(
+            "safety-families",
+            format!("the family registry could not be written: {error}"),
+        )
+    })
 }
 
 /// The catalogue as a front end reads it.

@@ -45,6 +45,9 @@ check("94 a sheet can draw", available === 94, `${available}`);
 check("96 safety calculations", catalogue.safety.length === 96, `${catalogue.safety.length}`);
 const nativeSafety = catalogue.safety.filter((entry) => entry.native).length;
 check("32 native safety ids", nativeSafety === 32, `${nativeSafety}`);
+check("23 safety families", catalogue.safety_families.length === 23, `${catalogue.safety_families.length}`);
+const safetyDecks = catalogue.safety_families.filter((family) => family.deck !== null).length;
+check("10 safety decks", safetyDecks === 10, `${safetyDecks}`);
 
 // 2. Opening the shipped document.
 const document = readFileSync("specs/flowsheets/demo.toml", "utf8");

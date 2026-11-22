@@ -324,3 +324,29 @@ fn a_command_that_is_not_one_is_refused() {
     let text = String::from_utf8(output.stderr).expect("utf-8");
     assert!(text.contains("the command is not one"), "{text}");
 }
+
+#[test]
+fn the_family_registry_rides_the_catalogue() {
+    let output = azoth(&["forms", "--palette", &palette()]);
+    assert!(output.status.success(), "it should print");
+    let document = json(&output);
+    let families = document["safety_families"]
+        .as_array()
+        .expect("the family registry is served");
+    assert_eq!(families.len(), 23);
+    assert_eq!(
+        families
+            .iter()
+            .filter(|family| !family["deck"].is_null())
+            .count(),
+        10
+    );
+    let declared: std::collections::BTreeSet<&str> = families
+        .iter()
+        .map(|family| family["id"].as_str().expect("an id"))
+        .collect();
+    for entry in document["safety"].as_array().expect("the calculations") {
+        let family = entry["family"].as_str().expect("a family");
+        assert!(declared.contains(family), "{family} has no registry row");
+    }
+}

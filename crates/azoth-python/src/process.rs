@@ -2051,7 +2051,9 @@ pub fn catalogue(palette_dir: Option<&str>, with_tools: bool) -> PyResult<String
     let palette = palette_from(palette_dir).map_err(PyValueError::new_err)?;
     let safety = azoth_safety::catalogue::to_value()
         .map_err(|error| PyValueError::new_err(error.to_string()))?;
-    azoth_process::middleware::catalogue_with(&palette, with_tools, Some(safety))
+    let families = azoth_safety::catalogue::families_to_value()
+        .map_err(|error| PyValueError::new_err(error.to_string()))?;
+    azoth_process::middleware::catalogue_with(&palette, with_tools, Some(safety), Some(families))
         .map_err(|error| PyValueError::new_err(error.to_string()))
 }
 
