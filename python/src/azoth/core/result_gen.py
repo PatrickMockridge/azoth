@@ -119,6 +119,7 @@ from azoth.core.record_outputs_gen import (
     StreamScaleMineralRow,
     Sts0131FindingResult,
     SubFraction,
+    SwellingPoint,
     TopsidesBreakdownLine,
     TopsidesCapitalLine,
     TopsidesFlag,
@@ -12587,6 +12588,25 @@ class SeparatorTestResult(_HasWarnings):
 
     #: one row per stage.
     stages: tuple[SeparatorStageResult, ...]
+
+    #: Caveats.
+    warnings: tuple[Warning, ...]
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class SwellingTestResult(_HasWarnings):
+    """Result of ``pvt.swelling_test``."""
+
+    CALC_ID: ClassVar[str] = "pvt.swelling_test"
+
+    #: the base oil's total amount.
+    original_oil_moles: Q
+
+    #: the base oil's bubble-point volume.
+    original_oil_volume: Q
+
+    #: one row per schedule entry.
+    points: tuple[SwellingPoint, ...]
 
     #: Caveats.
     warnings: tuple[Warning, ...]

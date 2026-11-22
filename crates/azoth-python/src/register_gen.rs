@@ -383,6 +383,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::transport_gen::PyOilMaterialBalanceResult>()?;
     m.add_class::<crate::transport_gen::PySaturationTestResult>()?;
     m.add_class::<crate::transport_gen::PySeparatorTestResult>()?;
+    m.add_class::<crate::transport_gen::PySwellingTestResult>()?;
     m.add_class::<crate::transport_gen::PyWaterCorrelationsResult>()?;
     m.add_class::<crate::transport_gen::PyChemicalEquilibriumResult>()?;
     m.add_class::<crate::transport_gen::PyEquilibriumConstantResult>()?;
@@ -505,6 +506,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::record_outputs_gen::PyStreamScaleMineralRow>()?;
     m.add_class::<crate::record_outputs_gen::PySts0131FindingResult>()?;
     m.add_class::<crate::record_outputs_gen::PySubFraction>()?;
+    m.add_class::<crate::record_outputs_gen::PySwellingPoint>()?;
     m.add_class::<crate::record_outputs_gen::PyTopsidesBreakdownLine>()?;
     m.add_class::<crate::record_outputs_gen::PyTopsidesCapitalLine>()?;
     m.add_class::<crate::record_outputs_gen::PyTopsidesFlag>()?;
@@ -1394,6 +1396,7 @@ pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::saturation_test, m)?)?;
     m.add_function(wrap_pyfunction!(crate::wrappers_gen::separator_test, m)?)?;
+    m.add_function(wrap_pyfunction!(crate::pvt::swelling_test, m)?)?;
     m.add_function(wrap_pyfunction!(
         crate::wrappers_gen::water_correlations,
         m

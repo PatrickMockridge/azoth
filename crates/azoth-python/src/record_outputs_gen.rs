@@ -7040,6 +7040,49 @@ impl From<&azoth_characterization::results::SubFraction> for PySubFraction {
     }
 }
 
+/// one row per schedule entry.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SwellingPoint"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySwellingPoint {
+    /// the cumulative injection, as a fraction of the original oil moles.
+    #[pyo3(get)]
+    pub cumulative_gas_injected: f64,
+    /// the bubble-point pressure.
+    #[pyo3(get)]
+    pub pressure: PyQty,
+    /// the bubble-point volume over the base oil's.
+    #[pyo3(get)]
+    pub relative_oil_volume: f64,
+}
+
+#[pymethods]
+impl PySwellingPoint {
+    fn __repr__(&self) -> String {
+        format!(
+            "SwellingPoint(cumulative_gas_injected={}, pressure={:?}, relative_oil_volume={})",
+            self.cumulative_gas_injected, self.pressure, self.relative_oil_volume
+        )
+    }
+}
+
+impl From<&azoth_pvt::swelling_test::SwellingPoint> for PySwellingPoint {
+    fn from(row: &azoth_pvt::swelling_test::SwellingPoint) -> Self {
+        Self {
+            cumulative_gas_injected: row.cumulative_gas_injected,
+            pressure: PyQty {
+                magnitude_si: row.pressure,
+                unit: "Pa".to_string(),
+            },
+            relative_oil_volume: row.relative_oil_volume,
+        }
+    }
+}
+
 /// the module breakdown lines, keyed `module.<camelCase>`.
 #[pyclass(
     frozen,

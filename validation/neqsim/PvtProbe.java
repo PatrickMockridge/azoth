@@ -19,6 +19,7 @@ import neqsim.pvtsimulation.simulation.DifferentialLiberation;
 import neqsim.pvtsimulation.simulation.SaturationPressure;
 import neqsim.pvtsimulation.simulation.SaturationTemperature;
 import neqsim.pvtsimulation.simulation.SeparatorTest;
+import neqsim.pvtsimulation.simulation.SwellingTest;
 import neqsim.pvtsimulation.simulation.SolutionGasWaterRatio;
 import neqsim.pvtsimulation.util.BlackOilCorrelations;
 import neqsim.pvtsimulation.util.DeclineCurveAnalysis;
@@ -718,6 +719,45 @@ public final class PvtProbe {
     value("api_at_optimum", best.getApiAtOptimum());
   }
 
+  private static void swellingBlock(String block, String[] oilNames, double[] oilMoles,
+      String[] gasNames, double[] gasMoles, double temperatureK, double[] schedule) {
+    System.out.println("[" + block + "]");
+    SystemInterface oil = new SystemSrkEos(temperatureK, 50.0);
+    for (int i = 0; i < oilNames.length; i++) oil.addComponent(oilNames[i], oilMoles[i]);
+    oil.setMixingRule(1);
+    oil.useVolumeCorrection(false);
+    SystemInterface gas = new SystemSrkEos(temperatureK, 50.0);
+    for (int i = 0; i < gasNames.length; i++) gas.addComponent(gasNames[i], gasMoles[i]);
+    gas.setMixingRule(1);
+    gas.useVolumeCorrection(false);
+
+    SwellingTest swelling = new SwellingTest(oil);
+    swelling.setInjectionGas(gas);
+    swelling.setCummulativeMolePercentGasInjected(schedule);
+    swelling.setTemperature(temperatureK);
+    swelling.runCalc();
+    double[] pressures = swelling.getPressures();
+    double[] volumes = swelling.getRelativeOilVolume();
+    for (int i = 0; i < schedule.length; i++) {
+      String at = "point_" + i + "_";
+      line(at + "cumulative_gas_injected", schedule[i] / 100.0);
+      line(at + "pressure_pa", pressures[i] * 1.0e5);
+      line(at + "relative_oil_volume", volumes[i]);
+    }
+  }
+
+  private static void swelling() {
+    System.out.println("swelling");
+    swellingBlock("swelling_upstream", new String[] {"methane", "nC10"}, new double[] {0.2, 0.8},
+        new String[] {"methane"}, new double[] {1.0}, 353.15, new double[] {0.0, 10.0, 20.0});
+    swellingBlock("swelling_mixed_gas", new String[] {"methane", "nC10"}, new double[] {0.5, 0.5},
+        new String[] {"methane", "ethane"}, new double[] {0.7, 0.3}, 323.15,
+        new double[] {0.0, 5.0, 15.0, 25.0});
+    swellingBlock("swelling_zero_injection", new String[] {"methane", "nC10"},
+        new double[] {0.5, 0.5}, new String[] {"methane"}, new double[] {1.0}, 323.15,
+        new double[] {0.0, 0.0});
+  }
+
   public static void main(String[] args) {
     String which = args.length > 0 ? args[0] : "black_oil";
     switch (which) {
@@ -753,6 +793,9 @@ public final class PvtProbe {
         break;
       case "separator":
         separator();
+        break;
+      case "swelling":
+        swelling();
         break;
       default:
         System.err.println("unknown subcommand: " + which);

@@ -365,6 +365,7 @@
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
+//!   - specs/models/pvt/swelling_test.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!   - specs/models/reactions/chemical_equilibrium.toml
 //!   - specs/calcs/reactions/equilibrium_constant.toml
@@ -6950,6 +6951,16 @@ pub const SPEC_INPUT_DIMENSIONS: &[(&str, &str, &str)] = &[
     (
         "pvt.separator_test",
         "first_stage_temperature_steps",
+        "dimensionless",
+    ),
+    (
+        "pvt.swelling_test",
+        "temperature",
+        "thermodynamic_temperature",
+    ),
+    (
+        "pvt.swelling_test",
+        "cumulative_gas_injected",
         "dimensionless",
     ),
     (

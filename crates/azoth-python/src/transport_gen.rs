@@ -39,11 +39,11 @@ use crate::record_outputs_gen::{
     PySafeChartItem, PySafeChartMissingDevice, PyScaleControlRiskRow, PyScaleControlRow,
     PyScenarioChangeRow, PyScenarioIndexRow, PySelfHeatingTimePoint, PySeparatorStageResult,
     PySettleOutCompartmentResult, PySilIssue, PySterileRadius, PyStreamScaleMineralRow,
-    PySts0131FindingResult, PySubFraction, PyTopsidesBreakdownLine, PyTopsidesCapitalLine,
-    PyTopsidesFlag, PyTopsidesMtoRow, PyTopsidesProjectLine, PyTopsidesProjectSummaryLine,
-    PyTopsidesSummaryLine, PyTopsidesWeightLine, PyTr3001Finding, PyTrappedInventorySegmentResult,
-    PyTypeCostLine, PyVesselFillingPoint, PyVesselRuptureStep, PyWaterMixingResult,
-    PyWaterResultRow, PyZoneRatingRow,
+    PySts0131FindingResult, PySubFraction, PySwellingPoint, PyTopsidesBreakdownLine,
+    PyTopsidesCapitalLine, PyTopsidesFlag, PyTopsidesMtoRow, PyTopsidesProjectLine,
+    PyTopsidesProjectSummaryLine, PyTopsidesSummaryLine, PyTopsidesWeightLine, PyTr3001Finding,
+    PyTrappedInventorySegmentResult, PyTypeCostLine, PyVesselFillingPoint, PyVesselRuptureStep,
+    PyWaterMixingResult, PyWaterResultRow, PyZoneRatingRow,
 };
 use crate::results::{PyQty, PyWarning, transport};
 use pyo3::prelude::*;
@@ -31071,6 +31071,58 @@ impl From<&azoth_pvt::separator_test::SeparatorTestResult> for PySeparatorTestRe
             bo_at_optimum: r.bo_at_optimum,
             api_at_optimum: r.api_at_optimum,
             stages: r.stages.iter().map(PySeparatorStageResult::from).collect(),
+            warnings: transport(&r.warnings),
+        }
+    }
+}
+/// Result of `pvt.swelling_test`, transported.
+#[pyclass(
+    frozen,
+    skip_from_py_object,
+    module = "azoth._core",
+    name = "SwellingTestResult"
+)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct PySwellingTestResult {
+    /// the base oil's total amount.
+    #[pyo3(get)]
+    pub original_oil_moles: PyQty,
+    /// the base oil's bubble-point volume.
+    #[pyo3(get)]
+    pub original_oil_volume: PyQty,
+    /// one row per schedule entry.
+    #[pyo3(get)]
+    pub points: Vec<PySwellingPoint>,
+    /// Caveats, deduplicated.
+    #[pyo3(get)]
+    pub warnings: Vec<PyWarning>,
+}
+
+#[pymethods]
+impl PySwellingTestResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SwellingTestResult(original_oil_moles={:?}, original_oil_volume={:?}, points={:?}, {} warning(s))",
+            self.original_oil_moles,
+            self.original_oil_volume,
+            self.points,
+            self.warnings.len()
+        )
+    }
+}
+
+impl From<&azoth_pvt::swelling_test::SwellingTestResult> for PySwellingTestResult {
+    fn from(r: &azoth_pvt::swelling_test::SwellingTestResult) -> Self {
+        Self {
+            original_oil_moles: PyQty {
+                magnitude_si: r.original_oil_moles,
+                unit: "mol".to_string(),
+            },
+            original_oil_volume: PyQty {
+                magnitude_si: r.original_oil_volume,
+                unit: "m**3".to_string(),
+            },
+            points: r.points.iter().map(PySwellingPoint::from).collect(),
             warnings: transport(&r.warnings),
         }
     }

@@ -245,12 +245,49 @@ def _separator(inputs: Mapping[str, Any]) -> dict[str, float]:
     return rows_out
 
 
+def _swelling(inputs: Mapping[str, Any]) -> dict[str, float]:
+    """`pvt.swelling_test`'s captured quantities, keyed as the capture spells them."""
+    from azoth.core.units import quantity
+
+    from .reference.swelling_test import swelling_test
+
+    components = [{**row, "moles": quantity(row["moles"], "mol")} for row in inputs["components"]]
+    injection_gas = inputs.get("injection_gas")
+    gas = (
+        None
+        if injection_gas is None
+        else [{**row, "moles": quantity(row["moles"], "mol")} for row in injection_gas]
+    )
+    result = swelling_test(
+        components,
+        gas,
+        eos=inputs.get("eos"),
+        mixing_rule=inputs.get("mixing_rule"),
+        temperature=None
+        if inputs.get("temperature") is None
+        else quantity(inputs["temperature"], "K"),
+        cumulative_gas_injected=inputs["cumulative_gas_injected"],
+        volume_correction=inputs.get("volume_correction"),
+    )
+    rows_out: dict[str, float] = {
+        "original_oil_moles": result.original_oil_moles.to("mol").magnitude,
+        "original_oil_volume_m3": result.original_oil_volume.to("m**3").magnitude,
+    }
+    for index, point in enumerate(result.points):
+        at = f"point_{index}_"
+        rows_out[at + "cumulative_gas_injected"] = point.cumulative_gas_injected
+        rows_out[at + "pressure_pa"] = point.pressure.to("Pa").magnitude
+        rows_out[at + "relative_oil_volume"] = point.relative_oil_volume
+    return rows_out
+
+
 #: Models whose per-step arithmetic is dumped by a function here.
 DUMPERS: dict[str, Dumper] = {
     "pvt.constant_mass_expansion": _cce,
     "pvt.differential_liberation": _dle,
     "pvt.constant_volume_depletion": _cvd,
     "pvt.separator_test": _separator,
+    "pvt.swelling_test": _swelling,
 }
 
 #: Record-list models with no interior to dump: every published row is the answer. The value

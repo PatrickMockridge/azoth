@@ -458,6 +458,8 @@ from azoth.core.result import (
     SupplyVerdict,
     SurfCooldownResult,
     SwameeJainResult,
+    SwellingPoint,
+    SwellingTestResult,
     TankResult,
     TbpClosureResult,
     TbpCutBoundariesResult,
@@ -899,6 +901,7 @@ __all__ = [
     "stripping_column",
     "sts0131_gate",
     "surf_cooldown",
+    "swelling_test",
     "tank",
     "tbp_closure",
     "tbp_cut_boundaries",
@@ -10737,6 +10740,26 @@ def separator_test(components: Sequence[Mapping[str, Any]], mode: str, *, stages
         bo_at_optimum=result.bo_at_optimum,
         api_at_optimum=result.api_at_optimum,
         stages=tuple(SeparatorStageResult(stage_number=c.stage_number, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), temperature=from_si(c.temperature.magnitude_si, c.temperature.unit), gas_volume=None if c.gas_volume is None else from_si(c.gas_volume.magnitude_si, c.gas_volume.unit), stage_gor=c.stage_gor, cumulative_gor=c.cumulative_gor, oil_fvf=c.oil_fvf, gas_density=None if c.gas_density is None else from_si(c.gas_density.magnitude_si, c.gas_density.unit), oil_density=None if c.oil_density is None else from_si(c.oil_density.magnitude_si, c.oil_density.unit), gas_molar_mass=None if c.gas_molar_mass is None else from_si(c.gas_molar_mass.magnitude_si, c.gas_molar_mass.unit), oil_molar_mass=None if c.oil_molar_mass is None else from_si(c.oil_molar_mass.magnitude_si, c.oil_molar_mass.unit), gas_z_factor=c.gas_z_factor, oil_viscosity=None if c.oil_viscosity is None else from_si(c.oil_viscosity.magnitude_si, c.oil_viscosity.unit)) for c in result.stages),
+        warnings=_warnings(result.warnings),
+    )
+
+
+def swelling_test(components: Sequence[Mapping[str, Any]], *, cumulative_gas_injected: Sequence[Any], injection_gas: Sequence[Mapping[str, Any]] | None=None, eos: str | None=None, mixing_rule: str | None=None, temperature: Any=None, volume_correction: bool | None=None) -> SwellingTestResult:
+    """``pvt.swelling_test``, computed in Rust."""
+    spec = _models_gen.model("pvt.swelling_test")
+    result = _core.swelling_test(
+        input_records_to_si(spec, "components", components),
+        None if injection_gas is None else input_records_to_si(spec, "injection_gas", injection_gas),
+        eos,
+        mixing_rule,
+        None if temperature is None else _si(spec, "temperature", temperature),
+        list(cumulative_gas_injected),
+        volume_correction,
+    )
+    return SwellingTestResult(
+        original_oil_moles=from_si(result.original_oil_moles.magnitude_si, result.original_oil_moles.unit),
+        original_oil_volume=from_si(result.original_oil_volume.magnitude_si, result.original_oil_volume.unit),
+        points=tuple(SwellingPoint(cumulative_gas_injected=c.cumulative_gas_injected, pressure=from_si(c.pressure.magnitude_si, c.pressure.unit), relative_oil_volume=c.relative_oil_volume) for c in result.points),
         warnings=_warnings(result.warnings),
     )
 

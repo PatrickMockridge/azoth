@@ -31,6 +31,7 @@ from azoth.core.result import (
     OilMaterialBalanceResult,
     SaturationTestResult,
     SeparatorTestResult,
+    SwellingTestResult,
     WaterCorrelationsResult,
 )
 from azoth.pvt import layers as layers
@@ -45,6 +46,7 @@ _GAS_MATERIAL_BALANCE = "pvt.gas_material_balance"
 _OIL_MATERIAL_BALANCE = "pvt.oil_material_balance"
 _SATURATION_TEST = "pvt.saturation_test"
 _SEPARATOR_TEST = "pvt.separator_test"
+_SWELLING_TEST = "pvt.swelling_test"
 _WATER_CORRELATIONS = "pvt.water_correlations"
 
 __all__ = [
@@ -59,6 +61,7 @@ __all__ = [
     "oil_material_balance",
     "saturation_test",
     "separator_test",
+    "swelling_test",
     "water_correlations",
 ]
 
@@ -215,6 +218,42 @@ def separator_test(
         first_stage_temperature_min=first_stage_temperature_min,
         first_stage_temperature_max=first_stage_temperature_max,
         first_stage_temperature_steps=first_stage_temperature_steps,
+    )
+
+
+def swelling_test(
+    components: Sequence[Mapping[str, Any]],
+    *,
+    cumulative_gas_injected: Sequence[Any],
+    injection_gas: Sequence[Mapping[str, Any]] | None = None,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: Any = None,
+    volume_correction: bool | None = None,
+) -> SwellingTestResult:
+    """The swelling of an oil by an injection gas.
+
+    ``components`` is the base oil's row list and ``injection_gas`` the gas's; the schedule
+    states the cumulative injection as fractions of the original oil moles. At each entry the
+    mixture's bubble point is solved and its volume is reported against the base oil's.
+
+    Returns:
+        The base oil's amount and bubble-point volume, and one ``points`` row per entry.
+
+    Raises:
+        InvalidInputError: for an empty, negative or decreasing schedule, an injection without
+            a gas, a non-positive temperature, or a failed bubble point.
+
+    See :func:`azoth.pvt.reference.swelling_test.swelling_test`.
+    """
+    return resolve(_SWELLING_TEST)(  # type: ignore[no-any-return]
+        components=components,
+        injection_gas=injection_gas,
+        eos=eos,
+        mixing_rule=mixing_rule,
+        temperature=temperature,
+        cumulative_gas_injected=cumulative_gas_injected,
+        volume_correction=volume_correction,
     )
 
 

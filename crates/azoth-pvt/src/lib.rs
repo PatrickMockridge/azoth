@@ -26,6 +26,7 @@ pub mod saturation;
 pub mod saturation_test;
 pub mod separator_test;
 pub mod standard;
+pub mod swelling_test;
 pub mod transport;
 pub mod volume;
 pub mod water_correlations;
@@ -50,6 +51,7 @@ pub use saturation_test::{SaturationTestResult, saturation_test};
 pub use separator_test::{
     SeparatorStageInput, SeparatorStageResult, SeparatorTestResult, separator_test,
 };
+pub use swelling_test::{SwellingPoint, SwellingTestResult, swelling_test};
 pub use water_correlations::{
     WaterCorrelationsResult, WaterQuery, WaterResultRow, water_correlations,
 };

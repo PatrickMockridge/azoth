@@ -2604,6 +2604,20 @@ class SubFraction:
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class SwellingPoint:
+    """one row per schedule entry."""
+
+    #: the cumulative injection, as a fraction of the original oil moles.
+    cumulative_gas_injected: float
+
+    #: the bubble-point pressure.
+    pressure: Q
+
+    #: the bubble-point volume over the base oil's.
+    relative_oil_volume: float
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class TopsidesBreakdownLine:
     """the module breakdown lines, keyed `module.<camelCase>`."""
 

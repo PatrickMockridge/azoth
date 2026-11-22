@@ -4019,6 +4019,17 @@ PROVENANCE: Final[dict[str, dict[str, Any]]] = {
         "tests_active": 4,
         "tests_skipped": 0,
     },
+    'pvt.swelling_test': {
+        "calc_id": 'pvt.swelling_test',
+        "name": 'Swelling test',
+        "spec": {'path': 'specs/models/pvt/swelling_test.toml', 'sha256': 'a7da350ee8e7f98b62b734ddc106bcc5d15a3d7adadf084ad7e900093335e2df'},
+        "code": [{'path': 'python/src/azoth/pvt/reference/swelling_test.py', 'sha256': '6fc4a6279e127014aa8ccc98dadc97aa5c1e9f484fabc5cfda582e6bb9ac941e'}, {'path': 'crates/azoth-pvt/src/swelling_test.rs', 'sha256': '99ee87280732f3e736f21f1a77b119082aa08a4aceca52d9c6fc0062ae66a00c'}],
+        "source": 'NeqSim pvtsimulation/simulation/SwellingTest.java',
+        "verification": 'partially_verified',
+        "validation_cases": 0,
+        "tests_active": 3,
+        "tests_skipped": 0,
+    },
     'pvt.water_correlations': {
         "calc_id": 'pvt.water_correlations',
         "name": 'Water and brine correlation table',

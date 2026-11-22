@@ -21,6 +21,7 @@ use crate::gas_material_balance::GasMaterialBalanceResult;
 use crate::oil_material_balance::OilMaterialBalanceResult;
 use crate::saturation_test::SaturationTestResult;
 use crate::separator_test::SeparatorTestResult;
+use crate::swelling_test::SwellingTestResult;
 use crate::water_correlations::WaterCorrelationsResult;
 
 impl CalcResult for BlackOilCorrelationsResult {
@@ -196,6 +197,20 @@ impl CalcResult for SeparatorTestResult {
         "bo_at_optimum",
         "api_at_optimum",
         "stages",
+        "warnings",
+    ];
+
+    fn warnings(&self) -> &[Warning] {
+        &self.warnings
+    }
+}
+
+impl CalcResult for SwellingTestResult {
+    const CALC_ID: &'static str = "pvt.swelling_test";
+    const FIELDS: &'static [&'static str] = &[
+        "original_oil_moles",
+        "original_oil_volume",
+        "points",
         "warnings",
     ];
 

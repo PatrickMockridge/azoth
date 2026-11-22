@@ -2548,6 +2548,14 @@ class SeparatorStageResult:
     oil_viscosity: Qty | None
 
 @final
+class SwellingPoint:
+    """one row per schedule entry."""
+
+    cumulative_gas_injected: float
+    pressure: Qty
+    relative_oil_volume: float
+
+@final
 class WaterResultRow:
     """one row per input row, in caller order; only the fields the calculation answers are present."""
 
@@ -6945,6 +6953,13 @@ class SeparatorTestResult:
     warnings: list[Warning]
 
 @final
+class SwellingTestResult:
+    original_oil_moles: Qty
+    original_oil_volume: Qty
+    points: list[SwellingPoint]
+    warnings: list[Warning]
+
+@final
 class WaterCorrelationsResult:
     queries: list[WaterResultRow]
     warnings: list[Warning]
@@ -11185,6 +11200,15 @@ def separator_test(
     first_stage_temperature_max: float | None = None,
     first_stage_temperature_steps: float | None = None,
 ) -> SeparatorTestResult: ...
+def swelling_test(
+    components: list[FluidComponent],
+    cumulative_gas_injected: list[float],
+    injection_gas: list[FluidComponent] | None = None,
+    eos: str | None = None,
+    mixing_rule: str | None = None,
+    temperature: float | None = None,
+    volume_correction: bool | None = None,
+) -> SwellingTestResult: ...
 def water_correlations(queries: list[WaterQuery]) -> WaterCorrelationsResult: ...
 def chemical_equilibrium(
     a_matrix: list[list[float]],

@@ -11,6 +11,7 @@
 //!   - specs/models/pvt/oil_material_balance.toml
 //!   - specs/models/pvt/saturation_test.toml
 //!   - specs/models/pvt/separator_test.toml
+//!   - specs/models/pvt/swelling_test.toml
 //!   - specs/models/pvt/water_correlations.toml
 //!
 //! Regenerate with `python tools/gen_models.py`; CI runs `--check` and fails
@@ -7322,6 +7323,401 @@ pub static SEPARATOR_TEST_SPEC: ModelSpec = ModelSpec {
     cases: SEPARATOR_TEST_CASES,
 };
 
+static SWELLING_TEST_CHECKS: &[SpecCheck] = &[];
+
+static SWELLING_TEST_CASES: &[TestCase] = &[
+    TestCase {
+        id: "swelling_upstream",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("temperature", 353.15)],
+        flags: &[("volume_correction", false)],
+        lists: &[],
+        strings: &[("mixing_rule", "zero")],
+        vectors: &[("cumulative_gas_injected", &[0.0, 0.1, 0.2])],
+        matrices: &[],
+        expected: &[("original_oil_moles", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "components",
+                &[
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("methane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.2),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("nC10"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.8),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "injection_gas",
+                &[&[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(1.0),
+                    },
+                ]],
+            ),
+        ],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "cumulative_gas_injected",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(5128370.972140508),
+                    },
+                    RecordField {
+                        name: "relative_oil_volume",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "cumulative_gas_injected",
+                        value: FieldValue::Number(0.1),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(7320109.92148898),
+                    },
+                    RecordField {
+                        name: "relative_oil_volume",
+                        value: FieldValue::Number(1.0301020971426877),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "cumulative_gas_injected",
+                        value: FieldValue::Number(0.2),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(9314150.739597373),
+                    },
+                    RecordField {
+                        name: "relative_oil_volume",
+                        value: FieldValue::Number(1.0602317415732485),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "swelling_mixed_gas",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("temperature", 323.15)],
+        flags: &[("volume_correction", false)],
+        lists: &[],
+        strings: &[("mixing_rule", "zero")],
+        vectors: &[("cumulative_gas_injected", &[0.0, 0.05, 0.15, 0.25])],
+        matrices: &[],
+        expected: &[("original_oil_moles", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[
+            (
+                "components",
+                &[
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("methane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.5),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("nC10"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.5),
+                        },
+                    ],
+                ],
+            ),
+            (
+                "injection_gas",
+                &[
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("methane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.7),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "fluid",
+                            value: FieldValue::Number(0.0),
+                        },
+                        RecordField {
+                            name: "name",
+                            value: FieldValue::Name("ethane"),
+                        },
+                        RecordField {
+                            name: "pseudo_component",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "moles",
+                            value: FieldValue::Number(0.3),
+                        },
+                    ],
+                ],
+            ),
+        ],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "cumulative_gas_injected",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(14411248.035344983),
+                    },
+                    RecordField {
+                        name: "relative_oil_volume",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "cumulative_gas_injected",
+                        value: FieldValue::Number(0.05),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(14975560.751318412),
+                    },
+                    RecordField {
+                        name: "relative_oil_volume",
+                        value: FieldValue::Number(1.0221147339758632),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "cumulative_gas_injected",
+                        value: FieldValue::Number(0.15),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(15993753.734622786),
+                    },
+                    RecordField {
+                        name: "relative_oil_volume",
+                        value: FieldValue::Number(1.066626241688908),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "cumulative_gas_injected",
+                        value: FieldValue::Number(0.25),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(16885067.716831215),
+                    },
+                    RecordField {
+                        name: "relative_oil_volume",
+                        value: FieldValue::Number(1.1115123217160363),
+                    },
+                ],
+            ],
+        )],
+    },
+    TestCase {
+        id: "swelling_zero_injection",
+        kind: "case",
+        property: None,
+        status: "active",
+        skip_reason: None,
+        tolerance: 1e-06,
+        numbers: &[("temperature", 323.15)],
+        flags: &[("volume_correction", false)],
+        lists: &[],
+        strings: &[("mixing_rule", "zero")],
+        vectors: &[("cumulative_gas_injected", &[0.0, 0.0])],
+        matrices: &[],
+        expected: &[("original_oil_moles", 1.0)],
+        expected_vectors: &[],
+        expected_strings: &[],
+        records: &[(
+            "components",
+            &[
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("methane"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "fluid",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "name",
+                        value: FieldValue::Name("nC10"),
+                    },
+                    RecordField {
+                        name: "pseudo_component",
+                        value: FieldValue::Flag(false),
+                    },
+                    RecordField {
+                        name: "moles",
+                        value: FieldValue::Number(0.5),
+                    },
+                ],
+            ],
+        )],
+        expected_records: &[(
+            "points",
+            &[
+                &[
+                    RecordField {
+                        name: "cumulative_gas_injected",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(14411248.035344983),
+                    },
+                    RecordField {
+                        name: "relative_oil_volume",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+                &[
+                    RecordField {
+                        name: "cumulative_gas_injected",
+                        value: FieldValue::Number(0.0),
+                    },
+                    RecordField {
+                        name: "pressure",
+                        value: FieldValue::Number(14411248.035344983),
+                    },
+                    RecordField {
+                        name: "relative_oil_volume",
+                        value: FieldValue::Number(1.0),
+                    },
+                ],
+            ],
+        )],
+    },
+];
+
+/// Registry entry for `pvt.swelling_test`.
+pub static SWELLING_TEST_SPEC: ModelSpec = ModelSpec {
+    id: "pvt.swelling_test",
+    kind: "direct",
+    algorithm: None,
+    checks: SWELLING_TEST_CHECKS,
+    cases: SWELLING_TEST_CASES,
+};
+
 static WATER_CORRELATIONS_CHECKS: &[SpecCheck] = &[];
 
 static WATER_CORRELATIONS_CASES: &[TestCase] = &[TestCase {
@@ -7676,6 +8072,7 @@ static ALL_MODELS: &[&ModelSpec] = &[
     &OIL_MATERIAL_BALANCE_SPEC,
     &SATURATION_TEST_SPEC,
     &SEPARATOR_TEST_SPEC,
+    &SWELLING_TEST_SPEC,
     &WATER_CORRELATIONS_SPEC,
 ];
 
