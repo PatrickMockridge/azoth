@@ -541,6 +541,33 @@ fn the_auto_strategy_accepts_its_damped_warm_base() {
         .expect("the model accepts the declared strategy");
 }
 
+/// **Each strategy reports the route the capture's `solver` column records**, including the
+/// guards that report another solve. The binary `naphtali_sandholm` ladder row is a known
+/// divergence (the port's mesh solve converges where NeqSim's falls back) and is tested in its
+/// own file; `newton` is either accepted or the damped fallback, tested above.
+#[test]
+fn each_strategy_reports_the_route_the_capture_records() {
+    for (strategy, used) in [
+        (
+            SolverType::DirectSubstitution,
+            SolverType::DirectSubstitution,
+        ),
+        (
+            SolverType::DampedSubstitution,
+            SolverType::DampedSubstitution,
+        ),
+        (SolverType::InsideOut, SolverType::InsideOut),
+        (SolverType::MatrixInsideOut, SolverType::MatrixInsideOut),
+        (SolverType::Wegstein, SolverType::DirectSubstitution),
+        (SolverType::SumRates, SolverType::DampedSubstitution),
+        (SolverType::MeshResidual, SolverType::MeshResidual),
+        (SolverType::Auto, SolverType::DampedSubstitution),
+    ] {
+        let out = distillation_column(&binary(strategy)).expect("the strategy converges");
+        assert_eq!(out.solver_used, used, "{strategy:?}");
+    }
+}
+
 /// **The Murphree efficiency is ported on the sequential solve and refused on the mesh one.**
 ///
 /// The two solves carry two different corrections, which is why the refusal is by solver rather
