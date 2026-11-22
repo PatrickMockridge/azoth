@@ -30390,6 +30390,206 @@
       "sub_interface": null
     }
   ],
+  "safety_families": [
+    {
+      "blurb": "Depressurization and blowdown, the vessel filling and blocked-outlet overpressure screens.",
+      "deck": {
+        "heading": "Depressurization scenarios",
+        "search": "Search depressurization models",
+        "step": "Add a pressure-safety-valve step, a vessel filling or a blocked-outlet overpressure screen.",
+        "tab": "Depressurization",
+        "title": "Depressurization models"
+      },
+      "id": "depressurization",
+      "label": "Depressurization"
+    },
+    {
+      "blurb": "Gaussian plume, hazardous area, dense gas, probit and toxic thresholds.",
+      "deck": {
+        "heading": "Dispersion scenarios",
+        "search": "Search dispersion models",
+        "step": "Add a plume, a hazardous-area screen, a dense-gas distance, a probit or a toxic-threshold lookup.",
+        "tab": "Dispersion",
+        "title": "Dispersion models"
+      },
+      "id": "dispersion",
+      "label": "Dispersion"
+    },
+    {
+      "blurb": "Gas blowby, pump deadhead, runaway reaction and minimum design metal temperature.",
+      "deck": {
+        "heading": "Equipment safety scenarios",
+        "search": "Search equipment safety models",
+        "step": "Add a gas blowby, a pump deadhead, a runaway reaction or a minimum design metal temperature.",
+        "tab": "Equipment safety",
+        "title": "Equipment safety models"
+      },
+      "id": "equipmentsafety",
+      "label": "Equipment and system safety"
+    },
+    {
+      "blurb": "Jet fire, pool fire, BLEVE, vapour-cloud explosion and passive fire protection.",
+      "deck": {
+        "heading": "Fire scenarios",
+        "search": "Search fire models",
+        "step": "Add a jet fire, a pool fire, a BLEVE, a vapour-cloud explosion or a protection demand.",
+        "tab": "Fire",
+        "title": "Fire models"
+      },
+      "id": "fire",
+      "label": "Fire and explosion"
+    },
+    {
+      "blurb": "Protection screening, deluge layout, monitor coverage and supply gates.",
+      "deck": {
+        "heading": "Firewater scenarios",
+        "search": "Search firewater models",
+        "step": "Add a protection screen, a deluge layout, a monitor coverage or a supply assessment.",
+        "tab": "Firewater",
+        "title": "Firewater models"
+      },
+      "id": "firewater",
+      "label": "Firewater"
+    },
+    {
+      "blurb": "Fire-case relief, relief-valve sizing, acceptance and pipeline protection.",
+      "deck": {
+        "heading": "Relief scenarios",
+        "search": "Search relief models",
+        "step": "Add a fire-case relief, a relief-valve sizing, an acceptance check or a pipeline protection screen.",
+        "tab": "Relief",
+        "title": "Relief models"
+      },
+      "id": "overpressure",
+      "label": "Overpressure and relief"
+    },
+    {
+      "blurb": "The NORSOK S-001 secondary-pressure protection screen.",
+      "deck": {
+        "heading": "Process safety system scenarios",
+        "search": "Search process safety system models",
+        "step": "Add a NORSOK S-001 secondary-pressure protection screen.",
+        "tab": "Process safety",
+        "title": "Process safety system models"
+      },
+      "id": "processsafetysystem",
+      "label": "Process safety systems"
+    },
+    {
+      "blurb": "NOG 070 minimum SIL and the instrumented function's PFD arithmetic.",
+      "deck": {
+        "heading": "Risk scenarios",
+        "search": "Search risk models",
+        "step": "Add a NOG 070 determination or an instrumented-function assessment.",
+        "tab": "Risk",
+        "title": "Risk and SIL models"
+      },
+      "id": "risk",
+      "label": "Risk and SIL"
+    },
+    {
+      "blurb": "The Kletz inherent-safety index.",
+      "deck": {
+        "heading": "Safety assessment scenarios",
+        "search": "Search safety assessment models",
+        "step": "Add an inherent-safety evaluation.",
+        "tab": "Assessment",
+        "title": "Safety assessment models"
+      },
+      "id": "safetyassessment",
+      "label": "Safety assessment"
+    },
+    {
+      "blurb": "Gas and liquid flow-induced vibration and acoustic-induced vibration.",
+      "deck": {
+        "heading": "Vibration scenarios",
+        "search": "Search vibration models",
+        "step": "Add a gas or liquid flow-induced vibration screen or an acoustic-induced vibration screen.",
+        "tab": "Vibration",
+        "title": "Vibration models"
+      },
+      "id": "vibration",
+      "label": "Vibration"
+    },
+    {
+      "blurb": "The SAFE chart's device rows and its missing-device findings.",
+      "deck": null,
+      "id": "api14c",
+      "label": "API 14C"
+    },
+    {
+      "blurb": "The barrier register's findings and the safety system's performance.",
+      "deck": null,
+      "id": "barrier",
+      "label": "Barriers"
+    },
+    {
+      "blurb": "The NORSOK P-002 and STS-0131 compliance gates.",
+      "deck": null,
+      "id": "compliance",
+      "label": "Compliance"
+    },
+    {
+      "blurb": "The process safety envelope and the deviations it reports.",
+      "deck": null,
+      "id": "envelope",
+      "label": "Safety envelope"
+    },
+    {
+      "blurb": "The emergency shutdown response time against its target.",
+      "deck": null,
+      "id": "esd",
+      "label": "Emergency shutdown"
+    },
+    {
+      "blurb": "The HAZOP, FMEA and MAH worksheets.",
+      "deck": null,
+      "id": "hazid",
+      "label": "Hazard identification"
+    },
+    {
+      "blurb": "The trapped inventory in isolated sections.",
+      "deck": null,
+      "id": "inventory",
+      "label": "Inventory"
+    },
+    {
+      "blurb": "The mass-balance leak detection and its threshold.",
+      "deck": null,
+      "id": "leakdetection",
+      "label": "Leak detection"
+    },
+    {
+      "blurb": "The open-drain review's rows and findings.",
+      "deck": null,
+      "id": "opendrain",
+      "label": "Open drain"
+    },
+    {
+      "blurb": "Consequence analysis for a quantitative risk assessment.",
+      "deck": null,
+      "id": "qra",
+      "label": "Quantitative risk"
+    },
+    {
+      "blurb": "Release-rate models from the ideal-gas forms to the finite-rate and drift-flux forms.",
+      "deck": null,
+      "id": "release",
+      "label": "Release"
+    },
+    {
+      "blurb": "Vessel and pipe rupture, and the trapped-liquid fire rupture.",
+      "deck": null,
+      "id": "rupture",
+      "label": "Rupture"
+    },
+    {
+      "blurb": "The Semenov, porous-media and basket-test self-heating screens.",
+      "deck": null,
+      "id": "selfheating",
+      "label": "Self-heating"
+    }
+  ],
   "tools": [
     {
       "description": "Add a unit operation. An id that already exists is replaced, so the call is retryable.",

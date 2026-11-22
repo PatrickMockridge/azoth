@@ -1,10 +1,17 @@
 /**
  * The Safety workspace's sub-interfaces.
  *
- * **One document, ten readings.** Overview lists what the study holds; Bow-tie draws the causes
- * and outcomes; the ten scenario decks run their family's models. A tab is a view and never a
- * second document, so switching one cannot lose an edit.
+ * **One document, the fixed readings and every deck the registry serves.** Overview lists what
+ * the study holds, Catalogue browses all 96 calculations across the 23 families, Bow-tie draws
+ * the causes and outcomes, and each deck runs its family's scenarios. A tab is a view and never
+ * a second document, so switching one cannot lose an edit.
+ *
+ * **The tabs are the library's answer.** The deck tabs come from `catalogue.safety_families`,
+ * not a list here: a family the registry gains is a tab, and a family it loses is gone, without
+ * this file changing.
  */
+
+import { useState } from "react";
 
 import type { Units } from "../../state/units";
 import type { SafetyTarget } from "../../wire/session";
@@ -15,24 +22,10 @@ import type {
   SafetyEnvelope,
 } from "../../wire/types";
 import { BowtieView } from "./BowtieView";
+import { SafetyCatalogue } from "./SafetyCatalogue";
 import { ScenarioDeck } from "./ScenarioDeck";
 import { SafetyOverview } from "./SafetyOverview";
-import { isScenarioView, type SafetyView } from "./views";
-
-const VIEWS: { id: SafetyView; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "bowtie", label: "Bow-tie" },
-  { id: "fire", label: "Fire" },
-  { id: "dispersion", label: "Dispersion" },
-  { id: "equipmentsafety", label: "Equipment safety" },
-  { id: "firewater", label: "Firewater" },
-  { id: "overpressure", label: "Relief" },
-  { id: "processsafetysystem", label: "Process safety" },
-  { id: "risk", label: "Risk" },
-  { id: "safetyassessment", label: "Assessment" },
-  { id: "vibration", label: "Vibration" },
-  { id: "depressurization", label: "Depressurization" },
-];
+import { deckFamily, isDeck, type SafetyView } from "./views";
 
 export function SafetyWorkspace({
   view,
@@ -69,6 +62,20 @@ export function SafetyWorkspace({
   onCalculate: (target: SafetyTarget | null) => void;
   onMoveNode: (bowtie: string, node: string, x: number, y: number) => void;
 }) {
+  const families = catalogue?.safety_families ?? [];
+  /** The family the Overview asked the Catalogue to open at. */
+  const [focus, setFocus] = useState<string | null>(null);
+
+  const choose = (next: SafetyView) => {
+    setFocus(null);
+    onView(next);
+  };
+
+  const openCatalogue = (family: string) => {
+    setFocus(family);
+    onView("catalogue");
+  };
+
   const selectScenario = (id: string) => {
     const row = envelope?.study.scenarios.find((scenario) => scenario.id === id);
     const entry = catalogue?.safety?.find((model) => model.id === row?.calculation);
@@ -76,19 +83,30 @@ export function SafetyWorkspace({
     // with its unsupported diagnostic on the overview, never silently dropped.
     const target = entry?.sub_interface ?? row?.family ?? null;
     onActiveScenario(id);
-    onView(isScenarioView(target) ? target : "overview");
+    onView(isDeck(target, families) ? target : "overview");
   };
+
+  const tabs: { id: SafetyView; label: string }[] = [
+    { id: "overview", label: "Overview" },
+    { id: "catalogue", label: "Catalogue" },
+    { id: "bowtie", label: "Bow-tie" },
+    ...families.flatMap((family) =>
+      family.deck === null ? [] : [{ id: family.id, label: family.deck.tab }],
+    ),
+  ];
+
+  const deck = deckFamily(view, families);
 
   return (
     <div className="safety-workspace">
       <nav className="safety-views" aria-label="Safety view">
-        {VIEWS.map((entry) => (
+        {tabs.map((entry) => (
           <button
             key={entry.id}
             type="button"
             className={entry.id === view ? "active" : ""}
             aria-pressed={entry.id === view}
-            onClick={() => onView(entry.id)}
+            onClick={() => choose(entry.id)}
           >
             {entry.label}
           </button>
@@ -101,9 +119,17 @@ export function SafetyWorkspace({
           envelope={envelope}
           catalogue={catalogue}
           onView={onView}
+          onCatalogue={openCatalogue}
           onBowtie={onActiveBowtie}
           onScenario={selectScenario}
           onAddBowtie={onAddBowtie}
+        />
+      ) : view === "catalogue" ? (
+        <SafetyCatalogue
+          catalogue={catalogue}
+          focus={focus}
+          onView={onView}
+          onAddScenario={onAddScenario}
         />
       ) : view === "bowtie" ? (
         <BowtieView
@@ -118,10 +144,18 @@ export function SafetyWorkspace({
           onMoveNode={onMoveNode}
           onScenario={selectScenario}
         />
+      ) : deck === null ? (
+        <SafetyCatalogue
+          catalogue={catalogue}
+          focus={null}
+          onView={onView}
+          onAddScenario={onAddScenario}
+        />
       ) : (
         <ScenarioDeck
           key={view}
-          view={view}
+          family={deck.family}
+          deck={deck.deck}
           envelope={envelope}
           catalogue={catalogue}
           units={units}

@@ -12,7 +12,8 @@
 #
 # Probes: dexpi.mappings, dexpi.faithful, dexpi.lossy, dexpi.refused,
 # dexpi.plant.total, dexpi.plant.writable, dexpi.plant.readable,
-# specs.calcs, specs.models, specs.ids, specs.unported_rows, unit_ops.declared,
+# specs.calcs, specs.models, specs.ids, specs.unported_rows,
+# safety.calculations, safety.families, unit_ops.declared,
 # unit_ops.kernels, unit_ops.dispatch, unit_ops.refusals, vocabulary.units,
 # lean.axioms_gated, lean.axioms_dim, lean.gate_printed, lean.guards_gated, lean.modules,
 # pairs.eos_files,
@@ -39,6 +40,13 @@ measure = { calcs = "specs.calcs", models = "specs.models" }
 page = "docs/src/architecture/specification.md"
 text = "The models declare **{unported_rows} refusals**"
 measure = { unported_rows = "specs.unported_rows" }
+
+# The safety catalogue the workspace draws. The generated file is the one answer, so the
+# page cannot state a count the generator disagrees with.
+[[claim]]
+page = "docs/src/using/safety.md"
+text = "The **Catalogue** lists all {calculations} calculations across {families} families"
+measure = { calculations = "safety.calculations", families = "safety.families" }
 
 # --- what a result says about itself ------------------------------------------
 #

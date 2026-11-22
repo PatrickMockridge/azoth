@@ -183,6 +183,24 @@ def specs_ids() -> int:
     return positive(len(calcs) + len(models), "ids")
 
 
+def _generated_safety() -> tuple[int, int]:
+    """The safety calculations and families `gen_safety.py` emits."""
+    text = (ROOT / "crates" / "azoth-safety" / "src" / "forms_gen.rs").read_text(encoding="utf-8")
+    calculations = len(re.findall(r"^    SafetyCalculation \{", text, re.M))
+    families = len(re.findall(r"^    SafetyFamily \{", text, re.M))
+    return positive(calculations, "safety calculations"), positive(families, "safety families")
+
+
+def safety_calculations() -> int:
+    """The safety calculations the workspace's catalogue carries."""
+    return _generated_safety()[0]
+
+
+def safety_families() -> int:
+    """The safety families the workspace's catalogue carries."""
+    return _generated_safety()[1]
+
+
 def _palette_ids() -> set[str]:
     text = (ROOT / "crates" / "azoth-process" / "src" / "palette_gen.rs").read_text(
         encoding="utf-8"
@@ -651,6 +669,8 @@ MEASURES = {
     "specs.models": specs_models,
     "specs.ids": specs_ids,
     "specs.unported_rows": specs_unported_rows,
+    "safety.calculations": safety_calculations,
+    "safety.families": safety_families,
     "unit_ops.declared": unit_ops_declared,
     "unit_ops.kernels": unit_ops_kernels,
     "unit_ops.dispatch": unit_ops_dispatch,

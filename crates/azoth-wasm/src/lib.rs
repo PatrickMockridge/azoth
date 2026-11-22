@@ -52,7 +52,8 @@ fn palette() -> Vec<UnitOpSpec> {
 #[wasm_bindgen]
 pub fn palette_json(with_tools: bool) -> Result<String, JsValue> {
     let safety = azoth_safety::catalogue::to_value().map_err(failed)?;
-    catalogue_with(&palette(), with_tools, Some(safety)).map_err(failed)
+    let families = azoth_safety::catalogue::families_to_value().map_err(failed)?;
+    catalogue_with(&palette(), with_tools, Some(safety), Some(families)).map_err(failed)
 }
 
 /// A live document: the session, as the browser holds it.

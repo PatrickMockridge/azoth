@@ -496,6 +496,24 @@ export interface SheetEnvelope {
   book: SheetBook;
 }
 
+/** The copy a scenario deck draws: its tab, picker title, starter heading and first step. */
+export interface SafetyDeck {
+  tab: string;
+  title: string;
+  heading: string;
+  search: string;
+  step: string;
+}
+
+/** One safety family: its display copy and, where it has one, its deck. */
+export interface SafetyFamily {
+  id: string;
+  label: string;
+  blurb: string;
+  /** `null` for a family the catalogue lists without a scenario deck. */
+  deck: SafetyDeck | null;
+}
+
 /** One safety calculation: a model id, its family, and the form a scenario draws. */
 export interface SafetyCalculation {
   id: string;
@@ -691,6 +709,13 @@ export interface Catalogue {
    * so their manual pages are reachable.
    */
   safety?: SafetyCalculation[];
+  /**
+   * The safety families, in registry order: the ten with a deck, then the listed ones.
+   *
+   * The tabs, the deck copy and the catalogue are drawn from this answer rather than a
+   * second list in the front end.
+   */
+  safety_families?: SafetyFamily[];
   /**
    * Every canonical unit, keyed by the string a quantity carries: what it measures, and what one
    * of it is worth in SI.

@@ -11,13 +11,25 @@ derived and never saved: a scenario's answer is the last calculate's, and a scen
 inputs changed says its answer is out of date.
 
 The **Overview** lists the study's bow-ties and scenarios, every diagnostic the study carries,
-and the whole safety surface grouped by family. Thirty-one scenario models across ten
-families — fire, dispersion, equipment safety, firewater, overpressure, process safety systems,
-risk, safety assessment, vibration and depressurization — and the bow-tie run inside this
-interface. The rest — the models that take a fluid or a table of rows, and the rupture,
-release, QRA, inventory, envelope, leak-detection, ESD and open-drain families — are listed
-with links to their manual pages; they are not runnable here yet. The four thermo-bound relief loads and the overpressure protection study are in that
-list: they take a fluid or a scenario table, and the library reaches them.
+a card for each scenario deck and a card for the catalogue. The ten decks — fire, dispersion,
+equipment safety, firewater, relief, process safety systems, risk, safety assessment,
+vibration and depressurization — run the thirty-one scalar scenario models and the bow-tie.
+The other 64 calculations are listed in their family's deck where it has one and in the
+catalogue everywhere else; they take a fluid or a table of rows, so a scenario cannot yet
+provide their inputs. The four thermo-bound relief loads and the overpressure protection study
+are in that list: the library reaches them and their manual pages state the inputs.
+
+## The catalogue
+
+The **Catalogue** lists all 96 calculations across 23 families, every one with the status its
+shape earns and a link to its manual page. Search narrows the list by name, id, purpose or
+family, and the family headings, the deck copy and the counts are the library's own. A
+calculation a scenario can run offers **Add as a scenario**; one that cannot shows the refusal
+its input shape earned, and where its family has a deck it opens that deck. The overview's
+family index opens the catalogue at a family, so the thirteen families without a deck — API
+14C, barriers, compliance, envelope, emergency shutdown, hazard identification, inventory,
+leak detection, open drain, quantitative risk, release, rupture and self-heating — are
+reachable from the study as well.
 
 ## Bow-ties
 

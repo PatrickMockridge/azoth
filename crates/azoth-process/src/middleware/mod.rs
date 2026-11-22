@@ -42,14 +42,14 @@ use crate::unit_op::UnitOpSpec;
 /// # Errors
 /// A write that fails, which for this shape it cannot.
 pub fn catalogue(palette: &[UnitOpSpec], with_tools: bool) -> Result<String> {
-    catalogue_with(palette, with_tools, None)
+    catalogue_with(palette, with_tools, None, None)
 }
 
-/// The catalogue, with the safety projection a caller may attach.
+/// The catalogue, with the safety projections a caller may attach.
 ///
-/// **The projection is passed in because this crate cannot depend on `azoth-safety`.** The
+/// **The projections are passed in because this crate cannot depend on `azoth-safety`.** The
 /// dependency runs `azoth-process -> azoth-safety -> azoth-process` the other way; the callers
-/// that own both (the CLI, the browser and the Python binding) attach it, so every front door
+/// that own both (the CLI, the browser and the Python binding) attach them, so every front door
 /// still reads one catalogue.
 ///
 /// # Errors
@@ -58,6 +58,7 @@ pub fn catalogue_with(
     palette: &[UnitOpSpec],
     with_tools: bool,
     safety: Option<serde_json::Value>,
+    safety_families: Option<serde_json::Value>,
 ) -> Result<String> {
     let mut document = serde_json::json!({
         "unit_ops": form::forms(palette),
@@ -71,6 +72,12 @@ pub fn catalogue_with(
             .as_object_mut()
             .expect("the object this function just built")
             .insert("safety".to_string(), safety);
+    }
+    if let Some(families) = safety_families {
+        document
+            .as_object_mut()
+            .expect("the object this function just built")
+            .insert("safety_families".to_string(), families);
     }
     if with_tools {
         let object = document

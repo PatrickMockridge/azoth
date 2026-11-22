@@ -69,6 +69,84 @@ describe("the safety workspace", () => {
     expect(within(app).getByText("Scenarios in this study")).toBeDefined();
     const families = within(app).getAllByRole("heading", { name: /dispersion|firewater|rupture/i });
     expect(families.length).toBeGreaterThan(0);
+    // **The card the hand list forgot.** Depressurization has a deck, and now a card too.
+    expect(
+      within(app).getByRole("heading", { name: "Depressurization scenarios" }),
+    ).toBeDefined();
+    // Every family is on the overview index, including the five no deck used to hide.
+    for (const label of [
+      "Emergency shutdown",
+      "Safety envelope",
+      "Inventory",
+      "Leak detection",
+      "Open drain",
+    ]) {
+      expect(within(app).getByRole("button", { name: new RegExp(label) })).toBeDefined();
+    }
+  });
+
+  it("browses all 96 calculations in the catalogue", async () => {
+    stubFetch();
+    const app = await openSafety();
+    fireEvent.click(within(app).getByRole("button", { name: "Catalogue" }));
+    await waitFor(() => {
+      expect(app.querySelectorAll("[data-calculation-id]")).toHaveLength(96);
+    });
+    expect(app.querySelectorAll("[data-family-id]")).toHaveLength(23);
+    for (const id of [
+      "process.safety_envelope",
+      "process.esd_response_time",
+      "process.trapped_inventory",
+      "process.mass_balance_leak_detection",
+      "process.open_drain_review",
+    ]) {
+      expect(app.querySelector(`[data-calculation-id="${id}"]`)).not.toBeNull();
+    }
+    const jet = app.querySelector('[data-calculation-id="process.jet_fire"]');
+    if (jet === null) {
+      throw new Error("jet fire is in the catalogue");
+    }
+    expect(
+      within(jet as HTMLElement)
+        .getByRole("link", { name: "Jet fire radiation" })
+        .getAttribute("href"),
+    ).toMatch(/process\/jet_fire\.html$/);
+    const dispersion = app.querySelector('[data-calculation-id="process.gas_dispersion"]');
+    expect(dispersion?.querySelector(".refusal")?.textContent).toMatch(/fluid/);
+  });
+
+  it("narrows the catalogue by search", async () => {
+    stubFetch();
+    const app = await openSafety();
+    fireEvent.click(within(app).getByRole("button", { name: "Catalogue" }));
+    const search = await waitFor(() =>
+      within(app).getByRole("searchbox", { name: "Search the safety catalogue" }),
+    );
+    fireEvent.change(search, { target: { value: "relief" } });
+    await waitFor(() => {
+      const shown = app.querySelectorAll("[data-calculation-id]").length;
+      expect(shown).toBeGreaterThan(0);
+      expect(shown).toBeLessThan(96);
+    });
+    const tools = app.querySelector(".safety-catalogue-tools");
+    if (tools === null) {
+      throw new Error("the catalogue tools are drawn");
+    }
+    expect(within(tools as HTMLElement).getByRole("status").textContent).not.toMatch(/^96 of 96/);
+    expect(app.querySelector('[data-calculation-id="process.blocked_outlet_relief"]')).not.toBeNull();
+  });
+
+  it("adds a scenario from the catalogue and opens its deck", async () => {
+    stubFetch();
+    const app = await openSafety();
+    fireEvent.click(within(app).getByRole("button", { name: "Catalogue" }));
+    const add = await waitFor(() =>
+      within(app).getByRole("button", { name: "Add Jet fire radiation as a scenario" }),
+    );
+    fireEvent.click(add);
+    await waitFor(() => {
+      expect(within(app).getAllByRole("tab")).toHaveLength(3);
+    });
   });
 
   it("draws the bow-tie projection and computes the RRF", async () => {

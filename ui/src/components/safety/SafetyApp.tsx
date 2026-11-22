@@ -32,7 +32,7 @@ import type {
 } from "../../wire/types";
 import { SafetyTitleStrip } from "./SafetyTitleStrip";
 import { SafetyWorkspace } from "./SafetyWorkspace";
-import { isScenarioView, type SafetyView } from "./views";
+import { isDeck, type SafetyView } from "./views";
 import { caseMenuCommands, type InterfaceId } from "../../interfaces";
 
 /** One study the workspace has stood at, for undo and redo. */
@@ -186,11 +186,13 @@ export function SafetyApp({
   const addScenario = useCallback(
     (entry: SafetyCalculation) => {
       const id = nextScenarioId(entry, envelope);
+      const deck = entry.sub_interface;
+      const families = catalogue?.safety_families ?? [];
       setActiveScenario(id);
-      setView(isScenarioView(entry.sub_interface) ? entry.sub_interface : "fire");
+      setView(isDeck(deck, families) ? deck : "overview");
       send({ command: "add_scenario", id, calculation: entry.id, name: entry.name });
     },
-    [envelope, send],
+    [catalogue, envelope, send],
   );
 
   const addBowtie = useCallback(() => {

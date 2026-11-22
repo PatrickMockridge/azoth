@@ -1374,8 +1374,10 @@ safety` in the shell); the read-only drawing rides `/dexpi`. The **Case** menu s
 interfaces from one registry in `ui/src/interfaces.ts`. The safety interface runs the thirty-one
 scalar safety models across ten families, and the bow-tie, natively; the record-shaped models
 and the rupture, release and QRA families are listed with their manual pages and no native view
-yet. A HAZOP worksheet, a printable safety report, a flux-versus-distance chart and scenario
-bundles remain unbuilt.
+yet. Every safety calculation is browsable in the workspace's **Catalogue**, grouped by the
+family the library serves, with the status its shape earns and a link to its manual page. A
+HAZOP worksheet, a printable safety report, a flux-versus-distance chart and scenario bundles
+remain unbuilt.
 
 **Three holes in the checker closed on the way, and each was the same shape.** The checker
 verified units, ports, names and connections, and never that a value was *there*, was of the

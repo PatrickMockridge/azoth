@@ -64,10 +64,14 @@ The drawing's own **Case** menu is the way back to the other interfaces.
 ## The Safety interface
 
 The fourth interface, chosen from the **Case** menu, is a safety study: an overview of the
-study's bow-ties and scenarios, a bow-tie canvas with an inspector, and scenario cards for five
-native families — fire, dispersion, firewater, overpressure and risk. The document is
-TOML and rides every envelope; the door is `SafetyDoor` in `src/wire/session.ts`; the module
-implements it (`SafetyEditor`) and `azoth serve` offers the same calls at `POST /safety`.
+study's bow-ties and scenarios, a bow-tie canvas with an inspector, a **Catalogue** of all 96
+safety calculations across 23 families, and a scenario deck for each of the ten families that
+has one — fire, dispersion, equipment safety, firewater, relief, process safety systems, risk,
+safety assessment, vibration and depressurization. The tabs, the deck copy and the catalogue
+are drawn from the library's `safety_families` projection rather than a list in the front end.
+The document is TOML and rides every envelope; the door is `SafetyDoor` in
+`src/wire/session.ts`; the module implements it (`SafetyEditor`) and `azoth serve` offers the
+same calls at `POST /safety`.
 `test/fixtures/safety-envelope.json` is the CLI's `azoth safety --study specs/safety/demo.toml
 --calculate all` output and `test/currency.test.ts` recomputes it from the built module.
 
