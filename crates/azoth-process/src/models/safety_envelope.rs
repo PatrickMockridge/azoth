@@ -180,6 +180,12 @@ pub fn safety_envelope(
     operating_temperature: Option<ThermodynamicTemperature>,
     phase_trace: Option<&[EnvelopeTracePoint]>,
 ) -> Result<SafetyEnvelopeResult> {
+    if z.len() != components.len() || z.iter().any(|value| !value.is_finite()) {
+        return Err(AzothError::invalid_input(
+            "z",
+            "the composition needs one finite mole fraction per component",
+        ));
+    }
     let spec = &model_gen::SAFETY_ENVELOPE_SPEC;
     let mut warnings = Vec::new();
     apply_checks(

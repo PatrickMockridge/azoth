@@ -80,6 +80,11 @@ def _arrays(pressure: Any, z: Any, gp: Any) -> tuple[list[float], list[float], l
         raise InvalidInputError("pressure", "the history arrays are different lengths")
     if len(pressure_si) < 2:
         raise InvalidInputError("pressure", "at least two history points are required")
+    for index, value in enumerate(pressure_si):
+        if not math.isfinite(value) or value <= 0.0:
+            raise InvalidInputError(
+                f"pressure[{index}]", "a material balance pressure must be finite and positive"
+            )
     return pressure_si, z_values, gp_values
 
 

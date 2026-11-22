@@ -288,6 +288,14 @@ fn arrays3(
             "at least two history points are required",
         ));
     }
+    for (index, value) in pressure.iter().enumerate() {
+        if !value.is_finite() || *value <= 0.0 {
+            return Err(AzothError::invalid_input(
+                format!("pressure[{index}]"),
+                "a material balance pressure must be finite and positive",
+            ));
+        }
+    }
     Ok((pressure.to_vec(), z.to_vec(), gp.to_vec()))
 }
 

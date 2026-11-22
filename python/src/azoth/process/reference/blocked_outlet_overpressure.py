@@ -55,6 +55,8 @@ def _evaluate(
 ) -> tuple[_Solution, list[Warning]]:
     """The class's arithmetic over SI values; shared with the layer dumper."""
     spec = _spec()
+    if any(not math.isfinite(value) for value in initial_z):
+        raise InvalidInputError("initial_z", "an initial composition must be finite")
     relief = input_to_si(spec, "relief_set_pressure", relief_set_pressure)
     step = 1.0 if time_step is None else input_to_si(spec, "time_step", time_step)
     span = 3600.0 if max_time is None else input_to_si(spec, "max_time", max_time)

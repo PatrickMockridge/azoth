@@ -600,4 +600,14 @@ def _history(
         raise InvalidInputError("history_rate", "the times and rates are different lengths")
     if len(times) < 3:
         raise InvalidInputError("history_time", "a fit needs at least three points")
-    return [float(value) for value in times], [float(value) for value in rates]
+    schedule = [float(value) for value in times]
+    for index, value in enumerate(schedule):
+        if not math.isfinite(value) or value < 0.0:
+            raise InvalidInputError(
+                "history_time", "the history's times must be finite and non-negative"
+            )
+        if index > 0 and value <= schedule[index - 1]:
+            raise InvalidInputError(
+                "history_time", "the history's times must be strictly increasing"
+            )
+    return schedule, [float(value) for value in rates]

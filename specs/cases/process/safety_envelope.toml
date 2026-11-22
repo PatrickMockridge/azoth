@@ -20,10 +20,10 @@ envelopes = [
   { envelope = "mdmt", name = "MDMT", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
 ]
 queries = [
-  { envelope = "hydrate", temperature = 279.2637590766215, safe_temperature = 274.2637590766215, margin = 0.7362409233784888 },
-  { envelope = "wax" },
-  { envelope = "co2_freezing", temperature = 216.72928, safe_temperature = 213.72928, margin = 63.27071999999998 },
-  { envelope = "mdmt", temperature = 100.65856713118744, safe_temperature = 90.65856713118744, margin = 179.34143286881255 },
+  { envelope = "hydrate", temperature = 279.2637590766215, safe_temperature = 274.2637590766215, margin = 0.7362409233784888, safe = true },
+  { envelope = "wax", safe = true },
+  { envelope = "co2_freezing", temperature = 216.72928, safe_temperature = 213.72928, margin = 63.27071999999998, safe = true },
+  { envelope = "mdmt", temperature = 100.65856713118744, safe_temperature = 90.65856713118744, margin = 179.34143286881255, safe = true },
 ]
 most_limiting_envelope = "Hydrate Formation"
 [[cases]]
@@ -47,10 +47,10 @@ envelopes = [
   { envelope = "mdmt", name = "MDMT", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
 ]
 queries = [
-  { envelope = "hydrate" },
-  { envelope = "wax", temperature = 270.4277881823088, safe_temperature = 265.4277881823088, margin = -0.42778818230880233 },
-  { envelope = "co2_freezing", temperature = 211.36615023369686, safe_temperature = 208.36615023369686, margin = 58.63384976630314 },
-  { envelope = "mdmt", temperature = 299.9999931606415, safe_temperature = 289.9999931606415, margin = -29.99999316064151 },
+  { envelope = "hydrate", safe = true },
+  { envelope = "wax", temperature = 270.4277881823088, safe_temperature = 265.4277881823088, margin = -0.42778818230880233, safe = true },
+  { envelope = "co2_freezing", temperature = 211.36615023369686, safe_temperature = 208.36615023369686, margin = 58.63384976630314, safe = true },
+  { envelope = "mdmt", temperature = 299.9999931606415, safe_temperature = 289.9999931606415, margin = -29.99999316064151, safe = false },
 ]
 most_limiting_envelope = "MDMT"
 [[cases]]
@@ -82,10 +82,10 @@ envelopes = [
   { envelope = "phase_envelope", name = "Phase Envelope", point_count = 5.0, reference_water_content = 0.0, reference_wax_content = 0.0 },
 ]
 queries = [
-  { envelope = "hydrate" },
-  { envelope = "wax" },
-  { envelope = "co2_freezing", temperature = 216.60928, safe_temperature = 213.60928, margin = 33.39071999999999 },
-  { envelope = "mdmt", temperature = 151.08776935056537, safe_temperature = 141.08776935056537, margin = 98.91223064943463 },
-  { envelope = "phase_envelope" },
+  { envelope = "hydrate", safe = true },
+  { envelope = "wax", safe = true },
+  { envelope = "co2_freezing", temperature = 216.60928, safe_temperature = 213.60928, margin = 33.39071999999999, safe = true },
+  { envelope = "mdmt", temperature = 151.08776935056537, safe_temperature = 141.08776935056537, margin = 98.91223064943463, safe = true },
+  { envelope = "phase_envelope", safe = true },
 ]
 most_limiting_envelope = "CO2 Freezing"

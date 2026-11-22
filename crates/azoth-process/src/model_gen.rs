@@ -90147,11 +90147,21 @@ static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
                             name: "margin",
                             value: FieldValue::Number(0.7362409233784888),
                         },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
+                        },
                     ],
-                    &[RecordField {
-                        name: "envelope",
-                        value: FieldValue::Name("wax"),
-                    }],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("wax"),
+                        },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
                     &[
                         RecordField {
                             name: "envelope",
@@ -90168,6 +90178,10 @@ static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
                         RecordField {
                             name: "margin",
                             value: FieldValue::Number(63.27071999999998),
+                        },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
                         },
                     ],
                     &[
@@ -90186,6 +90200,10 @@ static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
                         RecordField {
                             name: "margin",
                             value: FieldValue::Number(179.34143286881255),
+                        },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
                         },
                     ],
                 ],
@@ -90315,10 +90333,16 @@ static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
             (
                 "queries",
                 &[
-                    &[RecordField {
-                        name: "envelope",
-                        value: FieldValue::Name("hydrate"),
-                    }],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("hydrate"),
+                        },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
                     &[
                         RecordField {
                             name: "envelope",
@@ -90335,6 +90359,10 @@ static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
                         RecordField {
                             name: "margin",
                             value: FieldValue::Number(-0.42778818230880233),
+                        },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
                         },
                     ],
                     &[
@@ -90354,6 +90382,10 @@ static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
                             name: "margin",
                             value: FieldValue::Number(58.63384976630314),
                         },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
+                        },
                     ],
                     &[
                         RecordField {
@@ -90371,6 +90403,10 @@ static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
                         RecordField {
                             name: "margin",
                             value: FieldValue::Number(-29.99999316064151),
+                        },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(false),
                         },
                     ],
                 ],
@@ -90573,14 +90609,26 @@ static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
             (
                 "queries",
                 &[
-                    &[RecordField {
-                        name: "envelope",
-                        value: FieldValue::Name("hydrate"),
-                    }],
-                    &[RecordField {
-                        name: "envelope",
-                        value: FieldValue::Name("wax"),
-                    }],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("hydrate"),
+                        },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("wax"),
+                        },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
                     &[
                         RecordField {
                             name: "envelope",
@@ -90597,6 +90645,10 @@ static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
                         RecordField {
                             name: "margin",
                             value: FieldValue::Number(33.39071999999999),
+                        },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
                         },
                     ],
                     &[
@@ -90616,11 +90668,21 @@ static SAFETY_ENVELOPE_CASES: &[TestCase] = &[
                             name: "margin",
                             value: FieldValue::Number(98.91223064943463),
                         },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
+                        },
                     ],
-                    &[RecordField {
-                        name: "envelope",
-                        value: FieldValue::Name("phase_envelope"),
-                    }],
+                    &[
+                        RecordField {
+                            name: "envelope",
+                            value: FieldValue::Name("phase_envelope"),
+                        },
+                        RecordField {
+                            name: "safe",
+                            value: FieldValue::Flag(true),
+                        },
+                    ],
                 ],
             ),
         ],
@@ -91332,6 +91394,14 @@ static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
                     name: "related_quantitative_sif_count",
                     value: FieldValue::Name("0.0"),
                 },
+                RecordField {
+                    name: "has_traceable_evidence",
+                    value: FieldValue::Flag(true),
+                },
+                RecordField {
+                    name: "finding_count",
+                    value: FieldValue::Number(0.0),
+                },
             ]],
         )],
     },
@@ -91709,6 +91779,14 @@ static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
                         name: "related_quantitative_sif_count",
                         value: FieldValue::Name("0.0"),
                     },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "finding_count",
+                        value: FieldValue::Number(0.0),
+                    },
                 ]],
             ),
             (
@@ -92058,6 +92136,14 @@ static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
                         name: "related_quantitative_sif_count",
                         value: FieldValue::Name("0.0"),
                     },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "finding_count",
+                        value: FieldValue::Number(4.0),
+                    },
                 ]],
             ),
             (
@@ -92373,6 +92459,14 @@ static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
                         name: "related_quantitative_sif_count",
                         value: FieldValue::Name("1.0"),
                     },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "finding_count",
+                        value: FieldValue::Number(3.0),
+                    },
                 ]],
             ),
             (
@@ -92468,6 +92562,10 @@ static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
                     RecordField {
                         name: "kind",
                         value: FieldValue::Name("quantitative"),
+                    },
+                    RecordField {
+                        name: "sil_achieved",
+                        value: FieldValue::Flag(true),
                     },
                 ]],
             ),
@@ -92660,6 +92758,14 @@ static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
                     RecordField {
                         name: "related_quantitative_sif_count",
                         value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "finding_count",
+                        value: FieldValue::Number(2.0),
                     },
                 ]],
             ),
@@ -93019,6 +93125,14 @@ static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
                             name: "related_quantitative_sif_count",
                             value: FieldValue::Name("0.0"),
                         },
+                        RecordField {
+                            name: "has_traceable_evidence",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "finding_count",
+                            value: FieldValue::Number(6.0),
+                        },
                     ],
                     &[
                         RecordField {
@@ -93060,6 +93174,14 @@ static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
                         RecordField {
                             name: "related_quantitative_sif_count",
                             value: FieldValue::Name("0.0"),
+                        },
+                        RecordField {
+                            name: "has_traceable_evidence",
+                            value: FieldValue::Flag(false),
+                        },
+                        RecordField {
+                            name: "finding_count",
+                            value: FieldValue::Number(6.0),
                         },
                     ],
                 ],
@@ -93643,6 +93765,14 @@ static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
                         name: "related_quantitative_sif_count",
                         value: FieldValue::Name("0.0"),
                     },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "finding_count",
+                        value: FieldValue::Number(5.0),
+                    },
                 ]],
             ),
             (
@@ -93954,6 +94084,14 @@ static SAFETY_SYSTEM_PERFORMANCE_CASES: &[TestCase] = &[
                     RecordField {
                         name: "related_quantitative_sif_count",
                         value: FieldValue::Name("0.0"),
+                    },
+                    RecordField {
+                        name: "has_traceable_evidence",
+                        value: FieldValue::Flag(true),
+                    },
+                    RecordField {
+                        name: "finding_count",
+                        value: FieldValue::Number(4.0),
                     },
                 ]],
             ),

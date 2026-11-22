@@ -326,6 +326,8 @@ def _evaluate(
 ) -> tuple[_Solution, list[Warning]]:
     spec = _spec()
     warnings: list[Warning] = []
+    if any(not math.isfinite(value) for value in initial_z):
+        raise InvalidInputError("initial_z", "an initial composition must be finite")
     initial_t_si = input_to_si(spec, "initial_t", initial_t)
     initial_p_si = input_to_si(spec, "initial_p", initial_p)
     volume = input_to_si(spec, "vessel_volume", vessel_volume)

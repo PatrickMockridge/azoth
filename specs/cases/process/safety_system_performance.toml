@@ -37,7 +37,7 @@ pass_count = 1.0
 warning_count = 0.0
 fail_count = 0.0
 assessments = [
-  { barrier_id = "B-DELUGE-001", barrier_name = "Deluge system", category = "firewater_deluge", verdict = "pass", barrier_status = "available", demand_id = "D-DELUGE-001", barrier_pfd = "0.00028", barrier_effectiveness = "0.95", performance_standard_id = "PS-B-DELUGE-001", target_pfd = "0.001", actual_pfd = "0.00028", required_availability = "0.99", actual_availability = "0.995", required_response_time_seconds = "45.0", actual_response_time_seconds = "30.0", required_effectiveness = "0.9", actual_effectiveness = "0.95", scenario = "Jet fire on V-101", demand_value = "10.0", capacity_value = "15.0", demand_unit = "L/min/m2", capacity_margin = "5.0", related_instrument_count = "0.0", related_sif_count = "0.0", related_quantitative_sif_count = "0.0" },
+  { barrier_id = "B-DELUGE-001", barrier_name = "Deluge system", category = "firewater_deluge", verdict = "pass", barrier_status = "available", demand_id = "D-DELUGE-001", barrier_pfd = "0.00028", barrier_effectiveness = "0.95", performance_standard_id = "PS-B-DELUGE-001", target_pfd = "0.001", actual_pfd = "0.00028", required_availability = "0.99", actual_availability = "0.995", required_response_time_seconds = "45.0", actual_response_time_seconds = "30.0", required_effectiveness = "0.9", actual_effectiveness = "0.95", scenario = "Jet fire on V-101", demand_value = "10.0", capacity_value = "15.0", demand_unit = "L/min/m2", capacity_margin = "5.0", related_instrument_count = "0.0", related_sif_count = "0.0", related_quantitative_sif_count = "0.0", has_traceable_evidence = true, finding_count = 0.0 },
 ]
 
 [[cases]]
@@ -91,7 +91,7 @@ pass_count = 1.0
 warning_count = 0.0
 fail_count = 0.0
 assessments = [
-  { barrier_id = "B-FGS-001", barrier_name = "Fire and gas detection", category = "fire_gas_detection", verdict = "pass", barrier_status = "available", demand_id = "D-FGS-001", barrier_pfd = "0.00028", barrier_effectiveness = "0.99972", performance_standard_id = "PS-B-FGS-001", target_pfd = "0.001", actual_pfd = "0.00028", required_availability = "0.99", actual_availability = "0.996", required_response_time_seconds = "20.0", actual_response_time_seconds = "10.0", related_instrument_count = "2.0", max_instrument_response_time_seconds = "8.0", related_sif_count = "1.0", related_quantitative_sif_count = "0.0" },
+  { barrier_id = "B-FGS-001", barrier_name = "Fire and gas detection", category = "fire_gas_detection", verdict = "pass", barrier_status = "available", demand_id = "D-FGS-001", barrier_pfd = "0.00028", barrier_effectiveness = "0.99972", performance_standard_id = "PS-B-FGS-001", target_pfd = "0.001", actual_pfd = "0.00028", required_availability = "0.99", actual_availability = "0.996", required_response_time_seconds = "20.0", actual_response_time_seconds = "10.0", related_instrument_count = "2.0", max_instrument_response_time_seconds = "8.0", related_sif_count = "1.0", related_quantitative_sif_count = "0.0", has_traceable_evidence = true, finding_count = 0.0 },
 ]
 instruments = [
   { barrier_id = "B-FGS-001", tag = "FD-101", demand_id = "D-FGS-001" },
@@ -138,7 +138,7 @@ pass_count = 0.0
 warning_count = 0.0
 fail_count = 1.0
 assessments = [
-  { barrier_id = "B-PFP-001", barrier_name = "Passive fire protection", category = "passive_fire_protection", verdict = "fail", barrier_status = "available", demand_id = "D-PFP-001", barrier_effectiveness = "0.8", performance_standard_id = "PS-B-PFP-001", required_availability = "0.99", required_response_time_seconds = "60.0", required_effectiveness = "0.9", actual_effectiveness = "0.8", scenario = "Jet fire thermal radiation at support steel", demand_value = "45.0", capacity_value = "37.5", demand_unit = "kW/m2", capacity_margin = "-7.5", related_instrument_count = "0.0", related_sif_count = "0.0", related_quantitative_sif_count = "0.0" },
+  { barrier_id = "B-PFP-001", barrier_name = "Passive fire protection", category = "passive_fire_protection", verdict = "fail", barrier_status = "available", demand_id = "D-PFP-001", barrier_effectiveness = "0.8", performance_standard_id = "PS-B-PFP-001", required_availability = "0.99", required_response_time_seconds = "60.0", required_effectiveness = "0.9", actual_effectiveness = "0.8", scenario = "Jet fire thermal radiation at support steel", demand_value = "45.0", capacity_value = "37.5", demand_unit = "kW/m2", capacity_margin = "-7.5", related_instrument_count = "0.0", related_sif_count = "0.0", related_quantitative_sif_count = "0.0", has_traceable_evidence = true, finding_count = 4.0 },
 ]
 findings = [
   { barrier_id = "B-PFP-001", rule = "required_availability_without_actual", severity = "warning", demand_id = "D-PFP-001" },
@@ -181,7 +181,7 @@ pass_count = 0.0
 warning_count = 1.0
 fail_count = 0.0
 assessments = [
-  { barrier_id = "B-SIF-101", barrier_name = "SIF shutdown", category = "unknown", verdict = "pass_with_warnings", barrier_status = "available", barrier_pfd = "0.0008", barrier_effectiveness = "0.9992", performance_standard_id = "PS-B-SIF-101", target_pfd = "0.001", actual_pfd = "0.0008", required_availability = "0.99", required_response_time_seconds = "60.0", related_instrument_count = "0.0", related_sif_count = "0.0", related_quantitative_sif_count = "1.0" },
+  { barrier_id = "B-SIF-101", barrier_name = "SIF shutdown", category = "unknown", verdict = "pass_with_warnings", barrier_status = "available", barrier_pfd = "0.0008", barrier_effectiveness = "0.9992", performance_standard_id = "PS-B-SIF-101", target_pfd = "0.001", actual_pfd = "0.0008", required_availability = "0.99", required_response_time_seconds = "60.0", related_instrument_count = "0.0", related_sif_count = "0.0", related_quantitative_sif_count = "1.0", has_traceable_evidence = true, finding_count = 3.0 },
 ]
 findings = [
   { barrier_id = "B-SIF-101", rule = "required_availability_without_actual", severity = "warning" },
@@ -189,7 +189,7 @@ findings = [
   { barrier_id = "B-SIF-101", rule = "quantitative_sif_verification_warning", severity = "warning" },
 ]
 sifs = [
-  { barrier_id = "B-SIF-101", identifier = "B-SIF-101 quantitative SIL", claimed_sil = "3.0", achieved_sil = "3.0", pfd_average = "0.0008", pfd_upper = "0.0012000000000000001", risk_reduction_factor = "1250.0", architecture = "1oo2", proof_test_interval_hours = "8760.0", protected_equipment_count = "1.0", kind = "quantitative" },
+  { barrier_id = "B-SIF-101", identifier = "B-SIF-101 quantitative SIL", claimed_sil = "3.0", achieved_sil = "3.0", pfd_average = "0.0008", pfd_upper = "0.0012000000000000001", risk_reduction_factor = "1250.0", architecture = "1oo2", proof_test_interval_hours = "8760.0", protected_equipment_count = "1.0", kind = "quantitative", sil_achieved = true },
 ]
 
 [[cases]]
@@ -220,7 +220,7 @@ pass_count = 0.0
 warning_count = 1.0
 fail_count = 0.0
 assessments = [
-  { barrier_id = "B-PSD-101", barrier_name = "PSD valve", category = "psd", verdict = "pass_with_warnings", barrier_status = "available", barrier_pfd = "0.0008", barrier_effectiveness = "0.9992", performance_standard_id = "PS-B-PSD-101", target_pfd = "0.001", actual_pfd = "0.0008", required_availability = "0.99", required_response_time_seconds = "60.0", related_instrument_count = "0.0", related_sif_count = "0.0", related_quantitative_sif_count = "0.0" },
+  { barrier_id = "B-PSD-101", barrier_name = "PSD valve", category = "psd", verdict = "pass_with_warnings", barrier_status = "available", barrier_pfd = "0.0008", barrier_effectiveness = "0.9992", performance_standard_id = "PS-B-PSD-101", target_pfd = "0.001", actual_pfd = "0.0008", required_availability = "0.99", required_response_time_seconds = "60.0", related_instrument_count = "0.0", related_sif_count = "0.0", related_quantitative_sif_count = "0.0", has_traceable_evidence = true, finding_count = 2.0 },
 ]
 findings = [
   { barrier_id = "B-PSD-101", rule = "required_availability_without_actual", severity = "warning" },
@@ -270,8 +270,8 @@ pass_count = 0.0
 warning_count = 0.0
 fail_count = 2.0
 assessments = [
-  { barrier_id = "B-RULES-101", barrier_name = "Rules barrier", category = "esd_blowdown", verdict = "fail", barrier_status = "out_of_service", demand_id = "D-RULES-101", scenario = "Loss of containment", demand_value = "10.0", capacity_value = "5.0", demand_unit = "kg/s", capacity_margin = "-5.0", related_instrument_count = "1.0", max_instrument_response_time_seconds = "30.0", related_sif_count = "1.0", related_quantitative_sif_count = "0.0" },
-  { barrier_id = "B-RULES-101", barrier_name = "Rules barrier", category = "esd_blowdown", verdict = "fail", barrier_status = "out_of_service", demand_id = "D-RULES-102", related_instrument_count = "1.0", max_instrument_response_time_seconds = "30.0", related_sif_count = "1.0", related_quantitative_sif_count = "0.0" },
+  { barrier_id = "B-RULES-101", barrier_name = "Rules barrier", category = "esd_blowdown", verdict = "fail", barrier_status = "out_of_service", demand_id = "D-RULES-101", scenario = "Loss of containment", demand_value = "10.0", capacity_value = "5.0", demand_unit = "kg/s", capacity_margin = "-5.0", related_instrument_count = "1.0", max_instrument_response_time_seconds = "30.0", related_sif_count = "1.0", related_quantitative_sif_count = "0.0", has_traceable_evidence = false, finding_count = 6.0 },
+  { barrier_id = "B-RULES-101", barrier_name = "Rules barrier", category = "esd_blowdown", verdict = "fail", barrier_status = "out_of_service", demand_id = "D-RULES-102", related_instrument_count = "1.0", max_instrument_response_time_seconds = "30.0", related_sif_count = "1.0", related_quantitative_sif_count = "0.0", has_traceable_evidence = false, finding_count = 6.0 },
 ]
 findings = [
   { barrier_id = "B-RULES-101", rule = "barrier_not_available", severity = "fail", demand_id = "D-RULES-101" },
@@ -332,7 +332,7 @@ pass_count = 0.0
 warning_count = 0.0
 fail_count = 1.0
 assessments = [
-  { barrier_id = "B-INST-001", barrier_name = "Gas detection", category = "fire_gas_detection", verdict = "fail", barrier_status = "available", barrier_pfd = "0.00028", barrier_effectiveness = "0.99972", performance_standard_id = "PS-B-INST-001", target_pfd = "0.001", actual_pfd = "0.00028", required_availability = "0.99", required_response_time_seconds = "60.0", related_instrument_count = "0.0", related_sif_count = "1.0", related_quantitative_sif_count = "0.0" },
+  { barrier_id = "B-INST-001", barrier_name = "Gas detection", category = "fire_gas_detection", verdict = "fail", barrier_status = "available", barrier_pfd = "0.00028", barrier_effectiveness = "0.99972", performance_standard_id = "PS-B-INST-001", target_pfd = "0.001", actual_pfd = "0.00028", required_availability = "0.99", required_response_time_seconds = "60.0", related_instrument_count = "0.0", related_sif_count = "1.0", related_quantitative_sif_count = "0.0", has_traceable_evidence = true, finding_count = 5.0 },
 ]
 findings = [
   { barrier_id = "B-INST-001", rule = "required_availability_without_actual", severity = "warning" },
@@ -379,7 +379,7 @@ pass_count = 0.0
 warning_count = 1.0
 fail_count = 0.0
 assessments = [
-  { barrier_id = "B-INF-001", barrier_name = "Bland barrier", category = "firewater_deluge", verdict = "pass_with_warnings", barrier_status = "available", performance_standard_id = "PS-INF-001", target_pfd = "0.001", required_availability = "0.99", required_response_time_seconds = "60.0", related_instrument_count = "0.0", related_sif_count = "0.0", related_quantitative_sif_count = "0.0" },
+  { barrier_id = "B-INF-001", barrier_name = "Bland barrier", category = "firewater_deluge", verdict = "pass_with_warnings", barrier_status = "available", performance_standard_id = "PS-INF-001", target_pfd = "0.001", required_availability = "0.99", required_response_time_seconds = "60.0", related_instrument_count = "0.0", related_sif_count = "0.0", related_quantitative_sif_count = "0.0", has_traceable_evidence = true, finding_count = 4.0 },
 ]
 findings = [
   { barrier_id = "B-INF-001", rule = "target_pfd_without_actual", severity = "warning" },

@@ -290,6 +290,8 @@ def _evaluate(
     mixture, ideal_gas = _components.mixture_of([str(name) for name in components], eos="pr")
     check_composition([float(value) for value in initial_z], len(mixture.components), "initial_z")
     z = [float(value) for value in initial_z]
+    if any(not math.isfinite(value) for value in initial_z):
+        raise InvalidInputError("initial_z", "an initial composition must be finite")
     molar_mass = molar_mass_of(mixture, z)
     evaluations = Evaluations()
     initial = flashed_state(

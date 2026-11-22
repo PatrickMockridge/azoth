@@ -195,6 +195,8 @@ def safety_envelope(
     mdmt_margin_value = 10.0 if mdmt_margin is None else _scalar(spec, "mdmt_margin", mdmt_margin)
     eos_name = "srk" if eos is None else eos
     names = [str(name) for name in components]
+    if len(z) != len(names) or any(not math.isfinite(value) for value in z):
+        raise InvalidInputError("z", "the composition needs one finite mole fraction per component")
     waters = [index for index, name in enumerate(names) if name.strip().lower() == "water"]
     water_content = float(z[waters[0]]) if waters else 0.0
 

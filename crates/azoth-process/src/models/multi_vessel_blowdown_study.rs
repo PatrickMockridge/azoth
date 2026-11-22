@@ -237,6 +237,14 @@ pub fn multi_vessel_blowdown_study(
 
     let (velocity, mach) = match header_diameter {
         Some(diameter) => {
+            if let Some(value) = header_pressure {
+                if !value.value.is_finite() || value.value <= 0.0 {
+                    return Err(AzothError::invalid_input(
+                        "header_pressure",
+                        "the header pressure must be positive",
+                    ));
+                }
+            }
             let pressure = header_pressure.map_or(1.5e5, |value| value.value);
             let temperature = header_temperature.map_or(288.15, |value| value.value);
             let molar_mass = header_molar_mass.map_or(0.020, |value| value.value);

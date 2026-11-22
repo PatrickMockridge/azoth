@@ -161,7 +161,7 @@ pub fn decline_curve(
         }
         "effective_to_nominal_annual" => {
             let d = required("d_effective", d_effective)?;
-            if !(0.0..1.0).contains(&d) {
+            if !(d > 0.0 && d < 1.0) {
                 return Err(AzothError::invalid_input(
                     "d_effective",
                     "the effective decline is a fraction strictly between 0 and 1",
@@ -519,6 +519,20 @@ fn history(times: Option<&[f64]>, rates: Option<&[f64]>) -> Result<(Vec<f64>, Ve
             "history_time",
             "a fit needs at least three points",
         ));
+    }
+    for index in 0..times.len() {
+        if !times[index].is_finite() || times[index] < 0.0 {
+            return Err(AzothError::invalid_input(
+                "history_time",
+                "the history's times must be finite and non-negative",
+            ));
+        }
+        if index > 0 && times[index] <= times[index - 1] {
+            return Err(AzothError::invalid_input(
+                "history_time",
+                "the history's times must be strictly increasing",
+            ));
+        }
     }
     Ok((times.to_vec(), rates.to_vec()))
 }

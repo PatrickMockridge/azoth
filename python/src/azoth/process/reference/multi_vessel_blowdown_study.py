@@ -153,6 +153,8 @@ def _evaluate(
             if header_pressure is None
             else input_to_si(spec, "header_pressure", header_pressure)
         )
+        if not math.isfinite(pressure) or pressure <= 0.0:
+            raise InvalidInputError("header_pressure", "the header pressure must be positive")
         temperature = (
             288.15
             if header_temperature is None
