@@ -486,6 +486,25 @@ def test_the_inside_out_strategies_land_on_the_captured_state() -> None:
         assert worst < 2.0e-5, f"{strategy} moved the state by {worst} K"
 
 
+def test_the_guarded_accelerators_report_the_solve_they_run() -> None:
+    """Wegstein is the class's unconditional guard onto direct substitution, and sum-rates is
+    its condenser guard onto damped; without a condenser the flow-corrected loop runs."""
+    direct = process.distillation_column(**_binary_args())
+    wegstein = process.distillation_column(**_binary_args(), solver_type="wegstein")
+    damped = process.distillation_column(**_binary_args(), solver_type="damped_substitution")
+    sum_rates = process.distillation_column(**_binary_args(), solver_type="sum_rates")
+
+    for expected, actual, name in (
+        (direct, wegstein, "wegstein"),
+        (damped, sum_rates, "sum_rates"),
+    ):
+        worst = max(
+            abs(float(a.to("K").magnitude) - float(b.to("K").magnitude))
+            for a, b in zip(expected.tray_temperature, actual.tray_temperature, strict=True)
+        )
+        assert worst < 1.0e-6, f"{name} moved the state by {worst} K"
+
+
 def test_a_swapped_pair_of_draw_vectors_is_a_different_column() -> None:
     """**Two of the three swapped, and the answer moves.** The gas and liquid vectors are both
     `dimensionless` vectors of the same length, so a transposition between them is exactly the

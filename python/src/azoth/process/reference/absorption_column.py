@@ -194,12 +194,10 @@ def absorption_column(
         "damped_substitution",
         "inside_out",
         "matrix_inside_out",
+        "wegstein",
+        "sum_rates",
         "naphtali_sandholm",
     ):
-        if solver_type == "wegstein":
-            raise _unported.refuse("solver_type=wegstein")
-        if solver_type == "sum_rates":
-            raise _unported.refuse("solver_type=sum_rates")
         if solver_type == "newton":
             raise _unported.refuse("solver_type=newton")
         if solver_type == "mesh_residual":

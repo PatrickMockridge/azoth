@@ -433,17 +433,54 @@ fn the_inside_out_strategies_reach_the_substitution_state() {
     }
 }
 
+/// **Wegstein is the class's unconditional guard onto direct substitution**, and sum-rates is
+/// its condenser guard onto damped; without a condenser the flow-corrected loop runs.
+#[test]
+fn the_guarded_accelerators_report_the_solve_they_run() {
+    let direct = distillation_column(&binary(SolverType::DirectSubstitution))
+        .expect("the direct solve converges");
+    let wegstein =
+        distillation_column(&binary(SolverType::Wegstein)).expect("the guarded Wegstein solves");
+    assert_eq!(wegstein.solver_used, SolverType::DirectSubstitution);
+    let spread = direct
+        .trays
+        .iter()
+        .zip(&wegstein.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(spread < 1.0e-9, "Wegstein moved the state by {spread} K");
+
+    let damped = distillation_column(&binary(SolverType::DampedSubstitution))
+        .expect("the damped solve converges");
+    let sum_rates =
+        distillation_column(&binary(SolverType::SumRates)).expect("the guarded sum-rates solves");
+    assert_eq!(sum_rates.solver_used, SolverType::DampedSubstitution);
+    let spread = damped
+        .trays
+        .iter()
+        .zip(&sum_rates.trays)
+        .map(|(a, b)| (a.temperature.value - b.temperature.value).abs())
+        .fold(0.0_f64, f64::max);
+    assert!(spread < 1.0e-9, "sum-rates moved the state by {spread} K");
+
+    // **Without a condenser the guard does not fire**, and the flow-corrected loop runs. The
+    // capture has no such row; the closure is what this holds.
+    let mut open = binary(SolverType::SumRates);
+    open.has_condenser = false;
+    open.condenser_temperature = None;
+    let out = distillation_column(&open).expect("the flow-corrected loop converges");
+    assert_eq!(out.solver_used, SolverType::SumRates);
+    assert!(out.mass_residual < 1.0e-6, "mass {}", out.mass_residual);
+}
+
 /// **Every strategy this port does not carry is refused with the class that would close it.**
 ///
-/// The five are `ColumnSolverFactory`'s own nested solvers, and the refusal names the one the
-/// caller asked for rather than the family: a caller who states `wegstein` is owed
-/// `WegsteinSolver`, not "the inside-out family". The boundary is the model layer, so this
-/// calls it rather than the kernel - the strategy never reaches the kernel at all.
+/// The three are `ColumnSolverFactory`'s own nested solvers, and the refusal names the one the
+/// caller asked for rather than the family. The boundary is the model layer, so this calls it
+/// rather than the kernel - the strategy never reaches the kernel at all.
 #[test]
 fn an_unported_strategy_is_refused_by_its_class() {
     for (strategy, class) in [
-        ("wegstein", "WegsteinSolver"),
-        ("sum_rates", "SumRatesSolver"),
         ("newton", "TemperatureNewtonSolver"),
         ("mesh_residual", "MeshResidualSolver"),
         ("auto", "AutoSolver"),

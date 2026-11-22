@@ -386,9 +386,9 @@ def _distillation_column_states(
             different correction.
         tray_murphree_efficiency: one override per stage, ``NaN`` where a stage falls through
             to ``murphree_efficiency``; a length that is not ``number_of_stages`` is refused.
-        solver_type: **``direct_substitution``, ``damped_substitution``, ``inside_out``,
-            ``matrix_inside_out`` and ``naphtali_sandholm`` are ported**; the class's default
-            is the first.
+        solver_type: **every strategy but ``newton``, ``mesh_residual`` and ``auto`` is
+            ported**; ``wegstein`` runs direct substitution and ``sum_rates`` runs damped
+            substitution wherever a condenser is present, as the class's guards do.
         top_specification_type: the top product's degree of freedom, one of
             :data:`SPECIFICATION_KINDS`; omitted, the top is pinned by temperature instead.
         top_specification_target: its target, in the unit its type implies: dimensionless for a
@@ -844,8 +844,8 @@ def distillation_column(
         condenser_temperature: the condenser's temperature, which pins the top tray.
         murphree_efficiency: the column-wide Murphree tray efficiency.
         tray_murphree_efficiency: one override per stage, ``NaN`` where a stage falls through.
-        solver_type: **``direct_substitution``, ``damped_substitution``, ``inside_out``,
-            ``matrix_inside_out`` and ``naphtali_sandholm`` are ported**.
+        solver_type: **every strategy but ``newton``, ``mesh_residual`` and ``auto`` is
+            ported**.
         top_specification_type: the top product's degree of freedom.
         top_specification_target: its target value.
         top_specification_component: the component a purity or a recovery constrains.
@@ -1690,6 +1690,54 @@ def _states(
 
         return took, temperature_residual
 
+    def sum_rates_sweep(temperatures: list[float]) -> tuple[int, float]:
+        """`solveSumRates`: the flow-corrected route for a column with no condenser.
+
+        The class guards this route onto damped substitution wherever a condenser is present,
+        so no distillation capture exercises the loop below; it is the absorber's route.
+        """
+        temperature_residual = float("inf")
+        took = 0
+        for iteration in range(1, max_iterations + 1):
+            took = iteration
+            old = [temperature(i) for i in range(tray_count)]
+
+            for i in range(feed_stage, 1, -1):
+                run_with(i - 1, inlets_of(i - 1, None))
+            if has_reboiler:
+                run_with(0, inlets_of(0, None))
+            for i in range(1, tray_count):
+                run_with(i, inlets_of(i, None))
+            for i in range(tray_count - 2, feed_stage - 1, -1):
+                run_with(i, inlets_of(i, None))
+
+            ratio_sum = 0.0
+            counted = 0
+            for i in range(tray_count):
+                total_out = mass_flow(gas[i]) + mass_flow(liquid[i])
+                total_in = sum(mass_flow(stream) for stream in inlets_of(i, None))
+                if total_in > 1.0e-12:
+                    ratio_sum += total_out / total_in
+                    counted += 1
+            average = ratio_sum / counted if counted else 1.0
+            correction = min(max(1.0 / average, 0.5), 1.5)
+            effective = min(max(0.7 * correction, MIN_TEMPERATURE_RELAXATION), 1.0)
+
+            total = 0.0
+            for i in range(tray_count):
+                updated = temperature(i)
+                if not math.isfinite(updated):
+                    updated = old[i]
+                new_temperature = old[i] + effective * (updated - old[i])
+                total += abs(new_temperature - old[i])
+                temperatures[i] = new_temperature
+            temperature_residual = total / tray_count
+
+            if temperature_residual <= temperature_tolerance:
+                break
+
+        return took, temperature_residual
+
     def product_of(level: int) -> StreamRecord:
         """The product an end publishes: the top's vapour, the bottom's liquid.
 
@@ -1715,10 +1763,19 @@ def _states(
         )
 
     initial_relaxation = 0.5 if solver_type == "damped_substitution" else 1.0
+    reported = solver_type or "direct_substitution"
+    if reported == "wegstein":
+        reported = "direct_substitution"
+    elif reported == "sum_rates" and has_condenser:
+        reported = "damped_substitution"
 
     def inner(temperatures: list[float]) -> tuple[int, float]:
         if solver_type in ("inside_out", "matrix_inside_out"):
             return inside_out_sweep(temperatures)
+        if solver_type == "wegstein":
+            return sweep(temperatures, 1.0)
+        if solver_type == "sum_rates":
+            return sweep(temperatures, 0.5) if has_condenser else sum_rates_sweep(temperatures)
         return sweep(temperatures, initial_relaxation)
 
     if adjustable():
@@ -1986,7 +2043,7 @@ def _states(
             tuple(stream["z"]) if (stream := liquid[i]) is not None else ()
             for i in range(tray_count)
         ),
-        solver_used=solver_type or "direct_substitution",
+        solver_used=reported,
         distillate_n=distillate["n"],
         distillate_z=tuple(distillate["z"]),
         distillate_h=distillate["h"],
@@ -2332,13 +2389,11 @@ def _refuse_unported(solver_type: str | None, murphree_efficiency: _Murphree | N
         "damped_substitution",
         "inside_out",
         "matrix_inside_out",
+        "wegstein",
+        "sum_rates",
         "naphtali_sandholm",
     ):
         return
-    if solver_type == "wegstein":
-        raise _unported.refuse("solver_type=wegstein")
-    if solver_type == "sum_rates":
-        raise _unported.refuse("solver_type=sum_rates")
     if solver_type == "newton":
         raise _unported.refuse("solver_type=newton")
     if solver_type == "mesh_residual":

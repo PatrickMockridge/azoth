@@ -143,18 +143,6 @@ use crate::unported::Unported;
 /// Every value this namespace's models declare as not carried.
 pub static UNPORTED: &[Unported] = &[
     Unported {
-        key: "solver_type=wegstein",
-        model: "process.absorption_column",
-        class: "WegsteinSolver",
-        capture: "validation/neqsim/captures/process_column_solvers.tsv",
-    },
-    Unported {
-        key: "solver_type=sum_rates",
-        model: "process.absorption_column",
-        class: "SumRatesSolver",
-        capture: "validation/neqsim/captures/process_column_solvers.tsv",
-    },
-    Unported {
         key: "solver_type=newton",
         model: "process.absorption_column",
         class: "TemperatureNewtonSolver",
@@ -195,18 +183,6 @@ pub static UNPORTED: &[Unported] = &[
         model: "process.distillation_column",
         class: "PackedColumnMechanicalDesign",
         capture: "validation/neqsim/captures/process_column_mechanical_design.tsv",
-    },
-    Unported {
-        key: "solver_type=wegstein",
-        model: "process.distillation_column",
-        class: "WegsteinSolver",
-        capture: "validation/neqsim/captures/process_column_solvers.tsv",
-    },
-    Unported {
-        key: "solver_type=sum_rates",
-        model: "process.distillation_column",
-        class: "SumRatesSolver",
-        capture: "validation/neqsim/captures/process_column_solvers.tsv",
     },
     Unported {
         key: "solver_type=newton",

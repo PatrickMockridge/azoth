@@ -1248,6 +1248,16 @@ fn solve_once(setup: &ColumnSetup) -> Result<ColumnOutcome> {
                 SolverType::InsideOut | SolverType::MatrixInsideOut => {
                     inside_out_sweep(net, setup, temperatures)
                 }
+                SolverType::Wegstein => direct_sweep(net, setup, temperatures),
+                SolverType::SumRates if setup.has_condenser => sequential_sweep(
+                    net,
+                    setup,
+                    temperatures,
+                    SequentialOptions {
+                        initial_relaxation: 0.5,
+                    },
+                ),
+                SolverType::SumRates => sum_rates_sweep(net, setup, temperatures),
                 _ => sequential_sweep(
                     net,
                     setup,
@@ -1449,7 +1459,7 @@ fn solve_once(setup: &ColumnSetup) -> Result<ColumnOutcome> {
         condenser_duty: watts(condenser_duty),
         reboiler_duty: watts(reboiler_duty),
         iterations,
-        solver_used: setup.solver_type,
+        solver_used: reported_strategy(setup),
         temperature_residual,
         mass_residual,
         energy_residual,
@@ -2227,6 +2237,98 @@ fn inside_out_sweep(
         }
     }
     Ok((iterations, temperature_residual))
+}
+
+/// `DistillationColumn.solveSumRates`: the flow-corrected substitute for a column with no
+/// condenser.
+///
+/// **The class guards this route onto damped substitution wherever a condenser is present**, so
+/// no distillation capture exercises the loop below - it is the absorber's route, and the only
+/// one of the ten with no binary row. The step is the unit-relaxation sweep at 0.7 scaled by
+/// `1 / average(totalOut / totalIn)` within `[0.5, 1.5]` (Burningham and Otto, 1967).
+fn sum_rates_sweep(
+    net: &mut Network,
+    setup: &ColumnSetup,
+    temperatures: &mut [f64],
+) -> Result<(u32, f64)> {
+    let first_feed = setup.feed_stage;
+    let tray_count = net.tray_count;
+    let mut temperature_residual = f64::INFINITY;
+    let mut iterations = 0_u32;
+
+    for iter in 1..=setup.max_iterations {
+        iterations = iter as u32;
+        let old: Vec<f64> = temperatures.to_vec();
+
+        for i in (2..=first_feed).rev() {
+            let inlets = net.inlets_of(i - 1);
+            net.run_with(i - 1, &inlets)?;
+        }
+        if setup.has_reboiler {
+            let inlets = net.inlets_of(0);
+            net.run_with(0, &inlets)?;
+        }
+        for i in 1..tray_count {
+            let inlets = net.inlets_of(i);
+            net.run_with(i, &inlets)?;
+        }
+        for i in (first_feed..tray_count.saturating_sub(1)).rev() {
+            let inlets = net.inlets_of(i);
+            net.run_with(i, &inlets)?;
+        }
+
+        let mut ratio_sum = 0.0;
+        let mut counted = 0_usize;
+        for i in 0..tray_count {
+            let gas = match net.gas[i].as_ref() {
+                Some(gas) => gas.mass_flow()?,
+                None => 0.0,
+            };
+            let liquid = match net.liquid[i].as_ref() {
+                Some(liquid) => liquid.mass_flow()?,
+                None => 0.0,
+            };
+            let mut total_in = 0.0;
+            for inlet in net.inlets_of(i) {
+                total_in += inlet.mass_flow()?;
+            }
+            if total_in > 1.0e-12 {
+                ratio_sum += (gas + liquid) / total_in;
+                counted += 1;
+            }
+        }
+        let average = if counted > 0 {
+            ratio_sum / counted as f64
+        } else {
+            1.0
+        };
+        let correction = (1.0 / average).clamp(0.5, 1.5);
+        let effective = (0.7 * correction).clamp(MIN_TEMPERATURE_RELAXATION, 1.0);
+
+        let mut sum = 0.0;
+        for i in 0..tray_count {
+            let updated = net.temperature(i);
+            let updated = if updated.is_finite() { updated } else { old[i] };
+            let new_temperature = old[i] + effective * (updated - old[i]);
+            sum += (new_temperature - old[i]).abs();
+            temperatures[i] = new_temperature;
+        }
+        temperature_residual = sum / tray_count as f64;
+
+        if temperature_residual <= setup.temperature_tolerance {
+            break;
+        }
+    }
+    Ok((iterations, temperature_residual))
+}
+
+/// The strategy the state reports, which the class's guards can route elsewhere.
+fn reported_strategy(setup: &ColumnSetup) -> SolverType {
+    match setup.solver_type {
+        SolverType::Wegstein => SolverType::DirectSubstitution,
+        SolverType::SumRates if setup.has_condenser => SolverType::DampedSubstitution,
+        other => other,
+    }
 }
 
 /// Whether any specification needs the outer loop, which is `hasAdjustableSpecifications`.
