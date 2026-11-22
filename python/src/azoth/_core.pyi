@@ -2492,7 +2492,7 @@ class CvdPoint:
     total_volume: Qty
     relative_volume: float
     cumulative_mole_fraction_depleted: float
-    material_balance_relative_error: float
+    material_balance_relative_error: float | None
     zmix: float
     z_gas: float | None
     liquid_volume: Qty | None

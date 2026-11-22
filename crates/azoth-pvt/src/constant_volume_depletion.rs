@@ -35,8 +35,9 @@ pub struct CvdPoint {
     pub relative_volume: f64,
     /// The fraction of the initial moles removed through this point.
     pub cumulative_mole_fraction_depleted: f64,
-    /// `|initial - remaining - removed|/initial` after restoration.
-    pub material_balance_relative_error: f64,
+    /// `|initial - remaining - removed|/initial` after restoration; absent where the
+    /// accounting is at round-off, below `1e-12`.
+    pub material_balance_relative_error: Option<f64>,
     /// The mixture's volume-corrected compressibility.
     pub zmix: f64,
     /// The gas phase's volume-corrected compressibility, when there is one.
@@ -132,8 +133,14 @@ pub fn constant_volume_depletion(
             total_volume,
             relative_volume: total_volume / saturation_volume,
             cumulative_mole_fraction_depleted: 1.0 - remaining / initial_moles,
-            material_balance_relative_error: (initial_moles - remaining - cumulative_removed).abs()
-                / initial_moles,
+            material_balance_relative_error: {
+                let error = (initial_moles - remaining - cumulative_removed).abs() / initial_moles;
+                // **A residual at machine epsilon is not a measurement.** The restore loop
+                // converges to `1e-8`; an error four orders below that is the sum of the
+                // additions, not the cell's accounting, so the row leaves it absent rather
+                // than inviting a relative comparison that divides by the vanishing value.
+                (error > 1.0e-12).then_some(error)
+            },
             zmix: flash.zvolcorr(),
             z_gas: flash.gas().map(|gas| phase_zvolcorr(gas, *pressure, t)),
             liquid_volume: oil.map(|oil| oil.volume(flash.total_moles)),

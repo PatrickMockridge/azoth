@@ -36,7 +36,7 @@ def test_the_saturation_and_the_restored_points_answer() -> None:
     point = result.points[3]
     assert point.relative_volume == pytest.approx(1.00000000001827, rel=1.0e-4)
     assert point.cumulative_mole_fraction_depleted == pytest.approx(0.06770259075210731, rel=1.0e-4)
-    assert point.material_balance_relative_error < 1.0e-12
+    assert point.material_balance_relative_error is None
     assert point.z_gas is not None
     assert point.z_gas == pytest.approx(0.9159261004210869, rel=1.0e-4)
     assert point.liquid_volume_relative_to_vsat == pytest.approx(0.9025692156128022, rel=1.0e-4)

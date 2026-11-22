@@ -45,7 +45,8 @@ fn the_saturation_and_the_first_restored_point_match_the_capture() {
         point.cumulative_mole_fraction_depleted,
         0.067_702_590_752_107_31
     ));
-    assert!(point.material_balance_relative_error <= 1.0e-12);
+    // The captured residual is 1e-17: the accounting is at round-off, so the row is absent.
+    assert!(point.material_balance_relative_error.is_none());
     assert!(close(point.zmix, 0.979_455_921_712_563_5));
     assert!(close(point.z_gas.unwrap(), 0.915_926_100_421_086_9));
     assert!(close(

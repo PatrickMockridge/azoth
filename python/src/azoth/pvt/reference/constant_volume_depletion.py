@@ -217,8 +217,12 @@ def constant_volume_depletion(
                 total_volume=quantity(total_volume, "m**3"),
                 relative_volume=total_volume / saturation_volume,
                 cumulative_mole_fraction_depleted=1.0 - remaining / initial_moles,
-                material_balance_relative_error=abs(initial_moles - remaining - cumulative_removed)
-                / initial_moles,
+                material_balance_relative_error=(
+                    None
+                    if abs(initial_moles - remaining - cumulative_removed) / initial_moles
+                    <= 1.0e-12
+                    else abs(initial_moles - remaining - cumulative_removed) / initial_moles
+                ),
                 zmix=flash.zvolcorr(),
                 z_gas=(None if gas is None else pressure * gas.molar_volume / (_volume.R * t)),
                 liquid_volume=(

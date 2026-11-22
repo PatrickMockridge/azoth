@@ -1176,9 +1176,9 @@ pub struct PyCvdPoint {
     /// the fraction of the feed's moles removed through this point.
     #[pyo3(get)]
     pub cumulative_mole_fraction_depleted: f64,
-    /// the absolute residual of initial = remaining + removed, over the initial amount.
+    /// the absolute residual of initial = remaining + removed, over the initial amount; absent where it is at round-off, below 1e-12.
     #[pyo3(get)]
-    pub material_balance_relative_error: f64,
+    pub material_balance_relative_error: Option<f64>,
     /// the mixture's volume-corrected compressibility.
     #[pyo3(get)]
     pub zmix: f64,
@@ -1197,7 +1197,7 @@ pub struct PyCvdPoint {
 impl PyCvdPoint {
     fn __repr__(&self) -> String {
         format!(
-            "CvdPoint(pressure={:?}, total_volume={:?}, relative_volume={}, cumulative_mole_fraction_depleted={}, material_balance_relative_error={}, zmix={}, z_gas={:?}, liquid_volume={:?}, liquid_volume_relative_to_vsat={:?})",
+            "CvdPoint(pressure={:?}, total_volume={:?}, relative_volume={}, cumulative_mole_fraction_depleted={}, material_balance_relative_error={:?}, zmix={}, z_gas={:?}, liquid_volume={:?}, liquid_volume_relative_to_vsat={:?})",
             self.pressure,
             self.total_volume,
             self.relative_volume,

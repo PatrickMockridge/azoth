@@ -174,6 +174,16 @@ KNOWN_SIGNATURE_DRIFT = frozenset(
         "ge_nrtl_flash",
         "ge_wilson_phase",
         "hydrogen_phase",
+        # The six laboratory ids whose spec threads its optional inputs between the required
+        # ones: `gen_stub` renders a Python `def` with the optional parameters last, while the
+        # `#[pyfunction]` keeps the kernel's order. Both are correct for their audience; the
+        # stub is the one a caller reads.
+        "constant_mass_expansion",
+        "constant_volume_depletion",
+        "differential_liberation",
+        "mmp",
+        "property_sweep",
+        "swelling_test",
     }
 )
 

@@ -173,7 +173,8 @@ unit = "dimensionless"
 description = "the fraction of the feed's moles removed through this point.\n"
 [outputs.points.fields.material_balance_relative_error]
 unit = "dimensionless"
-description = "the absolute residual of initial = remaining + removed, over the initial amount.\n"
+optional = true
+description = "the absolute residual of initial = remaining + removed, over the initial amount; absent where it is at round-off, below 1e-12.\n"
 [outputs.points.fields.zmix]
 unit = "dimensionless"
 description = "the mixture's volume-corrected compressibility.\n"

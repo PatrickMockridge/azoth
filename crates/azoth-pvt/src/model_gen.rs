@@ -2209,10 +2209,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                         value: FieldValue::Number(0.0),
                     },
                     RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(0.0),
-                    },
-                    RecordField {
                         name: "zmix",
                         value: FieldValue::Number(1.4039438826508663),
                     },
@@ -2244,10 +2240,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
-                        value: FieldValue::Number(0.0),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
                         value: FieldValue::Number(0.0),
                     },
                     RecordField {
@@ -2285,10 +2277,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                         value: FieldValue::Number(0.0),
                     },
                     RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(0.0),
-                    },
-                    RecordField {
                         name: "zmix",
                         value: FieldValue::Number(1.091009470731482),
                     },
@@ -2321,10 +2309,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
                         value: FieldValue::Number(0.06770259075210731),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(1.3877787807814457e-17),
                     },
                     RecordField {
                         name: "zmix",
@@ -2365,10 +2349,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                         value: FieldValue::Number(0.16788425495470505),
                     },
                     RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(0.0),
-                    },
-                    RecordField {
                         name: "zmix",
                         value: FieldValue::Number(0.8779011561366561),
                     },
@@ -2405,10 +2385,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
                         value: FieldValue::Number(0.28527827968929415),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(5.551115123125783e-17),
                     },
                     RecordField {
                         name: "zmix",
@@ -2449,10 +2425,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                         value: FieldValue::Number(0.4179929028208641),
                     },
                     RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(1.1102230246251565e-16),
-                    },
-                    RecordField {
                         name: "zmix",
                         value: FieldValue::Number(0.6275828749733094),
                     },
@@ -2489,10 +2461,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
                         value: FieldValue::Number(0.5597746791158184),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(2.220446049250313e-16),
                     },
                     RecordField {
                         name: "zmix",
@@ -2607,10 +2575,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                         value: FieldValue::Number(0.0),
                     },
                     RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(0.0),
-                    },
-                    RecordField {
                         name: "zmix",
                         value: FieldValue::Number(1.2062620310338485),
                     },
@@ -2642,10 +2606,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
-                        value: FieldValue::Number(0.0),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
                         value: FieldValue::Number(0.0),
                     },
                     RecordField {
@@ -2681,10 +2641,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
                         value: FieldValue::Number(0.08585504148262274),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(9.71445146547012e-17),
                     },
                     RecordField {
                         name: "zmix",
@@ -2725,10 +2681,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                         value: FieldValue::Number(0.1896985269712455),
                     },
                     RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(5.551115123125783e-17),
-                    },
-                    RecordField {
                         name: "zmix",
                         value: FieldValue::Number(0.8724247720210797),
                     },
@@ -2765,10 +2717,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
                         value: FieldValue::Number(0.30642133325595),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(1.1102230246251565e-16),
                     },
                     RecordField {
                         name: "zmix",
@@ -2809,10 +2757,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                         value: FieldValue::Number(0.4340106888903092),
                     },
                     RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(1.1102230246251565e-16),
-                    },
-                    RecordField {
                         name: "zmix",
                         value: FieldValue::Number(0.624505678810674),
                     },
@@ -2849,10 +2793,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
                         value: FieldValue::Number(0.568267639271921),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(1.1102230246251565e-16),
                     },
                     RecordField {
                         name: "zmix",
@@ -2967,10 +2907,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                         value: FieldValue::Number(0.0),
                     },
                     RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(0.0),
-                    },
-                    RecordField {
                         name: "zmix",
                         value: FieldValue::Number(1.219058121483566),
                     },
@@ -3002,10 +2938,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     },
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
-                        value: FieldValue::Number(0.0),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
                         value: FieldValue::Number(0.0),
                     },
                     RecordField {
@@ -3041,10 +2973,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
                         value: FieldValue::Number(0.04727002845965799),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(8.326672684688674e-17),
                     },
                     RecordField {
                         name: "zmix",
@@ -3085,10 +3013,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                         value: FieldValue::Number(0.16469030379410468),
                     },
                     RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(2.7755575615628914e-17),
-                    },
-                    RecordField {
                         name: "zmix",
                         value: FieldValue::Number(0.7486800163982705),
                     },
@@ -3127,10 +3051,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                         value: FieldValue::Number(0.3003893650506288),
                     },
                     RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(0.0),
-                    },
-                    RecordField {
                         name: "zmix",
                         value: FieldValue::Number(0.5959311706743343),
                     },
@@ -3167,10 +3087,6 @@ static CONSTANT_VOLUME_DEPLETION_CASES: &[TestCase] = &[
                     RecordField {
                         name: "cumulative_mole_fraction_depleted",
                         value: FieldValue::Number(0.44882137411023293),
-                    },
-                    RecordField {
-                        name: "material_balance_relative_error",
-                        value: FieldValue::Number(5.551115123125783e-17),
                     },
                     RecordField {
                         name: "zmix",

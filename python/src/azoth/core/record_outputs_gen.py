@@ -471,8 +471,8 @@ class CvdPoint:
     #: the fraction of the feed's moles removed through this point.
     cumulative_mole_fraction_depleted: float
 
-    #: the absolute residual of initial = remaining + removed, over the initial amount.
-    material_balance_relative_error: float
+    #: the absolute residual of initial = remaining + removed, over the initial amount; absent where it is at round-off, below 1e-12.
+    material_balance_relative_error: float | None
 
     #: the mixture's volume-corrected compressibility.
     zmix: float

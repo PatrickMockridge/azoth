@@ -181,11 +181,6 @@ _DIAGNOSTIC_FIELDS: frozenset[str] = frozenset(
 #: pinning them.
 _UNCOMPARED_FIELDS: frozenset[str] = frozenset(
     {
-        # `pvt.constant_volume_depletion`'s residual after the restore loop: a round-off
-        # identity `initial = remaining + removed`, so it is `1e-17` in both languages and a
-        # relative comparison divides by the vanishing value. The Rust capture test pins it
-        # below `1e-12`; a case expectation of a round-off is not a number to compare.
-        "material_balance_relative_error",
         "iterations",
         "error",
         "converged",
@@ -515,11 +510,6 @@ def assert_results_equal(
                     name = row_field.name
                     va, vb = getattr(ra, name), getattr(rb, name)
                     at = f"{context}.{field}[{index}].{name}"
-                    if name in _UNCOMPARED_FIELDS:
-                        # A row field the comparison deliberately leaves out - a round-off
-                        # residual - is one both sides must still have produced.
-                        assert va is not None and vb is not None, f"{at}: absent on one side"
-                        continue
                     if va is None or vb is None:
                         assert va is None and vb is None, f"{at}: one side is absent"
                     elif isinstance(va, pint.Quantity):
