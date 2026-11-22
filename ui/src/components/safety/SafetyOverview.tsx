@@ -1,87 +1,20 @@
 /**
  * The safety study's overview.
  *
- * **What this workspace can run, and what it can only point at.** The scenario decks and the
- * bow-tie run here; every other family is listed with its manual pages, because a card that
- * ran nothing would be a promise the workspace does not keep.
+ * **What this study holds, and where the whole surface lives.** The deck cards and the family
+ * index are drawn from the library's family registry, so a family the catalogue gains appears
+ * here without a second list; the Catalogue tab is where every calculation is browsable, with
+ * its status and its manual page.
  */
 
-import { calcManualUrl } from "../../manual";
 import type { Catalogue, SafetyEnvelope } from "../../wire/types";
-import type { SafetyView, ScenarioView } from "./views";
-
-const FAMILIES: { id: string; label: string }[] = [
-  { id: "api14c", label: "API 14C" },
-  { id: "barrier", label: "Barriers" },
-  { id: "compliance", label: "Compliance" },
-  { id: "dispersion", label: "Dispersion" },
-  { id: "equipmentsafety", label: "Equipment and system safety" },
-  { id: "fire", label: "Fire and explosion" },
-  { id: "firewater", label: "Firewater" },
-  { id: "hazid", label: "Hazard identification" },
-  { id: "overpressure", label: "Overpressure and relief" },
-  { id: "processsafetysystem", label: "Process safety systems" },
-  { id: "qra", label: "Quantitative risk" },
-  { id: "release", label: "Release" },
-  { id: "risk", label: "Risk and SIL" },
-  { id: "rupture", label: "Rupture" },
-  { id: "safetyassessment", label: "Safety assessment" },
-  { id: "selfheating", label: "Self-heating" },
-  { id: "vibration", label: "Vibration" },
-];
-
-const SCENARIO_CARDS: { id: ScenarioView; label: string; blurb: string }[] = [
-  {
-    id: "fire",
-    label: "Fire scenarios",
-    blurb: "Jet fire, pool fire, BLEVE, vapour-cloud explosion and passive fire protection.",
-  },
-  {
-    id: "dispersion",
-    label: "Dispersion scenarios",
-    blurb: "Gaussian plume, hazardous area, dense gas, probit and toxic thresholds.",
-  },
-  {
-    id: "equipmentsafety",
-    label: "Equipment safety scenarios",
-    blurb: "Gas blowby, pump deadhead, runaway reaction and minimum design metal temperature.",
-  },
-  {
-    id: "firewater",
-    label: "Firewater scenarios",
-    blurb: "Protection screening, deluge layout, monitor coverage and supply gates.",
-  },
-  {
-    id: "overpressure",
-    label: "Relief scenarios",
-    blurb: "Fire-case relief, relief-valve sizing, acceptance and pipeline protection.",
-  },
-  {
-    id: "processsafetysystem",
-    label: "Process safety systems",
-    blurb: "The NORSOK S-001 secondary-pressure protection screen.",
-  },
-  {
-    id: "risk",
-    label: "Risk scenarios",
-    blurb: "NOG 070 minimum SIL and the instrumented function's PFD arithmetic.",
-  },
-  {
-    id: "safetyassessment",
-    label: "Safety assessment",
-    blurb: "The Kletz inherent-safety index.",
-  },
-  {
-    id: "vibration",
-    label: "Vibration scenarios",
-    blurb: "Gas and liquid flow-induced vibration and acoustic-induced vibration.",
-  },
-];
+import type { SafetyView } from "./views";
 
 export function SafetyOverview({
   envelope,
   catalogue,
   onView,
+  onCatalogue,
   onBowtie,
   onScenario,
   onAddBowtie,
@@ -89,6 +22,7 @@ export function SafetyOverview({
   envelope: SafetyEnvelope;
   catalogue: Catalogue | null;
   onView: (view: SafetyView) => void;
+  onCatalogue: (family: string) => void;
   onBowtie: (id: string) => void;
   onScenario: (id: string) => void;
   onAddBowtie: () => void;
@@ -105,9 +39,11 @@ export function SafetyOverview({
   const errors = diagnostics.filter((entry) => entry.severity === "error");
   const warnings = diagnostics.filter((entry) => entry.severity === "warning");
   const entries = catalogue?.safety ?? [];
-  const nativeScenarios = entries.filter(
-    (entry) => entry.native && entry.form !== undefined,
-  ).length;
+  const families = catalogue?.safety_families ?? [];
+  const nativeScenarios = entries.filter((entry) => entry.form !== undefined).length;
+  const decks = families.flatMap((family) =>
+    family.deck === null ? [] : [{ family, deck: family.deck }],
+  );
 
   return (
     <div className="safety-overview">
@@ -128,23 +64,33 @@ export function SafetyOverview({
             </button>
           </div>
         </article>
-        {SCENARIO_CARDS.map((card) => {
-          const count = study.scenarios.filter(
-            (scenario) => scenario.family === card.id,
-          ).length;
-          return (
-            <article className="safety-card" key={card.id}>
-              <h2>{card.label}</h2>
-              <p className="safety-count">{count}</p>
-              <p>{card.blurb}</p>
-              <div className="safety-actions">
-                <button type="button" onClick={() => onView(card.id)}>
-                  Open the {card.label.toLowerCase()} view
-                </button>
-              </div>
-            </article>
-          );
-        })}
+        {decks.map(({ family, deck }) => (
+          <article className="safety-card" key={family.id}>
+            <h2>{deck.heading}</h2>
+            <p className="safety-count">
+              {study.scenarios.filter((scenario) => scenario.family === family.id).length}
+            </p>
+            <p>{family.blurb}</p>
+            <div className="safety-actions">
+              <button type="button" onClick={() => onView(family.id)}>
+                Open the {deck.heading.toLowerCase()} view
+              </button>
+            </div>
+          </article>
+        ))}
+        <article className="safety-card">
+          <h2>Safety catalogue</h2>
+          <p className="safety-count">{entries.length}</p>
+          <p>
+            {families.length} families; {nativeScenarios} scenario models and the bow-tie run
+            here. Every calculation is listed with its manual page.
+          </p>
+          <div className="safety-actions">
+            <button type="button" onClick={() => onView("catalogue")}>
+              Browse the catalogue
+            </button>
+          </div>
+        </article>
       </section>
 
       {study.bowties.length === 0 ? null : (
@@ -195,32 +141,21 @@ export function SafetyOverview({
         <h2>The safety surface</h2>
         <p className="note">
           Every calculation whose source is under <code>process/safety/</code>. {nativeScenarios}{" "}
-          scenario models and the bow-tie run here; the rest are not runnable in this workspace
-          yet, and their manual pages state the inputs, the valid range and the worked example.
+          scenario models and the bow-tie run here; the rest are listed with the refusal their
+          shape earns and a manual page. Choose a family to open the catalogue there.
         </p>
-        {FAMILIES.map((family) => {
-          const rows = entries.filter((entry) => entry.family === family.id);
-          return rows.length === 0 ? null : (
-            <div className="safety-family" key={family.id}>
-              <h3>{family.label}</h3>
-              <ul>
-                {rows.map((entry) => (
-                  <li key={entry.id}>
-                    <a
-                      href={calcManualUrl(entry.id)}
-                      target="_blank"
-                      rel="noreferrer"
-                      title="the generated manual page for this calculation"
-                    >
-                      {entry.name}
-                    </a>
-                    {entry.native ? <span className="safety-native">native here</span> : null}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
+        <ul className="safety-family-index">
+          {families.map((family) => (
+            <li key={family.id}>
+              <button type="button" onClick={() => onCatalogue(family.id)}>
+                <span>{family.label}</span>
+                <span className="safety-meta">
+                  {entries.filter((entry) => entry.family === family.id).length} calculations
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );

@@ -1,44 +1,36 @@
 /**
  * The safety workspace's views.
  *
- * **One union, one place.** The tab list, the overview cards and the routing all read the same
- * ten scenario family ids. A view is a reading of the one study, never a second document.
+ * **The registry is the catalogue's, not this file's.** A view is one of the three fixed
+ * readings — the overview, the catalogue, the bow-tie — or a family id the served registry gives
+ * a deck. The ten deck ids used to be a literal union here, which was a fifth copy of a list the
+ * library already states; a family it gains is now a tab with no edit in this file.
  */
 
-export const SCENARIO_VIEWS = [
-  "fire",
-  "dispersion",
-  "equipmentsafety",
-  "firewater",
-  "overpressure",
-  "processsafetysystem",
-  "risk",
-  "safetyassessment",
-  "vibration",
-  "depressurization",
-] as const;
+import type { SafetyDeck, SafetyFamily } from "../../wire/types";
 
-/** A family with a deck of scenario cards. */
-export type ScenarioView = (typeof SCENARIO_VIEWS)[number];
+/** The three readings every study has. */
+export type FixedSafetyView = "overview" | "catalogue" | "bowtie";
 
-/** Every reading of the study: the overview, the bow-tie, and the ten scenario decks. */
-export type SafetyView = "overview" | "bowtie" | ScenarioView;
+/** A view is a fixed reading or a family id; the registry decides which ids have a deck. */
+export type SafetyView = string;
 
-/** Whether a catalogue entry's `sub_interface` names a deck. */
-export function isScenarioView(value: string | null | undefined): value is ScenarioView {
-  switch (value) {
-    case "fire":
-    case "dispersion":
-    case "equipmentsafety":
-    case "firewater":
-    case "overpressure":
-    case "processsafetysystem":
-    case "risk":
-    case "safetyassessment":
-    case "vibration":
-    case "depressurization":
-      return true;
-    default:
-      return false;
+/** The family row and the deck copy for a view, or `null` when the view has no deck. */
+export function deckFamily(
+  id: string | null | undefined,
+  families: readonly SafetyFamily[],
+): { family: SafetyFamily; deck: SafetyDeck } | null {
+  const family = families.find((entry) => entry.id === id);
+  if (family === undefined || family.deck === null) {
+    return null;
   }
+  return { family, deck: family.deck };
+}
+
+/** Whether a view id names a family the registry gives a deck. */
+export function isDeck(
+  id: string | null | undefined,
+  families: readonly SafetyFamily[],
+): id is string {
+  return deckFamily(id, families) !== null;
 }

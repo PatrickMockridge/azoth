@@ -14,6 +14,7 @@
 
 .safety-views {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.25rem;
   padding: 0.5rem 0.75rem 0;
   border-bottom: 1px solid var(--line);
@@ -106,13 +107,144 @@
   gap: 0.75rem;
 }
 
-.safety-family ul {
+.safety-family-index {
   list-style: none;
   margin: 0;
   padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.35rem;
+}
+
+.safety-family-index button {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.safety-catalogue {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  overflow: auto;
+  align-content: start;
+}
+
+.safety-catalogue-head h2 {
+  margin: 0;
+}
+
+.safety-catalogue-tools {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 1rem;
+  align-items: center;
+  gap: 1rem;
+}
+
+.safety-catalogue-tools .calc-search {
+  flex: 1 1 18rem;
+}
+
+.safety-catalogue .safety-family-index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.safety-catalogue .safety-family-index button {
+  width: auto;
+}
+
+.safety-catalogue-families {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.safety-catalogue-family {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  scroll-margin-top: 0.5rem;
+}
+
+.safety-catalogue-family.focused {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+}
+
+.safety-catalogue-family-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.safety-catalogue-family-head h3 {
+  margin: 0;
+}
+
+.safety-catalogue-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.safety-calculation {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.safety-calculation-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.safety-calculation-head .safety-name {
+  font-weight: 600;
+}
+
+.safety-calculation-head code {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.safety-badge {
+  margin-left: auto;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.safety-badge.native {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+
+.safety-badge.listed {
+  color: var(--text-dim);
+}
+
+.safety-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .safety-native {
