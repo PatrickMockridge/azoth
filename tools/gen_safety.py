@@ -523,9 +523,7 @@ def check_families(specs: list[dict]) -> None:
         if deck is not None:
             for field in ("tab", "title", "heading", "search", "step"):
                 if not str(deck[field]).strip():
-                    raise SystemExit(
-                        f"gen_safety: the deck {entry['id']} has an empty {field}"
-                    )
+                    raise SystemExit(f"gen_safety: the deck {entry['id']} has an empty {field}")
         text = " ".join(
             str(value)
             for value in (

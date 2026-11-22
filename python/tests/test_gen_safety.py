@@ -238,7 +238,9 @@ def test_a_deck_with_no_native_scenario_is_refused() -> None:
     module: Any = tool()
     saved = tuple(module.NATIVE_SCENARIOS)
     module.NATIVE_SCENARIOS = tuple(
-        wanted for wanted in saved if not wanted.startswith("process.piping_fiv")
+        wanted
+        for wanted in saved
+        if not wanted.startswith("process.piping_fiv")
         and not wanted.startswith("process.acoustic_")
     )
     try:

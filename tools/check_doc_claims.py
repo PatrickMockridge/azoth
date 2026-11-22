@@ -185,9 +185,7 @@ def specs_ids() -> int:
 
 def _generated_safety() -> tuple[int, int]:
     """The safety calculations and families `gen_safety.py` emits."""
-    text = (ROOT / "crates" / "azoth-safety" / "src" / "forms_gen.rs").read_text(
-        encoding="utf-8"
-    )
+    text = (ROOT / "crates" / "azoth-safety" / "src" / "forms_gen.rs").read_text(encoding="utf-8")
     calculations = len(re.findall(r"^    SafetyCalculation \{", text, re.M))
     families = len(re.findall(r"^    SafetyFamily \{", text, re.M))
     return positive(calculations, "safety calculations"), positive(families, "safety families")
